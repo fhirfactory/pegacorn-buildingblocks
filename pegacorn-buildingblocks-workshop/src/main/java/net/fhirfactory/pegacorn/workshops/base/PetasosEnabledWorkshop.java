@@ -19,38 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.ask;
+package net.fhirfactory.pegacorn.workshops.base;
 
-public abstract class AskLadonServicesBase extends InternalFHIRClientServices {
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 
-    protected abstract String specifyLadonService();
-    protected abstract String specifyLadonProcessingPlant();
-    protected abstract String specifyLadonSubsystemName();
-    protected abstract String specifyLadonSubsystemVersion();
-    protected abstract String specifyLadonAskEndpointName();
-
-    @Override
-    protected String specifyFHIRServerService() {
-        return (specifyLadonService());
-    }
-
-    @Override
-    protected String specifyFHIRServerProcessingPlant() {
-        return (specifyLadonProcessingPlant());
-    }
-
-    @Override
-    protected String specifyFHIRServerSubsystemName() {
-        return (specifyLadonSubsystemName());
-    }
-
-    @Override
-    protected String specifyFHIRServerSubsystemVersion() {
-        return (specifyLadonSubsystemVersion());
-    }
-
-    @Override
-    protected String specifyFHIRServerServerEndpointName() {
-        return (specifyLadonAskEndpointName());
+public abstract class PetasosEnabledWorkshop extends Workshop{
+    protected TopologyNodeTypeEnum specifyWorkshopType(){
+        return(TopologyNodeTypeEnum.WORKSHOP);
     }
 }

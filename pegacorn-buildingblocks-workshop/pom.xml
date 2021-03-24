@@ -10,11 +10,11 @@
         <relativePath>../pegacorn-buildingblocks</relativePath>
     </parent>
 
-    <artifactId>pegacorn-buildingblocks-processingplant</artifactId>
+    <artifactId>pegacorn-buildingblocks-workshop</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: BuildingBlocks :: ProcessingPlant</name>
-    <description>The Archetype/Template for each Subsystem within the Pegacorn EcoSystem</description>
+    <name>Pegacorn :: BuildingBlocks :: Workshop</name>
+    <description>The Archetype/Template for each Workshop within the Pegacorn EcoSystem</description>
 
     <licenses>
         <license>

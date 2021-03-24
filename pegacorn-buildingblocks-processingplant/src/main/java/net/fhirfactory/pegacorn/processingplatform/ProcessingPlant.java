@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.processingplatform;
 
 import net.fhirfactory.pegacorn.components.model.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.properties.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
 import net.fhirfactory.pegacorn.deployment.topology.builders.PegacornSolutionBuilderInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.map.common.archetypes.common.PetasosEnabledSubsystemTopologyFactory;

@@ -16,9 +16,11 @@
     <description>The core subset of subsystem building blocks and services</description>
 
     <modules>
-        <module>../pegacorn-buildingblocks-processingplant</module>
+        <module>../pegacorn-buildingblocks-model</module>
+<!--        <module>../pegacorn-buildingblocks-processingplant</module>
         <module>../pegacorn-buildingblocks-edge</module>
-	<module>../pegacorn-buildingblocks-fhirim</module>
-	<module>../pegacorn-buildingblocks-model</module>
+        <module>../pegacorn-buildingblocks-fhirim</module>
+
+	<module>../pegacorn-buildingblocks-workshop</module> -->
     </modules>
 </project>

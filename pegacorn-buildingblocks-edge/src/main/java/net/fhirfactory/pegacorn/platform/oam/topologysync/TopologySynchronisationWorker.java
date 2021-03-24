@@ -19,38 +19,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.ask;
+package net.fhirfactory.pegacorn.platform.oam.topologysync;
 
-public abstract class AskLadonServicesBase extends InternalFHIRClientServices {
+import net.fhirfactory.pegacorn.oamwup.base.OAMWorkUnitProcessor;
+import net.fhirfactory.pegacorn.workshops.base.OAMWorkshop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    protected abstract String specifyLadonService();
-    protected abstract String specifyLadonProcessingPlant();
-    protected abstract String specifyLadonSubsystemName();
-    protected abstract String specifyLadonSubsystemVersion();
-    protected abstract String specifyLadonAskEndpointName();
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+@ApplicationScoped
+public class TopologySynchronisationWorker extends OAMWorkUnitProcessor {
+    private static final Logger LOG = LoggerFactory.getLogger(TopologySynchronisationWorker.class);
+    private static final String OAM_WUP_NAME = "OAM-WUP-TopologySynchronisationWorker";
+    private static final String OAM_WUP_VERSION = "1.0.0";
+
+    @Inject
+    private TopologySyncrhonisationWorkshop topologySyncrhonisationWorkshop;
 
     @Override
-    protected String specifyFHIRServerService() {
-        return (specifyLadonService());
+    protected Logger specifyLogger() {
+        return (LOG);
     }
 
     @Override
-    protected String specifyFHIRServerProcessingPlant() {
-        return (specifyLadonProcessingPlant());
+    protected String specifyOAMWUPName() {
+        return (OAM_WUP_NAME);
     }
 
     @Override
-    protected String specifyFHIRServerSubsystemName() {
-        return (specifyLadonSubsystemName());
+    protected String specifyOAMWUPVersion() {
+        return (OAM_WUP_VERSION);
     }
 
     @Override
-    protected String specifyFHIRServerSubsystemVersion() {
-        return (specifyLadonSubsystemVersion());
+    protected OAMWorkshop specifyOAMWorkshop() {
+        return (topologySyncrhonisationWorkshop);
     }
 
     @Override
-    protected String specifyFHIRServerServerEndpointName() {
-        return (specifyLadonAskEndpointName());
+    protected void invokePostConstructInitialisation() {
+
+    }
+
+    @Override
+    public void configure() throws Exception {
+
     }
 }

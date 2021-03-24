@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,38 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.ask;
+package net.fhirfactory.pegacorn.platform.oam.topologysync;
 
-public abstract class AskLadonServicesBase extends InternalFHIRClientServices {
+import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
 
-    protected abstract String specifyLadonService();
-    protected abstract String specifyLadonProcessingPlant();
-    protected abstract String specifyLadonSubsystemName();
-    protected abstract String specifyLadonSubsystemVersion();
-    protected abstract String specifyLadonAskEndpointName();
+import javax.enterprise.context.ApplicationScoped;
 
-    @Override
-    protected String specifyFHIRServerService() {
-        return (specifyLadonService());
-    }
+@ApplicationScoped
+public class TopologySynchronisationBroker{
 
-    @Override
-    protected String specifyFHIRServerProcessingPlant() {
-        return (specifyLadonProcessingPlant());
-    }
-
-    @Override
-    protected String specifyFHIRServerSubsystemName() {
-        return (specifyLadonSubsystemName());
-    }
-
-    @Override
-    protected String specifyFHIRServerSubsystemVersion() {
-        return (specifyLadonSubsystemVersion());
-    }
-
-    @Override
-    protected String specifyFHIRServerServerEndpointName() {
-        return (specifyLadonAskEndpointName());
+    public IPCInterface registerInterface(String channelName, IPCInterfaceDefinition interfaceDefinition){
+        IPCInterface newInterface = new IPCInterface();
+        newInterface.getSupportedInterfaceDefinitions().add(interfaceDefinition);
+        newInterface.setInstanceName(channelName);
+        // TODO add IPCEndpoint
+        return(newInterface);
     }
 }

@@ -19,38 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.ask;
+package net.fhirfactory.pegacorn.workshops;
 
-public abstract class AskLadonServicesBase extends InternalFHIRClientServices {
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    protected abstract String specifyLadonService();
-    protected abstract String specifyLadonProcessingPlant();
-    protected abstract String specifyLadonSubsystemName();
-    protected abstract String specifyLadonSubsystemVersion();
-    protected abstract String specifyLadonAskEndpointName();
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class EdgeWorkshop extends PetasosEnabledWorkshop {
+    private static final Logger LOG = LoggerFactory.getLogger(EdgeWorkshop.class);
 
     @Override
-    protected String specifyFHIRServerService() {
-        return (specifyLadonService());
+    protected Logger specifyLogger() {
+        return (LOG);
     }
 
     @Override
-    protected String specifyFHIRServerProcessingPlant() {
-        return (specifyLadonProcessingPlant());
+    protected String specifyWorkshopName() {
+        return (DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop());
     }
 
     @Override
-    protected String specifyFHIRServerSubsystemName() {
-        return (specifyLadonSubsystemName());
+    protected String specifyWorkshopVersion() {
+        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
     }
 
     @Override
-    protected String specifyFHIRServerSubsystemVersion() {
-        return (specifyLadonSubsystemVersion());
-    }
+    protected void invokePostConstructInitialisation() {
 
-    @Override
-    protected String specifyFHIRServerServerEndpointName() {
-        return (specifyLadonAskEndpointName());
     }
 }

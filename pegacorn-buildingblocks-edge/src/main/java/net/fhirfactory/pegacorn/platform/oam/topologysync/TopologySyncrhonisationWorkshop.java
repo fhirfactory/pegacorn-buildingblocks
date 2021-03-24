@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,38 +19,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.ask;
+package net.fhirfactory.pegacorn.platform.oam.topologysync;
 
-public abstract class AskLadonServicesBase extends InternalFHIRClientServices {
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.workshops.base.OAMWorkshop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    protected abstract String specifyLadonService();
-    protected abstract String specifyLadonProcessingPlant();
-    protected abstract String specifyLadonSubsystemName();
-    protected abstract String specifyLadonSubsystemVersion();
-    protected abstract String specifyLadonAskEndpointName();
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class TopologySyncrhonisationWorkshop extends OAMWorkshop {
+    private static final Logger LOG = LoggerFactory.getLogger(TopologySyncrhonisationWorkshop.class);
+    private static final String WORKSHOP_NAME="OAM-TopologySynchronisation";
+    private static final String WORKSHOP_VERSION="1.0.0";
 
     @Override
-    protected String specifyFHIRServerService() {
-        return (specifyLadonService());
+    protected Logger specifyLogger() {
+        return (LOG);
     }
 
     @Override
-    protected String specifyFHIRServerProcessingPlant() {
-        return (specifyLadonProcessingPlant());
+    protected String specifyWorkshopName() {
+        return (WORKSHOP_NAME);
     }
 
     @Override
-    protected String specifyFHIRServerSubsystemName() {
-        return (specifyLadonSubsystemName());
+    protected String specifyWorkshopVersion() {
+        return (WORKSHOP_VERSION);
     }
 
     @Override
-    protected String specifyFHIRServerSubsystemVersion() {
-        return (specifyLadonSubsystemVersion());
+    protected void invokePostConstructInitialisation() {
+
     }
 
     @Override
-    protected String specifyFHIRServerServerEndpointName() {
-        return (specifyLadonAskEndpointName());
+    protected TopologyNodeTypeEnum specifyWorkshopType() {
+        return (TopologyNodeTypeEnum.OAM_WORKSHOP);
     }
 }

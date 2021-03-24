@@ -10,7 +10,7 @@
         <relativePath>../pegacorn-buildingblocks</relativePath>
     </parent>
 
-    <artifactId>pegacorn-buildingblocks-edge</artifactId>
+    <artifactId>pegacorn-buildingblocks-model</artifactId>
     <packaging>jar</packaging>
 
     <name>Pegacorn :: BuildingBlocks :: Model</name>

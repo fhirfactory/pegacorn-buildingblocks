@@ -19,38 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.ask;
+package net.fhirfactory.pegacorn.platform.edge.messaging.forward.fhirall;
 
-public abstract class AskLadonServicesBase extends InternalFHIRClientServices {
+import java.util.HashSet;
+import java.util.Set;
 
-    protected abstract String specifyLadonService();
-    protected abstract String specifyLadonProcessingPlant();
-    protected abstract String specifyLadonSubsystemName();
-    protected abstract String specifyLadonSubsystemVersion();
-    protected abstract String specifyLadonAskEndpointName();
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
 
-    @Override
-    protected String specifyFHIRServerService() {
-        return (specifyLadonService());
-    }
+public abstract class DefaultFHIRBundleToLadonForwarder extends EdgeIPCForwarderWUPTemplate {
 
     @Override
-    protected String specifyFHIRServerProcessingPlant() {
-        return (specifyLadonProcessingPlant());
+    public Set<TopicToken> specifySubscriptionTopics() {
+        getLogger().debug(".specifySubscriptionTopics(): Entry");
+        HashSet<TopicToken> myTopicSet = new HashSet<TopicToken>();
+        TopicToken topicId = getFHIRTopicIDBuilder().createTopicToken("Bundle", "4.0.1");
+        topicId.addDescriminator("Destination", specifyTargetService());
+        myTopicSet.add(topicId);
+        getLogger().debug(".specifySubscriptionTopics(): Exit, added TopicToken --> {}", topicId);
+        return (myTopicSet);
     }
 
-    @Override
-    protected String specifyFHIRServerSubsystemName() {
-        return (specifyLadonSubsystemName());
-    }
-
-    @Override
-    protected String specifyFHIRServerSubsystemVersion() {
-        return (specifyLadonSubsystemVersion());
-    }
-
-    @Override
-    protected String specifyFHIRServerServerEndpointName() {
-        return (specifyLadonAskEndpointName());
-    }
 }

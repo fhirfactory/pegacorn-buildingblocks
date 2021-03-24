@@ -104,6 +104,14 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <!-- Pegacorn Deployment Topology -->
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-topology</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
         <!-- Pegacorn Common Code -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
@@ -123,15 +131,23 @@
         <!-- Pegacorn Petasos Topology Services -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-platform-petasos-topology</artifactId>
+            <artifactId>pegacorn-platform-petasos-core</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Petasos Topology Services -->
+        <!-- Pegacorn Building Blocks Edge -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-platform-petasos-core</artifactId>
+            <artifactId>pegacorn-buildingblocks-edge</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Pegacorn Building Blocks Edge -->
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-buildingblocks-processingplant</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
