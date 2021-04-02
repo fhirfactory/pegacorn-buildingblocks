@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,36 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.workshops;
+package net.fhirfactory.pegacorn.internals.directories.stub;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
-import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
+public abstract class GenericSTAServiceWUPTemplateStub {
 
-@ApplicationScoped
-public class EdgeWorkshop extends PetasosEnabledWorkshop {
-    private static final Logger LOG = LoggerFactory.getLogger(EdgeWorkshop.class);
-
-    @Override
-    protected Logger specifyLogger() {
-        return (LOG);
-    }
-
-    @Override
-    protected String specifyWorkshopName() {
-        return (DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop());
-    }
-
-    @Override
-    protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
-    }
-
-    @Override
-    protected void invokePostConstructInitialisation() {
-
-    }
+    abstract protected String specifySTAClientName();
+    abstract protected String specifySTAClientVersion();
+    abstract protected Logger getLogger();
+//    abstract protected WorkshopTopologyNode specifyWorkshop();
+//    abstract protected ProcessingPlantTopologyNode specifyProcessingPlant();
+//    abstract protected PegacornTopologyFactoryBase specifyTopologyFactory();
 }

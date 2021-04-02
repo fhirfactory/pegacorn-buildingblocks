@@ -17,6 +17,7 @@
 
     <modules>
         <module>../pegacorn-buildingblocks-model</module>
+	<module>../pegacorn-buildingblocks-directoryservices</module>
 <!--        <module>../pegacorn-buildingblocks-processingplant</module>
         <module>../pegacorn-buildingblocks-edge</module>
         <module>../pegacorn-buildingblocks-fhirim</module>
