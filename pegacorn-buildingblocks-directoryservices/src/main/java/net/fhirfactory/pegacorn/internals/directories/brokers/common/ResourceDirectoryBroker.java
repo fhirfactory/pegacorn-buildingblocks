@@ -29,9 +29,15 @@ import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.Identifi
 import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.PegId;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryInvalidSortException;
+import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public abstract class ResourceDirectoryBroker {
 
@@ -60,20 +66,6 @@ public abstract class ResourceDirectoryBroker {
             outcome.setStatus(DirectoryMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
             outcome.setId(entry.getId());
         }
-        getLogger().debug(".reviewDirectoryEntry(): Exit");
-        return(outcome);
-    }
-
-    public DirectoryMethodOutcome reviewDirectoryEntry(){
-        getLogger().debug(".reviewDirectoryEntry(): Entry (for unqualified get)");
-        ArrayList<PegacornDirectoryEntry> resultList = new ArrayList<>();
-        resultList.addAll(getCache().getCacheEntries().values());
-        for(PegacornDirectoryEntry currentEntry: resultList){
-            enrichWithDirectoryEntryTypeSpecificInformation(currentEntry);
-        }
-        DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
-        outcome.getSearchResult().addAll(resultList);
-        outcome.setSearchSuccessful(true);
         getLogger().debug(".reviewDirectoryEntry(): Exit");
         return(outcome);
     }
@@ -184,5 +176,75 @@ public abstract class ResourceDirectoryBroker {
             getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
             return (outcome);
         }
+    }
+
+    public DirectoryMethodOutcome doAttributeBasedSearch(Map<String, String> searchParameters,
+                                                         Integer paginationSize,
+                                                         Integer paginationNumber,
+                                                         String sortAttribute,
+                                                         Boolean sortAscendingOrder)
+            throws DirectoryEntryInvalidSortException, DirectoryEntryInvalidSearchException {
+        // Merely a pass-through at this time
+        DirectoryMethodOutcome outcome = getCache().doAttributeBasedSearch(searchParameters, paginationSize, paginationNumber, sortAttribute, sortAscendingOrder);
+        return(outcome);
+
+    }
+
+    public DirectoryMethodOutcome getSortedDirectoryEntrySet(String sortParameter, Boolean sortOrder) throws DirectoryEntryInvalidSortException{
+        // Merely a pass-through at this time
+        DirectoryMethodOutcome outcome = getCache().getSortedDirectoryEntrySet(sortParameter, sortOrder);
+        if(outcome.isSearchSuccessful()) {
+            for (PegacornDirectoryEntry currentEntry : outcome.getSearchResult()){
+                enrichWithDirectoryEntryTypeSpecificInformation(currentEntry);
+            }
+        }
+        return(outcome);
+    }
+
+    public DirectoryMethodOutcome getPaginatedSortedDirectoryEntrySet(Integer pageSize, Integer page, String sortParameter, Boolean sortOrder) throws DirectoryEntryInvalidSortException{
+        getLogger().info(".getPaginatedSortedDirectoryEntrySet(): Entry, pageSize --> {}, page --> {}, sortParameter --> {}, sortOrder --> {}", pageSize, page, sortParameter, sortOrder);
+        DirectoryMethodOutcome sortedEntrySet = getCache().getSortedDirectoryEntrySet(sortParameter, sortOrder);
+        if(pageSize == 0){
+            getLogger().info(".getPaginatedSortedDirectoryEntrySet(): Entry, pageSize is zero, so no pagination!");
+            return(sortedEntrySet);
+        }
+        DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
+        if(sortedEntrySet.isSearchSuccessful()) {
+            getLogger().info(".getPaginatedSortedDirectoryEntrySet(): we have content, so now let's paginate");
+            Integer locationOffsetStart = pageSize * page;
+            Integer numberOfEntries = sortedEntrySet.getSearchResult().size();
+            if(numberOfEntries > locationOffsetStart) {
+                for (Integer counter = 0; counter < pageSize; counter += 1) {
+                    Integer listLocation = locationOffsetStart + counter;
+                    if (listLocation < numberOfEntries) {
+                        PegacornDirectoryEntry currentEntry = sortedEntrySet.getSearchResult().get(listLocation);
+                        enrichWithDirectoryEntryTypeSpecificInformation(currentEntry);
+                        outcome.getSearchResult().add(counter,currentEntry);
+                    } else {
+                        break;
+                    }
+                }
+                outcome.setSearchSuccessful(true);
+            } else {
+                outcome.setSearchSuccessful(false);
+            }
+            outcome.setStatus(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+            outcome.setSearch(true);
+            return(outcome);
+        } else {
+            return (sortedEntrySet);
+        }
+    }
+
+    public DirectoryMethodOutcome getPaginatedUnsortedDirectoryEntrySet(Integer pageSize, Integer page) {
+        // Merely a pass-through at this time, just enriching each entry
+        DirectoryMethodOutcome retrievalOutcome = getCache().getPegIdSortedList(pageSize, page);
+        if(retrievalOutcome.isSearchSuccessful()){
+            DirectoryMethodOutcome outcome = getCache().getPegIdSortedList(pageSize, page);
+            for(PegacornDirectoryEntry currentEntry: retrievalOutcome.getSearchResult()){
+                enrichWithDirectoryEntryTypeSpecificInformation(currentEntry);
+            }
+        }
+        return(retrievalOutcome);
     }
 }

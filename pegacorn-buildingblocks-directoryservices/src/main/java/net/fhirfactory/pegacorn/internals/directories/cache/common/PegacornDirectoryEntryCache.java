@@ -4,8 +4,11 @@ import net.fhirfactory.pegacorn.internals.directories.entries.common.PegacornDir
 import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.IdentifierDE;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryInvalidSortException;
 import org.slf4j.Logger;
 
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class PegacornDirectoryEntryCache {
@@ -13,6 +16,14 @@ public abstract class PegacornDirectoryEntryCache {
     private ConcurrentHashMap<String, PegacornDirectoryEntry> cacheEntries;
 
     abstract protected Logger getLogger();
+
+    abstract public DirectoryMethodOutcome directoryEntrySpecificSearch(List<PegacornDirectoryEntry> sortedEntryList, Map<String, String> searchParameters, Integer paginationSize, Integer paginationNumber)
+            throws DirectoryEntryInvalidSortException, DirectoryEntryInvalidSearchException;
+
+    abstract public DirectoryMethodOutcome getSortedDirectoryEntrySet(String sortParameter, Boolean sortAscendingOrder)
+            throws DirectoryEntryInvalidSortException;
+
+    abstract protected Boolean isSupportiveOfSearchType(String attributeName);
 
     public PegacornDirectoryEntryCache(){
         cacheEntriesByIdentifier = new ConcurrentHashMap<>();
@@ -129,6 +140,90 @@ public abstract class PegacornDirectoryEntryCache {
         }
     }
 
+    public PegacornDirectoryEntry getCacheEntry(String id){
+        getLogger().info(".getCacheEntry(): Entry (using Id), id --> {}", id);
+        if(cacheEntries.isEmpty()){
+            getLogger().info(".getCacheEntry(): Exit, id is NULL, so exiting");
+            return(null);
+        }
+        if(cacheEntries.isEmpty()){
+            getLogger().info(".getCacheEntry(): Exit, Cache is empty, so exiting");
+            return(null);
+        }
+        PegacornDirectoryEntry entry = this.cacheEntries.get(id);
+        if(entry != null){
+            getLogger().info(".getCacheEntry(): Exit, entry found");
+            return(entry);
+        } else {
+            getLogger().info(".getCacheEntry(): Exit, entry not found");
+            return (null);
+        }
+    }
+
+    /**
+     * This is a VERY expensive function... :(
+     *
+     * @param identifierType
+     * @param orderAscending
+     * @return
+     */
+    public List<PegacornDirectoryEntry> getIdentifierSortedList(String identifierType, Boolean orderAscending){
+        getLogger().info(".getCacheEntry(): Entry (using Id), orderAscending --> {}", orderAscending);
+
+        // 1st, Let's get all the Identifiers that have the appropriate type
+        ArrayList<String> sortableValues = new ArrayList<>();
+        HashMap<String, IdentifierDE> sortableValuesMap = new HashMap<>();
+        Enumeration<IdentifierDE> identifiers = this.getCacheEntriesByIdentifier().keys();
+        while(identifiers.hasMoreElements()){
+            IdentifierDE currentIdentifier = identifiers.nextElement();
+            if(currentIdentifier.getType().equalsIgnoreCase(identifierType)) {
+                sortableValues.add(currentIdentifier.getValue());
+                sortableValuesMap.put(currentIdentifier.getValue(), currentIdentifier);
+            }
+        }
+        if(sortableValues.isEmpty()){
+            return(new ArrayList<>());
+        }
+
+        // Now, lets sort that list of values
+        Collections.sort(sortableValues);
+
+        // Now, lets create the newly sorted list of IdentifierDE List
+        ArrayList<PegacornDirectoryEntry> sortedList = new ArrayList<>();
+        Integer counter = 0;
+        for(String currentValue: sortableValues){
+            IdentifierDE currentIdentifier = sortableValuesMap.get(currentValue);
+            PegacornDirectoryEntry currentEntry = this.cacheEntriesByIdentifier.get(currentIdentifier);
+            sortedList.add(counter, currentEntry);
+            counter += 1;
+        }
+
+        // Now, let's add the DirectoryEntries that can't be sorted using this type --> this is expensive
+        Collection<PegacornDirectoryEntry> entrySet = this.cacheEntries.values();
+        for(PegacornDirectoryEntry currentEntry: entrySet){
+            if(!sortedList.contains(currentEntry)){
+                sortedList.add(counter, currentEntry);
+                counter += 1;
+            }
+        }
+
+        // Now, let's adjust the order of the sort
+        if(!orderAscending){
+            ArrayList<PegacornDirectoryEntry> orderDescendingList = new ArrayList<>();
+            Integer listSize = sortedList.size();
+            for(Integer counter2 = 0; counter2 < listSize; counter2 += 1){
+                orderDescendingList.set(counter2, sortedList.get(listSize-counter2-1));
+            }
+            return(orderDescendingList);
+        } else {
+            return (sortedList);
+        }
+    }
+
+    //
+    // Search Services
+    //
+
     public DirectoryMethodOutcome searchCacheForEntryUsingIdentifierDE(IdentifierDE identifier){
         getLogger().info("searchCacheForEntryUsingIdentifierDE(): Entry, identifier --> {}", identifier);
         // Fast lookup first
@@ -142,18 +237,25 @@ public abstract class PegacornDirectoryEntryCache {
             return(outcome);
         }
         // Now slow lookup
+        ArrayList<PegacornDirectoryEntry> slowScanResultSet = new ArrayList<>();
         for(PegacornDirectoryEntry currentEntry: cacheEntriesByIdentifier.values()){
             if(hasIdentifier(currentEntry, identifier)){
                 getLogger().info("searchCacheForEntryUsingIdentifierDE(): Exit, Entry found via parsing Identifier sets");
-                DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
-                outcome.setStatus(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
-                outcome.getSearchResult().add(currentEntry);
-                outcome.setSearchSuccessful(true);
-                return(outcome);
+                slowScanResultSet.add(currentEntry);
             }
         }
-        getLogger().info("searchCacheForEntryUsingIdentifierDE(): Exit, Entry not found");
-        return(null);
+        DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
+        outcome.setStatus(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+        outcome.getSearchResult().addAll(slowScanResultSet);
+        if(slowScanResultSet.isEmpty()) {
+            outcome.setSearchSuccessful(false);
+            getLogger().info("searchCacheForEntryUsingIdentifierDE(): No matching entries found");
+        } else {
+            outcome.setSearchSuccessful(true);
+            getLogger().info("searchCacheForEntryUsingIdentifierDE(): Matching entries found");
+        }
+        getLogger().info("searchCacheForEntryUsingIdentifierDE(): Exit");
+        return(outcome);
     }
 
     protected boolean hasIdentifier(PegacornDirectoryEntry testEntry, IdentifierDE testIdentifier){
@@ -176,23 +278,91 @@ public abstract class PegacornDirectoryEntryCache {
         }
     }
 
-    public PegacornDirectoryEntry getCacheEntry(String id){
-        getLogger().info(".getCacheEntry(): Entry (using Id), id --> {}", id);
-        if(cacheEntries.isEmpty()){
-            getLogger().info(".getCacheEntry(): Exit, id is NULL, so exiting");
-            return(null);
+    protected ArrayList<PegacornDirectoryEntry> reverseSortOrder(ArrayList<PegacornDirectoryEntry> originalOrderedList){
+        if(originalOrderedList == null){
+            return(new ArrayList<>());
         }
-        if(cacheEntries.isEmpty()){
-            getLogger().info(".getCacheEntry(): Exit, Cache is empty, so exiting");
-            return(null);
+
+        if(originalOrderedList.isEmpty()){
+            return(new ArrayList<>());
         }
-        PegacornDirectoryEntry entry = this.cacheEntries.get(id);
-        if(entry != null){
-            getLogger().info(".getCacheEntry(): Exit, entry found");
-            return(entry);
+        ArrayList<PegacornDirectoryEntry> resortedList = new ArrayList<>();
+        Integer size = originalOrderedList.size();
+        for(Integer counter = 0; counter < size; counter += 1){
+            Integer reverseLocation = (size - 1) - counter;
+            resortedList.add(counter, originalOrderedList.get(reverseLocation));
+        }
+        return(resortedList);
+    }
+
+    public DirectoryMethodOutcome doAttributeBasedSearch(Map<String, String> searchParameters,
+                                                         Integer paginationSize,
+                                                         Integer paginationNumber,
+                                                         String sortAttribute,
+                                                         Boolean sortAscendingOrder)
+            throws DirectoryEntryInvalidSortException, DirectoryEntryInvalidSearchException {
+
+        DirectoryMethodOutcome sortOutcome = null;
+        if(sortAttribute == null){
+            sortOutcome = new DirectoryMethodOutcome();
+            sortOutcome.getSearchResult().addAll(getCacheEntries().values());
+            sortOutcome.setSearch(true);
         } else {
-            getLogger().info(".getCacheEntry(): Exit, entry not found");
-            return (null);
+            sortOutcome = this.getSortedDirectoryEntrySet(sortAttribute, sortAscendingOrder);
+            sortOutcome.setSearch(true);
+        }
+        if(sortOutcome.getSearchResult().isEmpty()){
+            sortOutcome.setSearchSuccessful(false);
+            sortOutcome.setStatus(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+            return(sortOutcome);
+        }
+        DirectoryMethodOutcome outcome = this.directoryEntrySpecificSearch(sortOutcome.getSearchResult(),searchParameters,paginationSize, paginationNumber );
+        return(outcome);
+    }
+
+    public DirectoryMethodOutcome getPegIdSortedList(Integer pageSize, Integer page){
+        Collection<PegacornDirectoryEntry> allEntries = this.getCacheEntries().values();
+        if(allEntries.isEmpty()){
+            DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
+            outcome.setSearch(true);
+            outcome.setSearchSuccessful(false);
+            outcome.setStatus(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+            outcome.setStatusReason("No entries in cache");
+            return(outcome);
+        }
+        DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
+        ArrayList<PegacornDirectoryEntry> allEntriesList = new ArrayList<>();
+        for(PegacornDirectoryEntry current: allEntries){
+            allEntriesList.add(current);
+        }
+        Collections.sort(allEntriesList, PegacornDirectoryEntry.pegIdComparator);
+        if(pageSize > 0) {
+            Integer locationOffsetStart = pageSize * page;
+            Integer numberOfEntries = allEntries.size();
+            if (numberOfEntries < locationOffsetStart) {
+                for (Integer counter = 0; counter < pageSize; counter += 1) {
+                    Integer listLocation = locationOffsetStart + counter;
+                    if (listLocation < numberOfEntries) {
+                        PegacornDirectoryEntry currentEntry = allEntriesList.get(listLocation);
+                        outcome.getSearchResult().add(counter, currentEntry);
+                    } else {
+                        break;
+                    }
+                }
+                outcome.setSearchSuccessful(true);
+                outcome.setStatus(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+                return (outcome);
+            } else {
+                outcome.setSearchSuccessful(false);
+                outcome.setStatus(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+                outcome.setStatusReason("No entries in page range");
+                return (outcome);
+            }
+        } else {
+            outcome.getSearchResult().addAll(allEntries);
+            outcome.setSearchSuccessful(true);
+            outcome.setStatus(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+            return (outcome);
         }
     }
 }

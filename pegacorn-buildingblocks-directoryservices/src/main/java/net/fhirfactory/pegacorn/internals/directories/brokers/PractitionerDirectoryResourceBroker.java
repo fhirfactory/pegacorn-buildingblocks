@@ -21,10 +21,12 @@
  */
 package net.fhirfactory.pegacorn.internals.directories.brokers;
 
+import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.directories.brokers.common.ResourceDirectoryBroker;
 import net.fhirfactory.pegacorn.internals.directories.cache.LocalPractitionerCache;
 import net.fhirfactory.pegacorn.internals.directories.cache.common.PegacornDirectoryEntryCache;
 import net.fhirfactory.pegacorn.internals.directories.entries.GroupDirectoryEntry;
+import net.fhirfactory.pegacorn.internals.directories.entries.MatrixRoomDirectoryEntry;
 import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerDirectoryEntry;
 import net.fhirfactory.pegacorn.internals.directories.entries.common.PegacornDirectoryEntry;
 import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.IdentifierDE;
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.UUID;
 
 @ApplicationScoped
 public class PractitionerDirectoryResourceBroker extends ResourceDirectoryBroker {
@@ -47,6 +50,12 @@ public class PractitionerDirectoryResourceBroker extends ResourceDirectoryBroker
 
     @Inject
     private GroupDirectoryResourceBroker groupBroker;
+
+    @Inject
+    private SystemManagedRoomNames managedRoomNames;
+
+    @Inject
+    private MatrixRoomDirectoryResourceBroker matrixRoomDirectoryResourceBroker;
 
     @Override
     protected Logger getLogger(){
@@ -71,7 +80,8 @@ public class PractitionerDirectoryResourceBroker extends ResourceDirectoryBroker
         activePractitionerSet.setDisplayName("PractitionerRoles-Fulfilled-by-Practitioner-"+entry.getIdentifierWithType("EmailAddress").getValue());
         activePractitionerSet.getIdentifiers().add(entry.getIdentifierWithType("EmailAddress"));
         DirectoryMethodOutcome groupCreateOutcome = groupBroker.createGroup(activePractitionerSet);
-        getLogger().info(".createPractitioner(): Entry");
+        createSystemManagedMatrixRooms(entry);
+        getLogger().info(".createPractitioner(): Exit");
         return(outcome);
     }
 
@@ -143,16 +153,40 @@ public class PractitionerDirectoryResourceBroker extends ResourceDirectoryBroker
     //
     // Search (by Identifier)
     //
-    public DirectoryMethodOutcome searchForPractitionerUsingIdentifier(IdentifierDE identifier){
-        DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
-        PegacornDirectoryEntry entry = practitionerCache.searchForPractitioner(identifier);
-        if(entry == null){
-            outcome.setSearchSuccessful(false);
-        } else {
-            outcome.setSearchSuccessful(true);
-            outcome.getSearchResult().add(entry);
-            outcome.setId(entry.getId());
+
+    //
+    // Room Based Services
+    //
+
+    protected void createSystemManagedMatrixRooms(PractitionerDirectoryEntry practitioner){
+        if(practitioner == null){
+            return;
         }
-        return(outcome);
+        IdentifierDE practitionerIdentifier = practitioner.getIdentifierWithType("EmailAddress");
+        createSystemManagedMatrixRoom(practitionerIdentifier, managedRoomNames.getPractitionerCallRoom() );
+        createSystemManagedMatrixRoom(practitionerIdentifier, managedRoomNames.getPractitionerCodeNotificationsRoom());
+        createSystemManagedMatrixRoom(practitionerIdentifier, managedRoomNames.getPractitionerMediaRoom());
+        createSystemManagedMatrixRoom(practitionerIdentifier, managedRoomNames.getPractitionerCriticalResultsNotificationsRoom());
+        createSystemManagedMatrixRoom(practitionerIdentifier, managedRoomNames.getPractitionerSystemMessagesRoom());
+    }
+
+    protected void createSystemManagedMatrixRoom(IdentifierDE practitionerIdentifier, String privateRoomName){
+        IdentifierDE roomIdBasedIdentifier = new IdentifierDE();
+        roomIdBasedIdentifier.setUse(IdentifierDEUseEnum.USUAL);
+        roomIdBasedIdentifier.setType("room_id");
+        roomIdBasedIdentifier.setValue(UUID.randomUUID().toString());
+        IdentifierDE roomNameBasedIdentifier = new IdentifierDE();
+        String roomName = privateRoomName + "-" + practitionerIdentifier.getValue();
+        roomNameBasedIdentifier.setUse(IdentifierDEUseEnum.OFFICIAL);
+        roomNameBasedIdentifier.setValue(roomName);
+        roomNameBasedIdentifier.setType("RoomFullName");
+        MatrixRoomDirectoryEntry matrixRoom = new MatrixRoomDirectoryEntry();
+        matrixRoom.addIdentifier(roomIdBasedIdentifier);
+        matrixRoom.addIdentifier(roomNameBasedIdentifier);
+        matrixRoom.setRoomOwner(practitionerIdentifier);
+        matrixRoom.setSystemManaged(true);
+        matrixRoom.setDisplayName(privateRoomName);
+        matrixRoom.getRoomAlias().add(roomName);
+        matrixRoomDirectoryResourceBroker.createMatrixRoom(matrixRoom);
     }
 }

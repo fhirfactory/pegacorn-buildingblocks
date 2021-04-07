@@ -59,4 +59,14 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
         LOG.info(".update(): Exit, something has gone wrong.....");
         return("Hmmm... not good!");
     }
+
+    @Override
+    protected void printOutcome(DirectoryMethodOutcome outcome) {
+        if(outcome.isSearchSuccessful()){
+            for(Integer counter = 0; counter < outcome.getSearchResult().size(); counter += 1){
+                PractitionerRoleDirectoryEntry currentEntry = (PractitionerRoleDirectoryEntry)outcome.getSearchResult().get(counter);
+                getLogger().info("Info: Entry --> {} :: {}", currentEntry.getPrimaryRoleCategory(), currentEntry.getDisplayName() );
+            }
+        }
+    }
 }

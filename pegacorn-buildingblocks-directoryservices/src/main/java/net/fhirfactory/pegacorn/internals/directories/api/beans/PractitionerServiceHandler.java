@@ -7,6 +7,7 @@ import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBa
 import net.fhirfactory.pegacorn.internals.directories.brokers.PractitionerDirectoryResourceBroker;
 import net.fhirfactory.pegacorn.internals.directories.brokers.common.ResourceDirectoryBroker;
 import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerDirectoryEntry;
+import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerRoleDirectoryEntry;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryUpdateException;
@@ -67,5 +68,10 @@ public class PractitionerServiceHandler extends HandlerBase {
         }
         LOG.info(".update(): Exit, something has gone wrong.....");
         return("Hmmm... not good!");
+    }
+
+    @Override
+    protected void printOutcome(DirectoryMethodOutcome outcome) {
+
     }
 }

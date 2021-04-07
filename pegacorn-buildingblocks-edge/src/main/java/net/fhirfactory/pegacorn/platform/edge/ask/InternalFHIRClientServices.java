@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.inject.Inject;
 
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle.BundleContentHelper;
 import net.fhirfactory.pegacorn.platform.ipc.frameworks.restfulapi.InternalFHIRClientProxy;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -36,7 +37,6 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.datasets.fhir.r4.base.entities.bundle.BundleContentHelper;
 
 public abstract class InternalFHIRClientServices extends InternalFHIRClientProxy {
 

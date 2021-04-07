@@ -7,6 +7,7 @@ import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBa
 import net.fhirfactory.pegacorn.internals.directories.brokers.GroupDirectoryResourceBroker;
 import net.fhirfactory.pegacorn.internals.directories.brokers.common.ResourceDirectoryBroker;
 import net.fhirfactory.pegacorn.internals.directories.entries.GroupDirectoryEntry;
+import net.fhirfactory.pegacorn.internals.directories.entries.common.PegacornDirectoryEntry;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryUpdateException;
@@ -16,6 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Dependent
 public class GroupServiceHandler extends HandlerBase {
@@ -59,4 +63,8 @@ public class GroupServiceHandler extends HandlerBase {
         LOG.info(".update(): Exit, something has gone wrong.....");
         return("Hmmm... not good!");
     }
+
+    @Override
+    protected void printOutcome(DirectoryMethodOutcome outcome) {}
+
 }

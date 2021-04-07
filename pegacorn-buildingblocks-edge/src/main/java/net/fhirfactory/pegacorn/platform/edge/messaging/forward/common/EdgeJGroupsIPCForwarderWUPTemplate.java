@@ -21,15 +21,6 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.forward.common;
 
-
-import net.fhirfactory.pegacorn.petasos.ipc.beans.sender.InterProcessingPlantHandoverFinisherBean;
-import net.fhirfactory.pegacorn.petasos.ipc.beans.sender.InterProcessingPlantHandoverPacketEncoderBean;
-import net.fhirfactory.pegacorn.petasos.ipc.beans.sender.InterProcessingPlantHandoverPacketGenerationBean;
-import net.fhirfactory.pegacorn.petasos.ipc.beans.sender.InterProcessingPlantHandoverPacketResponseDecoder;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
-import net.fhirfactory.pegacorn.petasos.model.topology.EndpointElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementTypeEnum;
 import net.fhirfactory.pegacorn.petasos.wup.archetypes.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.CamelContext;
 import org.apache.camel.LoggingLevel;
@@ -52,19 +43,12 @@ public abstract class EdgeJGroupsIPCForwarderWUPTemplate extends EdgeEgressMessa
     
     @Override
     public void configure() throws Exception {
-        getLogger().info("EdgeIPCForwarderWUPTemplate :: WUPIngresPoint/ingresFeed --> {}", this.ingresFeed());
-        getLogger().info("EdgeIPCForwarderWUPTemplate :: WUPEgressPoint/egressFeed --> {}", this.egressFeed());
+        getLogger().info("EdgeIPCForwarderWUPTemplate :: WUPIngresPoint/ingresFeed --> {}", this.getIngresTopologyEndpoint().getEndpointSpecification());
+        getLogger().info("EdgeIPCForwarderWUPTemplate :: WUPEgressPoint/egressFeed --> {}", this.getEgressTopologyEndpoint().getEndpointSpecification());
 
-        fromWithStandardExceptionHandling(ingresFeed())
+        fromWithStandardExceptionHandling(this.getIngresTopologyEndpoint().getEndpointSpecification())
                 .routeId(getNameSet().getRouteCoreWUP())
-                .log(LoggingLevel.DEBUG, "Raw Content to be Forwarded --> ${body}")
-                .bean(InterProcessingPlantHandoverPacketGenerationBean.class, "constructInterProcessingPlantHandoverPacket(*,  Exchange," + this.getWUPTopologyNode().extractNodeKey() + ")")
-                .bean(InterProcessingPlantHandoverPacketEncoderBean.class, "handoverPacketEncode")
-                .to(specifyEgressEndpoint())
-                .transform(simple("${bodyAs(String)}"))
-                .log(LoggingLevel.DEBUG, "Response Raw Message --> ${body}")
-                .bean(InterProcessingPlantHandoverPacketResponseDecoder.class, "contextualiseInterProcessingPlantHandoverResponsePacket(*,  Exchange," + this.getWUPTopologyNode().extractNodeKey() + ")")
-                .bean(InterProcessingPlantHandoverFinisherBean.class, "ipcSenderNotifyActivityFinished(*, Exchange," + this.getWUPTopologyNode().extractNodeKey() + ")");
+                .log(LoggingLevel.DEBUG, "Raw Content to be Forwarded --> ${body}");
     }
 
     protected abstract String specifyTargetSubsystem();
@@ -74,26 +58,5 @@ public abstract class EdgeJGroupsIPCForwarderWUPTemplate extends EdgeEgressMessa
     protected abstract String specifyTargetService();
     protected abstract String specifyTargetProcessingPlant();
 
-    @Override
-    protected String deriveTargetEndpointDetails(){
-        getLogger().debug(".deriveTargetEndpointDetails(): Entry");
-        getLogger().trace(".deriveTargetEndpointDetails(): Target Subsystem Name --> {}, Target Subsystem Version --> {}", specifyTargetSubsystem(), specifyTargetSubsystemVersion());
-        NodeElement targetSubsystem = getTopologyIM().getNode(specifyTargetSubsystem(), NodeElementTypeEnum.SUBSYSTEM, specifyTargetSubsystemVersion());
-        getLogger().trace(".deriveTargetEndpointDetails(): Target Subsystem (NodeElement) --> {}", targetSubsystem);
-        NodeElement targetNode;
-                getLogger().info(".deriveTargetEndpointDetails(): Connecting to published Kubernetes-Site");
-                targetNode = getTopologyIM().getNode(specifyTargetService(), NodeElementTypeEnum.CLUSTER_SERVICE, specifyTargetSubsystemVersion());
-        getLogger().trace(".deriveTargetEndpointDetails(): targetNode --> {}", targetNode);
-        getLogger().trace(".deriveTargetEndpointDetails(): targetEndpointName --> {}, targetEndpointVersion --> {}", specifyTargetEndpointName(), specifyTargetEndpointVersion());
-        EndpointElement endpoint = getTopologyIM().getEndpoint(targetNode, specifyTargetEndpointName(), specifyTargetEndpointVersion());
-        getLogger().trace(".deriveTargetEndpointDetails(): targetEndpoint (EndpointElement) --> {}", endpoint);
-        String endpointDetails = endpoint.getExposedHostname() + ":" + endpoint.getExposedPort();
-        getLogger().debug(".deriveTargetEndpointDetails(): Exit, endpointDetails --> {}", endpointDetails);
-        return(endpointDetails);
-    }
 
-    @Override
-    protected String specifyWUPWorkshop(){
-        return(DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop());
-    }
 }

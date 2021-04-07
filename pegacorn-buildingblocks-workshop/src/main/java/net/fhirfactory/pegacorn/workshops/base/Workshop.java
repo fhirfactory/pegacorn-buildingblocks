@@ -21,15 +21,14 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.model.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.model.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.map.common.archetypes.common.PetasosEnabledSubsystemTopologyFactory;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
-
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;

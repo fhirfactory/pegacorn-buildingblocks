@@ -47,8 +47,8 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     @Inject
     private TopologyIM topologyIM;
 
-    @Inject
-    private PegacornSolutionBuilderInterface topologyBuilder;
+//    @Inject
+//    private PegacornSolutionBuilderInterface topologyBuilder;
 
 //    abstract protected LadonPropertyNamesBase specifyBaseLadonNames();
 
@@ -70,7 +70,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     private void initialise() {
         if (!isInitialised) {
             getLogger().debug("StandardProcessingPlatform::initialise(): Invoked!");
-            topologyBuilder.initialiseSubsystemTopology();
+//            topologyBuilder.initialiseSubsystemTopology();
             getLogger().trace("StandardProcessingPlatform::initialise(): Building Workshops");
             isInitialised = true;
         }
@@ -86,9 +86,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return (topologyIM);
     }
 
-    public PegacornSolutionBuilderInterface getTopologyBuilder() {
-        return (this.topologyBuilder);
-    }
+//    public PegacornSolutionBuilderInterface getTopologyBuilder() {
+//        return (this.topologyBuilder);
+//    }
 
 //    public LadonPropertyNamesBase getBaseLadonNames() {
 //        return (specifyBaseLadonNames());

@@ -1,7 +1,6 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.receive;
 
-import net.fhirfactory.pegacorn.petasos.ipc.beans.receiver.*;
-import net.fhirfactory.pegacorn.petasos.ipc.codecs.IPCPacketDecoderInitializerFactory;
+
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.petasos.wup.archetypes.EdgeIngresMessagingGatewayWUP;
 import org.apache.camel.CamelContext;

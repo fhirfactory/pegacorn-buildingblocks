@@ -112,7 +112,14 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-
+        <!-- Pegacorn Building Blocks Datamodels Components -->
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-buildingblocks-datamodels-components</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
         <!-- Infinispan -->
         <dependency>
             <groupId>org.infinispan</groupId>
@@ -140,11 +147,18 @@
             <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
 
-        <!-- This dependency is for the HAPI-FHIR Server -->
+        <!-- This dependency is for the HAPI-FHIR Client -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-client</artifactId>
             <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+
+        <!-- This dependency is for the HAPI-FHIR Client -->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-server</artifactId>
+            <version>5.1.0</version>
         </dependency>
 
         <!-- At least one "structures" JAR must also be included -->
@@ -170,39 +184,7 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.arquillian</groupId>
-            <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <scope>test</scope>
-            <version>${version-org.wildfly.arquillian-wildfly-arquillian-container-managed}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.shrinkwrap.resolver</groupId>
-            <artifactId>shrinkwrap-resolver-depchain</artifactId>
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-server</artifactId>
-            <version>5.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-edge</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
     <distributionManagement>
@@ -225,6 +207,7 @@
             </plugin>
             <!--Build configuration for the WAR plugin: -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${version-org.apache.maven-war-plugin}</version>
                 <configuration>
@@ -239,6 +222,7 @@
                 <version>${version-org.apache.maven-surefire-plugin}</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${version-org.apache.maven-failsafe-plugin}</version>
             </plugin>

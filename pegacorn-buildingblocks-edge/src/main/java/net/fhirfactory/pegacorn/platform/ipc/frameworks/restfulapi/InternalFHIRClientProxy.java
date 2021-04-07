@@ -22,14 +22,16 @@
 package net.fhirfactory.pegacorn.platform.ipc.frameworks.restfulapi;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.datasets.PegacornReferenceProperties;
+
 import net.fhirfactory.pegacorn.deployment.names.common.SiteKeyNames;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.map.helpers.TopologyMapTraversalHelpers;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.IPCEndpoint;
+
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.*;
+import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;

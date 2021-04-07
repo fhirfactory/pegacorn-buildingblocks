@@ -82,14 +82,20 @@ public class PractitionerDirectoryAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
         from("direct:PractitionerPOST")
-                .log(LoggingLevel.INFO, "POST Request --> ${body}");
+                .log(LoggingLevel.INFO, "POST Request --> ${body}")
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
+                .setBody(simple("Action not support for this Directory Entry"));
 
         from("direct:PractitionerPUT")
                 .bean(practitionerServiceHandler, "update")
-                .log(LoggingLevel.INFO, "PUT Request --> ${body}");
+                .log(LoggingLevel.INFO, "PUT Request --> ${body}")
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
+                .setBody(simple("Action not support for this Directory Entry"));
 
         from("direct:PractitionerDELETE")
-                .log(LoggingLevel.INFO, "DELETE Request --> ${body}");
+                .log(LoggingLevel.INFO, "DELETE Request --> ${body}")
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
+                .setBody(simple("Action not support for this Directory Entry"));
 
 
 

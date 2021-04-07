@@ -4,3 +4,17 @@
 .classpath
 .project
 /.settings
+
+.DS_Store
+
+*.DS_Store
+
+*.lst
+
+*.jar
+
+*.class
+
+pegacorn-buildingblocks-processingplant/target/maven-archiver/
+
+pegacorn-buildingblocks-workshop/target/maven-archiver/

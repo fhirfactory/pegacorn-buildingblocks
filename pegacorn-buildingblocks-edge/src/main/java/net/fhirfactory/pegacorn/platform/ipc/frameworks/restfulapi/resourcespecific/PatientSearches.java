@@ -2,7 +2,7 @@ package net.fhirfactory.pegacorn.platform.ipc.frameworks.restfulapi.resourcespec
 
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
-import net.fhirfactory.pegacorn.datasets.fhir.r4.base.entities.identifier.SearchSupportHelper;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.SearchSupportHelper;
 import net.fhirfactory.pegacorn.platform.edge.ask.InternalFHIRClientServices;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;

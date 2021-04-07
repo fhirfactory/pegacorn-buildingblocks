@@ -27,10 +27,14 @@ import net.fhirfactory.pegacorn.internals.directories.entries.common.PegacornDir
 import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.IdentifierDE;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryInvalidSortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 public class LocalPractitionerCache extends PegacornDirectoryEntryCache {
@@ -56,16 +60,19 @@ public class LocalPractitionerCache extends PegacornDirectoryEntryCache {
         return(foundPractitionerDirectoryEntry);
     }
 
-    public PractitionerDirectoryEntry searchForPractitioner(IdentifierDE practitionerID){
-        DirectoryMethodOutcome outcome = this.searchCacheForEntryUsingIdentifierDE(practitionerID);
-        boolean searchCompleted = outcome.getStatus().equals(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
-        boolean searchFoundSomething = outcome.getSearchResult().size() == 1;
-        if(searchCompleted && searchFoundSomething) {
-            PegacornDirectoryEntry foundEntry = outcome.getEntry();
-            PractitionerDirectoryEntry foundPractitionerDirectoryEntry = (PractitionerDirectoryEntry) foundEntry;
-            return (foundPractitionerDirectoryEntry);
-        } else {
-            return(null);
-        }
+    @Override
+    public DirectoryMethodOutcome directoryEntrySpecificSearch(List<PegacornDirectoryEntry> sortedEntryList, Map<String, String> searchParameters, Integer paginationSize, Integer paginationNumber)
+            throws DirectoryEntryInvalidSortException, DirectoryEntryInvalidSearchException {
+        throw (new DirectoryEntryInvalidSearchException("Unsupported search function"));
+    }
+
+    @Override
+    public DirectoryMethodOutcome getSortedDirectoryEntrySet(String sortParameter, Boolean sortAscendingOrder) throws DirectoryEntryInvalidSortException {
+        throw (new DirectoryEntryInvalidSortException("Unsupported sort function"));
+    }
+
+    @Override
+    protected Boolean isSupportiveOfSearchType(String attributeName) {
+        return(false);
     }
 }
