@@ -339,7 +339,7 @@ public abstract class PegacornDirectoryEntryCache {
         if(pageSize > 0) {
             Integer locationOffsetStart = pageSize * page;
             Integer numberOfEntries = allEntries.size();
-            if (numberOfEntries < locationOffsetStart) {
+            if (numberOfEntries > locationOffsetStart) {
                 for (Integer counter = 0; counter < pageSize; counter += 1) {
                     Integer listLocation = locationOffsetStart + counter;
                     if (listLocation < numberOfEntries) {

@@ -44,8 +44,11 @@ public class PractitionerDirectoryEntry extends PersonDirectoryEntry {
 
     public PractitionerDirectoryEntry(){
         super();
-        organizationMembership = new HashMap<>();
-        currentPractitionerRoles = new ArrayList<>();
+        this.organizationMembership = new HashMap<>();
+        this.currentPractitionerRoles = new ArrayList<>();
+        this.practitionerFavourites = new ArrayList<>();
+        this.healthcareServiceFavourites = new ArrayList<>();
+        this.practitionerRoleFavourites = new ArrayList<>();
     }
 
     public ArrayList<IdentifierDE> getCurrentPractitionerRoles() {
