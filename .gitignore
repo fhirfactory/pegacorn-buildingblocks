@@ -18,3 +18,7 @@
 pegacorn-buildingblocks-processingplant/target/maven-archiver/
 
 pegacorn-buildingblocks-workshop/target/maven-archiver/
+
+pegacorn-buildingblocks-directoryservices/target/maven-archiver/pom.properties
+
+*.properties

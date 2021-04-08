@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.internals.directories.model.exceptions.Directory
 import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryUpdateException;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.model.rest.RestBindingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +46,16 @@ public class GroupDirectoryAPI extends ResourceDirectoryAPI {
 
     private String getGroupServiceEndpoint(){
         String endpointSpecification =
-                getIngresEndpoint() + "/Group?matchOnUriPrefix=true";
+                getIngresEndpoint() + "/Group"+getPathSuffix();
         return(endpointSpecification);
     }
 
     @Override
     public void configure() throws Exception {
+
+        //
+        //
+        //
 
         //
         // The Practitioner(Lite) Resource Handler

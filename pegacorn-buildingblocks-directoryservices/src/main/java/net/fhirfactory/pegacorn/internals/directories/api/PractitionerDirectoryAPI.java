@@ -44,7 +44,7 @@ public class PractitionerDirectoryAPI extends ResourceDirectoryAPI {
 
     private String getPractitionerServiceEndpoint(){
         String endpointSpecification =
-                getIngresEndpoint() + "/Practitioner?matchOnUriPrefix=true";
+                getIngresEndpoint() + "/Practitioner"+getPathSuffix();
         return(endpointSpecification);
     }
 

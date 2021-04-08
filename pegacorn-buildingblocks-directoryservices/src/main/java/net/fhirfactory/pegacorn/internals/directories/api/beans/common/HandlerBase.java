@@ -281,7 +281,7 @@ public abstract class HandlerBase {
     // General Search
     //
 
-    private String doFullDirectoryEntrySetRetrieval(Integer pageSize,
+    protected String doFullDirectoryEntrySetRetrieval(Integer pageSize,
                                                     Integer page,
                                                     String sortAttribute,
                                                     Boolean sortAscendingOrder)

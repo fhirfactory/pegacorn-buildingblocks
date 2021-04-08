@@ -55,7 +55,7 @@ public abstract class ResourceDirectoryBroker {
     abstract protected void enrichWithDirectoryEntryTypeSpecificInformation(PegacornDirectoryEntry entry);
 
     public DirectoryMethodOutcome reviewDirectoryEntry(PegId id){
-        getLogger().debug(".reviewDirectoryEntry(): Entry, id --> {}", id);
+        getLogger().info(".reviewDirectoryEntry(): Entry, id --> {}", id);
         DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
         PegacornDirectoryEntry entry = getCache().getCacheEntry(id.getValue());
         if(entry == null){
@@ -66,7 +66,7 @@ public abstract class ResourceDirectoryBroker {
             outcome.setStatus(DirectoryMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
             outcome.setId(entry.getId());
         }
-        getLogger().debug(".reviewDirectoryEntry(): Exit");
+        getLogger().info(".reviewDirectoryEntry(): Exit");
         return(outcome);
     }
 

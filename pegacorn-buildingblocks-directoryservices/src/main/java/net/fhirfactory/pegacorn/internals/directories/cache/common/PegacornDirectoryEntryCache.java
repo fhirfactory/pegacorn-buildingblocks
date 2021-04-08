@@ -140,9 +140,9 @@ public abstract class PegacornDirectoryEntryCache {
         }
     }
 
-    public PegacornDirectoryEntry getCacheEntry(String id){
-        getLogger().info(".getCacheEntry(): Entry (using Id), id --> {}", id);
-        if(cacheEntries.isEmpty()){
+    public PegacornDirectoryEntry getCacheEntry(String idValue){
+        getLogger().info(".getCacheEntry(): Entry (using Id), idValue --> {}", idValue);
+        if(idValue == null){
             getLogger().info(".getCacheEntry(): Exit, id is NULL, so exiting");
             return(null);
         }
@@ -150,7 +150,7 @@ public abstract class PegacornDirectoryEntryCache {
             getLogger().info(".getCacheEntry(): Exit, Cache is empty, so exiting");
             return(null);
         }
-        PegacornDirectoryEntry entry = this.cacheEntries.get(id);
+        PegacornDirectoryEntry entry = this.cacheEntries.get(idValue);
         if(entry != null){
             getLogger().info(".getCacheEntry(): Exit, entry found");
             return(entry);

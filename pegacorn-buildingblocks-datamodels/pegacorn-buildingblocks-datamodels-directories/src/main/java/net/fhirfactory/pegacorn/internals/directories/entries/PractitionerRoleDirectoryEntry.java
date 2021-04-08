@@ -242,4 +242,34 @@ public class PractitionerRoleDirectoryEntry extends PegacornDirectoryEntry {
             return(comparison);
         }
     };
+
+    public static Comparator<PegacornDirectoryEntry> displayNameComparator = new Comparator<PegacornDirectoryEntry>() {
+        @Override
+        public int compare(PegacornDirectoryEntry o1, PegacornDirectoryEntry o2) {
+            if(o1 == null && o2 == null){
+                return(0);
+            }
+            if(o1 == null && o2 != null){
+                return(1);
+            }
+            if(o1 != null && o2 == null){
+                return(-1);
+            }
+            PractitionerRoleDirectoryEntry practitionerRole1 = (PractitionerRoleDirectoryEntry) o1;
+            PractitionerRoleDirectoryEntry practitionerRole2 = (PractitionerRoleDirectoryEntry) o2;
+            if(practitionerRole1.getDisplayName() == null && practitionerRole2.getDisplayName() == null){
+                return(0);
+            }
+            if(practitionerRole1.getDisplayName() == null && !(practitionerRole2.getDisplayName() == null)){
+                return(1);
+            }
+            if(!(practitionerRole1.getDisplayName() == null) && practitionerRole1.getDisplayName() ==  null){
+                return(-1);
+            }
+            String testValue1 = practitionerRole1.getDisplayName();
+            String testValue2 = practitionerRole2.getDisplayName();
+            int comparison = testValue1.compareTo(testValue2);
+            return(comparison);
+        }
+    };
 }

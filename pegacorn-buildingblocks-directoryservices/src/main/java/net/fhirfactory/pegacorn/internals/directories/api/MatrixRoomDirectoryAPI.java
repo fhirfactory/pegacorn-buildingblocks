@@ -46,7 +46,7 @@ public class MatrixRoomDirectoryAPI extends ResourceDirectoryAPI {
 
     private String getGroupServiceEndpoint(){
         String endpointSpecification =
-                getIngresEndpoint() + "/MatrixRoom?matchOnUriPrefix=true";
+                getIngresEndpoint() + "/MatrixRoom"+getPathSuffix();
         return(endpointSpecification);
     }
 

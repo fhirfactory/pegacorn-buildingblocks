@@ -23,10 +23,13 @@ package net.fhirfactory.pegacorn.internals.directories.api;
 
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerRoleServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
+import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerRoleDirectoryEntry;
 import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryNotFoundException;
 import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryUpdateException;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,12 +49,27 @@ public class PractitionerRoleDirectoryAPI extends ResourceDirectoryAPI {
 
     private String getPractitionerRoleServiceEndpoint(){
         String endpointSpecification =
-                getIngresEndpoint() + "/PractitionerRole?matchOnUriPrefix=true";
+                getIngresEndpoint() + "/PractitionerRole"+getPathSuffix();
         return(endpointSpecification);
     }
 
     @Override
     public void configure() throws Exception {
+
+        //
+        // Camel REST
+        //
+
+        restConfiguration()
+                .component("netty-http")
+                .scheme("http")
+                .bindingMode(RestBindingMode.json)
+                .dataFormatProperty("prettyPrint", "true")
+                .contextPath(getPegacornReferenceProperties().getPegacornResourceDirectoryR1Path()).host(getServerHost()).port(getServerPort())
+                .enableCORS(true)
+                .corsAllowCredentials(true)
+                .corsHeaderProperty("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, login");
+
 
         //
         // The PractitionerRoleDirectory Resource Handler
@@ -62,7 +80,7 @@ public class PractitionerRoleDirectoryAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.INFO, "DirectoryEntryNotFoundException...")
                 // use HTTP status 404 when data was not found
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
-                .setBody(constant(""));
+                .setBody(simple("${exception.message}\n"));
 
         onException(DirectoryEntryUpdateException.class)
                 .handled(true)
@@ -77,23 +95,46 @@ public class PractitionerRoleDirectoryAPI extends ResourceDirectoryAPI {
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(500))
                 .setBody(simple("${exception.message}\n"));
 
-        from(getPractitionerRoleServiceEndpoint())
-                .log(LoggingLevel.INFO, "Incoming Request --> ${body}")
-                .choice()
-                .when(header("CamelHttpMethod").isEqualTo("GET"))
+
+        rest("/PractitionerRole")
+            .get("{id}").outType(PractitionerRoleDirectoryEntry.class)
                 .to("direct:PractitionerRoleGET")
-                .when(header("CamelHttpMethod").isEqualTo("POST"))
+            .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+                .param().name("pageSize").type(RestParamType.query).required(false).endParam()
+                .param().name("page").type(RestParamType.query).required(false).endParam()
+                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
+                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                .to("direct:PractitionerRoleListGET")
+            .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}&primaryRoleCategory={primaryRoleCategory}&primaryRole{primaryRole}&primaryOrganization={primaryOrg}&primaryLocation={primaryLocation}&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+                .param().name("shortName").type(RestParamType.query).required(false).endParam()
+                .param().name("longName").type(RestParamType.query).required(false).endParam()
+                .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                .param().name("primaryRoleCategory").type(RestParamType.query).required(false).endParam()
+                .param().name("primaryRole").type(RestParamType.query).required(false).endParam()
+                .param().name("primaryOrg").type(RestParamType.query).required(false).endParam()
+                .param().name("primaryLocation").type(RestParamType.query).required(false).endParam()
+                .param().name("pageSize").type(RestParamType.query).required(false).endParam()
+                .param().name("page").type(RestParamType.query).required(false).endParam()
+                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
+                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                .to("direct:PractitionerRoleSearchGET")
+            .post().type(PractitionerRoleDirectoryEntry.class)
                 .to("direct:PractitionerRolePOST")
-                .when(header("CamelHttpMethod").isEqualTo("PUT"))
-                .to("direct:PractitionerRolePUT")
-                .when(header("CamelHttpMethod").isEqualTo("DELETE"))
-                .to("direct:PractitionerRoleDELETE")
-                .otherwise()
-                .to("direct:Error");
+            .put().type(PractitionerRoleDirectoryEntry.class)
+                .to("direct:PractitionerRolePUT");
+
 
         from("direct:PractitionerRoleGET")
-                .bean(practitionerRoleServiceHandler, "get")
-                .log(LoggingLevel.INFO, "GET Request --> ${headers} ${body}");
+                .bean(practitionerRoleServiceHandler, "getPractitionerRole")
+                .log(LoggingLevel.INFO, "GET Request --> ${body}");
+
+        from("direct:PractitionerRoleListGET")
+                .bean(practitionerRoleServiceHandler, "getPractitionerRoleList")
+                .log(LoggingLevel.INFO, "GET Request --> ${body}");
+
+        from("direct:PractitionerRoleSearchGET")
+                .bean(practitionerRoleServiceHandler, "getPractitionerRoleSearch")
+                .log(LoggingLevel.INFO, "GET (Search) Request --> ${body}");
 
         from("direct:PractitionerRolePOST")
                 .log(LoggingLevel.INFO, "POST Request --> ${body}")
@@ -101,7 +142,7 @@ public class PractitionerRoleDirectoryAPI extends ResourceDirectoryAPI {
                 .setBody(simple("Action not support for this Directory Entry"));
 
         from("direct:PractitionerRolePUT")
-                .bean(practitionerRoleServiceHandler, "update")
+                .bean(practitionerRoleServiceHandler, "updatePractitionerRole")
                 .log(LoggingLevel.INFO, "PUT Request --> ${body}");
 
         from("direct:PractitionerRoleDELETE")

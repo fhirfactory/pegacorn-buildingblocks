@@ -21,8 +21,12 @@
  */
 package net.fhirfactory.pegacorn.internals.directories.api.common;
 
+import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.netty.NettyConfiguration;
+import org.apache.camel.component.netty.NettyServerBootstrapConfiguration;
+import org.apache.camel.component.netty.http.NettySharedHttpServerBootstrapConfiguration;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -34,7 +38,7 @@ public abstract class ResourceDirectoryAPI extends RouteBuilder {
 
 
     private static String SERVER_PORT = "12121";
-    private static String SERVER_HOST = "0.0.0.0";
+    private static String SERVER_HOST = "localhost";
 
     protected String getIngresEndpoint(){
         String endpointSpecification =
@@ -47,8 +51,24 @@ public abstract class ResourceDirectoryAPI extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+    }
 
+    protected PegacornReferenceProperties getPegacornReferenceProperties(){
+        return(pegacornReferenceProperties);
+    }
+
+    protected String getPathSuffix(){
+        String suffix = "?matchOnUriPrefix=true&option.enableCORS=true&option.corsAllowedCredentials=true";
+        return(suffix);
     }
 
     abstract protected Logger getLogger();
+
+    public static String getServerPort() {
+        return ("13531");
+    }
+
+    public static String getServerHost() {
+        return SERVER_HOST;
+    }
 }

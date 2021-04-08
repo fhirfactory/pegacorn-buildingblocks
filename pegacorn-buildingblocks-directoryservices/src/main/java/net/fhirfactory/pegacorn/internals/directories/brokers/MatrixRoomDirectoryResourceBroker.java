@@ -29,6 +29,7 @@ import net.fhirfactory.pegacorn.internals.directories.entries.MatrixRoomDirector
 import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerDirectoryEntry;
 import net.fhirfactory.pegacorn.internals.directories.entries.common.PegacornDirectoryEntry;
 import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.IdentifierDE;
+import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.IdentifierDEUseEnum;
 import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
 import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
@@ -68,7 +69,6 @@ public class MatrixRoomDirectoryResourceBroker extends ResourceDirectoryBroker {
     // Review
     //
 
-
     @Override
     protected void enrichWithDirectoryEntryTypeSpecificInformation(PegacornDirectoryEntry entry) {
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
@@ -78,6 +78,40 @@ public class MatrixRoomDirectoryResourceBroker extends ResourceDirectoryBroker {
     //
     // Update
     //
+
+    @Override
+    public DirectoryMethodOutcome updateDirectoryEntry(PegacornDirectoryEntry entry){
+        getLogger().info(".updateDirectoryEntry(): Entry");
+        DirectoryMethodOutcome outcome = new DirectoryMethodOutcome();
+        PegacornDirectoryEntry foundEntry = null;
+        getLogger().info(".updateDirectoryEntry(): Attempting to retrieve existing Resource");
+        if(entry.getId() != null){
+            getLogger().info(".updateDirectoryEntry(): The PegId is not-Null, so we should be able to retrieve Resource with it");
+            if(getLogger().isInfoEnabled()){
+                getLogger().info(".updateDirectoryEntry(): Attempting to retrieve PegacornDirectoryEntry for Id --> {}", entry.getId());
+            }
+            foundEntry = getCache().getCacheEntry(entry.getId().getValue());
+        } else {
+            getLogger().info(".PegacornDirectoryEntry(): The PegId is Null, so seeing if a suitable Identifier is available");
+            IdentifierDE entryIdentifier = entry.getIdentifierWithType("EmailAddress");
+            if(entryIdentifier != null){
+                getLogger().info(".PegacornDirectoryEntry(): Have a suitable Identifier, now retrieving");
+                if(entryIdentifier.getUse().equals(IdentifierDEUseEnum.OFFICIAL)){
+                    DirectoryMethodOutcome retrievalOutcome = getCache().searchCacheForEntryUsingIdentifierDE(entryIdentifier);
+                    boolean searchCompleted = retrievalOutcome.getStatus().equals(DirectoryMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+                    boolean searchFoundSomething = retrievalOutcome.getSearchResult().size() == 1;
+                    if(searchCompleted && searchFoundSomething) {
+                        foundEntry = retrievalOutcome.getSearchResult().get(0);
+                    }
+                }
+            }
+        }
+        getLogger().info(".updatePractitionerEntry(): Check to see if we were able to retrieve existing Resource");
+        DirectoryMethodOutcome entryUpdate = updateDirectoryEntry(entry);
+
+        getLogger().info(".updatePractitioner(): Exit");
+        return(entryUpdate);
+    }
 
     //
     // Delete
