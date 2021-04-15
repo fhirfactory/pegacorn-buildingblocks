@@ -19,6 +19,6 @@
         <module>../pegacorn-buildingblocks-datamodels-components</module>
         <module>../pegacorn-buildingblocks-datamodels-fhir</module>
         <module>../pegacorn-buildingblocks-datamodels-matrix</module>
-        <module>../pegacorn-buildingblocks-datamodels-directories</module>
+        <module>../pegacorn-buildingblocks-datamodels-esr</module>
     </modules>
 </project>

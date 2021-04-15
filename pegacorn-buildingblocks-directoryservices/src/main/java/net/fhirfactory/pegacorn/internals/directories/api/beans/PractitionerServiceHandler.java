@@ -4,14 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
-import net.fhirfactory.pegacorn.internals.directories.brokers.PractitionerDirectoryResourceBroker;
-import net.fhirfactory.pegacorn.internals.directories.brokers.common.ResourceDirectoryBroker;
-import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerDirectoryEntry;
-import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerRoleDirectoryEntry;
-import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
-import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
-import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryUpdateException;
+import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
 import org.apache.camel.Exchange;
+import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,7 @@ public class PractitionerServiceHandler extends HandlerBase {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerServiceHandler.class);
 
     @Inject
-    private PractitionerDirectoryResourceBroker practitionerDirectoryResourceBroker;
+    private PractitionerESRBroker practitionerDirectoryResourceBroker;
 
     @Override
     protected Logger getLogger() {
@@ -33,34 +35,38 @@ public class PractitionerServiceHandler extends HandlerBase {
     }
 
     @Override
-    protected ResourceDirectoryBroker specifyResourceBroker() {
+    protected ESRBroker specifyResourceBroker() {
         return (practitionerDirectoryResourceBroker);
     }
 
-    public String update(String inputBody,  Exchange camelExchange)
-            throws DirectoryEntryUpdateException {
+    //
+    // Update
+    //
+
+    public String updatePractitioner(String inputBody,  Exchange camelExchange)
+            throws ResourceUpdateException, ResourceInvalidSearchException {
         LOG.info(".update(): Entry, inputBody --> {}", inputBody);
-        PractitionerDirectoryEntry entry = null;
+        PractitionerESR entry = null;
         try{
             LOG.info(".update(): Attempting to parse Resource");
             JsonMapper jsonMapper = new JsonMapper();
-            entry = jsonMapper.readValue(inputBody, PractitionerDirectoryEntry.class);
+            entry = jsonMapper.readValue(inputBody, PractitionerESR.class);
             LOG.info(".update(): Resource parsing successful");
         } catch (JsonMappingException mappingException) {
-            throw(new DirectoryEntryUpdateException("Unable to parse (map) message, error --> " + mappingException.getMessage()));
+            throw(new ResourceUpdateException("Unable to parse (map) message, error --> " + mappingException.getMessage()));
         } catch (JsonProcessingException processingException) {
-            throw(new DirectoryEntryUpdateException("Unable to process message, error --> " + processingException.getMessage()));
+            throw(new ResourceUpdateException("Unable to process message, error --> " + processingException.getMessage()));
         }
         LOG.info(".update(): Requesting update from the Directory Resource Broker");
-        DirectoryMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitioner(entry);
+        ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitioner(entry);
         LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
-        if(outcome.getStatus().equals(DirectoryMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
+        if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             String result = convertToJSONString(outcome.getEntry());
             camelExchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
             LOG.info(".update(): Exit, returning updated resource");
             return(result);
         }
-        if(outcome.getStatus().equals(DirectoryMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
+        if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
             String result = convertToJSONString(outcome.getEntry());
             camelExchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, constant(201));
             LOG.info(".update(): Exit, returning updated resource (after creating it)");
@@ -70,8 +76,37 @@ public class PractitionerServiceHandler extends HandlerBase {
         return("Hmmm... not good!");
     }
 
+    public PractitionerRoleListESDT getPractitionerRoles(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
+        getLogger().debug(".getPractitionerRoles(): Entry, pathValue --> {}", id);
+        ESRMethodOutcome outcome = getResourceBroker().getResource(id.toLowerCase());
+        if (outcome.getEntry() != null) {
+            PractitionerRoleListESDT output = new PractitionerRoleListESDT();
+            PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
+            output.getPractitionerRoles().addAll(practitioner.getCurrentPractitionerRoles());
+            getLogger().debug(".getPractitionerRoles(): Exit, PractitionerRoles found, returning them");
+            return (output);
+        } else {
+            getLogger().debug(".getPractitionerRoles(): Exit, No PractitionerRoles found");
+            return (new PractitionerRoleListESDT());
+        }
+    }
+
+    public PractitionerESR updatePractitionerRoles(@Header("simplifiedID") String id, PractitionerRoleListESDT practitionerRoles) throws ResourceInvalidSearchException, ResourceUpdateException {
+        getLogger().debug(".updatePractitionerRoles(): Entry, simplifiedID->{}, practitionerRoles->{}", id, practitionerRoles);
+        ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitionerRoles(id, practitionerRoles);
+        LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
+        if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
+            ESRMethodOutcome updatedOutcome = getResourceBroker().getResource(id.toLowerCase());
+            PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
+            LOG.info(".update(): Exit, returning updated resource");
+            return(practitioner);
+        } else {
+            throw(new ResourceUpdateException(outcome.getStatusReason()) );
+        }
+    }
+
     @Override
-    protected void printOutcome(DirectoryMethodOutcome outcome) {
+    protected void printOutcome(ESRMethodOutcome outcome) {
 
     }
 }

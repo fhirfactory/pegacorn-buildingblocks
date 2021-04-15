@@ -13,7 +13,7 @@
     <artifactId>pegacorn-buildingblocks-datamodels-components</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Building Blocks :: DataModels :: Components</name>
+    <name>Pegacorn :: Building Blocks :: Data Models :: Components</name>
 
     <licenses>
         <license>

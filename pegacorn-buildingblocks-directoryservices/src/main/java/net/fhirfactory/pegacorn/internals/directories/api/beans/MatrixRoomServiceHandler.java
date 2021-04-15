@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
-import net.fhirfactory.pegacorn.internals.directories.brokers.GroupDirectoryResourceBroker;
-import net.fhirfactory.pegacorn.internals.directories.brokers.MatrixRoomDirectoryResourceBroker;
-import net.fhirfactory.pegacorn.internals.directories.brokers.common.ResourceDirectoryBroker;
-import net.fhirfactory.pegacorn.internals.directories.entries.GroupDirectoryEntry;
-import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
-import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
-import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryUpdateException;
+import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class MatrixRoomServiceHandler extends HandlerBase {
     private static final Logger LOG = LoggerFactory.getLogger(MatrixRoomServiceHandler.class);
 
     @Inject
-    private MatrixRoomDirectoryResourceBroker matrixRoomDirectoryResourceBroker;
+    private MatrixRoomESRBroker matrixRoomDirectoryResourceBroker;
 
     @Override
     protected Logger getLogger() {
@@ -31,31 +31,31 @@ public class MatrixRoomServiceHandler extends HandlerBase {
     }
 
     @Override
-    protected ResourceDirectoryBroker specifyResourceBroker() {
+    protected ESRBroker specifyResourceBroker() {
         return (matrixRoomDirectoryResourceBroker);
     }
 
     @Override
-    protected void printOutcome(DirectoryMethodOutcome outcome) {}
+    protected void printOutcome(ESRMethodOutcome outcome) {}
 
     public String update(String inputBody,  Exchange camelExchange)
-            throws DirectoryEntryUpdateException {
+            throws ResourceUpdateException, ResourceInvalidSearchException {
         LOG.info(".update(): Entry, inputBody --> {}", inputBody);
-        GroupDirectoryEntry entry = null;
+        GroupESR entry = null;
         try{
             LOG.info(".update(): Attempting to parse Resource");
             JsonMapper jsonMapper = new JsonMapper();
-            entry = jsonMapper.readValue(inputBody, GroupDirectoryEntry.class);
+            entry = jsonMapper.readValue(inputBody, GroupESR.class);
             LOG.info(".update(): Resource parsing successful");
         } catch (JsonMappingException mappingException) {
-            throw(new DirectoryEntryUpdateException("Unable to parse (map) message, error --> " + mappingException.getMessage()));
+            throw(new ResourceUpdateException("Unable to parse (map) message, error --> " + mappingException.getMessage()));
         } catch (JsonProcessingException processingException) {
-            throw(new DirectoryEntryUpdateException("Unable to process message, error --> " + processingException.getMessage()));
+            throw(new ResourceUpdateException("Unable to process message, error --> " + processingException.getMessage()));
         }
         LOG.info(".update(): Requesting update from the Directory Resource Broker");
-        DirectoryMethodOutcome outcome = matrixRoomDirectoryResourceBroker.updateDirectoryEntry(entry);
+        ESRMethodOutcome outcome = matrixRoomDirectoryResourceBroker.updateDirectoryEntry(entry);
         LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
-        if(outcome.getStatus().equals(DirectoryMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
+        if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             String result = convertToJSONString(outcome.getEntry());
             LOG.info(".update(): Exit, returning updated resource");
             return(result);

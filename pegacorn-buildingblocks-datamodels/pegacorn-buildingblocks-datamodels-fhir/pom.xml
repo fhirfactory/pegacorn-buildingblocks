@@ -13,7 +13,7 @@
     <artifactId>pegacorn-buildingblocks-datamodels-fhir</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Building Blocks :: DataModels :: FHIR</name>
+    <name>Pegacorn :: Building Blocks :: Data Models :: FHIR</name>
 
     <licenses>
         <license>

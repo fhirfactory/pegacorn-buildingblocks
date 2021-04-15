@@ -21,12 +21,19 @@
  */
 package net.fhirfactory.pegacorn.internals.directories.api.common;
 
-import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceNotFoundException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
+import org.apache.camel.Exchange;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.netty.NettyConfiguration;
-import org.apache.camel.component.netty.NettyServerBootstrapConfiguration;
-import org.apache.camel.component.netty.http.NettySharedHttpServerBootstrapConfiguration;
+import org.apache.camel.model.OnExceptionDefinition;
+import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.model.rest.RestConfigurationDefinition;
+import org.apache.camel.model.rest.RestDefinition;
+import org.apache.camel.model.rest.RestParamType;
+import org.apache.camel.spi.RestConfiguration;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -40,35 +47,93 @@ public abstract class ResourceDirectoryAPI extends RouteBuilder {
     private static String SERVER_PORT = "12121";
     private static String SERVER_HOST = "localhost";
 
-    protected String getIngresEndpoint(){
-        String endpointSpecification =
-                "netty-http:"
-                        + "http://" + SERVER_HOST
-                        + ":" + SERVER_PORT
-                        + pegacornReferenceProperties.getPegacornResourceDirectoryR1Path();
-        return(endpointSpecification);
-    }
-
     @Override
     public void configure() throws Exception {
     }
 
-    protected PegacornReferenceProperties getPegacornReferenceProperties(){
-        return(pegacornReferenceProperties);
+    protected PegacornReferenceProperties getPegacornReferenceProperties() {
+        return (pegacornReferenceProperties);
     }
 
-    protected String getPathSuffix(){
+    protected String getPathSuffix() {
         String suffix = "?matchOnUriPrefix=true&option.enableCORS=true&option.corsAllowedCredentials=true";
-        return(suffix);
+        return (suffix);
     }
 
     abstract protected Logger getLogger();
+    abstract protected String specifyESRName();
+    abstract protected Class specifyESRClass();
+
+    public String getESRName(){
+        return(specifyESRName());
+    }
+
+    public Class getESRClass(){
+        return(specifyESRClass());
+    }
 
     public static String getServerPort() {
-        return ("13531");
+        return (SERVER_PORT);
     }
 
     public static String getServerHost() {
         return SERVER_HOST;
+    }
+
+    protected RestConfigurationDefinition getRestConfigurationDefinition() {
+        RestConfigurationDefinition restConf = restConfiguration()
+                .component("netty-http")
+                .scheme("http")
+                .bindingMode(RestBindingMode.json)
+                .dataFormatProperty("prettyPrint", "true")
+                .contextPath(getPegacornReferenceProperties().getPegacornResourceDirectoryR1Path()).host(getServerHost()).port(getServerPort())
+                .enableCORS(true)
+                .corsAllowCredentials(true)
+                .corsHeaderProperty("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, login");
+        return (restConf);
+    }
+
+    protected RestDefinition getRestGetDefinition() {
+        RestDefinition restDef = rest("/" + getESRName())
+            .get("/{simplifiedID}").outType(getESRClass())
+                .to("direct:" + getESRName() + "GET")
+            .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+                .param().name("pageSize").type(RestParamType.query).required(false).endParam()
+                .param().name("page").type(RestParamType.query).required(false).endParam()
+                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
+                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                .to("direct:" + getESRName() + "ListGET");
+        return (restDef);
+    }
+
+    protected OnExceptionDefinition getResourceNotFoundException() {
+        OnExceptionDefinition exceptionDef = onException(ResourceNotFoundException.class)
+                .handled(true)
+                .log(LoggingLevel.INFO, "ResourceNotFoundException...")
+                // use HTTP status 404 when data was not found
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
+                .setBody(simple("${exception.message}\n"));
+
+        return(exceptionDef);
+    }
+
+    protected OnExceptionDefinition getResourceUpdateException() {
+        OnExceptionDefinition exceptionDef = onException(ResourceUpdateException.class)
+                .handled(true)
+                .log(LoggingLevel.INFO, "ResourceUpdateException...")
+                // use HTTP status 404 when data was not found
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(400))
+                .setBody(simple("${exception.message}\n"));
+
+        return(exceptionDef);
+    }
+
+    protected OnExceptionDefinition getGeneralException() {
+        OnExceptionDefinition exceptionDef = onException(Exception.class)
+                .handled(true)
+                // use HTTP status 500 when we had a server side error
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(500))
+                .setBody(simple("${exception.message}\n"));
+        return (exceptionDef);
     }
 }

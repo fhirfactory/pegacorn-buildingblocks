@@ -21,14 +21,14 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors;
 
-import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerDirectoryEntry;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common.MatrixRoomIdentifier;
 import net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common.MatrixUserIdentifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PractitionerMX extends PractitionerDirectoryEntry {
+public class PractitionerMX extends PractitionerESR {
     private MatrixUserIdentifier matrixUserIdentifier;
     private HashMap<String, String> otherIdentifiers;
     private ArrayList<MatrixRoomIdentifier> roomOwnership;

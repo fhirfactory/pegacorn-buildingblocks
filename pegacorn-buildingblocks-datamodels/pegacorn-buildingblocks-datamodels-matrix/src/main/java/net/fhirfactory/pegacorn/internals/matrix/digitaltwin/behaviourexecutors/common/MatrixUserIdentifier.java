@@ -21,15 +21,15 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common;
 
-import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.IdentifierDE;
-import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.IdentifierDEUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 
-public class MatrixUserIdentifier extends IdentifierDE {
+public class MatrixUserIdentifier extends IdentifierESDT {
 
     public MatrixUserIdentifier(){
         super();
         this.setType("MatrixUserID");
-        this.setUse(IdentifierDEUseEnum.SECONDARY);
+        this.setUse(IdentifierESDTUseEnum.SECONDARY);
         this.setValue(null);
     }
 
@@ -39,7 +39,7 @@ public class MatrixUserIdentifier extends IdentifierDE {
 
     public MatrixUserIdentifier(MatrixUserIdentifier oriIdentifier){
         this.setType("MatrixUserID");
-        this.setUse(IdentifierDEUseEnum.SECONDARY);
+        this.setUse(IdentifierESDTUseEnum.SECONDARY);
         this.setValue(oriIdentifier.getValue());
     }
 }

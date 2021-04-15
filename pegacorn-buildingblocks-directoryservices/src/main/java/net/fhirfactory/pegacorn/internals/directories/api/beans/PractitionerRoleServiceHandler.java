@@ -1,28 +1,27 @@
 package net.fhirfactory.pegacorn.internals.directories.api.beans;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
-import net.fhirfactory.pegacorn.internals.directories.brokers.PractitionerRoleDirectoryResourceBroker;
-import net.fhirfactory.pegacorn.internals.directories.brokers.common.ResourceDirectoryBroker;
-import net.fhirfactory.pegacorn.internals.directories.entries.PractitionerRoleDirectoryEntry;
-import net.fhirfactory.pegacorn.internals.directories.entries.common.PegacornDirectoryEntry;
-import net.fhirfactory.pegacorn.internals.directories.entries.datatypes.PegId;
-import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcome;
-import net.fhirfactory.pegacorn.internals.directories.model.DirectoryMethodOutcomeEnum;
-import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryInvalidSortException;
-import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryNotFoundException;
-import net.fhirfactory.pegacorn.internals.directories.model.exceptions.DirectoryEntryUpdateException;
+import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSortException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceNotFoundException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
-import org.apache.camel.spi.ApiParam;
-import org.apache.camel.spi.UriParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Dependent
@@ -30,7 +29,7 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleServiceHandler.class);
 
     @Inject
-    private PractitionerRoleDirectoryResourceBroker practitionerRoleDirectoryResourceBroker;
+    private PractitionerRoleESRBroker practitionerRoleDirectoryResourceBroker;
 
     @Override
     protected Logger getLogger() {
@@ -38,23 +37,100 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
     }
 
     @Override
-    protected ResourceDirectoryBroker specifyResourceBroker() {
+    protected ESRBroker specifyResourceBroker() {
         return (practitionerRoleDirectoryResourceBroker);
     }
 
+    //
+    // Create
+    //
 
-    public void createPractitionerRole(PractitionerRoleDirectoryEntry entryToUpdate,  Exchange camelExchange){
+    public void createPractitionerRole(PractitionerRoleESR entryToUpdate, Exchange camelExchange){
         LOG.info(".update(): Entry, inputBody --> {}", entryToUpdate);
     }
 
-    public void updatePractitionerRole(PractitionerRoleDirectoryEntry entryToUpdate,  Exchange camelExchange)
-            throws DirectoryEntryUpdateException {
+    //
+    // Review
+    //
+
+    //
+    // Review (Search)
+    //
+
+    public List<ExtremelySimplifiedResource> practitionerRoleSearch(@Header("shortName") String shortName,
+                                                                    @Header("longName") String longName,
+                                                                    @Header("displayName") String displayName,
+                                                                    @Header("primaryRoleCategoryID") String primaryRoleCategoryID,
+                                                                    @Header("primaryRoleID") String primaryRoleID,
+                                                                    @Header("primaryOrganizationID") String primaryOrganizationID,
+                                                                    @Header("primaryLocationID") String primaryLocationID,
+                                                                    @Header("sortBy") String sortBy,
+                                                                    @Header("sortOrder") String sortOrder,
+                                                                    @Header("pageSize") String pageSize,
+                                                                    @Header("page") String page)
+            throws ResourceNotFoundException, ResourceInvalidSortException, ESRPaginationException, ResourceInvalidSearchException, ESRSortingException {
+        getLogger().debug(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{}"
+                        + "sortBy->{}, sortOrder->{}, pageSize->{},page->{},primaryRoleCategoryID->{}"
+                        + "primaryRoleID->{}, primaryOrganizationID->{}, primaryLocationID->{}",
+                shortName, longName, displayName, sortBy, sortOrder, pageSize, page, primaryRoleCategoryID, primaryRoleID, primaryOrganizationID, primaryLocationID);
+        String searchAttributeName = null;
+        String searchAttributeValue = null;
+        if(shortName != null) {
+            searchAttributeValue = shortName;
+            searchAttributeName = "shortName";
+        } else if(longName != null){
+            searchAttributeValue = longName;
+            searchAttributeName = "longName";
+        } else if(displayName != null){
+            searchAttributeValue = displayName;
+            searchAttributeName = "displayName";
+        } else if(primaryRoleCategoryID != null){
+            searchAttributeValue = primaryRoleCategoryID;
+            searchAttributeName = "primaryRoleCategoryID";
+        } else if(primaryRoleID != null){
+            searchAttributeValue = primaryRoleID;
+            searchAttributeName = "primaryRoleID";
+        } else if(primaryOrganizationID != null){
+            searchAttributeValue = primaryOrganizationID;
+            searchAttributeName = "primaryOrganizationID";
+        } else if(primaryLocationID != null){
+            searchAttributeValue = primaryLocationID;
+            searchAttributeName = "primaryLocationID";
+        }
+        else {
+            throw( new ResourceInvalidSearchException("Search parameter not specified"));
+        }
+        Integer pageSizeValue = null;
+        Integer pageValue = null;
+        Boolean sortOrderValue = true;
+        if(pageSize != null) {
+            pageSizeValue = Integer.valueOf(pageSize);
+        }
+        if(page != null) {
+            pageValue = Integer.valueOf(page);
+        }
+        if(sortOrder != null) {
+            sortOrderValue = Boolean.valueOf(sortOrder);
+        }
+        String searchAttributeValueURLDecoded = URLDecoder.decode(searchAttributeValue, StandardCharsets.UTF_8);
+        ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValueURLDecoded, pageSizeValue, pageValue, sortBy, sortOrderValue);
+        getLogger().debug(".defaultSearch(): Exit");
+        return(outcome.getSearchResult());
+    }
+
+
+    //
+    // Update
+    //
+
+    public void updatePractitionerRole(PractitionerRoleESR entryToUpdate, Exchange camelExchange)
+            throws ResourceUpdateException, ResourceInvalidSearchException {
         LOG.info(".update(): Entry, inputBody --> {}", entryToUpdate);
-        PractitionerRoleDirectoryEntry entry = entryToUpdate;
+        PractitionerRoleESR entry = entryToUpdate;
         LOG.info(".update(): Requesting update from the Directory Resource Broker");
-        DirectoryMethodOutcome outcome = practitionerRoleDirectoryResourceBroker.updatePractitionerRole(entry);
+        ESRMethodOutcome outcome = practitionerRoleDirectoryResourceBroker.updatePractitionerRole(entry);
         LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
-        if(outcome.getStatus().equals(DirectoryMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
+        if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             String result = convertToJSONString(outcome.getEntry());
             LOG.info(".update(): Exit, returning updated resource");
             return;
@@ -62,36 +138,20 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
         LOG.info(".update(): Exit, something has gone wrong.....");
     }
 
-    public PractitionerRoleDirectoryEntry getPractitionerRole(@Header("id") String id)
-            throws DirectoryEntryNotFoundException {
-        getLogger().info(".getPractitionerRole(): Entry, id --> {}", id);
-        PegId pegId = new PegId(id);
-        DirectoryMethodOutcome outcome = getResourceBroker().reviewDirectoryEntry(pegId);
-        if(outcome.getEntry()!=null){
-            PractitionerRoleDirectoryEntry retrievedValue = (PractitionerRoleDirectoryEntry) outcome.getEntry();
-            return(retrievedValue);
-        } else {
-            throw (new DirectoryEntryNotFoundException(id));
-        }
-    }
-
-    public List<PegacornDirectoryEntry> getPractitionerRoleList(@Header("pageSize") String pageSize, @Header("page") String page)
-            throws DirectoryEntryNotFoundException, DirectoryEntryInvalidSortException {
-        LOG.info(".getPractitionerRoleList(): Entry, pageSize --> {}, page --> {}", pageSize, page);
-        DirectoryMethodOutcome outcome = getResourceBroker().getPaginatedUnsortedDirectoryEntrySet(0,0);
-        return(outcome.getSearchResult());
-    }
+    //
+    // Delete
+    //
 
     public void deletePractitionerRole(String id){
         getLogger().info(".deletePractitionerRole(): Entry, id --> {}", id);
     }
 
     @Override
-    protected void printOutcome(DirectoryMethodOutcome outcome) {
+    protected void printOutcome(ESRMethodOutcome outcome) {
         if(outcome.isSearchSuccessful()){
             for(Integer counter = 0; counter < outcome.getSearchResult().size(); counter += 1){
-                PractitionerRoleDirectoryEntry currentEntry = (PractitionerRoleDirectoryEntry)outcome.getSearchResult().get(counter);
-                getLogger().info("Info: Entry --> {} :: {}", currentEntry.getPrimaryRoleCategory(), currentEntry.getDisplayName() );
+                PractitionerRoleESR currentEntry = (PractitionerRoleESR)outcome.getSearchResult().get(counter);
+                getLogger().info("Info: Entry --> {} :: {}", currentEntry.getPrimaryRoleCategoryID(), currentEntry.getDisplayName() );
             }
         }
     }
