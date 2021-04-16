@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources.datatypes;
 
+import java.time.Instant;
 import java.util.Date;
 
 public class PractitionerStatusESDT {
@@ -29,6 +30,14 @@ public class PractitionerStatusESDT {
     private boolean typing;
     private Date lastActivity;
     private Date lastLogin;
+
+    public PractitionerStatusESDT(){
+        this.loggedIn = false;
+        this.active = false;
+        this.typing = false;
+        this.lastActivity = Date.from(Instant.EPOCH);
+        this.lastLogin = Date.from(Instant.EPOCH);
+    }
 
     public boolean isLoggedIn() {
         return loggedIn;

@@ -7,6 +7,7 @@ import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBa
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
@@ -94,14 +95,101 @@ public class PractitionerServiceHandler extends HandlerBase {
     public PractitionerESR updatePractitionerRoles(@Header("simplifiedID") String id, PractitionerRoleListESDT practitionerRoles) throws ResourceInvalidSearchException, ResourceUpdateException {
         getLogger().debug(".updatePractitionerRoles(): Entry, simplifiedID->{}, practitionerRoles->{}", id, practitionerRoles);
         ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitionerRoles(id, practitionerRoles);
-        LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
+        LOG.trace(".updatePractitionerRoles(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             ESRMethodOutcome updatedOutcome = getResourceBroker().getResource(id.toLowerCase());
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
-            LOG.info(".update(): Exit, returning updated resource");
+            LOG.debug(".updatePractitionerRoles(): Exit, returning updated resource");
             return(practitioner);
         } else {
+            LOG.error(".updatePractitionerRoles(): Could not update Resource");
             throw(new ResourceUpdateException(outcome.getStatusReason()) );
+        }
+    }
+
+    public FavouriteListESDT getPractitionerRoleFavourites(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
+        getLogger().debug(".getPractitionerRoleFavourites(): Entry, pathValue --> {}", id);
+        FavouriteListESDT output = getFavourites(id, "PractitionerRoleFavourites");
+        getLogger().debug(".getPractitionerRoleFavourites(): Exit");
+        return (output);
+    }
+
+    public FavouriteListESDT getPractitionerFavourites(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
+        getLogger().debug(".getPractitionerFavourites(): Entry, pathValue --> {}", id);
+        FavouriteListESDT output = getFavourites(id, "PractitionerFavourites");
+        getLogger().debug(".getPractitionerFavourites(): Exit");
+        return (output);
+    }
+
+    public FavouriteListESDT getServiceFavourites(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
+        getLogger().debug(".getServiceFavourites(): Entry, pathValue --> {}", id);
+        FavouriteListESDT output = getFavourites(id, "ServiceFavourites");
+        getLogger().debug(".getServiceFavourites(): Exit");
+        return (output);
+    }
+
+    private FavouriteListESDT getFavourites(String id, String favouriteType) throws ResourceInvalidSearchException {
+        getLogger().debug(".getFavourites(): Entry, id->{}, favouriteType->{}", id, favouriteType);
+        ESRMethodOutcome outcome = getResourceBroker().getResource(id.toLowerCase());
+        if (outcome.getEntry() != null) {
+            FavouriteListESDT output = new FavouriteListESDT();
+            PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
+            switch(favouriteType){
+                case "PractitionerRoleFavourites":{
+                    output.getFavourites().addAll(practitioner.getPractitionerRoleFavourites().getFavourites());
+                    break;
+                }
+                case "PractitionerFavourites":{
+                    output.getFavourites().addAll(practitioner.getPractitionerFavourites().getFavourites());
+                    break;
+                }
+                case "ServiceFavourites":{
+                    output.getFavourites().addAll(practitioner.getHealthcareServiceFavourites().getFavourites());
+                    break;
+                }
+                default:{
+                    // do nothing (and return an empty set)
+                }
+            }
+            getLogger().debug(".getFavourites(): Exit, Favourites found, returning them");
+            return (output);
+        } else {
+            getLogger().debug(".getFavourites(): Exit, No Favourites found");
+            return (new FavouriteListESDT());
+        }
+    }
+
+    public PractitionerESR updatePractitionerRoleFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
+        getLogger().debug(".updatePractitionerRoleFavourites(): Entry, id->{}, newFavourites->{}", id, newFavourites);
+        PractitionerESR output = updateFavourites(id, "PractitionerRoleFavourites", newFavourites);
+        getLogger().debug(".updatePractitionerRoleFavourites(): Exit");
+        return (output);
+    }
+
+    public PractitionerESR updatePractitionerFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
+        getLogger().debug(".updatePractitionerFavourites(): Entry, id->{}, newFavourites->{}", id, newFavourites);
+        PractitionerESR output = updateFavourites(id, "PractitionerFavourites", newFavourites);
+        getLogger().debug(".updatePractitionerFavourites(): Exit");
+        return (output);
+    }
+
+    public PractitionerESR updateServiceFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
+        getLogger().debug(".updateServiceFavourites(): Entry, id->{}, newFavourites->{}", id, newFavourites);
+        PractitionerESR output = updateFavourites(id, "ServiceFavourites", newFavourites);
+        getLogger().debug(".updateServiceFavourites(): Exit");
+        return (output);
+    }
+
+    private PractitionerESR updateFavourites(String id, String favouriteType, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
+        getLogger().debug(".getFavourites(): Entry, id->{}, favouriteType->{}", id, favouriteType);
+        ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updateFavourites(id, favouriteType, newFavourites);
+        if (outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)) {
+            getLogger().debug(".getFavourites(): Exit, Favourites found, returning them");
+            PractitionerESR updatedPractitioner = (PractitionerESR) getResource(id).getEntry();
+            return (updatedPractitioner);
+        } else {
+            getLogger().debug(".getFavourites(): Exit, No Favourites found");
+            return (null);
         }
     }
 
