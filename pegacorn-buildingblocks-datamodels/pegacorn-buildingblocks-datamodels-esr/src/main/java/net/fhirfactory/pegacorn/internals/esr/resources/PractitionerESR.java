@@ -23,10 +23,7 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.EmailAddress;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerStatusESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,18 +38,18 @@ public class PractitionerESR extends PersonESR {
 
     private ArrayList<String> currentPractitionerRoles;
     private HashMap<String, IdentifierESDT> organizationMembership;
-    private ArrayList<String> practitionerRoleFavourites;
-    private ArrayList<String> healthcareServiceFavourites;
-    private ArrayList<String> practitionerFavourites;
+    private FavouriteListESDT practitionerRoleFavourites;
+    private FavouriteListESDT healthcareServiceFavourites;
+    private FavouriteListESDT practitionerFavourites;
     private PractitionerStatusESDT practitionerStatus;
 
     public PractitionerESR(){
         super();
         this.organizationMembership = new HashMap<>();
         this.currentPractitionerRoles = new ArrayList<>();
-        this.practitionerFavourites = new ArrayList<>();
-        this.healthcareServiceFavourites = new ArrayList<>();
-        this.practitionerRoleFavourites = new ArrayList<>();
+        this.practitionerFavourites = new FavouriteListESDT();
+        this.healthcareServiceFavourites = new FavouriteListESDT();
+        this.practitionerRoleFavourites = new FavouriteListESDT();
     }
 
     public ArrayList<String> getCurrentPractitionerRoles() {
@@ -71,27 +68,27 @@ public class PractitionerESR extends PersonESR {
         this.organizationMembership = organizationMembership;
     }
 
-    public ArrayList<String> getPractitionerRoleFavourites() {
+    public FavouriteListESDT getPractitionerRoleFavourites() {
         return practitionerRoleFavourites;
     }
 
-    public void setPractitionerRoleFavourites(ArrayList<String> practitionerRoleFavourites) {
+    public void setPractitionerRoleFavourites(FavouriteListESDT practitionerRoleFavourites) {
         this.practitionerRoleFavourites = practitionerRoleFavourites;
     }
 
-    public ArrayList<String> getHealthcareServiceFavourites() {
+    public FavouriteListESDT getHealthcareServiceFavourites() {
         return healthcareServiceFavourites;
     }
 
-    public void setHealthcareServiceFavourites(ArrayList<String> healthcareServiceFavourites) {
+    public void setHealthcareServiceFavourites(FavouriteListESDT healthcareServiceFavourites) {
         this.healthcareServiceFavourites = healthcareServiceFavourites;
     }
 
-    public ArrayList<String> getPractitionerFavourites() {
+    public FavouriteListESDT getPractitionerFavourites() {
         return practitionerFavourites;
     }
 
-    public void setPractitionerFavourites(ArrayList<String> practitionerFavourites) {
+    public void setPractitionerFavourites(FavouriteListESDT practitionerFavourites) {
         this.practitionerFavourites = practitionerFavourites;
     }
 

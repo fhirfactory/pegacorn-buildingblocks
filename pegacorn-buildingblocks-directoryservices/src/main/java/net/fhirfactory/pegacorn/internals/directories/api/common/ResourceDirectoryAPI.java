@@ -45,7 +45,7 @@ public abstract class ResourceDirectoryAPI extends RouteBuilder {
 
 
     private static String SERVER_PORT = "12121";
-    private static String SERVER_HOST = "localhost";
+    private static String SERVER_HOST = "0.0.0.0";
 
     @Override
     public void configure() throws Exception {

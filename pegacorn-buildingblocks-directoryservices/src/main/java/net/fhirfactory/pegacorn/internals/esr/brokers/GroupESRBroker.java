@@ -142,34 +142,37 @@ public class GroupESRBroker extends ESRBroker {
     //
 
     public ESRMethodOutcome updateGroup(GroupESR group){
-        getLogger().info(".updateGroup(): Entry, group --> {}", group);
+        getLogger().debug(".updateGroup(): Entry, group --> {}", group);
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         GroupESR cachedGroup = null;
         ESRMethodOutcome groupOutcome = null;
         if(group.getSimplifiedID() != null){
-            getLogger().info(".updateGroup(): PegId is not null, so retrieving DirectoryEntry");
+            getLogger().trace(".updateGroup(): PegId is not null, so retrieving DirectoryEntry");
             cachedGroup = (GroupESR) groupCache.getCacheEntry(group.getSimplifiedID());
             groupOutcome = new ESRMethodOutcome();
             groupOutcome.setEntry(cachedGroup);
             getLogger().info(".updateGroup(): There are no modifiable attributes in the Group PegacornDirectoryEntry superclass, only membership");
             groupOutcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
+            groupOutcome.setId(cachedGroup.getSimplifiedID());
         }
         if(cachedGroup == null){
-            getLogger().info(".updateGroup(): PegId is not null, so retrieving DirectoryEntry");
+            getLogger().trace(".updateGroup(): PegId is not null, so retrieving DirectoryEntry");
             assignSimplifiedID(group);
             groupOutcome = groupCache.addGroup(group);
             if(groupOutcome.isCreated()){
                 groupOutcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
             }
             cachedGroup = (GroupESR) groupOutcome.getEntry();
+            groupOutcome.setId(cachedGroup.getSimplifiedID());
+            groupOutcome.setEntry(cachedGroup);
         }
         if(groupOutcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
-            getLogger().info(".updateGroup(): So far, update was successful, so let's update the membership details");
+            getLogger().trace(".updateGroup(): So far, update was successful, so let's update the membership details");
             if(group.isSystemManaged()){
-                getLogger().info(".updateGroup(): Is a SystemManaged room, type equals --> {}", cachedGroup.getGroupType());
+                getLogger().trace(".updateGroup(): Is a SystemManaged room, type equals --> {}", cachedGroup.getGroupType());
                 switch (SystemManagedGroupTypesEnum.fromTypeCode(cachedGroup.getGroupType())) {
                     case PRACTITIONEROLE_MAP_PRACTITIONER_GROUP: {
-                        getLogger().info(".updateGroup(): Is a PractitionerRoleMap Practitioner Group");
+                        getLogger().trace(".updateGroup(): Is a PractitionerRoleMap Practitioner Group");
                         List<String> currentStatePractitionerRoleFulfillmentList = roleMapCache.getListOfPractitionersFulfillingPractitionerRole(cachedGroup.getGroupManager());
                         List<String> futureStatePractitionerRoleFulfillmentList = cachedGroup.getGroupMembership();
                         ArrayList<String> practitionersToRemove = new ArrayList<>();
@@ -193,7 +196,7 @@ public class GroupESRBroker extends ESRBroker {
                         break;
                     }
                     case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
-                        getLogger().info(".updateGroup(): Is a PractitionerRoleMap PractitionerRole Group");
+                        getLogger().trace(".updateGroup(): Is a PractitionerRoleMap PractitionerRole Group");
                         List<String> currentStatePractitionerFulfilledPractitionerRoleList = roleMapCache.getListOfPractitionerRolesFulfilledByPractitioner(cachedGroup.getGroupManager());
                         List<String> futureStatePractitionerFulfilledPractitionerRoleList = cachedGroup.getGroupMembership();
                         ArrayList<String> practitionerRolesToRemove = new ArrayList<>();
@@ -208,9 +211,9 @@ public class GroupESRBroker extends ESRBroker {
                                 practitionerRolesToAdd.add(futureIncludedPractitionerRole);
                             }
                         }
-                        if(getLogger().isInfoEnabled()){
-                            getLogger().info(".updateGroup(): Number of PractitionerRoles to be added --> {}", practitionerRolesToAdd.size());
-                            getLogger().info(".updateGroup(): Number of PractitionerRoles to be removed --> {}", practitionerRolesToRemove.size());
+                        if(getLogger().isTraceEnabled()){
+                            getLogger().trace(".updateGroup(): Number of PractitionerRoles to be added --> {}", practitionerRolesToAdd.size());
+                            getLogger().trace(".updateGroup(): Number of PractitionerRoles to be removed --> {}", practitionerRolesToRemove.size());
                         }
                         for(String practitionerRoleToRemove: practitionerRolesToRemove){
                             roleMapCache.removePractitionerRoleFulfilledByPractitioner(practitionerRoleToRemove, cachedGroup.getGroupManager());
@@ -222,13 +225,16 @@ public class GroupESRBroker extends ESRBroker {
                     }
                     case GENERAL:
                     default:
-                        getLogger().info(".updateGroup(): Not presently supported");
+                        getLogger().trace(".updateGroup(): Not presently supported");
                 }
             } else {
                 // synchronise membership
             }
         }
-        getLogger().info(".updateGroup(): Exit");
+        outcome.setStatus(groupOutcome.getStatus());
+        outcome.setEntry(groupOutcome.getEntry());
+        outcome.setId(groupOutcome.getId());
+        getLogger().debug(".updateGroup(): Exit");
         return(outcome);
     }
 

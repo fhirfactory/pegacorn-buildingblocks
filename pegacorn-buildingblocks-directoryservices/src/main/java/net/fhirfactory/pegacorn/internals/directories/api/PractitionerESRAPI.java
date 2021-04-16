@@ -25,6 +25,7 @@ import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerServ
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
@@ -88,45 +89,81 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .to("direct:"+getESRName()+"SearchGET")
             .get("/{simplifiedID}/PractitionerRoles").outType(PractitionerRoleListESDT.class)
                 .to("direct:" + getESRName() + "PractitionerRolesGET")
+            .get("/{simplifiedID}/PractitionerRoleFavourites").outType(FavouriteListESDT.class)
+                .to("direct:" + getESRName() + "PractitionerRoleFavouritesGET")
+            .get("/{simplifiedID}/ServiceFavourites").outType(FavouriteListESDT.class)
+                .to("direct:" + getESRName() + "ServiceFavouritesGET")
+            .get("/{simplifiedID}/PractitionerFavourites").outType(FavouriteListESDT.class)
+                .to("direct:" + getESRName() + "PractitionerFavouritesGET")
             .post().type(PractitionerRoleESR.class)
                 .to("direct:"+getESRName()+"POST")
             .put("/").type(PractitionerRoleESR.class)
                 .to("direct:"+getESRName()+"PUT")
             .put("/{simplifiedID}/PractitionerRoles/").type(PractitionerRoleListESDT.class)
-                .to("direct:"+getESRName()+"PractitionerRolesPUT");
+                .to("direct:"+getESRName()+"PractitionerRolesPUT")
+            .put("/{simplifiedID}/PractitionerRoleFavourites/").type(FavouriteListESDT.class)
+                .to("direct:"+getESRName()+"PractitionerRolesFavouritesPUT")
+            .put("/{simplifiedID}/ServiceFavourites/").type(FavouriteListESDT.class)
+                .to("direct:"+getESRName()+"ServiceFavouritesPUT")
+            .put("/{simplifiedID}/PractitionerFavourites/").type(FavouriteListESDT.class)
+                .to("direct:"+getESRName()+"PractitionerFavouritesPUT");
 
 
         from("direct:"+getESRName()+"GET")
                 .bean(practitionerServiceHandler, "getResource")
-                .log(LoggingLevel.INFO, "GET Request --> ${body}");
+                .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
         from("direct:" + getESRName() + "PractitionerRolesGET")
                 .bean(practitionerServiceHandler, "getPractitionerRoles")
-                .log(LoggingLevel.INFO, "GET Request --> ${body}");
+                .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
         from("direct:" + getESRName() + "PractitionerRolesPUT")
                 .bean(practitionerServiceHandler, "updatePractitionerRoles")
-                .log(LoggingLevel.INFO, "PUT Request --> ${body}");
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerRoleFavouritesGET")
+                .bean(practitionerServiceHandler, "getPractitionerRoleFavourites")
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerRoleFavouritesPUT")
+                .bean(practitionerServiceHandler, "updatePractitionerRoleFavourites")
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerFavouritesGET")
+                .bean(practitionerServiceHandler, "getPractitionerFavourites")
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerFavouritesPUT")
+                .bean(practitionerServiceHandler, "updatePractitionerFavourites")
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "ServiceFavouritesGET")
+                .bean(practitionerServiceHandler, "getServiceFavourites")
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "ServiceFavouritesPUT")
+                .bean(practitionerServiceHandler, "updateServiceFavourites")
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
 
         from("direct:"+getESRName()+"ListGET")
                 .bean(practitionerServiceHandler, "defaultGetResourceList")
-                .log(LoggingLevel.INFO, "GET Request --> ${body}");
+                .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
         from("direct:"+getESRName()+"SearchGET")
                 .bean(practitionerServiceHandler, "defaultSearch")
-                .log(LoggingLevel.INFO, "GET (Search) Request --> ${body}");
+                .log(LoggingLevel.DEBUG, "GET (Search) Request --> ${body}");
 
         from("direct:"+getESRName()+"POST")
-                .log(LoggingLevel.INFO, "POST Request --> ${body}")
+                .log(LoggingLevel.DEBUG, "POST Request --> ${body}")
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
                 .setBody(simple("Action not support for this Directory Entry"));
 
         from("direct:"+getESRName()+"PUT")
                 .bean(practitionerServiceHandler, "updatePractitioner")
-                .log(LoggingLevel.INFO, "PUT Request --> ${body}");
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
 
         from("direct:"+getESRName()+"DELETE")
-                .log(LoggingLevel.INFO, "DELETE Request --> ${body}")
+                .log(LoggingLevel.DEBUG, "DELETE Request --> ${body}")
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
                 .setBody(simple("Action not support for this Directory Entry"));
     }

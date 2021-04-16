@@ -29,10 +29,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.MatrixRoomESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.*;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
@@ -154,21 +151,22 @@ public class PractitionerESRBroker extends ESRBroker {
     }
 
     public ESRMethodOutcome updatePractitionerRoles(String simplifiedID, PractitionerRoleListESDT updatePractitionerRoles) throws ResourceInvalidSearchException {
+        getLogger().debug(".updatePractitionerRoles():Entry");
         ESRMethodOutcome outcome = this.getResource(simplifiedID.toLowerCase());
         if (outcome.getEntry() != null) {
-            getLogger().info(".updatePractitionerRoles():Found Resource, so updating fulfilledPractitionerRole details");
+            getLogger().trace(".updatePractitionerRoles():Found Resource, so updating fulfilledPractitionerRole details");
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
             ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(practitioner.getIdentifierWithType("EmailAddress"));
             boolean searchCompleted = practitionerRolesGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY) || outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
             boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
             if (searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()) {
-                getLogger().info(".updatePractitionerRoles(): updating the associated group");
+                getLogger().trace(".updatePractitionerRoles(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR) practitionerRolesGroupGetOutcome.getSearchResult().get(0);
                 practitionerRolesGroup.getGroupMembership().clear();
                 practitionerRolesGroup.getGroupMembership().addAll(updatePractitionerRoles.getPractitionerRoles());
                 ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
                 if(groupUpdateOutcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
-                    outcome.setStatus(groupUpdateOutcome.getStatus());
+                    outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
                 } else {
                     outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
                     outcome.setStatusReason("Could not update associated PractitionerRoles Group");
@@ -180,6 +178,44 @@ public class PractitionerESRBroker extends ESRBroker {
         } else {
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
             outcome.setStatusReason("Could not update associated Resource");
+        }
+        getLogger().debug(".updatePractitionerRoles():Exit");
+        return(outcome);
+    }
+
+    public ESRMethodOutcome updateFavourites(String simplifiedID, String favouriteType, FavouriteListESDT favourites) throws ResourceInvalidSearchException {
+        getLogger().debug(".updateFavourites():Entry");
+        ESRMethodOutcome outcome = this.getResource(simplifiedID.toLowerCase());
+        if (outcome.getEntry() != null) {
+            getLogger().trace(".updateFavourites(): found Practitioner resource, updating");
+            PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
+            boolean shouldBeUpdated = false;
+            switch (favouriteType) {
+                case "PractitionerRoleFavourites": {
+                    practitioner.getPractitionerRoleFavourites().getFavourites().addAll(favourites.getFavourites());
+                    shouldBeUpdated = true;
+                    break;
+                }
+                case "PractitionerFavourites": {
+                    practitioner.getPractitionerFavourites().getFavourites().addAll(favourites.getFavourites());
+                    shouldBeUpdated = true;
+                    break;
+                }
+                case "ServiceFavourites": {
+                    practitioner.getHealthcareServiceFavourites().getFavourites().addAll(favourites.getFavourites());
+                    shouldBeUpdated = true;
+                    break;
+                }
+                default: {
+                    // do nothing (and return an empty set)
+                }
+            }
+            if(shouldBeUpdated){
+                ESRMethodOutcome updatePractitionerOutcome = updatePractitioner(practitioner);
+                outcome.setStatus(updatePractitionerOutcome.getStatus());
+                outcome.setEntry(updatePractitionerOutcome.getEntry());
+                outcome.setId(updatePractitionerOutcome.getId());
+            }
         }
         return(outcome);
     }
