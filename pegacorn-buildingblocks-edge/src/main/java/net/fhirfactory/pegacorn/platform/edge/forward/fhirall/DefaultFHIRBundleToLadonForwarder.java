@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.messaging.forward.fhirall;
+package net.fhirfactory.pegacorn.platform.edge.forward.fhirall;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacorn.platform.ipc.frameworks.restfulapi.resourcespecific;
+package net.fhirfactory.pegacorn.platform.ipc.frameworks.fhirapi.resourcespecific;
 
 import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.param.TokenParam;

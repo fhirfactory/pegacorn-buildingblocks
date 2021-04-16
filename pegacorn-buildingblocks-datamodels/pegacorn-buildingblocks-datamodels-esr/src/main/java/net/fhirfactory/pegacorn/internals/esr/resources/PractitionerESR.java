@@ -27,8 +27,10 @@ import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 
 public class PractitionerESR extends PersonESR {
@@ -47,6 +49,7 @@ public class PractitionerESR extends PersonESR {
         super();
         this.organizationMembership = new HashMap<>();
         this.currentPractitionerRoles = new ArrayList<>();
+        this.practitionerStatus = new PractitionerStatusESDT();
         this.practitionerFavourites = new FavouriteListESDT();
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();

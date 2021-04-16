@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacorn.platform.edge.messaging.receive;
+package net.fhirfactory.pegacorn.platform.edge.receive;
 
 public abstract class DefaultFHIRBundleFromLadonReceiver extends DefaultFHIRResourceFromLadonReceiver {
 

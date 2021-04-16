@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.components.model.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.names.common.IPCGroupNames;
 import net.fhirfactory.pegacorn.deployment.properties.environmentlookupbased.PlatformEnvironmentLookup;
-import net.fhirfactory.pegacorn.platform.ipc.frameworks.jgroups.JGroupsEndpoint;
+import net.fhirfactory.pegacorn.platform.ipc.frameworks.messaging.jgroups.JGroupsEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

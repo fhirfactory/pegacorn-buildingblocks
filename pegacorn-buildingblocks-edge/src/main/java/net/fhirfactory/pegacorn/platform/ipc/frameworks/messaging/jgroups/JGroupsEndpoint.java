@@ -1,7 +1,5 @@
-package net.fhirfactory.pegacorn.platform.ipc.frameworks.jgroups;
+package net.fhirfactory.pegacorn.platform.ipc.frameworks.messaging.jgroups;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
 import org.apache.camel.CamelContext;
 import org.jgroups.JChannel;
 import org.slf4j.Logger;

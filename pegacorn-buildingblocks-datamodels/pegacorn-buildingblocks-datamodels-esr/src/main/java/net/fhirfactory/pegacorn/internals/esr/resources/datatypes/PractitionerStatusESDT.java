@@ -32,11 +32,11 @@ public class PractitionerStatusESDT {
     private Date lastLogin;
 
     public PractitionerStatusESDT(){
-        this.loggedIn = false;
-        this.active = false;
-        this.typing = false;
-        this.lastActivity = Date.from(Instant.EPOCH);
-        this.lastLogin = Date.from(Instant.EPOCH);
+        this.setActive(false);
+        this.setTyping(false);
+        this.setLoggedIn(false);
+        this.setLastActivity(Date.from(Instant.EPOCH));
+        this.setLastLogin(Date.from(Instant.EPOCH));
     }
 
     public boolean isLoggedIn() {

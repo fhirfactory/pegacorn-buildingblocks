@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.ipc.frameworks.restfulapi;
+package net.fhirfactory.pegacorn.platform.ipc.frameworks.fhirapi;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 

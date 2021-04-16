@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacorn.platform.edge.messaging.receive.common;
+package net.fhirfactory.pegacorn.platform.edge.receive.common;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

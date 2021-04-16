@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.messaging.forward.common;
+package net.fhirfactory.pegacorn.platform.edge.forward.common;
 
 import net.fhirfactory.pegacorn.petasos.wup.archetypes.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.CamelContext;
