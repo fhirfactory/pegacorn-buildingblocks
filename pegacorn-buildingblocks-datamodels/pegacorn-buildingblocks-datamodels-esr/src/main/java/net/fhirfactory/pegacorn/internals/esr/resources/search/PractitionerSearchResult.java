@@ -76,6 +76,10 @@ public class PractitionerSearchResult extends ESRSearchResult {
                 Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
                 break;
             }
+            case "displayname": {
+                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.displayNameComparator);
+                break;
+            }
             default:{
                 Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
             }

@@ -83,6 +83,11 @@ public class RoleSearchResult extends ESRSearchResult {
             }
             case "longname": {
                 Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.identifierLongNameTypeComparator);
+                break;
+            }
+            case "displayname": {
+                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.displayNameComparator);
+                break;
             }
             default:{
                 Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
