@@ -125,7 +125,7 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .bean(practitionerServiceHandler, "getPractitionerRoleFavourites")
                 .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
 
-        from("direct:" + getESRName() + "PractitionerRoleFavouritesPUT")
+        from("direct:" + getESRName() + "PractitionerRolesFavouritesPUT")
                 .bean(practitionerServiceHandler, "updatePractitionerRoleFavourites")
                 .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
 
