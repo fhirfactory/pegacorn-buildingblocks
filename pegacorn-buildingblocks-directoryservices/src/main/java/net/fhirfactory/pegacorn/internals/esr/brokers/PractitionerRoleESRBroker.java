@@ -103,15 +103,13 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             if (!groupGetOutcome.getSearchResult().isEmpty()) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
-                practitionerRoleESR.getActivePractitionerSet().clear();
-                practitionerRoleESR.getActivePractitionerSet().addAll(practitionerRolesGroup.getGroupMembership());
+                practitionerRoleESR.setRoleHistory(practitionerRolesGroup.getGroupMembership());
             }
         } else {
             if (groupGetOutcome.getEntry() != null) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
-                practitionerRoleESR.getActivePractitionerSet().clear();
-                practitionerRoleESR.getActivePractitionerSet().addAll(practitionerRolesGroup.getGroupMembership());
+                practitionerRoleESR.setRoleHistory(practitionerRolesGroup.getGroupMembership());
             }
         }
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
@@ -155,8 +153,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             if(searchCompleted && searchFoundSomething){
                 getLogger().info(".updatePractitioner(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR)practitionersGroupGetOutcome.getSearchResult().get(0);
-                practitionerRolesGroup.getGroupMembership().clear();
-                practitionerRolesGroup.getGroupMembership().addAll(entry.getActivePractitionerSet());
+                practitionerRolesGroup.setGroupMembership(entry.getRoleHistory());
                 groupBroker.updateGroup(practitionerRolesGroup);
             }
         }

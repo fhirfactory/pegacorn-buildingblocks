@@ -21,6 +21,14 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
+import java.util.UUID;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
@@ -29,16 +37,14 @@ import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.MatrixRoomESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.*;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.UUID;
 
 @ApplicationScoped
 public class PractitionerESRBroker extends ESRBroker {
@@ -110,15 +116,13 @@ public class PractitionerESRBroker extends ESRBroker {
             if (!groupGetOutcome.getSearchResult().isEmpty()) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
-                practitionerESR.getCurrentPractitionerRoles().clear();
-                practitionerESR.getCurrentPractitionerRoles().addAll(practitionerRolesGroup.getGroupMembership());
+                practitionerESR.setPractitionerRoleHistories(practitionerRolesGroup.getGroupMembership());
             }
         } else {
             if (groupGetOutcome.getEntry() != null) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
-                practitionerESR.getCurrentPractitionerRoles().clear();
-                practitionerESR.getCurrentPractitionerRoles().addAll(practitionerRolesGroup.getGroupMembership());
+                practitionerESR.setPractitionerRoleHistories(practitionerRolesGroup.getGroupMembership());
             }
         }
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
@@ -139,8 +143,7 @@ public class PractitionerESRBroker extends ESRBroker {
             if(searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()){
                 getLogger().info(".updatePractitioner(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR)practitionerRolesGroupGetOutcome.getSearchResult().get(0);
-                practitionerRolesGroup.getGroupMembership().clear();
-                practitionerRolesGroup.getGroupMembership().addAll(entry.getCurrentPractitionerRoles());
+                practitionerRolesGroup.setGroupMembership(entry.getPractitionerRoleHistories());
                 ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
             }
         } else {
@@ -162,15 +165,16 @@ public class PractitionerESRBroker extends ESRBroker {
             if (searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()) {
                 getLogger().trace(".updatePractitionerRoles(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR) practitionerRolesGroupGetOutcome.getSearchResult().get(0);
-                practitionerRolesGroup.getGroupMembership().clear();
-                practitionerRolesGroup.getGroupMembership().addAll(updatePractitionerRoles.getPractitionerRoles());
+                
+                practitionerRolesGroup.getGroupMembership().update(updatePractitionerRoles.getPractitionerRoles());
+                
                 ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
                 if(groupUpdateOutcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
                     outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
                 } else {
                     outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
                     outcome.setStatusReason("Could not update associated PractitionerRoles Group");
-                }
+                } 
             } else {
                 outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
                 outcome.setStatusReason("Could not find associated PractitionerRoles Group");
@@ -179,6 +183,7 @@ public class PractitionerESRBroker extends ESRBroker {
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
             outcome.setStatusReason("Could not update associated Resource");
         }
+        
         getLogger().debug(".updatePractitionerRoles():Exit");
         return(outcome);
     }

@@ -1,8 +1,20 @@
 package net.fhirfactory.pegacorn.internals.directories.api.beans;
 
+import static org.apache.camel.builder.Builder.constant;
+
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Header;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
@@ -13,15 +25,6 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
-import org.apache.camel.Exchange;
-import org.apache.camel.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-
-import static org.apache.camel.builder.Builder.constant;
 
 @Dependent
 public class PractitionerServiceHandler extends HandlerBase {
@@ -77,13 +80,30 @@ public class PractitionerServiceHandler extends HandlerBase {
         return("Hmmm... not good!");
     }
 
-    public PractitionerRoleListESDT getPractitionerRoles(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
+    public PractitionerRoleListESDT getPractitionerRoles(@Header("simplifiedID") String id, @Header("recent") String recent) throws ResourceInvalidSearchException {
         getLogger().debug(".getPractitionerRoles(): Entry, pathValue --> {}", id);
+        
+        
         ESRMethodOutcome outcome = getResourceBroker().getResource(id.toLowerCase());
         if (outcome.getEntry() != null) {
             PractitionerRoleListESDT output = new PractitionerRoleListESDT();
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
-            output.getPractitionerRoles().addAll(practitioner.getCurrentPractitionerRoles());
+            if (StringUtils.isEmpty(recent)) {
+            	output.getPractitionerRoles().addAll(practitioner.getPractitionerRoleHistories().getAllCurrentRolesAsString());
+            } else {
+            	
+            	try {
+            		Integer recentValue = Integer.valueOf(recent);
+            		
+            		if (recentValue == 0) {
+            			throw new ResourceInvalidSearchException("recent param must be greater than 0");
+            		}
+            	} catch(NumberFormatException e) {
+            		throw new ResourceInvalidSearchException("recent param must be a number");
+            	}
+            	
+            	output.getPractitionerRoles().addAll(practitioner.getPractitionerRoleHistories().getPreviousRolesAsString(Integer.valueOf(recent), true));
+            }
             getLogger().debug(".getPractitionerRoles(): Exit, PractitionerRoles found, returning them");
             return (output);
         } else {
@@ -113,7 +133,8 @@ public class PractitionerServiceHandler extends HandlerBase {
         getLogger().debug(".getPractitionerRoleFavourites(): Exit");
         return (output);
     }
-
+    
+    
     public FavouriteListESDT getPractitionerFavourites(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
         getLogger().debug(".getPractitionerFavourites(): Entry, pathValue --> {}", id);
         FavouriteListESDT output = getFavourites(id, "PractitionerFavourites");

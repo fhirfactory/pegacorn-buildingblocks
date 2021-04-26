@@ -21,22 +21,27 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.*;
+import java.util.Comparator;
+import java.util.HashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.EmailAddress;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerStatusESDT;
 
 public class PractitionerESR extends PersonESR {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESR.class);
     @Override
     protected Logger getLogger(){return(LOG);}
 
-    private ArrayList<String> currentPractitionerRoles;
+    private RoleHistory practitionerRoleHistories;
     private HashMap<String, IdentifierESDT> organizationMembership;
     private FavouriteListESDT practitionerRoleFavourites;
     private FavouriteListESDT healthcareServiceFavourites;
@@ -46,18 +51,18 @@ public class PractitionerESR extends PersonESR {
     public PractitionerESR(){
         super();
         this.organizationMembership = new HashMap<>();
-        this.currentPractitionerRoles = new ArrayList<>();
+        this.practitionerRoleHistories = new RoleHistory();
         this.practitionerFavourites = new FavouriteListESDT();
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();
     }
 
-    public ArrayList<String> getCurrentPractitionerRoles() {
-        return currentPractitionerRoles;
+    public RoleHistory getPractitionerRoleHistories() {
+        return practitionerRoleHistories;
     }
-
-    public void setCurrentPractitionerRoles(ArrayList<String> currentPractitionerRoles) {
-        this.currentPractitionerRoles = currentPractitionerRoles;
+    
+    public void setPractitionerRoleHistories(RoleHistory practitionerRoleHistories) {
+        this.practitionerRoleHistories = practitionerRoleHistories;
     }
 
     public HashMap<String, IdentifierESDT> getOrganizationMembership() {

@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import java.util.Comparator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 
 public class GroupESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(GroupESR.class);
@@ -34,12 +34,13 @@ public class GroupESR extends ExtremelySimplifiedResource {
     protected Logger getLogger(){return(LOG);}
 
     private String groupManager;
-    private ArrayList<String> groupMembership;
+    private RoleHistory groupMembership;
+    
     private String groupType;
 
     public GroupESR(){
         super();
-        this.groupMembership = new ArrayList<>();
+        this.groupMembership = new RoleHistory();
     }
 
     public String getGroupManager() {
@@ -50,14 +51,15 @@ public class GroupESR extends ExtremelySimplifiedResource {
         this.groupManager = groupManager;
     }
 
-    public ArrayList<String> getGroupMembership() {
+    public RoleHistory getGroupMembership() {
         return groupMembership;
     }
 
-    public void setGroupMembership(ArrayList<String> groupMembership) {
+    public void setGroupMembership(RoleHistory groupMembership) {
         this.groupMembership = groupMembership;
     }
 
+    
     public String getGroupType() {
         return groupType;
     }

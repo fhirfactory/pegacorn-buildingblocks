@@ -88,6 +88,7 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
                 .to("direct:"+getESRName()+"SearchGET")
             .get("/{simplifiedID}/PractitionerRoles").outType(PractitionerRoleListESDT.class)
+         	    .param().name("recent").type(RestParamType.query).required(false).endParam()
                 .to("direct:" + getESRName() + "PractitionerRolesGET")
             .get("/{simplifiedID}/PractitionerRoleFavourites").outType(FavouriteListESDT.class)
                 .to("direct:" + getESRName() + "PractitionerRoleFavouritesGET")
@@ -95,6 +96,7 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .to("direct:" + getESRName() + "ServiceFavouritesGET")
             .get("/{simplifiedID}/PractitionerFavourites").outType(FavouriteListESDT.class)
                 .to("direct:" + getESRName() + "PractitionerFavouritesGET")
+               
             .post().type(PractitionerRoleESR.class)
                 .to("direct:"+getESRName()+"POST")
             .put("/").type(PractitionerRoleESR.class)
@@ -120,7 +122,7 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
         from("direct:" + getESRName() + "PractitionerRolesPUT")
                 .bean(practitionerServiceHandler, "updatePractitionerRoles")
                 .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
-
+        
         from("direct:" + getESRName() + "PractitionerRoleFavouritesGET")
                 .bean(practitionerServiceHandler, "getPractitionerRoleFavourites")
                 .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
@@ -166,5 +168,6 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.DEBUG, "DELETE Request --> ${body}")
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
                 .setBody(simple("Action not support for this Directory Entry"));
+        
     }
 }

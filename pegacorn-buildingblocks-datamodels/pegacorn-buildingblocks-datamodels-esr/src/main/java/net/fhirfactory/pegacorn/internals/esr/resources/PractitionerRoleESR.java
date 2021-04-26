@@ -40,11 +40,11 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private String primaryRoleID;
     private String practitionerRoleADGroup;
     private ArrayList<ContactPointESDT> contactPoints;
-    private ArrayList<String> activePractitionerSet;
+    private RoleHistory roleHistory;
 
     public PractitionerRoleESR(){
         this.contactPoints = new ArrayList<>();
-        this.activePractitionerSet = new ArrayList<>();
+        this.roleHistory = new RoleHistory();
     }
 
     public String getPrimaryOrganizationID() {
@@ -63,12 +63,12 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
         this.primaryLocationID = primaryLocationID;
     }
 
-    public ArrayList<String> getActivePractitionerSet() {
-        return activePractitionerSet;
+    public RoleHistory getRoleHistory() {
+        return roleHistory;
     }
 
-    public void setActivePractitionerSet(ArrayList<String> activePractitionerSet) {
-        this.activePractitionerSet = activePractitionerSet;
+    public void setRoleHistory(RoleHistory roleHistory) {
+        this.roleHistory = roleHistory;
     }
 
     public String getPrimaryRoleCategoryID() {
