@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleESR.class);
@@ -69,6 +70,10 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
 
     public void setRoleHistory(RoleHistory roleHistory) {
         this.roleHistory = roleHistory;
+    }
+    
+    public List<String> getActivePractitionerSet() {
+    	return roleHistory.getAllCurrentRolesAsString();
     }
 
     public String getPrimaryRoleCategoryID() {
