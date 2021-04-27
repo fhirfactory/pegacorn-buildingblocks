@@ -96,6 +96,7 @@ public class RoleCategoryESRBroker extends ESRBroker {
             newRoleCategoryIdentifier.setLeafValue(roleCategoryName);
             newRole.getIdentifiers().add(newRoleCategoryIdentifier);
             newRole.setDisplayName(roleCategoryName);
+            newRole.assignSimplifiedID(true,commonIdentifierESDTTypes.getShortName(),IdentifierESDTUseEnum.USUAL );
             newRole.getRoles().addAll(roleIDs);
             ESRMethodOutcome outcome = this.createDirectoryEntry(newRole);
             return (outcome);

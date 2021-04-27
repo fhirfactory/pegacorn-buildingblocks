@@ -90,6 +90,7 @@ public class PractitionerRoleSearchResult extends ESRSearchResult {
             }
             case "longname": {
                 Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.identifierLongNameTypeComparator);
+                break;
             }
             case "primarylocationid": {
                 Collections.sort(result.getSearchResultList(), PractitionerRoleESR.primaryLocationIDComparator);
