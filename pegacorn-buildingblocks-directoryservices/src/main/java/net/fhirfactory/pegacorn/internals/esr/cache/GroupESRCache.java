@@ -179,7 +179,7 @@ public class GroupESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             GroupESR currentGroup = (GroupESR) currentResource;
-            if(currentGroup.getGroupType().toLowerCase().startsWith(groupType)){
+            if(currentGroup.getGroupType().toLowerCase().contains(groupType)){
                 result.getSearchResultList().add(currentGroup);
             }
         }
@@ -193,7 +193,7 @@ public class GroupESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             GroupESR currentGroup = (GroupESR) currentResource;
-            if(currentGroup.getGroupManager().toLowerCase().startsWith(groupManager)){
+            if(currentGroup.getGroupManager().toLowerCase().contains(groupManager)){
                 result.getSearchResultList().add(currentGroup);
             }
         }

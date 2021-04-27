@@ -173,7 +173,7 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             PractitionerRoleESR currentPractitionerRole = (PractitionerRoleESR) currentResource;
-            if(currentPractitionerRole.getPrimaryOrganizationID().toLowerCase().startsWith(organisationNameAsLowerCase)){
+            if(currentPractitionerRole.getPrimaryOrganizationID().toLowerCase().contains(organisationNameAsLowerCase)){
                 result.getSearchResultList().add(currentPractitionerRole);
             }
         }
@@ -189,7 +189,7 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             PractitionerRoleESR currentPractitionerRole = (PractitionerRoleESR) currentResource;
-            if(currentPractitionerRole.getPrimaryLocationID().toLowerCase().startsWith(locationNameAsLowerCase)){
+            if(currentPractitionerRole.getPrimaryLocationID().toLowerCase().contains(locationNameAsLowerCase)){
                 result.getSearchResultList().add(currentPractitionerRole);
             }
         }
@@ -204,7 +204,7 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             PractitionerRoleESR currentPractitionerRole = (PractitionerRoleESR) currentResource;
-            if(currentPractitionerRole.getPrimaryRoleCategoryID().toLowerCase().startsWith(roleCategoryNameAsLowerCase)){
+            if(currentPractitionerRole.getPrimaryRoleCategoryID().toLowerCase().contains(roleCategoryNameAsLowerCase)){
                 result.getSearchResultList().add(currentPractitionerRole);
             }
         }
@@ -219,7 +219,7 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             PractitionerRoleESR currentPractitionerRole = (PractitionerRoleESR) currentResource;
-            if(currentPractitionerRole.getPrimaryRoleID().toLowerCase().startsWith(roleNameAsLowerCase)){
+            if(currentPractitionerRole.getPrimaryRoleID().toLowerCase().contains(roleNameAsLowerCase)){
                 result.getSearchResultList().add(currentPractitionerRole);
             }
         }

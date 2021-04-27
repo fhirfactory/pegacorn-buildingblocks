@@ -324,7 +324,7 @@ public abstract class PegacornESRCache {
         Enumeration<String> displayNameSet = displayName2ESRMap.keys();
         while(displayNameSet.hasMoreElements()){
             String currentDisplayName = displayNameSet.nextElement();
-            if(currentDisplayName.toLowerCase().startsWith(displayNameValueAsLowerCase)){
+            if(currentDisplayName.toLowerCase().contains(displayNameValueAsLowerCase)){
                 ExtremelySimplifiedResource resource = this.simplifiedID2ESRMap.get(currentDisplayName);
             }
         }
