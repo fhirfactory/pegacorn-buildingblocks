@@ -9,14 +9,14 @@ import java.util.Date;
  * @author Brendan Douglas
  *
  */
-public class RoleDetail {
+public class RoleHistoryDetail {
 	private String identifier;
 	private Date createdDate;
 	private Date endDate;
 	
-	public RoleDetail() {}
+	public RoleHistoryDetail() {}
 	
-	public RoleDetail(String identifier, Date createdDate, Date endDate) {
+	public RoleHistoryDetail(String identifier, Date createdDate, Date endDate) {
 		this.identifier = identifier;
 		this.createdDate = createdDate;
 		this.endDate = endDate;

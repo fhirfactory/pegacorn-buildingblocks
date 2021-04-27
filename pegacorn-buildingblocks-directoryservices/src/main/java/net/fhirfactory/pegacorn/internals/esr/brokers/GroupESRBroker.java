@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.internals.esr.cache.GroupESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.RoleDetail;
+import net.fhirfactory.pegacorn.internals.esr.resources.RoleHistoryDetail;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
@@ -85,14 +85,14 @@ public class GroupESRBroker extends ESRBroker {
                     roleMapCache.addPractitionerRoleIfAbsent(directoryEntry.getGroupManager());
                     
                     
-                    for (RoleDetail practitionerRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
+                    for (RoleHistoryDetail practitionerRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
                         roleMapCache.addPractitionerRoleFulfilledByPractitioner(directoryEntry.getGroupManager(), practitionerRID.getIdentifier());
                     }
                     break;
                 }
                 case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
                     roleMapCache.addPractitionerIfAbsent(directoryEntry.getGroupManager());
-                    for (RoleDetail practitionerRoleRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
+                    for (RoleHistoryDetail practitionerRoleRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
                         roleMapCache.addPractitionerRoleFulfilledByPractitioner(practitionerRoleRID.getIdentifier(), directoryEntry.getGroupManager());
                     }
                     break;
