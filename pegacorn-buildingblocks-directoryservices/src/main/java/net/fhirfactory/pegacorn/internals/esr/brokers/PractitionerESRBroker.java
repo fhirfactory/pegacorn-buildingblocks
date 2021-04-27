@@ -195,18 +195,22 @@ public class PractitionerESRBroker extends ESRBroker {
             getLogger().trace(".updateFavourites(): found Practitioner resource, updating");
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
             boolean shouldBeUpdated = false;
+            
             switch (favouriteType) {
                 case "PractitionerRoleFavourites": {
+                	practitioner.getPractitionerRoleFavourites().getFavourites().clear();
                     practitioner.getPractitionerRoleFavourites().getFavourites().addAll(favourites.getFavourites());
                     shouldBeUpdated = true;
                     break;
                 }
                 case "PractitionerFavourites": {
+                	practitioner.getPractitionerFavourites().getFavourites().clear();
                     practitioner.getPractitionerFavourites().getFavourites().addAll(favourites.getFavourites());
                     shouldBeUpdated = true;
                     break;
                 }
                 case "ServiceFavourites": {
+                	practitioner.getHealthcareServiceFavourites().getFavourites();
                     practitioner.getHealthcareServiceFavourites().getFavourites().addAll(favourites.getFavourites());
                     shouldBeUpdated = true;
                     break;
