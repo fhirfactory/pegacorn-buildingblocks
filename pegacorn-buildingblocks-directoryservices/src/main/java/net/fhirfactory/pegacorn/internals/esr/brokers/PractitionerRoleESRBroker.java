@@ -103,13 +103,13 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             if (!groupGetOutcome.getSearchResult().isEmpty()) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
-                practitionerRoleESR.setRoleHistory(practitionerRolesGroup.getGroupMembership());
+                practitionerRoleESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
             }
         } else {
             if (groupGetOutcome.getEntry() != null) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
-                practitionerRoleESR.setRoleHistory(practitionerRolesGroup.getGroupMembership());
+                practitionerRoleESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
             }
         }
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
@@ -153,7 +153,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             if(searchCompleted && searchFoundSomething){
                 getLogger().info(".updatePractitioner(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR)practitionersGroupGetOutcome.getSearchResult().get(0);
-                practitionerRolesGroup.setGroupMembership(entry.getRoleHistory());
+                practitionerRolesGroup.setRoleHistory(entry.getRoleHistory());
                 groupBroker.updateGroup(practitionerRolesGroup);
             }
         }

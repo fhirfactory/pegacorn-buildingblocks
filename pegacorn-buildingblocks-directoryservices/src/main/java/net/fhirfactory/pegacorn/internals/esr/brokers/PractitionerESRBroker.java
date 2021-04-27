@@ -116,13 +116,13 @@ public class PractitionerESRBroker extends ESRBroker {
             if (!groupGetOutcome.getSearchResult().isEmpty()) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
-                practitionerESR.setPractitionerRoleHistories(practitionerRolesGroup.getGroupMembership());
+                practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
             }
         } else {
             if (groupGetOutcome.getEntry() != null) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
-                practitionerESR.setPractitionerRoleHistories(practitionerRolesGroup.getGroupMembership());
+                practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
             }
         }
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
@@ -143,7 +143,7 @@ public class PractitionerESRBroker extends ESRBroker {
             if(searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()){
                 getLogger().info(".updatePractitioner(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR)practitionerRolesGroupGetOutcome.getSearchResult().get(0);
-                practitionerRolesGroup.setGroupMembership(entry.getPractitionerRoleHistories());
+                practitionerRolesGroup.setRoleHistory(entry.getRoleHistory());
                 ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
             }
         } else {
@@ -166,7 +166,7 @@ public class PractitionerESRBroker extends ESRBroker {
                 getLogger().trace(".updatePractitionerRoles(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR) practitionerRolesGroupGetOutcome.getSearchResult().get(0);
                 
-                practitionerRolesGroup.getGroupMembership().update(updatePractitionerRoles.getPractitionerRoles());
+                practitionerRolesGroup.getRoleHistory().update(updatePractitionerRoles.getPractitionerRoles());
                 
                 ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
                 if(groupUpdateOutcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){

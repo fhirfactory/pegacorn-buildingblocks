@@ -85,14 +85,14 @@ public class GroupESRBroker extends ESRBroker {
                     roleMapCache.addPractitionerRoleIfAbsent(directoryEntry.getGroupManager());
                     
                     
-                    for (RoleDetail practitionerRID : directoryEntry.getGroupMembership().getAllCurrentRoles()) {
+                    for (RoleDetail practitionerRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
                         roleMapCache.addPractitionerRoleFulfilledByPractitioner(directoryEntry.getGroupManager(), practitionerRID.getIdentifier());
                     }
                     break;
                 }
                 case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
                     roleMapCache.addPractitionerIfAbsent(directoryEntry.getGroupManager());
-                    for (RoleDetail practitionerRoleRID : directoryEntry.getGroupMembership().getAllCurrentRoles()) {
+                    for (RoleDetail practitionerRoleRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
                         roleMapCache.addPractitionerRoleFulfilledByPractitioner(practitionerRoleRID.getIdentifier(), directoryEntry.getGroupManager());
                     }
                     break;
@@ -120,13 +120,13 @@ public class GroupESRBroker extends ESRBroker {
                 case PRACTITIONEROLE_MAP_PRACTITIONER_GROUP: {
                     getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->Practitioner group");
                     List<String> practitionerList = roleMapCache.getListOfPractitionersFulfillingPractitionerRole(groupEntry.getGroupManager());
-                    groupEntry.getGroupMembership().update(practitionerList);
+                    groupEntry.getRoleHistory().update(practitionerList);
                     break;
                 }
                 case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
                     getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->PractitionerRole group");
                     List<String> practitionerRoleList = roleMapCache.getListOfPractitionerRolesFulfilledByPractitioner(groupEntry.getGroupManager());
-                    groupEntry.getGroupMembership().update(practitionerRoleList);
+                    groupEntry.getRoleHistory().update(practitionerRoleList);
                     break;
                 }
                 case GENERAL:
@@ -175,7 +175,7 @@ public class GroupESRBroker extends ESRBroker {
                     case PRACTITIONEROLE_MAP_PRACTITIONER_GROUP: {
                         getLogger().trace(".updateGroup(): Is a PractitionerRoleMap Practitioner Group");
                         List<String> currentStatePractitionerRoleFulfillmentList = roleMapCache.getListOfPractitionersFulfillingPractitionerRole(cachedGroup.getGroupManager());
-                        List<String> futureStatePractitionerRoleFulfillmentList = cachedGroup.getGroupMembership().getAllCurrentRolesAsString();
+                        List<String> futureStatePractitionerRoleFulfillmentList = cachedGroup.getRoleHistory().getAllCurrentRolesAsString();
                         ArrayList<String> practitionersToRemove = new ArrayList<>();
                         ArrayList<String> practitionersToAdd = new ArrayList<>();
                         for(String currentIncludedPractitioner: currentStatePractitionerRoleFulfillmentList){
@@ -199,7 +199,7 @@ public class GroupESRBroker extends ESRBroker {
                     case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
                         getLogger().trace(".updateGroup(): Is a PractitionerRoleMap PractitionerRole Group");
                         List<String> currentStatePractitionerFulfilledPractitionerRoleList = roleMapCache.getListOfPractitionerRolesFulfilledByPractitioner(cachedGroup.getGroupManager());
-                        List<String> futureStatePractitionerFulfilledPractitionerRoleList = cachedGroup.getGroupMembership().getAllCurrentRolesAsString();
+                        List<String> futureStatePractitionerFulfilledPractitionerRoleList = cachedGroup.getRoleHistory().getAllCurrentRolesAsString();
                         ArrayList<String> practitionerRolesToRemove = new ArrayList<>();
                         ArrayList<String> practitionerRolesToAdd = new ArrayList<>();
                         for(String currentIncludedPractitionerRole: currentStatePractitionerFulfilledPractitionerRoleList){

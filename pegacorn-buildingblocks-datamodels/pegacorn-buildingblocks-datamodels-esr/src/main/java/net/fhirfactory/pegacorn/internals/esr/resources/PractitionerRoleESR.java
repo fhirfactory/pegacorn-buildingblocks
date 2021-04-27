@@ -26,6 +26,8 @@ import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointES
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -41,6 +43,8 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private String primaryRoleID;
     private String practitionerRoleADGroup;
     private ArrayList<ContactPointESDT> contactPoints;
+    
+    @JsonIgnore
     private RoleHistory roleHistory;
 
     public PractitionerRoleESR(){

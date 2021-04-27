@@ -89,7 +89,7 @@ public class PractitionerServiceHandler extends HandlerBase {
             PractitionerRoleListESDT output = new PractitionerRoleListESDT();
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
             if (StringUtils.isEmpty(recent)) {
-            	output.getPractitionerRoles().addAll(practitioner.getPractitionerRoleHistories().getAllCurrentRolesAsString());
+            	output.getPractitionerRoles().addAll(practitioner.getRoleHistory().getAllCurrentRolesAsString());
             } else {
             	
             	try {
@@ -102,7 +102,7 @@ public class PractitionerServiceHandler extends HandlerBase {
             		throw new ResourceInvalidSearchException("recent param must be a number");
             	}
             	
-            	output.getPractitionerRoles().addAll(practitioner.getPractitionerRoleHistories().getPreviousRolesAsString(Integer.valueOf(recent), true));
+            	output.getPractitionerRoles().addAll(practitioner.getRoleHistory().getPreviousRolesAsString(Integer.valueOf(recent), true));
             }
             getLogger().debug(".getPractitionerRoles(): Exit, PractitionerRoles found, returning them");
             return (output);

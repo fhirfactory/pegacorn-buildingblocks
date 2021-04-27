@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,9 @@ public class PractitionerESR extends PersonESR {
     @Override
     protected Logger getLogger(){return(LOG);}
 
-    private RoleHistory practitionerRoleHistories;
+    @JsonIgnore
+    private RoleHistory roleHistory;
+    
     private HashMap<String, IdentifierESDT> organizationMembership;
     private FavouriteListESDT practitionerRoleFavourites;
     private FavouriteListESDT healthcareServiceFavourites;
@@ -51,20 +54,25 @@ public class PractitionerESR extends PersonESR {
     public PractitionerESR(){
         super();
         this.organizationMembership = new HashMap<>();
-        this.practitionerRoleHistories = new RoleHistory();
+        this.roleHistory = new RoleHistory();
         this.practitionerFavourites = new FavouriteListESDT();
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();
     }
 
-    public RoleHistory getPractitionerRoleHistories() {
-        return practitionerRoleHistories;
+    public RoleHistory getRoleHistory() {
+        return roleHistory;
     }
     
-    public void setPractitionerRoleHistories(RoleHistory practitionerRoleHistories) {
-        this.practitionerRoleHistories = practitionerRoleHistories;
+    public void setRoleHistory(RoleHistory roleHistory) {
+        this.roleHistory = roleHistory;
     }
-
+    
+    public List<String> getCurrentPractitionerRoles() {
+    	return roleHistory.getAllCurrentRolesAsString();
+    }
+    
+    
     public HashMap<String, IdentifierESDT> getOrganizationMembership() {
         return organizationMembership;
     }

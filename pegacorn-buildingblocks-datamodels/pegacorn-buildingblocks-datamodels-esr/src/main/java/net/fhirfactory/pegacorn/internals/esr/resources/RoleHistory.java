@@ -29,7 +29,6 @@ public class RoleHistory {
 		roleHistories = new ArrayList<>();
 	}
 	
-	@JsonIgnore
 	public void add(String role) {
 		roleHistories.add(new RoleDetail(role, new Date(), null));
 	}
@@ -40,7 +39,6 @@ public class RoleHistory {
 	 * 
 	 * @param newRoles
 	 */
-	@JsonIgnore
 	public void update(List<String>updateRoleList) {
 		
 		// Add any new roles
@@ -69,7 +67,6 @@ public class RoleHistory {
 	 * @param number
 	 * @return
 	 */
-	@JsonIgnore
 	public List<RoleDetail>getAllCurrentRoles() {
 		List<RoleDetail>current = new ArrayList<>();
 		
@@ -89,7 +86,6 @@ public class RoleHistory {
 	 * @param number
 	 * @return
 	 */
-	@JsonIgnore
 	public List<RoleDetail>getAllPreviousRoles() {
 		List<RoleDetail>previous = new ArrayList<>();
 		
@@ -108,7 +104,6 @@ public class RoleHistory {
 	 * 
 	 * @return
 	 */
-	@JsonIgnore
 	public List<String> getAllCurrentRolesAsString() {
 		List<String>currentAsString = new ArrayList<>();		
 		
@@ -125,7 +120,6 @@ public class RoleHistory {
 	 * 
 	 * @return
 	 */
-	@JsonIgnore
 	public List<String> getAllPreviousRolesAsString() {
 		List<String>previousAsString = new ArrayList<>();		
 		
@@ -142,7 +136,6 @@ public class RoleHistory {
 	 * @param removeDuplicates
 	 * @return
 	 */
-	@JsonIgnore
 	public List<String> getPreviousRolesAsString(int num, boolean removeDuplicates) {		
 		List<RoleDetail>previous = getAllPreviousRoles();
 		
@@ -197,8 +190,6 @@ public class RoleHistory {
 	}
 	
 	
-
-	@JsonIgnore
 	public List<RoleDetail>getFirst(int number) {
 		return roleHistories;
 	}
@@ -210,7 +201,6 @@ public class RoleHistory {
 	 * @param role
 	 * @return
 	 */
-	@JsonIgnore
 	public RoleDetail getCurrentRole(String role) {
 		for (RoleDetail roleDetail : roleHistories) {
 			if (roleDetail.getEndDate() == null && roleDetail.getIdentifier().equals(role)) {
@@ -221,7 +211,6 @@ public class RoleHistory {
 		return null;
 	}
 
-	@JsonIgnore
 	public boolean isEmpty() {
 		for (RoleDetail roleHistory : roleHistories) {
 			if (roleHistory.getEndDate() == null) {

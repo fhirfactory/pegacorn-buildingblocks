@@ -67,7 +67,7 @@ public class GroupESRCache extends PegacornESRCache {
             outcome.setStatusReason("Group does not exist");
             return(outcome);
         }
-        if(foundGroup.getGroupMembership().getAllCurrentRolesAsString().contains(memberPrimaryKey)){
+        if(foundGroup.getRoleHistory().getAllCurrentRolesAsString().contains(memberPrimaryKey)){
             ESRMethodOutcome outcome = new ESRMethodOutcome();
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
             return(outcome);
@@ -90,8 +90,8 @@ public class GroupESRCache extends PegacornESRCache {
             outcome.setStatusReason("Group does not exist");
             return(outcome);
         }
-        if(foundGroup.getGroupMembership().getAllCurrentRolesAsString().contains(memberPrimaryKey)){
-            foundGroup.getGroupMembership().getAllCurrentRolesAsString().remove(memberPrimaryKey);
+        if(foundGroup.getRoleHistory().getAllCurrentRolesAsString().contains(memberPrimaryKey)){
+            foundGroup.getRoleHistory().getAllCurrentRolesAsString().remove(memberPrimaryKey);
         }
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
