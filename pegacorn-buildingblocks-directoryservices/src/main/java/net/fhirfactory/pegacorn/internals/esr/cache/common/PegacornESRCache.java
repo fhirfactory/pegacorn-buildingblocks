@@ -7,7 +7,7 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
-import org.hl7.fhir.r4.model.IdType;
+
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -227,6 +227,7 @@ public abstract class PegacornESRCache {
             String currentID = idSet.nextElement();
             if(currentID.toLowerCase().startsWith(simplifiedIDValueAsLowerCase)){
                 ExtremelySimplifiedResource resource = this.simplifiedID2ESRMap.get(currentID);
+                result.getSearchResultList().add(resource);
             }
         }
         return(result);
@@ -299,7 +300,6 @@ public abstract class PegacornESRCache {
                 if(useMatches && typeMatches && valueMatches){
                     ExtremelySimplifiedResource resource = this.identifier2ESRMap.get(currentIdentifier);
                     result.getSearchResultList().add(resource);
-                    break;
                 }
             }
             getLogger().debug(".searchCacheForESRUsingIdentifierParameters(): Exit, result --> {}", result);
@@ -318,14 +318,18 @@ public abstract class PegacornESRCache {
         }
         ESRSearchResult result = instatiateNewESRSearchResult();
         if(this.simplifiedID2ESRMap.isEmpty()){
+        	getLogger().info(".searchCacheUsingDisplayName(): Exit, map is empty, no entries found");
             return(result);
         }
         String displayNameValueAsLowerCase = displayNameValue.toLowerCase();
         Enumeration<String> displayNameSet = displayName2ESRMap.keys();
         while(displayNameSet.hasMoreElements()){
             String currentDisplayName = displayNameSet.nextElement();
+            getLogger().info(".searchCacheUsingDisplayName(): Iterating through ESR Elements, currentEntry.displayName->{}, searchForDisplayName->{}", currentDisplayName, displayNameValueAsLowerCase);
             if(currentDisplayName.toLowerCase().contains(displayNameValueAsLowerCase)){
-                ExtremelySimplifiedResource resource = this.simplifiedID2ESRMap.get(currentDisplayName);
+                ExtremelySimplifiedResource resource = this.displayName2ESRMap.get(currentDisplayName);
+                                
+                result.getSearchResultList().add(resource);
             }
         }
         return(result);

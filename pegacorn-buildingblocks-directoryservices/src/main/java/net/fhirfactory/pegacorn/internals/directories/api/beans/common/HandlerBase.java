@@ -107,7 +107,8 @@ public abstract class HandlerBase {
     // Review (General Search)
     //
 
-    public List<ExtremelySimplifiedResource> defaultSearch( @Header("shortName") String shortName,
+    public List<ExtremelySimplifiedResource> defaultSearch( @Header("simplifiedID") String simplifiedID,
+    														@Header("shortName") String shortName,
                                                             @Header("longName") String longName,
                                                             @Header("displayName") String displayName,
                                                             @Header("leafValue") String leafValue,
@@ -116,12 +117,15 @@ public abstract class HandlerBase {
                                                             @Header("pageSize") String pageSize,
                                                             @Header("page") String page)
             throws ResourceNotFoundException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRPaginationException, ESRSortingException {
-        getLogger().debug(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{}"+
+        getLogger().info(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{}"+
                         "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
                 shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
         String searchAttributeName = null;
         String searchAttributeValue = null;
-        if(shortName != null) {
+        if(simplifiedID != null) {
+            searchAttributeValue = simplifiedID;
+            searchAttributeName = "simplifiedID";
+        } else if(shortName != null) {
             searchAttributeValue = shortName;
             searchAttributeName = "shortName";
         } else if(longName != null){
