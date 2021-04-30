@@ -148,11 +148,11 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
 
         from("direct:"+getESRName()+"ListGET")
-                .bean(practitionerServiceHandler, "defaultGetResourceList")
+                .bean(practitionerServiceHandler, "defaultGetResourceList(Exchange)")
                 .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
         from("direct:"+getESRName()+"SearchGET")
-                .bean(practitionerServiceHandler, "defaultSearch")
+                .bean(practitionerServiceHandler, "defaultSearch(Exchange)")
                 .log(LoggingLevel.DEBUG, "GET (Search) Request --> ${body}");
 
         from("direct:"+getESRName()+"POST")

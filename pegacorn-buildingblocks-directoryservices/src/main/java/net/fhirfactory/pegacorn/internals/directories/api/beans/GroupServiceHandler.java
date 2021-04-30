@@ -75,7 +75,8 @@ public class GroupServiceHandler extends HandlerBase {
     //
     // Group Unique Search
     //
-    public List<ExtremelySimplifiedResource> groupSearch(@Header("shortName") String shortName,
+    public List<ExtremelySimplifiedResource> groupSearch(Exchange exchange, 
+    													   @Header("shortName") String shortName,
                                                            @Header("longName") String longName,
                                                            @Header("displayName") String displayName,
                                                            @Header("groupType") String groupType,
@@ -121,7 +122,11 @@ public class GroupServiceHandler extends HandlerBase {
             sortOrderValue = Boolean.valueOf(sortOrder);
         }
         ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValue, pageSizeValue, pageValue, sortBy, sortOrderValue);
+        
+        exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+        
         getLogger().debug(".defaultSearch(): Exit");
+                
         return(outcome.getSearchResult());
     }
 

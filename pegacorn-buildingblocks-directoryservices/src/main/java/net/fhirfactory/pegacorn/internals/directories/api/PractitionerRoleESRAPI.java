@@ -101,11 +101,11 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
         from("direct:"+getESRName()+"ListGET")
-                .bean(practitionerRoleServiceHandler, "defaultGetResourceList")
+                .bean(practitionerRoleServiceHandler, "defaultGetResourceList(Exchange)")
                 .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
         from("direct:"+getESRName()+"SearchGET")
-                .bean(practitionerRoleServiceHandler, "practitionerRoleSearch")
+                .bean(practitionerRoleServiceHandler, "practitionerRoleSearch(Exchange)")
                 .log(LoggingLevel.INFO, "GET (Search) Request --> ${body}");
 
         from("direct:"+getESRName()+"POST")

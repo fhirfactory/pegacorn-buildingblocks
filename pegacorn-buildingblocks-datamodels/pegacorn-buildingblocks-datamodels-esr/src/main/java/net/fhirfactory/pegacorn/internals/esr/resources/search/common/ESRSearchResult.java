@@ -37,6 +37,8 @@ public abstract class ESRSearchResult {
     private ArrayList<ExtremelySimplifiedResource> searchResultList;
     private String statusReason;
     private boolean searchSuccessful;
+    
+    private int totalSearchResultCount;
 
     protected abstract Logger getLogger();
     public abstract ESRSearchResult filterBy(String attributeName, String attributeValue) throws ESRFilteringException;
@@ -76,12 +78,20 @@ public abstract class ESRSearchResult {
     public void setSearchSuccessful(boolean searchSuccessful) {
         this.searchSuccessful = searchSuccessful;
     }
+    
+    public int getTotalSearchResultCount() {
+		return totalSearchResultCount;
+	}
+	public void setTotalSearchResultCount(int totalSearchResultCount) {
+		this.totalSearchResultCount = totalSearchResultCount;
+	}
 
-    //
+	
+	//
     // Sorting Services
     //
 
-    /**
+	/**
      * This function reverses the order of elements within a List.
      *
      * @param esrList the List whose elements are to be reverse sorted.
@@ -126,6 +136,9 @@ public abstract class ESRSearchResult {
             getLogger().trace(".paginate():pageSize is null, so defaulting to " + DEFAULT_PAGE_SIZE);
             pageSize = DEFAULT_PAGE_SIZE;
         }
+        
+        result.setTotalSearchResultCount(getSearchResultList().size());
+               
         if(pageSize == 0){
             result.setSearchResultList(getSearchResultList());
             getLogger().debug(".paginate(): Exit, pageSize is zero, so returning ALL elements");
@@ -135,6 +148,8 @@ public abstract class ESRSearchResult {
             getLogger().debug(".paginate():page is null, so defaulting to first page");
             page = 0;
         }
+        
+        
         if(pageSize > 0) {
             Integer locationOffsetStart = pageSize * page;
             Integer numberOfEntries = getSearchResultList().size();
@@ -163,6 +178,7 @@ public abstract class ESRSearchResult {
             outcome.setSearchSuccessful(true);
         }
         outcome.setSearchResult(this.getSearchResultList());
+        outcome.setTotalSearchResultCount(getTotalSearchResultCount());
         return(outcome);
     }
 

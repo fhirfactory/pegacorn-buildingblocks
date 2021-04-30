@@ -57,7 +57,8 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
     // Review (Search)
     //
 
-    public List<ExtremelySimplifiedResource> practitionerRoleSearch(@Header("shortName") String shortName,
+    public List<ExtremelySimplifiedResource> practitionerRoleSearch(Exchange exchange,
+    															    @Header("shortName") String shortName,
                                                                     @Header("longName") String longName,
                                                                     @Header("displayName") String displayName,
                                                                     @Header("primaryRoleCategoryID") String primaryRoleCategoryID,
@@ -114,7 +115,11 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
         }
         String searchAttributeValueURLDecoded = URLDecoder.decode(searchAttributeValue, StandardCharsets.UTF_8);
         ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValueURLDecoded, pageSizeValue, pageValue, sortBy, sortOrderValue);
+        
+        exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+        
         getLogger().debug(".defaultSearch(): Exit");
+               
         return(outcome.getSearchResult());
     }
 

@@ -35,6 +35,8 @@ public class ESRMethodOutcome {
     private boolean search;
     private ArrayList<ExtremelySimplifiedResource> searchResult;
     private boolean searchSuccessful;
+    
+    private int totalSearchResultCount;
 
     public boolean isSearch() {
         return search;
@@ -103,4 +105,12 @@ public class ESRMethodOutcome {
     public void setId(String id) {
         this.id = id;
     }
+
+	public int getTotalSearchResultCount() {
+		return totalSearchResultCount;
+	}
+
+	public void setTotalSearchResultCount(int totalSearchResultCount) {
+		this.totalSearchResultCount = totalSearchResultCount;
+	}
 }

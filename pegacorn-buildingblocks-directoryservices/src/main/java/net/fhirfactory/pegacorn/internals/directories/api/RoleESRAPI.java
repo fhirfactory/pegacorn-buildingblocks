@@ -97,11 +97,11 @@ public class RoleESRAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
         from("direct:"+getESRName()+"ListGET")
-                .bean(roleServiceHandler, "defaultGetResourceList")
+                .bean(roleServiceHandler, "defaultGetResourceList(Exchange)")
                 .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
         from("direct:"+getESRName()+"SearchGET")
-                .bean(roleServiceHandler, "defaultSearch")
+                .bean(roleServiceHandler, "defaultSearch(Exchange)")
                 .log(LoggingLevel.INFO, "GET (Search) Request --> ${body}");
 
         from("direct:"+getESRName()+"POST")
