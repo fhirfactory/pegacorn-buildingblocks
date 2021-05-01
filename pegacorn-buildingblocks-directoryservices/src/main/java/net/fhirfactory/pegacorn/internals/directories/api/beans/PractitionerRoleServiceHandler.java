@@ -111,7 +111,11 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
             pageValue = Integer.valueOf(page);
         }
         if(sortOrder != null) {
-            sortOrderValue = Boolean.valueOf(sortOrder);
+        	if (sortOrder.equals(SORT_ORDER_ASCENDING)) {
+        		sortOrderValue = true;
+        	} else if (sortOrder.equals(SORT_ORDER_DESCENDING)) {
+        		sortOrderValue = false;
+        	}
         }
         String searchAttributeValueURLDecoded = URLDecoder.decode(searchAttributeValue, StandardCharsets.UTF_8);
         ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValueURLDecoded, pageSizeValue, pageValue, sortBy, sortOrderValue);

@@ -86,37 +86,6 @@ public abstract class ESRSearchResult {
 		this.totalSearchResultCount = totalSearchResultCount;
 	}
 
-	
-	//
-    // Sorting Services
-    //
-
-	/**
-     * This function reverses the order of elements within a List.
-     *
-     * @param esrList the List whose elements are to be reverse sorted.
-     * @return success (or otherwise) of the process.
-     */
-    protected boolean reverseSortOrder(List<ExtremelySimplifiedResource> esrList){
-        if(esrList == null){
-            return(false);
-        }
-
-        if(esrList.isEmpty()){
-            return(true);
-        }
-        List<ExtremelySimplifiedResource> originalList = new ArrayList<>();
-        for(int counter = 0; counter < esrList.size(); counter += 1){
-            originalList.add(counter, esrList.get(counter));
-        }
-        esrList.clear();
-        Integer size = esrList.size();
-        for(Integer counter = 0; counter < size; counter += 1){
-            Integer reverseLocation = (size - 1) - counter;
-            esrList.add(counter, originalList.get(reverseLocation));
-        }
-        return(true);
-    }
 
     //
     // Paginate Services

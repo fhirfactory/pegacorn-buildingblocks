@@ -77,48 +77,44 @@ public class PractitionerRoleSearchResult extends ESRSearchResult {
         getLogger().debug(".sortBy(): execute (via Switch() statement) the selected sort");
         switch(sortByLowerCase){
             case "simplifiedid": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
+                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
             case "displayname": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.displayNameComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
             }
             case "shortname": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.identifierShortNameBasedComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));
                 break;
             }
             case "longname": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.identifierLongNameTypeComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
                 break;
             }
             case "primarylocationid": {
-                Collections.sort(result.getSearchResultList(), PractitionerRoleESR.primaryLocationIDComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? PractitionerRoleESR.primaryLocationIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryLocationIDComparator));
                 break;
             }
             case "primaryorganizatonid":
             case "primaryorganisationid":{
                 getLogger().debug(".sortBy(): primaryOrganisationID sort requested...");
-                Collections.sort(result.getSearchResultList(), PractitionerRoleESR.primaryOrganizationIDComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? PractitionerRoleESR.primaryOrganizationIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryOrganizationIDComparator));
                 getLogger().debug(".sortBy(): primaryOrganisationID sort done...");
                 break;
             }
             case "primaryrolecategoryid": {
-                Collections.sort(result.getSearchResultList(), PractitionerRoleESR.primaryRoleCategoryIDComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? PractitionerRoleESR.primaryRoleCategoryIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryRoleCategoryIDComparator));
                 break;
             }
             case "primaryroleid": {
-                Collections.sort(result.getSearchResultList(), PractitionerRoleESR.primaryRoleIDComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? PractitionerRoleESR.primaryRoleIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryRoleIDComparator));
             }
             default:{
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
             }
         }
-        if(!ascendingOrder){
-            getLogger().debug(".sortBy(): reverse sorting order requested");
-            reverseSortOrder(getSearchResultList());
-            getLogger().debug(".sortBy(): reverse sorting order done...");
-        }
+
         getLogger().debug(".sortBy(): Exit");
         return(result);
     }

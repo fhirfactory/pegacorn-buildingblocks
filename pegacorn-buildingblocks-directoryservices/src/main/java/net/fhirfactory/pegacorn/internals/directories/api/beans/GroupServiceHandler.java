@@ -119,7 +119,11 @@ public class GroupServiceHandler extends HandlerBase {
             pageValue = Integer.valueOf(page);
         }
         if(sortOrder != null) {
-            sortOrderValue = Boolean.valueOf(sortOrder);
+        	if (sortOrder.equals(SORT_ORDER_ASCENDING)) {
+        		sortOrderValue = true;
+        	} else if (sortOrder.equals(SORT_ORDER_DESCENDING)) {
+        		sortOrderValue = false;
+        	}
         }
         ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValue, pageSizeValue, pageValue, sortBy, sortOrderValue);
         

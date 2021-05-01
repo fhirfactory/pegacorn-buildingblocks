@@ -50,6 +50,9 @@ public abstract class HandlerBase {
     private static String SORT_ATTRIBUTE = "sortBy";
     private static String SORT_ORDER = "sortOrder";
     
+    protected static final String SORT_ORDER_ASCENDING = "ascending";
+    protected static final String SORT_ORDER_DESCENDING = "descending";
+    
     protected static final String TOTAL_RECORD_COUNT_HEADER = "Total_Search_Result_Count";
 
     abstract protected Logger getLogger();
@@ -89,7 +92,11 @@ public abstract class HandlerBase {
             pageValue = Integer.valueOf(page);
         }
         if(sortOrder != null) {
-            sortOrderValue = Boolean.valueOf(sortOrder);
+        	if (sortOrder.equals(SORT_ORDER_ASCENDING)) {
+        		sortOrderValue = true;
+        	} else if (sortOrder.equals(SORT_ORDER_DESCENDING)) {
+        		sortOrderValue = false;
+        	}
         }
         if(sortBy == null){
             sortBy = "simplifiedID";
@@ -162,7 +169,11 @@ public abstract class HandlerBase {
             pageValue = Integer.valueOf(page);
         }
         if(sortOrder != null) {
-            sortOrderValue = Boolean.valueOf(sortOrder);
+        	if (sortOrder.equals(SORT_ORDER_ASCENDING)) {
+        		sortOrderValue = true;
+        	} else if (sortOrder.equals(SORT_ORDER_DESCENDING)) {
+        		sortOrderValue = false;
+        	}
         }
         String searchAttributeValueURLDecoded = URLDecoder.decode(searchAttributeValue, StandardCharsets.UTF_8);
         ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValueURLDecoded, pageSizeValue, pageValue, sortBy, sortOrderValue);

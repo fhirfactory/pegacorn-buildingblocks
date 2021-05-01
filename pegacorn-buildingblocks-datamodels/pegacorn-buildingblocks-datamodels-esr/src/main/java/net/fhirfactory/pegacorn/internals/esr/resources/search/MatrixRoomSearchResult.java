@@ -73,16 +73,14 @@ public class MatrixRoomSearchResult extends ESRSearchResult {
         String sortByLowerCase = attributeName.toLowerCase();
         switch(sortByLowerCase){
             case "simplifiedid": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
+                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
             default:{
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
+                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
             }
         }
-        if(!ascendingOrder){
-            reverseSortOrder(getSearchResultList());
-        }
+
         return(result);
     }
 

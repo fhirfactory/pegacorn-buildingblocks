@@ -73,20 +73,19 @@ public class PractitionerSearchResult extends ESRSearchResult {
         String sortByLowerCase = attributeName.toLowerCase();
         switch(sortByLowerCase){
             case "simplifiedid": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
+            	Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
             case "displayname": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.displayNameComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
             }
             default:{
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
+                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
+                break;
             }
         }
-        if(!ascendingOrder){
-            reverseSortOrder(getSearchResultList());
-        }
+
         return(result);
     }
 

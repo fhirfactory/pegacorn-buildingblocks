@@ -74,28 +74,26 @@ public class RoleSearchResult extends ESRSearchResult {
         String sortByLowerCase = attributeName.toLowerCase();
         switch(sortByLowerCase){
             case "simplifiedid": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
+                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
             case "shortname": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.identifierShortNameBasedComparator);
+                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));
                 break;
             }
             case "longname": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.identifierLongNameTypeComparator);
+                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
                 break;
             }
             case "displayname": {
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.displayNameComparator);
+                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
             }
             default:{
-                Collections.sort(result.getSearchResultList(), ExtremelySimplifiedResource.simplifiedIDComparator);
+                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
             }
         }
-        if(!ascendingOrder){
-            reverseSortOrder(getSearchResultList());
-        }
+
         return(result);
     }
 
