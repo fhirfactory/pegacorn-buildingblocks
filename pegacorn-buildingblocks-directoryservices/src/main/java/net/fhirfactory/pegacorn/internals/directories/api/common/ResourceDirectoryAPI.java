@@ -89,7 +89,7 @@ public abstract class ResourceDirectoryAPI extends RouteBuilder {
                 .contextPath(getPegacornReferenceProperties().getPegacornResourceDirectoryR1Path()).host(getServerHost()).port(getServerPort())
                 .enableCORS(true)
                 .corsAllowCredentials(true)
-                .corsHeaderProperty("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, login");
+                .corsHeaderProperty("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, login, Total_Search_Result_Count");
         return (restConf);
     }
 
