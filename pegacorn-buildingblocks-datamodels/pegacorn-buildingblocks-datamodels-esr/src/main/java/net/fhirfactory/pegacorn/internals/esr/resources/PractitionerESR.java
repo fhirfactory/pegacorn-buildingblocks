@@ -58,7 +58,9 @@ public class PractitionerESR extends PersonESR {
         this.practitionerFavourites = new FavouriteListESDT();
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();
+        this.practitionerStatus = new PractitionerStatusESDT();
     }
+    
 
     public RoleHistory getRoleHistory() {
         return roleHistory;
