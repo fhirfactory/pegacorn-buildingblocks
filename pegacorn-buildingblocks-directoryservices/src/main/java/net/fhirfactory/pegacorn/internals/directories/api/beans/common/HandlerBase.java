@@ -53,7 +53,7 @@ public abstract class HandlerBase {
     protected static final String SORT_ORDER_ASCENDING = "ascending";
     protected static final String SORT_ORDER_DESCENDING = "descending";
     
-    protected static final String TOTAL_RECORD_COUNT_HEADER = "Total_Search_Result_Count";
+    protected static final String TOTAL_RECORD_COUNT_HEADER = "X-Total-Count";
 
     abstract protected Logger getLogger();
     abstract protected ESRBroker specifyResourceBroker();
