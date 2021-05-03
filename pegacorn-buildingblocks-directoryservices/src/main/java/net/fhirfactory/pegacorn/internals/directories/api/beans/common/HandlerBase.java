@@ -54,6 +54,7 @@ public abstract class HandlerBase {
     protected static final String SORT_ORDER_DESCENDING = "descending";
     
     protected static final String TOTAL_RECORD_COUNT_HEADER = "X-Total-Count";
+    protected static final String ACCESS_CONTROL_EXPOSE_HEADERS_HEADER = "Access-Control-Expose-Headers";
 
     abstract protected Logger getLogger();
     abstract protected ESRBroker specifyResourceBroker();
@@ -104,6 +105,7 @@ public abstract class HandlerBase {
         ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(pageSizeValue, pageValue, sortBy, sortOrderValue);
         
         exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+        exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
         
         getLogger().debug(".defaultGetResourceList(): Exit");
                        
@@ -179,6 +181,7 @@ public abstract class HandlerBase {
         ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValueURLDecoded, pageSizeValue, pageValue, sortBy, sortOrderValue);
         
         exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+        exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
         
         getLogger().debug(".defaultSearch(): Exit");
                          
