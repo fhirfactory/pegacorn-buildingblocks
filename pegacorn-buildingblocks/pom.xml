@@ -18,6 +18,7 @@
     <modules>
         <module>../pegacorn-buildingblocks-datamodels/pegacorn-buildingblocks-datamodels</module>
 	    <module>../pegacorn-buildingblocks-directoryservices</module>
+		<module>../pegacorn-buildingblocks-esr/pegacorn-buildingblocks-esr</module>
         <!--
         <module>../pegacorn-buildingblocks-workshop</module>
         <module>../pegacorn-buildingblocks-processingplant</module>
