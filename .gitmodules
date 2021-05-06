@@ -1,0 +1,3 @@
+[submodule "pegacorn-buildingblocks-esr/pegacorn-buildingblocks-esr"]
+	path = pegacorn-buildingblocks-esr/pegacorn-buildingblocks-esr
+	url = https://github.com/fhirfactory/pegacorn-buildingblocks.git
