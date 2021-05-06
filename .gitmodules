@@ -1,0 +1,18 @@
+[submodule "pegacorn-buildingblocks-esr"]
+	path = pegacorn-buildingblocks-esr
+	url = https://github.com/fhirfactory/pegacorn-buildingblocks.git
+[submodule "pegacorn-buildingblocks-esr-model"]
+	path = pegacorn-buildingblocks-esr-model
+	url = https://github.com/fhirfactory/pegacorn-buildingblocks.git
+[submodule "pegacorn-buildingblocks-esr-server"]
+	path = pegacorn-buildingblocks-esr-server
+	url = https://github.com/fhirfactory/pegacorn-buildingblocks.git
+[submodule "pegacorn-buildingblocks-esr-restfulapi"]
+	path = pegacorn-buildingblocks-esr-restfulapi
+	url = https://github.com/fhirfactory/pegacorn-buildingblocks.git
+[submodule "pegacorn-buildingblocks-esr-proxy"]
+	path = pegacorn-buildingblocks-esr-proxy
+	url = https://github.com/fhirfactory/pegacorn-buildingblocks.git
+[submodule "pegacorn-buildingblocks-esr-search"]
+	path = pegacorn-buildingblocks-esr-search
+	url = https://github.com/fhirfactory/pegacorn-buildingblocks.git
