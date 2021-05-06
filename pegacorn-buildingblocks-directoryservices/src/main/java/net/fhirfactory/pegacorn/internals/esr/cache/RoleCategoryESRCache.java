@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.RoleCategorySearchResult;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 import org.slf4j.Logger;
@@ -84,35 +85,42 @@ public class RoleCategoryESRCache extends PegacornESRCache {
     }
 
     @Override
-    public ESRSearchResult search(String searchAttributeName, String searchAttributeValue)
+    public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchAttributeName, searchAttributeValue);
-        if(searchAttributeName == null || searchAttributeValue == null){
-            throw(new ResourceInvalidSearchException("Search Parameter Name or Value are null"));
+    	
+    	
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getParamName(), searchCriteria.getValue());
+        
+        if(searchCriteria.isValueNull()){
+            throw(new ResourceInvalidSearchException("Search Value is null"));
         }
-        if(searchAttributeName.isEmpty()){
+        if(searchCriteria.isParamNameNull()){
             throw(new ResourceInvalidSearchException("Search Parameter Name is empty"));
         }
+        
+        
         ESRSearchResult result = instatiateNewESRSearchResult();
-        if(searchAttributeValue.isEmpty()){
+        
+        if(searchCriteria.isValueEmpty()){
             return(result);
         }
-        String searchAttributeNameLowerCase = searchAttributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
+        
+
+        switch(searchCriteria.getParamName().toLowerCase()){
             case "simplifiedid": {
-                result = this.searchCacheUsingSimplifiedID(searchAttributeValue);
+                result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
             case "shortname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "ShortName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
             case "longname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "LongName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
             case "displayname": {
-                result = this.searchCacheUsingDisplayName(searchAttributeValue);
+                result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
             default: {

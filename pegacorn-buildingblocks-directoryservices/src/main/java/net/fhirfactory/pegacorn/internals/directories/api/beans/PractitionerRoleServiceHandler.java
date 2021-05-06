@@ -5,6 +5,10 @@ import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Pagination;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
@@ -69,7 +73,7 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
                                                                     @Header("sortOrder") String sortOrder,
                                                                     @Header("pageSize") String pageSize,
                                                                     @Header("page") String page)
-            throws ResourceNotFoundException, ResourceInvalidSortException, ESRPaginationException, ResourceInvalidSearchException, ESRSortingException {
+            throws ResourceNotFoundException, ResourceInvalidSortException, ESRPaginationException, ResourceInvalidSearchException, ESRSortingException, ESRFilteringException {
         getLogger().debug(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{}"
                         + "sortBy->{}, sortOrder->{}, pageSize->{},page->{},primaryRoleCategoryID->{}"
                         + "primaryRoleID->{}, primaryOrganizationID->{}, primaryLocationID->{}",
@@ -101,24 +105,24 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
         else {
             throw( new ResourceInvalidSearchException("Search parameter not specified"));
         }
+        
+        SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
+        
         Integer pageSizeValue = null;
         Integer pageValue = null;
-        Boolean sortOrderValue = true;
+ 
         if(pageSize != null) {
             pageSizeValue = Integer.valueOf(pageSize);
         }
         if(page != null) {
             pageValue = Integer.valueOf(page);
         }
-        if(sortOrder != null) {
-        	if (sortOrder.equals(SORT_ORDER_ASCENDING)) {
-        		sortOrderValue = true;
-        	} else if (sortOrder.equals(SORT_ORDER_DESCENDING)) {
-        		sortOrderValue = false;
-        	}
-        }
-        String searchAttributeValueURLDecoded = URLDecoder.decode(searchAttributeValue, StandardCharsets.UTF_8);
-        ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValueURLDecoded, pageSizeValue, pageValue, sortBy, sortOrderValue);
+
+        
+        Pagination pagination = new Pagination(pageSizeValue, pageValue);
+        Sort sort = new Sort(sortBy, sortOrder);
+
+        ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchCriteria, sort, pagination);
         
         exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
         exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);

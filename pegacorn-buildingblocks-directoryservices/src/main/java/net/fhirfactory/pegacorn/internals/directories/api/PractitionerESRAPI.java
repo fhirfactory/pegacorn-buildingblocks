@@ -86,6 +86,10 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .param().name("page").type(RestParamType.query).required(false).endParam()
                 .param().name("sortBy").type(RestParamType.query).required(false).endParam()
                 .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                .param().name("roleFilter").type(RestParamType.query).required(false).endParam()
+                .param().name("locationFilter").type(RestParamType.query).required(false).endParam()
+                .param().name("careTeamFilter").type(RestParamType.query).required(false).endParam()
+                .param().name("roleCategoryFilter").type(RestParamType.query).required(false).endParam()
                 .to("direct:"+getESRName()+"SearchGET")
             .get("/{simplifiedID}/PractitionerRoles").outType(PractitionerRoleListESDT.class)
          	    .param().name("recent").type(RestParamType.query).required(false).endParam()
@@ -108,8 +112,20 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
             .put("/{simplifiedID}/ServiceFavourites/").type(FavouriteListESDT.class)
                 .to("direct:"+getESRName()+"ServiceFavouritesPUT")
             .put("/{simplifiedID}/PractitionerFavourites/").type(FavouriteListESDT.class)
-                .to("direct:"+getESRName()+"PractitionerFavouritesPUT");
+                .to("direct:"+getESRName()+"PractitionerFavouritesPUT")
+                
 
+	        .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+		        .param().name("pageSize").type(RestParamType.query).required(false).endParam()
+		        .param().name("page").type(RestParamType.query).required(false).endParam()
+		        .param().name("sortBy").type(RestParamType.query).required(false).endParam()
+		        .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                .param().name("roleFilter").type(RestParamType.query).required(false).endParam()
+                .param().name("locationFilter").type(RestParamType.query).required(false).endParam()
+                .param().name("careTeamFilter").type(RestParamType.query).required(false).endParam()
+                .param().name("roleCategoryFilter").type(RestParamType.query).required(false).endParam()
+		        .to("direct:" + getESRName() + "ListGET");
+        
 
         from("direct:"+getESRName()+"GET")
                 .bean(practitionerServiceHandler, "getResource")
@@ -148,11 +164,11 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
 
         from("direct:"+getESRName()+"ListGET")
-                .bean(practitionerServiceHandler, "defaultGetResourceList(Exchange)")
+                .bean(practitionerServiceHandler, "practitionerGetResourceList(Exchange)")
                 .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
         from("direct:"+getESRName()+"SearchGET")
-                .bean(practitionerServiceHandler, "defaultSearch(Exchange)")
+                .bean(practitionerServiceHandler, "practitionerSearch(Exchange)")
                 .log(LoggingLevel.DEBUG, "GET (Search) Request --> ${body}");
 
         from("direct:"+getESRName()+"POST")

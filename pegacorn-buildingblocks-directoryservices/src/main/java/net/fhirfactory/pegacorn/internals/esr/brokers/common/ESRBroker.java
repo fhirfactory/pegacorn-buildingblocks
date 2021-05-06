@@ -25,6 +25,10 @@ import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.CommonIdentifierESDTTypes;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Pagination;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
@@ -129,17 +133,15 @@ public abstract class ESRBroker {
         }
     }
 
-    public ESRMethodOutcome searchForESRsUsingAttribute(String attributeName,
-                                                        String attributeValue,
-                                                        Integer pageSize,
-                                                        Integer page,
-                                                        String sortAttribute,
-                                                        Boolean sortAscendingOrder)
-            throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException {
+    public ESRMethodOutcome searchForESRsUsingAttribute(SearchCriteria searchCriteria,
+                                                        Sort sort,
+                                                        Pagination pagination)
+            throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
 
-        ESRMethodOutcome outcome = getCache().search(attributeName, attributeValue)
-                .sortBy(sortAttribute, sortAscendingOrder)
-                .paginate(pageSize, page)
+        ESRMethodOutcome outcome = getCache().search(searchCriteria)
+                .sortBy(sort)
+                .filterBy(searchCriteria.getFilters())
+                .paginate(pagination)
                 .toESRMethodOutcome();
         if(outcome.isSearchSuccessful()){
             for(ExtremelySimplifiedResource resource: outcome.getSearchResult()){
@@ -150,9 +152,9 @@ public abstract class ESRBroker {
 
     }
 
-    public ESRMethodOutcome getSortedDirectoryEntrySet(String sortParameter, Boolean sortOrder)
+    public ESRMethodOutcome getSortedDirectoryEntrySet(Sort sort)
             throws ResourceInvalidSortException, ESRSortingException, ResourceInvalidSearchException {
-        ESRMethodOutcome outcome = getCache().allResources().sortBy(sortParameter, sortOrder).toESRMethodOutcome();
+        ESRMethodOutcome outcome = getCache().allResources().sortBy(sort).toESRMethodOutcome();
         if(outcome.isSearchSuccessful()) {
             for (ExtremelySimplifiedResource currentEntry : outcome.getSearchResult()){
                 enrichWithDirectoryEntryTypeSpecificInformation(currentEntry);
@@ -161,10 +163,14 @@ public abstract class ESRBroker {
         return(outcome);
     }
 
-    public ESRMethodOutcome getPaginatedSortedDirectoryEntrySet(Integer pageSize, Integer page, String sortParameter, Boolean sortOrder)
-            throws ResourceInvalidSortException, ESRSortingException, ESRPaginationException, ResourceInvalidSearchException {
-        getLogger().debug(".getPaginatedSortedDirectoryEntrySet(): Entry, pageSize->{}, page->{}, sortParameter->{}, sortOrder->{}", pageSize, page, sortParameter, sortOrder);
-        ESRMethodOutcome outcome = getCache().allResources().sortBy(sortParameter, sortOrder).paginate(pageSize, page).toESRMethodOutcome();
+    public ESRMethodOutcome getPaginatedSortedDirectoryEntrySet(SearchCriteria searchCriteria, Pagination pagination, Sort sort)
+            throws ResourceInvalidSortException, ESRSortingException, ESRPaginationException, ResourceInvalidSearchException, ESRFilteringException {
+        getLogger().debug(".getPaginatedSortedDirectoryEntrySet(): Entry, pageSize->{}, page->{}, sortParameter->{}, sortOrder->{}", pagination.getPageSize(), pagination.getPageNumber(), sort.getSortBy(), sort.getSortOrder());
+        ESRMethodOutcome outcome = getCache().allResources()
+        		.sortBy(sort)
+        		.filterBy(searchCriteria.getFilters())
+        		.paginate(pagination)
+        		.toESRMethodOutcome();
         if(outcome.isSearchSuccessful()) {
             for (ExtremelySimplifiedResource currentEntry : outcome.getSearchResult()){
                 enrichWithDirectoryEntryTypeSpecificInformation(currentEntry);
@@ -174,10 +180,10 @@ public abstract class ESRBroker {
         return(outcome);
     }
 
-    public ESRMethodOutcome getPaginatedUnsortedDirectoryEntrySet(Integer pageSize, Integer page)
+    public ESRMethodOutcome getPaginatedUnsortedDirectoryEntrySet(Pagination pagination)
             throws ESRSortingException, ESRPaginationException, ResourceInvalidSearchException {
         // Merely a pass-through at this time, just enriching each entry
-        ESRMethodOutcome retrievalOutcome = getCache().allResources().sortBy("SimplifiedID").paginate(pageSize,page).toESRMethodOutcome();
+        ESRMethodOutcome retrievalOutcome = getCache().allResources().sortBy(new Sort()).paginate(pagination).toESRMethodOutcome();
         if(retrievalOutcome.isSearchSuccessful()){
             for(ExtremelySimplifiedResource currentEntry: retrievalOutcome.getSearchResult()){
                 enrichWithDirectoryEntryTypeSpecificInformation(currentEntry);

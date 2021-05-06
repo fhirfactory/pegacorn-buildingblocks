@@ -21,14 +21,18 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources.search;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.BaseFilter;
 
 public class RoleCategorySearchResult extends ESRSearchResult {
     private static final Logger LOG = LoggerFactory.getLogger(RoleCategorySearchResult.class);
@@ -39,57 +43,45 @@ public class RoleCategorySearchResult extends ESRSearchResult {
     }
 
     @Override
-    public ESRSearchResult filterBy(String attributeName, String attributeValue) throws ESRFilteringException{
-        getLogger().debug(".filterBy(): Entry, attributeName->{}, attributeValue->{}", attributeName, attributeValue);
-        RoleCategorySearchResult result = (RoleCategorySearchResult) filterBy(attributeName, attributeValue, true);
-        getLogger().debug(".filterBy(): Exit");
-        return(result);
-    }
-
-    @Override
-    public ESRSearchResult filterBy(String attributeName, String attributeValue, boolean isInclusive) throws ESRFilteringException {
-        getLogger().debug(".filterBy(): Entry, attributeName->{}, attributeValue->{}, isInclusive->{}", attributeName, attributeValue, isInclusive);
+    public ESRSearchResult filterBy(List<BaseFilter> filters) throws ESRFilteringException {
+    	for (BaseFilter filter : filters) {
+    		getLogger().info(".filterBy(): Entry, filter->{}", filter);
+    	}
+    	
         RoleCategorySearchResult result = (RoleCategorySearchResult)instatiateNewESRSearchResult();
-
-        return(result);
+        result.setSearchResultList(getSearchResultList());
+    	
+        getLogger().debug(".filterBy(): Exit");
+    	
+        return result;
     }
 
     @Override
-    public ESRSearchResult sortBy(String attributeName) throws ESRSortingException{
-        getLogger().debug(".sortBy(): Entry, attributeName->{}, attributeValue->{}", attributeName);
-        RoleCategorySearchResult result = (RoleCategorySearchResult) sortBy(attributeName, true);
-        getLogger().debug(".sortBy(): Exit");
-        return(result);
-    }
-
-    @Override
-    public ESRSearchResult sortBy(String attributeName, boolean ascendingOrder) throws ESRSortingException {
-        getLogger().debug(".sortBy(): Entry, attributeName->{}, ascendingOrder->{}", attributeName, ascendingOrder);
-        if(attributeName == null){
-            attributeName = "simplifiedID";
-        }
+    public ESRSearchResult sortBy(Sort sort) throws ESRSortingException {
+        getLogger().debug(".sortBy(): Entry, attributeName->{}, ascendingOrder->{}", sort.getSortBy(), sort.getSortOrder());
+              
         RoleCategorySearchResult result = (RoleCategorySearchResult)instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(getSearchResultList());
-        String sortByLowerCase = attributeName.toLowerCase();
-        switch(sortByLowerCase){
+
+        switch(sort.getSortBy().toLowerCase()){
             case "simplifiedid": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
             case "shortname": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));;
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));;
                 break;
             }
             case "longname": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
                 break;
             }
             case "displayname": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
             }
             default:{
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
             }
         }
 

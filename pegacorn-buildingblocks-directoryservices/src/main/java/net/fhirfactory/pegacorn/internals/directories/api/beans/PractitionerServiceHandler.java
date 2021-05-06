@@ -2,11 +2,14 @@ package net.fhirfactory.pegacorn.internals.directories.api.beans;
 
 import static org.apache.camel.builder.Builder.constant;
 
+import java.util.List;
+
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
+import org.apache.camel.model.rest.RestParamType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +22,24 @@ import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBa
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Pagination;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.practitioner.CareTeamFilter;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.practitioner.LocationFilter;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.practitioner.RoleCategoryFilter;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.practitioner.RoleFilter;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSortException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceNotFoundException;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
 
 @Dependent
@@ -111,6 +127,149 @@ public class PractitionerServiceHandler extends HandlerBase {
             return (new PractitionerRoleListESDT());
         }
     }
+    
+    
+    
+	public List<ExtremelySimplifiedResource> practitionerSearch(Exchange exchange,
+			@Header("simplifiedID") String simplifiedID, 
+			@Header("shortName") String shortName,
+			@Header("longName") String longName, 
+			@Header("displayName") String displayName,
+			@Header("leafValue") String leafValue, 
+			@Header("sortBy") String sortBy,
+			@Header("sortOrder") String sortOrder, 
+			@Header("pageSize") String pageSize, 
+			@Header("page") String page,
+			@Header("roleFilter") String roleFilter,
+			@Header("locationFilter") String locationFilter,
+			@Header("careTeamFilter") String careTeamFilter,
+			@Header("roleCategoryFilter") String roleCategoryFilter)
+			throws ResourceNotFoundException, ResourceInvalidSortException, ResourceInvalidSearchException,
+			ESRPaginationException, ESRSortingException, ESRFilteringException {
+		getLogger().info(
+				".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{},"
+						+ "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
+				shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
+		String searchAttributeName = null;
+		String searchAttributeValue = null;
+
+		
+		if (simplifiedID != null) {
+			searchAttributeValue = simplifiedID;
+			searchAttributeName = "simplifiedID";
+		} else if (shortName != null) {
+			searchAttributeValue = shortName;
+			searchAttributeName = "shortName";
+		} else if (longName != null) {
+			searchAttributeValue = longName;
+			searchAttributeName = "longName";
+		} else if (displayName != null) {
+			searchAttributeValue = displayName;
+			searchAttributeName = "displayName";
+		} else if (leafValue != null) {
+			searchAttributeValue = leafValue;
+			searchAttributeName = "leafValue";
+		} else {
+			throw (new ResourceInvalidSearchException("Search parameter not specified"));
+		}
+		
+				
+		SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
+		
+		if (roleFilter != null) {
+			searchCriteria.addFilter(new RoleFilter(roleFilter));
+		} 
+		
+		if (locationFilter != null) {
+			searchCriteria.addFilter(new LocationFilter(locationFilter));	
+		}
+		
+		if (careTeamFilter != null) {
+			searchCriteria.addFilter(new CareTeamFilter(careTeamFilter));		
+		}
+		
+		if (roleCategoryFilter != null) {
+			searchCriteria.addFilter(new RoleCategoryFilter(roleCategoryFilter));				
+		}
+		
+
+		Integer pageSizeValue = null;
+		Integer pageValue = null;
+
+		if (pageSize != null) {
+			pageSizeValue = Integer.valueOf(pageSize);
+		}
+		if (page != null) {
+			pageValue = Integer.valueOf(page);
+		}
+
+		Pagination pagination = new Pagination(pageSizeValue, pageValue);
+		Sort sort = new Sort(sortBy, sortOrder);
+
+		ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchCriteria, sort, pagination);
+
+		exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+		exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
+
+		getLogger().debug(".defaultSearch(): Exit");
+
+		return (outcome.getSearchResult());
+	}
+	
+	
+	public List<ExtremelySimplifiedResource> practitionerGetResourceList(Exchange exchange, 
+			@Header("sortBy") String sortBy,
+			@Header("sortOrder") String sortOrder, 
+			@Header("pageSize") String pageSize, 
+			@Header("page") String page,
+			@Header("roleFilter") String roleFilter,
+			@Header("locationFilter") String locationFilter,
+			@Header("careTeamFilter") String careTeamFilter,
+			@Header("roleCategoryFilter") String roleCategoryFilter)
+			throws ESRPaginationException, ResourceInvalidSortException, ResourceInvalidSearchException,
+			ESRSortingException, ESRFilteringException {
+		getLogger().debug(".defaultGetResourceList(): Entry, sortBy->{}, sortOrder->{}, pageSize->{}, page->{}", sortBy,
+				sortOrder, pageSize, page);
+		Integer pageSizeValue = null;
+		Integer pageValue = null;
+
+		if (pageSize != null) {
+			pageSizeValue = Integer.valueOf(pageSize);
+		}
+		if (page != null) {
+			pageValue = Integer.valueOf(page);
+		}
+
+		SearchCriteria searchCriteria = new SearchCriteria();
+		
+		if (roleFilter != null) {
+			searchCriteria.addFilter(new RoleFilter(roleFilter));
+		} 
+		
+		if (locationFilter != null) {
+			searchCriteria.addFilter(new LocationFilter(locationFilter));	
+		}
+		
+		if (careTeamFilter != null) {
+			searchCriteria.addFilter(new CareTeamFilter(careTeamFilter));		
+		}
+		
+		if (roleCategoryFilter != null) {
+			searchCriteria.addFilter(new RoleCategoryFilter(roleCategoryFilter));				
+		}
+
+		Pagination pagination = new Pagination(pageSizeValue, pageValue);
+		Sort sort = new Sort(sortBy, sortOrder);
+
+		ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(searchCriteria, pagination,sort);
+
+		exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+		exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
+
+		getLogger().debug(".defaultGetResourceList(): Exit");
+
+		return (outcome.getSearchResult());
+	}
 
     public PractitionerESR updatePractitionerRoles(@Header("simplifiedID") String id, PractitionerRoleListESDT practitionerRoles) throws ResourceInvalidSearchException, ResourceUpdateException {
         getLogger().debug(".updatePractitionerRoles(): Entry, simplifiedID->{}, practitionerRoles->{}", id, practitionerRoles);

@@ -21,9 +21,10 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.transactions;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-
 import java.util.ArrayList;
+import java.util.List;
+
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 
 public class ESRMethodOutcome {
     private String id;
@@ -33,7 +34,7 @@ public class ESRMethodOutcome {
     private String statusReason;
 
     private boolean search;
-    private ArrayList<ExtremelySimplifiedResource> searchResult;
+    private List<ExtremelySimplifiedResource> searchResult;
     private boolean searchSuccessful;
     
     private int totalSearchResultCount;
@@ -82,11 +83,11 @@ public class ESRMethodOutcome {
         this.statusReason = statusReason;
     }
 
-    public ArrayList<ExtremelySimplifiedResource> getSearchResult() {
+    public List<ExtremelySimplifiedResource> getSearchResult() {
         return searchResult;
     }
 
-    public void setSearchResult(ArrayList<ExtremelySimplifiedResource> searchResult) {
+    public void setSearchResult(List<ExtremelySimplifiedResource> searchResult) {
         this.searchResult = searchResult;
     }
 

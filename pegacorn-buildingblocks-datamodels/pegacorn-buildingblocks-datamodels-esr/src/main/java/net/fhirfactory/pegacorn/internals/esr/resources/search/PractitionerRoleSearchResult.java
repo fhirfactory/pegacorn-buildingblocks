@@ -21,15 +21,19 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources.search;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.BaseFilter;
 
 public class PractitionerRoleSearchResult extends ESRSearchResult {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleSearchResult.class);
@@ -40,78 +44,66 @@ public class PractitionerRoleSearchResult extends ESRSearchResult {
     }
 
     @Override
-    public ESRSearchResult filterBy(String attributeName, String attributeValue) throws ESRFilteringException {
-        getLogger().debug(".filterBy(): Entry, attributeName->{}, attributeValue->{}", attributeName, attributeValue);
-        PractitionerRoleSearchResult result = (PractitionerRoleSearchResult) filterBy(attributeName, attributeValue, true);
-        getLogger().debug(".filterBy(): Exit");
-        return(result);
-    }
-
-    @Override
-    public ESRSearchResult filterBy(String attributeName, String attributeValue, boolean isInclusive) throws ESRFilteringException{
-        getLogger().debug(".filterBy(): Entry, attributeName->{}, attributeValue->{}, isInclusive->{}", attributeName, attributeValue, isInclusive);
+    public ESRSearchResult filterBy(List<BaseFilter> filters) throws ESRFilteringException {
+    	for (BaseFilter filter : filters) {
+    		getLogger().info(".filterBy(): Entry, filter->{}", filter);
+    	}
+    	
         PractitionerRoleSearchResult result = (PractitionerRoleSearchResult)instatiateNewESRSearchResult();
-
-        return(result);
+        result.setSearchResultList(getSearchResultList());
+    	
+        getLogger().debug(".filterBy(): Exit");
+    	
+        return result;
     }
 
     @Override
-    public ESRSearchResult sortBy(String attributeName) throws ESRSortingException {
-        getLogger().debug(".sortBy(): Entry, attributeName->{}", attributeName);
-        PractitionerRoleSearchResult result = (PractitionerRoleSearchResult) sortBy(attributeName, true);
-        getLogger().debug(".sortBy(): Exit");
-        return(result);
-    }
-
-    @Override
-    public ESRSearchResult sortBy(String attributeName, boolean ascendingOrder) throws ESRSortingException{
-        getLogger().debug(".sortBy(): Entry, attributeName->{}, ascendingOrder->{}", attributeName, ascendingOrder);
-        if(attributeName == null){
-            attributeName = "simplifiedID";
-        }
+    public ESRSearchResult sortBy(Sort sort) throws ESRSortingException{
+        getLogger().debug(".sortBy(): Entry, attributeName->{}, ascendingOrder->{}", sort.getSortBy(), sort.getSortOrder());
+            
         PractitionerRoleSearchResult result = (PractitionerRoleSearchResult)instatiateNewESRSearchResult();
         getLogger().debug(".sortBy(): Populate new PractitionerRoleSearchResult with the search results");
         result.getSearchResultList().addAll(getSearchResultList());
         getLogger().debug(".sortBy(): Convert sortBy attribute name to lower case");
-        String sortByLowerCase = attributeName.toLowerCase();
         getLogger().debug(".sortBy(): execute (via Switch() statement) the selected sort");
-        switch(sortByLowerCase){
+        
+        switch(sort.getSortBy().toLowerCase()){
             case "simplifiedid": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
             case "displayname": {
-                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
             }
             case "shortname": {
-                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));
                 break;
             }
             case "longname": {
-                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
                 break;
             }
             case "primarylocationid": {
-                Collections.sort(result.getSearchResultList(),  ascendingOrder ? PractitionerRoleESR.primaryLocationIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryLocationIDComparator));
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerRoleESR.primaryLocationIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryLocationIDComparator));
                 break;
             }
             case "primaryorganizatonid":
             case "primaryorganisationid":{
                 getLogger().debug(".sortBy(): primaryOrganisationID sort requested...");
-                Collections.sort(result.getSearchResultList(),  ascendingOrder ? PractitionerRoleESR.primaryOrganizationIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryOrganizationIDComparator));
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerRoleESR.primaryOrganizationIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryOrganizationIDComparator));
                 getLogger().debug(".sortBy(): primaryOrganisationID sort done...");
                 break;
             }
             case "primaryrolecategoryid": {
-                Collections.sort(result.getSearchResultList(),  ascendingOrder ? PractitionerRoleESR.primaryRoleCategoryIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryRoleCategoryIDComparator));
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerRoleESR.primaryRoleCategoryIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryRoleCategoryIDComparator));
                 break;
             }
             case "primaryroleid": {
-                Collections.sort(result.getSearchResultList(),  ascendingOrder ? PractitionerRoleESR.primaryRoleIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryRoleIDComparator));
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerRoleESR.primaryRoleIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryRoleIDComparator));
             }
             default:{
-                Collections.sort(result.getSearchResultList(),  ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
             }
         }
 

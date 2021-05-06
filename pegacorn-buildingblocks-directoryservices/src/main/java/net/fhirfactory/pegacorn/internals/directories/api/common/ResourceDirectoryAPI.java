@@ -97,13 +97,7 @@ public abstract class ResourceDirectoryAPI extends RouteBuilder {
     protected RestDefinition getRestGetDefinition() {
         RestDefinition restDef = rest("/" + getESRName())
             .get("/{simplifiedID}").outType(getESRClass())
-                .to("direct:" + getESRName() + "GET")
-            .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
-                .param().name("pageSize").type(RestParamType.query).required(false).endParam()
-                .param().name("page").type(RestParamType.query).required(false).endParam()
-                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
-                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
-                .to("direct:" + getESRName() + "ListGET");
+                .to("direct:" + getESRName() + "GET");
         return (restDef);
     }
 

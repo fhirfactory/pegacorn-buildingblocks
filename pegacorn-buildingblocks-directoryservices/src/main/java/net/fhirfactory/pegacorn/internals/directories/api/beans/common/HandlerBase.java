@@ -21,8 +21,6 @@
  */
 package net.fhirfactory.pegacorn.internals.directories.api.beans.common;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.camel.Exchange;
@@ -35,6 +33,10 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Pagination;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
@@ -44,15 +46,7 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceNo
 
 
 public abstract class HandlerBase {
-
-    private static String PAGINATION_PAGE_SIZE = "pageSize";
-    private static String PAGINATION_PAGE_NUMBER = "page";
-    private static String SORT_ATTRIBUTE = "sortBy";
-    private static String SORT_ORDER = "sortOrder";
-    
-    protected static final String SORT_ORDER_ASCENDING = "ascending";
-    protected static final String SORT_ORDER_DESCENDING = "descending";
-    
+       
     protected static final String TOTAL_RECORD_COUNT_HEADER = "X-Total-Count";
     protected static final String ACCESS_CONTROL_EXPOSE_HEADERS_HEADER = "Access-Control-Expose-Headers";
 
@@ -81,28 +75,24 @@ public abstract class HandlerBase {
                                                                      @Header("sortOrder") String sortOrder,
                                                                      @Header("pageSize") String pageSize,
                                                                      @Header("page") String page)
-            throws ESRPaginationException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException {
+            throws ESRPaginationException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRFilteringException {
         getLogger().debug(".defaultGetResourceList(): Entry, sortBy->{}, sortOrder->{}, pageSize->{}, page->{}",sortBy, sortOrder, pageSize, page );
         Integer pageSizeValue = null;
         Integer pageValue = null;
-        Boolean sortOrderValue = true;
+
         if(pageSize != null) {
             pageSizeValue = Integer.valueOf(pageSize);
         }
         if(page != null) {
             pageValue = Integer.valueOf(page);
         }
-        if(sortOrder != null) {
-        	if (sortOrder.equals(SORT_ORDER_ASCENDING)) {
-        		sortOrderValue = true;
-        	} else if (sortOrder.equals(SORT_ORDER_DESCENDING)) {
-        		sortOrderValue = false;
-        	}
-        }
-        if(sortBy == null){
-            sortBy = "simplifiedID";
-        }
-        ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(pageSizeValue, pageValue, sortBy, sortOrderValue);
+
+        SearchCriteria searchCriteria = new SearchCriteria();
+        
+        Pagination pagination = new Pagination(pageSizeValue, pageValue);
+        Sort sort = new Sort(sortBy, sortOrder);
+        
+        ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(searchCriteria, pagination, sort);
         
         exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
         exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
@@ -137,7 +127,7 @@ public abstract class HandlerBase {
                                                             @Header("sortOrder") String sortOrder,
                                                             @Header("pageSize") String pageSize,
                                                             @Header("page") String page)
-            throws ResourceNotFoundException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRPaginationException, ESRSortingException {
+            throws ResourceNotFoundException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRPaginationException, ESRSortingException, ESRFilteringException {
         getLogger().info(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{},"+
                         "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
                 shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
@@ -161,24 +151,24 @@ public abstract class HandlerBase {
         } else {
             throw( new ResourceInvalidSearchException("Search parameter not specified"));
         }
+        
+        SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
+        
+        
         Integer pageSizeValue = null;
         Integer pageValue = null;
-        Boolean sortOrderValue = true;
+
         if(pageSize != null) {
             pageSizeValue = Integer.valueOf(pageSize);
         }
         if(page != null) {
             pageValue = Integer.valueOf(page);
         }
-        if(sortOrder != null) {
-        	if (sortOrder.equals(SORT_ORDER_ASCENDING)) {
-        		sortOrderValue = true;
-        	} else if (sortOrder.equals(SORT_ORDER_DESCENDING)) {
-        		sortOrderValue = false;
-        	}
-        }
-        String searchAttributeValueURLDecoded = URLDecoder.decode(searchAttributeValue, StandardCharsets.UTF_8);
-        ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchAttributeName, searchAttributeValueURLDecoded, pageSizeValue, pageValue, sortBy, sortOrderValue);
+
+        Pagination pagination = new Pagination(pageSizeValue, pageValue);
+        Sort sort = new Sort(sortBy, sortOrder);
+
+        ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchCriteria, sort, pagination);
         
         exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
         exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);

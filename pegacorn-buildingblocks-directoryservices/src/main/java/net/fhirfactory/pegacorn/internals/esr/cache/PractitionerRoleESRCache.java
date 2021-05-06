@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.PractitionerRoleSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 import org.slf4j.Logger;
@@ -98,36 +99,41 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
     }
 
     @Override
-    public ESRSearchResult search(String searchAttributeName, String searchAttributeValue)
+    public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchAttributeName, searchAttributeValue);
-        if(searchAttributeName == null || searchAttributeValue == null){
-            throw(new ResourceInvalidSearchException("Search Parameter Name or Value are null"));
+    	
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getParamName(), searchCriteria.getValue());
+        
+        if(searchCriteria.isValueNull()){
+            throw(new ResourceInvalidSearchException("Search Value is null"));
         }
-        if(searchAttributeName.isEmpty()){
+        if(searchCriteria.isParamNameNull()){
             throw(new ResourceInvalidSearchException("Search Parameter Name is empty"));
         }
+        
+        
         ESRSearchResult result = instatiateNewESRSearchResult();
-        if(searchAttributeValue.isEmpty()){
+        
+        if(searchCriteria.isValueEmpty()){
             return(result);
         }
-        String searchAttributeNameLowerCase = searchAttributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
+        
+        switch(searchCriteria.getParamName().toLowerCase()){
             case "simplifiedid":
             case "emailaddress":{
-                result = this.searchCacheUsingSimplifiedID(searchAttributeValue);
+                result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
             case "shortname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "ShortName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
             case "longname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "LongName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
             case "displayname": {
-                result = this.searchCacheUsingDisplayName(searchAttributeValue);
+                result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
             case "organizaton":
@@ -136,25 +142,25 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
             case "primaryorganisation":
             case "primaryorganizationid":
             case "primaryorganisationid":{
-                result = this.searchCacheViaOrganization(searchAttributeValue);
+                result = this.searchCacheViaOrganization(searchCriteria);
                 return(result);
             }
             case "location":
             case "primarylocation":
             case "primarylocationid": {
-                result = this.searchCacheViaLocation(searchAttributeValue);
+                result = this.searchCacheViaLocation(searchCriteria);
                 return(result);
             }
             case "rolecategory":
             case "rolecategoryid":
             case "primaryrolecategoryid":{
-                result = this.searchCacheViaRoleCategory(searchAttributeValue);
+                result = this.searchCacheViaRoleCategory(searchCriteria);
                 return(result);
             }
             case "role":
             case "roleid":
             case "primaryroleid":{
-                result = this.searchCacheViaRole(searchAttributeValue);
+                result = this.searchCacheViaRole(searchCriteria);
                 return(result);
             }
             default: {
@@ -163,63 +169,66 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
         }
     }
 
-    public ESRSearchResult searchCacheViaOrganization(String organizationName){
+    public ESRSearchResult searchCacheViaOrganization(SearchCriteria searchCriteria){
         LOG.debug(".searchCacheViaOrganization(): Entry");
         ESRSearchResult result = instatiateNewESRSearchResult();
-        String organisationNameAsLowerCase = organizationName.toLowerCase();
+        
         if(this.getSimplifiedID2ESRMap().isEmpty()){
             LOG.debug(".searchCacheViaOrganization(): Exit, cache is empty, so returning empty list!");
             return(result);
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             PractitionerRoleESR currentPractitionerRole = (PractitionerRoleESR) currentResource;
-            if(currentPractitionerRole.getPrimaryOrganizationID().toLowerCase().contains(organisationNameAsLowerCase)){
+            if(currentPractitionerRole.getPrimaryOrganizationID().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
                 result.getSearchResultList().add(currentPractitionerRole);
             }
         }
+        
         LOG.debug(".searchCacheViaOrganization(): Exit");
         return(result);
     }
 
-    public ESRSearchResult searchCacheViaLocation(String locationName){
+    public ESRSearchResult searchCacheViaLocation(SearchCriteria searchCriteria){
         ESRSearchResult result = instatiateNewESRSearchResult();
-        String locationNameAsLowerCase = locationName.toLowerCase();
+
         if(this.getSimplifiedID2ESRMap().isEmpty()){
             return(result);
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             PractitionerRoleESR currentPractitionerRole = (PractitionerRoleESR) currentResource;
-            if(currentPractitionerRole.getPrimaryLocationID().toLowerCase().contains(locationNameAsLowerCase)){
+            if(currentPractitionerRole.getPrimaryLocationID().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
                 result.getSearchResultList().add(currentPractitionerRole);
             }
         }
         return(result);
     }
 
-    public ESRSearchResult searchCacheViaRoleCategory(String roleCategoryName){
+    public ESRSearchResult searchCacheViaRoleCategory(SearchCriteria searchCriteria){
         ESRSearchResult result = instatiateNewESRSearchResult();
-        String roleCategoryNameAsLowerCase = roleCategoryName.toLowerCase();
+        
+
         if(this.getSimplifiedID2ESRMap().isEmpty()){
             return(result);
         }
+        
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             PractitionerRoleESR currentPractitionerRole = (PractitionerRoleESR) currentResource;
-            if(currentPractitionerRole.getPrimaryRoleCategoryID().toLowerCase().contains(roleCategoryNameAsLowerCase)){
+            if(currentPractitionerRole.getPrimaryRoleCategoryID().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
                 result.getSearchResultList().add(currentPractitionerRole);
             }
         }
         return(result);
     }
 
-    public ESRSearchResult searchCacheViaRole(String roleName){
+    public ESRSearchResult searchCacheViaRole(SearchCriteria searchCriteria){
         ESRSearchResult result = instatiateNewESRSearchResult();
-        String roleNameAsLowerCase = roleName.toLowerCase();
+
         if(this.getSimplifiedID2ESRMap().isEmpty()){
             return(result);
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             PractitionerRoleESR currentPractitionerRole = (PractitionerRoleESR) currentResource;
-            if(currentPractitionerRole.getPrimaryRoleID().toLowerCase().contains(roleNameAsLowerCase)){
+            if(currentPractitionerRole.getPrimaryRoleID().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
                 result.getSearchResultList().add(currentPractitionerRole);
             }
         }

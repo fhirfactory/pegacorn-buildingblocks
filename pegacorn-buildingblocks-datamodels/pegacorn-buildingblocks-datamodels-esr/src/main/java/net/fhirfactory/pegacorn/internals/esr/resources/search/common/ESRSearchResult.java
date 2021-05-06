@@ -21,30 +21,30 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources.search.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.BaseFilter;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
-import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class ESRSearchResult {
     private static Integer DEFAULT_PAGE_SIZE = 25;
-    private ArrayList<ExtremelySimplifiedResource> searchResultList;
+    private List<ExtremelySimplifiedResource> searchResultList;
     private String statusReason;
     private boolean searchSuccessful;
     
     private int totalSearchResultCount;
 
     protected abstract Logger getLogger();
-    public abstract ESRSearchResult filterBy(String attributeName, String attributeValue) throws ESRFilteringException;
-    public abstract ESRSearchResult filterBy(String attributeName, String attributeValue, boolean isInclusive) throws ESRFilteringException;
-    public abstract ESRSearchResult sortBy(String attributeName) throws ESRSortingException;
-    public abstract ESRSearchResult sortBy(String attributeName, boolean ascendingOrder) throws ESRSortingException;
+    public abstract ESRSearchResult filterBy(List<BaseFilter> filters) throws ESRFilteringException;
+    public abstract ESRSearchResult sortBy(Sort sort) throws ESRSortingException;
     protected abstract ESRSearchResult instatiateNewESRSearchResult();
 
     public ESRSearchResult(){
@@ -55,11 +55,11 @@ public abstract class ESRSearchResult {
         return DEFAULT_PAGE_SIZE;
     }
 
-    public ArrayList<ExtremelySimplifiedResource> getSearchResultList() {
+    public List<ExtremelySimplifiedResource> getSearchResultList() {
         return searchResultList;
     }
 
-    public void setSearchResultList(ArrayList<ExtremelySimplifiedResource> searchResultList) {
+    public void setSearchResultList(List<ExtremelySimplifiedResource> searchResultList) {
         this.searchResultList = searchResultList;
     }
 
@@ -87,43 +87,29 @@ public abstract class ESRSearchResult {
 	}
 
 
-    //
-    // Paginate Services
-    //
 
-    public ESRSearchResult paginate(Integer page) throws ESRPaginationException{
-        getLogger().debug(".paginate(): Entry, page->{}", page);
-        ESRSearchResult result = paginate(getDefaultPageSize(), page);
-        getLogger().debug(".paginate(): Exit");
-        return(result);
-    }
-
-    public ESRSearchResult paginate(Integer pageSize, Integer page) throws ESRPaginationException {
-        getLogger().debug(".paginate(): Entry, pageSize->{}, page->{}", pageSize, page);
+    public ESRSearchResult paginate(Pagination pagination) throws ESRPaginationException {
+        getLogger().debug(".paginate(): Entry, pageSize->{}, page->{}", pagination.getPageSize(), pagination.getPageNumber());
         ESRSearchResult result = instatiateNewESRSearchResult();
-        if(pageSize == null){
-            getLogger().trace(".paginate():pageSize is null, so defaulting to " + DEFAULT_PAGE_SIZE);
-            pageSize = DEFAULT_PAGE_SIZE;
-        }
-        
+               
         result.setTotalSearchResultCount(getSearchResultList().size());
                
-        if(pageSize == 0){
+        if(pagination.getPageSize() == 0){
             result.setSearchResultList(getSearchResultList());
             getLogger().debug(".paginate(): Exit, pageSize is zero, so returning ALL elements");
             return(result);
         }
-        if(page == null){
+        if(pagination.getPageNumber() == null){
             getLogger().debug(".paginate():page is null, so defaulting to first page");
-            page = 0;
+            pagination.setPageNumber(0);
         }
         
         
-        if(pageSize > 0) {
-            Integer locationOffsetStart = pageSize * page;
+        if(pagination.getPageSize() > 0) {
+            Integer locationOffsetStart = pagination.getPageSize() * pagination.getPageNumber();
             Integer numberOfEntries = getSearchResultList().size();
             if (numberOfEntries > locationOffsetStart) {
-                for (Integer counter = 0; counter < pageSize; counter += 1) {
+                for (Integer counter = 0; counter < pagination.getPageSize(); counter += 1) {
                     Integer listLocation = locationOffsetStart + counter;
                     if (listLocation < numberOfEntries) {
                         ExtremelySimplifiedResource currentEntry = getSearchResultList().get(listLocation);
@@ -135,6 +121,29 @@ public abstract class ESRSearchResult {
             }
         }
         return (result);
+    }
+    
+    
+    public List<ExtremelySimplifiedResource>doFilter(List<BaseFilter> filters) {
+    	 List<ExtremelySimplifiedResource>filteredList = new ArrayList<>();
+         
+         for (ExtremelySimplifiedResource resource : getSearchResultList()) {
+         	
+         	// we have the resource so now apply the filters.
+         	for (BaseFilter filter : filters) {
+         		boolean match = filter.doFilter(resource);
+         		
+         		if (match) {
+         			filteredList.add(resource);
+         			
+         			getLogger().info("brendan match.  here");
+         			
+         			break; // We only need a match on a single filter for the record to be included.  it is an OR, not an AND.
+         		}
+         	}
+         }
+
+         return filteredList;
     }
 
     public ESRMethodOutcome toESRMethodOutcome(){

@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifi
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.GroupSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
@@ -127,43 +128,47 @@ public class GroupESRCache extends PegacornESRCache {
     }
 
     @Override
-    public ESRSearchResult search(String searchAttributeName, String searchAttributeValue)
+    public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchAttributeName, searchAttributeValue);
-        if(searchAttributeName == null || searchAttributeValue == null){
-            throw(new ResourceInvalidSearchException("Search Parameter Name or Value are null"));
+    	
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getParamName(), searchCriteria.getValue());
+        
+        if(searchCriteria.isValueNull()){
+            throw(new ResourceInvalidSearchException("Search Value is null"));
         }
-        if(searchAttributeName.isEmpty()){
+        if(searchCriteria.isParamNameNull()){
             throw(new ResourceInvalidSearchException("Search Parameter Name is empty"));
         }
+        
         ESRSearchResult result = instatiateNewESRSearchResult();
-        if(searchAttributeValue.isEmpty()){
+        
+        if(searchCriteria.isValueEmpty()){
             return(result);
         }
-        String searchAttributeNameLowerCase = searchAttributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
+        
+        switch(searchCriteria.getParamName().toLowerCase()){
             case "simplifiedid": {
-                result = this.searchCacheUsingSimplifiedID(searchAttributeValue);
+                result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
             case "shortname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "ShortName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
             case "longname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "LongName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
             case "displayname": {
-                result = this.searchCacheUsingDisplayName(searchAttributeValue);
+                result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
             case "grouptype":{
-                result = this.searchCacheUsingGroupType(searchAttributeValue);
+                result = this.searchCacheUsingGroupType(searchCriteria);
                 return(result);
             }
             case "groupmanager":{
-                result = this.searchCacheUsingGroupManager(searchAttributeValue);
+                result = this.searchCacheUsingGroupManager(searchCriteria);
                 return(result);
             }
             default: {
@@ -172,28 +177,28 @@ public class GroupESRCache extends PegacornESRCache {
         }
     }
 
-    protected ESRSearchResult searchCacheUsingGroupType(String groupType){
+    protected ESRSearchResult searchCacheUsingGroupType(SearchCriteria searchCriteria) {
         ESRSearchResult result = instatiateNewESRSearchResult();
         if(this.getSimplifiedID2ESRMap().isEmpty()){
             return(result);
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             GroupESR currentGroup = (GroupESR) currentResource;
-            if(currentGroup.getGroupType().toLowerCase().contains(groupType)){
+            if(currentGroup.getGroupType().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
                 result.getSearchResultList().add(currentGroup);
             }
         }
         return(result);
     }
 
-    protected ESRSearchResult searchCacheUsingGroupManager(String groupManager){
+    protected ESRSearchResult searchCacheUsingGroupManager(SearchCriteria searchCriteria){
         ESRSearchResult result = instatiateNewESRSearchResult();
         if(this.getSimplifiedID2ESRMap().isEmpty()){
             return(result);
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             GroupESR currentGroup = (GroupESR) currentResource;
-            if(currentGroup.getGroupManager().toLowerCase().contains(groupManager)){
+            if(currentGroup.getGroupManager().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
                 result.getSearchResultList().add(currentGroup);
             }
         }

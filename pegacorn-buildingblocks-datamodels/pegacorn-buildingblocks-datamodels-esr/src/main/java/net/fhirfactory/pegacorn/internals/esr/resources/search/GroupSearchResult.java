@@ -21,17 +21,19 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources.search;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.BaseFilter;
 
 public class GroupSearchResult extends ESRSearchResult {
     private static final Logger LOG = LoggerFactory.getLogger(GroupSearchResult.class);
@@ -42,62 +44,49 @@ public class GroupSearchResult extends ESRSearchResult {
     }
 
     @Override
-    public ESRSearchResult filterBy(String attributeName, String attributeValue) throws ESRFilteringException{
-        getLogger().debug(".filterBy(): Entry, attributeName->{}, attributeValue->{}", attributeName, attributeValue);
-        GroupSearchResult result = (GroupSearchResult) filterBy(attributeName, attributeValue, true);
-        getLogger().debug(".filterBy(): Exit");
-        return(result);
-    }
-
-    @Override
-    public ESRSearchResult filterBy(String attributeName, String attributeValue, boolean isInclusive) throws ESRFilteringException {
-        getLogger().debug(".filterBy(): Entry, attributeName->{}, attributeValue->{}, isInclusive->{}", attributeName, attributeValue, isInclusive);
+    public ESRSearchResult filterBy(List<BaseFilter> filters) throws ESRFilteringException {
+    	for (BaseFilter filter : filters) {
+    		getLogger().info(".filterBy(): Entry, filter->{}", filter);
+    	}
+    	
         GroupSearchResult result = (GroupSearchResult)instatiateNewESRSearchResult();
-
-        return(result);
+        result.setSearchResultList(getSearchResultList());
+    	
+        getLogger().debug(".filterBy(): Exit");
+    	
+        return result;
     }
 
     @Override
-    public ESRSearchResult sortBy(String attributeName) throws ESRSortingException {
-        getLogger().debug(".sortBy(): Entry, attributeName->{}, attributeValue->{}", attributeName);
-        GroupSearchResult result = (GroupSearchResult) sortBy(attributeName, true);
-        getLogger().debug(".sortBy(): Exit");
-        return(result);
-    }
-
-    @Override
-    public ESRSearchResult sortBy(String attributeName, boolean ascendingOrder) throws ESRSortingException {
-        getLogger().debug(".sortBy(): Entry, attributeName->{}, ascendingOrder->{}", attributeName, ascendingOrder);
-        if(attributeName == null){
-            attributeName = "simplifiedID";
-        }
+    public ESRSearchResult sortBy(Sort sort) throws ESRSortingException {
+        getLogger().debug(".sortBy(): Entry, attributeName->{}, ascendingOrder->{}", sort.getSortBy(), sort.getSortOrder());
+              
         GroupSearchResult result = (GroupSearchResult)instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(getSearchResultList());
-        String sortByLowerCase = attributeName.toLowerCase();
-        switch(sortByLowerCase){
+        switch(sort.getSortBy().toLowerCase()){
             case "simplifiedid": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
             case "shortname": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));
                 break;
             }
             case "longname": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
                 break;
             }
             case "grouptype": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? GroupESR.groupTypeComparator : Collections.reverseOrder(GroupESR.groupTypeComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? GroupESR.groupTypeComparator : Collections.reverseOrder(GroupESR.groupTypeComparator));
                 break;
             }
             case "groupmanager": {
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? GroupESR.groupManagerComparator : Collections.reverseOrder(GroupESR.groupManagerComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? GroupESR.groupManagerComparator : Collections.reverseOrder(GroupESR.groupManagerComparator));
                 break;
 
             }
             default:{
-                Collections.sort(result.getSearchResultList(), ascendingOrder ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
+                Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
         }

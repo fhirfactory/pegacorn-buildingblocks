@@ -74,6 +74,11 @@ public class PractitionerESR extends PersonESR {
     	return roleHistory.getAllCurrentRolesAsString();
     }
     
+    @JsonIgnore
+    public boolean hasCurrentRole(String role) {
+    	return getCurrentPractitionerRoles().contains(role);
+    }
+    
     
     public HashMap<String, IdentifierESDT> getOrganizationMembership() {
         return organizationMembership;

@@ -93,7 +93,14 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
             .post().type(getESRClass())
                 .to("direct:"+getESRName()+"POST")
             .put().type(getESRClass())
-                .to("direct:"+getESRName()+"PUT");
+                .to("direct:"+getESRName()+"PUT")
+                   
+    	        .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+    		        .param().name("pageSize").type(RestParamType.query).required(false).endParam()
+    		        .param().name("page").type(RestParamType.query).required(false).endParam()
+    		        .param().name("sortBy").type(RestParamType.query).required(false).endParam()
+    		        .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+    		        .to("direct:" + getESRName() + "ListGET");
 
 
         from("direct:"+getESRName()+"GET")
