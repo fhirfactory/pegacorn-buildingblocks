@@ -21,23 +21,27 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers.common;
 
-import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.CommonIdentifierESDTTypes;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Pagination;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSortException;
-import org.slf4j.Logger;
+import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
+import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
+import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.Sort;
+import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
+import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
+import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
 
 public abstract class ESRBroker {
 
@@ -134,13 +138,14 @@ public abstract class ESRBroker {
     }
 
     public ESRMethodOutcome searchForESRsUsingAttribute(SearchCriteria searchCriteria,
+    												    List<BaseFilter> filters,
                                                         Sort sort,
                                                         Pagination pagination)
             throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
 
         ESRMethodOutcome outcome = getCache().search(searchCriteria)
+                .filterBy(filters)
                 .sortBy(sort)
-                .filterBy(searchCriteria.getFilters())
                 .paginate(pagination)
                 .toESRMethodOutcome();
         if(outcome.isSearchSuccessful()){
@@ -163,12 +168,12 @@ public abstract class ESRBroker {
         return(outcome);
     }
 
-    public ESRMethodOutcome getPaginatedSortedDirectoryEntrySet(SearchCriteria searchCriteria, Pagination pagination, Sort sort)
+    public ESRMethodOutcome getPaginatedSortedDirectoryEntrySet(SearchCriteria searchCriteria, List<BaseFilter> filters, Pagination pagination, Sort sort)
             throws ResourceInvalidSortException, ESRSortingException, ESRPaginationException, ResourceInvalidSearchException, ESRFilteringException {
         getLogger().debug(".getPaginatedSortedDirectoryEntrySet(): Entry, pageSize->{}, page->{}, sortParameter->{}, sortOrder->{}", pagination.getPageSize(), pagination.getPageNumber(), sort.getSortBy(), sort.getSortOrder());
         ESRMethodOutcome outcome = getCache().allResources()
         		.sortBy(sort)
-        		.filterBy(searchCriteria.getFilters())
+        		.filterBy(filters)
         		.paginate(pagination)
         		.toESRMethodOutcome();
         if(outcome.isSearchSuccessful()) {

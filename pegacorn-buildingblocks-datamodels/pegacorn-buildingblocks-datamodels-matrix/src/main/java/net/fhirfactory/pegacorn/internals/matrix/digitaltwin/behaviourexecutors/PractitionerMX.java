@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
-import net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common.MatrixRoomIdentifier;
-import net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common.MatrixUserIdentifier;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
+import net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common.MatrixRoomIdentifier;
+import net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common.MatrixUserIdentifier;
 
 public class PractitionerMX extends PractitionerESR {
     private MatrixUserIdentifier matrixUserIdentifier;

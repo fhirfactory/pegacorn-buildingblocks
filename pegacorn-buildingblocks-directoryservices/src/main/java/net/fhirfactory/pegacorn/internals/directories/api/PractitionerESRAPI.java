@@ -21,20 +21,22 @@
  */
 package net.fhirfactory.pegacorn.internals.directories.api;
 
-import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerServiceHandler;
-import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
-import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerServiceHandler;
+import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
+
 
 @ApplicationScoped
 public class PractitionerESRAPI extends ResourceDirectoryAPI {

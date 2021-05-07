@@ -17,7 +17,6 @@
 
     <modules>
         <module>../pegacorn-buildingblocks-esr-models</module>
-		<module>../pegacorn-buildingblocks-esr-search</module>
 		<module>../pegacorn-buildingblocks-esr-server</module>
 		<module>../pegacorn-buildingblocks-esr-restfulapi</module>
 		<module>../pegacorn-buildingblocks-esr-proxy</module>

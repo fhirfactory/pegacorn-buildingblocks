@@ -1,18 +1,20 @@
 package net.fhirfactory.pegacorn.internals.esr.cache.common;
 
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
+import java.util.Enumeration;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+
 
 public abstract class PegacornESRCache {
     private ConcurrentHashMap<IdentifierESDT, ExtremelySimplifiedResource> identifier2ESRMap;

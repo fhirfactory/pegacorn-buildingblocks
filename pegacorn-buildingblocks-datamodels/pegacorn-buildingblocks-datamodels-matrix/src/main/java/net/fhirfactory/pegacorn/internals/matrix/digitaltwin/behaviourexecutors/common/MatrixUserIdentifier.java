@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 
 public class MatrixUserIdentifier extends IdentifierESDT {
 

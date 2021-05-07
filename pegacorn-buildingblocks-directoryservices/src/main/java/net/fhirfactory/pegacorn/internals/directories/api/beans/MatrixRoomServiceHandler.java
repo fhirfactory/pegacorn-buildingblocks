@@ -1,22 +1,24 @@
 package net.fhirfactory.pegacorn.internals.directories.api.beans;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
-import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
+import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
+import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 
 @Dependent
 public class MatrixRoomServiceHandler extends HandlerBase {

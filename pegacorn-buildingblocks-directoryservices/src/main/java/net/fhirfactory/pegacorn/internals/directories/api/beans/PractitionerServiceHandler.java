@@ -2,6 +2,7 @@ package net.fhirfactory.pegacorn.internals.directories.api.beans;
 
 import static org.apache.camel.builder.Builder.constant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.Dependent;
@@ -9,7 +10,6 @@ import javax.inject.Inject;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
-import org.apache.camel.model.rest.RestParamType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,29 +18,30 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundException;
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
+import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Pagination;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.SearchCriteria;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.Sort;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRFilteringException;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRSortingException;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.practitioner.CareTeamFilter;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.practitioner.LocationFilter;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.practitioner.RoleCategoryFilter;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.filter.practitioner.RoleFilter;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSortException;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceNotFoundException;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
+import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.Sort;
+import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
+import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
+import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.CareTeamFilter;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.LocationFilter;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.RoleCategoryFilter;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.RoleFilter;
 
 @Dependent
 public class PractitionerServiceHandler extends HandlerBase {
@@ -48,6 +49,19 @@ public class PractitionerServiceHandler extends HandlerBase {
 
     @Inject
     private PractitionerESRBroker practitionerDirectoryResourceBroker;
+    
+    
+    @Inject
+    private RoleFilter roleFilter;
+    
+    @Inject
+    private RoleCategoryFilter roleCategoryFilter;
+    
+    @Inject
+    private CareTeamFilter careTeamFilter;
+    
+    @Inject
+    private LocationFilter locationFilter;
 
     @Override
     protected Logger getLogger() {
@@ -176,20 +190,26 @@ public class PractitionerServiceHandler extends HandlerBase {
 				
 		SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
 		
+		List<BaseFilter>filters = new ArrayList<>();
+		
 		if (roleFilter != null) {
-			searchCriteria.addFilter(new RoleFilter(roleFilter));
+			this.roleFilter.setValue(roleFilter);
+			filters.add(this.roleFilter);
 		} 
 		
 		if (locationFilter != null) {
-			searchCriteria.addFilter(new LocationFilter(locationFilter));	
+			this.locationFilter.setValue(locationFilter);
+			filters.add(this.locationFilter);	
 		}
 		
 		if (careTeamFilter != null) {
-			searchCriteria.addFilter(new CareTeamFilter(careTeamFilter));		
+			this.careTeamFilter.setValue(careTeamFilter);
+			filters.add(this.careTeamFilter);		
 		}
 		
 		if (roleCategoryFilter != null) {
-			searchCriteria.addFilter(new RoleCategoryFilter(roleCategoryFilter));				
+			this.roleCategoryFilter.setValue(roleCategoryFilter);
+			filters.add(this.roleCategoryFilter);				
 		}
 		
 
@@ -206,7 +226,7 @@ public class PractitionerServiceHandler extends HandlerBase {
 		Pagination pagination = new Pagination(pageSizeValue, pageValue);
 		Sort sort = new Sort(sortBy, sortOrder);
 
-		ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchCriteria, sort, pagination);
+		ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchCriteria, filters, sort, pagination);
 
 		exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
 		exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
@@ -242,26 +262,32 @@ public class PractitionerServiceHandler extends HandlerBase {
 
 		SearchCriteria searchCriteria = new SearchCriteria();
 		
+		List<BaseFilter>filters = new ArrayList<>();
+		
 		if (roleFilter != null) {
-			searchCriteria.addFilter(new RoleFilter(roleFilter));
+			this.roleFilter.setValue(roleFilter);
+			filters.add(this.roleFilter);
 		} 
 		
 		if (locationFilter != null) {
-			searchCriteria.addFilter(new LocationFilter(locationFilter));	
+			this.locationFilter.setValue(locationFilter);
+			filters.add(this.locationFilter);	
 		}
 		
 		if (careTeamFilter != null) {
-			searchCriteria.addFilter(new CareTeamFilter(careTeamFilter));		
+			this.careTeamFilter.setValue(careTeamFilter);
+			filters.add(this.careTeamFilter);		
 		}
 		
 		if (roleCategoryFilter != null) {
-			searchCriteria.addFilter(new RoleCategoryFilter(roleCategoryFilter));				
+			this.roleCategoryFilter.setValue(roleCategoryFilter);
+			filters.add(this.roleCategoryFilter);				
 		}
 
 		Pagination pagination = new Pagination(pageSizeValue, pageValue);
 		Sort sort = new Sort(sortBy, sortOrder);
 
-		ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(searchCriteria, pagination,sort);
+		ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(searchCriteria, filters, pagination,sort);
 
 		exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
 		exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
