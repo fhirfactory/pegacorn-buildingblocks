@@ -99,7 +99,7 @@ public class GroupSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        GroupSearchResult newCareTeamSearchResult = new GroupSearchResult();
-        return (newCareTeamSearchResult);
+        GroupSearchResult groupSearchResult = new GroupSearchResult();
+        return (groupSearchResult);
     }
 }

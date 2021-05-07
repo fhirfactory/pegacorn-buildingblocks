@@ -93,7 +93,7 @@ public class OrganizationSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        OrganizationSearchResult newCareTeamSearchResult = new OrganizationSearchResult();
-        return (newCareTeamSearchResult);
+        OrganizationSearchResult organisationSearchResult = new OrganizationSearchResult();
+        return (organisationSearchResult);
     }
 }

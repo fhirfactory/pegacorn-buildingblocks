@@ -81,7 +81,7 @@ public class PersonSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        PersonSearchResult newCareTeamSearchResult = new PersonSearchResult();
-        return (newCareTeamSearchResult);
+        PersonSearchResult personSearchResult = new PersonSearchResult();
+        return (personSearchResult);
     }
 }

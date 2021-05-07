@@ -82,7 +82,7 @@ public class MatrixRoomSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        MatrixRoomSearchResult newCareTeamSearchResult = new MatrixRoomSearchResult();
-        return (newCareTeamSearchResult);
+        MatrixRoomSearchResult mainRoomSearchResult = new MatrixRoomSearchResult();
+        return (mainRoomSearchResult);
     }
 }

@@ -94,7 +94,7 @@ public class LocationSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        LocationSearchResult newCareTeamSearchResult = new LocationSearchResult();
-        return (newCareTeamSearchResult);
+        LocationSearchResult locationSearchResult = new LocationSearchResult();
+        return (locationSearchResult);
     }
 }

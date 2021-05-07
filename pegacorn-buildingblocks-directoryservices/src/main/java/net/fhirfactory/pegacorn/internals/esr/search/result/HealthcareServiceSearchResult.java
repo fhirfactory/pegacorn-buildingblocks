@@ -90,7 +90,7 @@ public class HealthcareServiceSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        HealthcareServiceSearchResult newCareTeamSearchResult = new HealthcareServiceSearchResult();
-        return (newCareTeamSearchResult);
+        HealthcareServiceSearchResult healthCareSearchResult = new HealthcareServiceSearchResult();
+        return (healthCareSearchResult);
     }
 }

@@ -93,7 +93,7 @@ public class CareTeamSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        CareTeamSearchResult newCareTeamSearchResult = new CareTeamSearchResult();
-        return (newCareTeamSearchResult);
+        CareTeamSearchResult careTeamSearchResult = new CareTeamSearchResult();
+        return (careTeamSearchResult);
     }
 }

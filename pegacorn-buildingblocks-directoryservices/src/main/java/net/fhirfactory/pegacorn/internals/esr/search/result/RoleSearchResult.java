@@ -95,7 +95,7 @@ public class RoleSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        RoleSearchResult newCareTeamSearchResult = new RoleSearchResult();
-        return (newCareTeamSearchResult);
+        RoleSearchResult roleSearchResult = new RoleSearchResult();
+        return (roleSearchResult);
     }
 }

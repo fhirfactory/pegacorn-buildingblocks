@@ -95,7 +95,7 @@ public class PractitionerSearchResult extends ESRSearchResult {
 
     @Override
     protected ESRSearchResult instatiateNewESRSearchResult() {
-        PractitionerSearchResult newCareTeamSearchResult = new PractitionerSearchResult();
-        return (newCareTeamSearchResult);
+        PractitionerSearchResult practitionerSearchResult = new PractitionerSearchResult();
+        return (practitionerSearchResult);
     }
 }
