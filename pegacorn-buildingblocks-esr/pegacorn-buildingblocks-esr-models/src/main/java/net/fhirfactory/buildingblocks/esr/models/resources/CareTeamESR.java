@@ -34,8 +34,6 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
     private ArrayList<String> serviceDeliveryLocations;
     private String managingOrganization;
     
-    private String participant;
-
     public CareTeamESR(){
         super();
         this.serviceDeliveryLocations = new ArrayList<>();
@@ -57,12 +55,4 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
     public void setManagingOrganization(String managingOrganization) {
         this.managingOrganization = managingOrganization;
     }
-
-	public String getParticipant() {
-		return participant;
-	}
-
-	public void setParticipant(String participant) {
-		this.participant = participant;
-	} 
 }
