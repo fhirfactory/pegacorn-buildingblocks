@@ -25,6 +25,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifi
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.TypeESDT;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,5 +116,10 @@ public class LocationESR extends ExtremelySimplifiedResource {
         }
         getLogger().debug(".buildLocationCumulativeName(): Exit, built name --> {}", cumulativeName);
         return(cumulativeName);
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Location);
     }
 }

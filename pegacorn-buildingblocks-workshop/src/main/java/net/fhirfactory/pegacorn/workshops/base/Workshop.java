@@ -21,12 +21,13 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.components.model.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.components.model.WorkshopInterface;
+import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.map.common.archetypes.common.PetasosEnabledSubsystemTopologyFactory;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
 import org.apache.camel.LoggingLevel;
@@ -62,13 +63,11 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     abstract protected String specifyWorkshopName();
     abstract protected String specifyWorkshopVersion();
     abstract protected TopologyNodeTypeEnum specifyWorkshopType();
-
-    @Override
-    public PetasosEnabledSubsystemTopologyFactory getTopologyFactory(){
-        return(getProcessingPlant().getTopologyFactory());
-    }
-
     abstract protected void invokePostConstructInitialisation();
+
+    protected PegacornTopologyFactoryInterface getTopologyFactory(){
+        return(processingPlant.getTopologyFactory());
+    }
 
     @Override
     public WorkshopTopologyNode getWorkshopNode(){
@@ -95,7 +94,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     private void buildWorkshop() {
         getLogger().debug(".buildWorkshop(): Entry, adding Workshop --> {}, version --> {}", specifyWorkshopName(), specifyWorkshopVersion());
         WorkshopTopologyNode workshop = getTopologyFactory().addWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getProcessingPlantNode(),specifyWorkshopType());
-        topologyIM.addTopologyNode(getProcessingPlant().getProcessingPlantNode(), workshop);
+        topologyIM.addTopologyNode(getProcessingPlant().getProcessingPlantNode().getNodeFDN(), workshop);
         this.workshopNode = workshop;
         getLogger().debug(".buildWorkshop(): Exit");
     }
@@ -113,7 +112,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
         String fromString = "timer://" +getFriendlyName() + "-ingres" + "?repeatCount=1";
 
         from(fromString)
-        .log(LoggingLevel.DEBUG, "Response Content --> ${body}");
+            .log(LoggingLevel.DEBUG, "InteractWorkshop --> ${body}");
     }
 
     private String getFriendlyName(){
@@ -126,7 +125,8 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
         getLogger().info(".getWUP(): Entry, wupName --> {}, wupVersion --> {}", wupName, wupVersion);
         boolean found = false;
         WorkUnitProcessorTopologyNode foundWorkshop = null;
-        for (WorkUnitProcessorTopologyNode containedWorkshop : this.workshopNode.getWupSet().values()) {
+        for (TopologyNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
+            WorkUnitProcessorTopologyNode containedWorkshop = (WorkUnitProcessorTopologyNode)topologyIM.getNode(containedWorkshopFDN);
             TopologyNodeRDN testRDN = new TopologyNodeRDN(TopologyNodeTypeEnum.WORKSHOP, wupName, wupVersion);
             if (testRDN.equals(containedWorkshop.getNodeRDN())) {
                 found = true;

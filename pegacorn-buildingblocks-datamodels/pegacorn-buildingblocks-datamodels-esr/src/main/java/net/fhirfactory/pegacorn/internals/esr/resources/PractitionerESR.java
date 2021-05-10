@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.*;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -214,4 +215,9 @@ public class PractitionerESR extends PersonESR {
             return (comparison);
         }
     };
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Practitioner);
+    }
 }

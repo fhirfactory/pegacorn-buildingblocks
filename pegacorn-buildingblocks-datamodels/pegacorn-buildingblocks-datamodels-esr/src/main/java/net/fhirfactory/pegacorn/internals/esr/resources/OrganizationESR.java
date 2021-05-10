@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.TypeESDT;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,5 +65,10 @@ public class OrganizationESR extends ExtremelySimplifiedResource {
 
     public void setOrganizationType(TypeESDT organizationType) {
         this.organizationType = organizationType;
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Organization);
     }
 }

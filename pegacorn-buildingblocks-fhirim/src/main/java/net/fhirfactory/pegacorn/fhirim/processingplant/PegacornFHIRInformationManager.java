@@ -21,12 +21,9 @@
  */
 package net.fhirfactory.pegacorn.fhirim.processingplant;
 
-import net.fhirfactory.pegacorn.processingplatform.ProcessingPlant;
+import net.fhirfactory.pegacorn.processingplant.ProcessingPlant;
 
 public abstract class PegacornFHIRInformationManager extends ProcessingPlant {
 
-    @Override
-    protected void buildProcessingPlantWorkshops() {
 
-    }
 }

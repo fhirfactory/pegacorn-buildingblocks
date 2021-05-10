@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,5 +63,10 @@ public class MatrixRoomESR extends ExtremelySimplifiedResource {
 
     public void setMetadata(HashMap<String, String> metadata) {
         this.metadata = metadata;
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Group);
     }
 }

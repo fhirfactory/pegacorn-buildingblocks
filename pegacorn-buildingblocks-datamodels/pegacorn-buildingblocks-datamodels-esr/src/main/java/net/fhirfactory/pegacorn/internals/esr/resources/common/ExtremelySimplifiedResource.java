@@ -22,17 +22,20 @@
 
 package net.fhirfactory.pegacorn.internals.esr.resources.common;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.CacheIDMetadata;
 import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class ExtremelySimplifiedResource {
+public abstract class  ExtremelySimplifiedResource {
     private String simplifiedID;
     private CacheIDMetadata simplifiedIDMetadata;
     private ArrayList<IdentifierESDT> identifiers;
@@ -52,10 +55,16 @@ public abstract class ExtremelySimplifiedResource {
     // Abstract Methods
     //
     abstract protected Logger getLogger();
+    abstract protected ResourceType specifyResourceType();
 
     //
     // Bean Methods
     //
+
+    @JsonIgnore
+    public ResourceType getResourceType(){
+        return(specifyResourceType());
+    }
 
     public boolean isSystemManaged() {
         return systemManaged;
@@ -73,6 +82,7 @@ public abstract class ExtremelySimplifiedResource {
         this.simplifiedID = simplifiedID;
     }
 
+    @JsonIgnore
     public void assignSimplifiedID(boolean useIdentifier, String identifierType, IdentifierESDTUseEnum identifierUse){
         IdentifierESDT shortNameIdentifier = this.getIdentifierWithType(identifierType);
         CacheIDMetadata meta = new CacheIDMetadata();
@@ -83,6 +93,7 @@ public abstract class ExtremelySimplifiedResource {
         setSimplifiedIDMetadata(meta);
     }
 
+    @JsonIgnore
     public void assignSimplifiedID(String key, String keySource){
         this.simplifiedID =key;
         CacheIDMetadata meta = new CacheIDMetadata();

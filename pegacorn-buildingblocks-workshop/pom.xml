@@ -13,7 +13,7 @@
     <artifactId>pegacorn-buildingblocks-workshop</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: BuildingBlocks :: Workshop</name>
+    <name>Pegacorn :: Building Blocks :: Workshop</name>
     <description>The Archetype/Template for each Workshop within the Pegacorn EcoSystem</description>
 
     <licenses>
@@ -95,11 +95,30 @@
             <version>${version-com.fasterxml.jackson.core-jackson-core}</version>
         </dependency>
 
+        <!--                     -->
+        <!-- Pegacorn Components -->
+        <!--                     -->
 
         <!-- Pegacorn Deployment Properties -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-deployment-properties</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Pegacorn Deployment Model -->
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-model</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Pegacorn Deployment Topology -->
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-topology</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
