@@ -8,7 +8,7 @@ import java.util.Comparator;
  * @author Brendan Douglas
  *
  */
-public class RoleDateComparator implements Comparator<RoleHistoryDetail> {
+public class RoleEndDateComparator implements Comparator<RoleHistoryDetail> {
 
 	@Override
 	public int compare(RoleHistoryDetail first, RoleHistoryDetail second) {
@@ -26,5 +26,4 @@ public class RoleDateComparator implements Comparator<RoleHistoryDetail> {
 
 		return second.getEndDate().compareTo(first.getEndDate());
 	}
-
 }

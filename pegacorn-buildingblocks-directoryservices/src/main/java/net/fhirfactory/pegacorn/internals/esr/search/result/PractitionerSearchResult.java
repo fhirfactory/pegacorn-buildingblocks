@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
@@ -83,6 +84,10 @@ public class PractitionerSearchResult extends ESRSearchResult {
             case "displayname": {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
+            }
+            case "lastroleselected": {
+                Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerESR.lastRoleSelectionDateComparator : Collections.reverseOrder(PractitionerESR.lastRoleSelectionDateComparator));
+                break;            	
             }
             default:{
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));

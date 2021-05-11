@@ -230,4 +230,40 @@ public class PractitionerESR extends PersonESR {
             return (comparison);
         }
     };
+    
+    // Comparator for last time a practitioner selected a role.
+    public static Comparator<ExtremelySimplifiedResource> lastRoleSelectionDateComparator = new Comparator<ExtremelySimplifiedResource>() {
+
+    	@Override
+    	public int compare(ExtremelySimplifiedResource first, ExtremelySimplifiedResource second) {
+    		if (first == null && second == null) {
+    			return 0;
+    		}
+
+    		if (first == null) {
+    			return -1;
+    		}
+
+    		if (second == null) {
+    			return 1;
+    		}
+
+    		PractitionerESR firstPractitioner = (PractitionerESR)first;
+    		PractitionerESR secondPractitioner = (PractitionerESR)second;
+    		
+    		if (firstPractitioner.getRoleHistory().isEmpty() && secondPractitioner.getRoleHistory().isEmpty()) {
+    			return 0;
+    		}
+    		
+    		if (firstPractitioner.getRoleHistory().isEmpty()) {
+    			return 1;
+    		}
+    		
+       		if (secondPractitioner.getRoleHistory().isEmpty()) {
+    			return -1;
+    		}
+       		
+    		return secondPractitioner.getRoleHistory().getMostRecentSelection().getCreatedDate().compareTo(firstPractitioner.getRoleHistory().getMostRecentSelection().getCreatedDate());
+    	}
+   };
 }

@@ -138,7 +138,7 @@ public class RoleHistory {
 		List<RoleHistoryDetail>previous = getAllPreviousRoles();
 		
 		// Step 1: Sort.
-		Collections.sort(previous, new RoleDateComparator());
+		Collections.sort(previous, new RoleEndDateComparator());
 		
 		// Step 2: Remove the duplicates.
 		if (removeDuplicates) {
@@ -228,4 +228,16 @@ public class RoleHistory {
 	public void setRoleHistories(List<RoleHistoryDetail> roleHistories) {
 		this.roleHistories = roleHistories;
 	}	
+	
+	
+	public RoleHistoryDetail getMostRecentSelection() {
+		if (roleHistories.isEmpty()) {
+			return null;
+		}
+		
+		// Order the records and select the first
+		Collections.sort(roleHistories, new RoleStartDateComparator());
+		
+		return roleHistories.get(0);	
+	}
 }
