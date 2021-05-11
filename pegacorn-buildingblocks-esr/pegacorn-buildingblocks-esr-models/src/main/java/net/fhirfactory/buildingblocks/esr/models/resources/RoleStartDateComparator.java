@@ -12,7 +12,7 @@ public class RoleStartDateComparator implements Comparator<RoleHistoryDetail> {
 
 	@Override
 	public int compare(RoleHistoryDetail first, RoleHistoryDetail second) {
-		if (first.getCreatedDate() == null && second.getCreatedDate() == null) {
+		if (first.getStartDate() == null && second.getStartDate() == null) {
 			return 0;
 		}
 
@@ -24,7 +24,7 @@ public class RoleStartDateComparator implements Comparator<RoleHistoryDetail> {
 			return 1;
 		}
 
-		return second.getCreatedDate().compareTo(first.getCreatedDate());
+		return second.getStartDate().compareTo(first.getStartDate());
 	}
 
 }
