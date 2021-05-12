@@ -22,6 +22,7 @@
 package net.fhirfactory.buildingblocks.esr.models.resources;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -33,16 +34,18 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import net.fhirfactory.buildingblocks.esr.models.helpers.DateUtils;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.EmailAddress;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerStatusESDT;
 
-public class PractitionerESR extends PersonESR {
-	private static final SimpleDateFormat LAST_TIME_ROLE_SELECTED_TIMESTAMP_FORMAT = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
-	
+public class PractitionerESR extends PersonESR {	
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESR.class);
+    
+    protected static final DateTimeFormatter LAST_ROLE_SELECTION_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DateUtils.YYYY_MM_DD_T_HH_MM_SS_INPUT);
+    
     @Override
     protected Logger getLogger(){return(LOG);}
 
@@ -127,7 +130,7 @@ public class PractitionerESR extends PersonESR {
     
     public String getDateTimeLastRoleSelected() {
     	if (!roleHistory.getRoleHistories().isEmpty()) {
-    		return LAST_TIME_ROLE_SELECTED_TIMESTAMP_FORMAT.format(roleHistory.getMostRecentSelection().getStartDate());
+    		return DateUtils.format(roleHistory.getMostRecentSelection().getStartDate(), LAST_ROLE_SELECTION_DATE_TIME_FORMATTER);
     	}
     	
     	return null;
