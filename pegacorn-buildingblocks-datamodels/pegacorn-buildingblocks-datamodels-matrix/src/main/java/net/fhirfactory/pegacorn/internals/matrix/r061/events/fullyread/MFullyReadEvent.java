@@ -19,22 +19,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.fullyread;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes.MLocationContentType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEvent;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEventTypeEnum;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.fullyread.contenttypes.MFullyReadContentType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.presence.contenttypes.MPresenceContentType;
 
-public class MRoomLocationMessageEvent extends MatrixEventBase {
-    private MLocationContentType content;
+public class MFullyReadEvent extends MatrixEvent {
+    private MFullyReadContentType content;
+    private String roomID;
+    private MEventTypeEnum eventType;
 
     @JsonProperty("content")
-    public MLocationContentType getContent() {
+    public MFullyReadContentType getContent() {
         return content;
     }
 
     @JsonProperty("content")
-    public void setContent(MLocationContentType content) {
+    public void setContent(MFullyReadContentType content) {
         this.content = content;
+    }
+
+    @JsonProperty("room_id")
+    public String getRoomID() {
+        return roomID;
+    }
+
+    @JsonProperty("room_id")
+    public void setRoomID(String roomID) {
+        this.roomID = roomID;
+    }
+
+    @JsonProperty("type")
+    public MEventTypeEnum getEventType() {
+        return eventType;
+    }
+
+    @JsonProperty("type")
+    public void setEventType(MEventTypeEnum eventType) {
+        this.eventType = eventType;
     }
 }

@@ -19,49 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.esr.resources;
+package net.fhirfactory.pegacorn.internals.esr.helpers;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelTypeKeyEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+public class ESRTopicTokenFactory {
 
-public class RoleESR extends ExtremelySimplifiedResource {
-    private static final Logger LOG = LoggerFactory.getLogger(RoleESR.class);
-
-    private String roleCategory;
-    private ArrayList<String> containedRoles;
-
-    public RoleESR(){
-        super();
-        containedRoles = new ArrayList<>();
-        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_ROLE);
-    }
-
-    @Override
-    protected Logger getLogger(){return(LOG);}
-
-    public String getRoleCategory() {
-        return roleCategory;
-    }
-
-    public void setRoleCategory(String roleCategory) {
-        this.roleCategory = roleCategory;
-    }
-
-    public ArrayList<String> getContainedRoles() {
-        return containedRoles;
-    }
-
-    public void setContainedRoles(ArrayList<String> containedRoles) {
-        this.containedRoles = containedRoles;
-    }
-
-    @Override
-    protected ResourceType specifyResourceType() {
-        return (ResourceType.ValueSet);
+    public DataParcelToken buildTopicToken(ExtremelySimplifiedResourceTypeEnum resourceType){
+        FDN topicFDN = new FDN();
+        topicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DEFINER.getTopicType(), "FHIRFactory"));
+        topicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_CATEGORY.getTopicType(), "DirectoryServices"));
+        topicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicType(), "ExtremelySimplifiedResources"));
+        topicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicType(), resourceType.getResourceType()));
+        DataParcelToken payloadToken = new DataParcelToken();
+        payloadToken.setToken(topicFDN.getToken());
+        payloadToken.setVersion("1.0.0");
+        return(payloadToken);
     }
 }

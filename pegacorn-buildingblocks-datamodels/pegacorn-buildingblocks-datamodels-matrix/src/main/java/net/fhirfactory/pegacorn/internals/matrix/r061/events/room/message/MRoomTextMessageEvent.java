@@ -19,53 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes.MTextContentType;
 
-public class MTextContentType {
-    private MRoomMessageTypeEnum messageType;
-    private String body;
-    private String format;
-    private String formattedBody;
+public class MRoomTextMessageEvent extends MatrixEventBase {
+    private MTextContentType content;
 
-    @JsonProperty("msgtype")
-    public MRoomMessageTypeEnum getMessageType() {
-        return messageType;
+    @JsonProperty("content")
+    public MTextContentType getContent() {
+        return content;
     }
 
-    @JsonProperty("msgtype")
-    public void setMessageType(MRoomMessageTypeEnum messageType) {
-        this.messageType = messageType;
-    }
-
-    @JsonProperty("body")
-    public String getBody() {
-        return body;
-    }
-
-    @JsonProperty("body")
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    @JsonProperty("format")
-    public String getFormat() {
-        return format;
-    }
-
-    @JsonProperty("format")
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    @JsonProperty("formatted_body")
-    public String getFormattedBody() {
-        return formattedBody;
-    }
-
-    @JsonProperty("formatted_body")
-    public void setFormattedBody(String formatttedBody) {
-        this.formattedBody = formatttedBody;
+    @JsonProperty("content")
+    public void setContent(MTextContentType content) {
+        this.content = content;
     }
 }

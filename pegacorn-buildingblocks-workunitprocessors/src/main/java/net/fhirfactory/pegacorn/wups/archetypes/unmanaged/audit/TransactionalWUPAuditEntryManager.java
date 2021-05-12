@@ -24,17 +24,15 @@ package net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit;
 import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicTypeEnum;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelTypeKeyEnum;
 import net.fhirfactory.pegacorn.components.transaction.model.TransactionTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicIDBuilder;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
-import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWProcessingOutcomeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.hl7.fhir.r4.model.Resource;
@@ -44,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.transaction.Transaction;
 
 @ApplicationScoped
 public class TransactionalWUPAuditEntryManager {
@@ -106,7 +103,7 @@ public class TransactionalWUPAuditEntryManager {
                 String fullPayloadString = auditTrailPayload + resourceAsString;
                 payload.setPayload(fullPayloadString);
                 LOG.trace(".beginTransaction(): Construct a TopicToken to describe the payload & add it to the Payload");
-                TopicToken payloadToken = topicIDBuilder.createTopicToken(resourceType, FHIR_VERSION);
+                DataParcelToken payloadToken = topicIDBuilder.createTopicToken(resourceType, FHIR_VERSION);
                 payload.setPayloadTopicID(payloadToken);
             } catch (Exception Ex) {
                 LOG.error(".beginTransaction(): Failed to Encode --> {}", Ex.toString());
@@ -117,7 +114,7 @@ public class TransactionalWUPAuditEntryManager {
             String fullPayloadString = auditTrailPayload + auditCommentary;
             payload.setPayload(fullPayloadString);
             LOG.trace(".beginTransaction(): Construct a TopicToken to describe the payload & add it to the Payload");
-            TopicToken payloadToken = topicIDBuilder.createTopicToken(resourceType, FHIR_VERSION);
+            DataParcelToken payloadToken = topicIDBuilder.createTopicToken(resourceType, FHIR_VERSION);
             payload.setPayloadTopicID(payloadToken);
         }
         UoW theUoW;
@@ -125,12 +122,12 @@ public class TransactionalWUPAuditEntryManager {
             LOG.trace(".beginTransaction(): Failed to encode incoming content....");
             payload.setPayload("Error encoding content --> " + errorString);
             FDN payloadTopicFDN = new FDN();
-            payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_DEFINER.getTopicType(), "AETHER"));
-            payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_CATEGORY.getTopicType(), "DataTypes"));
-            payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_SUBCATEGORY.getTopicType(), "Error"));
-            payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_RESOURCE.getTopicType(), "JSONConversionErrorMessage"));
-            TopicToken newToken = new TopicToken();
-            newToken.setIdentifier(payloadTopicFDN.getToken());
+            payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DEFINER.getTopicType(), "AETHER"));
+            payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_CATEGORY.getTopicType(), "DataTypes"));
+            payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicType(), "Error"));
+            payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicType(), "JSONConversionErrorMessage"));
+            DataParcelToken newToken = new DataParcelToken();
+            newToken.setToken(payloadTopicFDN.getToken());
             newToken.setVersion("1.0.0");
             payload.setPayloadTopicID(newToken);
             LOG.trace(".beginTransaction(): Create the UoW with the fhirResource/TopicToken as the Ingres Payload");

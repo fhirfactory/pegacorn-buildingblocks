@@ -19,38 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MAudioInfoType;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEncryptedFileType;
 
-public class MAudioContentType {
-    private String body;
-    private MAudioInfoType info;
+public class MTextContentType {
     private MRoomMessageTypeEnum messageType;
-    private String audioURL;
-    private MEncryptedFileType audioFile;
-
-    @JsonProperty("body")
-    public String getBody() {
-        return body;
-    }
-
-    @JsonProperty("body")
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    @JsonProperty("info")
-    public MAudioInfoType getInfo() {
-        return info;
-    }
-
-    @JsonProperty("info")
-    public void setInfo(MAudioInfoType info) {
-        this.info = info;
-    }
+    private String body;
+    private String format;
+    private String formattedBody;
 
     @JsonProperty("msgtype")
     public MRoomMessageTypeEnum getMessageType() {
@@ -62,23 +39,33 @@ public class MAudioContentType {
         this.messageType = messageType;
     }
 
-    @JsonProperty("url")
-    public String getAudioURL() {
-        return audioURL;
+    @JsonProperty("body")
+    public String getBody() {
+        return body;
     }
 
-    @JsonProperty("url")
-    public void setAudioURL(String audioURL) {
-        this.audioURL = audioURL;
+    @JsonProperty("body")
+    public void setBody(String body) {
+        this.body = body;
     }
 
-    @JsonProperty("file")
-    public MEncryptedFileType getAudioFile() {
-        return audioFile;
+    @JsonProperty("format")
+    public String getFormat() {
+        return format;
     }
 
-    @JsonProperty("file")
-    public void setAudioFile(MEncryptedFileType audioFile) {
-        this.audioFile = audioFile;
+    @JsonProperty("format")
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    @JsonProperty("formatted_body")
+    public String getFormattedBody() {
+        return formattedBody;
+    }
+
+    @JsonProperty("formatted_body")
+    public void setFormattedBody(String formatttedBody) {
+        this.formattedBody = formatttedBody;
     }
 }

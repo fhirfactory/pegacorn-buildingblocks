@@ -19,22 +19,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.tag;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes.MNoticeContentType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEvent;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEventTypeEnum;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.fullyread.contenttypes.MFullyReadContentType;
 
-public class MRoomNoticeMessageEvent extends MatrixEventBase {
-    private MNoticeContentType content;
+public class MTagEvent extends MatrixEvent {
+    private MFullyReadContentType content;
+    private MEventTypeEnum eventType;
 
     @JsonProperty("content")
-    public MNoticeContentType getContent() {
+    public MFullyReadContentType getContent() {
         return content;
     }
 
     @JsonProperty("content")
-    public void setContent(MNoticeContentType content) {
+    public void setContent(MFullyReadContentType content) {
         this.content = content;
+    }
+
+    @JsonProperty("type")
+    public MEventTypeEnum getEventType() {
+        return eventType;
+    }
+
+    @JsonProperty("type")
+    public void setEventType(MEventTypeEnum eventType) {
+        this.eventType = eventType;
     }
 }

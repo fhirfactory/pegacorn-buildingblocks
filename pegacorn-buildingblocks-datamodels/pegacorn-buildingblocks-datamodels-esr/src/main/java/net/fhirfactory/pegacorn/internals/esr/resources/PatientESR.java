@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FunctionDE;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ public class PatientESR extends PersonESR {
     public PatientESR(){
         super();
         careProviders = new HashMap<>();
+        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_PATIENT);
     }
 
     public String getPrimaryLocation() {

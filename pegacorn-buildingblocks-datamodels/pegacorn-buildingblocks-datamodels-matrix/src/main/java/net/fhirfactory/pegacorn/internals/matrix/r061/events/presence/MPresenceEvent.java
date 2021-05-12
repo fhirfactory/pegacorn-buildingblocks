@@ -22,10 +22,11 @@
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.presence;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEvent;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEventTypeEnum;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.presence.contenttypes.MPresenceContentType;
 
-public class MPresenceEvent {
+public class MPresenceEvent extends MatrixEvent {
     private MPresenceContentType content;
     private String sender;
     private MEventTypeEnum eventType;

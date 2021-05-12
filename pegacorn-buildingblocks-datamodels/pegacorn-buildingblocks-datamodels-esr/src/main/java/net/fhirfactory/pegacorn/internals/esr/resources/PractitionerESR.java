@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.*;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
@@ -54,6 +55,7 @@ public class PractitionerESR extends PersonESR {
         this.practitionerFavourites = new FavouriteListESDT();
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();
+        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_PRACTITIONER);
     }
 
     public ArrayList<String> getCurrentPractitionerRoles() {

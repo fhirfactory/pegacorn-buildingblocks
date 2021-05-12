@@ -19,48 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.esr.resources.datatypes;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room;
 
-public class PegId{
-    String value;
-    String version;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.common.MRoomEventBase;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.contenttypes.MRoomNameContentType;
 
-    public PegId(){
-        this.value = null;
-        this.version = null;
+public class MRoomNameEvent extends MRoomEventBase {
+    private MRoomNameContentType content;
+
+    @JsonProperty("content")
+    public MRoomNameContentType getContent() {
+        return content;
     }
 
-    public PegId(String value){
-        this.value = value;
-        this.version = null;
-    }
-
-    public PegId(String value, String version){
-        this.value = value;
-        this.version = version;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    @Override
-    public String toString() {
-        String valueString = "value=" + this.getValue();
-        String versionString = "version=" + this.getVersion();
-        String stringValue = valueString + "|" + versionString;
-        return(stringValue);
+    @JsonProperty("content")
+    public void setContent(MRoomNameContentType content) {
+        this.content = content;
     }
 }

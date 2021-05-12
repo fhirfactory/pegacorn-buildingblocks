@@ -19,26 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message;
 
-public enum MRoomMessageTypeEnum {
-    VIDEO("m.video"),
-    LOCATION("m.location"),
-    AUDIO("m.audio"),
-    FILE("m.file"),
-    IMAGE("m.image"),
-    NOTICE("m.notice"),
-    EMOTE("m.emote"),
-    TEXT("m.text"),
-    SERVER_NOTICE("m.server_notice");
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes.MNoticeContentType;
 
-    private String msgtype;
+public class MRoomNoticeMessageEvent extends MatrixEventBase {
+    private MNoticeContentType content;
 
-    private MRoomMessageTypeEnum(String msgtype){
-        this.msgtype = msgtype;
+    @JsonProperty("content")
+    public MNoticeContentType getContent() {
+        return content;
     }
 
-    public String getMsgtype(){
-        return(msgtype);
+    @JsonProperty("content")
+    public void setContent(MNoticeContentType content) {
+        this.content = content;
     }
 }

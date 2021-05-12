@@ -19,22 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes.MVideoContentType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes.MEmoteContentType;
 
-public class MRoomVideoMessageEvent extends MatrixEventBase {
-    MVideoContentType content;
+public class MRoomEmoteMessageEvent extends MatrixEventBase {
+    private MEmoteContentType content;
 
     @JsonProperty("content")
-    public MVideoContentType getContent() {
+    public MEmoteContentType getContent() {
         return content;
     }
 
     @JsonProperty("content")
-    public void setContent(MVideoContentType content) {
+    public void setContent(MEmoteContentType content) {
         this.content = content;
     }
 }

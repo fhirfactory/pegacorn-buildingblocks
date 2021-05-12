@@ -19,31 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.common;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class MatrixEventKey extends MatrixEvent{
-    private String eventIdentifier;
-    private String roomIdentifier;
-
-    @JsonProperty("event_id")
-    public String getEventIdentifier() {
-        return eventIdentifier;
-    }
-
-    @JsonProperty("event_id")
-    public void setEventIdentifier(String eventIdentifier) {
-        this.eventIdentifier = eventIdentifier;
-    }
-
-    @JsonProperty("room_id")
-    public String getRoomIdentifier() {
-        return roomIdentifier;
-    }
-
-    @JsonProperty("room_id")
-    public void setRoomIdentifier(String roomIdentifier) {
-        this.roomIdentifier = roomIdentifier;
-    }
+public class MEmoteContentType extends MTextContentType{
 }

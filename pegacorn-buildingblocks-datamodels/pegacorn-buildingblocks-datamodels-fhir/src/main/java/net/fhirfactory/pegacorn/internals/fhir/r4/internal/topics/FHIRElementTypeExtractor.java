@@ -23,26 +23,26 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicTypeEnum;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelTypeKeyEnum;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class FHIRElementTypeExtractor {
 
-	public Class<?> extractResourceType(TopicToken token) throws ClassNotFoundException {
+	public Class<?> extractResourceType(DataParcelToken token) throws ClassNotFoundException {
 
     	if(token == null) {
     		return(null);
     	}
-    	if(token.getIdentifier() == null) {
+    	if(token.getToken() == null) {
     		return(null);
     	}
-    	FDN topicFDN = new FDN(token.getIdentifier());
+    	FDN topicFDN = new FDN(token.getToken());
         String resourceName = null;
         for(RDN currentRDN: topicFDN.getRDNSet()) {
-        	if(currentRDN.getQualifier().contentEquals(TopicTypeEnum.DATASET_RESOURCE.getTopicType())) {
+        	if(currentRDN.getQualifier().contentEquals(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicType())) {
         		resourceName = currentRDN.getValue();
         		break;
         	}

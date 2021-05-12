@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.HumanNameESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.HumanNameESDTUseEnum;
@@ -44,6 +45,7 @@ public class PersonESR extends ExtremelySimplifiedResource {
         super();
         this.contactPoints = new ArrayList<>();
         this.otherNames = new ArrayList<>();
+        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_PERSON);
     }
 
     public HumanNameESDT getOfficialName() {

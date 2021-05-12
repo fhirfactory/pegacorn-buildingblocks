@@ -4,7 +4,7 @@ import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.transaction.model.TransactionTypeEnum;
@@ -239,9 +239,9 @@ public abstract class NonResilientWithAuditTrailWUP {
         }
         UoWPayload newPayload = new UoWPayload();
         newPayload.setPayload("Resource="+resourceType+"?search=");
-        TopicToken topicToken = topicIDBuilder.createTopicToken(resourceType, resourceVersion);
-        topicToken.addDescriminator("SearchActivity", "SearchQuery");
-        newPayload.setPayloadTopicID(topicToken);
+        DataParcelToken dataParcelToken = topicIDBuilder.createTopicToken(resourceType, resourceVersion);
+        dataParcelToken.addDiscriminator("SearchActivity", "SearchQuery");
+        newPayload.setPayloadTopicID(dataParcelToken);
         UoW uow = new UoW(newPayload);
         TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(this.getCurrentJobCard(),uow, TransactionTypeEnum.SEARCH);
         return(transactionStatus);
@@ -251,9 +251,9 @@ public abstract class NonResilientWithAuditTrailWUP {
         String searchAnswerSummary = buildSearchResultString(resultSet);
         UoWPayload payload = new UoWPayload();
         payload.setPayload(searchAnswerSummary);
-        TopicToken topicToken = startingTransaction.getUnitOfWork().getPayloadTopicID();
-        topicToken.addDescriminator("SearchActivity", "SearchOutcome");
-        payload.setPayloadTopicID(topicToken);
+        DataParcelToken dataParcelToken = startingTransaction.getUnitOfWork().getPayloadTopicID();
+        dataParcelToken.addDiscriminator("SearchActivity", "SearchOutcome");
+        payload.setPayloadTopicID(dataParcelToken);
         startingTransaction.getUnitOfWork().getEgressContent().addPayloadElement(payload);
 //        auditEntryManager.endTransaction(searchAnswerCount, resourceType , null,action,success,startingTransaction,getNodeInstanceID(),getWUPInstanceVersion());
     }

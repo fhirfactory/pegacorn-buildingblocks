@@ -43,6 +43,7 @@ public abstract class  ExtremelySimplifiedResource {
     private String description;
     private boolean systemManaged;
     private String otherID;
+    private ExtremelySimplifiedResourceTypeEnum resourceType;
 
     public ExtremelySimplifiedResource(){
         this.identifiers = new ArrayList<>();
@@ -149,6 +150,10 @@ public abstract class  ExtremelySimplifiedResource {
             }
         }
         return(null);
+    }
+
+    public void setResourceType(ExtremelySimplifiedResourceTypeEnum resourceType) {
+        this.resourceType = resourceType;
     }
 
     public IdentifierESDT getIdentifierWithType(String identifierType){

@@ -19,7 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message;
 
-public class MNoticeContentType extends MTextContentType{
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes.MFileContentType;
+
+public class MRoomFileMessageEvent extends MatrixEventBase {
+    private MFileContentType content;
+
+    @JsonProperty("content")
+    public MFileContentType getContent() {
+        return content;
+    }
+
+    @JsonProperty("content")
+    public void setContent(MFileContentType content) {
+        this.content = content;
+    }
 }

@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.forward;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,11 +52,11 @@ public class EdgeForwardWUP extends EdgeEgressMessagingGatewayWUP {
     }
 
     @Override
-    protected Set<TopicToken> specifySubscriptionTopics() {
+    protected Set<DataParcelToken> specifySubscriptionTopics() {
         getLogger().debug(".specifySubscriptionTopics(): Entry");
-        HashSet<TopicToken> myTopicSet = new HashSet<TopicToken>();
-        TopicToken topicId = getFHIRTopicIDBuilder().createTopicToken("Bundle", "4.0.1");
-        topicId.addDescriminator("Destination", "*");
+        HashSet<DataParcelToken> myTopicSet = new HashSet<DataParcelToken>();
+        DataParcelToken topicId = getFHIRTopicIDBuilder().createTopicToken("Bundle", "4.0.1");
+        topicId.addDiscriminator("Destination", "*");
         myTopicSet.add(topicId);
         getLogger().debug(".specifySubscriptionTopics(): Exit, added TopicToken --> {}", topicId);
         return (myTopicSet);

@@ -2,15 +2,15 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicTypeEnum;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelTypeKeyEnum;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class HL7V2XTopicIDBuilder {
-    public TopicToken createTopicToken(String messageName, String version){
-        TopicToken newToken = new TopicToken();
+    public DataParcelToken createTopicToken(String messageName, String version){
+        DataParcelToken newToken = new DataParcelToken();
         FDN topicFDN = createTopicFDN(messageName);
         if(topicFDN==null){
             return(null);
@@ -18,15 +18,15 @@ public class HL7V2XTopicIDBuilder {
         if(version == null){
             return(null);
         }
-        newToken.setIdentifier(topicFDN.getToken());
+        newToken.setToken(topicFDN.getToken());
         newToken.setVersion(version);
         return(newToken);
     }
 
     public FDN createTopicFDN(String eventName) {
         FDN payloadTopicFDN = new FDN();
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_DEFINER.getTopicType(), "HL7"));
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_CATEGORY.getTopicType(), "Events"));
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DEFINER.getTopicType(), "HL7"));
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_CATEGORY.getTopicType(), "Events"));
         switch (eventName) {
             case "A01":
             case "A02":
@@ -86,37 +86,37 @@ public class HL7V2XTopicIDBuilder {
             case "A60":
             case "A61":
             case "A62": {
-                payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_SUBCATEGORY.getTopicType(), "ADT"));
-                payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_RESOURCE.getTopicType(), eventName));
+                payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicType(), "ADT"));
+                payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicType(), eventName));
                 return (payloadTopicFDN);
             }
             default:
-                payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_SUBCATEGORY.getTopicType(), "Unknown"));
-                payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_RESOURCE.getTopicType(), eventName));
+                payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicType(), "Unknown"));
+                payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicType(), eventName));
                 return (payloadTopicFDN);
         }
    }
 
-    public TopicToken createTopicToken(String eventType, String eventTrigger, String version){
+    public DataParcelToken createTopicToken(String eventType, String eventTrigger, String version){
         FDN payloadTopicFDN = new FDN();
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_DEFINER.getTopicType(), "HL7"));
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_CATEGORY.getTopicType(), "Events"));
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_SUBCATEGORY.getTopicType(), eventType));
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_RESOURCE.getTopicType(), eventTrigger));
-        TopicToken newToken = new TopicToken();
-        newToken.setIdentifier(payloadTopicFDN.getToken());
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DEFINER.getTopicType(), "HL7"));
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_CATEGORY.getTopicType(), "Events"));
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicType(), eventType));
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicType(), eventTrigger));
+        DataParcelToken newToken = new DataParcelToken();
+        newToken.setToken(payloadTopicFDN.getToken());
         newToken.setVersion(version);
         return(newToken);
     }
 
-    public TopicToken createBadTopicToken(){
+    public DataParcelToken createBadTopicToken(){
         FDN payloadTopicFDN = new FDN();
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_DEFINER.getTopicType(), "HL7"));
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_CATEGORY.getTopicType(), "Events"));
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_SUBCATEGORY.getTopicType(), "unknown"));
-        payloadTopicFDN.appendRDN(new RDN(TopicTypeEnum.DATASET_RESOURCE.getTopicType(), "unknown"));
-        TopicToken newToken = new TopicToken();
-        newToken.setIdentifier(payloadTopicFDN.getToken());
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DEFINER.getTopicType(), "HL7"));
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_CATEGORY.getTopicType(), "Events"));
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicType(), "unknown"));
+        payloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicType(), "unknown"));
+        DataParcelToken newToken = new DataParcelToken();
+        newToken.setToken(payloadTopicFDN.getToken());
         newToken.setVersion("x.x.x");
         return(newToken);
     }

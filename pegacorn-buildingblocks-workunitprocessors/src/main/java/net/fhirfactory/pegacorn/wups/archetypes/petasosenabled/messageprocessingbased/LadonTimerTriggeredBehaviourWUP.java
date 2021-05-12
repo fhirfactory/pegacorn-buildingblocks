@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
@@ -87,8 +87,8 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBase
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected Set<TopicToken> specifySubscriptionTopics() {
-        HashSet<TopicToken> subTopics = new HashSet<TopicToken>();
+    protected Set<DataParcelToken> specifySubscriptionTopics() {
+        HashSet<DataParcelToken> subTopics = new HashSet<DataParcelToken>();
         return(subTopics);
     }
     

@@ -19,22 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.common;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes.MFileContentType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class MRoomFileMessageEvent extends MatrixEventBase {
-    private MFileContentType content;
+public class MatrixEvent {
+    String matrixEventFineGrainType;
 
-    @JsonProperty("content")
-    public MFileContentType getContent() {
-        return content;
+    @JsonIgnore
+    public String getMatrixEventFineGrainType() {
+        return matrixEventFineGrainType;
     }
 
-    @JsonProperty("content")
-    public void setContent(MFileContentType content) {
-        this.content = content;
+    @JsonIgnore
+    public void setMatrixEventFineGrainType(String eventType) {
+        this.matrixEventFineGrainType = eventType;
     }
 }

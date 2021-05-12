@@ -19,16 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MLocationInfoType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEncryptedFileType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MFileInfoType;
 
-public class MLocationContentType {
+public class MFileContentType {
     private String body;
-    private String geographicURI;
+    private String fileName;
+    private MFileInfoType fileInfo;
     private MRoomMessageTypeEnum messageType;
-    private MLocationInfoType locationInfo;
+    private String fileURL;
+    private MEncryptedFileType encryptedFile;
 
     @JsonProperty("body")
     public String getBody() {
@@ -40,14 +43,24 @@ public class MLocationContentType {
         this.body = body;
     }
 
-    @JsonProperty("geo_uri")
-    public String getGeographicURI() {
-        return geographicURI;
+    @JsonProperty("filename")
+    public String getFileName() {
+        return fileName;
     }
 
-    @JsonProperty("geo_uri")
-    public void setGeographicURI(String geographicURI) {
-        this.geographicURI = geographicURI;
+    @JsonProperty("filename")
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    @JsonProperty("info")
+    public MFileInfoType getFileInfo() {
+        return fileInfo;
+    }
+
+    @JsonProperty("info")
+    public void setFileInfo(MFileInfoType fileInfo) {
+        this.fileInfo = fileInfo;
     }
 
     @JsonProperty("msgtype")
@@ -60,13 +73,23 @@ public class MLocationContentType {
         this.messageType = messageType;
     }
 
-    @JsonProperty("info")
-    public MLocationInfoType getLocationInfo() {
-        return locationInfo;
+    @JsonProperty("url")
+    public String getFileURL() {
+        return fileURL;
     }
 
-    @JsonProperty("info")
-    public void setLocationInfo(MLocationInfoType locationInfo) {
-        this.locationInfo = locationInfo;
+    @JsonProperty("url")
+    public void setFileURL(String fileURL) {
+        this.fileURL = fileURL;
+    }
+
+    @JsonProperty("file")
+    public MEncryptedFileType getEncryptedFile() {
+        return encryptedFile;
+    }
+
+    @JsonProperty("file")
+    public void setEncryptedFile(MEncryptedFileType encryptedFile) {
+        this.encryptedFile = encryptedFile;
     }
 }

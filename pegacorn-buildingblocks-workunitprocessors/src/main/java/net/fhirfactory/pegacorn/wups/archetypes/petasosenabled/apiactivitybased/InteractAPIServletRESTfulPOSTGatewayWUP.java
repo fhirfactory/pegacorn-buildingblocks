@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.apiactivitybased;
 
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
@@ -71,8 +71,8 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMes
      * @return An empty Set<TopicToken>
      */
     @Override
-    public Set<TopicToken> specifySubscriptionTopics() {
-        HashSet<TopicToken> subTopics = new HashSet<TopicToken>();
+    public Set<DataParcelToken> specifySubscriptionTopics() {
+        HashSet<DataParcelToken> subTopics = new HashSet<DataParcelToken>();
         return(subTopics);
     }
     

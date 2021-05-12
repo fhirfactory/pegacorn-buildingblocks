@@ -19,18 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEncryptedFileType;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MImageInfoType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MLocationInfoType;
 
-public class MImageContentType {
+public class MLocationContentType {
     private String body;
-    private MImageInfoType info;
+    private String geographicURI;
     private MRoomMessageTypeEnum messageType;
-    private String imageURL;
-    private MEncryptedFileType imageFile;
+    private MLocationInfoType locationInfo;
 
     @JsonProperty("body")
     public String getBody() {
@@ -42,14 +40,14 @@ public class MImageContentType {
         this.body = body;
     }
 
-    @JsonProperty("info")
-    public MImageInfoType getInfo() {
-        return info;
+    @JsonProperty("geo_uri")
+    public String getGeographicURI() {
+        return geographicURI;
     }
 
-    @JsonProperty("info")
-    public void setInfo(MImageInfoType info) {
-        this.info = info;
+    @JsonProperty("geo_uri")
+    public void setGeographicURI(String geographicURI) {
+        this.geographicURI = geographicURI;
     }
 
     @JsonProperty("msgtype")
@@ -62,23 +60,13 @@ public class MImageContentType {
         this.messageType = messageType;
     }
 
-    @JsonProperty("url")
-    public String getImageURL() {
-        return imageURL;
+    @JsonProperty("info")
+    public MLocationInfoType getLocationInfo() {
+        return locationInfo;
     }
 
-    @JsonProperty("url")
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
-    }
-
-    @JsonProperty("file")
-    public MEncryptedFileType getImageFile() {
-        return imageFile;
-    }
-
-    @JsonProperty("file")
-    public void setImageFile(MEncryptedFileType imageFile) {
-        this.imageFile = imageFile;
+    @JsonProperty("info")
+    public void setLocationInfo(MLocationInfoType locationInfo) {
+        this.locationInfo = locationInfo;
     }
 }

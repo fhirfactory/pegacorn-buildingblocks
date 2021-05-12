@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,8 @@ public class HealthcareServiceESR extends ExtremelySimplifiedResource {
 
     public HealthcareServiceESR(){
         super();
+        serviceDeliveryLocations = new ArrayList<>();
+        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_HEALTHCARE_SERVICE);
     }
 
     public ArrayList<String> getServiceDeliveryLocations() {

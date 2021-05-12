@@ -19,22 +19,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes.MAudioContentType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEventTypeEnum;
 
-public class MRoomAudioMessageEvent extends MatrixEventBase {
-    private MAudioContentType content;
+public enum MRoomMessageTypeEnum {
+    VIDEO("m.video"),
+    LOCATION("m.location"),
+    AUDIO("m.audio"),
+    FILE("m.file"),
+    IMAGE("m.image"),
+    NOTICE("m.notice"),
+    EMOTE("m.emote"),
+    TEXT("m.text"),
+    SERVER_NOTICE("m.server_notice");
 
-    @JsonProperty("content")
-    public MAudioContentType getContent() {
-        return content;
+    private String msgtype;
+
+    private MRoomMessageTypeEnum(String msgtype){
+        this.msgtype = msgtype;
     }
 
-    @JsonProperty("content")
-    public void setContent(MAudioContentType content) {
-        this.content = content;
+    public String getMsgtype(){
+        return(msgtype);
+    }
+
+    public static MRoomMessageTypeEnum fromString(String text) {
+        for (MRoomMessageTypeEnum evType : MRoomMessageTypeEnum.values()) {
+            if (evType.msgtype.equalsIgnoreCase(text)) {
+                return evType;
+            }
+        }
+        return null;
     }
 }

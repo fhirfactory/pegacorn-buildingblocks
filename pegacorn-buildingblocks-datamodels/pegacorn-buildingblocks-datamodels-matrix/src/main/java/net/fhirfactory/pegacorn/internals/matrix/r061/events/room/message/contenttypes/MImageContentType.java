@@ -19,18 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.instantmessaging.contenttypes;
+package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEncryptedFileType;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MVideoInfoType;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MImageInfoType;
 
-public class MVideoContentType {
+public class MImageContentType {
     private String body;
-    private MVideoInfoType videoInfo;
+    private MImageInfoType info;
     private MRoomMessageTypeEnum messageType;
-    private String videoURL;
-    private MEncryptedFileType videoFile;
+    private String imageURL;
+    private MEncryptedFileType imageFile;
 
     @JsonProperty("body")
     public String getBody() {
@@ -43,13 +43,13 @@ public class MVideoContentType {
     }
 
     @JsonProperty("info")
-    public MVideoInfoType getVideoInfo() {
-        return videoInfo;
+    public MImageInfoType getInfo() {
+        return info;
     }
 
     @JsonProperty("info")
-    public void setVideoInfo(MVideoInfoType videoInfo) {
-        this.videoInfo = videoInfo;
+    public void setInfo(MImageInfoType info) {
+        this.info = info;
     }
 
     @JsonProperty("msgtype")
@@ -63,22 +63,22 @@ public class MVideoContentType {
     }
 
     @JsonProperty("url")
-    public String getVideoURL() {
-        return videoURL;
+    public String getImageURL() {
+        return imageURL;
     }
 
     @JsonProperty("url")
-    public void setVideoURL(String videoURL) {
-        this.videoURL = videoURL;
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 
     @JsonProperty("file")
-    public MEncryptedFileType getVideoFile() {
-        return videoFile;
+    public MEncryptedFileType getImageFile() {
+        return imageFile;
     }
 
     @JsonProperty("file")
-    public void setVideoFile(MEncryptedFileType videoFile) {
-        this.videoFile = videoFile;
+    public void setImageFile(MEncryptedFileType imageFile) {
+        this.imageFile = imageFile;
     }
 }
