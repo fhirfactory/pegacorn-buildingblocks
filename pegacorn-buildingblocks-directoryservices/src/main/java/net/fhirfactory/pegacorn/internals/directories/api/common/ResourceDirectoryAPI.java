@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.netty.http.NettyHttpComponent;
 import org.apache.camel.model.OnExceptionDefinition;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestConfigurationDefinition;
@@ -35,12 +36,15 @@ import org.slf4j.Logger;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
 import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.platform.edge.common.CamelSSLTLSHandler;
 
 public abstract class ResourceDirectoryAPI extends RouteBuilder {
 
     @Inject
     private PegacornReferenceProperties pegacornReferenceProperties;
 
+    @Inject
+    private CamelSSLTLSHandler camelSSLTLSHandler;
 
     private static String SERVER_PORT = "12121";
     private static String SERVER_HOST = "0.0.0.0";
@@ -79,9 +83,20 @@ public abstract class ResourceDirectoryAPI extends RouteBuilder {
     }
 
     protected RestConfigurationDefinition getRestConfigurationDefinition() {
+        final String NETTY_HTTP = "netty-http";
+        String scheme = "http";
+        
+        if (camelSSLTLSHandler.isSSLTLSEnabled()) {
+            scheme = "https";
+            camelSSLTLSHandler.applySSLTLSConfigToCamelContext(getContext());
+    		
+    		NettyHttpComponent nettyHttpcomponent = getContext().getComponent(NETTY_HTTP, NettyHttpComponent.class);
+    		nettyHttpcomponent.setUseGlobalSslContextParameters(true);
+        }
+
         RestConfigurationDefinition restConf = restConfiguration()
-                .component("netty-http")
-                .scheme("http")
+                .component(NETTY_HTTP)
+                .scheme(scheme)
                 .bindingMode(RestBindingMode.json)
                 .dataFormatProperty("prettyPrint", "true")
                 .contextPath(getPegacornReferenceProperties().getPegacornResourceDirectoryR1Path()).host(getServerHost()).port(getServerPort())
