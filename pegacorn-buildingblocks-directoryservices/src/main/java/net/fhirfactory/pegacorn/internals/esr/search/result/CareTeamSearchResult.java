@@ -54,6 +54,7 @@ public class CareTeamSearchResult extends ESRSearchResult {
     	}
 
         CareTeamSearchResult result = (CareTeamSearchResult)instatiateNewESRSearchResult();
+        result.setSearchResultList(getSearchResultList());
         
         getLogger().debug(".filterBy(): Exit");
         return(result);

@@ -24,27 +24,34 @@ package net.fhirfactory.buildingblocks.esr.models.resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class CareTeamESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(CareTeamESR.class);
     @Override
     protected Logger getLogger(){return(LOG);}
 
-    private ArrayList<String> serviceDeliveryLocations;
+    private List<String> serviceDeliveryLocations;
     private String managingOrganization;
+    
+    private List<ParticipantESDT>participants;
     
     public CareTeamESR(){
         super();
+        
         this.serviceDeliveryLocations = new ArrayList<>();
         this.managingOrganization = null;
+        this.participants = new ArrayList<>();
     }
 
-    public ArrayList<String> getServiceDeliveryLocations() {
+    public List<String> getServiceDeliveryLocations() {
         return serviceDeliveryLocations;
     }
 
-    public void setServiceDeliveryLocations(ArrayList<String> serviceDeliveryLocations) {
+    public void setServiceDeliveryLocations(List<String> serviceDeliveryLocations) {
         this.serviceDeliveryLocations = serviceDeliveryLocations;
     }
 
@@ -55,4 +62,12 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
     public void setManagingOrganization(String managingOrganization) {
         this.managingOrganization = managingOrganization;
     }
+
+	public List<ParticipantESDT> getParticipants() {
+		return participants;
+	}
+
+	public void setParticipants(List<ParticipantESDT> participants) {
+		this.participants = participants;
+	}
 }

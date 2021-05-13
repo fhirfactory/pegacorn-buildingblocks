@@ -24,6 +24,8 @@ package net.fhirfactory.buildingblocks.esr.models.transaction;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 
 
@@ -38,6 +40,7 @@ public class ESRMethodOutcome {
     private List<ExtremelySimplifiedResource> searchResult;
     private boolean searchSuccessful;
     
+    @JsonIgnore
     private int totalSearchResultCount;
 
     public boolean isSearch() {

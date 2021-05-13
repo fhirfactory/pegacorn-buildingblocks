@@ -60,7 +60,7 @@ public abstract class PegacornESRCache {
     }
 
     public ESRMethodOutcome addCacheEntry(ExtremelySimplifiedResource entry){
-        getLogger().debug(".addCacheEntry(): Entry");
+        getLogger().info(".addCacheEntry(): Entry");
         if(entry == null){
             getLogger().debug(".addCacheEntry(): Exit, entry to be added is null");
             ESRMethodOutcome outcome = new ESRMethodOutcome();
@@ -87,7 +87,7 @@ public abstract class PegacornESRCache {
             getLogger().info(".addCacheEntry(): New Id --> {}", entry.getSimplifiedID());
         } else {
             getLogger().info(".addCacheEntry(): Resource has an Id already... attempting to retrieve associated Resource");
-            ExtremelySimplifiedResource foundEntry = getCacheEntry(entry.getSimplifiedID());
+            ExtremelySimplifiedResource foundEntry = getCacheEntry(entry.getSimplifiedID().toLowerCase());
             if(foundEntry != null){
                 getLogger().info(".addCacheEntry(): Resource already exists, so cant create it again.... ");
                 ESRMethodOutcome outcome = new ESRMethodOutcome();
@@ -109,13 +109,16 @@ public abstract class PegacornESRCache {
         }
         this.displayName2ESRMap.putIfAbsent(entry.getDisplayName().toLowerCase(), entry);
         getLogger().info(".addCacheEntry(): Adding to simplifiedID based Cache");
+        getLogger().info("Brendan.  Simplified id {}", entry.getSimplifiedID().toLowerCase());
+        
         this.simplifiedID2ESRMap.putIfAbsent(entry.getSimplifiedID().toLowerCase(), entry);
+        getLogger().info("Brendan map size: {}", simplifiedID2ESRMap.size());
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         outcome.setStatus(ESRMethodOutcomeEnum.CREATE_ENTRY_SUCCESSFUL);
         outcome.setId(entry.getSimplifiedID());
         outcome.setCreated(true);
         outcome.setEntry(entry);
-        getLogger().debug(".addCacheEntry(): Exit, entry added");
+        getLogger().info(".addCacheEntry(): Exit, entry added");
         return(outcome);
     }
 
@@ -360,6 +363,7 @@ public abstract class PegacornESRCache {
         getLogger().debug(".allResources(): Entry");
         ESRSearchResult result = instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(this.simplifiedID2ESRMap.values());
+        getLogger().info("Brendan.  result size: {}", result.getSearchResultList().size());
         getLogger().debug(".allResources(): Exit");
         return(result);
     }

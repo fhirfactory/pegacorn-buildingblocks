@@ -21,7 +21,6 @@
  */
 package net.fhirfactory.buildingblocks.esr.models.resources;
 
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -30,9 +29,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import net.fhirfactory.buildingblocks.esr.models.helpers.DateUtils;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.EmailAddress;

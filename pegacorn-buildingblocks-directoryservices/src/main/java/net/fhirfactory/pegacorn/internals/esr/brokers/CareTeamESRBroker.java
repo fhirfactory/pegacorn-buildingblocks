@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
@@ -76,8 +75,8 @@ public class CareTeamESRBroker extends ESRBroker {
     // Create
     //
 
-    public ESRMethodOutcome createCareTeam(RoleESR newRole){
-        ESRMethodOutcome outcome = this.createDirectoryEntry(newRole);
+    public ESRMethodOutcome createCareTeam(CareTeamESR newCareTeam){
+        ESRMethodOutcome outcome = this.createDirectoryEntry(newCareTeam);
         return(outcome);
     }
 
@@ -87,6 +86,8 @@ public class CareTeamESRBroker extends ESRBroker {
             outcome.setStatus(ESRMethodOutcomeEnum.CREATE_ENTRY_INVALID);
             outcome.setStatusReason("Role Category or Role Name is null");
             outcome.setCreated(false);
+            
+            LOG.info("Brendan.  NOT created");
             return(outcome);
         } else {
             CareTeamESR newCareTeam = new CareTeamESR();
@@ -98,6 +99,9 @@ public class CareTeamESRBroker extends ESRBroker {
             newCareTeam.getIdentifiers().add(newCareTeamIdentifier);
             newCareTeam.setDisplayName(careTeamLongName);
             ESRMethodOutcome outcome = this.createDirectoryEntry(newCareTeam);
+            
+            LOG.info("Brendan.  created");
+            
             return (outcome);
         }
     }
