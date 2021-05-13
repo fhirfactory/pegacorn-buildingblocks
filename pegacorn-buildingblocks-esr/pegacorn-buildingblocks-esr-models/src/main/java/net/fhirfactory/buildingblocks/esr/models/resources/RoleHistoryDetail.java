@@ -11,14 +11,14 @@ import java.util.Date;
  */
 public class RoleHistoryDetail {
 	private String identifier;
-	private Date createdDate;
+	private Date startDate;
 	private Date endDate;
 	
 	public RoleHistoryDetail() {}
 	
-	public RoleHistoryDetail(String identifier, Date createdDate, Date endDate) {
+	public RoleHistoryDetail(String identifier, Date startDate, Date endDate) {
 		this.identifier = identifier;
-		this.createdDate = createdDate;
+		this.startDate = startDate;
 		this.endDate = endDate;
 	}
 	
@@ -32,12 +32,12 @@ public class RoleHistoryDetail {
 		this.identifier = identifier;
 	}
 	
-	public Date getCreatedDate() {
-		return createdDate;
+	public Date getStartDate() {
+		return startDate;
 	}
 	
-	public void setCreatedDate(Date created) {
-		this.createdDate = created;
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
 	}
 	
 	public Date getEndDate() {

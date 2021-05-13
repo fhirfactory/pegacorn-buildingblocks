@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.buildingblocks.esr.models.resources;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -28,16 +30,22 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import net.fhirfactory.buildingblocks.esr.models.helpers.DateUtils;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.EmailAddress;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerStatusESDT;
 
-public class PractitionerESR extends PersonESR {
+public class PractitionerESR extends PersonESR {	
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESR.class);
+    
+    protected static final DateTimeFormatter LAST_ROLE_SELECTION_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DateUtils.YYYY_MM_DD_T_HH_MM_SS_INPUT);
+    
     @Override
     protected Logger getLogger(){return(LOG);}
 
@@ -49,7 +57,8 @@ public class PractitionerESR extends PersonESR {
     private FavouriteListESDT healthcareServiceFavourites;
     private FavouriteListESDT practitionerFavourites;
     private PractitionerStatusESDT practitionerStatus;
-
+    private String dateTimeLastRoleSelected; // leave this here even though not used.  If removed a practitioner search result will not be returned.  It is required because of the getter.
+    
     public PractitionerESR(){
         super();
         this.organizationMembership = new HashMap<>();
@@ -118,6 +127,14 @@ public class PractitionerESR extends PersonESR {
     public void setPractitionerStatus(PractitionerStatusESDT practitionerStatus) {
         this.practitionerStatus = practitionerStatus;
     }
+    
+    public String getDateTimeLastRoleSelected() {
+    	if (!roleHistory.getRoleHistories().isEmpty()) {
+    		return DateUtils.format(roleHistory.getMostRecentSelection().getStartDate(), LAST_ROLE_SELECTION_DATE_TIME_FORMATTER);
+    	}
+    	
+    	return null;
+	}
 
     @JsonIgnore
     public EmailAddress getEmailAddress(){
@@ -230,4 +247,40 @@ public class PractitionerESR extends PersonESR {
             return (comparison);
         }
     };
+    
+    // Comparator for last time a practitioner selected a role.
+    public static Comparator<ExtremelySimplifiedResource> lastRoleSelectionDateComparator = new Comparator<ExtremelySimplifiedResource>() {
+
+    	@Override
+    	public int compare(ExtremelySimplifiedResource first, ExtremelySimplifiedResource second) {
+    		if (first == null && second == null) {
+    			return 0;
+    		}
+
+    		if (first == null) {
+    			return -1;
+    		}
+
+    		if (second == null) {
+    			return 1;
+    		}
+
+    		PractitionerESR firstPractitioner = (PractitionerESR)first;
+    		PractitionerESR secondPractitioner = (PractitionerESR)second;
+    		
+    		if (firstPractitioner.getRoleHistory().isEmpty() && secondPractitioner.getRoleHistory().isEmpty()) {
+    			return 0;
+    		}
+    		
+    		if (firstPractitioner.getRoleHistory().isEmpty()) {
+    			return 1;
+    		}
+    		
+       		if (secondPractitioner.getRoleHistory().isEmpty()) {
+    			return -1;
+    		}
+       		
+    		return secondPractitioner.getRoleHistory().getMostRecentSelection().getStartDate().compareTo(firstPractitioner.getRoleHistory().getMostRecentSelection().getStartDate());
+    	}
+   };
 }
