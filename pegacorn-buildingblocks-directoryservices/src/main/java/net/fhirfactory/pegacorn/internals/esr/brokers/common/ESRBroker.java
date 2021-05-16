@@ -74,7 +74,8 @@ public abstract class ESRBroker {
     //
 
     abstract protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException;
-
+    
+    
     public ESRMethodOutcome getResource(String recordID) throws ResourceInvalidSearchException {
         getLogger().info(".getResource(): Entry, recordID --> {}", recordID);
         ESRMethodOutcome outcome = new ESRMethodOutcome();
@@ -92,13 +93,17 @@ public abstract class ESRBroker {
         return(outcome);
     }
 
+    
+    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
+    	return searchForDirectoryEntryUsingIdentifier(identifier, true);
+    }
 
     //
     // Review (Search - by Identifier)
     //
-    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
+    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier, boolean containsMatch) throws ResourceInvalidSearchException {
         getLogger().debug(".searchForDirectoryResourceRoleUsingIdentifier(): Entry, identifier --> {}", identifier);
-        ESRMethodOutcome outcome = getCache().searchCacheForESRUsingIdentifier(identifier);
+        ESRMethodOutcome outcome = getCache().searchCacheForESRUsingIdentifier(identifier, containsMatch);
         boolean searchCompleted = outcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY) || outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
         boolean searchFoundOnlyOneEntry = outcome.getSearchResult().size() == 1;
         ExtremelySimplifiedResource entry = null;

@@ -109,10 +109,9 @@ public abstract class PegacornESRCache {
         }
         this.displayName2ESRMap.putIfAbsent(entry.getDisplayName().toLowerCase(), entry);
         getLogger().info(".addCacheEntry(): Adding to simplifiedID based Cache");
-        getLogger().info("Brendan.  Simplified id {}", entry.getSimplifiedID().toLowerCase());
         
         this.simplifiedID2ESRMap.putIfAbsent(entry.getSimplifiedID().toLowerCase(), entry);
-        getLogger().info("Brendan map size: {}", simplifiedID2ESRMap.size());
+
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         outcome.setStatus(ESRMethodOutcomeEnum.CREATE_ENTRY_SUCCESSFUL);
         outcome.setId(entry.getSimplifiedID());
@@ -244,8 +243,12 @@ public abstract class PegacornESRCache {
         }
         return(result);
     }
-
+    
     public ESRMethodOutcome searchCacheForESRUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
+    	return searchCacheForESRUsingIdentifier(identifier, true);
+    }
+
+    public ESRMethodOutcome searchCacheForESRUsingIdentifier(IdentifierESDT identifier, boolean containsMatch) throws ResourceInvalidSearchException {
         if(identifier == null){
             ESRMethodOutcome outcome = new ESRMethodOutcome();
             outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_NOT_FOUND);
@@ -253,7 +256,7 @@ public abstract class PegacornESRCache {
         }
         getLogger().info("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", identifier);
         
-        SearchCriteria searchCriteria = new SearchCriteria(identifier.getType(), identifier.getValue());
+        SearchCriteria searchCriteria = new SearchCriteria(identifier.getType(), identifier.getValue(), containsMatch);
         
         ESRSearchResult result = searchCacheForESRUsingIdentifierParameters(searchCriteria, identifier.getType(), identifier.getUse());
         ESRMethodOutcome outcome = result.toESRMethodOutcome();
@@ -269,7 +272,8 @@ public abstract class PegacornESRCache {
             return (outcome);
         }
     }
-
+    
+    
     protected ESRSearchResult searchCacheForESRUsingIdentifierParameters(SearchCriteria searchCriteria,
                                                                          String type,
                                                                          IdentifierESDTUseEnum use)
@@ -290,9 +294,16 @@ public abstract class PegacornESRCache {
                 IdentifierESDT currentIdentifier = identifierSet.nextElement();
                 boolean valueMatches = false;
                 if(!valueIsNull){
-                    if(currentIdentifier.getValue().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
-                        valueMatches = true;
-                    }
+                	if (searchCriteria.isContainsMatch()) {
+                		
+	                    if(currentIdentifier.getValue().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
+	                        valueMatches = true;
+	                    }
+                	} else {
+                        if(currentIdentifier.getValue().toLowerCase().equals(searchCriteria.getValue().toLowerCase())){
+	                        valueMatches = true;
+	                    }
+                	}
                 } else {
                     valueMatches = true;
                 }
@@ -363,7 +374,6 @@ public abstract class PegacornESRCache {
         getLogger().debug(".allResources(): Entry");
         ESRSearchResult result = instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(this.simplifiedID2ESRMap.values());
-        getLogger().info("Brendan.  result size: {}", result.getSearchResultList().size());
         getLogger().debug(".allResources(): Exit");
         return(result);
     }

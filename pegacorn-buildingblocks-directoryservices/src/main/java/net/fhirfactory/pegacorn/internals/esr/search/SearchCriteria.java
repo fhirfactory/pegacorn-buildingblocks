@@ -25,15 +25,25 @@ public class SearchCriteria {
 	private String paramName;
 	private String value;
 	
+	private boolean containsMatch;
+	
 	private List<BaseFilter> filters = new ArrayList<>();
 	
 	public SearchCriteria() {
-		// 
+		containsMatch = true; 
 	}
 	
 	public SearchCriteria(String paramName, String value) {
+		this();
+		
 		this.paramName = paramName;
 		setValue(value);
+	}
+	
+	public SearchCriteria(String paramName, String value, boolean containsMatch) {
+		this(paramName, value);
+		
+		this.containsMatch = containsMatch;
 	}
 	
 	public String getParamName() {
@@ -78,5 +88,13 @@ public class SearchCriteria {
 	
 	public void addFilter(BaseFilter filter) throws ResourceInvalidSearchException {
 		this.filters.add(filter);	
+	}
+
+	public boolean isContainsMatch() {
+		return containsMatch;
+	}
+
+	public void setContainsMatch(boolean containsMatch) {
+		this.containsMatch = containsMatch;
 	}
 }
