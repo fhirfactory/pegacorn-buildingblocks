@@ -55,6 +55,7 @@ public class PractitionerESR extends PersonESR {
     private FavouriteListESDT practitionerFavourites;
     private PractitionerStatusESDT practitionerStatus;
     private String dateTimeLastRoleSelected; // leave this here even though not used.  If removed a practitioner search result will not be returned.  It is required because of the getter.
+    private String matrixId;
     
     public PractitionerESR(){
         super();
@@ -133,6 +134,19 @@ public class PractitionerESR extends PersonESR {
     	return null;
 	}
 
+    
+    public String getMatrixId() {
+    	//TODO this is just for mimic until the microservices is connected to the Synapse server.
+    	
+    	String emailAddress = this.getSimplifiedID();
+    	
+    	emailAddress = "@" + emailAddress;
+    	emailAddress = emailAddress.replace("@test.act.gov.au", ":chs.test.gov.au");
+    	
+    	return emailAddress;
+	}
+
+    
     @JsonIgnore
     public EmailAddress getEmailAddress(){
         IdentifierESDT foundIdentifier = getIdentifierWithType("EmailAddress");
