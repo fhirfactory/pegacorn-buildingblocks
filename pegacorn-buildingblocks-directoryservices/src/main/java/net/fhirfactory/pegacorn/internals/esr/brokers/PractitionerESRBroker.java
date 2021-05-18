@@ -210,7 +210,7 @@ public class PractitionerESRBroker extends ESRBroker {
                     break;
                 }
                 case "ServiceFavourites": {
-                	practitioner.getHealthcareServiceFavourites().getFavourites();
+                	practitioner.getHealthcareServiceFavourites().getFavourites().clear();
                     practitioner.getHealthcareServiceFavourites().getFavourites().addAll(favourites.getFavourites());
                     shouldBeUpdated = true;
                     break;
