@@ -120,6 +120,19 @@ public abstract class PegacornESRCache {
         getLogger().info(".addCacheEntry(): Exit, entry added");
         return(outcome);
     }
+    
+    
+    /**
+     * Updates an entry
+     * 
+     * @param id
+     * @param resource
+     * @return
+     */
+    public ESRMethodOutcome updateCacheEntry(String id, ExtremelySimplifiedResource entry) {
+    	removeCacheEntry(id);
+    	return addCacheEntry(entry);
+    }
 
     protected void removeCacheEntry(IdentifierESDT identifier){
         getLogger().debug(".removeCacheEntry(): Entry (using IdentifierDE)");

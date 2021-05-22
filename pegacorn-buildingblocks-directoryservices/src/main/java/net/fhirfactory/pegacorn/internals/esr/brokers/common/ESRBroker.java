@@ -223,6 +223,9 @@ public abstract class ESRBroker {
             outcome.setId(entry.getSimplifiedID());
             outcome.setEntry(entry);
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
+            
+            getCache().updateCacheEntry(entry.getSimplifiedID(), entry);
+            
             return(outcome);
         } else {
             getLogger().info(".updatePractitionerEntry(): No Resource retrieved, trying individual Identifiers");

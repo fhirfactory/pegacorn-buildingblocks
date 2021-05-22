@@ -103,9 +103,9 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
             .get("/{simplifiedID}/PractitionerFavourites").outType(FavouriteListESDT.class)
                 .to("direct:" + getESRName() + "PractitionerFavouritesGET")
                
-            .post().type(PractitionerRoleESR.class)
+            .post().type(PractitionerESR.class)
                 .to("direct:"+getESRName()+"POST")
-            .put("/").type(PractitionerRoleESR.class)
+            .put("/").type(PractitionerESR.class)
                 .to("direct:"+getESRName()+"PUT")
             .put("/{simplifiedID}/PractitionerRoles/").type(PractitionerRoleListESDT.class)
                 .to("direct:"+getESRName()+"PractitionerRolesPUT")

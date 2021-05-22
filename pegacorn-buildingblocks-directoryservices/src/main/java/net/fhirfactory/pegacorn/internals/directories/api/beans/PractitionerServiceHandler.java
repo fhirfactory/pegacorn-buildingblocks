@@ -77,20 +77,9 @@ public class PractitionerServiceHandler extends HandlerBase {
     // Update
     //
 
-    public String updatePractitioner(String inputBody,  Exchange camelExchange)
+    public String updatePractitioner(PractitionerESR entry,  Exchange camelExchange)
             throws ResourceUpdateException, ResourceInvalidSearchException {
-        LOG.info(".update(): Entry, inputBody --> {}", inputBody);
-        PractitionerESR entry = null;
-        try{
-            LOG.info(".update(): Attempting to parse Resource");
-            JsonMapper jsonMapper = new JsonMapper();
-            entry = jsonMapper.readValue(inputBody, PractitionerESR.class);
-            LOG.info(".update(): Resource parsing successful");
-        } catch (JsonMappingException mappingException) {
-            throw(new ResourceUpdateException("Unable to parse (map) message, error --> " + mappingException.getMessage()));
-        } catch (JsonProcessingException processingException) {
-            throw(new ResourceUpdateException("Unable to process message, error --> " + processingException.getMessage()));
-        }
+
         LOG.info(".update(): Requesting update from the Directory Resource Broker");
         ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitioner(entry);
         LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
