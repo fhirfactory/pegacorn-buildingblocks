@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
+
 public class GroupESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(GroupESR.class);
     @Override

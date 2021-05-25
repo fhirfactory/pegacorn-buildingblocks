@@ -1,7 +1,8 @@
-package net.fhirfactory.buildingblocks.esr.models.resources;
+package net.fhirfactory.buildingblocks.esr.models.resources.datatypes;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -240,4 +241,59 @@ public class RoleHistory {
 		
 		return roleHistories.get(0);	
 	}
+}
+
+
+/**
+ * A role date end date comparator. The record with the most current end date is ordered first.
+ * 
+ * @author Brendan Douglas
+ *
+ */
+class RoleEndDateComparator implements Comparator<RoleHistoryDetail> {
+
+	@Override
+	public int compare(RoleHistoryDetail first, RoleHistoryDetail second) {
+		if (first.getEndDate() == null && second.getEndDate() == null) {
+			return 0;
+		}
+
+		if (first == null) {
+			return -1;
+		}
+
+		if (second == null) {
+			return 1;
+		}
+
+		return second.getEndDate().compareTo(first.getEndDate());
+	}
+}
+
+
+/**
+ * A role date end date comparator. The record with the most current start date is ordered first.
+ * 
+ * @author Brendan Douglas
+ *
+ */
+class RoleStartDateComparator implements Comparator<RoleHistoryDetail> {
+
+	@Override
+	public int compare(RoleHistoryDetail first, RoleHistoryDetail second) {
+		if (first.getStartDate() == null && second.getStartDate() == null) {
+			return 0;
+		}
+
+		if (first == null) {
+			return -1;
+		}
+
+		if (second == null) {
+			return 1;
+		}
+
+		return second.getStartDate().compareTo(first.getStartDate());
+	}
+
 }

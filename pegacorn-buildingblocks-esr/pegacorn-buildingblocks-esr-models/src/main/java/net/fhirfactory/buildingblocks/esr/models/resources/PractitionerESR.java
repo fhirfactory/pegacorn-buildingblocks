@@ -37,6 +37,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteLi
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerStatusESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
 
 public class PractitionerESR extends PersonESR {	
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESR.class);

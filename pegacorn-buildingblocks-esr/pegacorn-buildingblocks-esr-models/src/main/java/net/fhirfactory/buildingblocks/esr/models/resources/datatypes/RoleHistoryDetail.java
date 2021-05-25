@@ -1,6 +1,8 @@
-package net.fhirfactory.buildingblocks.esr.models.resources;
+package net.fhirfactory.buildingblocks.esr.models.resources.datatypes;
 
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
