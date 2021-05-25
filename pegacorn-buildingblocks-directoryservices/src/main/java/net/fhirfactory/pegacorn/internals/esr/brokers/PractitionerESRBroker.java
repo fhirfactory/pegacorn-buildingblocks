@@ -34,10 +34,13 @@ import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedRe
 import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.MatrixRoomESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.RoleCategoryESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
@@ -45,6 +48,7 @@ import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomN
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 
 @ApplicationScoped
 public class PractitionerESRBroker extends ESRBroker {
@@ -61,6 +65,12 @@ public class PractitionerESRBroker extends ESRBroker {
 
     @Inject
     private MatrixRoomESRBroker matrixRoomDirectoryResourceBroker;
+    
+	@Inject
+    private PractitionerRoleESRBroker practitionerRoleBroker;
+	
+	@Inject
+    private RoleCategoryESRBroker roleCategoryBroker;
 
     @Override
     protected Logger getLogger(){
@@ -117,15 +127,36 @@ public class PractitionerESRBroker extends ESRBroker {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
                 practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
+                
+                populatedRoleCategoryId(practitionerESR);
             }
         } else {
             if (groupGetOutcome.getEntry() != null) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
                 practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
+                
+                populatedRoleCategoryId(practitionerESR);
             }
         }
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
+    }
+    
+    
+    
+    private void populatedRoleCategoryId( PractitionerESR practitionerESR) throws ResourceInvalidSearchException {
+        for (RoleHistoryDetail roleHistoryDetail : practitionerESR.getCurrentPractitionerRoles()) {
+			String role = roleHistoryDetail.getRole();
+			ESRMethodOutcome practitionerRoleOutcome =  practitionerRoleBroker.getResource(role.toLowerCase());
+			PractitionerRoleESR practitionerRole = (PractitionerRoleESR)practitionerRoleOutcome.getEntry();
+						
+			// if we are here we have got the practitioner role resource so now get the role category.
+			String roleCategoryId = practitionerRole.getPrimaryRoleCategoryID();
+			ESRMethodOutcome roleCategoryOutcome = roleCategoryBroker.getResource(roleCategoryId.toLowerCase());
+		
+			RoleCategoryESR roleCategory = (RoleCategoryESR)roleCategoryOutcome.getEntry();
+			roleHistoryDetail.setRoleCategory(roleCategory.getDisplayName());
+        }  	
     }
 
     //

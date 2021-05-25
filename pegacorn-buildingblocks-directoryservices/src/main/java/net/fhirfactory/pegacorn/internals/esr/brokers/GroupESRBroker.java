@@ -88,14 +88,14 @@ public class GroupESRBroker extends ESRBroker {
                     
                     
                     for (RoleHistoryDetail practitionerRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
-                        roleMapCache.addPractitionerRoleFulfilledByPractitioner(directoryEntry.getGroupManager(), practitionerRID.getIdentifier());
+                        roleMapCache.addPractitionerRoleFulfilledByPractitioner(directoryEntry.getGroupManager(), practitionerRID.getRole());
                     }
                     break;
                 }
                 case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
                     roleMapCache.addPractitionerIfAbsent(directoryEntry.getGroupManager());
                     for (RoleHistoryDetail practitionerRoleRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
-                        roleMapCache.addPractitionerRoleFulfilledByPractitioner(practitionerRoleRID.getIdentifier(), directoryEntry.getGroupManager());
+                        roleMapCache.addPractitionerRoleFulfilledByPractitioner(practitionerRoleRID.getRole(), directoryEntry.getGroupManager());
                     }
                     break;
                 }

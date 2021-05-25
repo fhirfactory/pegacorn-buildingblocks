@@ -10,6 +10,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedRe
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.RoleCategoryESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.RoleCategoryESRBroker;
@@ -49,7 +50,8 @@ public class RoleCategoryFilter extends BaseFilter {
 				return false;
 			}
 			
-			for (String role : practitioner.getCurrentPractitionerRoles()) {
+			for (RoleHistoryDetail roleHistoryDetail : practitioner.getCurrentPractitionerRoles()) {
+				String role = roleHistoryDetail.getRole();
 			
 				// get the practitioner role.
 				ESRMethodOutcome practitionerRoleOutcome =  practitionerRoleBroker.getResource(role.toLowerCase());

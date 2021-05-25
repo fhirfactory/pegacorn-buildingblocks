@@ -12,26 +12,32 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 public class RoleHistoryDetail {
-	private String identifier;
+	private String role;
+	
+	@JsonIgnore
 	private Date startDate;
+	
+	@JsonIgnore
 	private Date endDate;
+	
+	private String roleCategory;
 	
 	public RoleHistoryDetail() {}
 	
-	public RoleHistoryDetail(String identifier, Date startDate, Date endDate) {
-		this.identifier = identifier;
+	public RoleHistoryDetail(String role, Date startDate, Date endDate) {
+		this.role = role;
 		this.startDate = startDate;
 		this.endDate = endDate;
 	}
 	
 	
-	public String getIdentifier() {
-		return identifier;
+	public String getRole() {
+		return role;
 	}
 	
 	
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
+	public void setRole(String role) {
+		this.role = role;
 	}
 	
 	public Date getStartDate() {
@@ -48,5 +54,13 @@ public class RoleHistoryDetail {
 	
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public String getRoleCategory() {
+		return roleCategory;
+	}
+
+	public void setRoleCategory(String roleCategory) {
+		this.roleCategory = roleCategory;
 	}
 }

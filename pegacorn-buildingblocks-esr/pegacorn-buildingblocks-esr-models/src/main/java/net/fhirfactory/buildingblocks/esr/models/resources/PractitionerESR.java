@@ -38,6 +38,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierE
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerStatusESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
 
 public class PractitionerESR extends PersonESR {	
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESR.class);
@@ -77,13 +78,13 @@ public class PractitionerESR extends PersonESR {
         this.roleHistory = roleHistory;
     }
     
-    public List<String> getCurrentPractitionerRoles() {
-    	return roleHistory.getAllCurrentRolesAsString();
+    public List<RoleHistoryDetail> getCurrentPractitionerRoles() {
+    	return roleHistory.getAllCurrentRoles();
     }
     
     @JsonIgnore
     public boolean hasCurrentRole(String role) {
-    	return getCurrentPractitionerRoles().contains(role);
+    	return roleHistory.getCurrentRole(role) == null ? false : true;
     }
     
     

@@ -53,7 +53,7 @@ public class RoleHistory {
 		for (RoleHistoryDetail roleHistoryDetail : getAllCurrentRoles()) {
 			
 			// If the existing list contains one not in the new list then it has been removed so end date
-			if (!updateRoleList.contains(roleHistoryDetail.getIdentifier())) {
+			if (!updateRoleList.contains(roleHistoryDetail.getRole())) {
 				roleHistoryDetail.setEndDate(new Date());
 			}
 		}
@@ -107,7 +107,7 @@ public class RoleHistory {
 		List<String>currentAsString = new ArrayList<>();		
 		
 		for (RoleHistoryDetail current : getAllCurrentRoles()) {
-			currentAsString.add(current.getIdentifier());
+			currentAsString.add(current.getRole());
 		}
 		
 		return currentAsString;
@@ -123,7 +123,7 @@ public class RoleHistory {
 		List<String>previousAsString = new ArrayList<>();		
 		
 		for (RoleHistoryDetail previous : getAllPreviousRoles()) {
-			previousAsString.add(previous.getIdentifier());
+			previousAsString.add(previous.getRole());
 		}
 		
 		return previousAsString;
@@ -148,7 +148,7 @@ public class RoleHistory {
 			for (Iterator<RoleHistoryDetail> it = previous.iterator(); it.hasNext();) {
 				
 				// Try and add to the set, if the add method returns false, it means the role already exists.
-			    if (!uniqueSet.add(it.next().getIdentifier())) {
+			    if (!uniqueSet.add(it.next().getRole())) {
 			        it.remove();
 			    }
 			}
@@ -160,14 +160,14 @@ public class RoleHistory {
 		
 		// Add all the current roles to the set.
 		for (RoleHistoryDetail currentRoleDetail : getAllCurrentRoles()) {
-			uniqueSet.add(currentRoleDetail.getIdentifier());
+			uniqueSet.add(currentRoleDetail.getRole());
 		}
 		
 		// Now attempt to add the previous roles to the set.  If it can't be added it means the previous role is also a current role so remove from the final list.
 		for (Iterator<RoleHistoryDetail> it = previous.iterator(); it.hasNext();) {
 			
 			// Try and add to the set, if the add method returns false, it means the role already exists.
-		    if (!uniqueSet.add(it.next().getIdentifier())) {
+		    if (!uniqueSet.add(it.next().getRole())) {
 		        it.remove();
 		    }
 		}		
@@ -177,7 +177,7 @@ public class RoleHistory {
 		List<String>finalRoleList = new ArrayList<>();
 			
 		for (RoleHistoryDetail previousRoleDetail : previous) {
-			finalRoleList.add(previousRoleDetail.getIdentifier());
+			finalRoleList.add(previousRoleDetail.getRole());
 		}
 			
 		
@@ -202,7 +202,7 @@ public class RoleHistory {
 	 */
 	public RoleHistoryDetail getCurrentRole(String role) {
 		for (RoleHistoryDetail roleDetail : roleHistories) {
-			if (roleDetail.getEndDate() == null && roleDetail.getIdentifier().equals(role)) {
+			if (roleDetail.getEndDate() == null && roleDetail.getRole().contains(role)) {
 				return roleDetail;
 			}
 		}
