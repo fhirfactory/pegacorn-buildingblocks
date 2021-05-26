@@ -103,6 +103,13 @@ public class DataTypeTransformers {
                     rank += 1;
                     break;
                 }
+                case FACSIMILE: {
+                    ContactPoint facsimileContactPoint = contactPointFactory.buildContactPoint(
+                            currentEntry.getValue(), ContactPoint.ContactPointUse.WORK, ContactPoint.ContactPointSystem.PHONE, rank);
+                    rank += 1;
+                    contactPointList.add(facsimileContactPoint);
+                    break;
+                }
                 default:
             }
         }

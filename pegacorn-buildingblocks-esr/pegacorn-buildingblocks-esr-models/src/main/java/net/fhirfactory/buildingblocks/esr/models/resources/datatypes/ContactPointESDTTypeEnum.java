@@ -8,5 +8,6 @@ public enum ContactPointESDTTypeEnum {
     LINGO,
     PAGER,
     SOCIAL_MEDIA_ID,
-    USERNAME
+    USERNAME,
+    FACSIMILE;
 }
