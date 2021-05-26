@@ -26,11 +26,12 @@ public class PractitionerLdapEntry {
 	
 		setGivenName(entry.get(LdapAttributeNameEnum.GIVEN_NAME.getName()).getString());		
 		setSurname(entry.get(LdapAttributeNameEnum.SURNAME.getName()).getString());
-		setTitles(entry.get(LdapAttributeNameEnum.JOB_TITLE.getName()).getString());
+		setJobTitle(entry.get(LdapAttributeNameEnum.JOB_TITLE.getName()).getString());
+		setPersonalTitle(entry.get(LdapAttributeNameEnum.PERSONAL_TITLE.getName()).getString());
 		setPreferredName(entry.get(LdapAttributeNameEnum.PREFERRED_NAME.getName()).getString());
-		setSuffixes(entry.get(LdapAttributeNameEnum.SUFFIXES.getName()).getString());
+		setSuffix(entry.get(LdapAttributeNameEnum.SUFFIX.getName()).getString());
 		setEmailAddress(entry.get(LdapAttributeNameEnum.EMAIL.getName()).getString());
-		setPhoneNumber(entry.get(LdapAttributeNameEnum.TELEPHONE_NUMBER.getName()).getString());
+		setTelephoneNumber(entry.get(LdapAttributeNameEnum.TELEPHONE_NUMBER.getName()).getString());
 		setMobileNumber(entry.get(LdapAttributeNameEnum.MOBILE.getName()).getString());
 		setPager(entry.get(LdapAttributeNameEnum.PAGER.getName()).getString());
 		setDivision(entry.get(LdapAttributeNameEnum.DIVISION.getName()).getString());
@@ -58,12 +59,12 @@ public class PractitionerLdapEntry {
 		attributes.put(LdapAttributeNameEnum.SURNAME, new LdapAttribute(LdapAttributeNameEnum.SURNAME, lastName));
 	}
 
-	public LdapAttribute getTitles() {
+	public LdapAttribute getPersonalTitle() {
 		return attributes.get(LdapAttributeNameEnum.PERSONAL_TITLE);
 	}
 
-	public void setTitles(String titles) {
-		attributes.put(LdapAttributeNameEnum.PERSONAL_TITLE, new LdapAttribute(LdapAttributeNameEnum.PERSONAL_TITLE, titles));
+	public void setPersonalTitle(String title) {
+		attributes.put(LdapAttributeNameEnum.PERSONAL_TITLE, new LdapAttribute(LdapAttributeNameEnum.PERSONAL_TITLE, title));
 	}
 
 	public LdapAttribute getPreferredName() {
@@ -74,12 +75,12 @@ public class PractitionerLdapEntry {
 		attributes.put(LdapAttributeNameEnum.PREFERRED_NAME, new LdapAttribute(LdapAttributeNameEnum.PREFERRED_NAME, preferredName));
 	}
 
-	public LdapAttribute getSuffixes() {
-		return attributes.get(LdapAttributeNameEnum.SUFFIXES);
+	public LdapAttribute getSuffix() {
+		return attributes.get(LdapAttributeNameEnum.SUFFIX);
 	}
 
-	public void setSuffixes(String suffixes) {
-		attributes.put(LdapAttributeNameEnum.SUFFIXES, new LdapAttribute(LdapAttributeNameEnum.SUFFIXES, suffixes));
+	public void setSuffix(String suffixes) {
+		attributes.put(LdapAttributeNameEnum.SUFFIX, new LdapAttribute(LdapAttributeNameEnum.SUFFIX, suffixes));
 	}
 
 	public LdapAttribute getEmailAddress() {
@@ -94,7 +95,7 @@ public class PractitionerLdapEntry {
 		return attributes.get(LdapAttributeNameEnum.TELEPHONE_NUMBER);
 	}
 
-	public void setPhoneNumber(String phoneNumber) {
+	public void setTelephoneNumber(String phoneNumber) {
 		attributes.put(LdapAttributeNameEnum.TELEPHONE_NUMBER, new LdapAttribute(LdapAttributeNameEnum.TELEPHONE_NUMBER, phoneNumber));
 	}
 
