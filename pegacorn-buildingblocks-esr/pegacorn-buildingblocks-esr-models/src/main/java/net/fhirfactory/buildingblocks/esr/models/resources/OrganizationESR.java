@@ -22,24 +22,29 @@
 package net.fhirfactory.buildingblocks.esr.models.resources;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.TypeESDT;
 
 public class OrganizationESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(OrganizationESR.class);
+    
     @Override
     protected Logger getLogger(){return(LOG);}
 
     private ArrayList<String> containedOrganizations;
     private String parentOrganization;
     private TypeESDT organizationType;
+    private List<ContactPointESDT> contactPoints;
 
     public OrganizationESR(){
         super();
         this.containedOrganizations = new ArrayList<>();
+        this.contactPoints = new ArrayList<>();
     }
 
     public ArrayList<String> getContainedOrganizations() {
@@ -65,4 +70,16 @@ public class OrganizationESR extends ExtremelySimplifiedResource {
     public void setOrganizationType(TypeESDT organizationType) {
         this.organizationType = organizationType;
     }
+
+	public List<ContactPointESDT> getContactPoints() {
+		return contactPoints;
+	}
+
+	public void setContactPoints(List<ContactPointESDT> contactPoints) {
+		this.contactPoints = contactPoints;
+	}
+	
+	public void addContactPoint(ContactPointESDT contactPoint) {
+		this.contactPoints.add(contactPoint);
+	}
 }
