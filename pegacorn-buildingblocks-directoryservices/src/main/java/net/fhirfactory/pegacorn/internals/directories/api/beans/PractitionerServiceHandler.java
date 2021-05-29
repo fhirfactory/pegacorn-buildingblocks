@@ -81,6 +81,14 @@ public class PractitionerServiceHandler extends HandlerBase {
             throws ResourceUpdateException, ResourceInvalidSearchException {
 
         LOG.info(".update(): Requesting update from the Directory Resource Broker");
+        
+        
+        // Make sure the simplified id matches the email address.
+        if (!entry.getSimplifiedID().equals(entry.getIdentifierWithType("EmailAddress").getValue())) {
+        	throw new ResourceUpdateException("The simplified id must match the email address identifier for a practitioner update");
+        }
+        
+        
         ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitioner(entry);
         LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
