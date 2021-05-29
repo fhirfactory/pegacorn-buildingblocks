@@ -70,4 +70,9 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
 	public void setParticipants(List<ParticipantESDT> participants) {
 		this.participants = participants;
 	}
+	
+	
+	public void addParticipant(ParticipantESDT participant) {
+		this.participants.add(participant);
+	}
 }

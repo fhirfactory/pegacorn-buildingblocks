@@ -27,11 +27,15 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
@@ -44,6 +48,9 @@ public class CareTeamESRBroker extends ESRBroker {
 
     @Inject
     private CareTeamESRCache careTeamCache;
+    
+    @Inject
+    private PractitionerRoleESRBroker practitionerRoleBroker;
 
     @Inject
     private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
@@ -75,11 +82,27 @@ public class CareTeamESRBroker extends ESRBroker {
     // Create
     //
 
-    public ESRMethodOutcome createCareTeam(CareTeamESR newCareTeam){
+    public ESRMethodOutcome createCareTeam(CareTeamESR newCareTeam) throws ResourceInvalidSearchException {
         ESRMethodOutcome outcome = this.createDirectoryEntry(newCareTeam);
+        
+
+        for (ParticipantESDT participant : newCareTeam.getParticipants()) {
+        	PractitionerRoleESR practitionerRole =  (PractitionerRoleESR)practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
+        	
+        	if (practitionerRole != null) {
+                // Need to update the practitioner role now with the care team details
+        		
+        		practitionerRole.addCareTeam(new PractitionerRoleCareTeam(newCareTeam.getSimplifiedID(), participant.getParticipantType()));
+        		practitionerRoleBroker.updatePractitionerRole(practitionerRole);
+        	} else {
+        		getLogger().warn("Practitioner role not found. Name: {}", participant.getSimplifiedId());
+        	}
+        }
+        
         return(outcome);
     }
 
+    
     public ESRMethodOutcome createCareTeam(String careTeamShortName, String careTeamLongName){
         if(careTeamShortName == null || careTeamLongName == null ){
             ESRMethodOutcome outcome = new ESRMethodOutcome();
@@ -87,7 +110,6 @@ public class CareTeamESRBroker extends ESRBroker {
             outcome.setStatusReason("Role Category or Role Name is null");
             outcome.setCreated(false);
             
-            LOG.info("Brendan.  NOT created");
             return(outcome);
         } else {
             CareTeamESR newCareTeam = new CareTeamESR();
@@ -99,8 +121,7 @@ public class CareTeamESRBroker extends ESRBroker {
             newCareTeam.getIdentifiers().add(newCareTeamIdentifier);
             newCareTeam.setDisplayName(careTeamLongName);
             ESRMethodOutcome outcome = this.createDirectoryEntry(newCareTeam);
-            
-            LOG.info("Brendan.  created");
+              
             
             return (outcome);
         }

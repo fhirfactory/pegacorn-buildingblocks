@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
 
 public class PractitionerRoleESR extends ExtremelySimplifiedResource {
@@ -45,12 +46,15 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private String practitionerRoleADGroup;
     private ArrayList<ContactPointESDT> contactPoints;
     
+    private List<PractitionerRoleCareTeam>careTeams;
+    
     @JsonIgnore
     private RoleHistory roleHistory;
 
     public PractitionerRoleESR(){
         this.contactPoints = new ArrayList<>();
         this.roleHistory = new RoleHistory();
+        this.careTeams = new ArrayList<>();
     }
 
     public String getPrimaryOrganizationID() {
@@ -112,12 +116,28 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     public void setContactPoints(ArrayList<ContactPointESDT> contactPoints) {
         this.contactPoints = contactPoints;
     }
+    
+    
 
     //
     // Sorting (Comparators)
     //
 
-    public static Comparator<ExtremelySimplifiedResource> primaryLocationIDComparator = new Comparator<ExtremelySimplifiedResource>() {
+
+	public List<PractitionerRoleCareTeam> getCareTeams() {
+		return careTeams;
+	}
+
+	public void setCareTeams(List<PractitionerRoleCareTeam> careTeams) {
+		this.careTeams = careTeams;
+	}
+	
+	
+	public void addCareTeam(PractitionerRoleCareTeam careTeam) {
+		this.careTeams.add(careTeam);
+	}
+
+	public static Comparator<ExtremelySimplifiedResource> primaryLocationIDComparator = new Comparator<ExtremelySimplifiedResource>() {
         @Override
         public int compare(ExtremelySimplifiedResource o1, ExtremelySimplifiedResource o2) {
             if(o1 == null && o2 == null){
