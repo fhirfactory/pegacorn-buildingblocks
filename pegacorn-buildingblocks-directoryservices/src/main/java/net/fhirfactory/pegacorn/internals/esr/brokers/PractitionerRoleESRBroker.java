@@ -21,8 +21,6 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import java.util.List;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -181,24 +179,32 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     }
     
     
+    /**
+     * Updates the care teams the practitioner role is in.
+     * 
+     * @param simplifiedId
+     * @param newCareTeams
+     * @return
+     * @throws ResourceInvalidSearchException
+     */
     public ESRMethodOutcome updateCareTeams(String simplifiedId, PractitionerRoleCareTeamListESDT newCareTeams) throws ResourceInvalidSearchException {
         LOG.info(".getCareTeams(): Entry");
     	
     	PractitionerRoleESR practitionerRole = (PractitionerRoleESR) this.getResource(simplifiedId.toLowerCase()).getEntry();
     	
-    	// Remove the practitioner role from the care teams they are in.
+		practitionerRole.setCareTeams(newCareTeams.getCareTeams());
+		updatePractitionerRole(practitionerRole);
+    	
+    	// Remove the practitioner role from associated care team record.
     	for (PractitionerRoleCareTeam practitionerRoleCareTeam : practitionerRole.getCareTeams()) {
     		CareTeamESR careTeam = (CareTeamESR)careTeamBroker.getResource(practitionerRoleCareTeam.getName().toLowerCase()).getEntry();
     		careTeam.removeParticipant(practitionerRole.getSimplifiedID());
     		
     		careTeamBroker.updateCareTeam(careTeam);
-    		
-    		practitionerRole.setCareTeams(newCareTeams.getCareTeams());
-    		updatePractitionerRole(practitionerRole);
     	}
     	
     	
-    	// Add the practitioner role to the care teams.
+    	// Add the practitioner role to the associated care team rexord.
     	for (PractitionerRoleCareTeam practitionerRoleCareTeam : newCareTeams.getCareTeams()) {
     		CareTeamESR careTeam = (CareTeamESR)careTeamBroker.getResource(practitionerRoleCareTeam.getName().toLowerCase()).getEntry();
     		careTeam.addParticipant(new ParticipantESDT(simplifiedId, practitionerRoleCareTeam.getRole()));

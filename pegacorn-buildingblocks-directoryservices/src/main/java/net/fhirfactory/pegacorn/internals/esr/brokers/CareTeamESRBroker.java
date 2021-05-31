@@ -29,11 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
@@ -53,8 +50,6 @@ public class CareTeamESRBroker extends ESRBroker {
     @Inject
     private PractitionerRoleESRBroker practitionerRoleBroker;
 
-    @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
 
     @Override
     protected Logger getLogger() {
@@ -109,7 +104,7 @@ public class CareTeamESRBroker extends ESRBroker {
     }
 
 	/**
-	 * Update/create a care team
+	 * Update/create a care team.
 	 * 
 	 * @param entry
 	 * @return
@@ -123,15 +118,17 @@ public class CareTeamESRBroker extends ESRBroker {
 	    if(existing != null) {
 	    	ESRMethodOutcome outcome = updateDirectoryEntry(entry);
 	    	
-	    	// If the care team was updated/created then update the practitioners records within the care team.
+	    	// If the care team was updated/created then update the practitioner role records within the care team.
 	    	if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL) || outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
-	        
+	       
+	    		// Remove the care team from all the practitioner role records who were in the care team.
 	    		for (ParticipantESDT participant : existing.getParticipants()) {
 	    			PractitionerRoleESR practitionerRole = (PractitionerRoleESR) practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
 	    			practitionerRole.removeCareTeam(entry.getSimplifiedID());	
 	    			practitionerRoleBroker.updatePractitionerRole(practitionerRole);
 	    		}
 		        
+	    		// Add the care team to the new list of practitioner role records.
 	    		for (ParticipantESDT participant : entry.getParticipants()) {
 	    			PractitionerRoleESR practitionerRole = (PractitionerRoleESR) practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
 	    			practitionerRole.addCareTeam(new PractitionerRoleCareTeam(entry.getSimplifiedID(), participant.getParticipantType()));
