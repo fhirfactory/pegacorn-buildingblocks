@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerRoleServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
 
@@ -101,7 +103,13 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
     		        .param().name("page").type(RestParamType.query).required(false).endParam()
     		        .param().name("sortBy").type(RestParamType.query).required(false).endParam()
     		        .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
-    		        .to("direct:" + getESRName() + "ListGET");
+    		        .to("direct:" + getESRName() + "ListGET")
+        
+        .put("/{simplifiedID}/CareTeams").type(PractitionerRoleCareTeamListESDT.class)
+        	.to("direct:"+getESRName()+"PractitionerRoleCareTeamsPUT")
+        
+        .get("/{simplifiedID}/CareTeams").outType(PractitionerRoleCareTeamListESDT.class)
+     		.to("direct:" + getESRName() + "PractitionerRolesCareTeamsGET");
 
 
         from("direct:"+getESRName()+"GET")
@@ -129,5 +137,13 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.INFO, "DELETE Request --> ${body}")
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
                 .setBody(simple("Action not support for this Directory Entry"));
+        
+        from("direct:" + getESRName() + "PractitionerRolesCareTeamsGET")
+    			.bean(practitionerRoleServiceHandler, "getCareTeams")
+    			.log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+    
+        from("direct:" + getESRName() + "PractitionerRoleCareTeamsPUT")
+    			.bean(practitionerRoleServiceHandler, "updateCareTeams")
+    			.log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
     }
 }

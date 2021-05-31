@@ -216,7 +216,7 @@ public abstract class ESRBroker {
             if(getLogger().isInfoEnabled()){
                 getLogger().info(".PegacornDirectoryEntry(): Attempting to retrieve PegacornDirectoryEntry for Id --> {}", entry.getSimplifiedID());
             }
-            foundResource = getCache().getCacheEntry(entry.getSimplifiedID());
+            foundResource = getCache().getCacheEntry(entry.getSimplifiedID().toLowerCase());
         }
         getLogger().info(".updatePractitionerEntry(): Check to see if we were able to retrieve existing Resource");
         if(foundResource != null){

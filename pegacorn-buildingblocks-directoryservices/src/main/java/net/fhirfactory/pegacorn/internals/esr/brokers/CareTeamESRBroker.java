@@ -31,6 +31,7 @@ import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearc
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
@@ -85,14 +86,12 @@ public class CareTeamESRBroker extends ESRBroker {
     public ESRMethodOutcome createCareTeam(CareTeamESR newCareTeam) throws ResourceInvalidSearchException {
         ESRMethodOutcome outcome = this.createDirectoryEntry(newCareTeam);
         
-
         for (ParticipantESDT participant : newCareTeam.getParticipants()) {
         	PractitionerRoleESR practitionerRole =  (PractitionerRoleESR)practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
         	
         	if (practitionerRole != null) {
                 // Need to update the practitioner role now with the care team details
-        		
-        		practitionerRole.addCareTeam(new PractitionerRoleCareTeam(newCareTeam.getSimplifiedID(), participant.getParticipantType()));
+        		practitionerRole.addCareTeam(newCareTeam.getSimplifiedID(), participant.getParticipantType());
         		practitionerRoleBroker.updatePractitionerRole(practitionerRole);
         	} else {
         		getLogger().warn("Practitioner role not found. Name: {}", participant.getSimplifiedId());
@@ -103,33 +102,46 @@ public class CareTeamESRBroker extends ESRBroker {
     }
 
     
-    public ESRMethodOutcome createCareTeam(String careTeamShortName, String careTeamLongName){
-        if(careTeamShortName == null || careTeamLongName == null ){
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.CREATE_ENTRY_INVALID);
-            outcome.setStatusReason("Role Category or Role Name is null");
-            outcome.setCreated(false);
-            
-            return(outcome);
-        } else {
-            CareTeamESR newCareTeam = new CareTeamESR();
-            IdentifierESDT newCareTeamIdentifier = new IdentifierESDT();
-            newCareTeamIdentifier.setValue(careTeamShortName);
-            newCareTeamIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-            newCareTeamIdentifier.setType(commonIdentifierESDTTypes.getShortName());
-            newCareTeamIdentifier.setLeafValue(careTeamShortName);
-            newCareTeam.getIdentifiers().add(newCareTeamIdentifier);
-            newCareTeam.setDisplayName(careTeamLongName);
-            ESRMethodOutcome outcome = this.createDirectoryEntry(newCareTeam);
-              
-            
-            return (outcome);
-        }
-    }
-
-
+ 
     @Override
-    protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) {
+    protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry)  {
 
     }
+
+	/**
+	 * Update/create a care team
+	 * 
+	 * @param entry
+	 * @return
+	 * @throws ResourceInvalidSearchException
+	 */
+	public ESRMethodOutcome updateCareTeam(CareTeamESR entry) throws ResourceInvalidSearchException {
+		LOG.info(".updateCareTeam(): Entry");
+		
+		CareTeamESR existing = (CareTeamESR)careTeamCache.getCacheEntry(entry.getSimplifiedID().toLowerCase());
+		
+	    if(existing != null) {
+	    	ESRMethodOutcome outcome = updateDirectoryEntry(entry);
+	    	
+	    	// If the care team was updated/created then update the practitioners records within the care team.
+	    	if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL) || outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
+	        
+	    		for (ParticipantESDT participant : existing.getParticipants()) {
+	    			PractitionerRoleESR practitionerRole = (PractitionerRoleESR) practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
+	    			practitionerRole.removeCareTeam(entry.getSimplifiedID());	
+	    			practitionerRoleBroker.updatePractitionerRole(practitionerRole);
+	    		}
+		        
+	    		for (ParticipantESDT participant : entry.getParticipants()) {
+	    			PractitionerRoleESR practitionerRole = (PractitionerRoleESR) practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
+	    			practitionerRole.addCareTeam(new PractitionerRoleCareTeam(entry.getSimplifiedID(), participant.getParticipantType()));
+		        	practitionerRoleBroker.updatePractitionerRole(practitionerRole);
+	    		}
+	    	}
+	        
+	        return outcome;
+	    } else {
+	    	return createCareTeam(entry);
+	    }
+	}
 }

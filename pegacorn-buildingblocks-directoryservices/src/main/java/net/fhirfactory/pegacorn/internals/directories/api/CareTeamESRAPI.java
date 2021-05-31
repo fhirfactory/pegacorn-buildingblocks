@@ -88,9 +88,9 @@ public class CareTeamESRAPI extends ResourceDirectoryAPI {
                 .param().name("sortBy").type(RestParamType.query).required(false).endParam()
                 .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
                 .to("direct:"+getESRName()+"SearchGET")
-            .post().type(RoleESR.class)
+            .post().type(CareTeamESR.class)
                 .to("direct:"+getESRName()+"POST")
-            .put().type(RoleESR.class)
+            .put().type(CareTeamESR.class)
                 .to("direct:"+getESRName()+"PUT")
 
 	        .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
@@ -119,9 +119,8 @@ public class CareTeamESRAPI extends ResourceDirectoryAPI {
                 .setBody(simple("Action not support for this Directory Entry"));
 
         from("direct:"+getESRName()+"PUT")
-                .log(LoggingLevel.INFO, "PUT Request --> ${body}")
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
-                .setBody(simple("Action not support for this Directory Entry"));
+        	.bean(serviceHandler, "updateCareTeam")
+        	.log(LoggingLevel.INFO, "PUT Request --> ${body}");
 
         from("direct:"+getESRName()+"DELETE")
                 .log(LoggingLevel.INFO, "DELETE Request --> ${body}")

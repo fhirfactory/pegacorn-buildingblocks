@@ -8,6 +8,10 @@ public class PractitionerRoleCareTeam {
 		return name;
 	}
 	
+	public PractitionerRoleCareTeam() {
+		
+	}
+	
 	public PractitionerRoleCareTeam(String name, ParticipantTypeEnum role) {
 		this.name = name;
 		this.role = role;

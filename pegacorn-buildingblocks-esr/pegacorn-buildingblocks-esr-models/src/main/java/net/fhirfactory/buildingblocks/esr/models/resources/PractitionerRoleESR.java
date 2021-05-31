@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantTypeEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
 
@@ -46,7 +47,7 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private String practitionerRoleADGroup;
     private ArrayList<ContactPointESDT> contactPoints;
     
-    private List<PractitionerRoleCareTeam>careTeams;
+    private List<PractitionerRoleCareTeam> careTeams;
     
     @JsonIgnore
     private RoleHistory roleHistory;
@@ -124,18 +125,10 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     //
 
 
-	public List<PractitionerRoleCareTeam> getCareTeams() {
-		return careTeams;
-	}
-
-	public void setCareTeams(List<PractitionerRoleCareTeam> careTeams) {
-		this.careTeams = careTeams;
-	}
 	
 	
-	public void addCareTeam(PractitionerRoleCareTeam careTeam) {
-		this.careTeams.add(careTeam);
-	}
+	
+	
 
 	public static Comparator<ExtremelySimplifiedResource> primaryLocationIDComparator = new Comparator<ExtremelySimplifiedResource>() {
         @Override
@@ -166,8 +159,39 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
             return(comparison);
         }
     };
+    
+    
+    public List<PractitionerRoleCareTeam> getCareTeams() {
+		return careTeams;
+	}
 
-    public static Comparator<ExtremelySimplifiedResource> primaryOrganizationIDComparator = new Comparator<ExtremelySimplifiedResource>() {
+	public void setCareTeams(List<PractitionerRoleCareTeam> careTeams) {
+		this.careTeams = careTeams;
+	}
+	
+	public void addCareTeam(String careTeamName, ParticipantTypeEnum type) {
+		careTeams.add(new PractitionerRoleCareTeam(careTeamName, type));
+	}
+	
+	public void removeCareTeam(String simplifiedID) {
+		List<PractitionerRoleCareTeam>newList = new ArrayList<>();
+		
+		for (PractitionerRoleCareTeam careTeam : getCareTeams()) {
+			if (!careTeam.getName().equalsIgnoreCase(simplifiedID)) {
+				newList.add(careTeam);
+			}
+		}
+		
+		setCareTeams(newList);
+		
+	}
+
+	public void addCareTeam(PractitionerRoleCareTeam practitionerRoleCareTeam) {
+		this.careTeams.add(practitionerRoleCareTeam);	
+	}
+	
+	
+	public static Comparator<ExtremelySimplifiedResource> primaryOrganizationIDComparator = new Comparator<ExtremelySimplifiedResource>() {
         @Override
         public int compare(ExtremelySimplifiedResource o1, ExtremelySimplifiedResource o2) {
             if(o1 == null && o2 == null){

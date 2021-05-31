@@ -17,6 +17,9 @@ import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundExce
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
@@ -170,5 +173,40 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
                 getLogger().info("Info: Entry --> {} :: {}", currentEntry.getPrimaryRoleCategoryID(), currentEntry.getDisplayName() );
             }
         }
+    }
+    
+    
+    public void updateCareTeams(@Header("simplifiedID") String id, PractitionerRoleCareTeamListESDT newCareTeams) throws ResourceInvalidSearchException {
+        getLogger().info(".updateCareTeams: Entry, pathValue --> {}", id);
+    	practitionerRoleDirectoryResourceBroker.updateCareTeams(id, newCareTeams);
+        getLogger().info(".updateCareTeams: Exit, pathValue --> {}", id);   	
+    	
+   	}
+    
+    
+    /**
+     * Returns the care teams for a practitioner role.
+     * 
+     * @param id
+     * @return
+     * @throws ResourceInvalidSearchException
+     */
+    public PractitionerRoleCareTeamListESDT getCareTeams(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
+        getLogger().info(".getCareTeams: Entry, pathValue --> {}", id);
+        
+        ESRMethodOutcome outcome = practitionerRoleDirectoryResourceBroker.getResource(id.toLowerCase());
+        
+        if (outcome.getEntry() != null) {
+        	PractitionerRoleESR practitionerRole = (PractitionerRoleESR)outcome.getEntry();
+        	
+        	PractitionerRoleCareTeamListESDT careTeams = new PractitionerRoleCareTeamListESDT();
+        	careTeams.setCareTeams( practitionerRole.getCareTeams());
+        	
+            getLogger().info(".getCareTeams: Exit, pathValue --> {}", id);
+        	
+        	return careTeams;
+        }
+       
+        throw new ResourceInvalidSearchException("No practitioner role found for id: " + id);
     }
 }

@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -28,11 +30,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
@@ -46,6 +52,9 @@ public class PractitionerRoleESRBroker extends ESRBroker {
 
     @Inject
     private PractitionerRoleESRCache practitionerRoleCache;
+    
+    @Inject
+    private CareTeamESRBroker careTeamBroker;
 
     @Inject
     private GroupESRBroker groupBroker;
@@ -170,6 +179,37 @@ public class PractitionerRoleESRBroker extends ESRBroker {
 
         return(outcome);
     }
+    
+    
+    public ESRMethodOutcome updateCareTeams(String simplifiedId, PractitionerRoleCareTeamListESDT newCareTeams) throws ResourceInvalidSearchException {
+        LOG.info(".getCareTeams(): Entry");
+    	
+    	PractitionerRoleESR practitionerRole = (PractitionerRoleESR) this.getResource(simplifiedId.toLowerCase()).getEntry();
+    	
+    	// Remove the practitioner role from the care teams they are in.
+    	for (PractitionerRoleCareTeam practitionerRoleCareTeam : practitionerRole.getCareTeams()) {
+    		CareTeamESR careTeam = (CareTeamESR)careTeamBroker.getResource(practitionerRoleCareTeam.getName().toLowerCase()).getEntry();
+    		careTeam.removeParticipant(practitionerRole.getSimplifiedID());
+    		
+    		careTeamBroker.updateCareTeam(careTeam);
+    		
+    		practitionerRole.setCareTeams(newCareTeams.getCareTeams());
+    		updatePractitionerRole(practitionerRole);
+    	}
+    	
+    	
+    	// Add the practitioner role to the care teams.
+    	for (PractitionerRoleCareTeam practitionerRoleCareTeam : newCareTeams.getCareTeams()) {
+    		CareTeamESR careTeam = (CareTeamESR)careTeamBroker.getResource(practitionerRoleCareTeam.getName().toLowerCase()).getEntry();
+    		careTeam.addParticipant(new ParticipantESDT(simplifiedId, practitionerRoleCareTeam.getRole()));
+    		
+    		careTeamBroker.updateCareTeam(careTeam);
+    	}
 
-
+    	ESRMethodOutcome outcome = new ESRMethodOutcome();
+    	outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
+    	
+    	return outcome;
+    	
+    }
 }

@@ -75,4 +75,16 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
 	public void addParticipant(ParticipantESDT participant) {
 		this.participants.add(participant);
 	}
+	
+	public void removeParticipant(String participantId) {
+		List<ParticipantESDT>newList = new ArrayList<>();
+		
+		for (ParticipantESDT participant : participants) {
+			if (!participant.getSimplifiedId().equalsIgnoreCase(participantId)) {
+				newList.add(participant);
+			}
+		}
+		
+		setParticipants(newList);
+	}
 }
