@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;

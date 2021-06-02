@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerServiceHandler;
@@ -80,10 +79,11 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
         //
 
         getRestGetDefinition()
-            .get("/search?emailAddress={emailAddress}&displayName={displayName}"
+            .get("/search?emailAddress={emailAddress}&displayName={displayName}}&allName={allName}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
                 .param().name("emailAddress").type(RestParamType.query).required(false).endParam()
                 .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                .param().name("allName").type(RestParamType.query).required(false).endParam()
                 .param().name("pageSize").type(RestParamType.query).required(false).endParam()
                 .param().name("page").type(RestParamType.query).required(false).endParam()
                 .param().name("sortBy").type(RestParamType.query).required(false).endParam()

@@ -89,6 +89,7 @@ public class GroupServiceHandler extends HandlerBase {
     													   @Header("shortName") String shortName,
                                                            @Header("longName") String longName,
                                                            @Header("displayName") String displayName,
+                                                           @Header("allName") String allName,
                                                            @Header("groupType") String groupType,
                                                            @Header("groupManager") String groupManager,
                                                            @Header("sortBy") String sortBy,
@@ -110,6 +111,9 @@ public class GroupServiceHandler extends HandlerBase {
         } else if(displayName != null){
             searchAttributeValue = displayName;
             searchAttributeName = "displayName";
+        } else if(allName != null) {
+        	searchAttributeValue = allName;
+            searchAttributeName = "allName";
         } else if(groupManager != null){
             searchAttributeValue = groupManager;
             searchAttributeName = "groupManager";

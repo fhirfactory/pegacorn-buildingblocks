@@ -73,10 +73,11 @@ public class MatrixRoomESRAPI extends ResourceDirectoryAPI {
         getGeneralException();
 
         getRestGetDefinition()
-                .get("/search?roomID={room_id}&displayName={displayName}"
+                .get("/search?roomID={room_id}&displayName={displayName}}&allName={allName}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
                 .param().name("room_id").type(RestParamType.query).required(false).endParam()
                 .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                .param().name("allName").type(RestParamType.query).required(false).endParam()
                 .param().name("leafValue").type(RestParamType.query).required(false).endParam()
                 .param().name("pageSize").type(RestParamType.query).required(false).endParam()
                 .param().name("page").type(RestParamType.query).required(false).endParam()

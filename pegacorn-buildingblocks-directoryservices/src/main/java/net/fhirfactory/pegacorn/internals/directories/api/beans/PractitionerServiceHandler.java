@@ -14,10 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundException;
@@ -146,6 +142,7 @@ public class PractitionerServiceHandler extends HandlerBase {
 			@Header("shortName") String shortName,
 			@Header("longName") String longName, 
 			@Header("displayName") String displayName,
+			@Header("allName") String allName,
 			@Header("leafValue") String leafValue, 
 			@Header("sortBy") String sortBy,
 			@Header("sortOrder") String sortOrder, 
@@ -177,6 +174,9 @@ public class PractitionerServiceHandler extends HandlerBase {
 		} else if (displayName != null) {
 			searchAttributeValue = displayName;
 			searchAttributeName = "displayName";
+		} else if(allName != null) {
+        	searchAttributeValue = allName;
+            searchAttributeName = "allName";
 		} else if (leafValue != null) {
 			searchAttributeValue = leafValue;
 			searchAttributeName = "leafValue";

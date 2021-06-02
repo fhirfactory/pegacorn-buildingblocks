@@ -124,6 +124,10 @@ public class RoleCategoryESRCache extends PegacornESRCache {
                 result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
+            case "allname" : {
+            	result = this.searchCacheUsingAllNames(searchCriteria);
+            	return result;
+            }
             default: {
                 return (result);
             }

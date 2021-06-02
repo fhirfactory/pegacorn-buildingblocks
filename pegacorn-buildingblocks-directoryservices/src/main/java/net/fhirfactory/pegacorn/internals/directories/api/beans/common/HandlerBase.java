@@ -124,6 +124,7 @@ public abstract class HandlerBase {
     														@Header("shortName") String shortName,
                                                             @Header("longName") String longName,
                                                             @Header("displayName") String displayName,
+                                                            @Header("allName") String allName,
                                                             @Header("leafValue") String leafValue,
                                                             @Header("sortBy") String sortBy,
                                                             @Header("sortOrder") String sortOrder,
@@ -150,7 +151,11 @@ public abstract class HandlerBase {
         } else if(leafValue != null) {
             searchAttributeValue = leafValue;
             searchAttributeName = "leafValue";
-        } else {
+        } else if(allName != null) {
+            searchAttributeValue = allName;
+            searchAttributeName = "allName";
+        }
+        else {
             throw( new ResourceInvalidSearchException("Search parameter not specified"));
         }
         

@@ -77,7 +77,7 @@ public class GroupESRAPI extends ResourceDirectoryAPI {
         //
 
         getRestGetDefinition()
-                .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}"
+                .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}}&allName={allName}"
                         + "&groupType={groupType}&groupManager={groupManager}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
                 .param().name("shortName").type(RestParamType.query).required(false).endParam()
@@ -85,6 +85,7 @@ public class GroupESRAPI extends ResourceDirectoryAPI {
                 .param().name("groupType").type(RestParamType.query).required(false).endParam()
                 .param().name("groupManager").type(RestParamType.query).required(false).endParam()
                 .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                .param().name("allName").type(RestParamType.query).required(false).endParam()
                 .param().name("pageSize").type(RestParamType.query).required(false).endParam()
                 .param().name("page").type(RestParamType.query).required(false).endParam()
                 .param().name("sortBy").type(RestParamType.query).required(false).endParam()

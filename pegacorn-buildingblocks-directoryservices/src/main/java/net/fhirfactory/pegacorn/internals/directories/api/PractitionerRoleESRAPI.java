@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerRoleServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
@@ -78,12 +77,13 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
         //
 
         getRestGetDefinition()
-            .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}&primaryRoleCategoryID={primaryRoleCategoryID}"
+            .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}&allName={allName}&primaryRoleCategoryID={primaryRoleCategoryID}"
                         + "&primaryRoleID{primaryRoleID}&primaryOrganizationID={primaryOrganizationID}&primaryLocationID={primaryLocationID}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
                 .param().name("shortName").type(RestParamType.query).required(false).endParam()
                 .param().name("longName").type(RestParamType.query).required(false).endParam()
                 .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                .param().name("allName").type(RestParamType.query).required(false).endParam()
                 .param().name("primaryRoleCategoryID").type(RestParamType.query).required(false).endParam()
                 .param().name("primaryRoleID").type(RestParamType.query).required(false).endParam()
                 .param().name("primaryOrganizationID").type(RestParamType.query).required(false).endParam()

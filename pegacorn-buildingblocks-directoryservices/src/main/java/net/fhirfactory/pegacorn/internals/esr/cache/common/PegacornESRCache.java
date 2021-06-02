@@ -413,4 +413,9 @@ public abstract class PegacornESRCache {
             return(result);
         }
     }
+    
+    
+    public ESRSearchResult searchCacheUsingAllNames(SearchCriteria searchCriteria) {
+    	return null;
+    }
 }

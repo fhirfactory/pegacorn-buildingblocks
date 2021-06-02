@@ -17,9 +17,7 @@ import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundExce
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
@@ -70,6 +68,7 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
     															    @Header("shortName") String shortName,
                                                                     @Header("longName") String longName,
                                                                     @Header("displayName") String displayName,
+                                                                    @Header("allName") String allName,
                                                                     @Header("primaryRoleCategoryID") String primaryRoleCategoryID,
                                                                     @Header("primaryRoleID") String primaryRoleID,
                                                                     @Header("primaryOrganizationID") String primaryOrganizationID,
@@ -94,6 +93,9 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
         } else if(displayName != null){
             searchAttributeValue = displayName;
             searchAttributeName = "displayName";
+        } else if(allName != null) {
+        	searchAttributeValue = allName;
+            searchAttributeName = "allName";
         } else if(primaryRoleCategoryID != null){
             searchAttributeValue = primaryRoleCategoryID;
             searchAttributeName = "primaryRoleCategoryID";

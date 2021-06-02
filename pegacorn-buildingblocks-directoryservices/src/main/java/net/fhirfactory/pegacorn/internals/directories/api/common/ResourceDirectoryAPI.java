@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
+import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.platform.edge.common.CamelSSLTLSHandler;
 
@@ -70,7 +71,7 @@ public abstract class ResourceDirectoryAPI extends RouteBuilder {
         return(specifyESRName());
     }
 
-    public Class getESRClass(){
+    public Class<ExtremelySimplifiedResource> getESRClass(){
         return(specifyESRClass());
     }
 

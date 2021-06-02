@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.CareTeamServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
 
@@ -77,11 +76,12 @@ public class CareTeamESRAPI extends ResourceDirectoryAPI {
         //
 
         getRestGetDefinition()
-            .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}"
+            .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}}&allName={allName}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
                 .param().name("shortName").type(RestParamType.query).required(false).endParam()
                 .param().name("longName").type(RestParamType.query).required(false).endParam()
                 .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                .param().name("allName").type(RestParamType.query).required(false).endParam()
                 .param().name("leafValue").type(RestParamType.query).required(false).endParam()
                 .param().name("pageSize").type(RestParamType.query).required(false).endParam()
                 .param().name("page").type(RestParamType.query).required(false).endParam()

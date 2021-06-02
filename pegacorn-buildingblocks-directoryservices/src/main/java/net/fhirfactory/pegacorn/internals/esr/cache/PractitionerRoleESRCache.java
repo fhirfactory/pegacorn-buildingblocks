@@ -164,6 +164,10 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
                 result = this.searchCacheViaRole(searchCriteria);
                 return(result);
             }
+            case "allname" : {
+            	result = this.searchCacheUsingAllNames(searchCriteria);
+            	return result;
+            }
             default: {
                 return (result);
             }

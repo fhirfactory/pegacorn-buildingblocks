@@ -172,6 +172,10 @@ public class GroupESRCache extends PegacornESRCache {
                 result = this.searchCacheUsingGroupManager(searchCriteria);
                 return(result);
             }
+            case "allname" : {
+            	result = this.searchCacheUsingAllNames(searchCriteria);
+            	return result;
+            }
             default: {
                 return (result);
             }
