@@ -2,14 +2,9 @@ package net.fhirfactory.pegacorn.internals.esr.search;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
 
 
 /**
@@ -26,8 +21,6 @@ public class SearchCriteria {
 	private String value;
 	
 	private boolean containsMatch;
-	
-	private List<BaseFilter> filters = new ArrayList<>();
 	
 	public SearchCriteria() {
 		containsMatch = true; 
@@ -54,14 +47,7 @@ public class SearchCriteria {
 		this.paramName = paramName;
 	}
 	
-	public List<BaseFilter> getFilters() {
-		return filters;
-	}
 	
-	public void setFilters(List<BaseFilter> filters) {
-		this.filters = filters;
-	}
-
 	public String getValue() {
 		return value;
 	}
@@ -85,11 +71,6 @@ public class SearchCriteria {
 		return (value.isEmpty());
 	}
 	
-	
-	public void addFilter(BaseFilter filter) throws ResourceInvalidSearchException {
-		this.filters.add(filter);	
-	}
-
 	public boolean isContainsMatch() {
 		return containsMatch;
 	}
