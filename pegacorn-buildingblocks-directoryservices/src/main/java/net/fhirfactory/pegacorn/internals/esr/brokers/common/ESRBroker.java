@@ -128,8 +128,8 @@ public abstract class ESRBroker {
         if(outcome.getSearchResult().isEmpty()) {
             getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): No entry found");
             outcome.setSearchSuccessful(true);
-            outcome.getSearchResult().add(entry);
-            outcome.setId(entry.getSimplifiedID());
+      //      outcome.getSearchResult().add(entry);
+    //        outcome.setId(entry.getSimplifiedID());
             outcome.setSearch(true);
             getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
             return (outcome);

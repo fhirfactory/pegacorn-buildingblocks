@@ -31,12 +31,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.GroupESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesFulfilledByPractitionerGroupESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesInCareTeamGroupESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionersFulfillingPractitionerRolesGroupESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.GroupESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
@@ -50,6 +56,9 @@ public class GroupESRBroker extends ESRBroker {
 
     @Inject
     private PractitionerRoleMapCache roleMapCache;
+    
+    @Inject
+    private CareTeamPractitionerRoleMapCache careTeamPractitionerRoleMapCache;
 
     @Override
     protected Logger getLogger(){
@@ -83,22 +92,41 @@ public class GroupESRBroker extends ESRBroker {
         ESRMethodOutcome outcome = groupCache.addGroup(directoryEntry);
         if(directoryEntry.isSystemManaged() && !directoryEntry.getGroupMembership().isEmpty()) {
             switch (SystemManagedGroupTypesEnum.fromTypeCode(directoryEntry.getGroupType())) {
-                case PRACTITIONEROLE_MAP_PRACTITIONER_GROUP: {
+                case PRACTITIONERS_FULFILLING_PRACTITIONER_ROLE_GROUP: {
                     roleMapCache.addPractitionerRoleIfAbsent(directoryEntry.getGroupManager());
                     
-                    
-                    for (RoleHistoryDetail practitionerRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
-                        roleMapCache.addPractitionerRoleFulfilledByPractitioner(directoryEntry.getGroupManager(), practitionerRID.getRole());
+                    for (String practitionerRID :  ((PractitionersFulfillingPractitionerRolesGroupESR)directoryEntry).getGroupMembership()) {
+                        roleMapCache.addPractitionerRoleFulfilledByPractitioner(directoryEntry.getGroupManager(), practitionerRID);
                     }
                     break;
                 }
-                case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
+                case PRACTITONER_ROLES_FULFILLED_BY_PRACTITIONER_GROUP: {
                     roleMapCache.addPractitionerIfAbsent(directoryEntry.getGroupManager());
-                    for (RoleHistoryDetail practitionerRoleRID : directoryEntry.getRoleHistory().getAllCurrentRoles()) {
-                        roleMapCache.addPractitionerRoleFulfilledByPractitioner(practitionerRoleRID.getRole(), directoryEntry.getGroupManager());
+                    
+                    for (String practitionerRoleRID : ((PractitionerRolesFulfilledByPractitionerGroupESR)directoryEntry).getGroupMembership()) {
+                        roleMapCache.addPractitionerRoleFulfilledByPractitioner(practitionerRoleRID, directoryEntry.getGroupManager());
                     }
                     break;
                 }
+                case CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP: {
+                	careTeamPractitionerRoleMapCache.addPractitionerRoleIfAbsent(directoryEntry.getGroupManager());
+                	
+                	for (ParticipantRoleCareTeam careTeam : ((CareTeamsContainingPractitionerRoleGroupESR)directoryEntry).getGroupMembership()) {
+                		careTeamPractitionerRoleMapCache.addCareTeamToPractitionerRole(directoryEntry.getGroupManager(), careTeam);
+                	}
+                	
+                	break;
+                }
+                case PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP: {
+                	careTeamPractitionerRoleMapCache.addCareTeamIfAbsent(directoryEntry.getGroupManager());
+                    
+                    for (ParticipantESDT practitionerRole :  ((PractitionerRolesInCareTeamGroupESR)directoryEntry).getGroupMembership()) {                    	
+                    	careTeamPractitionerRoleMapCache.addPractitionerRoleToCareTeam(directoryEntry.getGroupManager(), practitionerRole);
+                    }
+                	
+                	
+                	break;
+                }                
                 case GENERAL:
                 default:
                     // Do nothing more for now
@@ -119,18 +147,30 @@ public class GroupESRBroker extends ESRBroker {
         if(directoryEntry.isSystemManaged()) {
             getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Is System Managed");
             switch (SystemManagedGroupTypesEnum.fromTypeCode(groupEntry.getGroupType())) {
-                case PRACTITIONEROLE_MAP_PRACTITIONER_GROUP: {
+                case PRACTITIONERS_FULFILLING_PRACTITIONER_ROLE_GROUP: {
                     getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->Practitioner group");
                     List<String> practitionerList = roleMapCache.getListOfPractitionersFulfillingPractitionerRole(groupEntry.getGroupManager());
-                    groupEntry.getRoleHistory().update(practitionerList);
+                    ((PractitionersFulfillingPractitionerRolesGroupESR)groupEntry).setGroupMembership(practitionerList);
                     break;
                 }
-                case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
+                case PRACTITONER_ROLES_FULFILLED_BY_PRACTITIONER_GROUP: {
                     getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->PractitionerRole group");
                     List<String> practitionerRoleList = roleMapCache.getListOfPractitionerRolesFulfilledByPractitioner(groupEntry.getGroupManager());
-                    groupEntry.getRoleHistory().update(practitionerRoleList);
+                    ((PractitionerRolesFulfilledByPractitionerGroupESR)groupEntry).getRoleHistory().update(practitionerRoleList);
                     break;
                 }
+                case CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP: {
+                    getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->Practitioner group");
+                    List<ParticipantRoleCareTeam> careTeamList = careTeamPractitionerRoleMapCache.getCareTeamsForPractitionerRole(groupEntry.getGroupManager());
+                    ((CareTeamsContainingPractitionerRoleGroupESR)groupEntry).setGroupMembership(careTeamList);
+                    break;
+                }
+                case PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP: {
+                    getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->Practitioner group");
+                    List<ParticipantESDT> practitionerRoleList = careTeamPractitionerRoleMapCache.getPractitionerRolesWithinCareTeam(groupEntry.getGroupManager());
+                    ((PractitionerRolesInCareTeamGroupESR)groupEntry).setGroupMembership(practitionerRoleList);
+                    break;
+                } 
                 case GENERAL:
                 default:
                     getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): unknown type");
@@ -174,58 +214,141 @@ public class GroupESRBroker extends ESRBroker {
             if(group.isSystemManaged()){
                 getLogger().trace(".updateGroup(): Is a SystemManaged room, type equals --> {}", cachedGroup.getGroupType());
                 switch (SystemManagedGroupTypesEnum.fromTypeCode(cachedGroup.getGroupType())) {
-                    case PRACTITIONEROLE_MAP_PRACTITIONER_GROUP: {
+                    case PRACTITIONERS_FULFILLING_PRACTITIONER_ROLE_GROUP: {
                         getLogger().trace(".updateGroup(): Is a PractitionerRoleMap Practitioner Group");
                         List<String> currentStatePractitionerRoleFulfillmentList = roleMapCache.getListOfPractitionersFulfillingPractitionerRole(cachedGroup.getGroupManager());
-                        List<String> futureStatePractitionerRoleFulfillmentList = cachedGroup.getRoleHistory().getAllCurrentRolesAsString();
+                        List<String> futureStatePractitionerRoleFulfillmentList = ((PractitionersFulfillingPractitionerRolesGroupESR)cachedGroup).getGroupMembership();
                         ArrayList<String> practitionersToRemove = new ArrayList<>();
                         ArrayList<String> practitionersToAdd = new ArrayList<>();
+                        
                         for(String currentIncludedPractitioner: currentStatePractitionerRoleFulfillmentList){
                             if(!futureStatePractitionerRoleFulfillmentList.contains(currentIncludedPractitioner)){
                                 practitionersToRemove.add(currentIncludedPractitioner);
                             }
                         }
+                        
                         for(String futureIncludedPractitioner: futureStatePractitionerRoleFulfillmentList){
                             if(!currentStatePractitionerRoleFulfillmentList.contains(futureIncludedPractitioner)){
                                 practitionersToAdd.add(futureIncludedPractitioner);
                             }
                         }
+                        
                         for(String practitionerToRemove: practitionersToRemove){
                             roleMapCache.removePractitionerRoleFulfilledByPractitioner(cachedGroup.getGroupManager(), practitionerToRemove);
                         }
+                        
                         for(String practitionerToAdd: practitionersToAdd){
                             roleMapCache.addPractitionerRoleFulfilledByPractitioner(cachedGroup.getGroupManager(), practitionerToAdd);
                         }
+                        
                         break;
                     }
-                    case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
+                    case PRACTITONER_ROLES_FULFILLED_BY_PRACTITIONER_GROUP: {
                         getLogger().trace(".updateGroup(): Is a PractitionerRoleMap PractitionerRole Group");
                         List<String> currentStatePractitionerFulfilledPractitionerRoleList = roleMapCache.getListOfPractitionerRolesFulfilledByPractitioner(cachedGroup.getGroupManager());
-                        List<String> futureStatePractitionerFulfilledPractitionerRoleList = cachedGroup.getRoleHistory().getAllCurrentRolesAsString();
+                        List<String> futureStatePractitionerFulfilledPractitionerRoleList = ((PractitionerRolesFulfilledByPractitionerGroupESR)cachedGroup).getGroupMembership();
                         ArrayList<String> practitionerRolesToRemove = new ArrayList<>();
                         ArrayList<String> practitionerRolesToAdd = new ArrayList<>();
+                        
                         for(String currentIncludedPractitionerRole: currentStatePractitionerFulfilledPractitionerRoleList){
                             if(!futureStatePractitionerFulfilledPractitionerRoleList.contains(currentIncludedPractitionerRole)){
                                 practitionerRolesToRemove.add(currentIncludedPractitionerRole);
                             }
                         }
+                        
                         for(String futureIncludedPractitionerRole: futureStatePractitionerFulfilledPractitionerRoleList){
                             if(!currentStatePractitionerFulfilledPractitionerRoleList.contains(futureIncludedPractitionerRole)){
                                 practitionerRolesToAdd.add(futureIncludedPractitionerRole);
                             }
                         }
+                        
                         if(getLogger().isTraceEnabled()){
                             getLogger().trace(".updateGroup(): Number of PractitionerRoles to be added --> {}", practitionerRolesToAdd.size());
                             getLogger().trace(".updateGroup(): Number of PractitionerRoles to be removed --> {}", practitionerRolesToRemove.size());
                         }
+                        
                         for(String practitionerRoleToRemove: practitionerRolesToRemove){
                             roleMapCache.removePractitionerRoleFulfilledByPractitioner(practitionerRoleToRemove, cachedGroup.getGroupManager());
                         }
+                        
                         for(String practitionerRoleToAdd: practitionerRolesToAdd){
                             roleMapCache.addPractitionerRoleFulfilledByPractitioner(practitionerRoleToAdd, cachedGroup.getGroupManager());
                         }
+                        
                         break;
                     }
+                    case CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP: {
+ 
+                    	 getLogger().trace(".updateGroup(): Is a Practitioner Role Care Team Group");
+                         List<ParticipantRoleCareTeam> currentStateCareTeamsForPractitionerRoleList = careTeamPractitionerRoleMapCache.getCareTeamsForPractitionerRole(cachedGroup.getGroupManager());
+                         
+                         if (currentStateCareTeamsForPractitionerRoleList == null) {
+                        	 currentStateCareTeamsForPractitionerRoleList = new ArrayList<>();
+                         }
+                         
+                         List<ParticipantRoleCareTeam> futureStateCareTeamsForPractitionerRoleList = ((CareTeamsContainingPractitionerRoleGroupESR)cachedGroup).getGroupMembership();
+                         
+                         List<ParticipantRoleCareTeam> careTeamsToRemove = new ArrayList<>();
+                         List<ParticipantRoleCareTeam> careTeamsToAdd = new ArrayList<>();
+                    
+                         for(ParticipantRoleCareTeam currentIncludedPractitioner: currentStateCareTeamsForPractitionerRoleList){
+                             if(!futureStateCareTeamsForPractitionerRoleList.contains(currentIncludedPractitioner)){
+                            	 careTeamsToRemove.add(currentIncludedPractitioner);
+                             }
+                         }
+                         
+                         for(ParticipantRoleCareTeam futureIncludedPractitioner: futureStateCareTeamsForPractitionerRoleList){
+                             if(!currentStateCareTeamsForPractitionerRoleList.contains(futureIncludedPractitioner)){
+                            	 careTeamsToAdd.add(futureIncludedPractitioner);
+                             }
+                         }
+                         
+                         for(ParticipantRoleCareTeam careTeamToRemove: careTeamsToRemove){
+                             careTeamPractitionerRoleMapCache.removeCareTeamFromPractitionerRole(cachedGroup.getGroupManager(), careTeamToRemove);
+                         }
+                         
+                         for(ParticipantRoleCareTeam careTeamToAdd: careTeamsToAdd){
+                             careTeamPractitionerRoleMapCache.addCareTeamToPractitionerRole(cachedGroup.getGroupManager(), careTeamToAdd);
+                         }
+                         
+                         break;
+                    }
+                    case PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP: {
+                    	
+                    	 getLogger().trace(".updateGroup(): Is a Practitioner Role Care Team Group");
+                         List<ParticipantESDT> currentStatePractitionerRolesInCareTeamsList = careTeamPractitionerRoleMapCache.getPractitionerRolesWithinCareTeam(cachedGroup.getGroupManager());
+                         
+                         if (currentStatePractitionerRolesInCareTeamsList == null) {
+                        	 currentStatePractitionerRolesInCareTeamsList = new ArrayList<>();
+                         }
+                         
+                         List<ParticipantESDT> futureStatePractitionerRolesInCareTeamList = ((PractitionerRolesInCareTeamGroupESR)cachedGroup).getGroupMembership();
+                         
+                         List<ParticipantESDT> practitionerRolesToRemove = new ArrayList<>();
+                         List<ParticipantESDT> practitionerRolesToAdd = new ArrayList<>();
+                    
+                         for(ParticipantESDT currentIncludedPractitioner: currentStatePractitionerRolesInCareTeamsList){
+                             if(!futureStatePractitionerRolesInCareTeamList.contains(currentIncludedPractitioner)){
+                            	 practitionerRolesToRemove.add(currentIncludedPractitioner);
+                             }
+                         }
+                         
+                         for(ParticipantESDT futureIncludedPractitioner: futureStatePractitionerRolesInCareTeamList){
+                             if(!currentStatePractitionerRolesInCareTeamsList.contains(futureIncludedPractitioner)){
+                            	 practitionerRolesToAdd.add(futureIncludedPractitioner);
+                             }
+                         }
+                         
+                         for(ParticipantESDT practitionerRoleToRemove: practitionerRolesToRemove){
+                             careTeamPractitionerRoleMapCache.removePractitionerRoleFromCareTeam(cachedGroup.getGroupManager(), practitionerRoleToRemove);
+                         }
+                         
+                         for(ParticipantESDT practitionerRoleToAdd: practitionerRolesToAdd){
+                             careTeamPractitionerRoleMapCache.addPractitionerRoleToCareTeam(cachedGroup.getGroupManager(), practitionerRoleToAdd);
+                         }
+                         
+                         break;
+                    } 
                     case GENERAL:
                     default:
                         getLogger().trace(".updateGroup(): Not presently supported");

@@ -32,4 +32,24 @@ public class ParticipantESDT {
 	public void setParticipantType(ParticipantTypeEnum participantType) {
 		this.participantType = participantType;
 	}
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		
+		ParticipantESDT other = (ParticipantESDT)obj;
+		
+		if (!simplifiedId.equals(other.getSimplifiedId())) {
+			return false;
+		}
+		
+		if (!participantType.name().equals(other.getParticipantType().name())) {
+			return false;
+		}
+		
+		return true;
+	}
 }

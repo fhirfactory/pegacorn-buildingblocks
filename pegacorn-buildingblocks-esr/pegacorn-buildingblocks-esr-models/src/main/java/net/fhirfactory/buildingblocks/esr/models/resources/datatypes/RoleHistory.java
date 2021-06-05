@@ -103,7 +103,7 @@ public class RoleHistory {
 	 * 
 	 * @return
 	 */
-	public List<String> getAllCurrentRolesAsString() {
+	public List<String> getAllCurrentPractitionerRolesSet() {
 		List<String>currentAsString = new ArrayList<>();		
 		
 		for (RoleHistoryDetail current : getAllCurrentRoles()) {

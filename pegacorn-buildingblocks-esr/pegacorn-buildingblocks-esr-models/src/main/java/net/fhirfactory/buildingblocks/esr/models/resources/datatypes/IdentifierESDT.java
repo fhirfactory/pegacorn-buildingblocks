@@ -94,7 +94,7 @@ public class IdentifierESDT {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, use, value);
+        return Objects.hash(type, use.getUseCode(), value);
     }
 
     @Override

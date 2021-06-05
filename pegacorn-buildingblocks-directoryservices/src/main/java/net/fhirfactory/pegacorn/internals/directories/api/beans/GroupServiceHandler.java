@@ -20,7 +20,7 @@ import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearc
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;

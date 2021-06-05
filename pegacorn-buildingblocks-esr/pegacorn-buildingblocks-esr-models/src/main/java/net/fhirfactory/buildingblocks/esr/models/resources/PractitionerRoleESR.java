@@ -28,12 +28,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantTypeEnum;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantRoleCareTeam;
 
 public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleESR.class);
@@ -46,15 +42,12 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private String primaryRoleID;
     private String practitionerRoleADGroup;
     private ArrayList<ContactPointESDT> contactPoints;
+    private List<String>activePractitionerSet;
     
-    private List<PractitionerRoleCareTeam> careTeams;
-    
-    @JsonIgnore
-    private RoleHistory roleHistory;
+    private List<ParticipantRoleCareTeam> careTeams;
 
     public PractitionerRoleESR(){
         this.contactPoints = new ArrayList<>();
-        this.roleHistory = new RoleHistory();
         this.careTeams = new ArrayList<>();
     }
 
@@ -74,19 +67,15 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
         this.primaryLocationID = primaryLocationID;
     }
 
-    public RoleHistory getRoleHistory() {
-        return roleHistory;
-    }
-
-    public void setRoleHistory(RoleHistory roleHistory) {
-        this.roleHistory = roleHistory;
-    }
-    
     public List<String> getActivePractitionerSet() {
-    	return roleHistory.getAllCurrentRolesAsString();
-    }
+		return activePractitionerSet;
+	}
 
-    public String getPrimaryRoleCategoryID() {
+	public void setActivePractitionerSet(List<String> activePractitionerSet) {
+		this.activePractitionerSet = activePractitionerSet;
+	}
+
+	public String getPrimaryRoleCategoryID() {
         return primaryRoleCategoryID;
     }
 
@@ -161,35 +150,14 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     };
     
     
-    public List<PractitionerRoleCareTeam> getCareTeams() {
+    public List<ParticipantRoleCareTeam> getCareTeams() {
 		return careTeams;
 	}
 
-	public void setCareTeams(List<PractitionerRoleCareTeam> careTeams) {
+	public void setCareTeams(List<ParticipantRoleCareTeam> careTeams) {
 		this.careTeams = careTeams;
 	}
-	
-	public void addCareTeam(String careTeamName, ParticipantTypeEnum type) {
-		careTeams.add(new PractitionerRoleCareTeam(careTeamName, type));
-	}
-	
-	public void removeCareTeam(String simplifiedID) {
-		List<PractitionerRoleCareTeam>newList = new ArrayList<>();
-		
-		for (PractitionerRoleCareTeam careTeam : getCareTeams()) {
-			if (!careTeam.getName().equalsIgnoreCase(simplifiedID)) {
-				newList.add(careTeam);
-			}
-		}
-		
-		setCareTeams(newList);
-		
-	}
 
-	public void addCareTeam(PractitionerRoleCareTeam practitionerRoleCareTeam) {
-		this.careTeams.add(practitionerRoleCareTeam);	
-	}
-	
 	
 	public static Comparator<ExtremelySimplifiedResource> primaryOrganizationIDComparator = new Comparator<ExtremelySimplifiedResource>() {
         @Override

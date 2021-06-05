@@ -28,10 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
@@ -61,47 +60,7 @@ public class GroupESRCache extends PegacornESRCache {
         return(foundGroupEntry);
     }
 
-    public ESRMethodOutcome addMember(String groupPrimaryKey, String memberPrimaryKey){
-        GroupESR foundGroup = getGroup(groupPrimaryKey);
-        if(foundGroup == null || memberPrimaryKey == null){
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-            outcome.setStatusReason("Group does not exist");
-            return(outcome);
-        }
-        if(foundGroup.getRoleHistory().getAllCurrentRolesAsString().contains(memberPrimaryKey)){
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-            return(outcome);
-
-        } else {
-            foundGroup.getGroupMembership().add(memberPrimaryKey);
-        }
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
-            outcome.setId(foundGroup.getSimplifiedID());
-            outcome.setEntry(foundGroup);
-            return (outcome);
-    }
-
-    public ESRMethodOutcome removeMember(String groupPrimaryKey, String memberPrimaryKey){
-        GroupESR foundGroup = getGroup(groupPrimaryKey);
-        if(foundGroup == null || memberPrimaryKey == null){
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-            outcome.setStatusReason("Group does not exist");
-            return(outcome);
-        }
-        if(foundGroup.getRoleHistory().getAllCurrentRolesAsString().contains(memberPrimaryKey)){
-            foundGroup.getRoleHistory().getAllCurrentRolesAsString().remove(memberPrimaryKey);
-        }
-        ESRMethodOutcome outcome = new ESRMethodOutcome();
-        outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
-        outcome.setId(foundGroup.getSimplifiedID());
-        outcome.setEntry(foundGroup);
-        return(outcome);
-    }
-
+    
     //
     // Search Services
     //

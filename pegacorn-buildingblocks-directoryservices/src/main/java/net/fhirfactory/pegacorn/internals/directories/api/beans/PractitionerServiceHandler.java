@@ -112,7 +112,7 @@ public class PractitionerServiceHandler extends HandlerBase {
             PractitionerRoleListESDT output = new PractitionerRoleListESDT();
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
             if (StringUtils.isEmpty(recent)) {
-            	output.getPractitionerRoles().addAll(practitioner.getRoleHistory().getAllCurrentRolesAsString());
+            	output.getPractitionerRoles().addAll(practitioner.getRoleHistory().getAllCurrentPractitionerRolesSet());
             } else {
             	
             	try {

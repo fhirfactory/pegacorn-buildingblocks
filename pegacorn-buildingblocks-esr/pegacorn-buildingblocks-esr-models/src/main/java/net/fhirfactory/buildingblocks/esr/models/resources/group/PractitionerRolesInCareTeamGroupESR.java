@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.buildingblocks.esr.models.resources;
+package net.fhirfactory.buildingblocks.esr.models.resources.group;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,45 +29,40 @@ import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
 
-public class CareTeamESR extends ExtremelySimplifiedResource {
-    private static final Logger LOG = LoggerFactory.getLogger(CareTeamESR.class);
+/**
+ * A group of practitioner roles within a care team.
+ * 
+ * @author Brendan Douglas
+ *
+ */
+public class PractitionerRolesInCareTeamGroupESR extends GroupESR {
+    private static final Logger LOG = LoggerFactory.getLogger(PractitionerRolesInCareTeamGroupESR.class);
+    
+    private List<ParticipantESDT>groupMembership;
+    
+    public PractitionerRolesInCareTeamGroupESR() {
+    	super();
+    	
+    	this.groupMembership = new ArrayList<>();
+    }
+
     @Override
-    protected Logger getLogger(){return(LOG);}
+    protected Logger getLogger() {
+    	return(LOG);
+    }
 
-    private List<String> serviceDeliveryLocations;
-    private String managingOrganization;
     
-    private List<ParticipantESDT>participants;
+    public List<ParticipantESDT>getGroupMembership() {
+    	return groupMembership;
+    }
     
-    public CareTeamESR(){
-        super();
-        
-        this.serviceDeliveryLocations = new ArrayList<>();
-        this.managingOrganization = null;
-        this.participants = new ArrayList<>();
+    
+    public void setGroupMembership(List<ParticipantESDT>groupMembership) {
+    	this.groupMembership = groupMembership;
     }
 
-    public List<String> getServiceDeliveryLocations() {
-        return serviceDeliveryLocations;
-    }
-
-    public void setServiceDeliveryLocations(List<String> serviceDeliveryLocations) {
-        this.serviceDeliveryLocations = serviceDeliveryLocations;
-    }
-
-    public String getManagingOrganization() {
-        return managingOrganization;
-    }
-
-    public void setManagingOrganization(String managingOrganization) {
-        this.managingOrganization = managingOrganization;
-    }
-
-	public List<ParticipantESDT> getParticipants() {
-		return participants;
-	}
-
-	public void setParticipants(List<ParticipantESDT> participants) {
-		this.participants = participants;
+    
+    public void addNewGroupMember(ParticipantESDT newGroupMember) {
+		this.groupMembership.add(newGroupMember);
 	}
 }

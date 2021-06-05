@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
+import java.util.ArrayList;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -30,10 +32,13 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantRoleCareTeam;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesInCareTeamGroupESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
@@ -47,9 +52,10 @@ public class CareTeamESRBroker extends ESRBroker {
     @Inject
     private CareTeamESRCache careTeamCache;
     
+    
     @Inject
-    private PractitionerRoleESRBroker practitionerRoleBroker;
-
+    private GroupESRBroker groupBroker;
+    
 
     @Override
     protected Logger getLogger() {
@@ -75,35 +81,90 @@ public class CareTeamESRBroker extends ESRBroker {
     }
 
     //
-    // Create
+    // Create a care team.  This will create many groups.  A single care team group with the care team as the key and the practitioner roles as the members, and create/update a group for every pracactitoner role with the practitionerrole as the key and the care teams as the members.
     //
 
     public ESRMethodOutcome createCareTeam(CareTeamESR newCareTeam) throws ResourceInvalidSearchException {
-        ESRMethodOutcome outcome = this.createDirectoryEntry(newCareTeam);
-        
+    
+    	// The new care team might contain practitioner role membership so remove it from here and add it to the group.  The PractitionerRoleESR will get it from the group.
+        PractitionerRolesInCareTeamGroupESR practionerRolesInCareTeamSet = new PractitionerRolesInCareTeamGroupESR();
         for (ParticipantESDT participant : newCareTeam.getParticipants()) {
-        	PractitionerRoleESR practitionerRole =  (PractitionerRoleESR)practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
+        	practionerRolesInCareTeamSet.addNewGroupMember(new ParticipantESDT(participant.getSimplifiedId(), participant.getParticipantType()));
+        }
+    	
+        newCareTeam.setParticipants(new ArrayList<>());
+    	ESRMethodOutcome outcome = this.createDirectoryEntry(newCareTeam);
+       
+        // Create a care team group with the practitioner roles as the group members.
+        practionerRolesInCareTeamSet.setGroupManager(newCareTeam.getSimplifiedID());
+        practionerRolesInCareTeamSet.setGroupType(SystemManagedGroupTypesEnum.PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP.getTypeCode());
+        practionerRolesInCareTeamSet.setSystemManaged(true);
+        practionerRolesInCareTeamSet.getIdentifiers().add(newCareTeam.getIdentifierWithType("ShortName"));
+        practionerRolesInCareTeamSet.setDisplayName(SystemManagedGroupTypesEnum.PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP.getGroupPrefix() + newCareTeam.getIdentifierWithType("ShortName").getValue());
+      
+    	groupBroker.createGroupDE(practionerRolesInCareTeamSet);
+
+        
+        // Create/update practitioner role groups with the care teams as the members.
+        for (ParticipantESDT participant : newCareTeam.getParticipants()) {        	
+	        CareTeamsContainingPractitionerRoleGroupESR careTeamsForPractitionerRoleSet = new CareTeamsContainingPractitionerRoleGroupESR();
+	        careTeamsForPractitionerRoleSet.setGroupManager(participant.getSimplifiedId());
+	        careTeamsForPractitionerRoleSet.setGroupType(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getTypeCode());
+	        careTeamsForPractitionerRoleSet.setSystemManaged(true);
+	        
+	        IdentifierESDT identifier = new IdentifierESDT();
+	        identifier.setUse(IdentifierESDTUseEnum.USUAL);
+	        identifier.setType("ShortName");
+	        identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + participant.getSimplifiedId());
+	        
+	        careTeamsForPractitionerRoleSet.getIdentifiers().add(identifier);   
+	        careTeamsForPractitionerRoleSet.setDisplayName(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + participant.getSimplifiedId());
+	        careTeamsForPractitionerRoleSet.addNewGroupMember(new ParticipantRoleCareTeam(newCareTeam.getSimplifiedID(), participant.getParticipantType()));
+	        
+	        
+	        // Create or update group.
+        	ESRMethodOutcome groupOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(identifier, false);
         	
-        	if (practitionerRole != null) {
-                // Need to update the practitioner role now with the care team details
-        		practitionerRole.addCareTeam(newCareTeam.getSimplifiedID(), participant.getParticipantType());
-        		practitionerRoleBroker.updatePractitionerRole(practitionerRole);
-        	} else {
-        		getLogger().warn("Practitioner role not found. Name: {}", participant.getSimplifiedId());
-        	}
+        	if (!groupOutcome.getSearchResult().isEmpty()) {
+        		CareTeamsContainingPractitionerRoleGroupESR group = (CareTeamsContainingPractitionerRoleGroupESR)groupOutcome.getEntry();
+        		group.addNewGroupMember(new ParticipantRoleCareTeam(newCareTeam.getSimplifiedID(), participant.getParticipantType()));
+		        groupBroker.updateGroup(group);
+	        } else {
+	  	        groupBroker.createGroupDE(careTeamsForPractitionerRoleSet);       		
+	    	}
         }
         
         return(outcome);
     }
 
     
- 
     @Override
-    protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry)  {
+    protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
+    	getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
+    	
+        CareTeamESR careTeamESR = (CareTeamESR) entry;
+    	
+    	ESRMethodOutcome groupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"), false);
+      
+    	if(groupGetOutcome.isSearch()){
+          if (!groupGetOutcome.getSearchResult().isEmpty()) {
+              getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
+              PractitionerRolesInCareTeamGroupESR careTeamGroupESR = (PractitionerRolesInCareTeamGroupESR) groupGetOutcome.getSearchResult().get(0);
+              careTeamESR.setParticipants(careTeamGroupESR.getGroupMembership());
+          }
+      } else {
+          if (groupGetOutcome.getEntry() != null) {
+              getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
+              PractitionerRolesInCareTeamGroupESR careTeamGroupESR = (PractitionerRolesInCareTeamGroupESR) groupGetOutcome.getEntry();
+              careTeamESR.setParticipants(careTeamGroupESR.getGroupMembership());
+          }
+      }
+      getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
 
     }
 
-	/**
+    
+    /**
 	 * Update/create a care team.
 	 * 
 	 * @param entry
@@ -121,18 +182,19 @@ public class CareTeamESRBroker extends ESRBroker {
 	    	// If the care team was updated/created then update the practitioner role records within the care team.
 	    	if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL) || outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
 	       
-	    		// Remove the care team from all the practitioner role records who were in the care team.
-	    		for (ParticipantESDT participant : existing.getParticipants()) {
-	    			PractitionerRoleESR practitionerRole = (PractitionerRoleESR) practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
-	    			practitionerRole.removeCareTeam(entry.getSimplifiedID());	
-	    			practitionerRoleBroker.updatePractitionerRole(practitionerRole);
-	    		}
-		        
-	    		// Add the care team to the new list of practitioner role records.
-	    		for (ParticipantESDT participant : entry.getParticipants()) {
-	    			PractitionerRoleESR practitionerRole = (PractitionerRoleESR) practitionerRoleBroker.getResource(participant.getSimplifiedId().toLowerCase()).getEntry();
-	    			practitionerRole.addCareTeam(new PractitionerRoleCareTeam(entry.getSimplifiedID(), participant.getParticipantType()));
-		        	practitionerRoleBroker.updatePractitionerRole(practitionerRole);
+	    		ESRMethodOutcome practitionerRolesInCareTeamGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"));
+	    		
+	    		boolean searchCompleted = practitionerRolesInCareTeamGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+	    		boolean searchFoundOneResultOnly = practitionerRolesInCareTeamGroupGetOutcome.getSearchResult().size() == 1;
+	    		
+	    		if(searchCompleted && searchFoundOneResultOnly && practitionerRolesInCareTeamGroupGetOutcome.isSearchSuccessful()){
+	    			getLogger().info(".updateCareTeam(): updating the associated group");
+	    		    
+	    			PractitionerRolesInCareTeamGroupESR practitionerRolesInCareTeamsGroup = (PractitionerRolesInCareTeamGroupESR)practitionerRolesInCareTeamGroupGetOutcome.getSearchResult().get(0);
+	    		    practitionerRolesInCareTeamsGroup.setGroupMembership(entry.getParticipants());
+	    		    outcome = groupBroker.updateGroup(practitionerRolesInCareTeamsGroup);
+	    		} else {
+	    		    getLogger().info(".updateCareTeam(): Update processed failed for the superclass PegacornDirectoryEntry, reason --> {}", outcome.getStatusReason());
 	    		}
 	    	}
 	        

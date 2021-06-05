@@ -22,27 +22,45 @@
 package net.fhirfactory.buildingblocks.esr.models.resources.datatypes;
 
 public enum SystemManagedGroupTypesEnum {
-    PRACTITIONEROLE_MAP_PRACTITIONER_GROUP("SystemManaged-PractitionerRoleMap-PractitionerGroup"),
-    PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP("SystemManaged-PractitionerRoleMap-PractitionerRoleGroup"),
-    GENERAL("SystemManaged-GeneralGroup");
+    PRACTITIONERS_FULFILLING_PRACTITIONER_ROLE_GROUP("SystemManaged-PractitionerRoleMap-PractitionerGroup",""),
+    PRACTITONER_ROLES_FULFILLED_BY_PRACTITIONER_GROUP("SystemManaged-PractitionerRoleMap-PractitionerRoleGroup",""),
+    GENERAL("SystemManaged-GeneralGroup",""),
+	CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP("SystemManaged-CareTeams-containing-PractitionerRole-Group","CareTeams-containing-PractitionerRole-"),
+	PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP("SystemManaged-PractitionerRoles_in_CareTeam-Group","PractitionerRoles-in-Care-Team-");
 
     private String typeCode;
+    private String groupPrefix;
 
-    private SystemManagedGroupTypesEnum(String typeValue){
+    private SystemManagedGroupTypesEnum(String typeValue, String groupPrefix){
         this.typeCode = typeValue;
+        this.groupPrefix = groupPrefix;
     }
 
     public String getTypeCode(){
         return(typeCode);
     }
+    
+    public String getGroupPrefix() {
+    	return groupPrefix;
+    }
 
     public static SystemManagedGroupTypesEnum fromTypeCode(String code){
         if(code.contentEquals("SystemManaged-PractitionerRoleMap-PractitionerGroup")){
-            return(SystemManagedGroupTypesEnum.PRACTITIONEROLE_MAP_PRACTITIONER_GROUP);
+            return(SystemManagedGroupTypesEnum.PRACTITIONERS_FULFILLING_PRACTITIONER_ROLE_GROUP);
         }
+        
         if(code.contentEquals("SystemManaged-PractitionerRoleMap-PractitionerRoleGroup")){
-            return(SystemManagedGroupTypesEnum.PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP);
+            return(SystemManagedGroupTypesEnum.PRACTITONER_ROLES_FULFILLED_BY_PRACTITIONER_GROUP);
         }
+        
+        if(code.contentEquals("SystemManaged-CareTeams-containing-PractitionerRole-Group")){
+            return(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP);
+        }
+        
+        if(code.contentEquals("SystemManaged-PractitionerRoles_in_CareTeam-Group")){
+            return(SystemManagedGroupTypesEnum.PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP);
+        }
+        
         return(GENERAL);
     }
 }

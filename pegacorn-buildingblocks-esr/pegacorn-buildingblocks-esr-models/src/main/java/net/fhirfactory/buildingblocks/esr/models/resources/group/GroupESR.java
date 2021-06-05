@@ -19,38 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.buildingblocks.esr.models.resources;
+package net.fhirfactory.buildingblocks.esr.models.resources.group;
 
 import java.util.Comparator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+/**
+ * Base class for all group ESR's
+ * 
+ * @author Brendan Douglas
+ *
+ */
+public abstract class GroupESR extends ExtremelySimplifiedResource {
 
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
-
-public class GroupESR extends ExtremelySimplifiedResource {
-    private static final Logger LOG = LoggerFactory.getLogger(GroupESR.class);
-    @Override
-    protected Logger getLogger(){return(LOG);}
-
-    private String groupManager;
+    protected String groupManager;
     
-    @JsonIgnore
-    private RoleHistory roleHistory;
-    
-    private String groupType;
+    protected String groupType;
 
     public GroupESR(){
         super();
-        this.roleHistory = new RoleHistory();
     }
 
-    public List<String>getGroupMembership() {
-    	return roleHistory.getAllCurrentRolesAsString();
-    }
+    public abstract List<?>getGroupMembership();
     
     public String getGroupManager() {
         return groupManager;
@@ -59,15 +51,6 @@ public class GroupESR extends ExtremelySimplifiedResource {
     public void setGroupManager(String groupManager) {
         this.groupManager = groupManager;
     }
-
-    public RoleHistory getRoleHistory() {
-        return roleHistory;
-    }
-
-    public void setRoleHistory(RoleHistory roleHistory) {
-        this.roleHistory = roleHistory;
-    }
-
     
     public String getGroupType() {
         return groupType;

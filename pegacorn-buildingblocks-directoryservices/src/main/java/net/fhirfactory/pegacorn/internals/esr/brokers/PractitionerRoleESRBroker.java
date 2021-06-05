@@ -28,16 +28,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionersFulfillingPractitionerRolesGroupESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
@@ -51,9 +49,6 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     @Inject
     private PractitionerRoleESRCache practitionerRoleCache;
     
-    @Inject
-    private CareTeamESRBroker careTeamBroker;
-
     @Inject
     private GroupESRBroker groupBroker;
 
@@ -86,14 +81,33 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     public ESRMethodOutcome createPractitionerRole(PractitionerRoleESR directoryEntry){
         getLogger().info(".createPractitionerRole(): Entry, directoryEntry --> {}", directoryEntry);
         ESRMethodOutcome outcome = practitionerRoleCache.addPractitionerRole(directoryEntry);
-        GroupESR activePractitionerSet = new GroupESR();
+        PractitionersFulfillingPractitionerRolesGroupESR activePractitionerSet = new PractitionersFulfillingPractitionerRolesGroupESR();
         activePractitionerSet.setGroupManager(directoryEntry.getSimplifiedID());
         activePractitionerSet.setSystemManaged(true);
-        activePractitionerSet.setGroupType(SystemManagedGroupTypesEnum.PRACTITIONEROLE_MAP_PRACTITIONER_GROUP.getTypeCode());
+        activePractitionerSet.setGroupType(SystemManagedGroupTypesEnum.PRACTITIONERS_FULFILLING_PRACTITIONER_ROLE_GROUP.getTypeCode());
         activePractitionerSet.setDisplayName("Practitioners-Fulfilling-PractitionerRole-"+directoryEntry.getIdentifierWithType("ShortName").getValue());
         activePractitionerSet.getIdentifiers().add(directoryEntry.getIdentifierWithType("ShortName"));
         ESRMethodOutcome groupCreateOutcome = groupBroker.createGroupDE(activePractitionerSet);
+        
+        
+        // Create a care teams group
+        CareTeamsContainingPractitionerRoleGroupESR careTeamsForPractitionerRoleSet = new CareTeamsContainingPractitionerRoleGroupESR();
+        careTeamsForPractitionerRoleSet.setGroupManager(directoryEntry.getSimplifiedID());
+        careTeamsForPractitionerRoleSet.setGroupType(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getTypeCode());
+        careTeamsForPractitionerRoleSet.setSystemManaged(true);
+        
+        IdentifierESDT identifier = new IdentifierESDT();
+        identifier.setUse(IdentifierESDTUseEnum.USUAL);
+        identifier.setType("ShortName");
+        identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + directoryEntry.getSimplifiedID());
+        careTeamsForPractitionerRoleSet.getIdentifiers().add(identifier);   
+        careTeamsForPractitionerRoleSet.setDisplayName(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + directoryEntry.getSimplifiedID());
+        
+  	    groupBroker.createGroupDE(careTeamsForPractitionerRoleSet);       		
+        
+
         getLogger().info(".createPractitionerRole(): Exit");
+        
         return(outcome);
     }
 
@@ -106,20 +120,48 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
         PractitionerRoleESR practitionerRoleESR = (PractitionerRoleESR) entry;
-        ESRMethodOutcome groupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"), false);
-        if(groupGetOutcome.isSearch()) {
-            if (!groupGetOutcome.getSearchResult().isEmpty()) {
+      
+        ESRMethodOutcome practitionerMembershipGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"), false);
+        if(practitionerMembershipGroupGetOutcome.isSearch()) {
+            if (!practitionerMembershipGroupGetOutcome.getSearchResult().isEmpty()) {
+            	PractitionersFulfillingPractitionerRolesGroupESR groupESR = (PractitionersFulfillingPractitionerRolesGroupESR) practitionerMembershipGroupGetOutcome.getSearchResult().get(0);
+     
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
-                GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
-                practitionerRoleESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
+              
+                practitionerRoleESR.setActivePractitionerSet(groupESR.getGroupMembership());
             }
         } else {
-            if (groupGetOutcome.getEntry() != null) {
+            if (practitionerMembershipGroupGetOutcome.getEntry() != null) {
+            	PractitionersFulfillingPractitionerRolesGroupESR groupESR = (PractitionersFulfillingPractitionerRolesGroupESR) practitionerMembershipGroupGetOutcome.getEntry();
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
-                GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
-                practitionerRoleESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
+              
+                practitionerRoleESR.setActivePractitionerSet(groupESR.getGroupMembership());
             }
         }
+
+        
+        IdentifierESDT identifier = new IdentifierESDT();
+       	identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + entry.getIdentifierWithType("ShortName").getValue());
+       	identifier.setUse(IdentifierESDTUseEnum.USUAL);
+       	identifier.setLeafValue(identifier.getValue());
+        
+       
+       	ESRMethodOutcome careTeamsForPractitionerRoleGroup = groupBroker.searchForDirectoryEntryUsingIdentifier(identifier, false);
+        if(careTeamsForPractitionerRoleGroup.isSearch()) {
+            if (!careTeamsForPractitionerRoleGroup.getSearchResult().isEmpty()) {
+            	CareTeamsContainingPractitionerRoleGroupESR groupESR = (CareTeamsContainingPractitionerRoleGroupESR) careTeamsForPractitionerRoleGroup.getSearchResult().get(0);
+        	
+            	practitionerRoleESR.setCareTeams(groupESR.getGroupMembership());
+            }
+        } else {
+            if (careTeamsForPractitionerRoleGroup.getEntry() != null) {
+            	CareTeamsContainingPractitionerRoleGroupESR groupESR = (CareTeamsContainingPractitionerRoleGroupESR) careTeamsForPractitionerRoleGroup.getEntry();
+        	
+            	practitionerRoleESR.setCareTeams(groupESR.getGroupMembership());
+            }
+        }
+        
+        
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
     }
 
@@ -153,16 +195,37 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             outcome.setEntry(entry);
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE);
         }
+        
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL) ||outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
             getLogger().info(".updatePractitioner(): Entry itself is updated, so updating its associated fulfilledPractitionerRole details");
+          
+            
             ESRMethodOutcome practitionersGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"));
             boolean searchCompleted = practitionersGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
             boolean searchFoundSomething = practitionersGroupGetOutcome.getSearchResult().size() == 1;
+            
             if(searchCompleted && searchFoundSomething){
                 getLogger().info(".updatePractitioner(): updating the associated group");
-                GroupESR practitionerRolesGroup = (GroupESR)practitionersGroupGetOutcome.getSearchResult().get(0);
-                practitionerRolesGroup.setRoleHistory(entry.getRoleHistory());
-                groupBroker.updateGroup(practitionerRolesGroup);
+                PractitionersFulfillingPractitionerRolesGroupESR practitionerRolesGroup = (PractitionersFulfillingPractitionerRolesGroupESR)practitionersGroupGetOutcome.getSearchResult().get(0);
+                practitionerRolesGroup.setGroupMembership(entry.getActivePractitionerSet());
+                groupBroker.updateGroup(practitionerRolesGroup);    
+            }
+
+            
+            IdentifierESDT identifier = new IdentifierESDT();
+	        identifier.setUse(IdentifierESDTUseEnum.USUAL);
+	        identifier.setType("ShortName");
+	        identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + entry.getSimplifiedID());
+
+            ESRMethodOutcome careTeamssGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(identifier);
+            searchCompleted = careTeamssGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
+            searchFoundSomething = careTeamssGroupGetOutcome.getSearchResult().size() == 1;
+        
+            if(searchCompleted && searchFoundSomething){
+                getLogger().info(".updatePractitioner(): updating the associated group");
+                CareTeamsContainingPractitionerRoleGroupESR careTeamRolesGroup = (CareTeamsContainingPractitionerRoleGroupESR)careTeamssGroupGetOutcome.getSearchResult().get(0);
+                careTeamRolesGroup.setGroupMembership(entry.getCareTeams());
+                groupBroker.updateGroup(careTeamRolesGroup);    
             }
         }
         LOG.info(".updatePractitionerRole(): Exit");
@@ -192,26 +255,9 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     	
     	PractitionerRoleESR practitionerRole = (PractitionerRoleESR) this.getResource(simplifiedId.toLowerCase()).getEntry();
     	
-		practitionerRole.setCareTeams(newCareTeams.getCareTeams());
-		updatePractitionerRole(practitionerRole);
+    	practitionerRole.setCareTeams(newCareTeams.getCareTeams());
+    	updatePractitionerRole(practitionerRole);
     	
-    	// Remove the practitioner role from associated care team record.
-    	for (PractitionerRoleCareTeam practitionerRoleCareTeam : practitionerRole.getCareTeams()) {
-    		CareTeamESR careTeam = (CareTeamESR)careTeamBroker.getResource(practitionerRoleCareTeam.getName().toLowerCase()).getEntry();
-    		careTeam.removeParticipant(practitionerRole.getSimplifiedID());
-    		
-    		careTeamBroker.updateCareTeam(careTeam);
-    	}
-    	
-    	
-    	// Add the practitioner role to the associated care team rexord.
-    	for (PractitionerRoleCareTeam practitionerRoleCareTeam : newCareTeams.getCareTeams()) {
-    		CareTeamESR careTeam = (CareTeamESR)careTeamBroker.getResource(practitionerRoleCareTeam.getName().toLowerCase()).getEntry();
-    		careTeam.addParticipant(new ParticipantESDT(simplifiedId, practitionerRoleCareTeam.getRole()));
-    		
-    		careTeamBroker.updateCareTeam(careTeam);
-    	}
-
     	ESRMethodOutcome outcome = new ESRMethodOutcome();
     	outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
     	

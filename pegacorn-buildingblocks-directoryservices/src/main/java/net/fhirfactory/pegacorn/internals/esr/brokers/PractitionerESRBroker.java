@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.MatrixRoomESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
@@ -42,13 +41,13 @@ import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierE
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesFulfilledByPractitionerGroupESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 
 @ApplicationScoped
 public class PractitionerESRBroker extends ESRBroker {
@@ -101,13 +100,15 @@ public class PractitionerESRBroker extends ESRBroker {
     public ESRMethodOutcome createPractitionerDE(PractitionerESR entry){
         getLogger().info(".createPractitioner(): Entry");
         ESRMethodOutcome outcome = practitionerCache.addPractitioner(entry);
-        GroupESR activePractitionerSet = new GroupESR();
+        
+        PractitionerRolesFulfilledByPractitionerGroupESR activePractitionerSet = new PractitionerRolesFulfilledByPractitionerGroupESR();
         activePractitionerSet.setGroupManager(entry.getSimplifiedID());
-        activePractitionerSet.setGroupType(SystemManagedGroupTypesEnum.PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP.getTypeCode());
+        activePractitionerSet.setGroupType(SystemManagedGroupTypesEnum.PRACTITONER_ROLES_FULFILLED_BY_PRACTITIONER_GROUP.getTypeCode());
         activePractitionerSet.setSystemManaged(true);
         activePractitionerSet.setDisplayName("PractitionerRoles-Fulfilled-by-Practitioner-"+entry.getIdentifierWithType("EmailAddress").getValue());
         activePractitionerSet.getIdentifiers().add(entry.getIdentifierWithType("EmailAddress"));
         ESRMethodOutcome groupCreateOutcome = groupBroker.createGroupDE(activePractitionerSet);
+        
         createSystemManagedMatrixRooms(entry);
         getLogger().info(".createPractitioner(): Exit");
         return(outcome);
@@ -125,7 +126,7 @@ public class PractitionerESRBroker extends ESRBroker {
         if(groupGetOutcome.isSearch()){
             if (!groupGetOutcome.getSearchResult().isEmpty()) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
-                GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
+                PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR) groupGetOutcome.getSearchResult().get(0);
                 practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
                 
                 populatedRoleCategoryId(practitionerESR);
@@ -133,7 +134,7 @@ public class PractitionerESRBroker extends ESRBroker {
         } else {
             if (groupGetOutcome.getEntry() != null) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
-                GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
+                PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR) groupGetOutcome.getEntry();
                 practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
                 
                 populatedRoleCategoryId(practitionerESR);
@@ -173,7 +174,7 @@ public class PractitionerESRBroker extends ESRBroker {
             boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
             if(searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()){
                 getLogger().info(".updatePractitioner(): updating the associated group");
-                GroupESR practitionerRolesGroup = (GroupESR)practitionerRolesGroupGetOutcome.getSearchResult().get(0);
+                PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR)practitionerRolesGroupGetOutcome.getSearchResult().get(0);
                 practitionerRolesGroup.setRoleHistory(entry.getRoleHistory());
                 ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
             }
@@ -195,7 +196,7 @@ public class PractitionerESRBroker extends ESRBroker {
             boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
             if (searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()) {
                 getLogger().trace(".updatePractitionerRoles(): updating the associated group");
-                GroupESR practitionerRolesGroup = (GroupESR) practitionerRolesGroupGetOutcome.getSearchResult().get(0);
+                PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR) practitionerRolesGroupGetOutcome.getSearchResult().get(0);
                 
                 practitionerRolesGroup.getRoleHistory().update(updatePractitionerRoles.getPractitionerRoles());
                 

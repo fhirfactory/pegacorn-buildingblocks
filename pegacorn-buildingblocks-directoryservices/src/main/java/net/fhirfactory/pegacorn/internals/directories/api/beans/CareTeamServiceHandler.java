@@ -47,6 +47,7 @@ public class CareTeamServiceHandler extends HandlerBase {
         LOG.info(".update(): Entry, inputBody --> {}", entryToUpdate);
         CareTeamESR entry = entryToUpdate;
         LOG.info(".update(): Requesting update from the Directory Resource Broker");
+       
         ESRMethodOutcome outcome = resourceBroker.updateCareTeam(entry);
         LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
         
