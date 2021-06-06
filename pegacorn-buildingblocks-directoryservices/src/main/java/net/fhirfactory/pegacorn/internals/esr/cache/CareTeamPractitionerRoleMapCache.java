@@ -44,7 +44,7 @@ public class CareTeamPractitionerRoleMapCache {
     	addCareTeamIfAbsent(careTeamRecordId);
     	List<ParticipantESDT> practitionerRoles = practitionerRolesInCareTeamMap.get(careTeamRecordId);
     	
-	    ParticipantESDT newPractitionerRole = new ParticipantESDT(practitionerRole.getSimplifiedId(), practitionerRole.getParticipantType());
+	    ParticipantESDT newPractitionerRole = new ParticipantESDT(practitionerRole.getSimplifiedID(), practitionerRole.getParticipantType());
 	    
 	    if (!practitionerRoles.contains(newPractitionerRole)) {
 	    	practitionerRoles.add(newPractitionerRole);
@@ -52,8 +52,8 @@ public class CareTeamPractitionerRoleMapCache {
    	 	
    	 	
    	 	// Now add the care team to the practitioner role
-   	 	addPractitionerRoleIfAbsent(practitionerRole.getSimplifiedId());
-		List<ParticipantRoleCareTeam> careTeams = careTeamsContainingPractitionerRoleMap.get(practitionerRole.getSimplifiedId());
+   	 	addPractitionerRoleIfAbsent(practitionerRole.getSimplifiedID());
+		List<ParticipantRoleCareTeam> careTeams = careTeamsContainingPractitionerRoleMap.get(practitionerRole.getSimplifiedID());
 		
 		ParticipantRoleCareTeam newCareTeam = new ParticipantRoleCareTeam(careTeamRecordId, practitionerRole.getParticipantType());
 		
@@ -141,7 +141,7 @@ public class CareTeamPractitionerRoleMapCache {
    	 	List<ParticipantESDT>newPractitionerRoleList = new ArrayList<>();
 	 	
 	 	for (ParticipantESDT practitionerRole : practitionerRoles) {
-	 		if (!practitionerRole.getSimplifiedId().equals(groupManager)) {
+	 		if (!practitionerRole.getSimplifiedID().equals(groupManager)) {
 	 			newPractitionerRoleList.add(practitionerRole);
 	 		}
 	 	}
@@ -210,7 +210,7 @@ public class CareTeamPractitionerRoleMapCache {
    	 	List<ParticipantESDT>newPractitionerRoleList = new ArrayList<>();
    	 	
    	 	for (ParticipantESDT practitionerRole : practitionerRoles) {
-   	 		if (!practitionerRole.getSimplifiedId().equals(practitionerRoleToRemove.getSimplifiedId())) {
+   	 		if (!practitionerRole.getSimplifiedID().equals(practitionerRoleToRemove.getSimplifiedID())) {
    	 			newPractitionerRoleList.add(practitionerRole);
    	 		}
    	 	}	
@@ -218,7 +218,7 @@ public class CareTeamPractitionerRoleMapCache {
    	 	practitionerRolesInCareTeamMap.replace(groupManager, newPractitionerRoleList);
 
    	 	// Now remove the care team from the practitioner.
-		List<ParticipantRoleCareTeam> careTeams = careTeamsContainingPractitionerRoleMap.get(practitionerRoleToRemove.getSimplifiedId());
+		List<ParticipantRoleCareTeam> careTeams = careTeamsContainingPractitionerRoleMap.get(practitionerRoleToRemove.getSimplifiedID());
 		
 		List<ParticipantRoleCareTeam>newCareTeamList = new ArrayList<>();
 		
@@ -228,6 +228,6 @@ public class CareTeamPractitionerRoleMapCache {
 			}
 		}
 		
-		careTeamsContainingPractitionerRoleMap.replace(practitionerRoleToRemove.getSimplifiedId(), newCareTeamList);
+		careTeamsContainingPractitionerRoleMap.replace(practitionerRoleToRemove.getSimplifiedID(), newCareTeamList);
 	}
 }

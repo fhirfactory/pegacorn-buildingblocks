@@ -65,6 +65,8 @@ public class CareTeamsContainingPractitionerRoleGroupESR extends GroupESR {
 
     
     public void addNewGroupMember(ParticipantRoleCareTeam newGroupMember) {
-		this.groupMembership.add(newGroupMember);
+    	if (!groupMembership.contains(newGroupMember)) {
+    		this.groupMembership.add(newGroupMember);
+    	}
 	}
 }

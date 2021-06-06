@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
@@ -55,6 +56,9 @@ public class CareTeamESRBroker extends ESRBroker {
     
     @Inject
     private GroupESRBroker groupBroker;
+    
+    @Inject
+    private PractitionerRoleESRBroker practitionerRoleBroker;
     
 
     @Override
@@ -89,7 +93,21 @@ public class CareTeamESRBroker extends ESRBroker {
     	// The new care team might contain practitioner role membership so remove it from here and add it to the group.  The PractitionerRoleESR will get it from the group.
         PractitionerRolesInCareTeamGroupESR practionerRolesInCareTeamSet = new PractitionerRolesInCareTeamGroupESR();
         for (ParticipantESDT participant : newCareTeam.getParticipants()) {
-        	practionerRolesInCareTeamSet.addNewGroupMember(new ParticipantESDT(participant.getSimplifiedId(), participant.getParticipantType()));
+	     
+        	// We need to make sure any practitioner role in the care team exists.  This is unlikely to occur but good to check.
+        	IdentifierESDT practitionerRoleIdentifier = new IdentifierESDT();
+	        practitionerRoleIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
+	        practitionerRoleIdentifier.setType("ShortName");
+	        practitionerRoleIdentifier.setValue(participant.getSimplifiedID());
+        	
+        	ESRMethodOutcome outcome = practitionerRoleBroker.searchForDirectoryEntryUsingIdentifier(practitionerRoleIdentifier);
+        	
+        	 if (outcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY)) {
+ 	        	PractitionerRoleESR existingPractitionerRole = (PractitionerRoleESR)outcome.getEntry();
+        	  	practionerRolesInCareTeamSet.addNewGroupMember(new ParticipantESDT(existingPractitionerRole.getSimplifiedID(), participant.getParticipantType()));
+        	 } else {
+ 	        	getLogger().warn("Practitioner record not found for simplifiedId: {}", practitionerRoleIdentifier);
+ 	        }
         }
     	
         newCareTeam.setParticipants(new ArrayList<>());
@@ -106,20 +124,23 @@ public class CareTeamESRBroker extends ESRBroker {
 
         
         // Create/update practitioner role groups with the care teams as the members.
-        for (ParticipantESDT participant : newCareTeam.getParticipants()) {        	
+        for (ParticipantESDT participant : practionerRolesInCareTeamSet.getGroupMembership()) {    
+	       
+        	participant.setSimplifiedID(participant.getSimplifiedID());
+   	
 	        CareTeamsContainingPractitionerRoleGroupESR careTeamsForPractitionerRoleSet = new CareTeamsContainingPractitionerRoleGroupESR();
-	        careTeamsForPractitionerRoleSet.setGroupManager(participant.getSimplifiedId());
+	        careTeamsForPractitionerRoleSet.setGroupManager(participant.getSimplifiedID());
 	        careTeamsForPractitionerRoleSet.setGroupType(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getTypeCode());
 	        careTeamsForPractitionerRoleSet.setSystemManaged(true);
 	        
 	        IdentifierESDT identifier = new IdentifierESDT();
 	        identifier.setUse(IdentifierESDTUseEnum.USUAL);
 	        identifier.setType("ShortName");
-	        identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + participant.getSimplifiedId());
+	        identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + participant.getSimplifiedID());
 	        
 	        careTeamsForPractitionerRoleSet.getIdentifiers().add(identifier);   
-	        careTeamsForPractitionerRoleSet.setDisplayName(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + participant.getSimplifiedId());
-	        careTeamsForPractitionerRoleSet.addNewGroupMember(new ParticipantRoleCareTeam(newCareTeam.getSimplifiedID(), participant.getParticipantType()));
+	        careTeamsForPractitionerRoleSet.setDisplayName(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + participant.getSimplifiedID());
+	        careTeamsForPractitionerRoleSet.addNewGroupMember(new ParticipantRoleCareTeam(participant.getSimplifiedID(), participant.getParticipantType()));
 	        
 	        
 	        // Create or update group.

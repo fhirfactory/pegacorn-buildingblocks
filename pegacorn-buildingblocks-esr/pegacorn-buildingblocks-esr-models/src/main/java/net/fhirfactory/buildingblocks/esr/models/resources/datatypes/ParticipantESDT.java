@@ -7,22 +7,22 @@ package net.fhirfactory.buildingblocks.esr.models.resources.datatypes;
  *
  */
 public class ParticipantESDT {
-	private String simplifiedId;
+	private String simplifiedID;
 	private ParticipantTypeEnum participantType;
 	
 	public ParticipantESDT() {}
 	
 	public ParticipantESDT(String simplifiedId,ParticipantTypeEnum participantType) {
-		this.simplifiedId = simplifiedId;
+		this.simplifiedID = simplifiedId;
 		this.participantType = participantType;
 	}
 
-	public String getSimplifiedId() {
-		return simplifiedId;
+	public String getSimplifiedID() {
+		return simplifiedID;
 	}
 
-	public void setSimplifiedId(String simplifiedId) {
-		this.simplifiedId = simplifiedId;
+	public void setSimplifiedID(String simplifiedID) {
+		this.simplifiedID = simplifiedID;
 	}
 
 	public ParticipantTypeEnum getParticipantType() {
@@ -42,7 +42,7 @@ public class ParticipantESDT {
 		
 		ParticipantESDT other = (ParticipantESDT)obj;
 		
-		if (!simplifiedId.equals(other.getSimplifiedId())) {
+		if (!simplifiedID.equals(other.getSimplifiedID())) {
 			return false;
 		}
 		
