@@ -136,9 +136,7 @@ public abstract class ESRSearchResult {
          		
          		if (match) {
          			filteredList.add(resource);
-         			
-         			getLogger().info("brendan match.  here");
-         			
+         			        			
          			break; // We only need a match on a single filter for the record to be included.  it is an OR, not an AND.
          		}
          	}
