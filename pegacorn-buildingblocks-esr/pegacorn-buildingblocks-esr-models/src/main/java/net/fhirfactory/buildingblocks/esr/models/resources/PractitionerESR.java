@@ -58,6 +58,7 @@ public class PractitionerESR extends PersonESR {
     private PractitionerStatusESDT practitionerStatus;
     private String dateTimeLastRoleSelected; // leave this here even though not used.  If removed a practitioner search result will not be returned.  It is required because of the getter.
     private String matrixId;
+    private String mainJobTitle;
     
     public PractitionerESR(){
         super();
@@ -137,7 +138,17 @@ public class PractitionerESR extends PersonESR {
 	}
 
     
-    public String getMatrixId() {
+    public String getMainJobTitle() {
+		return mainJobTitle;
+	}
+
+
+	public void setMainJobTitle(String mainJobTitle) {
+		this.mainJobTitle = mainJobTitle;
+	}
+
+
+	public String getMatrixId() {
     	//TODO this is just for mimic until the microservices is connected to the Synapse server.
     	
     	String emailAddress = this.getSimplifiedID();
