@@ -130,7 +130,7 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
                 return(result);
             }
             case "longname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.SECONDARY);
                 return(result);
             }
             case "displayname": {
@@ -165,7 +165,7 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
                 return(result);
             }
             case "allname" : {
-            	result = this.searchCacheUsingAllNames(searchCriteria);
+            	result = this.searchCacheUsingAllNames(searchCriteria, IdentifierESDTUseEnum.USUAL, IdentifierESDTUseEnum.SECONDARY);
             	return result;
             }
             default: {
@@ -239,4 +239,7 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
         }
         return(result);
     }
+    
+    
+    
 }

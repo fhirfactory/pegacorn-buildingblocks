@@ -109,7 +109,7 @@ public class MatrixRoomESRCache extends PegacornESRCache {
                 return(result);
             }
             case "allname" : {
-            	result = this.searchCacheUsingAllNames(searchCriteria);
+            	result = this.searchCacheUsingAllNames(searchCriteria, IdentifierESDTUseEnum.USUAL, IdentifierESDTUseEnum.USUAL);
             	return result;
             }
             default: {

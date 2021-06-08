@@ -122,7 +122,7 @@ public class LocationESRCache extends PegacornESRCache {
                 return(result);
             }
             case "longname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.OFFICIAL);
                 return(result);
             }
             case "displayname": {
@@ -130,7 +130,7 @@ public class LocationESRCache extends PegacornESRCache {
                 return(result);
             }
             case "allname" : {
-            	result = this.searchCacheUsingAllNames(searchCriteria);
+            	result = this.searchCacheUsingAllNames(searchCriteria, IdentifierESDTUseEnum.USUAL, IdentifierESDTUseEnum.OFFICIAL);
             	return result;
             }
             default: {
