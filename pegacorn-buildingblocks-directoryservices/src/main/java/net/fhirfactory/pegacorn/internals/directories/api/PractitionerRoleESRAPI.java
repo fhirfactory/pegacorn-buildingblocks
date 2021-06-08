@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerRoleServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
 
@@ -105,10 +104,10 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
     		        .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
     		        .to("direct:" + getESRName() + "ListGET")
         
-        .put("/{simplifiedID}/CareTeams").type(PractitionerRoleCareTeamListESDT.class)
+        .put("/{simplifiedID}/CareTeams").type(String.class)
         	.to("direct:"+getESRName()+"PractitionerRoleCareTeamsPUT")
         
-        .get("/{simplifiedID}/CareTeams").outType(PractitionerRoleCareTeamListESDT.class)
+        .get("/{simplifiedID}/CareTeams").outType(String.class)
      		.to("direct:" + getESRName() + "PractitionerRolesCareTeamsGET");
 
 

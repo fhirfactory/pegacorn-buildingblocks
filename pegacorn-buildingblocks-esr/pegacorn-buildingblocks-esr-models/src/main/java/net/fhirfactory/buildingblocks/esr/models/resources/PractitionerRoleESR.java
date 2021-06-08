@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantRoleCareTeam;
 
 public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleESR.class);
@@ -44,7 +43,7 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private ArrayList<ContactPointESDT> contactPoints;
     private List<String>activePractitionerSet;
     
-    private List<ParticipantRoleCareTeam> careTeams;
+    private List<String> careTeams;
 
     public PractitionerRoleESR(){
         this.contactPoints = new ArrayList<>();
@@ -150,11 +149,11 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     };
     
     
-    public List<ParticipantRoleCareTeam> getCareTeams() {
+    public List<String> getCareTeams() {
 		return careTeams;
 	}
 
-	public void setCareTeams(List<ParticipantRoleCareTeam> careTeams) {
+	public void setCareTeams(List<String> careTeams) {
 		this.careTeams = careTeams;
 	}
 

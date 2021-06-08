@@ -36,7 +36,6 @@ import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesInCareTeamGroupESR;
@@ -104,7 +103,7 @@ public class CareTeamESRBroker extends ESRBroker {
         	
         	 if (outcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY)) {
  	        	PractitionerRoleESR existingPractitionerRole = (PractitionerRoleESR)outcome.getEntry();
-        	  	practionerRolesInCareTeamSet.addNewGroupMember(new ParticipantESDT(existingPractitionerRole.getSimplifiedID(), participant.getParticipantType()));
+        	  	practionerRolesInCareTeamSet.addNewGroupMember(new ParticipantESDT(existingPractitionerRole.getSimplifiedID()));
         	 } else {
  	        	getLogger().warn("Practitioner record not found for simplifiedId: {}", practitionerRoleIdentifier);
  	        }
@@ -140,7 +139,7 @@ public class CareTeamESRBroker extends ESRBroker {
 	        
 	        careTeamsForPractitionerRoleSet.getIdentifiers().add(identifier);   
 	        careTeamsForPractitionerRoleSet.setDisplayName(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + participant.getSimplifiedID());
-	        careTeamsForPractitionerRoleSet.addNewGroupMember(new ParticipantRoleCareTeam(participant.getSimplifiedID(), participant.getParticipantType()));
+	        careTeamsForPractitionerRoleSet.addNewGroupMember(participant.getSimplifiedID());
 	        
 	        
 	        // Create or update group.
@@ -148,7 +147,7 @@ public class CareTeamESRBroker extends ESRBroker {
         	
         	if (!groupOutcome.getSearchResult().isEmpty()) {
         		CareTeamsContainingPractitionerRoleGroupESR group = (CareTeamsContainingPractitionerRoleGroupESR)groupOutcome.getEntry();
-        		group.addNewGroupMember(new ParticipantRoleCareTeam(newCareTeam.getSimplifiedID(), participant.getParticipantType()));
+        		group.addNewGroupMember(newCareTeam.getSimplifiedID());
 		        groupBroker.updateGroup(group);
 	        } else {
 	  	        groupBroker.createGroupDE(careTeamsForPractitionerRoleSet);       		

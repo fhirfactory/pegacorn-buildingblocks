@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -32,7 +34,6 @@ import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedRe
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionersFulfillingPractitionerRolesGroupESR;
@@ -250,12 +251,12 @@ public class PractitionerRoleESRBroker extends ESRBroker {
      * @return
      * @throws ResourceInvalidSearchException
      */
-    public ESRMethodOutcome updateCareTeams(String simplifiedId, PractitionerRoleCareTeamListESDT newCareTeams) throws ResourceInvalidSearchException {
+    public ESRMethodOutcome updateCareTeams(String simplifiedId, List<String> newCareTeams) throws ResourceInvalidSearchException {
         LOG.info(".getCareTeams(): Entry");
     	
     	PractitionerRoleESR practitionerRole = (PractitionerRoleESR) this.getResource(simplifiedId.toLowerCase()).getEntry();
     	
-    	practitionerRole.setCareTeams(newCareTeams.getCareTeams());
+    	practitionerRole.setCareTeams(newCareTeams);
     	updatePractitionerRole(practitionerRole);
     	
     	ESRMethodOutcome outcome = new ESRMethodOutcome();

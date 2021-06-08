@@ -27,8 +27,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantRoleCareTeam;
-
 /**
  * A group of care teams for a practitioner role.
  * 
@@ -38,7 +36,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.Participant
 public class CareTeamsContainingPractitionerRoleGroupESR extends GroupESR {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerRolesInCareTeamGroupESR.class);
     
-    private List<ParticipantRoleCareTeam>groupMembership;
+    private List<String>groupMembership;
     
     public CareTeamsContainingPractitionerRoleGroupESR() {
     	super();
@@ -53,18 +51,18 @@ public class CareTeamsContainingPractitionerRoleGroupESR extends GroupESR {
     }
 
     
-    public List<ParticipantRoleCareTeam>getGroupMembership() {
+    public List<String>getGroupMembership() {
     	return groupMembership;
     }
 
     
     
-    public void setGroupMembership(List<ParticipantRoleCareTeam>groupMembership) {
+    public void setGroupMembership(List<String>groupMembership) {
     	this.groupMembership = groupMembership;
     }
 
     
-    public void addNewGroupMember(ParticipantRoleCareTeam newGroupMember) {
+    public void addNewGroupMember(String newGroupMember) {
     	if (!groupMembership.contains(newGroupMember)) {
     		this.groupMembership.add(newGroupMember);
     	}

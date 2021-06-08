@@ -185,7 +185,7 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
      * @param newCareTeams
      * @throws ResourceInvalidSearchException
      */
-    public void updateCareTeams(@Header("simplifiedID") String id, PractitionerRoleCareTeamListESDT newCareTeams) throws ResourceInvalidSearchException {
+    public void updateCareTeams(@Header("simplifiedID") String id, List<String> newCareTeams) throws ResourceInvalidSearchException {
         getLogger().info(".updateCareTeams: Entry, pathValue --> {}", id);
         
     	practitionerRoleDirectoryResourceBroker.updateCareTeams(id, newCareTeams);
@@ -211,8 +211,8 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
         	PractitionerRoleESR practitionerRole = (PractitionerRoleESR)outcome.getEntry();
         	
         	PractitionerRoleCareTeamListESDT careTeams = new PractitionerRoleCareTeamListESDT();
-        	careTeams.setCareTeams(practitionerRole.getCareTeams());
-        	
+        	careTeams.setCareTeams( practitionerRole.getCareTeams());
+        	        	
             getLogger().info(".getCareTeams: Exit, pathValue --> {}", id);
         	
         	return careTeams;

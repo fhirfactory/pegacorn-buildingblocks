@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PractitionerRoleCareTeamListESDT {
-	List<ParticipantRoleCareTeam>careTeams;
+	List<String>careTeams;
 	
 	public PractitionerRoleCareTeamListESDT() {
 		this.careTeams = new ArrayList<>();
 	}
 
-	public List<ParticipantRoleCareTeam> getCareTeams() {
+	public List<String> getCareTeams() {
 		return careTeams;
 	}
 
-	public void setCareTeams(List<ParticipantRoleCareTeam> careTeams) {
+	public void setCareTeams(List<String> careTeams) {
 		this.careTeams = careTeams;
 	}
 }

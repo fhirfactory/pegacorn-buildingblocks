@@ -8,13 +8,11 @@ package net.fhirfactory.buildingblocks.esr.models.resources.datatypes;
  */
 public class ParticipantESDT {
 	private String simplifiedID;
-	private ParticipantTypeEnum participantType;
 	
 	public ParticipantESDT() {}
 	
-	public ParticipantESDT(String simplifiedId,ParticipantTypeEnum participantType) {
+	public ParticipantESDT(String simplifiedId) {
 		this.simplifiedID = simplifiedId;
-		this.participantType = participantType;
 	}
 
 	public String getSimplifiedID() {
@@ -25,14 +23,6 @@ public class ParticipantESDT {
 		this.simplifiedID = simplifiedID;
 	}
 
-	public ParticipantTypeEnum getParticipantType() {
-		return participantType;
-	}
-
-	public void setParticipantType(ParticipantTypeEnum participantType) {
-		this.participantType = participantType;
-	}
-	
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -43,10 +33,6 @@ public class ParticipantESDT {
 		ParticipantESDT other = (ParticipantESDT)obj;
 		
 		if (!simplifiedID.equals(other.getSimplifiedID())) {
-			return false;
-		}
-		
-		if (!participantType.name().equals(other.getParticipantType().name())) {
 			return false;
 		}
 		

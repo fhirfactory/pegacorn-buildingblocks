@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantRoleCareTeam;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
@@ -55,10 +54,10 @@ public class CareTeamFilter extends BaseFilter {
 				}
 			
 				// Compare the filter values against all the care teams the practitioner role is currently in.
-				for (ParticipantRoleCareTeam careTeam : practitionerRole.getCareTeams()) {
+				for (String careTeam : practitionerRole.getCareTeams()) {
 					for (String value : values) {
 						
-						if (value.equalsIgnoreCase(careTeam.getName())) {
+						if (value.equalsIgnoreCase(careTeam)) {
 							return true;
 						} 
 					}					
