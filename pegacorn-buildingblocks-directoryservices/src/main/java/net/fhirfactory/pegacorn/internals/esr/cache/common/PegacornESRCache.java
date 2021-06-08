@@ -1,6 +1,10 @@
 package net.fhirfactory.pegacorn.internals.esr.cache.common;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -415,7 +419,38 @@ public abstract class PegacornESRCache {
     }
     
     
-    public ESRSearchResult searchCacheUsingAllNames(SearchCriteria searchCriteria) {
-    	return null;
-    }
+    /**
+     * Search on shortname, longname, displayname and simplified id.
+     * 
+     * @param searchCriteria
+     * @return
+     * @throws ResourceInvalidSearchException
+     */
+    public ESRSearchResult searchCacheUsingAllNames(SearchCriteria searchCriteria, IdentifierESDTUseEnum shortNameUse, IdentifierESDTUseEnum longNameUse) throws ResourceInvalidSearchException {
+    	Set<String>matchedKeys = new TreeSet<>();
+  
+    	List<ExtremelySimplifiedResource>combinedESRSearchResultList = new ArrayList<>();
+    	
+    	// perform the individual searches
+    	List<ESRSearchResult>searchResults = new ArrayList<>();
+    	searchResults.add(this.searchCacheUsingSimplifiedID(searchCriteria));
+    	searchResults.add(searchCacheUsingDisplayName(searchCriteria));
+    	searchResults.add(searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", shortNameUse));
+    	searchResults.add(searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", longNameUse));
+    	
+    	
+    	// Add the unique records to the final list.
+    	for (ESRSearchResult searchResult : searchResults) {
+	    	for (ExtremelySimplifiedResource esr : searchResult.getSearchResultList()) {
+	    		if (matchedKeys.add(esr.getSimplifiedID())) {
+	    			combinedESRSearchResultList.add(esr);
+	    		}
+	    	}
+    	}
+
+    	ESRSearchResult result = instatiateNewESRSearchResult();
+    	result.setSearchResultList(combinedESRSearchResultList);
+    	
+    	return result;
+    }  
 }
