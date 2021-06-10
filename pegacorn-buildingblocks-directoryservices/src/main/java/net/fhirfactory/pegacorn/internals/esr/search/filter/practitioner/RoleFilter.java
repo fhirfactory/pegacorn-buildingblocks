@@ -33,7 +33,7 @@ public class RoleFilter extends BaseFilter {
 		PractitionerESR practitionerResource = (PractitionerESR)searchResult;
 		
 		for (String value : values) {
-			if (practitionerResource.hasCurrentRole(value)) {
+			if (practitionerResource.getRoleHistory().hasCurrentRole(value)) {
 				return true;
 			}
 		}

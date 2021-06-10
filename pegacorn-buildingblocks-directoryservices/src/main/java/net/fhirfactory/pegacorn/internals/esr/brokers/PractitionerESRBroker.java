@@ -34,11 +34,11 @@ import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedRe
 import net.fhirfactory.buildingblocks.esr.models.resources.MatrixRoomESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleCategoryESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesFulfilledByPractitionerGroupESR;
@@ -129,37 +129,32 @@ public class PractitionerESRBroker extends ESRBroker {
                 PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR) groupGetOutcome.getSearchResult().get(0);
                 practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
                 
-                populatedRoleCategoryId(practitionerESR);
+                practitionerESR.getCurrentPractitionerRoles().clear();
+                
+                for (RoleHistoryDetail roleHistoryDetail : practitionerRolesGroup.getRoleHistory().getAllCurrentRoles()) {
+                	PractitionerRoleESR practitionerRole = (PractitionerRoleESR)practitionerRoleBroker.getResource(roleHistoryDetail.getRole().toLowerCase(), false).getEntry();
+                	practitionerESR.addCurrentPractitionerRole(practitionerRole);
+                }
             }
         } else {
             if (groupGetOutcome.getEntry() != null) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
                 PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR) groupGetOutcome.getEntry();
-                practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory());
+                practitionerESR.setRoleHistory(practitionerRolesGroup.getRoleHistory()); 
                 
-                populatedRoleCategoryId(practitionerESR);
+                
+                practitionerESR.getCurrentPractitionerRoles().clear();
+                
+                for (RoleHistoryDetail roleHistoryDetail : practitionerRolesGroup.getRoleHistory().getAllCurrentRoles()) {
+                	PractitionerRoleESR practitionerRole = (PractitionerRoleESR)practitionerRoleBroker.getResource(roleHistoryDetail.getRole().toLowerCase(), false).getEntry();
+                	practitionerESR.addCurrentPractitionerRole(practitionerRole);
+                }
             }
         }
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
     }
     
     
-    
-    private void populatedRoleCategoryId( PractitionerESR practitionerESR) throws ResourceInvalidSearchException {
-        for (RoleHistoryDetail roleHistoryDetail : practitionerESR.getCurrentPractitionerRoles()) {
-			String role = roleHistoryDetail.getRole();
-			ESRMethodOutcome practitionerRoleOutcome =  practitionerRoleBroker.getResource(role.toLowerCase());
-			PractitionerRoleESR practitionerRole = (PractitionerRoleESR)practitionerRoleOutcome.getEntry();
-						
-			// if we are here we have got the practitioner role resource so now get the role category.
-			String roleCategoryId = practitionerRole.getPrimaryRoleCategoryID();
-			ESRMethodOutcome roleCategoryOutcome = roleCategoryBroker.getResource(roleCategoryId.toLowerCase());
-		
-			RoleCategoryESR roleCategory = (RoleCategoryESR)roleCategoryOutcome.getEntry();
-			roleHistoryDetail.setRoleCategory(roleCategory.getDisplayName());
-        }  	
-    }
-
     //
     // Update
     //
@@ -194,6 +189,7 @@ public class PractitionerESRBroker extends ESRBroker {
             ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(practitioner.getIdentifierWithType("EmailAddress"));
             boolean searchCompleted = practitionerRolesGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY) || outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
             boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
+
             if (searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()) {
                 getLogger().trace(".updatePractitionerRoles(): updating the associated group");
                 PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR) practitionerRolesGroupGetOutcome.getSearchResult().get(0);
@@ -325,4 +321,13 @@ public class PractitionerESRBroker extends ESRBroker {
         matrixRoom.setDisplayName(practitionerEmailBasedAlias);
         matrixRoomDirectoryResourceBroker.createMatrixRoomDE(matrixRoom);
     }
+    
+    
+	@Override
+	protected void clearAssociations(ExtremelySimplifiedResource entry) {
+		PractitionerESR practitonerESR = (PractitionerESR)entry;
+		
+		practitonerESR.getCurrentPractitionerRoles().clear();
+		practitonerESR.setRoleHistory(new RoleHistory());
+	}
 }

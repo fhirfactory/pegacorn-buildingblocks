@@ -22,6 +22,7 @@
 package net.fhirfactory.buildingblocks.esr.models.resources;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,6 @@ import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierE
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerStatusESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
 
 public class PractitionerESR extends PersonESR {	
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESR.class);
@@ -47,10 +47,11 @@ public class PractitionerESR extends PersonESR {
     
     @Override
     protected Logger getLogger(){return(LOG);}
-
+    
     @JsonIgnore
     private RoleHistory roleHistory;
     
+   
     private HashMap<String, IdentifierESDT> organizationMembership;
     private FavouriteListESDT practitionerRoleFavourites;
     private FavouriteListESDT healthcareServiceFavourites;
@@ -59,34 +60,21 @@ public class PractitionerESR extends PersonESR {
     private String dateTimeLastRoleSelected; // leave this here even though not used.  If removed a practitioner search result will not be returned.  It is required because of the getter.
     private String matrixId;
     private String mainJobTitle;
+    private List<PractitionerRoleESR> currentPractitionerRoles;
     
     public PractitionerESR(){
         super();
         this.organizationMembership = new HashMap<>();
-        this.roleHistory = new RoleHistory();
+        this.currentPractitionerRoles = new ArrayList<>();
         this.practitionerFavourites = new FavouriteListESDT();
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();
         this.practitionerStatus = new PractitionerStatusESDT();
+        
+        roleHistory = new RoleHistory();
     }
     
 
-    public RoleHistory getRoleHistory() {
-        return roleHistory;
-    }
-    
-    public void setRoleHistory(RoleHistory roleHistory) {
-        this.roleHistory = roleHistory;
-    }
-    
-    public List<RoleHistoryDetail> getCurrentPractitionerRoles() {
-    	return roleHistory.getAllCurrentRoles();
-    }
-    
-    @JsonIgnore
-    public boolean hasCurrentRole(String role) {
-    	return roleHistory.getCurrentRole(role) == null ? false : true;
-    }
     
     
     public HashMap<String, IdentifierESDT> getOrganizationMembership() {
@@ -128,14 +116,6 @@ public class PractitionerESR extends PersonESR {
     public void setPractitionerStatus(PractitionerStatusESDT practitionerStatus) {
         this.practitionerStatus = practitionerStatus;
     }
-    
-    public String getDateTimeLastRoleSelected() {
-    	if (!roleHistory.getRoleHistories().isEmpty()) {
-    		return DateUtils.format(roleHistory.getMostRecentSelection().getStartDate(), LAST_ROLE_SELECTION_DATE_TIME_FORMATTER);
-    	}
-    	
-    	return null;
-	}
 
     
     public String getMainJobTitle() {
@@ -147,7 +127,35 @@ public class PractitionerESR extends PersonESR {
 		this.mainJobTitle = mainJobTitle;
 	}
 
+	
+	public String getDateTimeLastRoleSelected() {
+    	if (!roleHistory.getRoleHistories().isEmpty()) {
+    		return DateUtils.format(roleHistory.getMostRecentSelection().getStartDate(), LAST_ROLE_SELECTION_DATE_TIME_FORMATTER);
+    	}
+    	
+    	return null;
+	}
 
+	
+	public void setDateTimeLastRoleSelected(String dateTimeLastRoleSelected) {
+		this.dateTimeLastRoleSelected = dateTimeLastRoleSelected;
+	}
+
+	
+	public List<PractitionerRoleESR> getCurrentPractitionerRoles() {
+		return currentPractitionerRoles;
+	}
+
+	
+	public void setCurrentPractitionerRoles(List<PractitionerRoleESR> currentPractitionerRoles) {
+		this.currentPractitionerRoles = currentPractitionerRoles;
+	}
+	
+	public void addCurrentPractitionerRole(PractitionerRoleESR practitonerRole) {
+		this.currentPractitionerRoles.add(practitonerRole);
+	}
+
+	
 	public String getMatrixId() {
     	//TODO this is just for mimic until the microservices is connected to the Synapse server.
     	
@@ -179,12 +187,24 @@ public class PractitionerESR extends PersonESR {
         identifier.setUse(IdentifierESDTUseEnum.USUAL);
         addIdentifier(identifier);
     }
+    
+    
+    
 
     //
     // Identifier Type based Comparator
     //
 
-    public static Comparator<ExtremelySimplifiedResource> identifierEmailAddressBasedComparator = new Comparator<ExtremelySimplifiedResource>() {
+    public RoleHistory getRoleHistory() {
+		return roleHistory;
+	}
+
+    
+    public void setRoleHistory(RoleHistory roleHistory) {
+		this.roleHistory = roleHistory;
+	}
+
+	public static Comparator<ExtremelySimplifiedResource> identifierEmailAddressBasedComparator = new Comparator<ExtremelySimplifiedResource>() {
         @Override
         public int compare(ExtremelySimplifiedResource o1, ExtremelySimplifiedResource o2) {
             if (o1 == null && o2 == null) {

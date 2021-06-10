@@ -21,8 +21,6 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import java.util.List;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -31,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
@@ -53,6 +52,9 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     
     @Inject
     private GroupESRBroker groupBroker;
+    
+    @Inject
+    private PractitionerESRBroker practitionerBroker;
 
     @Override
     protected Logger getLogger(){
@@ -122,6 +124,8 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
         PractitionerRoleESR practitionerRoleESR = (PractitionerRoleESR) entry;
+        
+        boolean doEnrich = true;
       
         ESRMethodOutcome practitionerMembershipGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"), false);
         if(practitionerMembershipGroupGetOutcome.isSearch()) {
@@ -130,14 +134,26 @@ public class PractitionerRoleESRBroker extends ESRBroker {
      
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
               
-                practitionerRoleESR.setActivePractitionerSet(groupESR.getGroupMembership());
+                practitionerRoleESR.getActivePractitionerSet().clear();
+                
+                for (String practitionerId : groupESR.getGroupMembership()) {
+                	doEnrich = false;
+                	PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource(practitionerId.toLowerCase(), doEnrich).getEntry();  
+                	practitionerRoleESR.addActivePractitioner(practitioner);
+                }
             }
         } else {
             if (practitionerMembershipGroupGetOutcome.getEntry() != null) {
             	PractitionersFulfillingPractitionerRolesGroupESR groupESR = (PractitionersFulfillingPractitionerRolesGroupESR) practitionerMembershipGroupGetOutcome.getEntry();
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
               
-                practitionerRoleESR.setActivePractitionerSet(groupESR.getGroupMembership());
+                practitionerRoleESR.getActivePractitionerSet().clear();
+                
+                for (String practitionerId : groupESR.getGroupMembership()) {
+                	doEnrich = false;
+                	PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource(practitionerId.toLowerCase(), doEnrich).getEntry();
+                	practitionerRoleESR.addActivePractitioner(practitioner);
+                }
             }
         }
 
@@ -209,7 +225,8 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             if(searchCompleted && searchFoundSomething){
                 getLogger().info(".updatePractitioner(): updating the associated group");
                 PractitionersFulfillingPractitionerRolesGroupESR practitionerRolesGroup = (PractitionersFulfillingPractitionerRolesGroupESR)practitionersGroupGetOutcome.getSearchResult().get(0);
-                practitionerRolesGroup.setGroupMembership(entry.getActivePractitionerSet());
+                
+                practitionerRolesGroup.setGroupMembership(entry.getActivePractitionerIds());
                 groupBroker.updateGroup(practitionerRolesGroup);    
             }
 
@@ -264,6 +281,13 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     	outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
     	
     	return outcome;
-    	
     }
+    
+    
+	@Override
+	protected void clearAssociations(ExtremelySimplifiedResource entry) {
+		PractitionerRoleESR practitonerESR = (PractitionerRoleESR)entry;
+		
+		practitonerESR.getActivePractitionerSet().clear();
+	}
 }

@@ -50,7 +50,7 @@ public class RoleCategoryFilter extends BaseFilter {
 				return false;
 			}
 			
-			for (RoleHistoryDetail roleHistoryDetail : practitioner.getCurrentPractitionerRoles()) {
+			for (RoleHistoryDetail roleHistoryDetail : practitioner.getRoleHistory().getAllCurrentRoles()) {
 				String role = roleHistoryDetail.getRole();
 			
 				// get the practitioner role.

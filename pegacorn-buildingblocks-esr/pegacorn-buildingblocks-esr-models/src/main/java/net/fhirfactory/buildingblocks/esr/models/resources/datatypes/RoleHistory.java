@@ -241,6 +241,11 @@ public class RoleHistory {
 		
 		return roleHistories.get(0);	
 	}
+
+	
+	public boolean hasCurrentRole(String role) {
+    	return getCurrentRole(role) == null ? false : true;
+    }
 }
 
 

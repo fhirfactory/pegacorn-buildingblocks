@@ -19,9 +19,7 @@ public class RoleHistoryDetail {
 	
 	@JsonIgnore
 	private Date endDate;
-	
-	private String roleCategory;
-	
+		
 	public RoleHistoryDetail() {}
 	
 	public RoleHistoryDetail(String role, Date startDate, Date endDate) {
@@ -54,13 +52,5 @@ public class RoleHistoryDetail {
 	
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
-	}
-
-	public String getRoleCategory() {
-		return roleCategory;
-	}
-
-	public void setRoleCategory(String roleCategory) {
-		this.roleCategory = roleCategory;
 	}
 }

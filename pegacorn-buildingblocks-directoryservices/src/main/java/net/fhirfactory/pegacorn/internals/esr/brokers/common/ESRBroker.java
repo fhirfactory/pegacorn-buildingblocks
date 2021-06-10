@@ -77,6 +77,11 @@ public abstract class ESRBroker {
     
     
     public ESRMethodOutcome getResource(String recordID) throws ResourceInvalidSearchException {
+    	return getResource(recordID, true);
+    }
+    
+    
+    public ESRMethodOutcome getResource(String recordID, boolean doEnrich) throws ResourceInvalidSearchException {
         getLogger().info(".getResource(): Entry, recordID --> {}", recordID);
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         ExtremelySimplifiedResource entry = getCache().getCacheEntry(recordID);
@@ -84,7 +89,14 @@ public abstract class ESRBroker {
             outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_NOT_FOUND);
             outcome.setId(recordID);
         } else {
-            enrichWithDirectoryEntryTypeSpecificInformation(entry);
+        	
+        	// We don't always want to do the enrich as this will cause circular dependencies.
+        	if (doEnrich) {
+        		enrichWithDirectoryEntryTypeSpecificInformation(entry);
+        	} else {
+        		clearAssociations(entry);
+        	}
+        	
             outcome.setEntry(entry);
             outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
             outcome.setId(entry.getSimplifiedID());
@@ -92,16 +104,30 @@ public abstract class ESRBroker {
         getLogger().info(".getResource(): Exit");
         return(outcome);
     }
-
     
-    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
-    	return searchForDirectoryEntryUsingIdentifier(identifier, true);
+    
+    /**
+     * Clear any associations we do not need.
+     * 
+     * @param entry
+     */
+    protected void clearAssociations(ExtremelySimplifiedResource entry) {
+    	// Do nothing by default
+	}
+    
+    
+	public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
+    	return searchForDirectoryEntryUsingIdentifier(identifier, true, true);
+    }
+    
+    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier,boolean containsMatch) throws ResourceInvalidSearchException {
+    	return searchForDirectoryEntryUsingIdentifier(identifier, containsMatch, true);
     }
 
     //
     // Review (Search - by Identifier)
     //
-    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier, boolean containsMatch) throws ResourceInvalidSearchException {
+    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier, boolean containsMatch, boolean doEnrich) throws ResourceInvalidSearchException {
         getLogger().debug(".searchForDirectoryResourceRoleUsingIdentifier(): Entry, identifier --> {}", identifier);
         ESRMethodOutcome outcome = getCache().searchCacheForESRUsingIdentifier(identifier, containsMatch);
         boolean searchCompleted = outcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY) || outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
@@ -119,7 +145,14 @@ public abstract class ESRBroker {
             } else {
                 getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Entry found");
                 outcome.setStatus(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
-                enrichWithDirectoryEntryTypeSpecificInformation(entry);
+                
+            	// We don't always want to do the enrich as this will cause circular dependencies.
+                if (doEnrich) {
+                	enrichWithDirectoryEntryTypeSpecificInformation(entry);
+                } else {
+                	clearAssociations(entry);
+                }
+                
                 outcome.setSearch(true);
                 getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
                 return (outcome);

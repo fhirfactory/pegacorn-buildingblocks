@@ -28,6 +28,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
 
 public class PractitionerRoleESR extends ExtremelySimplifiedResource {
@@ -41,13 +43,14 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private String primaryRoleID;
     private String practitionerRoleADGroup;
     private ArrayList<ContactPointESDT> contactPoints;
-    private List<String>activePractitionerSet;
+    private List<PractitionerESR>activePractitionerSet;
     
     private List<String> careTeams;
 
     public PractitionerRoleESR(){
         this.contactPoints = new ArrayList<>();
         this.careTeams = new ArrayList<>();
+        this.activePractitionerSet = new ArrayList<>();
     }
 
     public String getPrimaryOrganizationID() {
@@ -66,12 +69,29 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
         this.primaryLocationID = primaryLocationID;
     }
 
-    public List<String> getActivePractitionerSet() {
+    public List<PractitionerESR> getActivePractitionerSet() {
 		return activePractitionerSet;
 	}
 
-	public void setActivePractitionerSet(List<String> activePractitionerSet) {
+	public void setActivePractitionerSet(List<PractitionerESR> activePractitionerSet) {
 		this.activePractitionerSet = activePractitionerSet;
+	}
+	
+	
+	@JsonIgnore
+	public List<String>getActivePractitionerIds() {
+		List<String>ids = new ArrayList<>();
+		
+		for (PractitionerESR practitioner : activePractitionerSet) {
+			ids.add(practitioner.getSimplifiedID());
+		}
+		
+		return ids;
+	}
+
+	
+	public void addActivePractitioner(PractitionerESR practitioner) {
+		this.activePractitionerSet.add(practitioner);
 	}
 
 	public String getPrimaryRoleCategoryID() {
@@ -111,13 +131,6 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     //
     // Sorting (Comparators)
     //
-
-
-	
-	
-	
-	
-
 	public static Comparator<ExtremelySimplifiedResource> primaryLocationIDComparator = new Comparator<ExtremelySimplifiedResource>() {
         @Override
         public int compare(ExtremelySimplifiedResource o1, ExtremelySimplifiedResource o2) {
