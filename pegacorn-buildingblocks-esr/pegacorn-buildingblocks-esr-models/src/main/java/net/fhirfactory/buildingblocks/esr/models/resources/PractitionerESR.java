@@ -37,6 +37,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.EmailAddres
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.OrganisationStructure;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerStatusESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
 
@@ -61,6 +62,7 @@ public class PractitionerESR extends PersonESR {
     private String matrixId;
     private String mainJobTitle;
     private List<PractitionerRoleESR> currentPractitionerRoles;
+    private List<OrganisationStructure>organisationStructure;
     
     public PractitionerESR(){
         super();
@@ -70,6 +72,7 @@ public class PractitionerESR extends PersonESR {
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();
         this.practitionerStatus = new PractitionerStatusESDT();
+        this.organisationStructure = new ArrayList<OrganisationStructure>();
         
         roleHistory = new RoleHistory();
     }
@@ -187,14 +190,22 @@ public class PractitionerESR extends PersonESR {
         identifier.setUse(IdentifierESDTUseEnum.USUAL);
         addIdentifier(identifier);
     }
-    
-    
-    
 
+    
     //
     // Identifier Type based Comparator
     //
 
+    public List<OrganisationStructure> getOrganisationStructure() {
+		return organisationStructure;
+	}
+
+    
+    public void setOrganisationStructure(List<OrganisationStructure> organisationStructure) {
+		this.organisationStructure = organisationStructure;
+	}
+
+    
     public RoleHistory getRoleHistory() {
 		return roleHistory;
 	}
