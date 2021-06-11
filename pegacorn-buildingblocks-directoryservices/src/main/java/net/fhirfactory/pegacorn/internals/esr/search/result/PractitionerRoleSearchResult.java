@@ -54,7 +54,13 @@ public class PractitionerRoleSearchResult extends ESRSearchResult {
     	
         PractitionerRoleSearchResult result = (PractitionerRoleSearchResult)instatiateNewESRSearchResult();
         result.setSearchResultList(getSearchResultList());
-    	
+        
+        if (filters == null || filters.isEmpty()) {
+        	return result;
+        }
+                
+        result.setSearchResultList(doFilter(filters));
+        
         getLogger().debug(".filterBy(): Exit");
     	
         return result;
