@@ -36,6 +36,7 @@ import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingExcepti
 import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.CareTeamFilter;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.LocationFilter;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.PractitionerOtherPractitionerFavouriteFilter;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.RoleCategoryFilter;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.RoleFilter;
 
@@ -45,19 +46,21 @@ public class PractitionerServiceHandler extends HandlerBase {
 
     @Inject
     private PractitionerESRBroker practitionerDirectoryResourceBroker;
-    
-    
+
     @Inject
     private RoleFilter roleFilter;
-    
+
     @Inject
     private RoleCategoryFilter roleCategoryFilter;
-    
+
     @Inject
     private CareTeamFilter careTeamFilter;
-    
+
     @Inject
     private LocationFilter locationFilter;
+
+    @Inject
+    private PractitionerOtherPractitionerFavouriteFilter practitionerOtherPractitionerFavouriteFilter;
 
     @Override
     protected Logger getLogger() {
@@ -73,59 +76,56 @@ public class PractitionerServiceHandler extends HandlerBase {
     // Update
     //
 
-    public String updatePractitioner(PractitionerESR entry,  Exchange camelExchange)
-            throws ResourceUpdateException, ResourceInvalidSearchException {
+    public String updatePractitioner(PractitionerESR entry, Exchange camelExchange) throws ResourceUpdateException, ResourceInvalidSearchException {
 
         LOG.info(".update(): Requesting update from the Directory Resource Broker");
-        
-        
+
         // Make sure the simplified id matches the email address.
         if (!entry.getSimplifiedID().equals(entry.getIdentifierWithType("EmailAddress").getValue())) {
-        	throw new ResourceUpdateException("The simplified id must match the email address identifier for a practitioner update");
+            throw new ResourceUpdateException("The simplified id must match the email address identifier for a practitioner update");
         }
-        
-        
+
         ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitioner(entry);
         LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
-        if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
+        if (outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)) {
             String result = convertToJSONString(outcome.getEntry());
             camelExchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
             LOG.info(".update(): Exit, returning updated resource");
-            return(result);
+            return (result);
         }
-        if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
+        if (outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)) {
             String result = convertToJSONString(outcome.getEntry());
             camelExchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, constant(201));
             LOG.info(".update(): Exit, returning updated resource (after creating it)");
-            return(result);
+            return (result);
         }
         LOG.info(".update(): Exit, something has gone wrong.....");
-        return("Hmmm... not good!");
+        return ("Hmmm... not good!");
     }
 
-    public PractitionerRoleListESDT getPractitionerRoles(@Header("simplifiedID") String id, @Header("recent") String recent) throws ResourceInvalidSearchException {
+    public PractitionerRoleListESDT getPractitionerRoles(@Header("simplifiedID") String id, @Header("recent") String recent)
+            throws ResourceInvalidSearchException {
         getLogger().debug(".getPractitionerRoles(): Entry, pathValue --> {}", id);
-        
-        
+
         ESRMethodOutcome outcome = getResourceBroker().getResource(id.toLowerCase());
         if (outcome.getEntry() != null) {
             PractitionerRoleListESDT output = new PractitionerRoleListESDT();
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
             if (StringUtils.isEmpty(recent)) {
-            	output.getPractitionerRoles().addAll(practitioner.getRoleHistory().getAllCurrentPractitionerRolesSet());
+                output.getPractitionerRoles().addAll(practitioner.getRoleHistory().getAllCurrentPractitionerRolesSet());
             } else {
-            	
-            	try {
-            		Integer recentValue = Integer.valueOf(recent);
-            		
-            		if (recentValue == 0) {
-            			throw new ResourceInvalidSearchException("recent param must be greater than 0");
-            		}
-            	} catch(NumberFormatException e) {
-            		throw new ResourceInvalidSearchException("recent param must be a number");
-            	}
-            	
-            	output.getPractitionerRoles().addAll(practitioner.getRoleHistory().getPreviousRolesAsString(Integer.valueOf(recent), true));
+
+                try {
+                    Integer recentValue = Integer.valueOf(recent);
+
+                    if (recentValue == 0) {
+                        throw new ResourceInvalidSearchException("recent param must be greater than 0");
+                    }
+                } catch (NumberFormatException e) {
+                    throw new ResourceInvalidSearchException("recent param must be a number");
+                }
+
+                output.getPractitionerRoles().addAll(practitioner.getRoleHistory().getPreviousRolesAsString(Integer.valueOf(recent), true));
             }
             getLogger().debug(".getPractitionerRoles(): Exit, PractitionerRoles found, returning them");
             return (output);
@@ -134,178 +134,217 @@ public class PractitionerServiceHandler extends HandlerBase {
             return (new PractitionerRoleListESDT());
         }
     }
-    
-    
-    
-	public List<ExtremelySimplifiedResource> practitionerSearch(Exchange exchange,
-			@Header("simplifiedID") String simplifiedID, 
-			@Header("shortName") String shortName,
-			@Header("longName") String longName, 
-			@Header("displayName") String displayName,
-			@Header("allName") String allName,
-			@Header("leafValue") String leafValue, 
-			@Header("sortBy") String sortBy,
-			@Header("sortOrder") String sortOrder, 
-			@Header("pageSize") String pageSize, 
-			@Header("page") String page,
-			@Header("roleFilter") String roleFilter,
-			@Header("locationFilter") String locationFilter,
-			@Header("careTeamFilter") String careTeamFilter,
-			@Header("roleCategoryFilter") String roleCategoryFilter)
-			throws ResourceNotFoundException, ResourceInvalidSortException, ResourceInvalidSearchException,
-			ESRPaginationException, ESRSortingException, ESRFilteringException {
-		getLogger().info(
-				".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{},"
-						+ "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
-				shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
-		String searchAttributeName = null;
-		String searchAttributeValue = null;
 
-		
-		if (simplifiedID != null) {
-			searchAttributeValue = simplifiedID;
-			searchAttributeName = "simplifiedID";
-		} else if (shortName != null) {
-			searchAttributeValue = shortName;
-			searchAttributeName = "shortName";
-		} else if (longName != null) {
-			searchAttributeValue = longName;
-			searchAttributeName = "longName";
-		} else if (displayName != null) {
-			searchAttributeValue = displayName;
-			searchAttributeName = "displayName";
-		} else if(allName != null) {
-        	searchAttributeValue = allName;
+    public List<ExtremelySimplifiedResource> practitionerSearch(Exchange exchange, @Header("simplifiedID") String simplifiedID,
+            @Header("shortName") String shortName, @Header("longName") String longName, @Header("displayName") String displayName,
+            @Header("allName") String allName, @Header("leafValue") String leafValue, @Header("sortBy") String sortBy, @Header("sortOrder") String sortOrder,
+            @Header("pageSize") String pageSize, @Header("page") String page, @Header("roleFilter") String roleFilter,
+            @Header("locationFilter") String locationFilter, @Header("careTeamFilter") String careTeamFilter,
+            @Header("roleCategoryFilter") String roleCategoryFilter) throws ResourceNotFoundException, ResourceInvalidSortException,
+            ResourceInvalidSearchException, ESRPaginationException, ESRSortingException, ESRFilteringException {
+        getLogger().info(".practitionerSearch(): Entry, shortName->{}, longName->{}, displayName->{}," + "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
+                shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
+      
+        List<BaseFilter> filters = new ArrayList<>();
+
+        if (roleFilter != null) {
+            this.roleFilter.setValue(roleFilter);
+            filters.add(this.roleFilter);
+        }
+
+        if (locationFilter != null) {
+            this.locationFilter.setValue(locationFilter);
+            filters.add(this.locationFilter);
+        }
+
+        if (careTeamFilter != null) {
+            this.careTeamFilter.setValue(careTeamFilter);
+            filters.add(this.careTeamFilter);
+        }
+
+        if (roleCategoryFilter != null) {
+            this.roleCategoryFilter.setValue(roleCategoryFilter);
+            filters.add(this.roleCategoryFilter);
+        }
+        
+        return practitionerSearch(exchange, simplifiedID, shortName, longName, displayName, allName, leafValue, sortBy, sortOrder, pageSize, page, filters);
+    }
+
+    public List<ExtremelySimplifiedResource> practitionerFavouriteSearch(Exchange exchange, @Header("id") String id,
+            @Header("simplifiedID") String simplifiedID, @Header("shortName") String shortName, @Header("longName") String longName,
+            @Header("displayName") String displayName, @Header("allName") String allName, @Header("leafValue") String leafValue,
+            @Header("sortBy") String sortBy, @Header("sortOrder") String sortOrder, @Header("pageSize") String pageSize, @Header("page") String page)
+            throws ResourceNotFoundException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRPaginationException, ESRSortingException,
+            ESRFilteringException {
+        getLogger().info(".practitionerFavouriteSearch(): Entry, shortName->{}, longName->{}, displayName->{}," + "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
+                shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
+
+        List<BaseFilter> filters = new ArrayList<>();
+        practitionerOtherPractitionerFavouriteFilter.setValue(id);
+        filters.add(practitionerOtherPractitionerFavouriteFilter);
+
+        getLogger().debug(".practitionerFavouriteSearch(): Exit");
+
+        return practitionerSearch(exchange, simplifiedID, shortName, longName, displayName, allName, leafValue, sortBy, sortOrder, pageSize, page, filters);
+    }
+    
+    
+    private List<ExtremelySimplifiedResource> practitionerSearch(Exchange exchange, String simplifiedID, String shortName, String longName, String displayName,
+            String allName, String leafValue, String sortBy,  String sortOrder,
+             String pageSize,  String page,  List<BaseFilter> filters) throws ResourceNotFoundException, ResourceInvalidSortException,
+            ResourceInvalidSearchException, ESRPaginationException, ESRSortingException, ESRFilteringException {
+        getLogger().info(".practitionerSearch(): Entry, shortName->{}, longName->{}, displayName->{}," + "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
+                shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
+        String searchAttributeName = null;
+        String searchAttributeValue = null;
+
+        if (simplifiedID != null) {
+            searchAttributeValue = simplifiedID;
+            searchAttributeName = "simplifiedID";
+        } else if (shortName != null) {
+            searchAttributeValue = shortName;
+            searchAttributeName = "shortName";
+        } else if (longName != null) {
+            searchAttributeValue = longName;
+            searchAttributeName = "longName";
+        } else if (displayName != null) {
+            searchAttributeValue = displayName;
+            searchAttributeName = "displayName";
+        } else if (allName != null) {
+            searchAttributeValue = allName;
             searchAttributeName = "allName";
-		} else if (leafValue != null) {
-			searchAttributeValue = leafValue;
-			searchAttributeName = "leafValue";
-		} else {
-			throw (new ResourceInvalidSearchException("Search parameter not specified"));
-		}
-		
-				
-		SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
-		
-		List<BaseFilter>filters = new ArrayList<>();
-		
-		if (roleFilter != null) {
-			this.roleFilter.setValue(roleFilter);
-			filters.add(this.roleFilter);
-		} 
-		
-		if (locationFilter != null) {
-			this.locationFilter.setValue(locationFilter);
-			filters.add(this.locationFilter);	
-		}
-		
-		if (careTeamFilter != null) {
-			this.careTeamFilter.setValue(careTeamFilter);
-			filters.add(this.careTeamFilter);		
-		}
-		
-		if (roleCategoryFilter != null) {
-			this.roleCategoryFilter.setValue(roleCategoryFilter);
-			filters.add(this.roleCategoryFilter);				
-		}
-		
+        } else if (leafValue != null) {
+            searchAttributeValue = leafValue;
+            searchAttributeName = "leafValue";
+        } else {
+            throw (new ResourceInvalidSearchException("Search parameter not specified"));
+        }
 
-		Integer pageSizeValue = null;
-		Integer pageValue = null;
+        SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
 
-		if (pageSize != null) {
-			pageSizeValue = Integer.valueOf(pageSize);
-		}
-		if (page != null) {
-			pageValue = Integer.valueOf(page);
-		}
+        Integer pageSizeValue = null;
+        Integer pageValue = null;
 
-		Pagination pagination = new Pagination(pageSizeValue, pageValue);
-		Sort sort = new Sort(sortBy, sortOrder);
+        if (pageSize != null) {
+            pageSizeValue = Integer.valueOf(pageSize);
+        }
+        if (page != null) {
+            pageValue = Integer.valueOf(page);
+        }
 
-		ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchCriteria, filters, sort, pagination);
+        Pagination pagination = new Pagination(pageSizeValue, pageValue);
+        Sort sort = new Sort(sortBy, sortOrder);
 
-		exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
-		exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
+        ESRMethodOutcome outcome = getResourceBroker().searchForESRsUsingAttribute(searchCriteria, filters, sort, pagination);
 
-		getLogger().debug(".defaultSearch(): Exit");
+        exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+        exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
 
-		return (outcome.getSearchResult());
-	}
-	
-	
-	public List<ExtremelySimplifiedResource> practitionerGetResourceList(Exchange exchange, 
-			@Header("sortBy") String sortBy,
-			@Header("sortOrder") String sortOrder, 
-			@Header("pageSize") String pageSize, 
-			@Header("page") String page,
-			@Header("roleFilter") String roleFilter,
-			@Header("locationFilter") String locationFilter,
-			@Header("careTeamFilter") String careTeamFilter,
-			@Header("roleCategoryFilter") String roleCategoryFilter)
-			throws ESRPaginationException, ResourceInvalidSortException, ResourceInvalidSearchException,
-			ESRSortingException, ESRFilteringException {
-		getLogger().debug(".defaultGetResourceList(): Entry, sortBy->{}, sortOrder->{}, pageSize->{}, page->{}", sortBy,
-				sortOrder, pageSize, page);
-		Integer pageSizeValue = null;
-		Integer pageValue = null;
+        getLogger().debug(".defaultSearch(): Exit");
 
-		if (pageSize != null) {
-			pageSizeValue = Integer.valueOf(pageSize);
-		}
-		if (page != null) {
-			pageValue = Integer.valueOf(page);
-		}
+        return (outcome.getSearchResult());        
+        
+    }
 
-		SearchCriteria searchCriteria = new SearchCriteria();
-		
-		List<BaseFilter>filters = new ArrayList<>();
-		
-		if (roleFilter != null) {
-			this.roleFilter.setValue(roleFilter);
-			filters.add(this.roleFilter);
-		} 
-		
-		if (locationFilter != null) {
-			this.locationFilter.setValue(locationFilter);
-			filters.add(this.locationFilter);	
-		}
-		
-		if (careTeamFilter != null) {
-			this.careTeamFilter.setValue(careTeamFilter);
-			filters.add(this.careTeamFilter);		
-		}
-		
-		if (roleCategoryFilter != null) {
-			this.roleCategoryFilter.setValue(roleCategoryFilter);
-			filters.add(this.roleCategoryFilter);				
-		}
+    public List<ExtremelySimplifiedResource> practitionerGetResourceList(Exchange exchange, @Header("sortBy") String sortBy,
+            @Header("sortOrder") String sortOrder, @Header("pageSize") String pageSize, @Header("page") String page, @Header("roleFilter") String roleFilter,
+            @Header("locationFilter") String locationFilter, @Header("careTeamFilter") String careTeamFilter,
+            @Header("roleCategoryFilter") String roleCategoryFilter)
+            throws ESRPaginationException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRFilteringException {
+        getLogger().debug(".defaultGetResourceList(): Entry, sortBy->{}, sortOrder->{}, pageSize->{}, page->{}", sortBy, sortOrder, pageSize, page);
+        Integer pageSizeValue = null;
+        Integer pageValue = null;
 
-		Pagination pagination = new Pagination(pageSizeValue, pageValue);
-		Sort sort = new Sort(sortBy, sortOrder);
+        if (pageSize != null) {
+            pageSizeValue = Integer.valueOf(pageSize);
+        }
+        if (page != null) {
+            pageValue = Integer.valueOf(page);
+        }
 
-		ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(searchCriteria, filters, pagination,sort);
+        SearchCriteria searchCriteria = new SearchCriteria();
 
-		exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
-		exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
+        List<BaseFilter> filters = new ArrayList<>();
 
-		getLogger().debug(".defaultGetResourceList(): Exit");
+        if (roleFilter != null) {
+            this.roleFilter.setValue(roleFilter);
+            filters.add(this.roleFilter);
+        }
 
-		return (outcome.getSearchResult());
-	}
+        if (locationFilter != null) {
+            this.locationFilter.setValue(locationFilter);
+            filters.add(this.locationFilter);
+        }
 
-    public PractitionerESR updatePractitionerRoles(@Header("simplifiedID") String id, PractitionerRoleListESDT practitionerRoles) throws ResourceInvalidSearchException, ResourceUpdateException {
+        if (careTeamFilter != null) {
+            this.careTeamFilter.setValue(careTeamFilter);
+            filters.add(this.careTeamFilter);
+        }
+
+        if (roleCategoryFilter != null) {
+            this.roleCategoryFilter.setValue(roleCategoryFilter);
+            filters.add(this.roleCategoryFilter);
+        }
+
+        Pagination pagination = new Pagination(pageSizeValue, pageValue);
+        Sort sort = new Sort(sortBy, sortOrder);
+
+        ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(searchCriteria, filters, pagination, sort);
+
+        exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+        exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
+
+        getLogger().debug(".defaultGetResourceList(): Exit");
+
+        return (outcome.getSearchResult());
+    }
+
+    public List<ExtremelySimplifiedResource> practitionerFavouriteResourceList(Exchange exchange, @Header("simplifiedID") String id,
+            @Header("sortBy") String sortBy, @Header("sortOrder") String sortOrder, @Header("pageSize") String pageSize, @Header("page") String page)
+            throws ESRPaginationException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRFilteringException {
+        getLogger().debug(".defaultGetResourceList(): Entry, sortBy->{}, sortOrder->{}, pageSize->{}, page->{}", sortBy, sortOrder, pageSize, page);
+        Integer pageSizeValue = null;
+        Integer pageValue = null;
+
+        if (pageSize != null) {
+            pageSizeValue = Integer.valueOf(pageSize);
+        }
+        if (page != null) {
+            pageValue = Integer.valueOf(page);
+        }
+
+        SearchCriteria searchCriteria = new SearchCriteria();
+
+        List<BaseFilter> filters = new ArrayList<>();
+        practitionerOtherPractitionerFavouriteFilter.setValue(id);
+        filters.add(practitionerOtherPractitionerFavouriteFilter);
+
+        Pagination pagination = new Pagination(pageSizeValue, pageValue);
+        Sort sort = new Sort(sortBy, sortOrder);
+
+        ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(searchCriteria, filters, pagination, sort);
+
+        exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+        exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
+
+        getLogger().debug(".defaultGetResourceList(): Exit");
+
+        return (outcome.getSearchResult());
+    }
+
+    public PractitionerESR updatePractitionerRoles(@Header("simplifiedID") String id, PractitionerRoleListESDT practitionerRoles)
+            throws ResourceInvalidSearchException, ResourceUpdateException {
         getLogger().debug(".updatePractitionerRoles(): Entry, simplifiedID->{}, practitionerRoles->{}", id, practitionerRoles);
         ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitionerRoles(id, practitionerRoles);
         LOG.trace(".updatePractitionerRoles(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
-        if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
+        if (outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)) {
             ESRMethodOutcome updatedOutcome = getResourceBroker().getResource(id.toLowerCase());
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
             LOG.debug(".updatePractitionerRoles(): Exit, returning updated resource");
-            return(practitioner);
+            return (practitioner);
         } else {
             LOG.error(".updatePractitionerRoles(): Could not update Resource");
-            throw(new ResourceUpdateException(outcome.getStatusReason()) );
+            throw (new ResourceUpdateException(outcome.getStatusReason()));
         }
     }
 
@@ -315,8 +354,7 @@ public class PractitionerServiceHandler extends HandlerBase {
         getLogger().debug(".getPractitionerRoleFavourites(): Exit");
         return (output);
     }
-    
-    
+
     public FavouriteListESDT getPractitionerFavourites(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
         getLogger().debug(".getPractitionerFavourites(): Entry, pathValue --> {}", id);
         FavouriteListESDT output = getFavourites(id, "PractitionerFavourites");
@@ -337,22 +375,22 @@ public class PractitionerServiceHandler extends HandlerBase {
         if (outcome.getEntry() != null) {
             FavouriteListESDT output = new FavouriteListESDT();
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
-            switch(favouriteType){
-                case "PractitionerRoleFavourites":{
-                    output.getFavourites().addAll(practitioner.getPractitionerRoleFavourites().getFavourites());
-                    break;
-                }
-                case "PractitionerFavourites":{
-                    output.getFavourites().addAll(practitioner.getPractitionerFavourites().getFavourites());
-                    break;
-                }
-                case "ServiceFavourites":{
-                    output.getFavourites().addAll(practitioner.getHealthcareServiceFavourites().getFavourites());
-                    break;
-                }
-                default:{
-                    // do nothing (and return an empty set)
-                }
+            switch (favouriteType) {
+            case "PractitionerRoleFavourites": {
+                output.getFavourites().addAll(practitioner.getPractitionerRoleFavourites().getFavourites());
+                break;
+            }
+            case "PractitionerFavourites": {
+                output.getFavourites().addAll(practitioner.getPractitionerFavourites().getFavourites());
+                break;
+            }
+            case "ServiceFavourites": {
+                output.getFavourites().addAll(practitioner.getHealthcareServiceFavourites().getFavourites());
+                break;
+            }
+            default: {
+                // do nothing (and return an empty set)
+            }
             }
             getLogger().debug(".getFavourites(): Exit, Favourites found, returning them");
             return (output);
@@ -362,14 +400,16 @@ public class PractitionerServiceHandler extends HandlerBase {
         }
     }
 
-    public PractitionerESR updatePractitionerRoleFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
+    public PractitionerESR updatePractitionerRoleFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites)
+            throws ResourceInvalidSearchException {
         getLogger().debug(".updatePractitionerRoleFavourites(): Entry, id->{}, newFavourites->{}", id, newFavourites);
         PractitionerESR output = updateFavourites(id, "PractitionerRoleFavourites", newFavourites);
         getLogger().debug(".updatePractitionerRoleFavourites(): Exit");
         return (output);
     }
 
-    public PractitionerESR updatePractitionerFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
+    public PractitionerESR updatePractitionerFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites)
+            throws ResourceInvalidSearchException {
         getLogger().debug(".updatePractitionerFavourites(): Entry, id->{}, newFavourites->{}", id, newFavourites);
         PractitionerESR output = updateFavourites(id, "PractitionerFavourites", newFavourites);
         getLogger().debug(".updatePractitionerFavourites(): Exit");

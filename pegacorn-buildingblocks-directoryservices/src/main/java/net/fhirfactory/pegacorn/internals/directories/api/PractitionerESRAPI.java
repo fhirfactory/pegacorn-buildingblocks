@@ -37,14 +37,13 @@ import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerRole
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
 
-
 @ApplicationScoped
 public class PractitionerESRAPI extends ResourceDirectoryAPI {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESRAPI.class);
 
     @Inject
     private PractitionerServiceHandler practitionerServiceHandler;
-    
+
     @Inject
     private PractitionerRoleServiceHandler practitionerRoleServiceHandler;
 
@@ -59,7 +58,9 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
     }
 
     @Override
-    protected Logger getLogger(){return(LOG);}
+    protected Logger getLogger() {
+        return (LOG);
+    }
 
     @Override
     public void configure() throws Exception {
@@ -83,148 +84,118 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
         //
 
         getRestGetDefinition()
-            .get("/search?emailAddress={emailAddress}&displayName={displayName}}&allName={allName}"
+                .get("/search?emailAddress={emailAddress}&displayName={displayName}}&allName={allName}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
-                .param().name("emailAddress").type(RestParamType.query).required(false).endParam()
-                .param().name("displayName").type(RestParamType.query).required(false).endParam()
-                .param().name("allName").type(RestParamType.query).required(false).endParam()
-                .param().name("pageSize").type(RestParamType.query).required(false).endParam()
-                .param().name("page").type(RestParamType.query).required(false).endParam()
-                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
-                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
-                .param().name("roleFilter").type(RestParamType.query).required(false).endParam()
-                .param().name("locationFilter").type(RestParamType.query).required(false).endParam()
-                .param().name("careTeamFilter").type(RestParamType.query).required(false).endParam()
-                .param().name("roleCategoryFilter").type(RestParamType.query).required(false).endParam()
-                .to("direct:"+getESRName()+"SearchGET")
-            .get("/{simplifiedID}/PractitionerRoles").outType(PractitionerRoleListESDT.class)
-         	    .param().name("recent").type(RestParamType.query).required(false).endParam()
-                .to("direct:" + getESRName() + "PractitionerRolesGET")
-            .get("/{simplifiedID}/PractitionerRoleFavourites").outType(FavouriteListESDT.class)
-                .to("direct:" + getESRName() + "PractitionerRoleFavouritesGET")
-            .get("/{simplifiedID}/ServiceFavourites").outType(FavouriteListESDT.class)
-                .to("direct:" + getESRName() + "ServiceFavouritesGET")
-            .get("/{simplifiedID}/PractitionerFavourites").outType(FavouriteListESDT.class)
-                .to("direct:" + getESRName() + "PractitionerFavouritesGET")
-               
-            .post().type(PractitionerESR.class)
-                .to("direct:"+getESRName()+"POST")
-            .put("/").type(PractitionerESR.class)
-                .to("direct:"+getESRName()+"PUT")
-            .put("/{simplifiedID}/PractitionerRoles/").type(PractitionerRoleListESDT.class)
-                .to("direct:"+getESRName()+"PractitionerRolesPUT")
-            .put("/{simplifiedID}/PractitionerRoleFavourites/").type(FavouriteListESDT.class)
-                .to("direct:"+getESRName()+"PractitionerRolesFavouritesPUT")
-            .put("/{simplifiedID}/ServiceFavourites/").type(FavouriteListESDT.class)
-                .to("direct:"+getESRName()+"ServiceFavouritesPUT")
-            .put("/{simplifiedID}/PractitionerFavourites/").type(FavouriteListESDT.class)
-                .to("direct:"+getESRName()+"PractitionerFavouritesPUT")
-                
+                .param().name("emailAddress").type(RestParamType.query).required(false).endParam().param().name("displayName").type(RestParamType.query)
+                .required(false).endParam().param().name("allName").type(RestParamType.query).required(false).endParam().param().name("pageSize")
+                .type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam().param()
+                .name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query).required(false)
+                .endParam().param().name("roleFilter").type(RestParamType.query).required(false).endParam().param().name("locationFilter")
+                .type(RestParamType.query).required(false).endParam().param().name("careTeamFilter").type(RestParamType.query).required(false).endParam()
+                .param().name("roleCategoryFilter").type(RestParamType.query).required(false).endParam().to("direct:" + getESRName() + "SearchGET")
+                .get("/{simplifiedID}/PractitionerRoles").outType(PractitionerRoleListESDT.class).param().name("recent").type(RestParamType.query)
+                .required(false).endParam().to("direct:" + getESRName() + "PractitionerRolesGET").get("/{simplifiedID}/PractitionerRoleFavourites")
+                .outType(FavouriteListESDT.class).to("direct:" + getESRName() + "PractitionerRoleFavouritesGET").get("/{simplifiedID}/ServiceFavourites")
+                .outType(FavouriteListESDT.class).to("direct:" + getESRName() + "ServiceFavouritesGET").get("/{simplifiedID}/PractitionerFavourites")
+                .outType(FavouriteListESDT.class).to("direct:" + getESRName() + "PractitionerFavouritesGET")
 
-	        .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
-		        .param().name("pageSize").type(RestParamType.query).required(false).endParam()
-		        .param().name("page").type(RestParamType.query).required(false).endParam()
-		        .param().name("sortBy").type(RestParamType.query).required(false).endParam()
-		        .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
-                .param().name("roleFilter").type(RestParamType.query).required(false).endParam()
-                .param().name("locationFilter").type(RestParamType.query).required(false).endParam()
-                .param().name("careTeamFilter").type(RestParamType.query).required(false).endParam()
-                .param().name("roleCategoryFilter").type(RestParamType.query).required(false).endParam()
-		        .to("direct:" + getESRName() + "ListGET")
-        
-        
-		        // Search practitioner role favourites.
-		        .get("/{simplifiedID}/PractitionerRoleFavouritesDetails/search?shortName={shortName}&longName={longName}&displayName={displayName}&allName={allName}&primaryRoleCategoryID={primaryRoleCategoryID}"
+                .post().type(PractitionerESR.class).to("direct:" + getESRName() + "POST").put("/").type(PractitionerESR.class)
+                .to("direct:" + getESRName() + "PUT").put("/{simplifiedID}/PractitionerRoles/").type(PractitionerRoleListESDT.class)
+                .to("direct:" + getESRName() + "PractitionerRolesPUT").put("/{simplifiedID}/PractitionerRoleFavourites/").type(FavouriteListESDT.class)
+                .to("direct:" + getESRName() + "PractitionerRolesFavouritesPUT").put("/{simplifiedID}/ServiceFavourites/").type(FavouriteListESDT.class)
+                .to("direct:" + getESRName() + "ServiceFavouritesPUT").put("/{simplifiedID}/PractitionerFavourites/").type(FavouriteListESDT.class)
+                .to("direct:" + getESRName() + "PractitionerFavouritesPUT")
+
+                .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}").param().name("pageSize").type(RestParamType.query)
+                .required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam().param().name("sortBy")
+                .type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query).required(false).endParam().param()
+                .name("roleFilter").type(RestParamType.query).required(false).endParam().param().name("locationFilter").type(RestParamType.query)
+                .required(false).endParam().param().name("careTeamFilter").type(RestParamType.query).required(false).endParam().param()
+                .name("roleCategoryFilter").type(RestParamType.query).required(false).endParam().to("direct:" + getESRName() + "ListGET")
+
+                // Search practitioner role favourites.
+                .get("/{simplifiedID}/PractitionerRoleFavouritesDetails/search?shortName={shortName}&longName={longName}&displayName={displayName}&allName={allName}&primaryRoleCategoryID={primaryRoleCategoryID}"
                         + "&primaryRoleID{primaryRoleID}&primaryOrganizationID={primaryOrganizationID}&primaryLocationID={primaryLocationID}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
-                .param().name("shortName").type(RestParamType.query).required(false).endParam()
-                .param().name("longName").type(RestParamType.query).required(false).endParam()
-                .param().name("displayName").type(RestParamType.query).required(false).endParam()
-                .param().name("allName").type(RestParamType.query).required(false).endParam()
-                .param().name("primaryRoleCategoryID").type(RestParamType.query).required(false).endParam()
-                .param().name("primaryRoleID").type(RestParamType.query).required(false).endParam()
-                .param().name("primaryOrganizationID").type(RestParamType.query).required(false).endParam()
-                .param().name("primaryLocationID").type(RestParamType.query).required(false).endParam()
-                .param().name("pageSize").type(RestParamType.query).required(false).endParam()
-                .param().name("page").type(RestParamType.query).required(false).endParam()
-                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
-                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
-                .to("direct:" + getESRName() +"SearchPractitionerRoleFavouritesGET")
-        
-        
-            .get("/{simplifiedID}/PractitionerRoleFavouritesDetails?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
-		        .param().name("pageSize").type(RestParamType.query).required(false).endParam()
-		        .param().name("page").type(RestParamType.query).required(false).endParam()
-		        .param().name("sortBy").type(RestParamType.query).required(false).endParam()
-		        .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
-		        .to("direct:" + getESRName() + "PractitionerRoleFavouritesListGET");
+                .param().name("shortName").type(RestParamType.query).required(false).endParam().param().name("longName").type(RestParamType.query)
+                .required(false).endParam().param().name("displayName").type(RestParamType.query).required(false).endParam().param().name("allName")
+                .type(RestParamType.query).required(false).endParam().param().name("primaryRoleCategoryID").type(RestParamType.query).required(false).endParam()
+                .param().name("primaryRoleID").type(RestParamType.query).required(false).endParam().param().name("primaryOrganizationID")
+                .type(RestParamType.query).required(false).endParam().param().name("primaryLocationID").type(RestParamType.query).required(false).endParam()
+                .param().name("pageSize").type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false)
+                .endParam().param().name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query)
+                .required(false).endParam().to("direct:" + getESRName() + "SearchPractitionerRoleFavouritesGET")
 
+                .get("/{simplifiedID}/PractitionerRoleFavouritesDetails?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}").param()
+                .name("pageSize").type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam()
+                .param().name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query).required(false)
+                .endParam().to("direct:" + getESRName() + "PractitionerRoleFavouritesListGET")
 
-        from("direct:"+getESRName()+"GET")
-                .bean(practitionerServiceHandler, "getResource")
+                // Search practitioner favourites.
+                .get("/{id}/PractitionerFavouritesDetails/search?emailAddress={emailAddress}&displayName={displayName}}&allName={allName}"
+                        + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+                .param().name("emailAddress").type(RestParamType.query).required(false).endParam().param().name("displayName").type(RestParamType.query)
+                .required(false).endParam().param().name("allName").type(RestParamType.query).required(false).endParam().param().name("pageSize")
+                .type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam().param()
+                .name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query).required(false)
+                .endParam().to("direct:" + getESRName() + "SearchPractitionerFavouritesGET")
+
+                .get("/{simplifiedID}/PractitionerFavouritesDetails?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}").param()
+                .name("pageSize").type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam()
+                .param().name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query).required(false)
+                .endParam().to("direct:" + getESRName() + "PractitionerFavouritesListGET");
+
+        from("direct:" + getESRName() + "GET").bean(practitionerServiceHandler, "getResource").log(LoggingLevel.DEBUG, "GET Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerRolesGET").bean(practitionerServiceHandler, "getPractitionerRoles").log(LoggingLevel.DEBUG,
+                "GET Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerRolesPUT").bean(practitionerServiceHandler, "updatePractitionerRoles").log(LoggingLevel.DEBUG,
+                "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerRoleFavouritesGET").bean(practitionerServiceHandler, "getPractitionerRoleFavourites")
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerRolesFavouritesPUT").bean(practitionerServiceHandler, "updatePractitionerRoleFavourites")
+                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerFavouritesGET").bean(practitionerServiceHandler, "getPractitionerFavourites").log(LoggingLevel.DEBUG,
+                "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerFavouritesPUT").bean(practitionerServiceHandler, "updatePractitionerFavourites").log(LoggingLevel.DEBUG,
+                "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "ServiceFavouritesGET").bean(practitionerServiceHandler, "getServiceFavourites").log(LoggingLevel.DEBUG,
+                "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "ServiceFavouritesPUT").bean(practitionerServiceHandler, "updateServiceFavourites").log(LoggingLevel.DEBUG,
+                "PUT Request --> ${body}");
+
+        from("direct:" + getESRName() + "ListGET").bean(practitionerServiceHandler, "practitionerGetResourceList(Exchange)").log(LoggingLevel.DEBUG,
+                "GET Request --> ${body}");
+
+        from("direct:" + getESRName() + "SearchPractitionerRoleFavouritesGET").bean(practitionerRoleServiceHandler, "practitionerRoleFavouriteSearch(Exchange)")
                 .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
-        from("direct:" + getESRName() + "PractitionerRolesGET")
-                .bean(practitionerServiceHandler, "getPractitionerRoles")
+        from("direct:" + getESRName() + "PractitionerRoleFavouritesListGET")
+                .bean(practitionerRoleServiceHandler, "practitionerRoleFavouriteResourceList(Exchange)").log(LoggingLevel.DEBUG, "GET Request --> ${body}");
+
+        from("direct:" + getESRName() + "SearchPractitionerFavouritesGET").bean(practitionerServiceHandler, "practitionerFavouriteSearch(Exchange)")
                 .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
-        from("direct:" + getESRName() + "PractitionerRolesPUT")
-                .bean(practitionerServiceHandler, "updatePractitionerRoles")
-                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
-        
-        from("direct:" + getESRName() + "PractitionerRoleFavouritesGET")
-                .bean(practitionerServiceHandler, "getPractitionerRoleFavourites")
-                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
-
-        from("direct:" + getESRName() + "PractitionerRolesFavouritesPUT")
-                .bean(practitionerServiceHandler, "updatePractitionerRoleFavourites")
-                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
-
-        from("direct:" + getESRName() + "PractitionerFavouritesGET")
-                .bean(practitionerServiceHandler, "getPractitionerFavourites")
-                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
-
-        from("direct:" + getESRName() + "PractitionerFavouritesPUT")
-                .bean(practitionerServiceHandler, "updatePractitionerFavourites")
-                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
-
-        from("direct:" + getESRName() + "ServiceFavouritesGET")
-                .bean(practitionerServiceHandler, "getServiceFavourites")
-                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
-
-        from("direct:" + getESRName() + "ServiceFavouritesPUT")
-                .bean(practitionerServiceHandler, "updateServiceFavourites")
-                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
-
-        from("direct:"+getESRName()+"ListGET")
-                .bean(practitionerServiceHandler, "practitionerGetResourceList(Exchange)")
+        from("direct:" + getESRName() + "PractitionerFavouritesListGET").bean(practitionerServiceHandler, "practitionerFavouriteResourceList(Exchange)")
                 .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
-        
-        from("direct:"+getESRName()+"SearchPractitionerRoleFavouritesGET")
-        		.bean(practitionerRoleServiceHandler, "practitionerRoleFavouriteSearch(Exchange)")
-        		.log(LoggingLevel.DEBUG, "GET Request --> ${body}");
-        
-        from("direct:"+getESRName()+"PractitionerRoleFavouritesListGET")
-        		.bean(practitionerRoleServiceHandler, "practitionerRoleFavouriteResourceList(Exchange)")
-        		.log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
-        from("direct:"+getESRName()+"SearchGET")
-                .bean(practitionerServiceHandler, "practitionerSearch(Exchange)")
-                .log(LoggingLevel.DEBUG, "GET (Search) Request --> ${body}");
+        from("direct:" + getESRName() + "SearchGET").bean(practitionerServiceHandler, "practitionerSearch(Exchange)").log(LoggingLevel.DEBUG,
+                "GET (Search) Request --> ${body}");
 
-        from("direct:"+getESRName()+"POST")
-                .log(LoggingLevel.DEBUG, "POST Request --> ${body}")
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
+        from("direct:" + getESRName() + "POST").log(LoggingLevel.DEBUG, "POST Request --> ${body}").setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
                 .setBody(simple("Action not support for this Directory Entry"));
 
-        from("direct:"+getESRName()+"PUT")
-                .bean(practitionerServiceHandler, "updatePractitioner")
-                .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
+        from("direct:" + getESRName() + "PUT").bean(practitionerServiceHandler, "updatePractitioner").log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
 
-        from("direct:"+getESRName()+"DELETE")
-                .log(LoggingLevel.DEBUG, "DELETE Request --> ${body}")
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
+        from("direct:" + getESRName() + "DELETE").log(LoggingLevel.DEBUG, "DELETE Request --> ${body}").setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
                 .setBody(simple("Action not support for this Directory Entry"));
-        
+
     }
 }
