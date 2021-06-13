@@ -28,7 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
@@ -38,7 +40,7 @@ public class HealthcareServiceESRBroker extends ESRBroker {
     private static final Logger LOG = LoggerFactory.getLogger(HealthcareServiceESRBroker.class);
 
     @Inject
-    HealthcareServiceESRCache resourceCache;
+    private HealthcareServiceESRCache healthCareServiceCache;
 
     @Override
     protected Logger getLogger() {
@@ -47,7 +49,7 @@ public class HealthcareServiceESRBroker extends ESRBroker {
 
     @Override
     protected PegacornESRCache specifyCache() {
-        return (resourceCache);
+        return (healthCareServiceCache);
     }
 
     //
@@ -67,4 +69,11 @@ public class HealthcareServiceESRBroker extends ESRBroker {
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) {
 
     }
+    
+    public ESRMethodOutcome createHealthCareService(HealthcareServiceESR newHealthCareService){
+        ESRMethodOutcome outcome = this.createDirectoryEntry(newHealthCareService);
+        
+        return outcome;
+    }
+
 }

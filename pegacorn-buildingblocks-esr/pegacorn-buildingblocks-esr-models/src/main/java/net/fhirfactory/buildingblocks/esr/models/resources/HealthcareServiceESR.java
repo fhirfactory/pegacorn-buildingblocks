@@ -21,36 +21,44 @@
  */
 package net.fhirfactory.buildingblocks.esr.models.resources;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
 
 public class HealthcareServiceESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(HealthcareServiceESR.class);
     @Override
     protected Logger getLogger(){return(LOG);}
 
-    private ArrayList<String> serviceDeliveryLocations;
-    private String managingOrganization;
+    private List<ContactPointESDT> contactPoints;
+    private String organisationalUnit;
 
     public HealthcareServiceESR(){
         super();
+        
+        contactPoints = new ArrayList<>();
     }
 
-    public ArrayList<String> getServiceDeliveryLocations() {
-        return serviceDeliveryLocations;
+    
+    public List<ContactPointESDT> getContactPoints() {
+		return contactPoints;
+	}
+	
+	public void setContactPoints(List<ContactPointESDT> contactPoints) {
+		this.contactPoints = contactPoints;
+	}
+
+	
+	public String getOrganisationalUnit() {
+        return organisationalUnit;
     }
 
-    public void setServiceDeliveryLocations(ArrayList<String> serviceDeliveryLocations) {
-        this.serviceDeliveryLocations = serviceDeliveryLocations;
-    }
-
-    public String getManagingOrganization() {
-        return managingOrganization;
-    }
-
-    public void setManagingOrganization(String managingOrganization) {
-        this.managingOrganization = managingOrganization;
-    }
+    
+    public void setOrganisationalUnit(String organisationalUnit) {
+        this.organisationalUnit = organisationalUnit;
+    } 
 }

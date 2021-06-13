@@ -44,14 +44,16 @@ public class HealthcareServiceSearchResult extends ESRSearchResult {
 
     @Override
     public ESRSearchResult filterBy(List<BaseFilter> filters) throws ESRFilteringException {
-    	if (filters != null) {
-        	
-	    	for (BaseFilter filter : filters) {
-	    		getLogger().info(".filterBy(): Entry, filter->{}", filter);
-	    	}
-    	}
-    	
+        if (filters != null) {
+            
+            for (BaseFilter filter : filters) {
+                getLogger().info(".filterBy(): Entry, filter->{}", filter);
+            }
+        }
+
         HealthcareServiceSearchResult result = (HealthcareServiceSearchResult)instatiateNewESRSearchResult();
+        result.setSearchResultList(getSearchResultList());
+        
         getLogger().debug(".filterBy(): Exit");
         return(result);
     }

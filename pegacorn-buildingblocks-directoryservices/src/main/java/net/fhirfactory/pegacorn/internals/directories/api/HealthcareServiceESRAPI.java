@@ -31,8 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
-import net.fhirfactory.pegacorn.internals.directories.api.beans.LocationServiceHandler;
+import net.fhirfactory.pegacorn.internals.directories.api.beans.HealthcareServiceServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
 
 @ApplicationScoped
@@ -40,7 +39,7 @@ public class HealthcareServiceESRAPI extends ResourceDirectoryAPI {
     private static final Logger LOG = LoggerFactory.getLogger(HealthcareServiceESRAPI.class);
 
     @Inject
-    private LocationServiceHandler serviceHandler;
+    private HealthcareServiceServiceHandler serviceHandler;
 
     @Override
     protected Logger getLogger(){return(LOG);}
@@ -90,9 +89,9 @@ public class HealthcareServiceESRAPI extends ResourceDirectoryAPI {
                 .param().name("sortBy").type(RestParamType.query).required(false).endParam()
                 .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
                 .to("direct:"+getESRName()+"SearchGET")
-                .post().type(RoleESR.class)
+                .post().type(HealthcareServiceESR.class)
                 .to("direct:"+getESRName()+"POST")
-                .put().type(RoleESR.class)
+                .put().type(HealthcareServiceESR.class)
                 .to("direct:"+getESRName()+"PUT")
                 
 
