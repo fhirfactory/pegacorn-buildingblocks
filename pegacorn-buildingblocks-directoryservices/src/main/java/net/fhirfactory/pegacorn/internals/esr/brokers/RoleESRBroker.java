@@ -27,30 +27,17 @@ import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.RoleESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.CommonIdentifierESDTTypes;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-@ApplicationScoped
-public class RoleESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(RoleESRBroker.class);
+public abstract class RoleESRBroker extends ESRBroker {
 
     @Inject
     private RoleESRCache roleCache;
-
-    @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
-
-    @Override
-    protected Logger getLogger() {
-        return (LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache() {
@@ -67,7 +54,7 @@ public class RoleESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.USUAL);
+        resource.assignSimplifiedID(true, IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_SHORT_NAME.getIdentifierType(), IdentifierESDTUseEnum.USUAL);
     }
 
     //
@@ -91,7 +78,7 @@ public class RoleESRBroker extends ESRBroker {
             IdentifierESDT newRoleIdentifier = new IdentifierESDT();
             newRoleIdentifier.setValue(roleName);
             newRoleIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-            newRoleIdentifier.setType(commonIdentifierESDTTypes.getShortName());
+            newRoleIdentifier.setType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_SHORT_NAME.getIdentifierType());
             newRoleIdentifier.setLeafValue(roleName);
             newRole.getIdentifiers().add(newRoleIdentifier);
             newRole.setDisplayName(roleName);

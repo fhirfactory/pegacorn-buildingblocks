@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources.datatypes;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 import java.util.Objects;
 

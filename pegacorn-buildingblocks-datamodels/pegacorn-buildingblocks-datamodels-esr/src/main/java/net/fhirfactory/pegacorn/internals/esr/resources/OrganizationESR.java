@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.TypeESDT;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class OrganizationESR extends ExtremelySimplifiedResource {
     public OrganizationESR(){
         super();
         this.containedOrganizations = new ArrayList<>();
-        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_ORGANIZATION);
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_ORGANIZATION);
     }
 
     public ArrayList<String> getContainedOrganizations() {

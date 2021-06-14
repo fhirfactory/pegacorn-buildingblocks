@@ -21,23 +21,53 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.api.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class MAPIErrorResponse {
     private String errorCode;
     private String errorDescription;
 
+    public MAPIErrorResponse(){
+        this.errorCode = null;
+        this.errorDescription = null;
+    }
+
+    @JsonProperty("errcode")
     public String getErrorCode() {
         return errorCode;
     }
 
+    @JsonProperty("errcode")
     public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
     }
 
+    @JsonProperty("error")
     public String getErrorDescription() {
         return errorDescription;
     }
 
+    @JsonProperty("error")
     public void setErrorDescription(String errorDescription) {
         this.errorDescription = errorDescription;
+    }
+
+    @JsonIgnore
+    public boolean hasErrorCode(){
+        if(this.errorCode == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasErrorDescription(){
+        if(this.errorDescription == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 }

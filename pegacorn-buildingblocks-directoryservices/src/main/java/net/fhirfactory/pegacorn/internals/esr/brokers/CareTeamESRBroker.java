@@ -28,30 +28,23 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.CareTeamESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.RoleESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.CommonIdentifierESDTTypes;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-@ApplicationScoped
-public class CareTeamESRBroker extends ESRBroker {
+public abstract class CareTeamESRBroker extends ESRBroker {
     private static final Logger LOG = LoggerFactory.getLogger(CareTeamESRBroker.class);
 
     @Inject
     private CareTeamESRCache careTeamCache;
 
     @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
-
-    @Override
-    protected Logger getLogger() {
-        return (LOG);
-    }
+    private IdentifierESDTTypesEnum identifierESDTTypesEnum;
 
     @Override
     protected PegacornESRCache specifyCache() {
@@ -68,7 +61,7 @@ public class CareTeamESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.USUAL);
+        resource.assignSimplifiedID(true, IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_SHORT_NAME.getIdentifierType(), IdentifierESDTUseEnum.USUAL);
     }
 
     //
@@ -92,7 +85,7 @@ public class CareTeamESRBroker extends ESRBroker {
             IdentifierESDT newCareTeamIdentifier = new IdentifierESDT();
             newCareTeamIdentifier.setValue(careTeamShortName);
             newCareTeamIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-            newCareTeamIdentifier.setType(commonIdentifierESDTTypes.getShortName());
+            newCareTeamIdentifier.setType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_SHORT_NAME.getIdentifierType());
             newCareTeamIdentifier.setLeafValue(careTeamShortName);
             newCareTeam.getIdentifiers().add(newCareTeamIdentifier);
             newCareTeam.setDisplayName(careTeamLongName);

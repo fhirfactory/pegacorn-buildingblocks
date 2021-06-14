@@ -21,10 +21,20 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.api.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.net.HttpURLConnection;
+
 public class MAPIResponse {
     int responseCode;
     String responseContent;
     MAPIErrorResponse errorResponse;
+
+    public MAPIResponse(){
+        this.responseContent = null;
+        this.responseCode = 0;
+        this.errorResponse = null;
+    }
 
     public int getResponseCode() {
         return responseCode;
@@ -49,4 +59,44 @@ public class MAPIResponse {
     public void setErrorResponse(MAPIErrorResponse errorResponse) {
         this.errorResponse = errorResponse;
     }
+
+    @JsonIgnore
+    public boolean isSuccessful(){
+        switch (getResponseCode()){
+            case HttpURLConnection.HTTP_CREATED:
+            case HttpURLConnection.HTTP_ACCEPTED:
+            case HttpURLConnection.HTTP_OK:
+                return(true);
+            default:
+                return(false);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasResponseCode(){
+        if(this.responseCode == 0){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasResponseContent(){
+        if(this.responseContent == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasErrorResponse(){
+        if(this.errorResponse == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
 }

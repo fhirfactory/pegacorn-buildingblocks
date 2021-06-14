@@ -50,7 +50,6 @@ public class PegacornIdentifierCodeSystemFactory {
         idTypeCoding.setSystem(getPegacornIdentifierCodeSystem());
         idTypeCoding.setDisplayElement(codeDisplayText(identifierCode));
         idType.getCoding().add(idTypeCoding);
-
         idType.setText(identifierCode.getIdentifierCode() + " --> " + codeDisplayText(identifierCode));
         return(idType);
     }
@@ -76,14 +75,11 @@ public class PegacornIdentifierCodeSystemFactory {
             case IDENTIFIER_CODE_CONTAINMENT_BASED_LOCATION:
                 displayText = "FHIR::Location Identifier (Containment Based Location Identifier)";
                 break;
-            case IDENTIFIER_CODE_PRACTITIONER_ROLE_GROUP:
-                displayText = "FHIR::Group Identifier (PractitionerRole Group Identifier)";
-                break;
-            case IDENTIFIER_CODE_PRACTITIONER_GROUP:
-                displayText = "FHIR::Group Identifier (Practitioner Group Identifier)";
-                break;
             case IDENTIFIER_CODE_PRACTITIONER_EMAIL:
                 displayText = "FHIR::Practitioner Identifier (Corporate Email Address)";
+                break;
+            case IDENTIFIER_CODE_COMMUNICATE_ROOM_ID:
+                displayText = "FHIR::Group Identifier (CommunicateRoom Id)";
                 break;
         }
         return(new StringType(displayText));

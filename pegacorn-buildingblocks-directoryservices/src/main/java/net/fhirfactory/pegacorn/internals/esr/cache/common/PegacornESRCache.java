@@ -32,6 +32,14 @@ public abstract class PegacornESRCache {
         displayName2ESRMap = new ConcurrentHashMap<>();
     }
 
+    public boolean hasEntry(String simplifiedID){
+        if(this.simplifiedID2ESRMap.containsKey(simplifiedID)){
+            return(true);
+        } else {
+            return(false);
+        }
+    }
+
     public ConcurrentHashMap<IdentifierESDT, ExtremelySimplifiedResource> getIdentifier2ESRMap() {
         return identifier2ESRMap;
     }
@@ -227,6 +235,7 @@ public abstract class PegacornESRCache {
             String currentID = idSet.nextElement();
             if(currentID.toLowerCase().startsWith(simplifiedIDValueAsLowerCase)){
                 ExtremelySimplifiedResource resource = this.simplifiedID2ESRMap.get(currentID);
+                result.getSearchResultList().add(resource);
             }
         }
         return(result);
@@ -326,6 +335,7 @@ public abstract class PegacornESRCache {
             String currentDisplayName = displayNameSet.nextElement();
             if(currentDisplayName.toLowerCase().startsWith(displayNameValueAsLowerCase)){
                 ExtremelySimplifiedResource resource = this.simplifiedID2ESRMap.get(currentDisplayName);
+                result.getSearchResultList().add(resource);
             }
         }
         return(result);

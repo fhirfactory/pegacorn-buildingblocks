@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.OrganizationESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,17 +36,10 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-@ApplicationScoped
-public class OrganizationESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(OrganizationESRBroker.class);
+public abstract class OrganizationESRBroker extends ESRBroker {
 
     @Inject
     OrganizationESRCache organizationCache;
-
-    @Override
-    protected Logger getLogger() {
-        return (LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache() {
@@ -62,7 +56,7 @@ public class OrganizationESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.OFFICIAL);
+        resource.assignSimplifiedID(true, IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_SHORT_NAME.getIdentifierType(), IdentifierESDTUseEnum.OFFICIAL);
     }
 
     //

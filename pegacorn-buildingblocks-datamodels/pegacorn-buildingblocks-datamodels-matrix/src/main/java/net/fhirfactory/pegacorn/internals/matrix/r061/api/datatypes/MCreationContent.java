@@ -21,5 +21,18 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.api.datatypes;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class MCreationContent {
+    private boolean federate;
+
+    @JsonProperty("m.federate")
+    public boolean isFederate() {
+        return federate;
+    }
+
+    @JsonProperty("m.federate")
+    public void setFederate(boolean federate) {
+        this.federate = federate;
+    }
 }

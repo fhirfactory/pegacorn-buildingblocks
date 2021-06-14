@@ -21,11 +21,17 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MatrixEventKey extends MatrixEvent{
     private String eventIdentifier;
     private String roomIdentifier;
+
+    public MatrixEventKey(){
+        this.eventIdentifier = null;
+        this.roomIdentifier = null;
+    }
 
     @JsonProperty("event_id")
     public String getEventIdentifier() {
@@ -45,5 +51,23 @@ public class MatrixEventKey extends MatrixEvent{
     @JsonProperty("room_id")
     public void setRoomIdentifier(String roomIdentifier) {
         this.roomIdentifier = roomIdentifier;
+    }
+
+    @JsonIgnore
+    public boolean hasEventIdentifier(){
+        if(this.eventIdentifier == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasRoomIdentifier(){
+        if(this.roomIdentifier == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 }

@@ -24,34 +24,21 @@ package net.fhirfactory.pegacorn.internals.esr.brokers;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.RoleCategoryESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.RoleCategoryESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.CommonIdentifierESDTTypes;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
 
-@ApplicationScoped
-public class RoleCategoryESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(RoleCategoryESRBroker.class);
+public abstract class RoleCategoryESRBroker extends ESRBroker {
 
     @Inject
     private RoleCategoryESRCache roleCategoryCache;
-
-    @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
-
-    @Override
-    protected Logger getLogger() {
-        return (LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache() {
@@ -68,7 +55,7 @@ public class RoleCategoryESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.USUAL);
+        resource.assignSimplifiedID(true, IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_SHORT_NAME.getIdentifierType(), IdentifierESDTUseEnum.USUAL);
     }
 
     //
@@ -92,7 +79,7 @@ public class RoleCategoryESRBroker extends ESRBroker {
             IdentifierESDT newRoleCategoryIdentifier = new IdentifierESDT();
             newRoleCategoryIdentifier.setValue(roleCategoryName);
             newRoleCategoryIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-            newRoleCategoryIdentifier.setType(commonIdentifierESDTTypes.getShortName());
+            newRoleCategoryIdentifier.setType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_SHORT_NAME.getIdentifierType());
             newRoleCategoryIdentifier.setLeafValue(roleCategoryName);
             newRole.getIdentifiers().add(newRoleCategoryIdentifier);
             newRole.setDisplayName(roleCategoryName);

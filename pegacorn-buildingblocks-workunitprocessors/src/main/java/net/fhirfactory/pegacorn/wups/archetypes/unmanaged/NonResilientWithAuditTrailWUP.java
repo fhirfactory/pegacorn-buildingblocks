@@ -13,8 +13,8 @@ import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEn
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicIDBuilder;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.IdentifierDataTypeHelpers;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.IdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
@@ -58,10 +58,10 @@ public abstract class NonResilientWithAuditTrailWUP {
     private net.fhirfactory.pegacorn.util.FHIRContextUtility FHIRContextUtility;
 
     @Inject
-    private IdentifierFactory identifierFactory;
+    private PegacornIdentifierFactory pegacornIdentifierFactory;
 
     @Inject
-    private IdentifierDataTypeHelpers identifierHelpers;
+    private PegacornIdentifierDataTypeHelpers identifierHelpers;
 
     public NonResilientWithAuditTrailWUP(){
         this.isInitialised = false;

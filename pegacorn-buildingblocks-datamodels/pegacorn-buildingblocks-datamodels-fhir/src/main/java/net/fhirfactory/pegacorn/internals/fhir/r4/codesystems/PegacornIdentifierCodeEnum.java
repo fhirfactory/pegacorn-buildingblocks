@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.codesystems;
 
 public enum PegacornIdentifierCodeEnum {
+    IDENTIFIER_CODE_COMMUNICATE_ROOM_ID("idcode:communicate-room-id"),
     IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM("idcode:endpoint-name"),
     IDENTIFIER_CODE_SOURCE_OF_TRUTH_RECORD_ID("idcode:sot-rid"),
     IDENTIFIER_CODE_PRACTITIONER_ROLE_SHORT_NAME("idcode:practitioner-role-short-name"),

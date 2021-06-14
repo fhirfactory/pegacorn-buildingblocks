@@ -21,8 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.HumanNameESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.HumanNameESDTUseEnum;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class PersonESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(PersonESR.class);
@@ -40,12 +42,14 @@ public class PersonESR extends ExtremelySimplifiedResource {
     private HumanNameESDT officialName;
     private ArrayList<HumanNameESDT> otherNames;
     private ArrayList<ContactPointESDT> contactPoints;
+    private Date dateOfBirth;
 
     public PersonESR(){
         super();
         this.contactPoints = new ArrayList<>();
         this.otherNames = new ArrayList<>();
-        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_PERSON);
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_PERSON);
+        this.dateOfBirth = null;
     }
 
     public HumanNameESDT getOfficialName() {
@@ -81,8 +85,25 @@ public class PersonESR extends ExtremelySimplifiedResource {
         return(null);
     }
 
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
     @Override
     protected ResourceType specifyResourceType() {
         return (ResourceType.Person);
+    }
+
+    @JsonIgnore
+    public boolean hasDateOfBirth(){
+        if(this.dateOfBirth == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 }

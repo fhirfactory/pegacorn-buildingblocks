@@ -30,28 +30,18 @@ import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifi
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApplicationScoped
-public class GroupESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(GroupESRBroker.class);
+public abstract class GroupESRBroker extends ESRBroker {
 
     @Inject
     private GroupESRCache groupCache;
 
     @Inject
     private PractitionerRoleMapCache roleMapCache;
-
-    @Override
-    protected Logger getLogger(){
-        return(LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache(){

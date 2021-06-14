@@ -21,12 +21,18 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.room;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.common.MRoomEventBase;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.contenttypes.MRoomCreateContentType;
 
 public class MRoomCreateEvent extends MRoomEventBase {
     private MRoomCreateContentType content;
+
+    public MRoomCreateEvent(){
+        super();
+        this.content = null;
+    }
 
     @JsonProperty("content")
     public MRoomCreateContentType getContent() {
@@ -36,5 +42,14 @@ public class MRoomCreateEvent extends MRoomEventBase {
     @JsonProperty("content")
     public void setContent(MRoomCreateContentType content) {
         this.content = content;
+    }
+
+    @JsonIgnore
+    public boolean hasContent(){
+        if(this.content == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 }

@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,14 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
         super();
         this.serviceDeliveryLocations = new ArrayList<>();
         this.managingOrganization = null;
-        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_CARE_TEAM);
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_CARE_TEAM);
+    }
+
+    public CareTeamESR(CareTeamESR ori){
+        super(ori);
+        this.serviceDeliveryLocations = new ArrayList<>();
+        this.serviceDeliveryLocations.addAll(ori.getServiceDeliveryLocations());
+        this.managingOrganization = ori.getManagingOrganization();
     }
 
     public ArrayList<String> getServiceDeliveryLocations() {

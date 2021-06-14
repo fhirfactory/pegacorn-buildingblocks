@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class RoleESR extends ExtremelySimplifiedResource {
     public RoleESR(){
         super();
         containedRoles = new ArrayList<>();
-        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_ROLE);
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_ROLE);
     }
 
     @Override

@@ -74,6 +74,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core-model</artifactId>
+            <version>${version-org.apache.camel}</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -160,6 +168,7 @@
             <version>${version-org.jgroups-jgroups}</version>
         </dependency>
 
+
         <!-- This dependency includes the core HAPI-FHIR classes -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
@@ -219,11 +228,23 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
+
+        <!--         -->
+        <!-- Logging -->
+        <!--         -->
         <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-server</artifactId>
-            <version>5.1.0</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <distributionManagement>

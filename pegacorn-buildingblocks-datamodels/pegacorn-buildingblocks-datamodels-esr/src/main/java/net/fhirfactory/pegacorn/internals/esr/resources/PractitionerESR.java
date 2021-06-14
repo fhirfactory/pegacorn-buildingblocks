@@ -23,20 +23,19 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.*;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 
 public class PractitionerESR extends PersonESR {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESR.class);
+
     @Override
     protected Logger getLogger(){return(LOG);}
 
@@ -55,7 +54,7 @@ public class PractitionerESR extends PersonESR {
         this.practitionerFavourites = new FavouriteListESDT();
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();
-        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_PRACTITIONER);
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_PRACTITIONER);
     }
 
     public ArrayList<String> getCurrentPractitionerRoles() {
@@ -116,6 +115,18 @@ public class PractitionerESR extends PersonESR {
         emailAddress.setValue(foundIdentifier.getValue());
         return(emailAddress);
     }
+
+    @JsonIgnore
+    public String getEmailAddressUserNamePart(){
+        IdentifierESDT foundIdentifier = getIdentifierWithType("EmailAddress");
+        if(foundIdentifier == null){
+            return(null);
+        }
+        String[] emailAddressParts = foundIdentifier.getValue().split("@");
+        String emailAddressUserNamePart = emailAddressParts[0];
+        return(emailAddressUserNamePart);
+    }
+
 
     @JsonIgnore
     public void setEmailAddress(String email){

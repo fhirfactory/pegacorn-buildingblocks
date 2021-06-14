@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.esr.brokers.common;
 
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.CommonIdentifierESDTTypes;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.search.exceptions.ESRPaginationException;
@@ -38,18 +38,20 @@ import javax.inject.Inject;
 public abstract class ESRBroker {
 
     @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
+    private IdentifierESDTTypesEnum identifierESDTTypesEnum;
 
     protected abstract Logger getLogger();
     protected abstract PegacornESRCache specifyCache();
     protected abstract void assignSimplifiedID(ExtremelySimplifiedResource resource);
 
+    protected abstract ExtremelySimplifiedResource synchroniseResource(ExtremelySimplifiedResource resource);
+
     protected PegacornESRCache getCache(){
         return(specifyCache());
     }
 
-    protected CommonIdentifierESDTTypes getCommonIdentifierTypes(){
-        return(commonIdentifierESDTTypes);
+    protected IdentifierESDTTypesEnum getCommonIdentifierTypes(){
+        return(identifierESDTTypesEnum);
     }
 
     //
@@ -82,6 +84,11 @@ public abstract class ESRBroker {
         }
         getLogger().info(".getResource(): Exit");
         return(outcome);
+    }
+
+    public boolean hasEntry(String simplifiedID){
+        boolean entryExists = getCache().hasEntry(simplifiedID);
+        return(entryExists);
     }
 
 

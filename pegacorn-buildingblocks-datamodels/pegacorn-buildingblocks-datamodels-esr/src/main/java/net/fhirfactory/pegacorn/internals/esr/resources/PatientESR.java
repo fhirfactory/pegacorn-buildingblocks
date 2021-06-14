@@ -21,8 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FunctionDE;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FunctionESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ReferenceESDT;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +38,12 @@ public class PatientESR extends PersonESR {
     private String primaryLocation;
     private String primaryHealthcareService;
     private String currentLocation;
-    private HashMap<FunctionDE, String> careProviders;
+    private HashMap<FunctionESDT, ReferenceESDT> careProviders;
 
     public PatientESR(){
         super();
         careProviders = new HashMap<>();
-        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_PATIENT);
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_PATIENT);
     }
 
     public String getPrimaryLocation() {
@@ -69,11 +70,11 @@ public class PatientESR extends PersonESR {
         this.currentLocation = currentLocation;
     }
 
-    public HashMap<FunctionDE, String> getCareProviders() {
+    public HashMap<FunctionESDT, ReferenceESDT> getCareProviders() {
         return careProviders;
     }
 
-    public void setCareProviders(HashMap<FunctionDE, String> careProviders) {
+    public void setCareProviders(HashMap<FunctionESDT, ReferenceESDT> careProviders) {
         this.careProviders = careProviders;
     }
 

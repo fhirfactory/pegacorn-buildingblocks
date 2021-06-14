@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifi
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
@@ -39,20 +40,13 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-@ApplicationScoped
-public class PractitionerRoleESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleESRBroker.class);
+public abstract class PractitionerRoleESRBroker extends ESRBroker {
 
     @Inject
     private PractitionerRoleESRCache practitionerRoleCache;
 
     @Inject
     private GroupESRBroker groupBroker;
-
-    @Override
-    protected Logger getLogger(){
-        return(LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache(){
@@ -69,7 +63,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.OFFICIAL);
+        resource.assignSimplifiedID(true, IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_SHORT_NAME.getIdentifierType(), IdentifierESDTUseEnum.OFFICIAL);
     }
 
     //
@@ -121,7 +115,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     // Update
     //
     public ESRMethodOutcome updatePractitionerRole(PractitionerRoleESR entry) throws ResourceInvalidSearchException {
-        LOG.info(".updatePractitionerRole(): Entry");
+        getLogger().info(".updatePractitionerRole(): Entry");
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         PractitionerRoleESR foundEntry = null;
         if(entry.getSimplifiedID() != null){
@@ -160,7 +154,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
                 groupBroker.updateGroup(practitionerRolesGroup);
             }
         }
-        LOG.info(".updatePractitionerRole(): Exit");
+        getLogger().info(".updatePractitionerRole(): Exit");
         return(outcome);
     }
 

@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.TypeESDT;
@@ -49,7 +49,7 @@ public class LocationESR extends ExtremelySimplifiedResource {
     public LocationESR(){
         super();
         this.containedLocationIDs = new ArrayList<>();
-        this.setResourceType(ExtremelySimplifiedResourceTypeEnum.ESR_LOCATION);
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_LOCATION);
     }
 
     public ArrayList<String> getContainedLocationIDs() {
