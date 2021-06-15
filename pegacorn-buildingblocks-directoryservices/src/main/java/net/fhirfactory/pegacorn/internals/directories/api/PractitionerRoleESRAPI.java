@@ -53,7 +53,7 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
     }
 
     @Override
-    protected Class specifyESRClass() {
+    protected Class<?> specifyESRClass() {
         return (PractitionerRoleESR.class);
     }
 
@@ -82,46 +82,72 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
                 "/search?shortName={shortName}&longName={longName}&displayName={displayName}&allName={allName}&primaryRoleCategoryID={primaryRoleCategoryID}"
                         + "&primaryRoleID{primaryRoleID}&primaryOrganizationID={primaryOrganizationID}&primaryLocationID={primaryLocationID}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
-                .param().name("shortName").type(RestParamType.query).required(false).endParam().param().name("longName").type(RestParamType.query)
-                .required(false).endParam().param().name("displayName").type(RestParamType.query).required(false).endParam().param().name("allName")
-                .type(RestParamType.query).required(false).endParam().param().name("primaryRoleCategoryID").type(RestParamType.query).required(false).endParam()
-                .param().name("primaryRoleID").type(RestParamType.query).required(false).endParam().param().name("primaryOrganizationID")
-                .type(RestParamType.query).required(false).endParam().param().name("primaryLocationID").type(RestParamType.query).required(false).endParam()
-                .param().name("pageSize").type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false)
-                .endParam().param().name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query)
-                .required(false).endParam().to("direct:" + getESRName() + "SearchGET").post().type(getESRClass()).to("direct:" + getESRName() + "POST").put()
-                .type(getESRClass()).to("direct:" + getESRName() + "PUT")
+                .param().name("shortName").type(RestParamType.query).required(false).endParam()
+                .param().name("longName").type(RestParamType.query).required(false).endParam()
+                .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                .param().name("allName").type(RestParamType.query).required(false).endParam()
+                .param().name("primaryRoleCategoryID").type(RestParamType.query).required(false).endParam()
+                .param().name("primaryRoleID").type(RestParamType.query).required(false).endParam().param().name("primaryOrganizationID").type(RestParamType.query).required(false).endParam()
+                .param().name("primaryLocationID").type(RestParamType.query).required(false).endParam()
+                .param().name("pageSize").type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam()
+                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
+                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                .to("direct:" + getESRName() + "SearchGET")
+                
+                .post()
+                    .type(getESRClass())
+                    .to("direct:" + getESRName() + "POST")
+                    
+                .put()
+                    .type(getESRClass())
+                    .to("direct:" + getESRName() + "PUT")
 
-                .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}").param().name("pageSize").type(RestParamType.query)
-                .required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam().param().name("sortBy")
-                .type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+                    .param().name("pageSize").type(RestParamType.query).required(false).endParam()
+                .param().name("page").type(RestParamType.query).required(false).endParam()
+                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
+                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
                 .to("direct:" + getESRName() + "ListGET")
 
-                .put("/{simplifiedID}/CareTeams").type(PractitionerRoleCareTeamListESDT.class).to("direct:" + getESRName() + "PractitionerRoleCareTeamsPUT")
+                .put("/{simplifiedID}/CareTeams")
+                    .type(PractitionerRoleCareTeamListESDT.class)
+                    .to("direct:" + getESRName() + "PractitionerRoleCareTeamsPUT")
 
-                .get("/{simplifiedID}/CareTeams").outType(PractitionerRoleCareTeamListESDT.class)
-                .to("direct:" + getESRName() + "PractitionerRolesCareTeamsGET");
+                .get("/{simplifiedID}/CareTeams")
+                    .outType(PractitionerRoleCareTeamListESDT.class)
+                    .to("direct:" + getESRName() + "PractitionerRolesCareTeamsGET");
 
-        from("direct:" + getESRName() + "GET").bean(practitionerRoleServiceHandler, "getResource").log(LoggingLevel.INFO, "GET Request --> ${body}");
+        from("direct:" + getESRName() + "GET")
+            .bean(practitionerRoleServiceHandler, "getResource")
+            .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
-        from("direct:" + getESRName() + "ListGET").bean(practitionerRoleServiceHandler, "defaultGetResourceList(Exchange)").log(LoggingLevel.INFO,
-                "GET Request --> ${body}");
+        from("direct:" + getESRName() + "ListGET")
+            .bean(practitionerRoleServiceHandler, "defaultGetResourceList(Exchange)")
+            .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
-        from("direct:" + getESRName() + "SearchGET").bean(practitionerRoleServiceHandler, "practitionerRoleSearch(Exchange)").log(LoggingLevel.INFO,
-                "GET (Search) Request --> ${body}");
+        from("direct:" + getESRName() + "SearchGET").bean(practitionerRoleServiceHandler, "practitionerRoleSearch(Exchange)")
+            .log(LoggingLevel.INFO, "GET (Search) Request --> ${body}");
 
-        from("direct:" + getESRName() + "POST").log(LoggingLevel.INFO, "POST Request --> ${body}").setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
-                .setBody(simple("Action not support for this Directory Entry"));
+        from("direct:" + getESRName() + "POST")
+            .log(LoggingLevel.INFO, "POST Request --> ${body}")
+            .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
+            .setBody(simple("Action not support for this Directory Entry"));
 
-        from("direct:" + getESRName() + "PUT").bean(practitionerRoleServiceHandler, "updatePractitionerRole").log(LoggingLevel.INFO, "PUT Request --> ${body}");
+        from("direct:" + getESRName() + "PUT")
+            .bean(practitionerRoleServiceHandler, "updatePractitionerRole")
+            .log(LoggingLevel.INFO, "PUT Request --> ${body}");
 
-        from("direct:" + getESRName() + "DELETE").log(LoggingLevel.INFO, "DELETE Request --> ${body}").setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
-                .setBody(simple("Action not support for this Directory Entry"));
+        from("direct:" + getESRName() + "DELETE")
+            .log(LoggingLevel.INFO, "DELETE Request --> ${body}")
+            .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
+            .setBody(simple("Action not support for this Directory Entry"));
 
-        from("direct:" + getESRName() + "PractitionerRolesCareTeamsGET").bean(practitionerRoleServiceHandler, "getCareTeams").log(LoggingLevel.DEBUG,
-                "PUT Request --> ${body}");
+        from("direct:" + getESRName() + "PractitionerRolesCareTeamsGET")
+            .bean(practitionerRoleServiceHandler, "getCareTeams")
+            .log(LoggingLevel.DEBUG,"PUT Request --> ${body}");
 
-        from("direct:" + getESRName() + "PractitionerRoleCareTeamsPUT").bean(practitionerRoleServiceHandler, "updateCareTeams").log(LoggingLevel.DEBUG,
-                "PUT Request --> ${body}");
+        from("direct:" + getESRName() + "PractitionerRoleCareTeamsPUT")
+            .bean(practitionerRoleServiceHandler, "updateCareTeams")
+            .log(LoggingLevel.DEBUG, "PUT Request --> ${body}");
     }
 }
