@@ -29,7 +29,7 @@ public class PractitionerHealthCareServiceFavouriteFilter extends BasePractition
     
     @Override
 	public List<String> getFavouriteList() {
-		return practitioner.getPractitionerFavourites().getFavourites();
+		return practitioner.getHealthcareServiceFavourites().getFavourites();
 	}
     
     

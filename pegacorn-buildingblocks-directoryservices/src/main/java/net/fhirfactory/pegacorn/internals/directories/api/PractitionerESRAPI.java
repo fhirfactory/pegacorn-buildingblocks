@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.pegacorn.internals.directories.api.beans.HealthcareServiceServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerRoleServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
@@ -47,13 +48,16 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
     @Inject
     private PractitionerRoleServiceHandler practitionerRoleServiceHandler;
 
+    @Inject
+    private HealthcareServiceServiceHandler healthCareServiceHandler;
+
     @Override
     protected String specifyESRName() {
         return ("Practitioner");
     }
 
     @Override
-    protected Class specifyESRClass() {
+    protected Class<?> specifyESRClass() {
         return (PractitionerESR.class);
     }
 
@@ -143,7 +147,21 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .get("/{simplifiedID}/PractitionerFavouritesDetails?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}").param()
                 .name("pageSize").type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam()
                 .param().name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query).required(false)
-                .endParam().to("direct:" + getESRName() + "PractitionerFavouritesListGET");
+                .endParam().to("direct:" + getESRName() + "PractitionerFavouritesListGET")
+
+                // Search practitioner health care service favourites.
+                .get("/{id}/PractitionerHealthCareServiceFavouritesDetails/search?emailAddress={emailAddress}&displayName={displayName}}&allName={allName}"
+                        + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+                .param().name("emailAddress").type(RestParamType.query).required(false).endParam().param().name("displayName").type(RestParamType.query)
+                .required(false).endParam().param().name("allName").type(RestParamType.query).required(false).endParam().param().name("pageSize")
+                .type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam().param()
+                .name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query).required(false)
+                .endParam().to("direct:" + getESRName() + "SearchPractitionerHealthCareServiceFavouritesGET")
+
+                .get("/{simplifiedID}/PractitionerHealthCareServiceFavouritesDetails?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
+                .param().name("pageSize").type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false)
+                .endParam().param().name("sortBy").type(RestParamType.query).required(false).endParam().param().name("sortOrder").type(RestParamType.query)
+                .required(false).endParam().to("direct:" + getESRName() + "PractitionerHealthCareServiceFavouritesListGET");
 
         from("direct:" + getESRName() + "GET").bean(practitionerServiceHandler, "getResource").log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
@@ -184,6 +202,13 @@ public class PractitionerESRAPI extends ResourceDirectoryAPI {
                 .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
         from("direct:" + getESRName() + "PractitionerFavouritesListGET").bean(practitionerServiceHandler, "practitionerFavouriteResourceList(Exchange)")
+                .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
+
+        from("direct:" + getESRName() + "SearchPractitionerHealthCareServiceFavouritesGET")
+                .bean(healthCareServiceHandler, "practitionerHealthCareServiceFavouriteSearch(Exchange)").log(LoggingLevel.DEBUG, "GET Request --> ${body}");
+
+        from("direct:" + getESRName() + "PractitionerHealthCareServiceFavouritesListGET")
+                .bean(healthCareServiceHandler, "practitionerHealthCareServiceFavouriteResourceList(Exchange)")
                 .log(LoggingLevel.DEBUG, "GET Request --> ${body}");
 
         from("direct:" + getESRName() + "SearchGET").bean(practitionerServiceHandler, "practitionerSearch(Exchange)").log(LoggingLevel.DEBUG,

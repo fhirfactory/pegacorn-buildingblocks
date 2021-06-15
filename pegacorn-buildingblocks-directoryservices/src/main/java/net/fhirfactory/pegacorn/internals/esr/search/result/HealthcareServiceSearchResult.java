@@ -50,12 +50,19 @@ public class HealthcareServiceSearchResult extends ESRSearchResult {
                 getLogger().info(".filterBy(): Entry, filter->{}", filter);
             }
         }
-
+        
         HealthcareServiceSearchResult result = (HealthcareServiceSearchResult)instatiateNewESRSearchResult();
         result.setSearchResultList(getSearchResultList());
         
+        if (filters == null || filters.isEmpty()) {
+            return result;
+        }
+                
+        result.setSearchResultList(doFilter(filters));
+        
         getLogger().debug(".filterBy(): Exit");
-        return(result);
+        
+        return result;
     }
 
     @Override
