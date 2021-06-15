@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.services.audit.logger;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicIDBuilder;
+import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.services.audit.logger.base.AuditEntryLoggerServiceBase;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.hl7.fhir.r4.model.AuditEvent;
@@ -48,7 +48,7 @@ public class TransactionAuditEntryLoggerService extends AuditEntryLoggerServiceB
     private IParser parserR4;
 
     @Inject
-    private FHIRElementTopicIDBuilder topicIDBuilder;
+    private FHIRElementTopicFactory topicIDBuilder;
 
 
     @PostConstruct

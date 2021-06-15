@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2020 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,20 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.esr.helpers;
+package net.fhirfactory.pegacorn.components.dataparcel.valuesets;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+public enum DataParcelNormalisationStatusEnum {
+    DATA_PARCEL_CONTENT_NORMALISATION_TRUE("data-parcel-content-normalisation-true"),
+    DATA_PARCEL_CONTENT_NORMALISATION_FALSE("data-parcel-content-normalisation-false"),
+    DATA_PARCEL_CONTENT_NORMALISATION_ANY("data-parcel-content-normalisation-any");
 
-public class ESRTopicTokenFactory {
+    private String normalisationStatus;
 
-    public DataParcelToken newTopicFactory(ExtremelySimplifiedResourceTypeEnum resourceType){
-        DataParcelToken token = new DataParcelToken();
-        token.setDataParcelDefiner("FHIRFactory");
-        token.setDataParcelCategory("DirectoryServices");
-        token.setDataParcelSubCategory("ExtremelySimplifiedResources");
-        token.setDataParcelResource(resourceType.getResourceType());
-        token.setVersion("1.0.0");
-        return(token);
+    private DataParcelNormalisationStatusEnum(String normalisation){
+        this.normalisationStatus = normalisation;
+    }
+
+    public String getNormalisationStatusValue(){
+        return(this.normalisationStatus);
+    }
+
+    public static DataParcelNormalisationStatusEnum fromNormalisationStatusString(String theString){
+        for (DataParcelNormalisationStatusEnum b : DataParcelNormalisationStatusEnum.values()) {
+            if (b.getNormalisationStatusValue().equalsIgnoreCase(theString)) {
+                return b;
+            }
+        }
+        return null;
     }
 }

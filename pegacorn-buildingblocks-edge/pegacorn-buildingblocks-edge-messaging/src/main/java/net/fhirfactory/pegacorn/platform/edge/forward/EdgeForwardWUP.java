@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.forward;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
@@ -55,8 +55,8 @@ public class EdgeForwardWUP extends EdgeEgressMessagingGatewayWUP {
     protected Set<DataParcelToken> specifySubscriptionTopics() {
         getLogger().debug(".specifySubscriptionTopics(): Entry");
         HashSet<DataParcelToken> myTopicSet = new HashSet<DataParcelToken>();
-        DataParcelToken topicId = getFHIRTopicIDBuilder().createTopicToken("Bundle", "4.0.1");
-        topicId.addDiscriminator("Destination", "*");
+        DataParcelToken topicId = getFHIRTopicIDBuilder().newTopicToken("Bundle", "4.0.1");
+        topicId.setDataParcelSourceSystem(getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeName());
         myTopicSet.add(topicId);
         getLogger().debug(".specifySubscriptionTopics(): Exit, added TopicToken --> {}", topicId);
         return (myTopicSet);

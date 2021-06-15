@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2020 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,20 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.esr.helpers;
+package net.fhirfactory.pegacorn.components.dataparcel;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ESRTopicTokenFactory {
+public class DataParcelQualityStatement implements Serializable {
+    private List<DataParcelFragmentQualityStatement> fragmentQualityStatementList;
 
-    public DataParcelToken newTopicFactory(ExtremelySimplifiedResourceTypeEnum resourceType){
-        DataParcelToken token = new DataParcelToken();
-        token.setDataParcelDefiner("FHIRFactory");
-        token.setDataParcelCategory("DirectoryServices");
-        token.setDataParcelSubCategory("ExtremelySimplifiedResources");
-        token.setDataParcelResource(resourceType.getResourceType());
-        token.setVersion("1.0.0");
-        return(token);
+    public DataParcelQualityStatement(){
+        this.fragmentQualityStatementList = new ArrayList<>();
+    }
+
+    public List<DataParcelFragmentQualityStatement> getFragmentQualityStatementList() {
+        return fragmentQualityStatementList;
+    }
+
+    public void setFragmentQualityStatementList(List<DataParcelFragmentQualityStatement> fragmentQualityStatementList) {
+        this.fragmentQualityStatementList = fragmentQualityStatementList;
     }
 }

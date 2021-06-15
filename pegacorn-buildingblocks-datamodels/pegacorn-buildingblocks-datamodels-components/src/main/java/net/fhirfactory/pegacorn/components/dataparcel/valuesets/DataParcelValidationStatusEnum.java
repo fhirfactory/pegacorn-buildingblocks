@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2020 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,20 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.esr.helpers;
+package net.fhirfactory.pegacorn.components.dataparcel.valuesets;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+public enum DataParcelValidationStatusEnum {
+    DATA_PARCEL_CONTENT_VALIDATED_TRUE("data-parcel-content-validation-true"),
+    DATA_PARCEL_CONTENT_VALIDATED_FALSE("data-parcel-content-validation-false"),
+    DATA_PARCEL_CONTENT_VALIDATION_ANY("data-parcel-content-validation-any");
 
-public class ESRTopicTokenFactory {
+    private String validationStatus;
 
-    public DataParcelToken newTopicFactory(ExtremelySimplifiedResourceTypeEnum resourceType){
-        DataParcelToken token = new DataParcelToken();
-        token.setDataParcelDefiner("FHIRFactory");
-        token.setDataParcelCategory("DirectoryServices");
-        token.setDataParcelSubCategory("ExtremelySimplifiedResources");
-        token.setDataParcelResource(resourceType.getResourceType());
-        token.setVersion("1.0.0");
-        return(token);
+    private DataParcelValidationStatusEnum(String normalisation){
+        this.validationStatus = normalisation;
+    }
+
+    public String getValidationStatusValue(){
+        return(this.validationStatus);
+    }
+
+    public static DataParcelValidationStatusEnum fromValidationStatusString(String statusString){
+        for (DataParcelValidationStatusEnum b : DataParcelValidationStatusEnum.values()) {
+            if (b.getValidationStatusValue().equalsIgnoreCase(statusString)) {
+                return b;
+            }
+        }
+        return null;
     }
 }

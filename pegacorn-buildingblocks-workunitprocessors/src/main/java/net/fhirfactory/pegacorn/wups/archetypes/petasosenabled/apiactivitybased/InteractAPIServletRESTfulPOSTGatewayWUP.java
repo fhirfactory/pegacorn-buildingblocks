@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.apiactivitybased;
 
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;

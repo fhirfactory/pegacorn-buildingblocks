@@ -19,33 +19,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics;
+package net.fhirfactory.pegacorn.components.dataparcel.valuesets;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public enum DataParcelTypeKeyEnum {
+    DATASET_DEFINER("definer"),
+    DATASET_CATEGORY("category"),
+    DATASET_SUBCATEGORY("subcategory"),
+    DATASET_RESOURCE("resource"),
+    DATASET_SEGMENT("segment"),
+    DATASET_ATTRIBUTE("attribute"),
+    DATASET_DISCRIMINATOR_VALUE("discriminator_value"),
+    DATASET_NORMALISATION_STATUS("normalisation_status"),
+    DATASET_VALIDATION_STATUS("validation_status"),
+    DATASET_TYPE("type"),
+    DATASET_SOURCE("source"),
+    DATASET_INTENDED_TARGET("target"),
+    DATASET_VERSION("version");
+   
+    private String topicKey;
 
-import javax.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
-public class FHIRElementTypeExtractor {
-	private static final Logger LOG = LoggerFactory.getLogger(FHIRElementTypeExtractor.class);
-
-	public Class<?> extractResourceType(DataParcelToken token) throws ClassNotFoundException {
-		LOG.debug(".extractResourceType(): Entry, token->{}", token);
-    	if(token == null) {
-			LOG.debug(".extractResourceType(): Exit, token is null");
-    		return(null);
-    	}
-    	String stringName = token.getDataParcelResource();
-        if(stringName==null) {
-        	LOG.debug(".extractResourceType(): Exit, no Resource attribute found");
-        	return(null);
-        }
-        Class resourceClass = Class.forName("org.hl7.fhir.r4.model." + stringName);
-		LOG.debug(".extractResourceType(): Exit, resourceClass->{}", resourceClass);
-        return(resourceClass);
+    private DataParcelTypeKeyEnum(String mapElementType){
+        this.topicKey = mapElementType;
     }
 
-    
+    public String getTopicKey(){
+        return(this.topicKey);
+    }
+
+    public static DataParcelTypeKeyEnum fromTopicKeyString(String keyString){
+        for (DataParcelTypeKeyEnum b : DataParcelTypeKeyEnum.values()) {
+            if (b.getTopicKey().equalsIgnoreCase(keyString)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

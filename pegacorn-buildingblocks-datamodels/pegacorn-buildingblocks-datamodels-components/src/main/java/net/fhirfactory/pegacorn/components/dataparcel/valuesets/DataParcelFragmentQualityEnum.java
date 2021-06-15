@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2020 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,20 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.esr.helpers;
+package net.fhirfactory.pegacorn.components.dataparcel.valuesets;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+public enum DataParcelFragmentQualityEnum {
+    AUTHORITATIVE_QUALITY_DATA_PARCEL_FRAGMENT("dataparcel.fragment-quality.authoritative"),
+    INFORMATIONAL_QUALITY_DATA_PARCEL_FRAGMENT("dataparcel.fragment-quality.informational"),
+    ANECDOTAL_QUALITY_DATA_PARCEL_FRAGMENT("dataparcel.fragment-quality.anecdotal");
 
-public class ESRTopicTokenFactory {
+    private String dataParcelFragmentQualityValue;
 
-    public DataParcelToken newTopicFactory(ExtremelySimplifiedResourceTypeEnum resourceType){
-        DataParcelToken token = new DataParcelToken();
-        token.setDataParcelDefiner("FHIRFactory");
-        token.setDataParcelCategory("DirectoryServices");
-        token.setDataParcelSubCategory("ExtremelySimplifiedResources");
-        token.setDataParcelResource(resourceType.getResourceType());
-        token.setVersion("1.0.0");
-        return(token);
+    private DataParcelFragmentQualityEnum(String qualityValue){
+        this.dataParcelFragmentQualityValue = qualityValue;
+    }
+
+    public String getDataParcelFragmentQualityValue() {
+        return dataParcelFragmentQualityValue;
+    }
+
+    public static DataParcelFragmentQualityEnum fromDataParcelFragmentQualityValueString(String dataQualityValue){
+        for (DataParcelFragmentQualityEnum b : DataParcelFragmentQualityEnum.values()) {
+            if (b.getDataParcelFragmentQualityValue().equalsIgnoreCase(dataQualityValue)) {
+                return b;
+            }
+        }
+        return null;
     }
 }

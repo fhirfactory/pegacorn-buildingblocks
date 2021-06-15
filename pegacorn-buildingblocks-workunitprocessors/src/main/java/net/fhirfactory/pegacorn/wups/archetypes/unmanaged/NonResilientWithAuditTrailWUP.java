@@ -4,7 +4,8 @@ import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.transaction.model.TransactionTypeEnum;
@@ -12,7 +13,7 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicIDBuilder;
+import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
@@ -46,7 +47,7 @@ public abstract class NonResilientWithAuditTrailWUP {
     private TopologyIM topologyIM;
 
     @Inject
-    private FHIRElementTopicIDBuilder topicIDBuilder;
+    private FHIRElementTopicFactory topicIDBuilder;
 
     @Inject
     private TransactionalWUPAuditEntryManager auditEntryManager;
@@ -127,7 +128,7 @@ public abstract class NonResilientWithAuditTrailWUP {
         return parserR4;
     }
 
-    public FHIRElementTopicIDBuilder getTopicIDBuilder() {
+    public FHIRElementTopicFactory getTopicIDBuilder() {
         return topicIDBuilder;
     }
 
@@ -239,8 +240,8 @@ public abstract class NonResilientWithAuditTrailWUP {
         }
         UoWPayload newPayload = new UoWPayload();
         newPayload.setPayload("Resource="+resourceType+"?search=");
-        DataParcelToken dataParcelToken = topicIDBuilder.createTopicToken(resourceType, resourceVersion);
-        dataParcelToken.addDiscriminator("SearchActivity", "SearchQuery");
+        DataParcelToken dataParcelToken = topicIDBuilder.newTopicToken(resourceType, resourceVersion);
+        dataParcelToken.setDataParcelType(DataParcelTypeEnum.SEARCH_QUERY_DATA_PARCEL_TYPE);
         newPayload.setPayloadTopicID(dataParcelToken);
         UoW uow = new UoW(newPayload);
         TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(this.getCurrentJobCard(),uow, TransactionTypeEnum.SEARCH);
@@ -252,7 +253,7 @@ public abstract class NonResilientWithAuditTrailWUP {
         UoWPayload payload = new UoWPayload();
         payload.setPayload(searchAnswerSummary);
         DataParcelToken dataParcelToken = startingTransaction.getUnitOfWork().getPayloadTopicID();
-        dataParcelToken.addDiscriminator("SearchActivity", "SearchOutcome");
+        dataParcelToken.setDataParcelType(DataParcelTypeEnum.SEARCH_RESULT_DATA_PARCEL_TYPE);
         payload.setPayloadTopicID(dataParcelToken);
         startingTransaction.getUnitOfWork().getEgressContent().addPayloadElement(payload);
 //        auditEntryManager.endTransaction(searchAnswerCount, resourceType , null,action,success,startingTransaction,getNodeInstanceID(),getWUPInstanceVersion());
