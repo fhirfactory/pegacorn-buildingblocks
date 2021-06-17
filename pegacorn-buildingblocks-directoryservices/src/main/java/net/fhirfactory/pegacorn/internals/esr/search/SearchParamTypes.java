@@ -4,7 +4,6 @@ public enum SearchParamTypes {
     SHORT_NAME("shortName"),
     LONG_NAME("longName"),
     SIMPLIFIED_ID("simplifiedID"),
-    EMAIL_ADDRESS("emailAddress"),
     ALL_NAME("allName"),
     DISPLAY_NAME("displayName"),
     PRIMARY_ROLE_CATEGORY_ID("primaryRoleCategegoryID"),

@@ -112,9 +112,9 @@ public class PractitionerESRBrokerSearchTest extends BaseESRBrokerSearchTest {
         try {
             createResources(26);
 
-            search(new SearchCriteria(SearchParamTypes.EMAIL_ADDRESS, "@test"), 25); // Only 25 instead of 26 due to paging.
-            search(new SearchCriteria(SearchParamTypes.EMAIL_ADDRESS, "John.Smithz"), 1); 
-            search(new SearchCriteria(SearchParamTypes.EMAIL_ADDRESS, "John.Smithzzzz"), 0);
+            search(new SearchCriteria(SearchParamTypes.SIMPLIFIED_ID, "@test"), 25); // Only 25 instead of 26 due to paging.
+            search(new SearchCriteria(SearchParamTypes.SIMPLIFIED_ID, "John.Smithz"), 1); 
+            search(new SearchCriteria(SearchParamTypes.SIMPLIFIED_ID, "John.Smithzzzz"), 0);
 
         } catch (Exception e) {
             fail("Error performing search", e);

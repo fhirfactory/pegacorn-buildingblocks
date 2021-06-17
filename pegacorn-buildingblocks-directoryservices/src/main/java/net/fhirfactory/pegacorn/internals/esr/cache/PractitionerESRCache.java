@@ -92,8 +92,7 @@ public class PractitionerESRCache extends PegacornESRCache {
         }
         
         switch(searchCriteria.getParamName()){
-            case SIMPLIFIED_ID:
-            case EMAIL_ADDRESS:{
+            case SIMPLIFIED_ID: {
                 result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
