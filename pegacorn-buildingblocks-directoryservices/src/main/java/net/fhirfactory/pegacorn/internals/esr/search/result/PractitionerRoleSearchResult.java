@@ -76,39 +76,39 @@ public class PractitionerRoleSearchResult extends ESRSearchResult {
         getLogger().debug(".sortBy(): Convert sortBy attribute name to lower case");
         getLogger().debug(".sortBy(): execute (via Switch() statement) the selected sort");
         
-        switch(sort.getSortBy().toLowerCase()){
-            case "simplifiedid": {
+        switch(sort.getSortBy()){
+            case SIMPLIFIED_ID: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
-            case "displayname": {
+            case DISPLAY_NAME: {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
             }
-            case "shortname": {
+            case SHORT_NAME: {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));
                 break;
             }
-            case "longname": {
+            case LONG_NAME: {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
                 break;
             }
-            case "primarylocationid": {
+            case PRIMARY_LOCATION_ID: {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerRoleESR.primaryLocationIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryLocationIDComparator));
                 break;
             }
-            case "primaryorganizatonid":
-            case "primaryorganisationid":{
+            case PRIMARY_ORGANISATION_ID:
+            case PRIMARY_ORGANIZATION_ID:{
                 getLogger().debug(".sortBy(): primaryOrganisationID sort requested...");
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerRoleESR.primaryOrganizationIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryOrganizationIDComparator));
                 getLogger().debug(".sortBy(): primaryOrganisationID sort done...");
                 break;
             }
-            case "primaryrolecategoryid": {
+            case PRIMARY_ROLE_CATEGORY_ID: {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerRoleESR.primaryRoleCategoryIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryRoleCategoryIDComparator));
                 break;
             }
-            case "primaryroleid": {
+            case PRIMARY_ROLE_ID: {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerRoleESR.primaryRoleIDComparator : Collections.reverseOrder(PractitionerRoleESR.primaryRoleIDComparator));
             }
             default:{

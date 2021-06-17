@@ -66,20 +66,20 @@ public class RoleCategorySearchResult extends ESRSearchResult {
         RoleCategorySearchResult result = (RoleCategorySearchResult)instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(getSearchResultList());
 
-        switch(sort.getSortBy().toLowerCase()){
-            case "simplifiedid": {
+        switch(sort.getSortBy()){
+            case SIMPLIFIED_ID: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
-            case "shortname": {
+            case SHORT_NAME: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));;
                 break;
             }
-            case "longname": {
+            case LONG_NAME: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
                 break;
             }
-            case "displayname": {
+            case DISPLAY_NAME: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
             }

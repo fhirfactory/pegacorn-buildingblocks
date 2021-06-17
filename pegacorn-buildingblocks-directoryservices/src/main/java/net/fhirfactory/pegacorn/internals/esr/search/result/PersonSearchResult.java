@@ -66,8 +66,8 @@ public class PersonSearchResult extends ESRSearchResult {
         PersonSearchResult result = (PersonSearchResult)instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(getSearchResultList());
 
-        switch(sort.getSortBy().toLowerCase()){
-            case "simplifiedid": {
+        switch(sort.getSortBy()){
+            case SIMPLIFIED_ID : {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }

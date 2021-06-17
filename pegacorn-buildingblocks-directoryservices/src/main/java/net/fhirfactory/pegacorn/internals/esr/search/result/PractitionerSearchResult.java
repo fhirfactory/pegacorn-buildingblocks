@@ -76,16 +76,16 @@ public class PractitionerSearchResult extends ESRSearchResult {
         PractitionerSearchResult result = (PractitionerSearchResult)instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(getSearchResultList());
 
-        switch(sort.getSortBy().toLowerCase()){
-            case "simplifiedid": {
+        switch(sort.getSortBy()){
+            case SIMPLIFIED_ID: {
             	Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
-            case "displayname": {
+            case DISPLAY_NAME: {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? ExtremelySimplifiedResource.displayNameComparator : Collections.reverseOrder(ExtremelySimplifiedResource.displayNameComparator));
                 break;
             }
-            case "lastroleselected": {
+            case LAST_ROLE_SELECTED: {
                 Collections.sort(result.getSearchResultList(),  sort.isAscendingOrder() ? PractitionerESR.lastRoleSelectionDateComparator : Collections.reverseOrder(PractitionerESR.lastRoleSelectionDateComparator));
                 break;            	
             }
