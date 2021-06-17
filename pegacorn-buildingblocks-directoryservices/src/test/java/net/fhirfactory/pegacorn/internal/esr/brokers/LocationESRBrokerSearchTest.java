@@ -8,40 +8,40 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.LocationESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.brokers.HealthcareServiceESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.LocationESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.LocationESRCache;
 
 /**
- * Health Care Service search tests.
+ * Location search tests.
  * 
  * @author Brendan Douglas
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, CommonIdentifierESDTTypes.class })
-public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTest {
+@AddBeanClasses({ LocationESRBroker.class, LocationESRCache.class, CommonIdentifierESDTTypes.class })
+public class LocationESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
-    private static final String PREFIX = "Health Care Service";
+    private static final String PREFIX = "Location";
 
     @Inject
-    private HealthcareServiceESRBroker broker;
+    private LocationESRBroker broker;
 
     
     /**
-     * Create a health care service.
+     * Create a location.
      * 
      * @param shortName
      * @param longName
      * @return
      */
-    public HealthcareServiceESR createResource(String shortName, String longName, char charToAdd) {
-        HealthcareServiceESR healthCareService = new HealthcareServiceESR();
+    public LocationESR createResource(String shortName, String longName, char charToAdd) {
+        LocationESR location = new LocationESR();
 
-        healthCareService.setDisplayName(shortName);
+        location.setDisplayName(shortName);
 
         CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
 
@@ -50,17 +50,17 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
-        healthCareService.getIdentifiers().add(shortNameBasedIdentifier);
-        healthCareService.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        location.getIdentifiers().add(shortNameBasedIdentifier);
+        location.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
         longNameBasedIdentifier.setType(identifierTypes.getLongName());
-        longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
+        longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.OFFICIAL);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);
-        healthCareService.getIdentifiers().add(longNameBasedIdentifier);
+        location.getIdentifiers().add(longNameBasedIdentifier);
 
-        return healthCareService;
+        return location;
     }
     
     
@@ -84,6 +84,6 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
     
     @Override
     protected void storeResource(ExtremelySimplifiedResource resource) throws ResourceInvalidSearchException {
-        broker.createHealthCareService((HealthcareServiceESR)resource);
+        broker.createLocationDE((LocationESR) resource);
     } 
 }

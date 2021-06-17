@@ -8,40 +8,46 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.brokers.HealthcareServiceESRBroker;
+import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
+import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.RoleCategoryESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleESRCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
 
 /**
- * Health Care Service search tests.
+ * Practitioner Role search tests.
  * 
  * @author Brendan Douglas
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, CommonIdentifierESDTTypes.class })
-public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTest {
+@AddBeanClasses({ PractitionerRoleESRBroker.class, PractitionerRoleESRCache.class, CommonIdentifierESDTTypes.class,GroupESRBroker.class, PractitionerRoleMapCache.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class })
+public class PractitionerRoleESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
-    private static final String PREFIX = "Health Care Service";
+    private static final String PREFIX = "Practitioner Role";
 
     @Inject
-    private HealthcareServiceESRBroker broker;
+    private PractitionerRoleESRBroker broker;
 
     
     /**
-     * Create a health care service.
+     * Create a practitioner role.
      * 
      * @param shortName
      * @param longName
      * @return
      */
-    public HealthcareServiceESR createResource(String shortName, String longName, char charToAdd) {
-        HealthcareServiceESR healthCareService = new HealthcareServiceESR();
+    public PractitionerRoleESR createResource(String shortName, String longName, char charToAdd) {
+        PractitionerRoleESR practitionerRole = new PractitionerRoleESR();
 
-        healthCareService.setDisplayName(shortName);
+        practitionerRole.setDisplayName(shortName);
 
         CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
 
@@ -50,17 +56,17 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
-        healthCareService.getIdentifiers().add(shortNameBasedIdentifier);
-        healthCareService.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        practitionerRole.getIdentifiers().add(shortNameBasedIdentifier);
+        practitionerRole.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
         longNameBasedIdentifier.setType(identifierTypes.getLongName());
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);
-        healthCareService.getIdentifiers().add(longNameBasedIdentifier);
+        practitionerRole.getIdentifiers().add(longNameBasedIdentifier);
 
-        return healthCareService;
+        return practitionerRole;
     }
     
     
@@ -84,6 +90,6 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
     
     @Override
     protected void storeResource(ExtremelySimplifiedResource resource) throws ResourceInvalidSearchException {
-        broker.createHealthCareService((HealthcareServiceESR)resource);
+        broker.createDirectoryEntry((PractitionerRoleESR) resource);
     } 
 }

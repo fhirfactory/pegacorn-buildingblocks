@@ -8,40 +8,40 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.brokers.HealthcareServiceESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.RoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.RoleESRCache;
 
 /**
- * Health Care Service search tests.
+ * Role search tests.
  * 
  * @author Brendan Douglas
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, CommonIdentifierESDTTypes.class })
-public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTest {
+@AddBeanClasses({ RoleESRBroker.class, RoleESRCache.class, CommonIdentifierESDTTypes.class })
+public class RoleESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
-    private static final String PREFIX = "Health Care Service";
+    private static final String PREFIX = "Role";
 
     @Inject
-    private HealthcareServiceESRBroker broker;
+    private RoleESRBroker broker;
 
     
     /**
-     * Create a health care service.
+     * Create a role.
      * 
      * @param shortName
      * @param longName
      * @return
      */
-    public HealthcareServiceESR createResource(String shortName, String longName, char charToAdd) {
-        HealthcareServiceESR healthCareService = new HealthcareServiceESR();
+    public RoleESR createResource(String shortName, String longName, char charToAdd) {
+        RoleESR role = new RoleESR();
 
-        healthCareService.setDisplayName(shortName);
+        role.setDisplayName(shortName);
 
         CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
 
@@ -50,17 +50,17 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
-        healthCareService.getIdentifiers().add(shortNameBasedIdentifier);
-        healthCareService.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        role.getIdentifiers().add(shortNameBasedIdentifier);
+        role.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
         longNameBasedIdentifier.setType(identifierTypes.getLongName());
-        longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
+        longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);
-        healthCareService.getIdentifiers().add(longNameBasedIdentifier);
+        role.getIdentifiers().add(longNameBasedIdentifier);
 
-        return healthCareService;
+        return role;
     }
     
     
@@ -84,6 +84,6 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
     
     @Override
     protected void storeResource(ExtremelySimplifiedResource resource) throws ResourceInvalidSearchException {
-        broker.createHealthCareService((HealthcareServiceESR)resource);
+        broker.createRole((RoleESR) resource);
     } 
 }

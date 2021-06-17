@@ -8,40 +8,40 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.OrganizationESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.brokers.HealthcareServiceESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.OrganizationESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.OrganizationESRCache;
 
 /**
- * Health Care Service search tests.
+ * Organisation search tests.
  * 
  * @author Brendan Douglas
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, CommonIdentifierESDTTypes.class })
-public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTest {
+@AddBeanClasses({ OrganizationESRBroker.class, OrganizationESRCache.class, CommonIdentifierESDTTypes.class })
+public class OrganisationESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
-    private static final String PREFIX = "Health Care Service";
+    private static final String PREFIX = "Organisation";
 
     @Inject
-    private HealthcareServiceESRBroker broker;
+    private OrganizationESRBroker broker;
 
     
     /**
-     * Create a health care service.
+     * Create an organisation.
      * 
      * @param shortName
      * @param longName
      * @return
      */
-    public HealthcareServiceESR createResource(String shortName, String longName, char charToAdd) {
-        HealthcareServiceESR healthCareService = new HealthcareServiceESR();
+    public OrganizationESR createResource(String shortName, String longName, char charToAdd) {
+        OrganizationESR organisation = new OrganizationESR();
 
-        healthCareService.setDisplayName(shortName);
+        organisation.setDisplayName(shortName);
 
         CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
 
@@ -50,17 +50,17 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
-        healthCareService.getIdentifiers().add(shortNameBasedIdentifier);
-        healthCareService.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        organisation.getIdentifiers().add(shortNameBasedIdentifier);
+        organisation.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
         longNameBasedIdentifier.setType(identifierTypes.getLongName());
-        longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
+        longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);
-        healthCareService.getIdentifiers().add(longNameBasedIdentifier);
+        organisation.getIdentifiers().add(longNameBasedIdentifier);
 
-        return healthCareService;
+        return organisation;
     }
     
     
@@ -84,6 +84,6 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
     
     @Override
     protected void storeResource(ExtremelySimplifiedResource resource) throws ResourceInvalidSearchException {
-        broker.createHealthCareService((HealthcareServiceESR)resource);
+        broker.createOrganizationDE((OrganizationESR) resource);
     } 
 }
