@@ -110,13 +110,6 @@ public class DataTypeTransformers {
                     contactPointList.add(facsimileContactPoint);
                     break;
                 }
-                case PERSONAL_PHONE: {
-                    ContactPoint personalPhoneContactPoint = contactPointFactory.buildContactPoint(
-                            currentEntry.getValue(), ContactPoint.ContactPointUse.HOME, ContactPoint.ContactPointSystem.PHONE, rank);
-                    rank += 1;
-                    contactPointList.add(personalPhoneContactPoint);
-                    break;
-                }
                 default:
             }
         }
