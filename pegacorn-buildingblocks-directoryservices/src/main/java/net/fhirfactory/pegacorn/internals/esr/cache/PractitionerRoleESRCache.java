@@ -119,52 +119,41 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
             return(result);
         }
         
-        switch(searchCriteria.getParamName().toLowerCase()){
-            case "simplifiedid":
-            case "emailaddress":{
+        switch(searchCriteria.getParamName()){
+            case SIMPLIFIED_ID:
+            case EMAIL_ADDRESS:{
                 result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
-            case "shortname": {
+            case SHORT_NAME: {
                 result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "longname": {
+            case LONG_NAME: {
                 result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.SECONDARY);
                 return(result);
             }
-            case "displayname": {
+            case DISPLAY_NAME: {
                 result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
-            case "organizaton":
-            case "primaryorganization":
-            case "organisation":
-            case "primaryorganisation":
-            case "primaryorganizationid":
-            case "primaryorganisationid":{
+            case PRIMARY_ORGANISATION_ID:{
                 result = this.searchCacheViaOrganization(searchCriteria);
                 return(result);
             }
-            case "location":
-            case "primarylocation":
-            case "primarylocationid": {
+            case PRIMARY_LOCATION_ID: {
                 result = this.searchCacheViaLocation(searchCriteria);
                 return(result);
             }
-            case "rolecategory":
-            case "rolecategoryid":
-            case "primaryrolecategoryid":{
+            case PRIMARY_ROLE_CATEGORY_ID:{
                 result = this.searchCacheViaRoleCategory(searchCriteria);
                 return(result);
             }
-            case "role":
-            case "roleid":
-            case "primaryroleid":{
+            case PRIMARY_ROLE_ID:{
                 result = this.searchCacheViaRole(searchCriteria);
                 return(result);
             }
-            case "allname" : {
+            case ALL_NAME : {
             	result = this.searchCacheUsingAllNames(searchCriteria, IdentifierESDTUseEnum.USUAL, IdentifierESDTUseEnum.SECONDARY);
             	return result;
             }

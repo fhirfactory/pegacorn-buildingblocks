@@ -17,7 +17,7 @@ public class SearchCriteria {
     private static final Logger LOG = LoggerFactory.getLogger(SearchCriteria.class);
 
 	
-	private String paramName;
+	private SearchParamTypes paramName;
 	private String value;
 	
 	private boolean containsMatch;
@@ -26,24 +26,24 @@ public class SearchCriteria {
 		containsMatch = true; 
 	}
 	
-	public SearchCriteria(String paramName, String value) {
+	public SearchCriteria(SearchParamTypes paramName, String value) {
 		this();
 		
 		this.paramName = paramName;
 		setValue(value);
 	}
 	
-	public SearchCriteria(String paramName, String value, boolean containsMatch) {
+	public SearchCriteria(SearchParamTypes paramName, String value, boolean containsMatch) {
 		this(paramName, value);
 		
 		this.containsMatch = containsMatch;
 	}
 	
-	public String getParamName() {
+	public SearchParamTypes getParamName() {
 		return paramName;
 	}
 	
-	public void setParamName(String paramName) {
+	public void setParamName(SearchParamTypes paramName) {
 		this.paramName = paramName;
 	}
 	

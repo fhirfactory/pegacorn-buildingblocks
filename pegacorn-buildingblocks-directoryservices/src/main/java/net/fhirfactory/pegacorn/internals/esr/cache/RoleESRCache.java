@@ -105,24 +105,24 @@ public class RoleESRCache extends PegacornESRCache {
             return(result);
         }
         
-        switch(searchCriteria.getParamName().toLowerCase()){
-            case "simplifiedid": {
+        switch(searchCriteria.getParamName()){
+            case SIMPLIFIED_ID: {
                 result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
-            case "shortname": {
+            case SHORT_NAME: {
                 result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "longname": {
+            case LONG_NAME: {
                 result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "displayname": {
+            case DISPLAY_NAME: {
                 result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
-            case "allname" : {
+            case ALL_NAME: {
             	result = this.searchCacheUsingAllNames(searchCriteria, IdentifierESDTUseEnum.USUAL, IdentifierESDTUseEnum.USUAL);
             	return result;
             }

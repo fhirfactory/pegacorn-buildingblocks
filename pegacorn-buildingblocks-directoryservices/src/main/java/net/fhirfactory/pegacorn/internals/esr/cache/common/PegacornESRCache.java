@@ -18,6 +18,7 @@ import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParamTypes;
 
 
 public abstract class PegacornESRCache {
@@ -273,7 +274,7 @@ public abstract class PegacornESRCache {
         }
         getLogger().info("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", identifier);
         
-        SearchCriteria searchCriteria = new SearchCriteria(identifier.getType(), identifier.getValue(), containsMatch);
+        SearchCriteria searchCriteria = new SearchCriteria(SearchParamTypes.get(identifier.getType()), identifier.getValue(), containsMatch);
         
         ESRSearchResult result = searchCacheForESRUsingIdentifierParameters(searchCriteria, identifier.getType(), identifier.getUse());
         ESRMethodOutcome outcome = result.toESRMethodOutcome();

@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParamTypes;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
@@ -100,26 +101,26 @@ public class GroupServiceHandler extends HandlerBase {
         getLogger().debug(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{}"+
                         "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
                 shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
-        String searchAttributeName = null;
+        SearchParamTypes searchAttributeName = null;
         String searchAttributeValue = null;
         if(shortName != null) {
             searchAttributeValue = shortName;
-            searchAttributeName = "shortName";
+            searchAttributeName = SearchParamTypes.SHORT_NAME;
         } else if(longName != null){
             searchAttributeValue = longName;
-            searchAttributeName = "longName";
+            searchAttributeName = SearchParamTypes.LONG_NAME;
         } else if(displayName != null){
             searchAttributeValue = displayName;
-            searchAttributeName = "displayName";
+            searchAttributeName = SearchParamTypes.DISPLAY_NAME;
         } else if(allName != null) {
         	searchAttributeValue = allName;
-            searchAttributeName = "allName";
+            searchAttributeName = SearchParamTypes.ALL_NAME;
         } else if(groupManager != null){
             searchAttributeValue = groupManager;
-            searchAttributeName = "groupManager";
+            searchAttributeName = SearchParamTypes.GROUP_MANAGER;
         } else if(groupType != null){
             searchAttributeValue = groupType;
-            searchAttributeName = "groupType";
+            searchAttributeName = SearchParamTypes.GROUP_TYPE;
         } else {
             throw( new ResourceInvalidSearchException("Search parameter not specified"));
         }

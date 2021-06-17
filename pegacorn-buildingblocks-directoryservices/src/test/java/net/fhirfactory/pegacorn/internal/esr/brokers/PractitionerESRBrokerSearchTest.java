@@ -24,6 +24,7 @@ import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapC
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParamTypes;
 
 /**
  * Practitioner search tests.
@@ -111,9 +112,9 @@ public class PractitionerESRBrokerSearchTest extends BaseESRBrokerSearchTest {
         try {
             createResources(26);
 
-            search(new SearchCriteria("emailaddress", "@test"), 25); // Only 25 instead of 26 due to paging.
-            search(new SearchCriteria("emailaddress", "John.Smithz"), 1); 
-            search(new SearchCriteria("emailaddress", "John.Smithzzzz"), 0);
+            search(new SearchCriteria(SearchParamTypes.EMAIL_ADDRESS, "@test"), 25); // Only 25 instead of 26 due to paging.
+            search(new SearchCriteria(SearchParamTypes.EMAIL_ADDRESS, "John.Smithz"), 1); 
+            search(new SearchCriteria(SearchParamTypes.EMAIL_ADDRESS, "John.Smithzzzz"), 0);
 
         } catch (Exception e) {
             fail("Error performing search", e);
