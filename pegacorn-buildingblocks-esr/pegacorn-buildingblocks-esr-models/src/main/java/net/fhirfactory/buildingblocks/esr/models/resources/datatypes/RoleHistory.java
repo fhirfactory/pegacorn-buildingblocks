@@ -195,20 +195,38 @@ public class RoleHistory {
 
 	
 	/**
-	 * Rrturns the current {@link RoleHistoryDetail} for the supplied role.
+	 * Returns the current {@link RoleHistoryDetail} for the supplied role.
 	 * 
 	 * @param role
 	 * @return
 	 */
 	public RoleHistoryDetail getCurrentRole(String role) {
-		for (RoleHistoryDetail roleDetail : roleHistories) {
-			if (roleDetail.getEndDate() == null && roleDetail.getRole().contains(role)) {
+		for (RoleHistoryDetail roleDetail : getAllCurrentRoles()) {
+			if (roleDetail.getRole().contains(role)) {
 				return roleDetail;
 			}
 		}
 		
 		return null;
 	}
+	
+	
+    /**
+     * Returns the current {@link RoleHistoryDetail} for the supplied role.
+     * 
+     * @param role
+     * @return
+     */
+    public RoleHistoryDetail getPreviousRole(String role) {
+        for (RoleHistoryDetail roleDetail : getAllPreviousRoles()) {
+            if (roleDetail.getRole().contains(role)) {
+                return roleDetail;
+            }
+        }
+        
+        return null;
+    }	
+	
 
 	public boolean isEmpty() {
 		for (RoleHistoryDetail roleHistory : roleHistories) {
