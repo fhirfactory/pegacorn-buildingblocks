@@ -23,12 +23,11 @@ import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingExcepti
  *
  */
 public abstract class BaseESRBrokerSearchTest {
-    
+
     protected abstract ESRBroker getBroker();
 
-    
     /**
-     * Performs a search.  Assert the expected count.
+     * Performs a search. Assert the expected count.
      * 
      * @param searchCriteria
      * @param expectedResultCount
@@ -39,20 +38,19 @@ public abstract class BaseESRBrokerSearchTest {
      * @throws ESRPaginationException
      * @throws ESRFilteringException
      */
-    List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, int expectedResultCount) throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
+    List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, int expectedResultCount)
+            throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
         return search(searchCriteria, new Sort(), new Pagination(), expectedResultCount);
     }
-    
-    
-    
-    List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, Sort sort, Pagination pagination, int expectedResultCount) throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
-        ESRMethodOutcome outcome = getBroker().searchForESRsUsingAttribute(searchCriteria, null, sort, pagination);
-        
-        List<ExtremelySimplifiedResource> results = outcome.getSearchResult();
-        
-        assertEquals(expectedResultCount, results.size());
-        
-        return results;        
-    }
 
+    List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, Sort sort, Pagination pagination, int expectedResultCount)
+            throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
+        ESRMethodOutcome outcome = getBroker().searchForESRsUsingAttribute(searchCriteria, null, sort, pagination);
+
+        List<ExtremelySimplifiedResource> results = outcome.getSearchResult();
+
+        assertEquals(expectedResultCount, results.size());
+
+        return results;
+    }
 }

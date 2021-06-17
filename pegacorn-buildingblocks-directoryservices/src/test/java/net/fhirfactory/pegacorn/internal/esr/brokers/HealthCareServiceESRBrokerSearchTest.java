@@ -13,31 +13,30 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import org.junit.jupiter.api.Test;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.brokers.CareTeamESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.HealthcareServiceESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamESRCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 
 /**
- * Care team search tests.
+ * Health Care Service search tests.
  * 
  * @author Brendan Douglas
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ CareTeamESRBroker.class, CareTeamESRCache.class, PractitionerRoleESRBroker.class })
-public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
+@AddBeanClasses({ HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, CommonIdentifierESDTTypes.class })
+public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTest {
 
     @Inject
-    private CareTeamESRBroker broker;
+    private HealthcareServiceESRBroker broker;
 
     /**
      * A search test which matches all records. Also tests the default sort order
@@ -46,7 +45,7 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     public void testSearchUsingShortNameAllRecordsMatch() {
 
         try {
-            createCareTeams(4);
+            createHealthCareServices(4);
 
             search(new SearchCriteria("shortName", "short"), 4);
             search(new SearchCriteria("longName", "long"), 4);
@@ -63,7 +62,7 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     public void testSearchUsingShortNameOneRecordMatches() {
 
         try {
-            createCareTeams(4);
+            createHealthCareServices(4);
 
             search(new SearchCriteria("shortName", "namea"), 1);
             search(new SearchCriteria("longName", "namey"), 1);
@@ -78,7 +77,7 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     @Test
     public void testAllNameSearch() {
         try {
-            createCareTeams(26);
+            createHealthCareServices(26);
 
             search(new SearchCriteria("allname", "namez"), 2); // There will be 2. One matches short name, the other long name.
         } catch (Exception e) {
@@ -94,7 +93,7 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     public void testSearchUsingShortNameNoRecordsMatch() {
 
         try {
-            createCareTeams(4);
+            createHealthCareServices(4);
 
             search(new SearchCriteria("shortName", "zzzz"), 0);
             search(new SearchCriteria("longName", "xxxxx"), 0);
@@ -111,11 +110,11 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     public void testSearchUsingShortNameDefaultPaging() {
 
         try {
-            createCareTeams(26);
+            createHealthCareServices(26);
 
             // Match sure the default pagination returns the first 25 records only.
-            search(new SearchCriteria("shortName", "care"), 25);
-            search(new SearchCriteria("longName", "care"), 25);
+            search(new SearchCriteria("shortName", "health"), 25);
+            search(new SearchCriteria("longName", "health"), 25);
         } catch (Exception e) {
             fail("Error performing search", e);
         }
@@ -128,16 +127,16 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     public void testSearchUsingShortNameCustomPaging() {
 
         try {
-            createCareTeams(26);
+            createHealthCareServices(26);
 
             // Match sure the correct records are returned for the custom paging.
-            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria("shortName", "care"), new Sort(), new Pagination(5, 3), 5);
+            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria("shortName", "health"), new Sort(), new Pagination(5, 3), 5);
 
-            assertEquals("Care team short namep", searchResult.get(0).getDisplayName());
-            assertEquals("Care team short nameq", searchResult.get(1).getDisplayName());
-            assertEquals("Care team short namer", searchResult.get(2).getDisplayName());
-            assertEquals("Care team short names", searchResult.get(3).getDisplayName());
-            assertEquals("Care team short namet", searchResult.get(4).getDisplayName());
+            assertEquals("Health Care Service short namep", searchResult.get(0).getDisplayName());
+            assertEquals("Health Care Service short nameq", searchResult.get(1).getDisplayName());
+            assertEquals("Health Care Service short namer", searchResult.get(2).getDisplayName());
+            assertEquals("Health Care Service short names", searchResult.get(3).getDisplayName());
+            assertEquals("Health Care Service short namet", searchResult.get(4).getDisplayName());
 
         } catch (Exception e) {
             fail("Error performing search", e);
@@ -151,16 +150,16 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     public void testDefaultAscendingSorting() {
 
         try {
-            createCareTeams(26);
+            createHealthCareServices(26);
 
             // Match sure the correct records are returned for the custom paging.
-            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria("shortName", "care"), new Sort(), new Pagination(), 25);
+            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria("shortName", "health"), new Sort(), new Pagination(), 25);
 
             String alphabet = "abcdefghijklmnopqrstuvwxyz";
 
             for (int i = 0; i < 25; i++) {
                 char shortNameChar = alphabet.charAt(i);
-                assertEquals("Care team short name" + shortNameChar, searchResult.get(i).getDisplayName());
+                assertEquals("Health Care Service short name" + shortNameChar, searchResult.get(i).getDisplayName());
             }
         } catch (Exception e) {
             fail("Error performing search", e);
@@ -174,7 +173,7 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     public void testDescendingSorting() {
 
         try {
-            createCareTeams(26);
+            createHealthCareServices(26);
 
             // Match sure the correct records are returned for the custom paging.
             List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria("shortName", "care"), new Sort("shortName", "descending"),
@@ -185,7 +184,7 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
 
             for (int i = 0; i < 25; i++) {
                 char shortNameChar = alphabetbackward.charAt(i);
-                assertEquals("Care team short name" + shortNameChar, searchResult.get(i).getDisplayName());
+                assertEquals("Health Care Service short name" + shortNameChar, searchResult.get(i).getDisplayName());
             }
         } catch (Exception e) {
             fail("Error performing search", e);
@@ -193,12 +192,12 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     }
 
     /**
-     * Create some care teams.
+     * Create some health care services.
      * 
      * @param number
      * @throws ResourceInvalidSearchException
      */
-    private void createCareTeams(int number) throws ResourceInvalidSearchException {
+    private void createHealthCareServices(int number) throws ResourceInvalidSearchException {
         if (number > 26) {
             throw new RuntimeException("Can only create max 26 records");
         }
@@ -210,21 +209,22 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
             char shortNameChar = alphabetForward.charAt(i);
             char longtNameChar = alphabetbackward.charAt(i);
 
-            broker.createCareTeam(createCareTeam("Care team short name" + shortNameChar, "Care team long name" + longtNameChar));
+            broker.createHealthCareService(
+                    createHealthCareService("Health Care Service short name" + shortNameChar, "Health Care Service long name" + longtNameChar));
         }
     }
 
     /**
-     * Create a car team.
+     * Create a health care service.
      * 
      * @param shortName
      * @param longName
      * @return
      */
-    private CareTeamESR createCareTeam(String shortName, String longName) {
-        CareTeamESR careTeam = new CareTeamESR();
+    private HealthcareServiceESR createHealthCareService(String shortName, String longName) {
+        HealthcareServiceESR healthCareService = new HealthcareServiceESR();
 
-        careTeam.setDisplayName(shortName);
+        healthCareService.setDisplayName(shortName);
 
         CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
 
@@ -233,17 +233,17 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
-        careTeam.getIdentifiers().add(shortNameBasedIdentifier);
-        careTeam.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        healthCareService.getIdentifiers().add(shortNameBasedIdentifier);
+        healthCareService.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
         longNameBasedIdentifier.setType(identifierTypes.getLongName());
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);
-        careTeam.getIdentifiers().add(longNameBasedIdentifier);
+        healthCareService.getIdentifiers().add(longNameBasedIdentifier);
 
-        return careTeam;
+        return healthCareService;
     }
 
     @Override
