@@ -84,6 +84,19 @@ public class PractitionerCurrentRolesTest {
             
             assertNotNull(practitioner.getRoleHistory().getCurrentRole("Role 1 short name"));
             assertNotNull(practitioner.getRoleHistory().getCurrentRole("Role 2 short name"));
+            
+            // The practitioner role needs to have an association with the practitioner
+            PractitionerRoleESR practitionerRole1 = (PractitionerRoleESR)practitionerRoleBroker.getResource("Role 1 short name".toLowerCase()).getEntry();
+            PractitionerRoleESR practitionerRole2 = (PractitionerRoleESR)practitionerRoleBroker.getResource("Role 1 short name".toLowerCase()).getEntry();
+            
+            assertEquals(1, practitionerRole1.getActivePractitionerSet().size());
+            assertEquals(1, practitionerRole2.getActivePractitionerSet().size());
+            
+            assertEquals("test1@test.com", practitionerRole1.getActivePractitionerSet().get(0).getSimplifiedID());
+            assertEquals("test1@test.com", practitionerRole2.getActivePractitionerSet().get(0).getSimplifiedID());
+            
+            assertEquals("test1@test.com", practitionerRole1.getActivePractitionerIds().get(0));
+            assertEquals("test1@test.com", practitionerRole2.getActivePractitionerIds().get(0));
         } catch(Exception e) {
             fail("Unable to get the practitioner roles", e);
         }
@@ -108,6 +121,12 @@ public class PractitionerCurrentRolesTest {
             assertEquals(2, practitioner.getRoleHistory().getAllPreviousRoles().size());
             assertNotNull(practitioner.getRoleHistory().getPreviousRole("Role 1 short name"));
             assertNotNull(practitioner.getRoleHistory().getPreviousRole("Role 2 short name"));
+            
+            // The practitioner role should no longer have an association with the practitioner
+            PractitionerRoleESR practitionerRole1 = (PractitionerRoleESR)practitionerRoleBroker.getResource("Role 1 short name".toLowerCase()).getEntry();
+            PractitionerRoleESR practitionerRole2 = (PractitionerRoleESR)practitionerRoleBroker.getResource("Role 1 short name".toLowerCase()).getEntry();
+            assertEquals(0, practitionerRole1.getActivePractitionerSet().size());
+            assertEquals(0, practitionerRole2.getActivePractitionerSet().size());
             
         } catch(Exception e) {
             fail("Unable to get the practitioner roles", e);
