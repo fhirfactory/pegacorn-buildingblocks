@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
-import net.fhirfactory.pegacorn.internals.esr.search.SearchParamTypes;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
@@ -138,32 +138,32 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
                         + "primaryRoleID->{}, primaryOrganizationID->{}, primaryLocationID->{}",
                 shortName, longName, displayName, sortBy, sortOrder, pageSize, page, primaryRoleCategoryID, primaryRoleID, primaryOrganizationID,
                 primaryLocationID);
-        SearchParamTypes searchAttributeName = null;
+        SearchParamNames searchAttributeName = null;
         String searchAttributeValue = null;
         if (shortName != null) {
             searchAttributeValue = shortName;
-            searchAttributeName = SearchParamTypes.SHORT_NAME;
+            searchAttributeName = SearchParamNames.SHORT_NAME;
         } else if (longName != null) {
             searchAttributeValue = longName;
-            searchAttributeName = SearchParamTypes.LONG_NAME;
+            searchAttributeName = SearchParamNames.LONG_NAME;
         } else if (displayName != null) {
             searchAttributeValue = displayName;
-            searchAttributeName = SearchParamTypes.DISPLAY_NAME;
+            searchAttributeName = SearchParamNames.DISPLAY_NAME;
         } else if (allName != null) {
             searchAttributeValue = allName;
-            searchAttributeName = SearchParamTypes.ALL_NAME;
+            searchAttributeName = SearchParamNames.ALL_NAME;
         } else if (primaryRoleCategoryID != null) {
             searchAttributeValue = primaryRoleCategoryID;
-            searchAttributeName = SearchParamTypes.PRIMARY_ROLE_CATEGORY_ID;
+            searchAttributeName = SearchParamNames.PRIMARY_ROLE_CATEGORY_ID;
         } else if (primaryRoleID != null) {
             searchAttributeValue = primaryRoleID;
-            searchAttributeName = SearchParamTypes.PRIMARY_ROLE_ID;
+            searchAttributeName = SearchParamNames.PRIMARY_ROLE_ID;
         } else if (primaryOrganizationID != null) {
             searchAttributeValue = primaryOrganizationID;
-            searchAttributeName = SearchParamTypes.PRIMARY_ORGANISATION_ID;
+            searchAttributeName = SearchParamNames.PRIMARY_ORGANISATION_ID;
         } else if (primaryLocationID != null) {
             searchAttributeValue = primaryLocationID;
-            searchAttributeName = SearchParamTypes.PRIMARY_LOCATION_ID;
+            searchAttributeName = SearchParamNames.PRIMARY_LOCATION_ID;
         } else {
             throw (new ResourceInvalidSearchException("Search parameter not specified"));
         }

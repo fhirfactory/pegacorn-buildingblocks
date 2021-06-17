@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.internals.esr.search;
 
-public enum SearchParamTypes {
+public enum SearchParamNames {
     SHORT_NAME("shortName"),
     LONG_NAME("longName"),
     SIMPLIFIED_ID("simplifiedID"),
@@ -16,7 +16,7 @@ public enum SearchParamTypes {
     
     private String value;
     
-    SearchParamTypes(String value) {
+    SearchParamNames(String value) {
         this.value = value;
     }
     
@@ -25,8 +25,8 @@ public enum SearchParamTypes {
     }
     
     
-    public static SearchParamTypes get(String searchValue) {
-        for (SearchParamTypes type : values()) {
+    public static SearchParamNames get(String searchValue) {
+        for (SearchParamNames type : values()) {
             if (type.getValue().equalsIgnoreCase(searchValue)) {
                 return type;
             }

@@ -15,7 +15,7 @@ import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
-import net.fhirfactory.pegacorn.internals.esr.search.SearchParamTypes;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
@@ -73,12 +73,12 @@ public abstract class BaseESRBrokerSearchTest {
         try {
             createResources(4);
 
-            search(new SearchCriteria(SearchParamTypes.SHORT_NAME, "short"), 4);
-            search(new SearchCriteria(SearchParamTypes.LONG_NAME, "long"), 4);
-            search(new SearchCriteria(SearchParamTypes.SHORT_NAME, "namea"), 1);
-            search(new SearchCriteria(SearchParamTypes.LONG_NAME, "namey"), 1);
-            search(new SearchCriteria(SearchParamTypes.SHORT_NAME, "zzzz"), 0);
-            search(new SearchCriteria(SearchParamTypes.LONG_NAME, "xxxxx"), 0);
+            search(new SearchCriteria(SearchParamNames.SHORT_NAME, "short"), 4);
+            search(new SearchCriteria(SearchParamNames.LONG_NAME, "long"), 4);
+            search(new SearchCriteria(SearchParamNames.SHORT_NAME, "namea"), 1);
+            search(new SearchCriteria(SearchParamNames.LONG_NAME, "namey"), 1);
+            search(new SearchCriteria(SearchParamNames.SHORT_NAME, "zzzz"), 0);
+            search(new SearchCriteria(SearchParamNames.LONG_NAME, "xxxxx"), 0);
 
         } catch (Exception e) {
             fail("Error performing search", e);
@@ -96,7 +96,7 @@ public abstract class BaseESRBrokerSearchTest {
         try {
             createResources(26);
 
-            search(new SearchCriteria(SearchParamTypes.ALL_NAME, "namez"), 2); // There will be 2. One matches short name, the other long name.
+            search(new SearchCriteria(SearchParamNames.ALL_NAME, "namez"), 2); // There will be 2. One matches short name, the other long name.
         } catch (Exception e) {
             fail("Error performing search", e);
         }
@@ -115,8 +115,8 @@ public abstract class BaseESRBrokerSearchTest {
             createResources(26);
 
             // Match sure the default pagination returns the first 25 records only.
-            search(new SearchCriteria(SearchParamTypes.SHORT_NAME, getShortNamePrefix()), 25);
-            search(new SearchCriteria(SearchParamTypes.LONG_NAME, getLongNamePrefix()), 25);
+            search(new SearchCriteria(SearchParamNames.SHORT_NAME, getShortNamePrefix()), 25);
+            search(new SearchCriteria(SearchParamNames.LONG_NAME, getLongNamePrefix()), 25);
         } catch (Exception e) {
             fail("Error performing search", e);
         }
@@ -133,7 +133,7 @@ public abstract class BaseESRBrokerSearchTest {
             createResources(26);
 
             // Match sure the correct records are returned for the custom paging.
-            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria(SearchParamTypes.SHORT_NAME, getShortNamePrefix()), new Sort(), new Pagination(5, 3), 5);
+            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria(SearchParamNames.SHORT_NAME, getShortNamePrefix()), new Sort(), new Pagination(5, 3), 5);
 
             assertEquals(getShortNamePrefix() + "short namep", searchResult.get(0).getDisplayName());
             assertEquals(getShortNamePrefix() + "short nameq", searchResult.get(1).getDisplayName());
@@ -157,7 +157,7 @@ public abstract class BaseESRBrokerSearchTest {
             createResources(26);
 
             // Match sure the correct records are returned for the custom paging.
-            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria(SearchParamTypes.SHORT_NAME, getShortNamePrefix()), new Sort(), new Pagination(), 25);
+            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria(SearchParamNames.SHORT_NAME, getShortNamePrefix()), new Sort(), new Pagination(), 25);
 
             String alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -181,7 +181,7 @@ public abstract class BaseESRBrokerSearchTest {
             createResources(26);
 
             // Match sure the correct records are returned for the custom paging.
-            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria(SearchParamTypes.SHORT_NAME, getShortNamePrefix()), new Sort("shortName", "descending"),
+            List<ExtremelySimplifiedResource> searchResult = search(new SearchCriteria(SearchParamNames.SHORT_NAME, getShortNamePrefix()), new Sort("shortName", "descending"),
                     new Pagination(), 25);
 
             String alphabetForward = "abcdefghijklmnopqrstuvwxyz";
