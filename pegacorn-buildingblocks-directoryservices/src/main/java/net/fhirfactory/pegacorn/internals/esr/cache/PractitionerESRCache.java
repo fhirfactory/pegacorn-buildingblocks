@@ -117,18 +117,4 @@ public class PractitionerESRCache extends PegacornESRCache {
             }
         }
     }
-
-    @Override
-    public Boolean supportsSearchType(String attributeName) {
-        String searchAttributeNameLowerCase = attributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "shortnmae":
-            case "longname":
-            case "displayname":
-                return(true);
-            default:
-                return(false);
-        }
-    }
 }

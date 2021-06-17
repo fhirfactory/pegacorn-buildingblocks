@@ -78,21 +78,6 @@ public class LocationESRCache extends PegacornESRCache {
     }
 
     @Override
-    public Boolean supportsSearchType(String attributeName) {
-        String searchAttributeNameLowerCase = attributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "shortnmae":
-            case "longname":
-            case "displayname":
-            case "leafvalue":
-                return(true);
-            default:
-                return(false);
-        }
-    }
-
-    @Override
     public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
     	

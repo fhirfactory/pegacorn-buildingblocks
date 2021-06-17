@@ -71,33 +71,6 @@ public class PractitionerRoleESRCache extends PegacornESRCache {
         return(result);
     }
 
-    @Override
-    public Boolean supportsSearchType(String attributeName) {
-        String searchAttributeNameLowerCase = attributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "shortnmae":
-            case "longname":
-            case "displayname":
-            case "emailaddress":
-            case "organizaton":
-            case "primaryorganization":
-            case "organisationid":
-            case "primaryorganisation":
-            case "primaryorganizationid":
-            case "primaryorganisationid":
-            case "location":
-            case "primarylocation":
-            case "primarylocationid":
-            case "primaryrolecategory":
-            case "primaryrolecategoryid":
-            case "primaryrole":
-            case "primaryroleid":
-                return(true);
-            default:
-                return(false);
-        }
-    }
 
     @Override
     public ESRSearchResult search(SearchCriteria searchCriteria)

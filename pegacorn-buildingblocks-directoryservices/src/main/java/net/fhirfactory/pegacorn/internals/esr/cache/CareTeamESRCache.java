@@ -60,25 +60,8 @@ public class CareTeamESRCache extends PegacornESRCache {
         CareTeamESR foundCareTeam = (CareTeamESR) foundEntry;
         return(foundCareTeam);
     }
-
-    //
-    // Search/Filter Services
-    //
-
-    @Override
-    public Boolean supportsSearchType(String attributeName) {
-        String searchAttributeNameLowerCase = attributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "shortname":
-            case "longname":
-            case "displayname":
-                return(true);
-            default:
-                return(false);
-        }
-    }
-
+    
+    
     @Override
     public ESRSearchResult search(SearchCriteria searchCriteria)
         throws ResourceInvalidSearchException {

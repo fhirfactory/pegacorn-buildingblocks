@@ -32,8 +32,6 @@ public abstract class PegacornESRCache {
             throws ResourceInvalidSearchException;
     abstract protected ESRSearchResult instatiateNewESRSearchResult();
 
-    abstract public Boolean supportsSearchType(String attributeName);
-
     public PegacornESRCache(){
         identifier2ESRMap = new ConcurrentHashMap<>();
         simplifiedID2ESRMap = new ConcurrentHashMap<>();
