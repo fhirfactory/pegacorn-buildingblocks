@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.OrganisationStructure;
 
 public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleESR.class);
@@ -44,6 +45,7 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
     private String practitionerRoleADGroup;
     private ArrayList<ContactPointESDT> contactPoints;
     private List<PractitionerESR>activePractitionerSet;
+    private List<OrganisationStructure>organisationStructure;
     
     private List<String> careTeams;
 
@@ -51,6 +53,7 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
         this.contactPoints = new ArrayList<>();
         this.careTeams = new ArrayList<>();
         this.activePractitionerSet = new ArrayList<>();
+        this.organisationStructure = new ArrayList<OrganisationStructure>();
     }
 
     public String getPrimaryOrganizationID() {
@@ -76,9 +79,16 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
 	public void setActivePractitionerSet(List<PractitionerESR> activePractitionerSet) {
 		this.activePractitionerSet = activePractitionerSet;
 	}
+
+	public List<OrganisationStructure> getOrganisationStructure() {
+        return organisationStructure;
+    }
 	
-	
-	@JsonIgnore
+    public void setOrganisationStructure(List<OrganisationStructure> organisationStructure) {
+        this.organisationStructure = organisationStructure;
+    }
+    
+    @JsonIgnore
 	public List<String>getActivePractitionerIds() {
 		List<String>ids = new ArrayList<>();
 		
