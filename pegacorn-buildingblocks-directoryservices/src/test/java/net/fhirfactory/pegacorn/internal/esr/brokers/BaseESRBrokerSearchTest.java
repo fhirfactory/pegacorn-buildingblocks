@@ -20,6 +20,7 @@ import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingException;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
 
 /**
  * Base class for all search tests.
@@ -47,14 +48,24 @@ public abstract class BaseESRBrokerSearchTest {
      * @throws ESRPaginationException
      * @throws ESRFilteringException
      */
-    List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, int expectedResultCount)
+    protected List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, int expectedResultCount)
             throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
-        return search(searchCriteria, new Sort(), new Pagination(), expectedResultCount);
+        return search(searchCriteria, null, new Sort(), new Pagination(), expectedResultCount);
+    }
+    
+    protected List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, List<BaseFilter> filters, int expectedResultCount)
+            throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
+        return search(searchCriteria, filters, new Sort(), new Pagination(), expectedResultCount);
+    }
+    
+    protected List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, Sort sort, Pagination pagination, int expectedResultCount)
+            throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
+        return search(searchCriteria, null, sort, pagination, expectedResultCount);
     }
 
-    List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, Sort sort, Pagination pagination, int expectedResultCount)
+    protected List<ExtremelySimplifiedResource> search(SearchCriteria searchCriteria, List<BaseFilter> filters, Sort sort, Pagination pagination, int expectedResultCount)
             throws ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRPaginationException, ESRFilteringException {
-        ESRMethodOutcome outcome = getBroker().searchForESRsUsingAttribute(searchCriteria, null, sort, pagination);
+        ESRMethodOutcome outcome = getBroker().searchForESRsUsingAttribute(searchCriteria, filters, sort, pagination);
 
         List<ExtremelySimplifiedResource> results = outcome.getSearchResult();
 

@@ -12,19 +12,24 @@ import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearc
 import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.RoleCategoryESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.RoleCategoryESRCache;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.RoleCategoryFilter;
 
 /**
  * Practitioner search tests.
@@ -33,13 +38,22 @@ import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ PractitionerESRBroker.class, PractitionerESRCache.class, CommonIdentifierESDTTypes.class, GroupESRBroker.class, PractitionerRoleMapCache.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class })
+@AddBeanClasses({ PractitionerESRBroker.class, PractitionerESRCache.class, CommonIdentifierESDTTypes.class, PractitionerRoleESRBroker.class, RoleCategoryFilter.class, PractitionerRoleESRCache.class, GroupESRBroker.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class, RoleCategoryESRCache.class })
 public class PractitionerESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
     private static final String PREFIX = "Practitioner";
 
     @Inject
     private PractitionerESRBroker broker;
+    
+    @Inject
+    private PractitionerRoleESRBroker practitionerRoleBroker;
+    
+    @Inject
+    private RoleCategoryESRBroker roleCategoryBroker;
+    
+    @Inject
+    private RoleCategoryFilter roleCategoryFilter;
 
     
     /**
@@ -120,4 +134,92 @@ public class PractitionerESRBrokerSearchTest extends BaseESRBrokerSearchTest {
             fail("Error performing search", e);
         }
     }
+    
+    @Test
+    public void careTeamFilterTest() {
+        
+    }
+
+    
+    /**
+     * Create a practitioner.
+     * 
+     * @param shortName
+     * @param longName
+     * @return
+     */
+    private PractitionerESR createPractitioner(String shortName, String longName, String emailAddress) {
+        PractitionerESR practitioner = new PractitionerESR();
+
+        practitioner.setDisplayName(shortName);
+
+        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
+
+        IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
+        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
+        shortNameBasedIdentifier.setValue(shortName);
+        shortNameBasedIdentifier.setLeafValue(null);
+        practitioner.getIdentifiers().add(shortNameBasedIdentifier);
+
+        IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
+        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
+        longNameBasedIdentifier.setValue(longName);
+        longNameBasedIdentifier.setLeafValue(null);
+        practitioner.getIdentifiers().add(longNameBasedIdentifier);
+        
+        
+        IdentifierESDT emailBasedIdentifier = new IdentifierESDT();
+        emailBasedIdentifier.setType(identifierTypes.getEmailAddress());
+        emailBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
+        emailBasedIdentifier.setValue(emailAddress);
+        emailBasedIdentifier.setLeafValue(null);
+        practitioner.getIdentifiers().add(emailBasedIdentifier);
+        practitioner.assignSimplifiedID(true, identifierTypes.getEmailAddress(), IdentifierESDTUseEnum.USUAL);
+
+        return practitioner;
+    }
+    
+    
+    @Test
+    public void locationFilterTest() {
+        
+    } 
+    
+    
+    
+    /**
+     * Create a practitioner role.
+     * 
+     * @param shortName
+     * @param longName
+     * @return
+     */
+    private PractitionerRoleESR createPractitionerRole(String shortName, String longName, String roleCategoryId) {
+        PractitionerRoleESR practitionerRole = new PractitionerRoleESR();
+        
+        practitionerRole.setPrimaryRoleCategoryID(roleCategoryId);
+
+        practitionerRole.setDisplayName(shortName);
+
+        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
+
+        IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
+        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
+        shortNameBasedIdentifier.setValue(shortName);
+        shortNameBasedIdentifier.setLeafValue(null);
+        practitionerRole.getIdentifiers().add(shortNameBasedIdentifier);
+        practitionerRole.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+
+        IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
+        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
+        longNameBasedIdentifier.setValue(longName);
+        longNameBasedIdentifier.setLeafValue(null);
+        practitionerRole.getIdentifiers().add(longNameBasedIdentifier);
+
+        return practitionerRole;
+    }  
 }

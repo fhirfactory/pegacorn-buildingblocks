@@ -114,9 +114,9 @@ public abstract class ESRBroker {
     protected void clearAssociations(ExtremelySimplifiedResource entry) {
     	// Do nothing by default
 	}
+
     
-    
-	public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
+    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
     	return searchForDirectoryEntryUsingIdentifier(identifier, true, true);
     }
     

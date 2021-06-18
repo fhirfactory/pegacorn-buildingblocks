@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.cache;
 
+import java.util.Map;
+
 import javax.enterprise.context.ApplicationScoped;
 
 import org.slf4j.Logger;
@@ -119,4 +121,25 @@ public class OrganizationESRCache extends PegacornESRCache {
             }
         }
     }
+    
+    
+    /**
+     * Returns a directory entry where the leaf value matches the supplied recordID.
+     * 
+     * @param recordID
+     * @return
+     */
+    public OrganizationESR getDirectoryEntryForLeafValue(String recordID) {
+        
+        for (Map.Entry<IdentifierESDT, ExtremelySimplifiedResource> entry : this.getIdentifier2ESRMap().entrySet()) {
+            String leafValue = entry.getKey().getLeafValue();
+            
+            if (leafValue != null && leafValue.equalsIgnoreCase(recordID)) {
+                return (OrganizationESR)entry.getValue();
+            }
+        
+        }
+        
+        return null;
+    } 
 }

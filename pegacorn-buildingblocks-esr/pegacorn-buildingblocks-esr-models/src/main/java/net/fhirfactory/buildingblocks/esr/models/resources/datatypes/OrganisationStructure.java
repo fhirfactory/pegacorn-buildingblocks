@@ -2,7 +2,7 @@ package net.fhirfactory.buildingblocks.esr.models.resources.datatypes;
 
 public class OrganisationStructure {
 	private int index;
-	private OrganisationStructureElementType type;
+	private String type;
 	private String value;
 	
 	
@@ -14,17 +14,16 @@ public class OrganisationStructure {
 	public void setIndex(int index) {
 		this.index = index;
 	}
-	
-	
-	public OrganisationStructureElementType getType() {
+
+	public String getType() {
 		return type;
 	}
 	
 	
-	public void setType(OrganisationStructureElementType type) {
+	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 	
 	public String getValue() {
 		return value;

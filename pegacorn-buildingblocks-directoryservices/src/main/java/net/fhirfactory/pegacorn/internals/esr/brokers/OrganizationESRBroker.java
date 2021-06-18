@@ -31,6 +31,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedRe
 import net.fhirfactory.buildingblocks.esr.models.resources.OrganizationESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.OrganizationESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
@@ -77,5 +78,25 @@ public class OrganizationESRBroker extends ESRBroker {
     @Override
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) {
 
+    }
+    
+    
+    
+    public ESRMethodOutcome searchForDirectoryEntryUsingLeafValue(String recordID) {
+        getLogger().info(".searchForDirectoryEntryUsingLeafValue(): Entry, recordID --> {}", recordID);
+        
+        ESRMethodOutcome outcome = new ESRMethodOutcome();
+        ExtremelySimplifiedResource entry = ((OrganizationESRCache)getCache()).getDirectoryEntryForLeafValue(recordID);
+        if(entry == null){
+            outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_NOT_FOUND);
+            outcome.setId(recordID);
+        } else {       
+            outcome.setEntry(entry);
+            outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
+            outcome.setId(entry.getSimplifiedID());
+        }
+        
+        getLogger().info(".getResource(): Exit");
+        return(outcome);        
     }
 }
