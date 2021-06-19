@@ -186,26 +186,44 @@ public class PractitionerESRBroker extends ESRBroker {
         if (outcome.getEntry() != null) {
             getLogger().trace(".updatePractitionerRoles():Found Resource, so updating fulfilledPractitionerRole details");
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
-            ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(practitioner.getIdentifierWithType("EmailAddress"));
-            boolean searchCompleted = practitionerRolesGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY) || outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
-            boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
+            
+            
+            boolean practitionerRoleFound = true;
+            
+            // Make sure all the provided practitioner roles are valid.  Fail the request if one isn't.
+            for (String practitionerRole : updatePractitionerRoles.getPractitionerRoles()) {
+                ESRMethodOutcome practitionerRoleOutcome = practitionerRoleBroker.getResource(practitionerRole.toLowerCase(), false);
+                
+                if (practitionerRoleOutcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_NOT_FOUND)) {
+                    outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
+                    outcome.setStatusReason("Practitioner role not found: " + practitionerRole);     
+                    practitionerRoleFound = false;
+                    break;
+                }
+            }
+            
+            if (practitionerRoleFound) {
+                ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(practitioner.getIdentifierWithType("EmailAddress"));
+                boolean searchCompleted = practitionerRolesGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY) || outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
+                boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
 
-            if (searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()) {
-                getLogger().trace(".updatePractitionerRoles(): updating the associated group");
-                PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR) practitionerRolesGroupGetOutcome.getSearchResult().get(0);
-                
-                practitionerRolesGroup.getRoleHistory().update(updatePractitionerRoles.getPractitionerRoles());
-                
-                ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
-                if(groupUpdateOutcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
-                    outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
+                if (searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()) {
+                    getLogger().trace(".updatePractitionerRoles(): updating the associated group");
+                    PractitionerRolesFulfilledByPractitionerGroupESR practitionerRolesGroup = (PractitionerRolesFulfilledByPractitionerGroupESR) practitionerRolesGroupGetOutcome.getSearchResult().get(0);
+                    
+                    practitionerRolesGroup.getRoleHistory().update(updatePractitionerRoles.getPractitionerRoles());
+                    
+                    ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
+                    if(groupUpdateOutcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
+                        outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
+                    } else {
+                        outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
+                        outcome.setStatusReason("Could not update associated PractitionerRoles Group");
+                    } 
                 } else {
                     outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-                    outcome.setStatusReason("Could not update associated PractitionerRoles Group");
-                } 
-            } else {
-                outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-                outcome.setStatusReason("Could not find associated PractitionerRoles Group");
+                    outcome.setStatusReason("Could not find associated PractitionerRoles Group");
+                }
             }
         } else {
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
