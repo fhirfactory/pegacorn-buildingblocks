@@ -160,8 +160,6 @@ public class PractitionerRoleESRBroker extends ESRBroker {
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
         PractitionerRoleESR practitionerRoleESR = (PractitionerRoleESR) entry;
         
-        boolean doEnrich = true;
-      
         ESRMethodOutcome practitionerMembershipGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"), false);
         if(practitionerMembershipGroupGetOutcome.isSearch()) {
             if (!practitionerMembershipGroupGetOutcome.getSearchResult().isEmpty()) {
@@ -172,8 +170,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
                 practitionerRoleESR.getActivePractitionerSet().clear();
                 
                 for (String practitionerId : groupESR.getGroupMembership()) {
-                	doEnrich = false;
-                	PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource(practitionerId.toLowerCase(), doEnrich).getEntry();  
+                	PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource(practitionerId.toLowerCase(), false).getEntry();  
                 	practitionerRoleESR.addActivePractitioner(practitioner);
                 }
             }
@@ -185,8 +182,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
                 practitionerRoleESR.getActivePractitionerSet().clear();
                 
                 for (String practitionerId : groupESR.getGroupMembership()) {
-                	doEnrich = false;
-                	PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource(practitionerId.toLowerCase(), doEnrich).getEntry();
+                	PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource(practitionerId.toLowerCase(), false).getEntry();
                 	practitionerRoleESR.addActivePractitioner(practitioner);
                 }
             }
