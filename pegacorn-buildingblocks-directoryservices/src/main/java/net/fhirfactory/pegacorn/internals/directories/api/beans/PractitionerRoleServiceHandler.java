@@ -21,7 +21,6 @@ import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.Practitione
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
-import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
@@ -33,6 +32,9 @@ import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationExce
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingException;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.PractitionerRoleFavouriteFilter;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.practitionerrole.LocationFilter;
+import net.fhirfactory.pegacorn.internals.esr.search.filter.practitionerrole.RoleCategoryFilter;
+
 
 @Dependent
 public class PractitionerRoleServiceHandler extends HandlerBase {
@@ -43,9 +45,12 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
 
     @Inject
     private PractitionerRoleFavouriteFilter practitionerRoleFavouriteFilter;
+   
+    @Inject
+    private RoleCategoryFilter roleCategoryFilter;
 
     @Inject
-    private PractitionerESRBroker practitionerBroker;
+    private LocationFilter locationFilter;
 
     @Override
     protected Logger getLogger() {
@@ -77,12 +82,26 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
             @Header("longName") String longName, @Header("displayName") String displayName, @Header("allName") String allName,
             @Header("primaryRoleCategoryID") String primaryRoleCategoryID, @Header("primaryRoleID") String primaryRoleID,
             @Header("primaryOrganizationID") String primaryOrganizationID, @Header("primaryLocationID") String primaryLocationID,
-            @Header("sortBy") String sortBy, @Header("sortOrder") String sortOrder, @Header("pageSize") String pageSize, @Header("page") String page)
+            @Header("sortBy") String sortBy, @Header("sortOrder") String sortOrder, @Header("pageSize") String pageSize, @Header("locationFilter") String locationFilter, 
+            @Header("roleCategoryFilter") String roleCategoryFilter, @Header("page") String page)
             throws ResourceNotFoundException, ResourceInvalidSortException, ESRPaginationException, ResourceInvalidSearchException, ESRSortingException,
             ESRFilteringException {
+        
+        List<BaseFilter> filters = new ArrayList<>();
+
+
+        if (locationFilter != null) {
+            this.locationFilter.setValue(locationFilter);
+            filters.add(this.locationFilter);
+        }
+
+        if (roleCategoryFilter != null) {
+            this.roleCategoryFilter.setValue(roleCategoryFilter);
+            filters.add(this.roleCategoryFilter);
+        }
 
         return practitionerRoleSearch(exchange, shortName, longName, displayName, allName, primaryRoleCategoryID, primaryRoleID, primaryOrganizationID,
-                primaryLocationID, sortBy, sortOrder, pageSize, page, new ArrayList<>());
+                primaryLocationID, sortBy, sortOrder, pageSize, page, filters);
     }
 
     /**
@@ -192,6 +211,51 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
 
         return (outcome.getSearchResult());
     }
+    
+    
+    public List<ExtremelySimplifiedResource> practitionerRoleGetResourceList(Exchange exchange, @Header("sortBy") String sortBy, @Header("sortOrder") String sortOrder,
+            @Header("pageSize") String pageSize, @Header("page") String page, @Header("locationFilter") String locationFilter, @Header("roleCategoryFilter") String roleCategoryFilter)
+            throws ESRPaginationException, ResourceInvalidSortException, ResourceInvalidSearchException, ESRSortingException, ESRFilteringException {
+        getLogger().debug(".defaultGetResourceList(): Entry, sortBy->{}, sortOrder->{}, pageSize->{}, page->{}", sortBy, sortOrder, pageSize, page);
+        Integer pageSizeValue = null;
+        Integer pageValue = null;
+
+        if (pageSize != null) {
+            pageSizeValue = Integer.valueOf(pageSize);
+        }
+        if (page != null) {
+            pageValue = Integer.valueOf(page);
+        }
+        
+        List<BaseFilter> filters = new ArrayList<>();
+
+
+        if (locationFilter != null) {
+            this.locationFilter.setValue(locationFilter);
+            filters.add(this.locationFilter);
+        }
+
+        if (roleCategoryFilter != null) {
+            this.roleCategoryFilter.setValue(roleCategoryFilter);
+            filters.add(this.roleCategoryFilter);
+        }
+
+
+        SearchCriteria searchCriteria = new SearchCriteria();
+
+        Pagination pagination = new Pagination(pageSizeValue, pageValue);
+        Sort sort = new Sort(sortBy, sortOrder);
+
+        ESRMethodOutcome outcome = getResourceBroker().getPaginatedSortedDirectoryEntrySet(searchCriteria, filters, pagination, sort);
+
+        exchange.getMessage().setHeader(TOTAL_RECORD_COUNT_HEADER, outcome.getTotalSearchResultCount());
+        exchange.getMessage().setHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, TOTAL_RECORD_COUNT_HEADER);
+
+        getLogger().debug(".defaultGetResourceList(): Exit");
+
+        return (outcome.getSearchResult());
+}
+
 
     public List<ExtremelySimplifiedResource> practitionerRoleFavouriteResourceList(Exchange exchange, @Header("simplifiedID") String id,
             @Header("sortBy") String sortBy, @Header("sortOrder") String sortOrder, @Header("pageSize") String pageSize, @Header("page") String page)

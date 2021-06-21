@@ -92,6 +92,8 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
                     .param().name("pageSize").type(RestParamType.query).required(false).endParam().param().name("page").type(RestParamType.query).required(false).endParam()
                     .param().name("sortBy").type(RestParamType.query).required(false).endParam()
                     .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                    .param().name("locationFilter").type(RestParamType.query).required(false).endParam()
+                    .param().name("roleCategoryFilter").type(RestParamType.query).required(false).endParam()
                     .to("direct:" + getESRName() + "SearchGET")
                 
                 .post()
@@ -107,6 +109,8 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
                     .param().name("page").type(RestParamType.query).required(false).endParam()
                     .param().name("sortBy").type(RestParamType.query).required(false).endParam()
                     .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                    .param().name("locationFilter").type(RestParamType.query).required(false).endParam()
+                    .param().name("roleCategoryFilter").type(RestParamType.query).required(false).endParam()
                     .to("direct:" + getESRName() + "ListGET")
 
                 .put("/{simplifiedID}/CareTeams")
@@ -122,7 +126,7 @@ public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {
             .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
         from("direct:" + getESRName() + "ListGET")
-            .bean(practitionerRoleServiceHandler, "defaultGetResourceList(Exchange)")
+            .bean(practitionerRoleServiceHandler, "practitionerRoleGetResourceList(Exchange)")
             .log(LoggingLevel.INFO, "GET Request --> ${body}");
 
         from("direct:" + getESRName() + "SearchGET").bean(practitionerRoleServiceHandler, "practitionerRoleSearch(Exchange)")
