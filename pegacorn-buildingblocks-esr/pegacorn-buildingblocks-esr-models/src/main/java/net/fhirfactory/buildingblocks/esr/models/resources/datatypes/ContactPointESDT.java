@@ -29,6 +29,7 @@ public class ContactPointESDT {
     private Integer rank;
     private ContactPointESDTTypeEnum type;
     private ContactPointESDTUseEnum use;
+    private String displayName;
 
     public String getName() {
         return name;
@@ -68,6 +69,11 @@ public class ContactPointESDT {
 
     public void setUse(ContactPointESDTUseEnum use) {
         this.use = use;
+    }
+    
+    
+    public String getDisplayName() {
+        return use.getValue() + " " + type.getValue();
     }
 
     @Override
