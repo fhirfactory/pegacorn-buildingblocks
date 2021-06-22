@@ -2,7 +2,7 @@ package net.fhirfactory.buildingblocks.esr.models.resources.datatypes;
 
 public enum ContactPointESDTTypeEnum {
     MOBILE("Mobile"),
-    PABX_EXTENSION("PAX Extension"),
+    PABX_EXTENSION("Extension"),
     LANDLINE("Landline"),
     EMAIL("Email"),
     LINGO("Lingo"),
