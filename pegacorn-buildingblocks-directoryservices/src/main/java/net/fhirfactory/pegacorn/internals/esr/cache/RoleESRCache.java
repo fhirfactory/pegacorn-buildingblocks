@@ -75,7 +75,7 @@ public class RoleESRCache extends PegacornESRCache {
     public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
     	
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getParamName(), searchCriteria.getValue());
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getSearchParam().getName(), searchCriteria.getSearchParam().getValue());
         
         if(searchCriteria.isValueNull()){
             throw(new ResourceInvalidSearchException("Search Value is null"));
@@ -91,7 +91,7 @@ public class RoleESRCache extends PegacornESRCache {
             return(result);
         }
         
-        switch(searchCriteria.getParamName()){
+        switch(searchCriteria.getSearchParam().getName()) {
             case SIMPLIFIED_ID: {
                 result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);

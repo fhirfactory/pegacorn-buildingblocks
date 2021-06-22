@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.RoleCategoryESRCache;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParam;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.practitioner.RoleCategoryFilter;
 
@@ -126,9 +127,9 @@ public class PractitionerESRBrokerSearchTest extends BaseESRBrokerSearchTest {
         try {
             createResources(26);
 
-            search(new SearchCriteria(SearchParamNames.SIMPLIFIED_ID, "@test"), 25); // Only 25 instead of 26 due to paging.
-            search(new SearchCriteria(SearchParamNames.SIMPLIFIED_ID, "John.Smithz"), 1); 
-            search(new SearchCriteria(SearchParamNames.SIMPLIFIED_ID, "John.Smithzzzz"), 0);
+            search(new SearchCriteria(new SearchParam(SearchParamNames.SIMPLIFIED_ID, "@test")), 25); // Only 25 instead of 26 due to paging.
+            search(new SearchCriteria(new SearchParam(SearchParamNames.SIMPLIFIED_ID, "John.Smithz")), 1); 
+            search(new SearchCriteria(new SearchParam(SearchParamNames.SIMPLIFIED_ID, "John.Smithzzzz")), 0);
 
         } catch (Exception e) {
             fail("Error performing search", e);

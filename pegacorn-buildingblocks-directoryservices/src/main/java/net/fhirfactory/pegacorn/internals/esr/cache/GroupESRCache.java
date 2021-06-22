@@ -75,7 +75,7 @@ public class GroupESRCache extends PegacornESRCache {
     public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
     	
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getParamName(), searchCriteria.getValue());
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getSearchParam().getName(), searchCriteria.getSearchParam().getValue());
         
         if(searchCriteria.isValueNull()){
             throw(new ResourceInvalidSearchException("Search Value is null"));
@@ -90,7 +90,7 @@ public class GroupESRCache extends PegacornESRCache {
             return(result);
         }
         
-        switch(searchCriteria.getParamName()){
+        switch(searchCriteria.getSearchParam().getName()) {
             case SIMPLIFIED_ID: {
                 result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
@@ -132,7 +132,7 @@ public class GroupESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             GroupESR currentGroup = (GroupESR) currentResource;
-            if(currentGroup.getGroupType().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
+            if(currentGroup.getGroupType().toLowerCase().contains(searchCriteria.getSearchParam().getValue().toLowerCase())){
                 result.getSearchResultList().add(currentGroup);
             }
         }
@@ -146,7 +146,7 @@ public class GroupESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             GroupESR currentGroup = (GroupESR) currentResource;
-            if(currentGroup.getGroupManager().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
+            if(currentGroup.getGroupManager().toLowerCase().contains(searchCriteria.getSearchParam().getValue().toLowerCase())){
                 result.getSearchResultList().add(currentGroup);
             }
         }

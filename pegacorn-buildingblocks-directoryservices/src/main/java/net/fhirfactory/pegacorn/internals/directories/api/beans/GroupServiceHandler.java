@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParam;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
@@ -101,31 +102,26 @@ public class GroupServiceHandler extends HandlerBase {
         getLogger().debug(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{}"+
                         "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
                 shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
-        SearchParamNames searchAttributeName = null;
-        String searchAttributeValue = null;
+
+        SearchParam searchParam = null;
+        
         if(shortName != null) {
-            searchAttributeValue = shortName;
-            searchAttributeName = SearchParamNames.SHORT_NAME;
+            searchParam = new SearchParam(SearchParamNames.SHORT_NAME, shortName);
         } else if(longName != null){
-            searchAttributeValue = longName;
-            searchAttributeName = SearchParamNames.LONG_NAME;
+            searchParam = new SearchParam(SearchParamNames.LONG_NAME, longName);
         } else if(displayName != null){
-            searchAttributeValue = displayName;
-            searchAttributeName = SearchParamNames.DISPLAY_NAME;
+            searchParam = new SearchParam(SearchParamNames.DISPLAY_NAME, displayName);
         } else if(allName != null) {
-        	searchAttributeValue = allName;
-            searchAttributeName = SearchParamNames.ALL_NAME;
+            searchParam = new SearchParam(SearchParamNames.ALL_NAME, allName);
         } else if(groupManager != null){
-            searchAttributeValue = groupManager;
-            searchAttributeName = SearchParamNames.GROUP_MANAGER;
+            searchParam = new SearchParam(SearchParamNames.GROUP_MANAGER, groupManager);
         } else if(groupType != null){
-            searchAttributeValue = groupType;
-            searchAttributeName = SearchParamNames.GROUP_TYPE;
+            searchParam = new SearchParam(SearchParamNames.GROUP_TYPE, groupType);
         } else {
             throw( new ResourceInvalidSearchException("Search parameter not specified"));
         }
         
-        SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
+        SearchCriteria searchCriteria = new SearchCriteria(searchParam);
         
         Integer pageSizeValue = null;
         Integer pageValue = null;

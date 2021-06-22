@@ -29,6 +29,7 @@ import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParam;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
@@ -196,32 +197,26 @@ public class PractitionerServiceHandler extends HandlerBase {
             ResourceInvalidSearchException, ESRPaginationException, ESRSortingException, ESRFilteringException {
         getLogger().info(".practitionerSearch(): Entry, shortName->{}, longName->{}, displayName->{}," + "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
                 shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
-        SearchParamNames searchAttributeName = null;
-        String searchAttributeValue = null;
+
+        SearchParam searchParam = null;
 
         if (simplifiedID != null) {
-            searchAttributeValue = simplifiedID;
-            searchAttributeName = SearchParamNames.SIMPLIFIED_ID;
+            searchParam = new SearchParam(SearchParamNames.SIMPLIFIED_ID, simplifiedID);
         } else if (shortName != null) {
-            searchAttributeValue = shortName;
-            searchAttributeName = SearchParamNames.SHORT_NAME;
+            searchParam = new SearchParam(SearchParamNames.SHORT_NAME, shortName);
         } else if (longName != null) {
-            searchAttributeValue = longName;
-            searchAttributeName = SearchParamNames.LONG_NAME;
+            searchParam = new SearchParam(SearchParamNames.LONG_NAME, longName);
         } else if (displayName != null) {
-            searchAttributeValue = displayName;
-            searchAttributeName = SearchParamNames.DISPLAY_NAME;
+            searchParam = new SearchParam(SearchParamNames.DISPLAY_NAME, displayName);
         } else if (allName != null) {
-            searchAttributeValue = allName;
-            searchAttributeName = SearchParamNames.ALL_NAME;
+            searchParam = new SearchParam(SearchParamNames.ALL_NAME, allName);
         } else if (leafValue != null) {
-            searchAttributeValue = leafValue;
-            searchAttributeName = SearchParamNames.LEAF_VALUE;
+            searchParam = new SearchParam(SearchParamNames.LEAF_VALUE, leafValue);
         } else {
             throw (new ResourceInvalidSearchException("Search parameter not specified"));
         }
 
-        SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
+        SearchCriteria searchCriteria = new SearchCriteria(searchParam);
 
         Integer pageSizeValue = null;
         Integer pageValue = null;
