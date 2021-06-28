@@ -167,7 +167,7 @@ public class PractitionerESR extends PersonESR {
     	emailAddress = "@" + emailAddress;
     	emailAddress = emailAddress.replace("@test.act.gov.au", ":chs.test.gov.au");
     	
-    	return emailAddress;
+    	return emailAddress.toLowerCase();
 	}
 
     
