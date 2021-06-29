@@ -27,10 +27,16 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.OrganizationESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.OrganisationStructure;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
+import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
@@ -41,6 +47,9 @@ public class HealthcareServiceESRBroker extends ESRBroker {
 
     @Inject
     private HealthcareServiceESRCache healthCareServiceCache;
+    
+    @Inject
+    private OrganizationESRBroker organisationBroker;
 
     @Override
     protected Logger getLogger() {
@@ -70,10 +79,40 @@ public class HealthcareServiceESRBroker extends ESRBroker {
 
     }
     
-    public ESRMethodOutcome createHealthCareService(HealthcareServiceESR newHealthCareService){
+    public ESRMethodOutcome createHealthCareService(HealthcareServiceESR newHealthCareService) throws ResourceInvalidSearchException{
+        addOrganisationStructure(newHealthCareService);
+        
         ESRMethodOutcome outcome = this.createDirectoryEntry(newHealthCareService);
         
         return outcome;
+    }
+    
+    
+    
+    /**
+     * Add the organisation structure.
+     * 
+     * @param directoryEntry
+     * @throws ResourceInvalidSearchException
+     */
+    private void addOrganisationStructure(HealthcareServiceESR directoryEntry) throws ResourceInvalidSearchException {      
+        if (directoryEntry.getPrimaryOrganizationID() != null) {
+            ESRMethodOutcome outcome = organisationBroker.searchForDirectoryEntryUsingLeafValue(directoryEntry.getPrimaryOrganizationID().toLowerCase());
+            
+            if (outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND)) {
+                OrganizationESR organisation = (OrganizationESR)outcome.getEntry();
+                
+                CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
+                IdentifierESDT shortNameIdentifier = organisation.getIdentifierWithType(identifierTypes.getShortName());
+                
+                OrganisationStructure structure = new OrganisationStructure();
+                
+                structure.setIndex(1);
+                structure.setValue(shortNameIdentifier.getLeafValue());
+                structure.setType(organisation.getOrganizationType().getTypeDisplayValue());
+                directoryEntry.getOrganisationStructure().add(structure);
+            }
+        }
     }
 
 }

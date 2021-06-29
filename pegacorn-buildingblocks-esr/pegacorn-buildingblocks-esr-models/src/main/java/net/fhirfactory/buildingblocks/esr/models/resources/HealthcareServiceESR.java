@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.OrganisationStructure;
 
 public class HealthcareServiceESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(HealthcareServiceESR.class);
@@ -35,30 +36,43 @@ public class HealthcareServiceESR extends ExtremelySimplifiedResource {
     protected Logger getLogger(){return(LOG);}
 
     private List<ContactPointESDT> contactPoints;
-    private String organisationalUnit;
+    private String primaryOrganizationID;
+    private List<OrganisationStructure>organisationStructure;
 
     public HealthcareServiceESR(){
         super();
         
         contactPoints = new ArrayList<>();
+        this.organisationStructure = new ArrayList<OrganisationStructure>();
     }
 
     
     public List<ContactPointESDT> getContactPoints() {
 		return contactPoints;
 	}
-	
+    
+    
 	public void setContactPoints(List<ContactPointESDT> contactPoints) {
 		this.contactPoints = contactPoints;
 	}
 
 	
-	public String getOrganisationalUnit() {
-        return organisationalUnit;
+	public List<OrganisationStructure> getOrganisationStructure() {
+        return organisationStructure;
+    }
+
+	
+	public void setOrganisationStructure(List<OrganisationStructure> organisationStructure) {
+        this.organisationStructure = organisationStructure;
     }
 
     
-    public void setOrganisationalUnit(String organisationalUnit) {
-        this.organisationalUnit = organisationalUnit;
-    } 
+    public String getPrimaryOrganizationID() {
+        return primaryOrganizationID;
+    }
+
+    
+    public void setPrimaryOrganizationID(String primaryOrganizationID) {
+        this.primaryOrganizationID = primaryOrganizationID;
+    }
 }
