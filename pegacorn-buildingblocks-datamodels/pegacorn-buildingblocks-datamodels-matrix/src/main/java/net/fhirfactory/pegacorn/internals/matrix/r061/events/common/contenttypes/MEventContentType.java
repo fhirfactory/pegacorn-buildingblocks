@@ -82,11 +82,8 @@ public class MEventContentType {
 
     @JsonIgnore
     public boolean hasMembership(){
-        if(this.membership == null){
-            return(false);
-        } else {
-            return(true);
-        }
+        boolean hasValue = this.membership != null;
+        return(hasValue);
     }
 
     @JsonProperty("membership")

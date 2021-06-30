@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import org.slf4j.Logger;
@@ -43,9 +43,9 @@ public abstract class InteractEgressAPIClientGatewayWUP extends GenericMessageBa
     }
 
     @Override
-    protected GenericMessageBasedWUPEndpoint specifyIngresTopologyEndpoint(){
+    protected MessageBasedWUPEndpoint specifyIngresEndpoint(){
         getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
-        GenericMessageBasedWUPEndpoint ingressEndpoint = new GenericMessageBasedWUPEndpoint();
+        MessageBasedWUPEndpoint ingressEndpoint = new MessageBasedWUPEndpoint();
         ingressEndpoint.setFrameworkEnabled(true);
         ingressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPIngres());
         getLogger().debug(".specifyIngresTopologyEndpoint(): Exit");

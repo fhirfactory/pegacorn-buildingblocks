@@ -32,6 +32,9 @@ import org.hl7.fhir.r4.model.UriType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
 public class GroupMemberTypeExtensionEnricher {
     private static final Logger LOG = LoggerFactory.getLogger(GroupMemberTypeExtensionEnricher.class);
 
@@ -45,6 +48,7 @@ public class GroupMemberTypeExtensionEnricher {
         Extension newStatusExtension = new Extension();
         newStatusExtension.setUrlElement(MEMBERSHIP_TYPE_MEANING);
         newStatusExtension.setValue(new StringType(userType.getContextualUserType()));
+        membership.addExtension(newStatusExtension);
         LOG.debug(".injectMemberType(): Exit, membership->{}", membership);
     }
 

@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelFragme
 import java.io.Serializable;
 import java.util.Objects;
 
-public class DataParcelFragmentQualityStatement extends DataParcelReference implements Serializable {
+public class DataParcelFragmentQualityStatement extends DataParcelTypeDescriptor implements Serializable {
     private DataParcelFragmentQualityEnum fragmentQuality;
 
     public DataParcelFragmentQualityEnum getFragmentQuality() {

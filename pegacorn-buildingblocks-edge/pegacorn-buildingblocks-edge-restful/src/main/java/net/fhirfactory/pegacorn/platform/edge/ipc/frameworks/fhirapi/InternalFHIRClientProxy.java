@@ -23,10 +23,10 @@ package net.fhirfactory.pegacorn.platform.edge.ipc.frameworks.fhirapi;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 
-import net.fhirfactory.pegacorn.deployment.names.common.SiteKeyNames;
+import net.fhirfactory.pegacorn.deployment.names.sites.SiteKeyNames;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.factories.helpers.TopologyMapTraversalHelpers;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 
@@ -98,7 +98,7 @@ public abstract class InternalFHIRClientProxy extends HAPIServerSecureProxy {
         DeploymentSiteTopologyNode site = mapTraversalHelpers.selectSite(businessService, siteKeyNames.getSiteA() ); // TODO this should be a comparison against what site I am in
         ClusterServiceTopologyNode clusterService = mapTraversalHelpers.selectClusterService(site, requiredInterfaceDef);
 
-        IPCTopologyEndpoint endpoint = null;
+        IPCClusteredServerTopologyEndpoint endpoint = null;
         String dnsName = null;
         String portNumber = null;
         switch(targetSubsystem.getResilienceMode()){

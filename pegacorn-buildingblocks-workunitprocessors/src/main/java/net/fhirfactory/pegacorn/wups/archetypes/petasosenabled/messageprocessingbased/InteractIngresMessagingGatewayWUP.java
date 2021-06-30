@@ -22,21 +22,21 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractIngresMessagingGatewayWUP.class);
 
-    private GenericMessageBasedWUPEndpoint ingresEndpoint;
+    private MessageBasedWUPEndpoint ingresEndpoint;
 
     public InteractIngresMessagingGatewayWUP() {
         super();
@@ -52,9 +52,9 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
     }
 
     @Override
-    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+    protected MessageBasedWUPEndpoint specifyEgressEndpoint(){
         getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
-        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
         egressEndpoint.setFrameworkEnabled(true);
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
@@ -68,16 +68,8 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected Set<DataParcelToken> specifySubscriptionTopics() {
-        HashSet<DataParcelToken> subTopics = new HashSet<DataParcelToken>();
+    protected List<DataParcelManifest> specifySubscriptionTopics() {
+        List<DataParcelManifest> subTopics = new ArrayList<>();
         return(subTopics);
-    }
-
-    public GenericMessageBasedWUPEndpoint getIngresEndpoint() {
-        return ingresEndpoint;
-    }
-
-    public void setIngresEndpoint(GenericMessageBasedWUPEndpoint ingresEndpoint) {
-        this.ingresEndpoint = ingresEndpoint;
     }
 }

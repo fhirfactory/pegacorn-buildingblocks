@@ -22,7 +22,10 @@
 package net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit;
 
 import ca.uhn.fhir.parser.IParser;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
 import net.fhirfactory.pegacorn.components.transaction.model.TransactionTypeEnum;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.DeploymentSystemIdentificationInterface;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
@@ -104,8 +107,11 @@ public class TransactionalWUPAuditEntryManager {
                 String fullPayloadString = auditTrailPayload + resourceAsString;
                 payload.setPayload(fullPayloadString);
                 LOG.trace(".beginTransaction(): Construct a TopicToken to describe the payload & add it to the Payload");
-                DataParcelToken payloadToken = topicIDBuilder.newTopicToken(resourceType, FHIR_VERSION);
-                payload.setPayloadTopicID(payloadToken);
+                DataParcelTypeDescriptor payloadToken = topicIDBuilder.newTopicToken(resourceType, FHIR_VERSION);
+                DataParcelManifest payloadManifest = new DataParcelManifest();
+                payloadManifest.setContentDescriptor(payloadToken);
+                payloadManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
+                payload.setPayloadManifest(payloadManifest);
             } catch (Exception Ex) {
                 LOG.error(".beginTransaction(): Failed to Encode --> {}", Ex.toString());
                 errorString = Ex.toString();
@@ -115,20 +121,24 @@ public class TransactionalWUPAuditEntryManager {
             String fullPayloadString = auditTrailPayload + auditCommentary;
             payload.setPayload(fullPayloadString);
             LOG.trace(".beginTransaction(): Construct a TopicToken to describe the payload & add it to the Payload");
-            DataParcelToken payloadToken = topicIDBuilder.newTopicToken(resourceType, FHIR_VERSION);
-            payload.setPayloadTopicID(payloadToken);
+            DataParcelTypeDescriptor payloadToken = topicIDBuilder.newTopicToken(resourceType, FHIR_VERSION);
+            DataParcelManifest payloadManifest = new DataParcelManifest();
+            payloadManifest.setContentDescriptor(payloadToken);
+            payloadManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
         }
         UoW theUoW;
         if (encodingFailure) {
             LOG.trace(".beginTransaction(): Failed to encode incoming content....");
             payload.setPayload("Error encoding content --> " + errorString);
-            DataParcelToken token = new DataParcelToken();
-            token.setDataParcelDefiner(systemIdentificationInterface.getSystemName());
-            token.setDataParcelCategory("DataTypes");
-            token.setDataParcelSubCategory("Error");
-            token.setDataParcelResource("JSONConversionErrorMessage");
-            token.setVersion("1.0.0");
-            payload.setPayloadTopicID(token);
+            DataParcelTypeDescriptor typeDescriptor = new DataParcelTypeDescriptor();
+            typeDescriptor.setDataParcelDefiner(systemIdentificationInterface.getSystemName());
+            typeDescriptor.setDataParcelCategory("DataTypes");
+            typeDescriptor.setDataParcelSubCategory("Error");
+            typeDescriptor.setDataParcelResource("JSONConversionErrorMessage");
+            typeDescriptor.setVersion("1.0.0");
+            DataParcelManifest payloadManifest = new DataParcelManifest();
+            payloadManifest.setContentDescriptor(typeDescriptor);
+            payloadManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
             LOG.trace(".beginTransaction(): Create the UoW with the fhirResource/TopicToken as the Ingres Payload");
             theUoW = new UoW(payload);
             theUoW.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_FAILED);
