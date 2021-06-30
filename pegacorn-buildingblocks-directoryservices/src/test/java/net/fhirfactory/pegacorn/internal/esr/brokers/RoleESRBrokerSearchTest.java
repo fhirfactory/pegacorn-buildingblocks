@@ -6,11 +6,11 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.brokers.RoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.RoleESRCache;
@@ -22,7 +22,7 @@ import net.fhirfactory.pegacorn.internals.esr.cache.RoleESRCache;
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ RoleESRBroker.class, RoleESRCache.class, CommonIdentifierESDTTypes.class })
+@AddBeanClasses({ RoleESRBroker.class, RoleESRCache.class })
 public class RoleESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
     private static final String PREFIX = "Role";
@@ -43,18 +43,17 @@ public class RoleESRBrokerSearchTest extends BaseESRBrokerSearchTest {
 
         role.setDisplayName(shortName);
 
-        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
 
         IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
-        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setType(IdentifierType.SHORT_NAME);
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
         role.getIdentifiers().add(shortNameBasedIdentifier);
-        role.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        role.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
-        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setType(IdentifierType.LONG_NAME);
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);

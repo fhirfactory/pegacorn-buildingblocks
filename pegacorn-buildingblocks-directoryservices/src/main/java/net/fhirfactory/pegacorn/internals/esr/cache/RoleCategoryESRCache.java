@@ -31,6 +31,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedRe
 import net.fhirfactory.buildingblocks.esr.models.resources.RoleCategoryESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
@@ -96,11 +97,11 @@ public class RoleCategoryESRCache extends PegacornESRCache {
                 return (result);
             }
             case SHORT_NAME: {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
             case LONG_NAME: {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.LONG_NAME, IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
             case DISPLAY_NAME: {

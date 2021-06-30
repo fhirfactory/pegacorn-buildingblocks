@@ -27,11 +27,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
@@ -45,8 +45,6 @@ public class RoleESRBroker extends ESRBroker {
     @Inject
     private RoleESRCache roleCache;
 
-    @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
 
     @Override
     protected Logger getLogger() {
@@ -68,7 +66,7 @@ public class RoleESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.USUAL);
+        resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
     }
 
     //
@@ -92,7 +90,7 @@ public class RoleESRBroker extends ESRBroker {
             IdentifierESDT newRoleIdentifier = new IdentifierESDT();
             newRoleIdentifier.setValue(roleName);
             newRoleIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-            newRoleIdentifier.setType(commonIdentifierESDTTypes.getShortName());
+            newRoleIdentifier.setType(IdentifierType.SHORT_NAME);
             newRoleIdentifier.setLeafValue(roleName);
             newRole.getIdentifiers().add(newRoleIdentifier);
             newRole.setDisplayName(roleName);

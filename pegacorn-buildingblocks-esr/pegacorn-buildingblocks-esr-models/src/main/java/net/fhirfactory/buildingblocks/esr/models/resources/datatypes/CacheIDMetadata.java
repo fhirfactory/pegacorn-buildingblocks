@@ -23,7 +23,7 @@ package net.fhirfactory.buildingblocks.esr.models.resources.datatypes;
 
 public class CacheIDMetadata {
     private boolean identifierBased;
-    private String identifierType;
+    private IdentifierType identifierType;
     private String identifierUse;
     private String derivationSource;
 
@@ -35,11 +35,11 @@ public class CacheIDMetadata {
         this.identifierBased = identifierBased;
     }
 
-    public String getIdentifierType() {
+    public IdentifierType getIdentifierType() {
         return identifierType;
     }
 
-    public void setIdentifierType(String identifierType) {
+    public void setIdentifierType(IdentifierType identifierType) {
         this.identifierType = identifierType;
     }
 

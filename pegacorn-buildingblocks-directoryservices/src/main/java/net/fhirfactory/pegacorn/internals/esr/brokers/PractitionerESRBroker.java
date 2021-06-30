@@ -37,6 +37,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
@@ -92,7 +93,7 @@ public class PractitionerESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getEmailAddress(), IdentifierESDTUseEnum.OFFICIAL);
+        resource.assignSimplifiedID(true, IdentifierType.EMAIL_ADDRESS, IdentifierESDTUseEnum.OFFICIAL);
     }
 
     //
@@ -106,8 +107,8 @@ public class PractitionerESRBroker extends ESRBroker {
         activePractitionerSet.setGroupManager(entry.getSimplifiedID());
         activePractitionerSet.setGroupType(SystemManagedGroupTypesEnum.PRACTITONER_ROLES_FULFILLED_BY_PRACTITIONER_GROUP.getTypeCode());
         activePractitionerSet.setSystemManaged(true);
-        activePractitionerSet.setDisplayName("PractitionerRoles-Fulfilled-by-Practitioner-"+entry.getIdentifierWithType("EmailAddress").getValue());
-        activePractitionerSet.getIdentifiers().add(entry.getIdentifierWithType("EmailAddress"));
+        activePractitionerSet.setDisplayName("PractitionerRoles-Fulfilled-by-Practitioner-"+entry.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS).getValue());
+        activePractitionerSet.getIdentifiers().add(entry.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS));
         ESRMethodOutcome groupCreateOutcome = groupBroker.createGroupDE(activePractitionerSet);
         
         createSystemManagedMatrixRooms(entry);
@@ -123,7 +124,7 @@ public class PractitionerESRBroker extends ESRBroker {
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
         PractitionerESR practitionerESR = (PractitionerESR) entry;
-        ESRMethodOutcome groupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("EmailAddress"), false);
+        ESRMethodOutcome groupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS), false);
         if(groupGetOutcome.isSearch()){
             if (!groupGetOutcome.getSearchResult().isEmpty()) {
                 getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
@@ -165,7 +166,7 @@ public class PractitionerESRBroker extends ESRBroker {
         ESRMethodOutcome entryUpdate = updateDirectoryEntry(entry);
         if(entryUpdate.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL) || entryUpdate.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
             getLogger().info(".updatePractitioner(): Entry itself is updated, so updating its associated fulfilledPractitionerRole details");
-            ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("EmailAddress"));
+            ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS));
             boolean searchCompleted = practitionerRolesGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
             boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
             if(searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()){
@@ -204,7 +205,7 @@ public class PractitionerESRBroker extends ESRBroker {
             }
             
             if (practitionerRoleFound) {
-                ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(practitioner.getIdentifierWithType("EmailAddress"));
+                ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(practitioner.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS));
                 boolean searchCompleted = practitionerRolesGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY) || outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
                 boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
 
@@ -295,7 +296,7 @@ public class PractitionerESRBroker extends ESRBroker {
         if(practitioner == null){
             return;
         }
-        IdentifierESDT practitionerIdentifier = practitioner.getIdentifierWithType("EmailAddress");
+        IdentifierESDT practitionerIdentifier = practitioner.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS);
         createSystemManagedMatrixRoom(
                 practitioner.getSimplifiedID(),
                 managedRoomNames.getPractitionerCallRoom(),
@@ -326,12 +327,12 @@ public class PractitionerESRBroker extends ESRBroker {
     protected void createSystemManagedMatrixRoom(String practitionerRecordID, String displayName, String practitionerRecordIDBasedName, String practitionerEmailBasedAlias){
         IdentifierESDT roomIdBasedIdentifier = new IdentifierESDT();
         roomIdBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-        roomIdBasedIdentifier.setType(getCommonIdentifierTypes().getMatrixRoomID());
+        roomIdBasedIdentifier.setType(IdentifierType.MATRIX_ROOM_ID);
         roomIdBasedIdentifier.setValue(UUID.randomUUID().toString());
         IdentifierESDT roomNameBasedIdentifier = new IdentifierESDT();
         roomNameBasedIdentifier.setUse(IdentifierESDTUseEnum.OFFICIAL);
         roomNameBasedIdentifier.setValue(practitionerRecordIDBasedName);
-        roomNameBasedIdentifier.setType(getCommonIdentifierTypes().getMatrixRoomSystemID());
+        roomNameBasedIdentifier.setType(IdentifierType.MATRIX_ROOM_SYSTEM_ID);
         MatrixRoomESR matrixRoom = new MatrixRoomESR();
         matrixRoom.addIdentifier(roomIdBasedIdentifier);
         matrixRoom.addIdentifier(roomNameBasedIdentifier);

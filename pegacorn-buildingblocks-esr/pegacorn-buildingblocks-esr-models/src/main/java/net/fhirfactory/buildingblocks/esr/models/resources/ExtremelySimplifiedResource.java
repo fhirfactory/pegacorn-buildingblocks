@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.CacheIDMetadata;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 
 public abstract class ExtremelySimplifiedResource {
     private String simplifiedID;
@@ -72,7 +73,7 @@ public abstract class ExtremelySimplifiedResource {
         this.simplifiedID = simplifiedID;
     }
 
-    public void assignSimplifiedID(boolean useIdentifier, String identifierType, IdentifierESDTUseEnum identifierUse){
+    public void assignSimplifiedID(boolean useIdentifier, IdentifierType identifierType, IdentifierESDTUseEnum identifierUse){
         IdentifierESDT shortNameIdentifier = this.getIdentifierWithType(identifierType);
         CacheIDMetadata meta = new CacheIDMetadata();
         setSimplifiedID(shortNameIdentifier.getValue());
@@ -139,9 +140,9 @@ public abstract class ExtremelySimplifiedResource {
         return(null);
     }
 
-    public IdentifierESDT getIdentifierWithType(String identifierType){
+    public IdentifierESDT getIdentifierWithType(IdentifierType identifierType){
         for(IdentifierESDT identifier: this.identifiers){
-            if(identifier.getType().contentEquals(identifierType)){
+            if(identifier.getType().equals(identifierType)){
                 return(identifier);
             }
         }
@@ -257,8 +258,8 @@ public abstract class ExtremelySimplifiedResource {
             if (!o1.getIdentifiers().isEmpty() && o2.getIdentifiers().isEmpty()) {
                 return (-1);
             }
-            IdentifierESDT practitionerRole1Identifier = o1.getIdentifierWithType("ShortName");
-            IdentifierESDT practitionerRole2Identifier = o2.getIdentifierWithType("ShortName");
+            IdentifierESDT practitionerRole1Identifier = o1.getIdentifierWithType(IdentifierType.SHORT_NAME);
+            IdentifierESDT practitionerRole2Identifier = o2.getIdentifierWithType(IdentifierType.SHORT_NAME);
             if (practitionerRole1Identifier == null && practitionerRole2Identifier == null) {
                 return (0);
             }
@@ -299,8 +300,8 @@ public abstract class ExtremelySimplifiedResource {
             if(!o1.getIdentifiers().isEmpty() && o2.getIdentifiers().isEmpty()){
                 return(-1);
             }
-            IdentifierESDT practitionerRole1Identifier = o1.getIdentifierWithType("LongName");
-            IdentifierESDT practitionerRole2Identifier = o2.getIdentifierWithType("LongName");
+            IdentifierESDT practitionerRole1Identifier = o1.getIdentifierWithType(IdentifierType.LONG_NAME);
+            IdentifierESDT practitionerRole2Identifier = o2.getIdentifierWithType(IdentifierType.LONG_NAME);
             if(practitionerRole1Identifier == null && practitionerRole2Identifier == null){
                 return(0);
             }

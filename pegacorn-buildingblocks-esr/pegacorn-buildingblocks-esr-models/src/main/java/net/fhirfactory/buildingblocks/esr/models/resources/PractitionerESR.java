@@ -37,6 +37,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.EmailAddres
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.OrganisationStructure;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerStatusESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
@@ -173,7 +174,7 @@ public class PractitionerESR extends PersonESR {
     
     @JsonIgnore
     public EmailAddress getEmailAddress(){
-        IdentifierESDT foundIdentifier = getIdentifierWithType("EmailAddress");
+        IdentifierESDT foundIdentifier = getIdentifierWithType(IdentifierType.EMAIL_ADDRESS);
         if(foundIdentifier == null){
             return(null);
         }
@@ -186,7 +187,7 @@ public class PractitionerESR extends PersonESR {
     public void setEmailAddress(String email){
         IdentifierESDT identifier = new IdentifierESDT();
         identifier.setValue(email);
-        identifier.setType("EmailAddress");
+        identifier.setType(IdentifierType.EMAIL_ADDRESS);
         identifier.setUse(IdentifierESDTUseEnum.USUAL);
         addIdentifier(identifier);
     }
@@ -239,8 +240,8 @@ public class PractitionerESR extends PersonESR {
             if (!o1.getIdentifiers().isEmpty() && o2.getIdentifiers().isEmpty()) {
                 return (-1);
             }
-            IdentifierESDT practitionerRole1Identifier = o1.getIdentifierWithType("EmailAddress");
-            IdentifierESDT practitionerRole2Identifier = o2.getIdentifierWithType("EmailAddress");
+            IdentifierESDT practitionerRole1Identifier = o1.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS);
+            IdentifierESDT practitionerRole2Identifier = o2.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS);
             if (practitionerRole1Identifier == null && practitionerRole2Identifier == null) {
                 return (0);
             }
@@ -285,8 +286,8 @@ public class PractitionerESR extends PersonESR {
             if (!o1.getIdentifiers().isEmpty() && o2.getIdentifiers().isEmpty()) {
                 return (-1);
             }
-            IdentifierESDT practitionerRole1Identifier = o1.getIdentifierWithType("user_id");
-            IdentifierESDT practitionerRole2Identifier = o2.getIdentifierWithType("user_id");
+            IdentifierESDT practitionerRole1Identifier = o1.getIdentifierWithType(IdentifierType.USER_ID);
+            IdentifierESDT practitionerRole2Identifier = o2.getIdentifierWithType(IdentifierType.USER_ID);
             if (practitionerRole1Identifier == null && practitionerRole2Identifier == null) {
                 return (0);
             }

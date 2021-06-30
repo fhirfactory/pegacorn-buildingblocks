@@ -6,11 +6,11 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ PractitionerRoleESRBroker.class, PractitionerRoleESRCache.class, CommonIdentifierESDTTypes.class,GroupESRBroker.class, PractitionerRoleMapCache.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class })
+@AddBeanClasses({ PractitionerRoleESRBroker.class, PractitionerRoleESRCache.class,GroupESRBroker.class, PractitionerRoleMapCache.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class })
 public class PractitionerRoleESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
     private static final String PREFIX = "Practitioner Role";
@@ -49,18 +49,16 @@ public class PractitionerRoleESRBrokerSearchTest extends BaseESRBrokerSearchTest
 
         practitionerRole.setDisplayName(shortName);
 
-        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
-
         IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
-        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setType(IdentifierType.SHORT_NAME);
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
         practitionerRole.getIdentifiers().add(shortNameBasedIdentifier);
-        practitionerRole.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        practitionerRole.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
-        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setType(IdentifierType.LONG_NAME);
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);

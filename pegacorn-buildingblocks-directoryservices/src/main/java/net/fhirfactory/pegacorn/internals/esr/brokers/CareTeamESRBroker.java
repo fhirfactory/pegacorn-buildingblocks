@@ -35,6 +35,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedRe
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
@@ -80,7 +81,7 @@ public class CareTeamESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.USUAL);
+        resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
     }
 
     //
@@ -96,7 +97,7 @@ public class CareTeamESRBroker extends ESRBroker {
         	// We need to make sure any practitioner role in the care team exists.  This is unlikely to occur but good to check.
         	IdentifierESDT practitionerRoleIdentifier = new IdentifierESDT();
 	        practitionerRoleIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-	        practitionerRoleIdentifier.setType("ShortName");
+	        practitionerRoleIdentifier.setType(IdentifierType.SHORT_NAME);
 	        practitionerRoleIdentifier.setValue(participant.getSimplifiedID());
         	
         	ESRMethodOutcome outcome = practitionerRoleBroker.searchForDirectoryEntryUsingIdentifier(practitionerRoleIdentifier);
@@ -116,8 +117,8 @@ public class CareTeamESRBroker extends ESRBroker {
         practionerRolesInCareTeamSet.setGroupManager(newCareTeam.getSimplifiedID());
         practionerRolesInCareTeamSet.setGroupType(SystemManagedGroupTypesEnum.PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP.getTypeCode());
         practionerRolesInCareTeamSet.setSystemManaged(true);
-        practionerRolesInCareTeamSet.getIdentifiers().add(newCareTeam.getIdentifierWithType("ShortName"));
-        practionerRolesInCareTeamSet.setDisplayName(SystemManagedGroupTypesEnum.PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP.getGroupPrefix() + newCareTeam.getIdentifierWithType("ShortName").getValue());
+        practionerRolesInCareTeamSet.getIdentifiers().add(newCareTeam.getIdentifierWithType(IdentifierType.SHORT_NAME));
+        practionerRolesInCareTeamSet.setDisplayName(SystemManagedGroupTypesEnum.PRACTITIONER_ROLES_IN_CARE_TEAM_GROUP.getGroupPrefix() + newCareTeam.getIdentifierWithType(IdentifierType.SHORT_NAME).getValue());
       
     	groupBroker.createGroupDE(practionerRolesInCareTeamSet);
 
@@ -134,7 +135,7 @@ public class CareTeamESRBroker extends ESRBroker {
 	        
 	        IdentifierESDT identifier = new IdentifierESDT();
 	        identifier.setUse(IdentifierESDTUseEnum.USUAL);
-	        identifier.setType("ShortName");
+	        identifier.setType(IdentifierType.SHORT_NAME);
 	        identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + participant.getSimplifiedID());
 	        
 	        careTeamsForPractitionerRoleSet.getIdentifiers().add(identifier);   
@@ -164,7 +165,7 @@ public class CareTeamESRBroker extends ESRBroker {
     	
         CareTeamESR careTeamESR = (CareTeamESR) entry;
     	
-    	ESRMethodOutcome groupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"), false);
+    	ESRMethodOutcome groupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType(IdentifierType.SHORT_NAME), false);
       
     	if(groupGetOutcome.isSearch()){
           if (!groupGetOutcome.getSearchResult().isEmpty()) {
@@ -202,7 +203,7 @@ public class CareTeamESRBroker extends ESRBroker {
 	    	// If the care team was updated/created then update the practitioner role records within the care team.
 	    	if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL) || outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
 	       
-	    		ESRMethodOutcome practitionerRolesInCareTeamGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"));
+	    		ESRMethodOutcome practitionerRolesInCareTeamGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType(IdentifierType.SHORT_NAME));
 	    		
 	    		boolean searchCompleted = practitionerRolesInCareTeamGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
 	    		boolean searchFoundOneResultOnly = practitionerRolesInCareTeamGroupGetOutcome.getSearchResult().size() == 1;

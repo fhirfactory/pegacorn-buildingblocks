@@ -26,7 +26,7 @@ import java.util.Objects;
 public class IdentifierESDT {
     private static String CONTEXTUALISED_VALUE_SEPARATOR = "+";
 
-    private String type;
+    private IdentifierType type;
     private IdentifierESDTUseEnum use;
     private String value;
     private String leafValue;
@@ -38,11 +38,11 @@ public class IdentifierESDT {
         this.leafValue = null;
     }
 
-    public String getType() {
+    public IdentifierType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(IdentifierType type) {
         this.type = type;
     }
 
@@ -79,7 +79,7 @@ public class IdentifierESDT {
             return (false);
         }
         IdentifierESDT that = (IdentifierESDT) o;
-        boolean typeMatches = this.getType().contentEquals(that.getType());
+        boolean typeMatches = this.getType().equals(that.getType());
         boolean useMatches = this.getUse().equals(that.getUse());
         boolean valueMatches = this.getValue().contentEquals(that.getValue());
         boolean displayValueMatches = true;

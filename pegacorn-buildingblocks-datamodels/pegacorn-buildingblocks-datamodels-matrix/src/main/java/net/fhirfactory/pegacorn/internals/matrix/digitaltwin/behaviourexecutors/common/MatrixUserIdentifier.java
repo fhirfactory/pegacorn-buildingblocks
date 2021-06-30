@@ -23,12 +23,13 @@ package net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors
 
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 
 public class MatrixUserIdentifier extends IdentifierESDT {
 
     public MatrixUserIdentifier(){
         super();
-        this.setType("MatrixUserID");
+        this.setType(IdentifierType.MATRIX_USER_ID);
         this.setUse(IdentifierESDTUseEnum.SECONDARY);
         this.setValue(null);
     }
@@ -38,7 +39,7 @@ public class MatrixUserIdentifier extends IdentifierESDT {
     }
 
     public MatrixUserIdentifier(MatrixUserIdentifier oriIdentifier){
-        this.setType("MatrixUserID");
+        this.setType(IdentifierType.MATRIX_USER_ID);
         this.setUse(IdentifierESDTUseEnum.SECONDARY);
         this.setValue(oriIdentifier.getValue());
     }

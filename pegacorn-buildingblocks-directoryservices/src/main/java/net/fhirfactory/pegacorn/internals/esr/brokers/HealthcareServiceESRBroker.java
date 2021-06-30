@@ -28,12 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.OrganizationESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.OrganisationStructure;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
@@ -71,7 +71,7 @@ public class HealthcareServiceESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.USUAL);
+        resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
     }
 
     @Override
@@ -102,8 +102,7 @@ public class HealthcareServiceESRBroker extends ESRBroker {
             if (outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND)) {
                 OrganizationESR organisation = (OrganizationESR)outcome.getEntry();
                 
-                CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
-                IdentifierESDT shortNameIdentifier = organisation.getIdentifierWithType(identifierTypes.getShortName());
+                IdentifierESDT shortNameIdentifier = organisation.getIdentifierWithType(IdentifierType.SHORT_NAME);
                 
                 OrganisationStructure structure = new OrganisationStructure();
                 

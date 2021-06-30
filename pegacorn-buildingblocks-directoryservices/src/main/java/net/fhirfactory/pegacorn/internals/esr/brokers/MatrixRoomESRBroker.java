@@ -34,6 +34,7 @@ import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedRe
 import net.fhirfactory.buildingblocks.esr.models.resources.MatrixRoomESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
@@ -67,13 +68,13 @@ public class MatrixRoomESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
-        if(resource.getIdentifierWithType(getCommonIdentifierTypes().getMatrixRoomSystemID()) != null){
-            resource.assignSimplifiedID(true, getCommonIdentifierTypes().getMatrixRoomSystemID(), IdentifierESDTUseEnum.OFFICIAL);
+        if(resource.getIdentifierWithType(IdentifierType.MATRIX_ROOM_SYSTEM_ID) != null){
+            resource.assignSimplifiedID(true, IdentifierType.MATRIX_ROOM_SYSTEM_ID, IdentifierESDTUseEnum.OFFICIAL);
             getLogger().debug(".assignPrimaryKey(): Exit, Assigned MatrixRoomSystemID identifier");
             return;
         }
-        if(resource.getIdentifierWithType(getCommonIdentifierTypes().getMatrixRoomID()) != null){
-            resource.assignSimplifiedID(true, getCommonIdentifierTypes().getMatrixRoomID(), IdentifierESDTUseEnum.OFFICIAL);
+        if(resource.getIdentifierWithType(IdentifierType.MATRIX_ROOM_ID) != null){
+            resource.assignSimplifiedID(true, IdentifierType.MATRIX_ROOM_ID, IdentifierESDTUseEnum.OFFICIAL);
             getLogger().debug(".assignPrimaryKey(): Exit, Assigned Matrix Room Id (room_id) identifier");
             return;
         }
@@ -118,7 +119,7 @@ public class MatrixRoomESRBroker extends ESRBroker {
             foundEntry = getCache().getCacheEntry(entry.getSimplifiedID());
         } else {
             getLogger().info(".PegacornDirectoryEntry(): The PegId is Null, so seeing if a suitable Identifier is available");
-            IdentifierESDT entryIdentifier = entry.getIdentifierWithType("EmailAddress");
+            IdentifierESDT entryIdentifier = entry.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS);
             if(entryIdentifier != null){
                 getLogger().info(".PegacornDirectoryEntry(): Have a suitable Identifier, now retrieving");
                 if(entryIdentifier.getUse().equals(IdentifierESDTUseEnum.OFFICIAL)){

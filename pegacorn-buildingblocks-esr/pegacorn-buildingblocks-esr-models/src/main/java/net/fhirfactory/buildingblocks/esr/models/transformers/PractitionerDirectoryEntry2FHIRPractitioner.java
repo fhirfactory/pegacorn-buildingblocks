@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.GroupFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitioner.PractitionerFactory;
 
@@ -60,7 +61,7 @@ public class PractitionerDirectoryEntry2FHIRPractitioner {
     public org.hl7.fhir.r4.model.Practitioner convertToPractitioner(PractitionerESR practitionerESR){
         LOG.debug(".convertToPractitioner(): Entry");
         String practitionerName = practitionerESR.getOfficialName().getDisplayName();
-        String practitionerEmail = practitionerESR.getIdentifierWithType("EmailAddress").getValue();
+        String practitionerEmail = practitionerESR.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS).getValue();
         org.hl7.fhir.r4.model.Practitioner newPractitioner = practitionerFactory.buildPractitioner(practitionerName, practitionerEmail);
         List<ContactPoint> contactPoints = dataTypeTransformers.createContactPoints(practitionerESR);
         newPractitioner.getTelecom().addAll(contactPoints);
@@ -73,7 +74,7 @@ public class PractitionerDirectoryEntry2FHIRPractitioner {
      * @return
      */
     public Group createPractitionerRoleGroup(PractitionerESR practitionerESR){
-        String associatedPractitionerEmailAddress = practitionerESR.getIdentifierWithType("EmailAddress").getValue();
+        String associatedPractitionerEmailAddress = practitionerESR.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS).getValue();
         Group practitionerRoleGroup = groupFactory.buildPractitionerGroupForPractitionerRole(associatedPractitionerEmailAddress);
         return(practitionerRoleGroup);
     }

@@ -30,7 +30,6 @@ import javax.inject.Inject;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.Group;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
@@ -38,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.GroupFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.location.LocationResourceHelper;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.OrganizationResourceHelpers;
@@ -80,8 +80,8 @@ public class PractitionerRoleDirectoryEntry2FHIRPractitionerRole {
      * @return
      */
     public org.hl7.fhir.r4.model.PractitionerRole convertToPractitionerRole(PractitionerRoleESR practitionerRoleDE){
-        String prCode = practitionerRoleDE.getIdentifierWithType("ShortName").getValue();
-        String prName = practitionerRoleDE.getIdentifierWithType("LongName").getValue();
+        String prCode = practitionerRoleDE.getIdentifierWithType(IdentifierType.SHORT_NAME).getValue();
+        String prName = practitionerRoleDE.getIdentifierWithType(IdentifierType.LONG_NAME).getValue();
         ArrayList<CodeableConcept> roleSet = new ArrayList<>();
         CodeableConcept role = roleFactory.buildRoleWithCategory(practitionerRoleDE.getPrimaryRoleCategoryID(), practitionerRoleDE.getPrimaryRoleID());
         roleSet.add(role);
@@ -97,16 +97,5 @@ public class PractitionerRoleDirectoryEntry2FHIRPractitionerRole {
         prMetadata.addSecurity(confidentialitySecurityLabel);
         practitionerRole.setMeta(prMetadata);
         return(practitionerRole);
-    }
-
-    /**
-     *
-     * @param practitionerRoleESR
-     * @return
-     */
-    public Group createPractitionerGroup(PractitionerRoleESR practitionerRoleESR){
-        String practitionerRoleName = practitionerRoleESR.getIdentifierWithType("ShortName").getType();
-        Group practitionerGroup = groupFactory.buildPractitionerGroupForPractitionerRole(practitionerRoleName);
-        return(practitionerGroup);
     }
 }

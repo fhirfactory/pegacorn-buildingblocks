@@ -6,11 +6,11 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.brokers.HealthcareServiceESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
@@ -22,7 +22,7 @@ import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, CommonIdentifierESDTTypes.class })
+@AddBeanClasses({ HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class})
 public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
     private static final String PREFIX = "Health Care Service";
@@ -43,18 +43,16 @@ public class HealthCareServiceESRBrokerSearchTest extends BaseESRBrokerSearchTes
 
         healthCareService.setDisplayName(shortName);
 
-        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
-
         IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
-        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setType(IdentifierType.SHORT_NAME);
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
         healthCareService.getIdentifiers().add(shortNameBasedIdentifier);
-        healthCareService.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        healthCareService.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
-        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setType(IdentifierType.LONG_NAME);
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);

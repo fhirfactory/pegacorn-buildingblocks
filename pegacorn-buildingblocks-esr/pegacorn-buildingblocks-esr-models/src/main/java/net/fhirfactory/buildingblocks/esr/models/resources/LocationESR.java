@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.TypeESDT;
 
 public class LocationESR extends ExtremelySimplifiedResource {
@@ -77,28 +78,28 @@ public class LocationESR extends ExtremelySimplifiedResource {
         getLogger().debug(".populateCumulativeNameIdentifiers(), Entry");
         IdentifierESDT cumulativeShortNameIdentifier = new IdentifierESDT();
         cumulativeShortNameIdentifier.setUse(IdentifierESDTUseEnum.OFFICIAL);
-        cumulativeShortNameIdentifier.setType(this.CUMULATIVE_SHORT_NAME_IDENTIFIER_TYPE);
-        String shortNameValue = generateLocationCumulativeName(parentLocationIdentifierList, shortName,this.CUMULATIVE_SHORT_NAME_IDENTIFIER_TYPE);
+        cumulativeShortNameIdentifier.setType(IdentifierType.CUMULATIVE_SHORT_NAME_IDENTIFIER_TYPE);
+        String shortNameValue = generateLocationCumulativeName(parentLocationIdentifierList, shortName,IdentifierType.CUMULATIVE_SHORT_NAME_IDENTIFIER_TYPE);
         cumulativeShortNameIdentifier.setValue(shortNameValue);
         this.getIdentifiers().add(cumulativeShortNameIdentifier);
         IdentifierESDT cumulativeLongNameIdentifier = new IdentifierESDT();
         cumulativeLongNameIdentifier.setUse(IdentifierESDTUseEnum.OFFICIAL);
-        cumulativeLongNameIdentifier.setType(this.CUMULATIVE_LONG_NAME_IDENTIFIER_TYPE);
-        String longNameValue = generateLocationCumulativeName(parentLocationIdentifierList, shortName,this.CUMULATIVE_LONG_NAME_IDENTIFIER_TYPE);
+        cumulativeLongNameIdentifier.setType(IdentifierType.CUMULATIVE_LONG_NAME_IDENTIFIER_TYPE);
+        String longNameValue = generateLocationCumulativeName(parentLocationIdentifierList, shortName, IdentifierType.CUMULATIVE_LONG_NAME_IDENTIFIER_TYPE);
         cumulativeLongNameIdentifier.setValue(longNameValue);
         this.getIdentifiers().add(cumulativeLongNameIdentifier);
         getLogger().debug(".populateCumulativeNameIdentifiers(): Exit, returning long cumulative name --> {}", longNameValue);
         return(longNameValue);
     }
 
-    public String generateLocationCumulativeName(List<IdentifierESDT> parentLocationIdentifierList, String thisName, String identifierType){
+    public String generateLocationCumulativeName(List<IdentifierESDT> parentLocationIdentifierList, String thisName, IdentifierType identifierType){
         getLogger().debug(".buildLocationCumulativeName(), Entry");
         String parentLocationCumulativeName = null;
         if( parentLocationIdentifierList != null ) {
             if( !parentLocationIdentifierList.isEmpty() ) {
                 IdentifierESDT uniqueParentIdentifier = null;
                 for(IdentifierESDT currentIdentifier: parentLocationIdentifierList){
-                    if(currentIdentifier.getType().equalsIgnoreCase(identifierType)){
+                    if(currentIdentifier.getType().equals(identifierType)){
                         uniqueParentIdentifier = currentIdentifier;
                     }
                 }

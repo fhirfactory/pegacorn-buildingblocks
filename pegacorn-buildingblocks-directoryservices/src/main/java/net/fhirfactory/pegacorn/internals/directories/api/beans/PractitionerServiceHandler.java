@@ -21,6 +21,7 @@ import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateExcept
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
@@ -84,7 +85,7 @@ public class PractitionerServiceHandler extends HandlerBase {
         LOG.info(".update(): Requesting update from the Directory Resource Broker");
 
         // Make sure the simplified id matches the email address.
-        if (!entry.getSimplifiedID().equals(entry.getIdentifierWithType("EmailAddress").getValue())) {
+        if (!entry.getSimplifiedID().equals(entry.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS).getValue())) {
             throw new ResourceUpdateException("The simplified id must match the email address identifier for a practitioner update");
         }
 

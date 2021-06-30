@@ -7,10 +7,10 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.brokers.CareTeamESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
@@ -44,18 +44,16 @@ public class CareTeamESRBrokerSearchTest extends BaseESRBrokerSearchTest {
 
         careTeam.setDisplayName(shortName);
 
-        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
-
         IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
-        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setType(IdentifierType.SHORT_NAME);
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
         careTeam.getIdentifiers().add(shortNameBasedIdentifier);
-        careTeam.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        careTeam.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
-        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setType(IdentifierType.LONG_NAME);
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);

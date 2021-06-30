@@ -23,13 +23,10 @@ package net.fhirfactory.pegacorn.internals.esr.brokers.common;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
@@ -45,8 +42,6 @@ import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
 
 public abstract class ESRBroker {
 
-    @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
 
     protected abstract Logger getLogger();
     protected abstract PegacornESRCache specifyCache();
@@ -54,10 +49,6 @@ public abstract class ESRBroker {
 
     protected PegacornESRCache getCache(){
         return(specifyCache());
-    }
-
-    protected CommonIdentifierESDTTypes getCommonIdentifierTypes(){
-        return(commonIdentifierESDTTypes);
     }
 
     //

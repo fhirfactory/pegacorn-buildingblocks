@@ -9,13 +9,13 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import org.junit.jupiter.api.Test;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.HealthcareServiceESRBroker;
@@ -39,7 +39,7 @@ import net.fhirfactory.pegacorn.internals.esr.search.FavouriteTypes;
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ PractitionerESRBroker.class, PractitionerESRCache.class, PractitionerRoleESRBroker.class, PractitionerRoleESRCache.class, CommonIdentifierESDTTypes.class, GroupESRBroker.class, PractitionerRoleMapCache.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class,HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, OrganizationESRCache.class, OrganizationESRBroker.class })
+@AddBeanClasses({ PractitionerESRBroker.class, PractitionerESRCache.class, PractitionerRoleESRBroker.class, PractitionerRoleESRCache.class, GroupESRBroker.class, PractitionerRoleMapCache.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class,HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, OrganizationESRCache.class, OrganizationESRBroker.class })
 public class PractitionerFavouritesTest {
     
     @Inject
@@ -318,17 +318,15 @@ public class PractitionerFavouritesTest {
 
         practitioner.setDisplayName(shortName);
 
-        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
-
         IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
-        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setType(IdentifierType.SHORT_NAME);
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
         practitioner.getIdentifiers().add(shortNameBasedIdentifier);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
-        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setType(IdentifierType.LONG_NAME);
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);
@@ -336,12 +334,12 @@ public class PractitionerFavouritesTest {
         
         
         IdentifierESDT emailBasedIdentifier = new IdentifierESDT();
-        emailBasedIdentifier.setType(identifierTypes.getEmailAddress());
+        emailBasedIdentifier.setType(IdentifierType.EMAIL_ADDRESS);
         emailBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         emailBasedIdentifier.setValue(emailAddress);
         emailBasedIdentifier.setLeafValue(null);
         practitioner.getIdentifiers().add(emailBasedIdentifier);
-        practitioner.assignSimplifiedID(true, identifierTypes.getEmailAddress(), IdentifierESDTUseEnum.USUAL);
+        practitioner.assignSimplifiedID(true, IdentifierType.EMAIL_ADDRESS, IdentifierESDTUseEnum.USUAL);
 
         return practitioner;
     }
@@ -359,18 +357,16 @@ public class PractitionerFavouritesTest {
 
         practitionerRole.setDisplayName(shortName);
 
-        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
-
         IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
-        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setType(IdentifierType.SHORT_NAME);
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
         practitionerRole.getIdentifiers().add(shortNameBasedIdentifier);
-        practitionerRole.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        practitionerRole.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
-        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setType(IdentifierType.LONG_NAME);
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);
@@ -392,18 +388,16 @@ public class PractitionerFavouritesTest {
 
         healthCareService.setDisplayName(shortName);
 
-        CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
-
         IdentifierESDT shortNameBasedIdentifier = new IdentifierESDT();
-        shortNameBasedIdentifier.setType(identifierTypes.getShortName());
+        shortNameBasedIdentifier.setType(IdentifierType.SHORT_NAME);
         shortNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         shortNameBasedIdentifier.setValue(shortName);
         shortNameBasedIdentifier.setLeafValue(null);
         healthCareService.getIdentifiers().add(shortNameBasedIdentifier);
-        healthCareService.assignSimplifiedID(true, identifierTypes.getShortName(), IdentifierESDTUseEnum.USUAL);
+        healthCareService.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
 
         IdentifierESDT longNameBasedIdentifier = new IdentifierESDT();
-        longNameBasedIdentifier.setType(identifierTypes.getLongName());
+        longNameBasedIdentifier.setType(IdentifierType.LONG_NAME);
         longNameBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
         longNameBasedIdentifier.setValue(longName);
         longNameBasedIdentifier.setLeafValue(null);

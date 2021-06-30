@@ -14,6 +14,7 @@ import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearc
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
@@ -274,10 +275,10 @@ public abstract class PegacornESRCache {
         getLogger().info("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", identifier);
         
         
-        SearchParam searchParam = new SearchParam(SearchParamNames.get(identifier.getType()), identifier.getValue());
+        SearchParam searchParam = new SearchParam(SearchParamNames.get(identifier.getType().getValue()), identifier.getValue());
         SearchCriteria searchCriteria = new SearchCriteria(searchParam, containsMatch);
         
-        ESRSearchResult result = searchCacheForESRUsingIdentifierParameters(searchCriteria, identifier.getType(), identifier.getUse());
+        ESRSearchResult result = searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.get(identifier.getType().getValue()), identifier.getUse());
         ESRMethodOutcome outcome = result.toESRMethodOutcome();
         if(result.getSearchResultList().size() == 1){
             outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
@@ -294,7 +295,7 @@ public abstract class PegacornESRCache {
     
     
     protected ESRSearchResult searchCacheForESRUsingIdentifierParameters(SearchCriteria searchCriteria,
-                                                                         String type,
+                                                                         IdentifierType type,
                                                                          IdentifierESDTUseEnum use)
             throws ResourceInvalidSearchException {
         getLogger().debug("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", searchCriteria.getSearchParam().getValue(), type, use);
@@ -328,7 +329,7 @@ public abstract class PegacornESRCache {
                 }
                 boolean typeMatches = false;
                 if(!typeIsNull){
-                    if(currentIdentifier.getType().contains(type)){
+                    if(currentIdentifier.getType().equals(type)){
                         typeMatches = true;
                     }
                 } else {
@@ -437,8 +438,8 @@ public abstract class PegacornESRCache {
     	List<ESRSearchResult>searchResults = new ArrayList<>();
     	searchResults.add(this.searchCacheUsingSimplifiedID(searchCriteria));
     	searchResults.add(searchCacheUsingDisplayName(searchCriteria));
-    	searchResults.add(searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", shortNameUse));
-    	searchResults.add(searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", longNameUse));
+    	searchResults.add(searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.SHORT_NAME, shortNameUse));
+    	searchResults.add(searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.LONG_NAME, longNameUse));
     	
     	
     	// Add the unique records to the final list.

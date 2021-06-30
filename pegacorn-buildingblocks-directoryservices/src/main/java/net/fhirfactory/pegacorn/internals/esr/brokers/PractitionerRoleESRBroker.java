@@ -28,13 +28,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
 import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.resources.OrganizationESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.OrganisationStructure;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
@@ -82,7 +82,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.OFFICIAL);
+        resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.OFFICIAL);
     }
 
     //
@@ -100,8 +100,8 @@ public class PractitionerRoleESRBroker extends ESRBroker {
         activePractitionerSet.setGroupManager(directoryEntry.getSimplifiedID());
         activePractitionerSet.setSystemManaged(true);
         activePractitionerSet.setGroupType(SystemManagedGroupTypesEnum.PRACTITIONERS_FULFILLING_PRACTITIONER_ROLE_GROUP.getTypeCode());
-        activePractitionerSet.setDisplayName("Practitioners-Fulfilling-PractitionerRole-"+directoryEntry.getIdentifierWithType("ShortName").getValue());
-        activePractitionerSet.getIdentifiers().add(directoryEntry.getIdentifierWithType("ShortName"));
+        activePractitionerSet.setDisplayName("Practitioners-Fulfilling-PractitionerRole-"+directoryEntry.getIdentifierWithType(IdentifierType.SHORT_NAME).getValue());
+        activePractitionerSet.getIdentifiers().add(directoryEntry.getIdentifierWithType(IdentifierType.SHORT_NAME));
         ESRMethodOutcome groupCreateOutcome = groupBroker.createGroupDE(activePractitionerSet);
         
         
@@ -113,7 +113,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
         
         IdentifierESDT identifier = new IdentifierESDT();
         identifier.setUse(IdentifierESDTUseEnum.USUAL);
-        identifier.setType("ShortName");
+        identifier.setType(IdentifierType.SHORT_NAME);
         identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + directoryEntry.getSimplifiedID());
         careTeamsForPractitionerRoleSet.getIdentifiers().add(identifier);   
         careTeamsForPractitionerRoleSet.setDisplayName(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + directoryEntry.getSimplifiedID());
@@ -141,8 +141,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             if (outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND)) {
                 OrganizationESR organisation = (OrganizationESR)outcome.getEntry();
                 
-                CommonIdentifierESDTTypes identifierTypes = new CommonIdentifierESDTTypes();
-                IdentifierESDT shortNameIdentifier = organisation.getIdentifierWithType(identifierTypes.getShortName());
+                IdentifierESDT shortNameIdentifier = organisation.getIdentifierWithType(IdentifierType.SHORT_NAME);
                 
                 OrganisationStructure structure = new OrganisationStructure();
                 
@@ -160,7 +159,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
         PractitionerRoleESR practitionerRoleESR = (PractitionerRoleESR) entry;
         
-        ESRMethodOutcome practitionerMembershipGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"), false);
+        ESRMethodOutcome practitionerMembershipGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType(IdentifierType.SHORT_NAME), false);
         if(practitionerMembershipGroupGetOutcome.isSearch()) {
             if (!practitionerMembershipGroupGetOutcome.getSearchResult().isEmpty()) {
             	PractitionersFulfillingPractitionerRolesGroupESR groupESR = (PractitionersFulfillingPractitionerRolesGroupESR) practitionerMembershipGroupGetOutcome.getSearchResult().get(0);
@@ -190,9 +189,10 @@ public class PractitionerRoleESRBroker extends ESRBroker {
 
         
         IdentifierESDT identifier = new IdentifierESDT();
-       	identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + entry.getIdentifierWithType("ShortName").getValue());
+       	identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + entry.getIdentifierWithType(IdentifierType.SHORT_NAME).getValue());
        	identifier.setUse(IdentifierESDTUseEnum.USUAL);
        	identifier.setLeafValue(identifier.getValue());
+       	identifier.setType(IdentifierType.SHORT_NAME);
         
        
        	ESRMethodOutcome careTeamsForPractitionerRoleGroup = groupBroker.searchForDirectoryEntryUsingIdentifier(identifier, false);
@@ -224,7 +224,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
         if(entry.getSimplifiedID() != null){
             foundEntry = (PractitionerRoleESR) practitionerRoleCache.getCacheEntry(entry.getSimplifiedID());
         } else {
-            IdentifierESDT entryIdentifier = entry.getIdentifierWithType("ShortName");
+            IdentifierESDT entryIdentifier = entry.getIdentifierWithType(IdentifierType.SHORT_NAME);
             if(entryIdentifier != null){
                 if(entryIdentifier.getUse().equals(IdentifierESDTUseEnum.OFFICIAL)){
                     ESRMethodOutcome practitionerRoleQueryOutcome = practitionerRoleCache.searchCacheForESRUsingIdentifier(entryIdentifier);
@@ -249,7 +249,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             getLogger().info(".updatePractitioner(): Entry itself is updated, so updating its associated fulfilledPractitionerRole details");
           
             
-            ESRMethodOutcome practitionersGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"));
+            ESRMethodOutcome practitionersGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType(IdentifierType.SHORT_NAME));
             boolean searchCompleted = practitionersGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
             boolean searchFoundSomething = practitionersGroupGetOutcome.getSearchResult().size() == 1;
             
@@ -264,7 +264,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             
             IdentifierESDT identifier = new IdentifierESDT();
 	        identifier.setUse(IdentifierESDTUseEnum.USUAL);
-	        identifier.setType("ShortName");
+	        identifier.setType(IdentifierType.SHORT_NAME);
 	        identifier.setValue(SystemManagedGroupTypesEnum.CARE_TEAMS_CONTAINING_PRACTITIONER_ROLE_GROUP.getGroupPrefix() + entry.getSimplifiedID());
 
             ESRMethodOutcome careTeamssGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(identifier);
