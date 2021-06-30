@@ -27,6 +27,7 @@ import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnu
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.search.FavouriteTypes;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchParam;
@@ -346,41 +347,41 @@ public class PractitionerServiceHandler extends HandlerBase {
 
     public FavouriteListESDT getPractitionerRoleFavourites(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
         getLogger().debug(".getPractitionerRoleFavourites(): Entry, pathValue --> {}", id);
-        FavouriteListESDT output = getFavourites(id, "PractitionerRoleFavourites");
+        FavouriteListESDT output = getFavourites(id, FavouriteTypes.PRACTITIONER_ROLE_FAVOURITES);
         getLogger().debug(".getPractitionerRoleFavourites(): Exit");
         return (output);
     }
 
     public FavouriteListESDT getPractitionerFavourites(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
         getLogger().debug(".getPractitionerFavourites(): Entry, pathValue --> {}", id);
-        FavouriteListESDT output = getFavourites(id, "PractitionerFavourites");
+        FavouriteListESDT output = getFavourites(id, FavouriteTypes.PRACTITIONER_FAVOURITES);
         getLogger().debug(".getPractitionerFavourites(): Exit");
         return (output);
     }
 
     public FavouriteListESDT getServiceFavourites(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
         getLogger().debug(".getServiceFavourites(): Entry, pathValue --> {}", id);
-        FavouriteListESDT output = getFavourites(id, "ServiceFavourites");
+        FavouriteListESDT output = getFavourites(id, FavouriteTypes.SERVICE_FAVOURITES);
         getLogger().debug(".getServiceFavourites(): Exit");
         return (output);
     }
 
-    private FavouriteListESDT getFavourites(String id, String favouriteType) throws ResourceInvalidSearchException {
+    private FavouriteListESDT getFavourites(String id, FavouriteTypes favouriteType) throws ResourceInvalidSearchException {
         getLogger().debug(".getFavourites(): Entry, id->{}, favouriteType->{}", id, favouriteType);
         ESRMethodOutcome outcome = getResourceBroker().getResource(id.toLowerCase());
         if (outcome.getEntry() != null) {
             FavouriteListESDT output = new FavouriteListESDT();
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
             switch (favouriteType) {
-            case "PractitionerRoleFavourites": {
+            case PRACTITIONER_ROLE_FAVOURITES: {
                 output.getFavourites().addAll(practitioner.getPractitionerRoleFavourites().getFavourites());
                 break;
             }
-            case "PractitionerFavourites": {
+            case PRACTITIONER_FAVOURITES: {
                 output.getFavourites().addAll(practitioner.getPractitionerFavourites().getFavourites());
                 break;
             }
-            case "ServiceFavourites": {
+            case SERVICE_FAVOURITES: {
                 output.getFavourites().addAll(practitioner.getHealthcareServiceFavourites().getFavourites());
                 break;
             }
@@ -399,7 +400,7 @@ public class PractitionerServiceHandler extends HandlerBase {
     public PractitionerESR updatePractitionerRoleFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites)
             throws ResourceInvalidSearchException {
         getLogger().debug(".updatePractitionerRoleFavourites(): Entry, id->{}, newFavourites->{}", id, newFavourites);
-        PractitionerESR output = updateFavourites(id, "PractitionerRoleFavourites", newFavourites);
+        PractitionerESR output = updateFavourites(id, FavouriteTypes.PRACTITIONER_ROLE_FAVOURITES, newFavourites);
         getLogger().debug(".updatePractitionerRoleFavourites(): Exit");
         return (output);
     }
@@ -407,19 +408,19 @@ public class PractitionerServiceHandler extends HandlerBase {
     public PractitionerESR updatePractitionerFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites)
             throws ResourceInvalidSearchException {
         getLogger().debug(".updatePractitionerFavourites(): Entry, id->{}, newFavourites->{}", id, newFavourites);
-        PractitionerESR output = updateFavourites(id, "PractitionerFavourites", newFavourites);
+        PractitionerESR output = updateFavourites(id, FavouriteTypes.PRACTITIONER_FAVOURITES, newFavourites);
         getLogger().debug(".updatePractitionerFavourites(): Exit");
         return (output);
     }
 
     public PractitionerESR updateServiceFavourites(@Header("simplifiedID") String id, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
         getLogger().debug(".updateServiceFavourites(): Entry, id->{}, newFavourites->{}", id, newFavourites);
-        PractitionerESR output = updateFavourites(id, "ServiceFavourites", newFavourites);
+        PractitionerESR output = updateFavourites(id, FavouriteTypes.SERVICE_FAVOURITES, newFavourites);
         getLogger().debug(".updateServiceFavourites(): Exit");
         return (output);
     }
 
-    private PractitionerESR updateFavourites(String id, String favouriteType, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
+    private PractitionerESR updateFavourites(String id, FavouriteTypes favouriteType, FavouriteListESDT newFavourites) throws ResourceInvalidSearchException {
         getLogger().debug(".getFavourites(): Entry, id->{}, favouriteType->{}", id, favouriteType);
         ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updateFavourites(id, favouriteType, newFavourites);
         if (outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)) {

@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.internals.esr.cache.OrganizationESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
+import net.fhirfactory.pegacorn.internals.esr.search.FavouriteTypes;
 
 /**
  * Testing of the practitioner favourites.  There are practitioner role favourites, health care service favourites and practitioner favourites.
@@ -103,7 +104,7 @@ public class PractitionerFavouritesTest {
             FavouriteListESDT roleList = new FavouriteListESDT();
             roleList.getFavourites().add("Role 1 short name");
             roleList.getFavourites().add("Role 2 short name");
-            practitionerBroker.updateFavourites("test1@test.com", "PractitionerRoleFavourites", roleList);
+            practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.PRACTITIONER_ROLE_FAVOURITES, roleList);
             
             PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
             
@@ -124,7 +125,7 @@ public class PractitionerFavouritesTest {
             
             FavouriteListESDT practitionerList = new FavouriteListESDT();
             practitionerList.getFavourites().add("test2@test.com");
-            practitionerBroker.updateFavourites("test1@test.com", "PractitionerFavourites", practitionerList);
+            practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.PRACTITIONER_FAVOURITES, practitionerList);
             
             PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
             
@@ -147,7 +148,7 @@ public class PractitionerFavouritesTest {
             FavouriteListESDT healthCareServiceList = new FavouriteListESDT();
             healthCareServiceList.getFavourites().add("Service 1 short name");
             healthCareServiceList.getFavourites().add("Service 2 short name");
-            practitionerBroker.updateFavourites("test1@test.com", "ServiceFavourites", healthCareServiceList);
+            practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.SERVICE_FAVOURITES, healthCareServiceList);
             
             PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
             
@@ -174,7 +175,7 @@ public class PractitionerFavouritesTest {
                 roleList.getFavourites().add("Role 2 short name");
                 roleList.getFavourites().add("Role 3 short name");
                 roleList.getFavourites().add("Role 4 short name");
-                practitionerBroker.updateFavourites("test1@test.com", "PractitionerRoleFavourites", roleList);
+                practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.PRACTITIONER_ROLE_FAVOURITES, roleList);
                 
                 PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
                 
@@ -204,7 +205,7 @@ public class PractitionerFavouritesTest {
             practitionerList.getFavourites().add("test2@test.com");
             practitionerList.getFavourites().add("test3@test.com");
             practitionerList.getFavourites().add("test4@test.com");
-            practitionerBroker.updateFavourites("test1@test.com", "PractitionerFavourites", practitionerList);
+            practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.PRACTITIONER_FAVOURITES, practitionerList);
             
             PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
             
@@ -231,7 +232,7 @@ public class PractitionerFavouritesTest {
             healthCareServiceList.getFavourites().add("Service 2 short name");
             healthCareServiceList.getFavourites().add("Service 3 short name");
             healthCareServiceList.getFavourites().add("Service 4 short name");
-            practitionerBroker.updateFavourites("test1@test.com", "ServiceFavourites", healthCareServiceList);
+            practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.SERVICE_FAVOURITES, healthCareServiceList);
             
             PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
             
@@ -254,7 +255,7 @@ public class PractitionerFavouritesTest {
             // Now update the list of role
             try {               
                 FavouriteListESDT roleList = new FavouriteListESDT();
-                practitionerBroker.updateFavourites("test1@test.com", "PractitionerRoleFavourites", roleList);
+                practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.PRACTITIONER_ROLE_FAVOURITES, roleList);
                 
                 PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
                 
@@ -275,7 +276,7 @@ public class PractitionerFavouritesTest {
             testCreatePractitionerFavourites();
                        
             FavouriteListESDT practitionerList = new FavouriteListESDT();
-            practitionerBroker.updateFavourites("test1@test.com", "PractitionerFavourites", practitionerList);
+            practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.PRACTITIONER_FAVOURITES, practitionerList);
             
             PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
             
@@ -293,7 +294,7 @@ public class PractitionerFavouritesTest {
             testCreatePractitionerHealthCareServiceFavourites();
            
             FavouriteListESDT healthCareServiceList = new FavouriteListESDT();
-            practitionerBroker.updateFavourites("test1@test.com", "ServiceFavourites", healthCareServiceList);
+            practitionerBroker.updateFavourites("test1@test.com", FavouriteTypes.SERVICE_FAVOURITES, healthCareServiceList);
             
             PractitionerESR practitioner = (PractitionerESR)practitionerBroker.getResource("test1@test.com").getEntry();
             

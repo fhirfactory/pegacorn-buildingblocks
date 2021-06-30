@@ -48,6 +48,7 @@ import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomN
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.search.FavouriteTypes;
 
 @ApplicationScoped
 public class PractitionerESRBroker extends ESRBroker {
@@ -234,7 +235,7 @@ public class PractitionerESRBroker extends ESRBroker {
         return(outcome);
     }
 
-    public ESRMethodOutcome updateFavourites(String simplifiedID, String favouriteType, FavouriteListESDT favourites) throws ResourceInvalidSearchException {
+    public ESRMethodOutcome updateFavourites(String simplifiedID, FavouriteTypes favouriteType, FavouriteListESDT favourites) throws ResourceInvalidSearchException {
         getLogger().debug(".updateFavourites():Entry");
         ESRMethodOutcome outcome = this.getResource(simplifiedID.toLowerCase());
         if (outcome.getEntry() != null) {
@@ -243,19 +244,19 @@ public class PractitionerESRBroker extends ESRBroker {
             boolean shouldBeUpdated = false;
             
             switch (favouriteType) {
-                case "PractitionerRoleFavourites": {
+                case PRACTITIONER_ROLE_FAVOURITES: {
                 	practitioner.getPractitionerRoleFavourites().getFavourites().clear();
                     practitioner.getPractitionerRoleFavourites().getFavourites().addAll(favourites.getFavourites());
                     shouldBeUpdated = true;
                     break;
                 }
-                case "PractitionerFavourites": {
+                case PRACTITIONER_FAVOURITES: {
                 	practitioner.getPractitionerFavourites().getFavourites().clear();
                     practitioner.getPractitionerFavourites().getFavourites().addAll(favourites.getFavourites());
                     shouldBeUpdated = true;
                     break;
                 }
-                case "ServiceFavourites": {
+                case SERVICE_FAVOURITES: {
                 	practitioner.getHealthcareServiceFavourites().getFavourites().clear();
                     practitioner.getHealthcareServiceFavourites().getFavourites().addAll(favourites.getFavourites());
                     shouldBeUpdated = true;
