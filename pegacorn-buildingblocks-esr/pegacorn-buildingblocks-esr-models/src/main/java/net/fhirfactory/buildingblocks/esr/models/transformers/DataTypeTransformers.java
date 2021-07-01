@@ -31,8 +31,8 @@ import org.hl7.fhir.r4.model.ContactPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ContactPointESDT;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.datatypes.ContactPointFactory;
 
 @ApplicationScoped

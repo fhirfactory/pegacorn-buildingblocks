@@ -6,12 +6,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.LocationESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.LocationESR;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.pegacorn.internals.esr.brokers.LocationESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;

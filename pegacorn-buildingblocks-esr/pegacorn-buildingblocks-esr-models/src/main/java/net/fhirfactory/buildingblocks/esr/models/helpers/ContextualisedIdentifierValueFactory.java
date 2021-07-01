@@ -24,7 +24,7 @@ package net.fhirfactory.buildingblocks.esr.models.helpers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierESDT;
 
 import javax.enterprise.context.ApplicationScoped;
 

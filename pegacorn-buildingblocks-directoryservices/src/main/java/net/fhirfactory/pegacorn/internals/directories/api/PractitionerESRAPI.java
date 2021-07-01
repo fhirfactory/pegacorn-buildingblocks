@@ -30,9 +30,9 @@ import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.FavouriteListESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.FavouriteListESDT;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.PractitionerRoleListESDT;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.HealthcareServiceServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerRoleServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerServiceHandler;

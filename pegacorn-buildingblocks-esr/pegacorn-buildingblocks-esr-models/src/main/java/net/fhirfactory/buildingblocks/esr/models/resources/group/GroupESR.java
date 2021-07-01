@@ -24,7 +24,7 @@ package net.fhirfactory.buildingblocks.esr.models.resources.group;
 import java.util.Comparator;
 import java.util.List;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
 
 /**
  * Base class for all group ESR's

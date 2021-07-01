@@ -27,7 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.ParticipantESDT;
 
 /**
  * A group of practitioner roles within a care team.

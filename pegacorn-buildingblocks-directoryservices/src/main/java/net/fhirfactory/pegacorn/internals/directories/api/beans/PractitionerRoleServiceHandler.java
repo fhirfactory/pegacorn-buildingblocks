@@ -15,11 +15,11 @@ import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearc
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;

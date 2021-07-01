@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 
 

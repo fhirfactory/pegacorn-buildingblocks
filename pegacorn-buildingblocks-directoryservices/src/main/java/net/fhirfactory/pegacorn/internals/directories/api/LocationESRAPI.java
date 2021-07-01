@@ -30,8 +30,8 @@ import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.LocationESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
+import net.fhirfactory.buildingblocks.esr.resources.LocationESR;
+import net.fhirfactory.buildingblocks.esr.resources.RoleESR;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.LocationServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
 

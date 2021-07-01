@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;

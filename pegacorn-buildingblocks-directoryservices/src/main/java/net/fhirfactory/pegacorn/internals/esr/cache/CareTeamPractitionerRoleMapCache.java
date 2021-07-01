@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.ParticipantESDT;
 
 @ApplicationScoped
 public class CareTeamPractitionerRoleMapCache {

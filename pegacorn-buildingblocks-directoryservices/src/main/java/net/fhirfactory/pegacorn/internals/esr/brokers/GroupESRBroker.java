@@ -30,9 +30,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.ParticipantESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.GroupESR;
 import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesFulfilledByPractitionerGroupESR;
@@ -40,6 +37,9 @@ import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRol
 import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionersFulfillingPractitionerRolesGroupESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.GroupESRCache;

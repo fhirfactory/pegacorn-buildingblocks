@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common.MatrixRoomIdentifier;
 import net.fhirfactory.pegacorn.internals.matrix.digitaltwin.behaviourexecutors.common.MatrixUserIdentifier;
 

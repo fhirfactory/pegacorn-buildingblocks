@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.platform.edge.common.CamelSSLTLSHandler;
 

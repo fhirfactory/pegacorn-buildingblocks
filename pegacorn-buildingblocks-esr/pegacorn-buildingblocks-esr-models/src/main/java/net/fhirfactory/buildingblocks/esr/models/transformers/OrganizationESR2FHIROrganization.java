@@ -28,7 +28,7 @@ import org.hl7.fhir.r4.model.Organization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.OrganizationESR;
+import net.fhirfactory.buildingblocks.esr.resources.OrganizationESR;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.OrganizationFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.OrganizationResourceHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.SecurityLabelFactory;

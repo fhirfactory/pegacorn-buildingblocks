@@ -30,7 +30,7 @@ import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleCategoryESR;
+import net.fhirfactory.buildingblocks.esr.resources.RoleCategoryESR;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.RoleCategoryServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
 

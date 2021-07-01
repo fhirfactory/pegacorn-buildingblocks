@@ -26,7 +26,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
 
 
 public class ESRMethodOutcome {

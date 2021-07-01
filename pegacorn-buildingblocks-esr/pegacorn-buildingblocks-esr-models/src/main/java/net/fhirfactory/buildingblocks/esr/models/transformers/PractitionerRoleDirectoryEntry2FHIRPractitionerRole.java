@@ -36,8 +36,8 @@ import org.hl7.fhir.r4.model.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.GroupFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.location.LocationResourceHelper;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.OrganizationResourceHelpers;

@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;

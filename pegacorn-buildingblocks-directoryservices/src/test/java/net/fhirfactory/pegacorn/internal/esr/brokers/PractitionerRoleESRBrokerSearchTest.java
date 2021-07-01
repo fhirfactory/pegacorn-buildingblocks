@@ -6,11 +6,11 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 
 import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierType;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;

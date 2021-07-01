@@ -8,10 +8,10 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
+import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.buildingblocks.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.RoleHistory;
+import net.fhirfactory.buildingblocks.esr.resources.datatypes.RoleHistory;
 
 /**
  * A group of practitioner roles for a practitioner.
