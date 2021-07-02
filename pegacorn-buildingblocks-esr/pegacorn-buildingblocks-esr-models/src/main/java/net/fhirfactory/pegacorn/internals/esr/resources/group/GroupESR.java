@@ -21,20 +21,14 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources.group;
 
-<<<<<<< HEAD:pegacorn-buildingblocks-esr/pegacorn-buildingblocks-esr-models/src/main/java/net/fhirfactory/pegacorn/internals/esr/resources/group/GroupESR.java
-=======
-import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
->>>>>>> feature/228417-As-a-system-aether-must-receive-hl7v2-messages-from-bridges-for-forwarding-to-other-downstream-systems:pegacorn-buildingblocks-datamodels/pegacorn-buildingblocks-datamodels-esr/src/main/java/net/fhirfactory/pegacorn/internals/esr/resources/GroupESR.java
 import java.util.Comparator;
 import java.util.List;
 
+import org.hl7.fhir.r4.model.ResourceType;
+
 import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 /**
  * Base class for all group ESR's
@@ -45,16 +39,13 @@ import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResou
 public abstract class GroupESR extends ExtremelySimplifiedResource {
 
     protected String groupManager;
-    
     protected String groupType;
+    protected List<String> groupMembership;
 
     public GroupESR(){
         super();
-<<<<<<< HEAD:pegacorn-buildingblocks-esr/pegacorn-buildingblocks-esr-models/src/main/java/net/fhirfactory/pegacorn/internals/esr/resources/group/GroupESR.java
-=======
         this.groupMembership = new ArrayList<>();
         this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_GROUP);
->>>>>>> feature/228417-As-a-system-aether-must-receive-hl7v2-messages-from-bridges-for-forwarding-to-other-downstream-systems:pegacorn-buildingblocks-datamodels/pegacorn-buildingblocks-datamodels-esr/src/main/java/net/fhirfactory/pegacorn/internals/esr/resources/GroupESR.java
     }
 
     public abstract List<?>getGroupMembership();
