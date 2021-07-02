@@ -58,6 +58,7 @@ public class CommunicateGroup extends GroupESR{
         this.surrogateCommunicateUser = surrogateCommunicateUser;
     }
 
+    //TODO THIS NEEDS TO BE FIXED.
     @JsonIgnore
     public GroupESR getGroupESR(){
      //   GroupESR group = new GroupESR();
