@@ -21,21 +21,24 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.cache;
 
+import java.util.Date;
+
+import javax.enterprise.context.ApplicationScoped;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.PatientESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PatientESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.PatientSearchResult;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.result.PatientSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import java.util.Date;
 
 @ApplicationScoped
 public class PatientESRCache extends PegacornESRCache {
@@ -72,32 +75,35 @@ public class PatientESRCache extends PegacornESRCache {
     }
 
     @Override
-    public ESRSearchResult search(String searchAttributeName, String searchAttributeValue)
-            throws ResourceInvalidSearchException {
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchAttributeName, searchAttributeValue);
-        if(searchAttributeName == null || searchAttributeValue == null){
-            throw(new ResourceInvalidSearchException("Search Parameter Name or Value are null"));
+    public ESRSearchResult search(SearchCriteria searchCriteria)  throws ResourceInvalidSearchException {
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getSearchParam().getName(), searchCriteria.getSearchParam().getValue());
+        
+        if(searchCriteria.isValueNull()){
+            throw(new ResourceInvalidSearchException("Search Value is null"));
         }
-        if(searchAttributeName.isEmpty()){
+        if(searchCriteria.isParamNameNull()){
             throw(new ResourceInvalidSearchException("Search Parameter Name is empty"));
         }
+        
+        
         ESRSearchResult result = instatiateNewESRSearchResult();
-        if(searchAttributeValue.isEmpty()){
+        
+        if(searchCriteria.isValueEmpty()){
             return(result);
         }
-        String searchAttributeNameLowerCase = searchAttributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "emailaddress":{
-                result = this.searchCacheUsingSimplifiedID(searchAttributeValue);
+        
+        switch(searchCriteria.getSearchParam().getName()){
+            case SIMPLIFIED_ID:
+            case EMAIL_ADDRESS:{
+                result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
-            case "dateofbirth": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "Date of Birth", IdentifierESDTUseEnum.USUAL);
+            case DATE_OF_BIRTH: {
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria,IdentifierType.DATE_OF_BIRTH, IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "displayname": {
-                result = this.searchCacheUsingDisplayName(searchAttributeValue);
+            case DISPLAY_NAME: {
+                result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
             default: {
@@ -105,20 +111,8 @@ public class PatientESRCache extends PegacornESRCache {
             }
         }
     }
-
-    @Override
-    public Boolean supportsSearchType(String attributeName) {
-        String searchAttributeNameLowerCase = attributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "dateofbirth":
-            case "displayname":
-                return(true);
-            default:
-                return(false);
-        }
-    }
-
+    
+    
     public ESRSearchResult searchCacheViaDateOfBirth(Date dateOfBirth){
         LOG.debug(".searchCacheViaDateOfBirth(): Entry");
         ESRSearchResult result = instatiateNewESRSearchResult();

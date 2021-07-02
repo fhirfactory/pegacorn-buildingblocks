@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapC
 import net.fhirfactory.pegacorn.internals.esr.cache.GroupESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ParticipantESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.group.CareTeamsContainingPractitionerRoleGroupESR;

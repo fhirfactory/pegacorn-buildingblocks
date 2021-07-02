@@ -26,11 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sun.org.slf4j.internal.LoggerFactory;
-
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.OrganisationStructure;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 public class HealthcareServiceESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(HealthcareServiceESR.class);
@@ -45,7 +47,6 @@ public class HealthcareServiceESR extends ExtremelySimplifiedResource {
         super();        
         contactPoints = new ArrayList<>();
         this.organisationStructure = new ArrayList<OrganisationStructure>();
-        serviceDeliveryLocations = new ArrayList<>();
         this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_HEALTHCARE_SERVICE);
     }
 

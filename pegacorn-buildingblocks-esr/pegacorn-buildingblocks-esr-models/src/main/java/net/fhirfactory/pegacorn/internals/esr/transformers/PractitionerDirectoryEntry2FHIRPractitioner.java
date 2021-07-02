@@ -27,14 +27,14 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.GroupFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitioner.PractitionerFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.factories.GroupFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitioner.factories.PractitionerFactory;
+
 
 @ApplicationScoped
 public class PractitionerDirectoryEntry2FHIRPractitioner {
@@ -66,16 +66,5 @@ public class PractitionerDirectoryEntry2FHIRPractitioner {
         List<ContactPoint> contactPoints = dataTypeTransformers.createContactPoints(practitionerESR);
         newPractitioner.getTelecom().addAll(contactPoints);
         return(newPractitioner);
-    }
-
-    /**
-     *
-     * @param practitionerESR
-     * @return
-     */
-    public Group createPractitionerRoleGroup(PractitionerESR practitionerESR){
-        String associatedPractitionerEmailAddress = practitionerESR.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS).getValue();
-        Group practitionerRoleGroup = groupFactory.buildPractitionerGroupForPractitionerRole(associatedPractitionerEmailAddress);
-        return(practitionerRoleGroup);
     }
 }

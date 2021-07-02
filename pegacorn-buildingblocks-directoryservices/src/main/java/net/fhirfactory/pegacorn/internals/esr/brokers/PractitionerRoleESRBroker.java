@@ -23,13 +23,16 @@ package net.fhirfactory.pegacorn.internals.esr.brokers;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.OrganizationESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
@@ -43,6 +46,8 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
 public abstract class PractitionerRoleESRBroker extends ESRBroker {
+    private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleESRBroker.class);
+    
 
     @Inject
     private PractitionerRoleESRCache practitionerRoleCache;
@@ -60,7 +65,12 @@ public abstract class PractitionerRoleESRBroker extends ESRBroker {
     protected PegacornESRCache specifyCache(){
         return(practitionerRoleCache);
     }
-
+    
+    @Override
+    public Logger getLogger() {
+        return LOG;
+    }
+    
     //
     // Primary Key Setting
     //

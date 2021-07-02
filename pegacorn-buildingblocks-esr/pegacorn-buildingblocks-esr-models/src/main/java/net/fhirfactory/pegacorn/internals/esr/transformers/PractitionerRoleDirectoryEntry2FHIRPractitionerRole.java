@@ -38,13 +38,13 @@ import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.GroupFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.location.LocationResourceHelper;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.OrganizationResourceHelpers;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitionerrole.PractitionerRoleFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitionerrole.RoleFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.InformationConfidentialitySecurityCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.factories.GroupFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.location.factories.LocationResourceHelper;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.factories.OrganizationResourceHelpers;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitionerrole.factories.PractitionerRoleFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitionerrole.factories.RoleFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.SecurityLabelFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.valuesets.InformationConfidentialitySecurityCodeEnum;
 
 @ApplicationScoped
 public class PractitionerRoleDirectoryEntry2FHIRPractitionerRole {

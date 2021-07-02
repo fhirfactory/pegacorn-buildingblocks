@@ -25,10 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sun.org.slf4j.internal.LoggerFactory;
-
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+
 
 public class CareTeamESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(CareTeamESR.class);

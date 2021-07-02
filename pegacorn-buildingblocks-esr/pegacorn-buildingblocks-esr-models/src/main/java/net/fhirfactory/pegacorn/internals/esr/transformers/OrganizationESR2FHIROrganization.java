@@ -29,8 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.OrganizationESR;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.OrganizationFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.OrganizationResourceHelpers;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.factories.OrganizationFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.factories.OrganizationResourceHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.SecurityLabelFactory;
 
 @ApplicationScoped

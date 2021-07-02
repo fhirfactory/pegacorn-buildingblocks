@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.resources.CareTeamESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;

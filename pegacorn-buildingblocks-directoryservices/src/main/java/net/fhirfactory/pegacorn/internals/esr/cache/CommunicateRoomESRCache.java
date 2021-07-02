@@ -21,17 +21,21 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.cache;
 
-import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateRoomESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.MatrixRoomSearchResult;
-import net.fhirfactory.pegacorn.internals.esr.resources.search.common.ESRSearchResult;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import java.util.Enumeration;
+
+import javax.enterprise.context.ApplicationScoped;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import java.util.Enumeration;
+import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateRoomESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.result.MatrixRoomSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
 @ApplicationScoped
 public class CommunicateRoomESRCache extends PegacornESRCache {
@@ -56,55 +60,43 @@ public class CommunicateRoomESRCache extends PegacornESRCache {
         return(result);
     }
 
+    
     @Override
-    public Boolean supportsSearchType(String attributeName) {
-        String searchAttributeNameLowerCase = attributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "shortnmae":
-            case "longname":
-            case "displayname":
-            case "canonicalAlias":
-                return(true);
-            default:
-                return(false);
+    public ESRSearchResult search(SearchCriteria searchCriteria) throws ResourceInvalidSearchException {
+        
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getSearchParam().getName(), searchCriteria.getSearchParam().getValue());
+        
+        if(searchCriteria.isValueNull()){
+            throw(new ResourceInvalidSearchException("Search Value is null"));
         }
-    }
-
-    @Override
-    public ESRSearchResult search(String searchAttributeName, String searchAttributeValue)
-            throws ResourceInvalidSearchException {
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchAttributeName, searchAttributeValue);
-        if(searchAttributeName == null || searchAttributeValue == null){
-            throw(new ResourceInvalidSearchException("Search Parameter Name or Value are null"));
-        }
-        if(searchAttributeName.isEmpty()){
+        if(searchCriteria.isParamNameNull()){
             throw(new ResourceInvalidSearchException("Search Parameter Name is empty"));
         }
+        
         ESRSearchResult result = instatiateNewESRSearchResult();
-        if(searchAttributeValue.isEmpty()){
+        
+        if(searchCriteria.isValueEmpty()){
             return(result);
         }
-        String searchAttributeNameLowerCase = searchAttributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid": {
-                result = this.searchCacheUsingSimplifiedID(searchAttributeValue);
+        switch(searchCriteria.getSearchParam().getName()){
+            case SIMPLIFIED_ID: {
+                result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
-            case "shortname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "ShortName", IdentifierESDTUseEnum.USUAL);
+            case SHORT_NAME: {
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "longname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchAttributeValue, "LongName", IdentifierESDTUseEnum.USUAL);
+            case LONG_NAME: {
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.LONG_NAME, IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "displayname": {
-                result = this.searchCacheUsingDisplayName(searchAttributeValue);
+            case DISPLAY_NAME: {
+                result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
-            case "canonicalalias":{
-                result = this.searchCacheUsingCanonicalAlias(searchAttributeValue);
+            case CANONICAL_ALIAS:{
+                result = this.searchCacheUsingCanonicalAlias(searchCriteria);
                 return(result);
             }
             default: {
@@ -113,26 +105,26 @@ public class CommunicateRoomESRCache extends PegacornESRCache {
         }
     }
 
-    public ESRSearchResult searchCacheUsingCanonicalAlias(String canonicalAlias)
+    public ESRSearchResult searchCacheUsingCanonicalAlias(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
-        getLogger().debug(".searchCacheUsingCanonicalAlias(): Entry, canonicalAlias->{}", canonicalAlias);
-        if(canonicalAlias == null){
+        getLogger().debug(".searchCacheUsingCanonicalAlias(): Entry, canonicalAlias->{}", searchCriteria.getSearchParam().getValue());
+        if(searchCriteria.getSearchParam().getValue() == null){
             throw(new ResourceInvalidSearchException("Search parameter name or value are null"));
         }
-        if(canonicalAlias.isEmpty()){
+        if(searchCriteria.getSearchParam().getValue().isEmpty()){
             throw(new ResourceInvalidSearchException("Search parameter name is empty"));
         }
         ESRSearchResult result = instatiateNewESRSearchResult();
         if(this.getSimplifiedID2ESRMap().isEmpty()){
             return(result);
         }
-        String simplifiedIDValueAsLowerCase = canonicalAlias.toLowerCase();
+        String simplifiedIDValueAsLowerCase = searchCriteria.getSearchParam().getValue().toLowerCase();
         Enumeration<String> idSet = this.getSimplifiedID2ESRMap().keys();
         while(idSet.hasMoreElements()){
             String currentID = idSet.nextElement();
             CommunicateRoomESR matrixRoom = (CommunicateRoomESR)this.getSimplifiedID2ESRMap().get(currentID);
             String currentCanonicalAlias = matrixRoom.getCanonicalAlias();
-            if(currentCanonicalAlias.toLowerCase().contentEquals(canonicalAlias)){
+            if(currentCanonicalAlias.toLowerCase().contentEquals(searchCriteria.getSearchParam().getValue())){
                result.getSearchResultList().add(matrixRoom);
             }
         }

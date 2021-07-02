@@ -21,24 +21,19 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import java.util.UUID;
-
 import javax.inject.Inject;
 
 import net.fhirfactory.pegacorn.deployment.communicate.matrix.CommunicateSystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.esr.resources.MatrixRoomESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.RoleHistory;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.group.PractitionerRolesFulfilledByPractitionerGroupESR;
@@ -61,8 +56,6 @@ public abstract class PractitionerESRBroker extends ESRBroker {
     private CommunicateSystemManagedRoomNames managedRoomNames;
 
 
-    @Inject
-    private MatrixRoomESRBroker matrixRoomDirectoryResourceBroker;
     
 	@Inject
     private PractitionerRoleESRBroker practitionerRoleBroker;
@@ -298,69 +291,5 @@ public abstract class PractitionerESRBroker extends ESRBroker {
 
         return(outcome);
     }
-
-
-
-    //
-    // Room Based Services
-    //
-
-    protected void createSystemManagedMatrixRooms(PractitionerESR practitioner){
-        if(practitioner == null){
-            return;
-        }
-        IdentifierESDT practitionerIdentifier = practitioner.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS);
-        createSystemManagedMatrixRoom(
-                practitioner.getSimplifiedID(),
-                managedRoomNames.getPractitionerCallRoom(),
-                managedRoomNames.getPractitionerCallRoomAlias(practitioner.getSimplifiedID()),
-                managedRoomNames.getPractitionerCallRoomAlias(practitionerIdentifier.getValue()));
-        createSystemManagedMatrixRoom(
-                practitioner.getSimplifiedID(),
-                managedRoomNames.getPractitionerCodeNotificationsRoom(),
-                managedRoomNames.getPractitionerCodeNotificationsRoomAlias(practitioner.getSimplifiedID()),
-                managedRoomNames.getPractitionerCodeNotificationsRoomAlias(practitionerIdentifier.getValue()));
-        createSystemManagedMatrixRoom(
-                practitioner.getSimplifiedID(),
-                managedRoomNames.getPractitionerMediaRoom(),
-                managedRoomNames.getPractitionerMediaRoomAlias(practitioner.getSimplifiedID()),
-                managedRoomNames.getPractitionerMediaRoomAlias(practitionerIdentifier.getValue()));
-        createSystemManagedMatrixRoom(
-                practitioner.getSimplifiedID(),
-                managedRoomNames.getPractitionerCriticalResultsNotificationsRoom(),
-                managedRoomNames.getPractitionerCriticalResultsNotificationsRoomAlias(practitioner.getSimplifiedID()),
-                managedRoomNames.getPractitionerCriticalResultsNotificationsRoomAlias(practitionerIdentifier.getValue()));
-        createSystemManagedMatrixRoom(
-                practitioner.getSimplifiedID(),
-                managedRoomNames.getPractitionerSystemMessagesRoom(),
-                managedRoomNames.getPractitionerSystemMessagesRoomAlias(practitioner.getSimplifiedID()),
-                managedRoomNames.getPractitionerSystemMessagesRoomAlias(practitionerIdentifier.getValue()));
-    }
-
-    protected void createSystemManagedMatrixRoom(String practitionerRecordID, String displayName, String practitionerRecordIDBasedName, String practitionerEmailBasedAlias){
-        IdentifierESDT roomIdBasedIdentifier = new IdentifierESDT();
-        roomIdBasedIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-        roomIdBasedIdentifier.setType(IdentifierType.MATRIX_ROOM_ID);
-        roomIdBasedIdentifier.setValue(UUID.randomUUID().toString());
-        IdentifierESDT roomNameBasedIdentifier = new IdentifierESDT();
-        roomNameBasedIdentifier.setUse(IdentifierESDTUseEnum.OFFICIAL);
-        roomNameBasedIdentifier.setValue(practitionerRecordIDBasedName);
-        roomNameBasedIdentifier.setType(IdentifierType.MATRIX_ROOM_SYSTEM_ID);
-        MatrixRoomESR matrixRoom = new MatrixRoomESR();
-        matrixRoom.addIdentifier(roomIdBasedIdentifier);
-        matrixRoom.addIdentifier(roomNameBasedIdentifier);
-        matrixRoom.setRoomOwner(practitionerRecordID);
-        matrixRoom.setSystemManaged(true);
-        matrixRoom.setDisplayName(practitionerEmailBasedAlias);
-        matrixRoomDirectoryResourceBroker.createMatrixRoomDE(matrixRoom);
-    }
-    
-    
-	@Override
-	protected void clearAssociations(ExtremelySimplifiedResource entry) {
-		PractitionerESR practitonerESR = (PractitionerESR)entry;
-		
-		practitonerESR.getCurrentPractitionerRoles().clear();
-		practitonerESR.setRoleHistory(new RoleHistory());
-	}
+  
 }

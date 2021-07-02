@@ -9,10 +9,8 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import org.junit.jupiter.api.Test;
 
-import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.HealthcareServiceESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.OrganizationESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
@@ -39,7 +37,7 @@ import net.fhirfactory.pegacorn.internals.esr.search.FavouriteTypes;
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ PractitionerESRBroker.class, PractitionerESRCache.class, PractitionerRoleESRBroker.class, PractitionerRoleESRCache.class, GroupESRBroker.class, PractitionerRoleMapCache.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class,HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, OrganizationESRCache.class, OrganizationESRBroker.class })
+@AddBeanClasses({ PractitionerESRBroker.class, PractitionerESRCache.class, PractitionerRoleESRBroker.class, PractitionerRoleESRCache.class, GroupESRBroker.class, PractitionerRoleMapCache.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, RoleCategoryESRBroker.class,HealthcareServiceESRBroker.class, HealthcareServiceESRCache.class, OrganizationESRCache.class, OrganizationESRBroker.class })
 public class PractitionerFavouritesTest {
     
     @Inject

@@ -8,9 +8,7 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import org.junit.jupiter.api.Test;
 
-import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.RoleCategoryESRBroker;
@@ -20,9 +18,9 @@ import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.RoleCategoryESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
@@ -39,7 +37,7 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceIn
  *
  */
 @EnableAutoWeld
-@AddBeanClasses({ PractitionerESRBroker.class, PractitionerESRCache.class, PractitionerRoleESRBroker.class, RoleCategoryFilter.class, PractitionerRoleESRCache.class, GroupESRBroker.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, SystemManagedRoomNames.class, MatrixRoomESRBroker.class, RoleCategoryESRBroker.class, RoleCategoryESRCache.class })
+@AddBeanClasses({ PractitionerESRBroker.class, PractitionerESRCache.class, PractitionerRoleESRBroker.class, RoleCategoryFilter.class, PractitionerRoleESRCache.class, GroupESRBroker.class, PractitionerRoleMapCache.class, CareTeamPractitionerRoleMapCache.class, RoleCategoryESRBroker.class, RoleCategoryESRCache.class })
 public class PractitionerESRBrokerSearchTest extends BaseESRBrokerSearchTest {
     
     private static final String PREFIX = "Practitioner";

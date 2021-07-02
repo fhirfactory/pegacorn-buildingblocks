@@ -27,15 +27,21 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.org.slf4j.internal.LoggerFactory;
 
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.OrganisationStructure;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+
 
 public class PractitionerRoleESR extends ExtremelySimplifiedResource {
+    
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleESR.class);
+    
     @Override
     protected Logger getLogger(){return(LOG);}
 

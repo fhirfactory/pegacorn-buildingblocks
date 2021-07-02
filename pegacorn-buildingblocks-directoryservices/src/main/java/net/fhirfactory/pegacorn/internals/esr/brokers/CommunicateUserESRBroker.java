@@ -21,22 +21,21 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
+import java.util.UUID;
+
+import javax.inject.Inject;
+
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.cache.CommunicateRoomESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.CommunicateUserESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateRoomESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateUserESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
-
-import javax.inject.Inject;
-import java.util.UUID;
 
 public abstract class CommunicateUserESRBroker extends ESRBroker {
 
@@ -58,16 +57,12 @@ public abstract class CommunicateUserESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
-        if(resource.getIdentifierWithType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID) != null){
-            resource.assignSimplifiedID(true, IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_ROOM_ID.getIdentifierType(), IdentifierESDTUseEnum.SECONDARY);
-            getLogger().debug(".assignPrimaryKey(): Exit, Assigned MatrixRoomSystemID identifier");
+        if(resource.getIdentifierWithType(IdentifierType.MATRIX_USER_ID) != null){
+            resource.assignSimplifiedID(true, IdentifierType.MATRIX_USER_ID, IdentifierESDTUseEnum.SECONDARY);
+            getLogger().debug(".assignPrimaryKey(): Exit, Assigned MatrixUserId identifier");
             return;
         }
-        if(resource.getIdentifierWithType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID) != null){
-            resource.assignSimplifiedID(true, IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_ROOM_ID.getIdentifierType(), IdentifierESDTUseEnum.SECONDARY);
-            getLogger().debug(".assignPrimaryKey(): Exit, Assigned Matrix Room Id (room_id) identifier");
-            return;
-        }
+
         resource.assignSimplifiedID(UUID.randomUUID().toString(), "UUID.randomUUID()");
         getLogger().debug(".assignPrimaryKey(): Exit, Assigned UUID.randomUUID()");
     }
@@ -109,7 +104,7 @@ public abstract class CommunicateUserESRBroker extends ESRBroker {
             foundEntry = getCache().getCacheEntry(entry.getSimplifiedID());
         } else {
             getLogger().info(".PegacornDirectoryEntry(): The PegId is Null, so seeing if a suitable Identifier is available");
-            IdentifierESDT entryIdentifier = entry.getIdentifierWithType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID);
+            IdentifierESDT entryIdentifier = entry.getIdentifierWithType(IdentifierType.MATRIX_USER_ID);
             if(entryIdentifier != null){
                 getLogger().info(".PegacornDirectoryEntry(): Have a suitable Identifier, now retrieving");
                 if(entryIdentifier.getUse().equals(IdentifierESDTUseEnum.SECONDARY)){

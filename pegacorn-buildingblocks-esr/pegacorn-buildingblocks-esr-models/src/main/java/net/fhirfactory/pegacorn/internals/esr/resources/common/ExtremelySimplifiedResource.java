@@ -20,30 +20,21 @@
  * SOFTWARE.
  */
 
-package net.fhirfactory.pegacorn.internals.esr.resources;
+package net.fhirfactory.pegacorn.internals.esr.resources.common;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.CacheIDMetadata;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
-package net.fhirfactory.pegacorn.internals.esr.resources.common;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.CacheIDMetadata;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.Comparator;
 
 
 public abstract class  ExtremelySimplifiedResource {
@@ -159,7 +150,7 @@ public abstract class  ExtremelySimplifiedResource {
 
 
     @JsonIgnore
-    public void assignSimplifiedID(boolean useIdentifier, String identifierType, IdentifierESDTUseEnum identifierUse){
+    public void assignSimplifiedID(boolean useIdentifier, IdentifierType identifierType, IdentifierESDTUseEnum identifierUse){
         IdentifierESDT shortNameIdentifier = this.getIdentifierWithType(identifierType);
         CacheIDMetadata meta = new CacheIDMetadata();
         setSimplifiedID(shortNameIdentifier.getValue());
@@ -232,7 +223,7 @@ public abstract class  ExtremelySimplifiedResource {
         this.resourceESRType = resourceESRType;
     }
 
-    public IdentifierESDT getIdentifierWithType(String identifierType){
+    public IdentifierESDT getIdentifierWithType(IdentifierType identifierType){
         for(IdentifierESDT identifier: this.identifiers){
             if(identifier.getType().equals(identifierType)){
                 return(identifier);
@@ -241,11 +232,7 @@ public abstract class  ExtremelySimplifiedResource {
         return(null);
     }
 
-    public IdentifierESDT getIdentifierWithType(IdentifierESDTTypesEnum identifierType){
-        IdentifierESDT identifier = getIdentifierWithType(identifierType.getIdentifierType());
-        return(identifier);
-    }
-
+    
     public void addIdentifier(IdentifierESDT newIdentifier){
         getLogger().info(".addIdentifier(): Entry, newIdentifier --> {}", newIdentifier);
         if(this.identifiers.contains(newIdentifier)){

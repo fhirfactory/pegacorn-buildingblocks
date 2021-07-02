@@ -12,7 +12,10 @@ public enum SearchParamNames {
     PRIMARY_LOCATION_ID("primaryLocationID"),
     GROUP_MANAGER("groupManager"),
     GROUP_TYPE("groupType"),
-    LEAF_VALUE("leafValue");
+    LEAF_VALUE("leafValue"),
+    CANONICAL_ALIAS("canonicalalias"),
+    DATE_OF_BIRTH("dateofbirth"),
+    EMAIL_ADDRESS("emailaddress");
     
     private String value;
     

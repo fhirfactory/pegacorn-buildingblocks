@@ -25,13 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sun.org.slf4j.internal.LoggerFactory;
-
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.TypeESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 public class LocationESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(LocationESR.class);

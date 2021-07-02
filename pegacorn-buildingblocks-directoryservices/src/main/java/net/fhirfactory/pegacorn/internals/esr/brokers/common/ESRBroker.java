@@ -23,8 +23,11 @@ package net.fhirfactory.pegacorn.internals.esr.brokers.common;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
-import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
@@ -124,13 +127,7 @@ public abstract class ESRBroker {
     	return searchForDirectoryEntryUsingIdentifier(identifier, containsMatch, true);
     }
 
-    public boolean hasEntry(String simplifiedID){
-        boolean entryExists = getCache().hasEntry(simplifiedID);
-        return(entryExists);
-    }
-
-
-
+    
     //
     // Review (Search - by Identifier)
     //

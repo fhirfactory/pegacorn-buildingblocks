@@ -24,8 +24,11 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 import java.util.ArrayList;
 
 import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sun.org.slf4j.internal.LoggerFactory;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 public class RoleCategoryESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(RoleCategoryESR.class);

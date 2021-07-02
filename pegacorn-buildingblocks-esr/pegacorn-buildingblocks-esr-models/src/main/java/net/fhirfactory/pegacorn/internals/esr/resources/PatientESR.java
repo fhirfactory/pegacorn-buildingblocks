@@ -25,10 +25,12 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 import java.util.HashMap;
 
 import org.hl7.fhir.r4.model.ResourceType;
-
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FunctionESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ReferenceESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 public class PatientESR extends PersonESR {
     private static final Logger LOG = LoggerFactory.getLogger(PatientESR.class);

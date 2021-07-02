@@ -29,11 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.org.slf4j.internal.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.helpers.DateUtils;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.EmailAddress;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
@@ -42,6 +44,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.OrganisationStructure;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerStatusESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.RoleHistory;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 public class PractitionerESR extends PersonESR {	
     private static final Logger LOG = LoggerFactory.getLogger(PractitionerESR.class);
@@ -189,7 +192,7 @@ public class PractitionerESR extends PersonESR {
 
     @JsonIgnore
     public String getEmailAddressUserNamePart(){
-        IdentifierESDT foundIdentifier = getIdentifierWithType("EmailAddress");
+        IdentifierESDT foundIdentifier = getIdentifierWithType(IdentifierType.EMAIL_ADDRESS);
         if(foundIdentifier == null){
             return(null);
         }

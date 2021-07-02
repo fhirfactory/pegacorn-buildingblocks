@@ -21,17 +21,19 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.careteam;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.fhirfactory.pegacorn.internals.communicate.entities.careteam.valuesets.CommunicateCareTeamTypeEnum;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.CommunicateSession;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
 import net.fhirfactory.pegacorn.internals.esr.resources.CareTeamESR;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommunicateCareTeam extends CareTeamESR {
     private static final Logger LOG = LoggerFactory.getLogger(CommunicateCareTeam.class);
@@ -57,7 +59,9 @@ public class CommunicateCareTeam extends CareTeamESR {
     }
 
     @Override
-    protected Logger getLogger(){return(LOG);}
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public CommunicateRoomReference getCentralRoom() {
         return centralRoom;

@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.PatientESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
@@ -61,7 +61,7 @@ public abstract class PatientESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_PATIENT_URN.getIdentifierType(), IdentifierESDTUseEnum.OFFICIAL);
+        resource.assignSimplifiedID(true, IdentifierType.PATIENT_URN, IdentifierESDTUseEnum.OFFICIAL);
     }
 
     //

@@ -27,13 +27,16 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.org.slf4j.internal.LoggerFactory;
 
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.HumanNameESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.HumanNameESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 
 public class PersonESR extends ExtremelySimplifiedResource {
