@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
-import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.brokers.CommunicateRoomESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.resources.group.GroupESR;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
@@ -25,7 +25,7 @@ public class MatrixRoomServiceHandler extends HandlerBase {
     private static final Logger LOG = LoggerFactory.getLogger(MatrixRoomServiceHandler.class);
 
     @Inject
-    private MatrixRoomESRBroker matrixRoomDirectoryResourceBroker;
+    private CommunicateRoomESRBroker matrixRoomDirectoryResourceBroker;
 
     @Override
     protected Logger getLogger() {

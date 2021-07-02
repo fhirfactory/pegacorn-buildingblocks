@@ -22,10 +22,11 @@
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.typing;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEvent;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEventTypeEnum;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.typing.contentypes.MTypingContentType;
 
-public class MTypingEvent {
+public class MTypingEvent extends MatrixEvent {
     private MTypingContentType content;
     private String roomIdentifier;
     private MEventTypeEnum messageType;

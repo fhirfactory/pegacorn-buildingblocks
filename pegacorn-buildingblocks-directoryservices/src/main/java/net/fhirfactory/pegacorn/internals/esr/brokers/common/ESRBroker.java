@@ -23,11 +23,11 @@ package net.fhirfactory.pegacorn.internals.esr.brokers.common;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
@@ -42,13 +42,22 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceIn
 
 public abstract class ESRBroker {
 
+    @Inject
+    private IdentifierESDTTypesEnum identifierESDTTypesEnum;
 
     protected abstract Logger getLogger();
     protected abstract PegacornESRCache specifyCache();
     protected abstract void assignSimplifiedID(ExtremelySimplifiedResource resource);
 
+    protected abstract ExtremelySimplifiedResource synchroniseResource(ExtremelySimplifiedResource resource);
+
     protected PegacornESRCache getCache(){
         return(specifyCache());
+    }
+
+
+    protected IdentifierESDTTypesEnum getCommonIdentifierTypes(){
+        return(identifierESDTTypesEnum);
     }
 
     //
@@ -114,6 +123,13 @@ public abstract class ESRBroker {
     public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier,boolean containsMatch) throws ResourceInvalidSearchException {
     	return searchForDirectoryEntryUsingIdentifier(identifier, containsMatch, true);
     }
+
+    public boolean hasEntry(String simplifiedID){
+        boolean entryExists = getCache().hasEntry(simplifiedID);
+        return(entryExists);
+    }
+
+
 
     //
     // Review (Search - by Identifier)

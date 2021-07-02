@@ -24,13 +24,15 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hl7.fhir.r4.model.ResourceType;
+
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ParticipantESDT;
 
 public class CareTeamESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(CareTeamESR.class);
+    
     @Override
     protected Logger getLogger(){return(LOG);}
 
@@ -45,6 +47,14 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
         this.serviceDeliveryLocations = new ArrayList<>();
         this.managingOrganization = null;
         this.participants = new ArrayList<>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_CARE_TEAM);
+    }
+
+    public CareTeamESR(CareTeamESR ori){
+        super(ori);
+        this.serviceDeliveryLocations = new ArrayList<>();
+        this.serviceDeliveryLocations.addAll(ori.getServiceDeliveryLocations());
+        this.managingOrganization = ori.getManagingOrganization();
     }
 
     public List<String> getServiceDeliveryLocations() {
@@ -63,6 +73,7 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
         this.managingOrganization = managingOrganization;
     }
 
+
 	public List<ParticipantESDT> getParticipants() {
 		return participants;
 	}
@@ -70,4 +81,9 @@ public class CareTeamESR extends ExtremelySimplifiedResource {
 	public void setParticipants(List<ParticipantESDT> participants) {
 		this.participants = participants;
 	}
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.CareTeam);
+    }
 }

@@ -24,11 +24,7 @@ package net.fhirfactory.pegacorn.internals.esr.brokers;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapCache;
@@ -46,9 +42,8 @@ import net.fhirfactory.pegacorn.internals.esr.resources.group.PractitionersFulfi
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 
-@ApplicationScoped
-public class GroupESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(GroupESRBroker.class);
+
+public abstract class GroupESRBroker extends ESRBroker {
 
     @Inject
     private GroupESRCache groupCache;
@@ -58,11 +53,6 @@ public class GroupESRBroker extends ESRBroker {
     
     @Inject
     private CareTeamPractitionerRoleMapCache careTeamPractitionerRoleMapCache;
-
-    @Override
-    protected Logger getLogger(){
-        return(LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache(){

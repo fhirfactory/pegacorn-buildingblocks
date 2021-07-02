@@ -21,36 +21,30 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicTypeEnum;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class FHIRElementTypeExtractor {
+	private static final Logger LOG = LoggerFactory.getLogger(FHIRElementTypeExtractor.class);
 
-	public Class<?> extractResourceType(TopicToken token) throws ClassNotFoundException {
-
+	public Class<?> extractResourceType(DataParcelToken token) throws ClassNotFoundException {
+		LOG.debug(".extractResourceType(): Entry, token->{}", token);
     	if(token == null) {
+			LOG.debug(".extractResourceType(): Exit, token is null");
     		return(null);
     	}
-    	if(token.getIdentifier() == null) {
-    		return(null);
-    	}
-    	FDN topicFDN = new FDN(token.getIdentifier());
-        String resourceName = null;
-        for(RDN currentRDN: topicFDN.getRDNSet()) {
-        	if(currentRDN.getQualifier().contentEquals(TopicTypeEnum.DATASET_RESOURCE.getTopicType())) {
-        		resourceName = currentRDN.getValue();
-        		break;
-        	}
-        }
-        if(resourceName==null) {
+    	String stringName = token.getDataParcelResource();
+        if(stringName==null) {
+        	LOG.debug(".extractResourceType(): Exit, no Resource attribute found");
         	return(null);
         }
-        return(Class.forName("org.hl7.fhir.r4.model." + resourceName));
+        Class resourceClass = Class.forName("org.hl7.fhir.r4.model." + stringName);
+		LOG.debug(".extractResourceType(): Exit, resourceClass->{}", resourceClass);
+        return(resourceClass);
     }
 
     

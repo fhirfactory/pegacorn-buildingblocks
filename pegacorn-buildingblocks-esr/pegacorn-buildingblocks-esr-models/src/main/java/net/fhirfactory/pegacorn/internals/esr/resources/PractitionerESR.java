@@ -21,16 +21,17 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hl7.fhir.r4.model.ResourceType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.helpers.DateUtils;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.EmailAddress;
@@ -47,6 +48,7 @@ public class PractitionerESR extends PersonESR {
     
     protected static final DateTimeFormatter LAST_ROLE_SELECTION_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DateUtils.YYYY_MM_DD_T_HH_MM_SS_INPUT);
     
+
     @Override
     protected Logger getLogger(){return(LOG);}
     
@@ -69,6 +71,7 @@ public class PractitionerESR extends PersonESR {
         super();
         this.organizationMembership = new HashMap<>();
         this.currentPractitionerRoles = new ArrayList<>();
+        this.practitionerStatus = new PractitionerStatusESDT();
         this.practitionerFavourites = new FavouriteListESDT();
         this.healthcareServiceFavourites = new FavouriteListESDT();
         this.practitionerRoleFavourites = new FavouriteListESDT();
@@ -76,6 +79,7 @@ public class PractitionerESR extends PersonESR {
         this.organisationStructure = new ArrayList<OrganisationStructure>();
         
         roleHistory = new RoleHistory();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_PRACTITIONER);
     }
     
 
@@ -182,6 +186,18 @@ public class PractitionerESR extends PersonESR {
         emailAddress.setValue(foundIdentifier.getValue());
         return(emailAddress);
     }
+
+    @JsonIgnore
+    public String getEmailAddressUserNamePart(){
+        IdentifierESDT foundIdentifier = getIdentifierWithType("EmailAddress");
+        if(foundIdentifier == null){
+            return(null);
+        }
+        String[] emailAddressParts = foundIdentifier.getValue().split("@");
+        String emailAddressUserNamePart = emailAddressParts[0];
+        return(emailAddressUserNamePart);
+    }
+
 
     @JsonIgnore
     public void setEmailAddress(String email){
@@ -339,4 +355,10 @@ public class PractitionerESR extends PersonESR {
     		return secondPractitioner.getRoleHistory().getMostRecentSelection().getStartDate().compareTo(firstPractitioner.getRoleHistory().getMostRecentSelection().getStartDate());
     	}
    };
+
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Practitioner);
+    }
 }

@@ -21,11 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
@@ -41,20 +37,13 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
-@ApplicationScoped
-public class HealthcareServiceESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(HealthcareServiceESRBroker.class);
+public abstract class HealthcareServiceESRBroker extends ESRBroker {
 
     @Inject
     private HealthcareServiceESRCache healthCareServiceCache;
     
     @Inject
     private OrganizationESRBroker organisationBroker;
-
-    @Override
-    protected Logger getLogger() {
-        return (LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache() {
@@ -71,6 +60,7 @@ public class HealthcareServiceESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
+
         resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
     }
 

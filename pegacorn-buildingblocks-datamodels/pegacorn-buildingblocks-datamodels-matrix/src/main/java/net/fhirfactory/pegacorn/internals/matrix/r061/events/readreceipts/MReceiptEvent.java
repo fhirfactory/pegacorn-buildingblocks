@@ -22,10 +22,11 @@
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.readreceipts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEvent;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEventTypeEnum;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.readreceipts.contenttypes.MReceiptContentType;
 
-public class MReceiptEvent {
+public class MReceiptEvent extends MatrixEvent {
     private MReceiptContentType content;
     private String roomIdentifier;
     private MEventTypeEnum eventType;

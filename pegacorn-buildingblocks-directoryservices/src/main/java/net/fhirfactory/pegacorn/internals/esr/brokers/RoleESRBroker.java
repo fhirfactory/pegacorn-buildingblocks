@@ -21,26 +21,21 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.RoleESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.RoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 
-@ApplicationScoped
-public class RoleESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(RoleESRBroker.class);
+public abstract class RoleESRBroker extends ESRBroker {
 
     @Inject
     private RoleESRCache roleCache;
@@ -66,7 +61,9 @@ public class RoleESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
+
         resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
+
     }
 
     //

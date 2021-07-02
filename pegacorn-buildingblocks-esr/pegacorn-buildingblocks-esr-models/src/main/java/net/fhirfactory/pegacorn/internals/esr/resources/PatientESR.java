@@ -21,12 +21,14 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
+
 import java.util.HashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hl7.fhir.r4.model.ResourceType;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FunctionDE;
+import com.sun.org.slf4j.internal.LoggerFactory;
+
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FunctionESDT;
 
 public class PatientESR extends PersonESR {
     private static final Logger LOG = LoggerFactory.getLogger(PatientESR.class);
@@ -36,11 +38,12 @@ public class PatientESR extends PersonESR {
     private String primaryLocation;
     private String primaryHealthcareService;
     private String currentLocation;
-    private HashMap<FunctionDE, String> careProviders;
+    private HashMap<FunctionESDT, ReferenceESDT> careProviders;
 
     public PatientESR(){
         super();
         careProviders = new HashMap<>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_PATIENT);
     }
 
     public String getPrimaryLocation() {
@@ -67,11 +70,16 @@ public class PatientESR extends PersonESR {
         this.currentLocation = currentLocation;
     }
 
-    public HashMap<FunctionDE, String> getCareProviders() {
+    public HashMap<FunctionESDT, ReferenceESDT> getCareProviders() {
         return careProviders;
     }
 
-    public void setCareProviders(HashMap<FunctionDE, String> careProviders) {
+    public void setCareProviders(HashMap<FunctionESDT, ReferenceESDT> careProviders) {
         this.careProviders = careProviders;
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Patient);
     }
 }

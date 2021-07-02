@@ -1,5 +1,8 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource;
 
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.valuesets.InformationCompartmentSecurityCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.valuesets.InformationConfidentialitySecurityCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.valuesets.InformationSensitivitySecurityCodeEnum;
 import org.hl7.fhir.r4.model.*;
 
 import javax.enterprise.context.ApplicationScoped;

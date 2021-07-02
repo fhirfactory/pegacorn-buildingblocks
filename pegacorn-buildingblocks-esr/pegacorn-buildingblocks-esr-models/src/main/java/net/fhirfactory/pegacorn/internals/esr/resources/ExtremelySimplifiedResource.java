@@ -31,8 +31,22 @@ import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.CacheIDMetadat
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+package net.fhirfactory.pegacorn.internals.esr.resources.common;
 
-public abstract class ExtremelySimplifiedResource {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.CacheIDMetadata;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+
+
+public abstract class  ExtremelySimplifiedResource {
     private String simplifiedID;
     private CacheIDMetadata simplifiedIDMetadata;
     private ArrayList<IdentifierESDT> identifiers;
@@ -40,22 +54,92 @@ public abstract class ExtremelySimplifiedResource {
     private String description;
     private boolean systemManaged;
     private String otherID;
+    private ExtremelySimplifiedResourceTypeEnum resourceESRType;
 
     public ExtremelySimplifiedResource(){
         this.identifiers = new ArrayList<>();
         this.displayName = null;
         this.simplifiedID = null;
         this.otherID = null;
+        this.description = null;
+        this.resourceESRType = null;
+        this.simplifiedIDMetadata = null;
+    }
+
+    public ExtremelySimplifiedResource(ExtremelySimplifiedResource ori){
+        this.identifiers = new ArrayList<>();
+        this.identifiers.addAll(ori.getIdentifiers());
+        this.displayName = ori.getDisplayName();
+        this.simplifiedID = ori.getSimplifiedID();
+        this.otherID = ori.getOtherID();
+        this.description = ori.getDescription();
+        this.resourceESRType = ori.getResourceESRType();
+        this.simplifiedIDMetadata = ori.getSimplifiedIDMetadata();
     }
 
     //
     // Abstract Methods
     //
     abstract protected Logger getLogger();
+    abstract protected ResourceType specifyResourceType();
+
+    //
+    // Has Methods
+    //
+
+    @JsonIgnore
+    public boolean hasSimplifiedID(){
+        if(this.simplifiedID == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasSimplifiedIDMetadata(){
+        if(this.simplifiedIDMetadata == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasDisplayName(){
+        if(this.displayName == null) {
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasDescription(){
+        if(this.description == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasOtherID(){
+        if(this.otherID == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
 
     //
     // Bean Methods
     //
+
+    @JsonIgnore
+    public ResourceType getResourceType(){
+        return(specifyResourceType());
+    }
 
     public boolean isSystemManaged() {
         return systemManaged;
@@ -73,7 +157,9 @@ public abstract class ExtremelySimplifiedResource {
         this.simplifiedID = simplifiedID;
     }
 
-    public void assignSimplifiedID(boolean useIdentifier, IdentifierType identifierType, IdentifierESDTUseEnum identifierUse){
+
+    @JsonIgnore
+    public void assignSimplifiedID(boolean useIdentifier, String identifierType, IdentifierESDTUseEnum identifierUse){
         IdentifierESDT shortNameIdentifier = this.getIdentifierWithType(identifierType);
         CacheIDMetadata meta = new CacheIDMetadata();
         setSimplifiedID(shortNameIdentifier.getValue());
@@ -83,6 +169,7 @@ public abstract class ExtremelySimplifiedResource {
         setSimplifiedIDMetadata(meta);
     }
 
+    @JsonIgnore
     public void assignSimplifiedID(String key, String keySource){
         this.simplifiedID =key;
         CacheIDMetadata meta = new CacheIDMetadata();
@@ -140,7 +227,12 @@ public abstract class ExtremelySimplifiedResource {
         return(null);
     }
 
-    public IdentifierESDT getIdentifierWithType(IdentifierType identifierType){
+
+    public void setResourceESRType(ExtremelySimplifiedResourceTypeEnum resourceESRType) {
+        this.resourceESRType = resourceESRType;
+    }
+
+    public IdentifierESDT getIdentifierWithType(String identifierType){
         for(IdentifierESDT identifier: this.identifiers){
             if(identifier.getType().equals(identifierType)){
                 return(identifier);
@@ -149,12 +241,21 @@ public abstract class ExtremelySimplifiedResource {
         return(null);
     }
 
+    public IdentifierESDT getIdentifierWithType(IdentifierESDTTypesEnum identifierType){
+        IdentifierESDT identifier = getIdentifierWithType(identifierType.getIdentifierType());
+        return(identifier);
+    }
+
     public void addIdentifier(IdentifierESDT newIdentifier){
         getLogger().info(".addIdentifier(): Entry, newIdentifier --> {}", newIdentifier);
         if(this.identifiers.contains(newIdentifier)){
             return;
         }
         this.identifiers.add(newIdentifier);
+    }
+
+    public ExtremelySimplifiedResourceTypeEnum getResourceESRType() {
+        return resourceESRType;
     }
 
     @Override

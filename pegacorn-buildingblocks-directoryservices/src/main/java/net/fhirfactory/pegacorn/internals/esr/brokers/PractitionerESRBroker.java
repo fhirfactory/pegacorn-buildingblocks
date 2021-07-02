@@ -50,10 +50,28 @@ import net.fhirfactory.pegacorn.internals.esr.search.FavouriteTypes;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+=======
+import net.fhirfactory.pegacorn.deployment.communicate.matrix.CommunicateSystemManagedRoomNames;
+import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerESRCache;
+import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.FavouriteListESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
-@ApplicationScoped
-public class PractitionerESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(PractitionerESRBroker.class);
+import javax.inject.Inject;
+
+
+
+public abstract class PractitionerESRBroker extends ESRBroker {
 
     @Inject
     private PractitionerESRCache practitionerCache;
@@ -62,7 +80,8 @@ public class PractitionerESRBroker extends ESRBroker {
     private GroupESRBroker groupBroker;
 
     @Inject
-    private SystemManagedRoomNames managedRoomNames;
+    private CommunicateSystemManagedRoomNames managedRoomNames;
+
 
     @Inject
     private MatrixRoomESRBroker matrixRoomDirectoryResourceBroker;
@@ -73,14 +92,28 @@ public class PractitionerESRBroker extends ESRBroker {
 	@Inject
     private RoleCategoryESRBroker roleCategoryBroker;
 
-    @Override
-    protected Logger getLogger(){
-        return(LOG);
-    }
+    abstract protected CommunicateRoomESRBroker specifyMatrixRoomESRBroker();
+
 
     @Override
     protected PegacornESRCache specifyCache(){
         return(practitionerCache);
+    }
+
+    protected PractitionerESRCache getPractitionerESRCache(){
+        return(practitionerCache);
+    }
+
+    protected GroupESRBroker getGroupESRBroker(){
+        return(groupBroker);
+    }
+
+    protected CommunicateSystemManagedRoomNames getManagedRoomNames(){
+        return(managedRoomNames);
+    }
+
+    protected CommunicateRoomESRBroker getMatrixRoomESRBroker(){
+        return(specifyMatrixRoomESRBroker());
     }
 
     //
@@ -93,6 +126,7 @@ public class PractitionerESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
+
         resource.assignSimplifiedID(true, IdentifierType.EMAIL_ADDRESS, IdentifierESDTUseEnum.OFFICIAL);
     }
 
@@ -111,7 +145,8 @@ public class PractitionerESRBroker extends ESRBroker {
         activePractitionerSet.getIdentifiers().add(entry.getIdentifierWithType(IdentifierType.EMAIL_ADDRESS));
         ESRMethodOutcome groupCreateOutcome = groupBroker.createGroupDE(activePractitionerSet);
         
-        createSystemManagedMatrixRooms(entry);
+        //createSystemManagedMatrixRooms(entry);
+
         getLogger().info(".createPractitioner(): Exit");
         return(outcome);
     }

@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,15 +30,33 @@ import org.slf4j.LoggerFactory;
 
 public class MatrixRoomESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(MatrixRoomESR.class);
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class CommunicateRoomESR extends ExtremelySimplifiedResource {
+    private static final Logger LOG = LoggerFactory.getLogger(CommunicateRoomESR.class);
     @Override
     protected Logger getLogger(){return(LOG);}
 
+    private String canonicalAlias;
+    private boolean irisGenerated;
     private ArrayList<String> roomAlias;
     private String roomOwner;
     private HashMap<String, String> metadata;
+    private int memberCount;
+    private String roomVersion;
+    private String encryptionType;
+    private boolean federatable;
 
-    public MatrixRoomESR(){
+    public CommunicateRoomESR(){
         this.roomAlias = new ArrayList<>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_MATRIX_ROOM);
     }
     public ArrayList<String> getRoomAlias() {
         return roomAlias;
@@ -61,5 +80,58 @@ public class MatrixRoomESR extends ExtremelySimplifiedResource {
 
     public void setMetadata(HashMap<String, String> metadata) {
         this.metadata = metadata;
+    }
+
+    public String getCanonicalAlias() {
+        return canonicalAlias;
+    }
+
+    public void setCanonicalAlias(String canonicalAlias) {
+        this.canonicalAlias = canonicalAlias;
+    }
+
+    public boolean isIrisGenerated() {
+        return irisGenerated;
+    }
+
+    public void setIrisGenerated(boolean irisGenerated) {
+        this.irisGenerated = irisGenerated;
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Group);
+    }
+
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    public String getRoomVersion() {
+        return roomVersion;
+    }
+
+    public void setRoomVersion(String roomVersion) {
+        this.roomVersion = roomVersion;
+    }
+
+    public String getEncryptionType() {
+        return encryptionType;
+    }
+
+    public void setEncryptionType(String encryptionType) {
+        this.encryptionType = encryptionType;
+    }
+
+    public boolean isFederatable() {
+        return federatable;
+    }
+
+    public void setFederatable(boolean federatable) {
+        this.federatable = federatable;
     }
 }

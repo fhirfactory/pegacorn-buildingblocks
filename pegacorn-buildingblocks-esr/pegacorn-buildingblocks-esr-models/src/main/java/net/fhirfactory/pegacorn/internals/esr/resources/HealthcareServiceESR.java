@@ -21,11 +21,13 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hl7.fhir.r4.model.ResourceType;
+
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.OrganisationStructure;
@@ -40,10 +42,11 @@ public class HealthcareServiceESR extends ExtremelySimplifiedResource {
     private List<OrganisationStructure>organisationStructure;
 
     public HealthcareServiceESR(){
-        super();
-        
+        super();        
         contactPoints = new ArrayList<>();
         this.organisationStructure = new ArrayList<OrganisationStructure>();
+        serviceDeliveryLocations = new ArrayList<>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_HEALTHCARE_SERVICE);
     }
 
     
@@ -74,5 +77,10 @@ public class HealthcareServiceESR extends ExtremelySimplifiedResource {
     
     public void setPrimaryOrganizationID(String primaryOrganizationID) {
         this.primaryOrganizationID = primaryOrganizationID;
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.HealthcareService);
     }
 }

@@ -21,10 +21,12 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+
+import org.hl7.fhir.r4.model.ResourceType;
+
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 public class RoleESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(RoleESR.class);
@@ -35,6 +37,7 @@ public class RoleESR extends ExtremelySimplifiedResource {
     public RoleESR(){
         super();
         containedRoles = new ArrayList<>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_ROLE);
     }
 
     @Override
@@ -54,5 +57,10 @@ public class RoleESR extends ExtremelySimplifiedResource {
 
     public void setContainedRoles(ArrayList<String> containedRoles) {
         this.containedRoles = containedRoles;
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.ValueSet);
     }
 }

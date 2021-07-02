@@ -21,11 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleESRCache;
@@ -46,9 +42,7 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
-@ApplicationScoped
-public class PractitionerRoleESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(PractitionerRoleESRBroker.class);
+public abstract class PractitionerRoleESRBroker extends ESRBroker {
 
     @Inject
     private PractitionerRoleESRCache practitionerRoleCache;
@@ -61,11 +55,6 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     
     @Inject
     private OrganizationESRBroker organisationBroker;
-
-    @Override
-    protected Logger getLogger(){
-        return(LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache(){
@@ -82,7 +71,9 @@ public class PractitionerRoleESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
+
         resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.OFFICIAL);
+
     }
 
     //
@@ -218,7 +209,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
     // Update
     //
     public ESRMethodOutcome updatePractitionerRole(PractitionerRoleESR entry) throws ResourceInvalidSearchException {
-        LOG.info(".updatePractitionerRole(): Entry");
+        getLogger().info(".updatePractitionerRole(): Entry");
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         PractitionerRoleESR foundEntry = null;
         if(entry.getSimplifiedID() != null){
@@ -278,7 +269,7 @@ public class PractitionerRoleESRBroker extends ESRBroker {
                 groupBroker.updateGroup(careTeamRolesGroup);    
             }
         }
-        LOG.info(".updatePractitionerRole(): Exit");
+        getLogger().info(".updatePractitionerRole(): Exit");
         return(outcome);
     }
 

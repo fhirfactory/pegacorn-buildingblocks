@@ -21,11 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.LocationESRCache;
@@ -37,17 +33,10 @@ import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
-@ApplicationScoped
-public class LocationESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(LocationESRBroker.class);
+public abstract class LocationESRBroker extends ESRBroker {
 
     @Inject
     LocationESRCache locationCache;
-
-    @Override
-    protected Logger getLogger() {
-        return (LOG);
-    }
 
     @Override
     protected PegacornESRCache specifyCache() {
@@ -64,7 +53,9 @@ public class LocationESRBroker extends ESRBroker {
             getLogger().debug(".assignPrimaryKey(): Entry, resource is null, exiting");
             return;
         }
+
         resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.OFFICIAL);
+
     }
 
     //

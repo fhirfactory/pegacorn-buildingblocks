@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.contenttypes.MMembershipEnum;
 
@@ -29,8 +30,26 @@ public class MEventContentType {
     private String displayName;
     private MMembershipEnum membership;
     private boolean direct;
-    private MInviteType invite;
+    private MInviteType thirdPartyInvite;
     private MUnsignedDataType unsignedData;
+
+    public MEventContentType(){
+        this.avatarURL = null;
+        this.displayName = null;
+        this.membership = null;
+        this.direct = false;
+        this.thirdPartyInvite = null;
+        this.unsignedData = null;
+    }
+
+    @JsonIgnore
+    public boolean hasAvatarURL(){
+        if(this.avatarURL == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
 
     @JsonProperty("avatar_url")
     public String getAvatarURL() {
@@ -40,6 +59,15 @@ public class MEventContentType {
     @JsonProperty("avatar_url")
     public void setAvatarURL(String avatarURL) {
         this.avatarURL = avatarURL;
+    }
+
+    @JsonIgnore
+    public boolean hasDisplayName(){
+        if(this.displayName == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 
     @JsonProperty("displayname")
@@ -52,10 +80,21 @@ public class MEventContentType {
         this.displayName = displayName;
     }
 
+    @JsonIgnore
+    public boolean hasMembership(){
+        if(this.membership == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonProperty("membership")
     public MMembershipEnum getMembership() {
         return membership;
     }
 
+    @JsonProperty("membership")
     public void setMembership(MMembershipEnum membership) {
         this.membership = membership;
     }
@@ -70,14 +109,32 @@ public class MEventContentType {
         this.direct = direct;
     }
 
-    @JsonProperty("Invite")
-    public MInviteType getInvite() {
-        return invite;
+    @JsonIgnore
+    public boolean hasThirdPartyInvite(){
+        if(this.thirdPartyInvite == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 
     @JsonProperty("third_party_invite")
-    public void setInvite(MInviteType invite) {
-        this.invite = invite;
+    public MInviteType getThirdPartyInvite() {
+        return thirdPartyInvite;
+    }
+
+    @JsonProperty("third_party_invite")
+    public void setThirdPartyInvite(MInviteType thirdPartyInvite) {
+        this.thirdPartyInvite = thirdPartyInvite;
+    }
+
+    @JsonIgnore
+    public boolean hasUnsignedData(){
+        if(this.unsignedData == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 
     @JsonProperty("unsigned")

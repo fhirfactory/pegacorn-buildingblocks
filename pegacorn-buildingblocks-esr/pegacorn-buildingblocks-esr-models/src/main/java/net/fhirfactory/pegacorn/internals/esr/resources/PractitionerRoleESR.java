@@ -21,14 +21,15 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hl7.fhir.r4.model.ResourceType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.OrganisationStructure;
@@ -53,7 +54,9 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
         this.contactPoints = new ArrayList<>();
         this.careTeams = new ArrayList<>();
         this.activePractitionerSet = new ArrayList<>();
+
         this.organisationStructure = new ArrayList<OrganisationStructure>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_PRACTITIONER_ROLE);
     }
 
     public String getPrimaryOrganizationID() {
@@ -270,4 +273,9 @@ public class PractitionerRoleESR extends ExtremelySimplifiedResource {
             return(comparison);
         }
     };
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.PractitionerRole);
+    }
 }

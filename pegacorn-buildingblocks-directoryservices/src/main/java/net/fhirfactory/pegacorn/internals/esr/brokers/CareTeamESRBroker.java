@@ -45,9 +45,18 @@ import net.fhirfactory.pegacorn.internals.esr.resources.group.PractitionerRolesI
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.esr.resources.RoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@ApplicationScoped
-public class CareTeamESRBroker extends ESRBroker {
+import javax.inject.Inject;
+
+
+public abstract class CareTeamESRBroker extends ESRBroker {
     private static final Logger LOG = LoggerFactory.getLogger(CareTeamESRBroker.class);
 
     @Inject
@@ -66,6 +75,7 @@ public class CareTeamESRBroker extends ESRBroker {
         return (LOG);
     }
 
+
     @Override
     protected PegacornESRCache specifyCache() {
         return (careTeamCache);
@@ -81,6 +91,7 @@ public class CareTeamESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
+
         resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
     }
 
@@ -153,7 +164,7 @@ public class CareTeamESRBroker extends ESRBroker {
 	        } else {
 	  	        groupBroker.createGroupDE(careTeamsForPractitionerRoleSet);       		
 	    	}
-        }
+
         
         return(outcome);
     }

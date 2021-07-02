@@ -24,6 +24,8 @@ package net.fhirfactory.pegacorn.workshops.base;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 
 public abstract class PetasosEnabledWorkshop extends Workshop{
+
+    @Override
     protected TopologyNodeTypeEnum specifyWorkshopType(){
         return(TopologyNodeTypeEnum.WORKSHOP);
     }

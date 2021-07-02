@@ -22,9 +22,9 @@
 package net.fhirfactory.pegacorn.oamwup.base;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.components.model.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.map.common.archetypes.common.PetasosEnabledSubsystemTopologyFactory;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.workshops.base.OAMWorkshop;
 import org.apache.camel.builder.RouteBuilder;
@@ -64,8 +64,8 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
     abstract protected String specifyOAMWUPVersion();
     abstract protected OAMWorkshop specifyOAMWorkshop();
 
-    public PetasosEnabledSubsystemTopologyFactory getTopologyFactory(){
-        return(getProcessingPlant().getTopologyFactory());
+    public PegacornTopologyFactoryInterface getTopologyFactory(){
+        return(processingPlant.getTopologyFactory());
     }
 
     public OAMWorkshop getWorkshop(){
@@ -93,7 +93,7 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
     private void buildOAMWorkUnitProcessor() {
         getLogger().debug(".buildOAMWorkUnitProcessor(): Entry, adding Workshop --> {}, version --> {}", specifyOAMWUPName(), specifyOAMWUPVersion());
         WorkUnitProcessorTopologyNode wup = getTopologyFactory().addWorkUnitProcessor(specifyOAMWUPName(), specifyOAMWUPVersion(), specifyOAMWorkshop().getWorkshopNode(), TopologyNodeTypeEnum.OAM_WORK_UNIT_PROCESSOR);
-        topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode(), wup);
+        topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getNodeFDN(), wup);
         this.wupTopologyNode = wup;
         getLogger().debug(".buildOAMWorkUnitProcessor(): Exit");
     }

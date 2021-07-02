@@ -20,10 +20,12 @@
  * SOFTWARE.
  */
 package net.fhirfactory.pegacorn.internals.esr.resources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+
+import org.hl7.fhir.r4.model.ResourceType;
+
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 public class RoleCategoryESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(RoleCategoryESR.class);
@@ -33,6 +35,7 @@ public class RoleCategoryESR extends ExtremelySimplifiedResource {
     public RoleCategoryESR(){
         super();
         this.roles = new ArrayList<>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_ROLE_CATEGORY);
     }
 
     @Override
@@ -44,5 +47,10 @@ public class RoleCategoryESR extends ExtremelySimplifiedResource {
 
     public void setRoles(ArrayList<String> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.ValueSet);
     }
 }

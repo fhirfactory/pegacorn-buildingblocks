@@ -24,8 +24,9 @@ package net.fhirfactory.pegacorn.internals.esr.resources;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hl7.fhir.r4.model.ResourceType;
+
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
@@ -48,6 +49,7 @@ public class LocationESR extends ExtremelySimplifiedResource {
     public LocationESR(){
         super();
         this.containedLocationIDs = new ArrayList<>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_LOCATION);
     }
 
     public ArrayList<String> getContainedLocationIDs() {
@@ -116,5 +118,10 @@ public class LocationESR extends ExtremelySimplifiedResource {
         }
         getLogger().debug(".buildLocationCumulativeName(): Exit, built name --> {}", cumulativeName);
         return(cumulativeName);
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Location);
     }
 }

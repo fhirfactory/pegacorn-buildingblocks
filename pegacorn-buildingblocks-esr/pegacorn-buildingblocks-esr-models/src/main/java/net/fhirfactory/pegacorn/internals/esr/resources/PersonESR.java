@@ -22,14 +22,19 @@
 package net.fhirfactory.pegacorn.internals.esr.resources;
 
 
-import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
+import java.util.Date;
+
+import org.hl7.fhir.r4.model.ResourceType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ContactPointESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.HumanNameESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.HumanNameESDTUseEnum;
+
 
 public class PersonESR extends ExtremelySimplifiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(PersonESR.class);
@@ -39,11 +44,14 @@ public class PersonESR extends ExtremelySimplifiedResource {
     private HumanNameESDT officialName;
     private ArrayList<HumanNameESDT> otherNames;
     private ArrayList<ContactPointESDT> contactPoints;
+    private Date dateOfBirth;
 
     public PersonESR(){
         super();
         this.contactPoints = new ArrayList<>();
         this.otherNames = new ArrayList<>();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_PERSON);
+        this.dateOfBirth = null;
     }
 
     public HumanNameESDT getOfficialName() {
@@ -77,5 +85,27 @@ public class PersonESR extends ExtremelySimplifiedResource {
             }
         }
         return(null);
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    @Override
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Person);
+    }
+
+    @JsonIgnore
+    public boolean hasDateOfBirth(){
+        if(this.dateOfBirth == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 }
