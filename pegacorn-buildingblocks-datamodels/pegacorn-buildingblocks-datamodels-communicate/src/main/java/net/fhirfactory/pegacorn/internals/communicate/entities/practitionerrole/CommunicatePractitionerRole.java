@@ -21,26 +21,21 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.practitionerrole;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
-import net.fhirfactory.pegacorn.internals.communicate.entities.session.CommunicateSession;
-import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionID;
-import net.fhirfactory.pegacorn.internals.communicate.entities.user.CommunicateUser;
-import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
-import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
-import org.hl7.fhir.r4.model.PractitionerRole;
-
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hl7.fhir.r4.model.PractitionerRole;
+
+import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
+import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionID;
+import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
 
 public class CommunicatePractitionerRole extends PractitionerRoleESR {
     private CommunicateRoomReference centralRoom;
     private CommunicateUserReference surrogateCommunicateUser;
     private ArrayList<CommunicateSessionID> practitionerRoleSessions;
 
-    @Inject
-    private IdentifierESDTTypesEnum identifierESDTTypesEnum;
 
     public CommunicatePractitionerRole(){
         super();
@@ -78,13 +73,4 @@ public class CommunicatePractitionerRole extends PractitionerRoleESR {
     public void setSurrogateCommunicateUser(CommunicateUserReference surrogateCommunicateUser) {
         this.surrogateCommunicateUser = surrogateCommunicateUser;
     }
-
-    protected IdentifierESDTTypesEnum getCommonIdentifierESDTTypes() {
-        return identifierESDTTypesEnum;
-    }
-
-    protected void setCommonIdentifierESDTTypes(IdentifierESDTTypesEnum identifierESDTTypesEnum) {
-        this.identifierESDTTypesEnum = identifierESDTTypesEnum;
-    }
-
 }

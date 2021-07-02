@@ -23,14 +23,11 @@ package net.fhirfactory.pegacorn.internals.esr.brokers.common;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
@@ -45,8 +42,6 @@ import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceIn
 
 public abstract class ESRBroker {
 
-    @Inject
-    private IdentifierESDTTypesEnum identifierESDTTypesEnum;
 
     protected abstract Logger getLogger();
     protected abstract PegacornESRCache specifyCache();
@@ -58,10 +53,6 @@ public abstract class ESRBroker {
         return(specifyCache());
     }
 
-
-    protected IdentifierESDTTypesEnum getCommonIdentifierTypes(){
-        return(identifierESDTTypesEnum);
-    }
 
     //
     // Create

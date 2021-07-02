@@ -15,6 +15,7 @@ import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
+
 /**
  * Location search tests.
  * 
