@@ -22,21 +22,21 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.apiactivitybased;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMessageBasedWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractAPIServletRESTfulPOSTGatewayWUP.class);
 
-    private IPCTopologyEndpoint ingresEndpointElement;
+    private IPCClusteredServerTopologyEndpoint ingresEndpointElement;
 
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
@@ -44,9 +44,9 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMes
     }
 
     @Override
-    protected GenericMessageBasedWUPEndpoint specifyIngresTopologyEndpoint(){
+    protected MessageBasedWUPEndpoint specifyIngresEndpoint(){
         getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
-        GenericMessageBasedWUPEndpoint ingresEndpoint = new GenericMessageBasedWUPEndpoint();
+        MessageBasedWUPEndpoint ingresEndpoint = new MessageBasedWUPEndpoint();
         ingresEndpoint.setFrameworkEnabled(false);
         String ingresEndPoint = "direct:" + this.getWupInstanceName() + "-" + this.specifyIngresEndpointPath();
         ingresEndpoint.setEndpointSpecification(ingresEndPoint);
@@ -55,9 +55,9 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMes
     }
 
     @Override
-    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+    protected MessageBasedWUPEndpoint specifyEgressEndpoint(){
         getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
-        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
         egressEndpoint.setFrameworkEnabled(true);
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
@@ -71,8 +71,8 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMes
      * @return An empty Set<TopicToken>
      */
     @Override
-    public Set<DataParcelToken> specifySubscriptionTopics() {
-        HashSet<DataParcelToken> subTopics = new HashSet<DataParcelToken>();
+    public List<DataParcelManifest> specifySubscriptionTopics() {
+        List<DataParcelManifest> subTopics = new ArrayList<>();
         return(subTopics);
     }
     

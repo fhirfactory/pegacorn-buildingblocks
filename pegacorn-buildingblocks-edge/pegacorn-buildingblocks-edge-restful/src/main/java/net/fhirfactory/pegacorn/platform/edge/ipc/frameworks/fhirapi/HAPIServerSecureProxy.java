@@ -30,16 +30,18 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
-import net.fhirfactory.pegacorn.util.PegacornProperties;
+import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
 
 public abstract class HAPIServerSecureProxy {
     public static final String API_KEY_HEADER_NAME = "x-api-key";
     public static final String DEFAULT_API_KEY_PROPERTY_NAME = "HAPI_API_KEY";
-    public static final int SOCKET_TIMEOUT_IN_SECS = PegacornProperties.getIntegerProperty("HAPI_SOCKET_TIMEOUT_IN_SECS", 30);
     private IGenericClient client;
 
     @Inject
     private FHIRContextUtility fhirContextUtility;
+
+    @Inject
+    private PegacornEnvironmentProperties pegacornProperties;
 
     public HAPIServerSecureProxy(){
     }
@@ -49,6 +51,8 @@ public abstract class HAPIServerSecureProxy {
     protected FHIRContextUtility getFHIRContextUtility() {
         return(fhirContextUtility);
     }
+
+
     
     /**
      * @return the name of the PegacornProperties to lookup to get the value of the API Key.  Subclasses can override
@@ -59,7 +63,8 @@ public abstract class HAPIServerSecureProxy {
     }
 
     protected int getSocketTimeoutInSecs() {
-        return SOCKET_TIMEOUT_IN_SECS;
+        int socketTimeout = pegacornProperties.getIntegerProperty("HAPI_SOCKET_TIMEOUT_IN_SECS", 30);
+        return socketTimeout;
     }
     
     protected IGenericClient newRestfulGenericClient(String theServerBase) {
@@ -72,7 +77,7 @@ public abstract class HAPIServerSecureProxy {
         getLogger().trace(".newRestfulGenericClient(): Get the Client");
         client = contextR4.newRestfulGenericClient(theServerBase);
         getLogger().trace(".newRestfulGenericClient(): Grab the API Key from the Properties");
-        String apiKey = PegacornProperties.getMandatoryProperty(getApiKeyPropertyName());
+        String apiKey = pegacornProperties.getMandatoryProperty(getApiKeyPropertyName());
         // From https://hapifhir.io/hapi-fhir/docs/interceptors/built_in_client_interceptors.html#misc-add-headers-to-request
         getLogger().trace(".newRestfulGenericClient(): Create a new Interceptor");
         AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();

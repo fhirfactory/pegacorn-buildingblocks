@@ -22,13 +22,13 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBasedWUPTemplate {
     
@@ -46,9 +46,9 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBase
     }
 
     @Override
-    protected GenericMessageBasedWUPEndpoint specifyIngresTopologyEndpoint(){
+    protected MessageBasedWUPEndpoint specifyIngresEndpoint(){
         getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
-        GenericMessageBasedWUPEndpoint ingresEndpoint = new GenericMessageBasedWUPEndpoint();
+        MessageBasedWUPEndpoint ingresEndpoint = new MessageBasedWUPEndpoint();
         ingresEndpoint.setFrameworkEnabled(false);
         // Get Port
         String ingresEndPoint;
@@ -65,9 +65,9 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBase
     }
 
     @Override
-    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+    protected MessageBasedWUPEndpoint specifyEgressEndpoint(){
         getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
-        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
         egressEndpoint.setFrameworkEnabled(true);
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
@@ -87,8 +87,8 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBase
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected Set<DataParcelToken> specifySubscriptionTopics() {
-        HashSet<DataParcelToken> subTopics = new HashSet<DataParcelToken>();
+    protected List<DataParcelManifest> specifySubscriptionTopics() {
+        List<DataParcelManifest> subTopics = new ArrayList<>();
         return(subTopics);
     }
     

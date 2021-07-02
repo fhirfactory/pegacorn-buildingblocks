@@ -22,18 +22,16 @@
 package net.fhirfactory.pegacorn.internals.communicate.entities.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateSurrogateResourceReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserID;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.valuesets.CommunicateUserTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateUserESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ReferenceESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
-import net.fhirfactory.pegacorn.internals.synapse.api.SynapseUser;
-import org.jboss.as.controller.parsing.ExtensionXml;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 public class CommunicateUser extends CommunicateUserESR {
     private CommunicateSurrogateResourceReference representedResource;
@@ -93,7 +91,7 @@ public class CommunicateUser extends CommunicateUserESR {
         IdentifierESDT identifier = new IdentifierESDT();
         identifier.setUse(IdentifierESDTUseEnum.SECONDARY);
         identifier.setValue(getSimplifiedID());
-        identifier.setType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID.getIdentifierType());
+        identifier.setType(IdentifierType.MATRIX_USER_ID);
         return(identifier);
     }
 

@@ -21,21 +21,22 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.healthcareservice;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.internals.communicate.entities.session.CommunicateSession;
-import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
-import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserID;
-import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
-import net.fhirfactory.pegacorn.internals.esr.resources.HealthcareServiceESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
+import net.fhirfactory.pegacorn.internals.communicate.entities.session.CommunicateSession;
+import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserID;
+import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
+import net.fhirfactory.pegacorn.internals.esr.resources.HealthcareServiceESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 
 public class CommunicateHealthcareService extends HealthcareServiceESR {
     private static final Logger LOG = LoggerFactory.getLogger(CommunicateHealthcareService.class);
@@ -43,9 +44,6 @@ public class CommunicateHealthcareService extends HealthcareServiceESR {
     private CommunicateRoomReference centralRoom;
     private CommunicateUserReference surrogateCommunicateUser;
     private List<CommunicateSession> practitionerConnections;
-
-    @Inject
-    private IdentifierESDTTypesEnum identifierESDTTypesEnum;
 
     public CommunicateHealthcareService(){
         super();
@@ -96,7 +94,7 @@ public class CommunicateHealthcareService extends HealthcareServiceESR {
 
     @JsonIgnore
     public CommunicateUserID getCommunicateUserID() {
-        IdentifierESDT identifier = getIdentifierWithType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID);
+        IdentifierESDT identifier = getIdentifierWithType(IdentifierType.MATRIX_USER_ID);
         if (identifier != null) {
             CommunicateUserID userID = new CommunicateUserID(identifier.getValue());
             return(userID);
@@ -107,11 +105,11 @@ public class CommunicateHealthcareService extends HealthcareServiceESR {
     @JsonIgnore
     public void setCommunicateUserID(CommunicateUserID matrixUserID) {
         this.surrogateCommunicateUser.setUserID(matrixUserID);
-        IdentifierESDT identifier = getIdentifierWithType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID);
+        IdentifierESDT identifier = getIdentifierWithType(IdentifierType.MATRIX_USER_ID);
         if(identifier == null){
             IdentifierESDT newIdentifier = new IdentifierESDT();
             newIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
-            newIdentifier.setType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID.getIdentifierType());
+            newIdentifier.setType(IdentifierType.MATRIX_USER_ID);
             newIdentifier.setValue(matrixUserID.getValue());
             this.getIdentifiers().add(newIdentifier);
         } else {

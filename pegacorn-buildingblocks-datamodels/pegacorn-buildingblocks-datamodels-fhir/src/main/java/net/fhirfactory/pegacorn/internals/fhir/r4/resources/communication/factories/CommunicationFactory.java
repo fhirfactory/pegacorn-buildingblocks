@@ -21,12 +21,36 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.communication.factories;
 
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import org.hl7.fhir.r4.model.Communication;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.Date;
 
 @ApplicationScoped
 public class CommunicationFactory {
     private static final Logger LOG = LoggerFactory.getLogger(CommunicationFactory.class);
+
+    @Inject
+    private PegacornIdentifierFactory identifierFactory;
+
+    public Communication newCommunicationResource(String idValue, Date date) {
+        LOG.debug(".newCommunicationResource(): Entry, idValue->{}, date->{}", idValue, date);
+        Communication communicationResource = new Communication();
+        Period newPeriod = new Period();
+        newPeriod.setStart(date);
+        Identifier baseIdentifier = identifierFactory.newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER,idValue,newPeriod);
+        communicationResource.addIdentifier(baseIdentifier);
+
+        LOG.debug(".newCommunicationResource(): Exit, communicationResource->{}", communicationResource);
+        return(communicationResource);
+    }
+
 }

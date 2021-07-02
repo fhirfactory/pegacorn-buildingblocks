@@ -22,32 +22,73 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
-public abstract class EdgeEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
+import javax.inject.Inject;
 
-    protected static final String IPC_FRAME_DECODER = "ipcFrameDecoder";
-    protected static final String IPC_STRING_DECODER = "ipcStringDecoder";
-    protected static final String IPC_STRING_ENCODER = "ipcStringEncoder";
-    private static final String DEFAULT_NETTY_PARAMS = 
-            "?allowDefaultCodec=false&decoders=#" + IPC_FRAME_DECODER + "&encoders=#" + IPC_STRING_ENCODER + 
-            "&keepAlive=false&clientMode=true&sync=true&sendBufferSize=" + IPC_PACKET_MAXIMUM_FRAME_SIZE;
-        
+public abstract class EdgeEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
+    private IPCServerTopologyEndpoint associatedEgressTopologyEndpoint;
+
+    public EdgeEgressMessagingGatewayWUP() {
+        super();
+    }
+
+    protected abstract String specifyEgressInterfaceName();
+    protected abstract IPCInterfaceDefinition specifyEgressInterfaceDefinition();
+
+    @Inject
+    private PegacornCommonInterfaceNames interfaceNames;
+
+    protected PegacornCommonInterfaceNames getInterfaceNames(){
+        return(interfaceNames);
+    }
+
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT);
     }
 
     @Override
-    protected GenericMessageBasedWUPEndpoint specifyIngresTopologyEndpoint(){
+    protected MessageBasedWUPEndpoint specifyIngresEndpoint(){
         getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
-        GenericMessageBasedWUPEndpoint ingressEndpoint = new GenericMessageBasedWUPEndpoint();
-        ingressEndpoint.setFrameworkEnabled(true);
-        ingressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPIngres());
+        MessageBasedWUPEndpoint ingresEndpoint = new MessageBasedWUPEndpoint();
+        ingresEndpoint.setFrameworkEnabled(true);
+        ingresEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPIngres());
         getLogger().debug(".specifyIngresTopologyEndpoint(): Exit");
-        return(ingressEndpoint);
+        return(ingresEndpoint);
+    }
+
+    @Override
+    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint() {
+        return(false);
+    }
+
+    /**
+     * Derive the Ingres Topology Endpoint
+     */
+    protected void assignEgressTopologyEndpoint(){
+        getLogger().debug(".assignIngresTopologyEndpoint(): Entry");
+        IPCServerTopologyEndpoint endpoint = deriveAssociatedTopologyEndpoint(specifyEgressInterfaceName(), specifyEgressInterfaceDefinition());
+        if(endpoint != null){
+            this.associatedEgressTopologyEndpoint = endpoint;
+        } else {
+            throw(new RuntimeException("Cannot resolve appropriate Ingres Interface to bind to!"));
+        }
+        getLogger().debug(".assignIngresTopologyEndpoint(): Exit, endpoint->{}", endpoint);
+    }
+
+    public IPCServerTopologyEndpoint getAssociatedEgressTopologyEndpoint() {
+        return associatedEgressTopologyEndpoint;
+    }
+
+    public void setAssociatedEgressTopologyEndpoint(IPCServerTopologyEndpoint associatedEgressTopologyEndpoint) {
+        this.associatedEgressTopologyEndpoint = associatedEgressTopologyEndpoint;
     }
 
 }

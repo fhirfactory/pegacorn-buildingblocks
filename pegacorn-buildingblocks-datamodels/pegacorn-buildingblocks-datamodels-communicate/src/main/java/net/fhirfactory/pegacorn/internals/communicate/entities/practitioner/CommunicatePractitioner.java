@@ -21,18 +21,18 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.practitioner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionID;
-import net.fhirfactory.pegacorn.internals.communicate.entities.user.CommunicateUser;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
 import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
-
-import java.util.ArrayList;
-import java.util.List;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 
 public class CommunicatePractitioner extends PractitionerESR {
     private List<CommunicateSessionID> participatingSessions;
@@ -95,7 +95,7 @@ public class CommunicatePractitioner extends PractitionerESR {
 
     @JsonIgnore
     public String getMatrixUserID() {
-        IdentifierESDT matrixUserIdentifier = getIdentifierWithType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID);
+        IdentifierESDT matrixUserIdentifier = getIdentifierWithType(IdentifierType.MATRIX_USER_ID);
         if(matrixUserIdentifier != null){
             return (matrixUserIdentifier.getValue());
         } else {
@@ -105,11 +105,11 @@ public class CommunicatePractitioner extends PractitionerESR {
 
     @JsonIgnore
     public void setMatrixUserID(String matrixUserID) {
-        IdentifierESDT identifier = getIdentifierWithType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID);
+        IdentifierESDT identifier = getIdentifierWithType(IdentifierType.MATRIX_USER_ID);
         if(identifier == null){
             IdentifierESDT newIdentifier = new IdentifierESDT();
             newIdentifier.setUse(IdentifierESDTUseEnum.SECONDARY);
-            newIdentifier.setType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_MATRIX_USER_ID.getIdentifierType());
+            newIdentifier.setType(IdentifierType.MATRIX_USER_ID);
             newIdentifier.setValue(matrixUserID);
             this.getIdentifiers().add(newIdentifier);
         } else {

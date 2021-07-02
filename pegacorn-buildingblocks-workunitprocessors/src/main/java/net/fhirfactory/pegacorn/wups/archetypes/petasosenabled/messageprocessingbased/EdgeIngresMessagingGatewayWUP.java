@@ -22,21 +22,35 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
-import java.util.HashSet;
-import java.util.Set;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
-    
-    private static final String DEFAULT_NETTY_PARAMS_POSTFIX = "&sync=true&disconnect=true&keepAlive=false&receiveBufferSize=" + IPC_PACKET_MAXIMUM_FRAME_SIZE;
-    
+
+    private IPCServerTopologyEndpoint associatedIngresTopologyEndpoint;
+
     public EdgeIngresMessagingGatewayWUP() {
         super();
-//        getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
+    }
+
+    protected abstract String specifyIngresInterfaceName();
+    protected abstract IPCInterfaceDefinition specifyIngresInterfaceDefinition();
+
+    @Inject
+    private PegacornCommonInterfaceNames interfaceNames;
+
+    protected PegacornCommonInterfaceNames getInterfaceNames(){
+        return(interfaceNames);
     }
 
     @Override
@@ -45,9 +59,9 @@ public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedW
     }
 
     @Override
-    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+    protected MessageBasedWUPEndpoint specifyEgressEndpoint(){
         getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
-        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
         egressEndpoint.setFrameworkEnabled(true);
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
@@ -67,8 +81,30 @@ public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedW
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected Set<DataParcelToken> specifySubscriptionTopics() {
-        HashSet<DataParcelToken> subTopics = new HashSet<DataParcelToken>();
+    protected List<DataParcelManifest> specifySubscriptionTopics() {
+        List<DataParcelManifest> subTopics = new ArrayList<>();
         return(subTopics);
+    }
+
+    /**
+     * Derive the Ingres Topology Endpoint
+     */
+    protected void assignIngresTopologyEndpoint(){
+        getLogger().debug(".assignIngresTopologyEndpoint(): Entry");
+        IPCServerTopologyEndpoint endpoint = deriveAssociatedTopologyEndpoint(specifyIngresInterfaceName(), specifyIngresInterfaceDefinition());
+        if(endpoint != null){
+            this.associatedIngresTopologyEndpoint = endpoint;
+        } else {
+            throw(new RuntimeException("Cannot resolve appropriate Ingres Interface to bind to!"));
+        }
+        getLogger().debug(".assignIngresTopologyEndpoint(): Exit, endpoint->{}", endpoint);
+    }
+
+    public IPCServerTopologyEndpoint getAssociatedIngresTopologyEndpoint() {
+        return associatedIngresTopologyEndpoint;
+    }
+
+    public void setAssociatedIngresTopologyEndpoint(IPCServerTopologyEndpoint associatedIngresTopologyEndpoint) {
+        this.associatedIngresTopologyEndpoint = associatedIngresTopologyEndpoint;
     }
 }

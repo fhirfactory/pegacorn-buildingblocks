@@ -36,32 +36,26 @@ import java.util.Objects;
  * @author Mark A. Hunter
  * @since 2020-08-01
  */
-public class DataParcelToken extends DataParcelReference implements Serializable {
+@Deprecated
+public class DataParcelToken extends DataParcelTypeDescriptor implements Serializable {
 
 
     private DataParcelNormalisationStatusEnum normalisationStatus;
     private DataParcelValidationStatusEnum validationStatus;
     private DataParcelTypeEnum dataParcelType;
-    private String dataParcelSourceSystem;
-    private String dataParcelIntendedTargetSystem;
 
     public DataParcelToken() {
         super();
-
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_FALSE;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_FALSE;
         this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
-        this.dataParcelSourceSystem = null;
-        this.dataParcelIntendedTargetSystem = null;
     }
 
     public DataParcelToken(DataParcelToken originalToken){
         super(originalToken);
         this.normalisationStatus = originalToken.getNormalisationStatus();
         this.validationStatus = originalToken.getValidationStatus();
-        this.dataParcelSourceSystem = originalToken.getDataParcelSourceSystem();
         this.dataParcelType = originalToken.getDataParcelType();
-        this.dataParcelIntendedTargetSystem = originalToken.getDataParcelIntendedTargetSystem();
     }
 
     public DataParcelToken(FDN fdn){
@@ -69,27 +63,7 @@ public class DataParcelToken extends DataParcelReference implements Serializable
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_FALSE;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_FALSE;
         this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
-        this.dataParcelSourceSystem = null;
-        this.dataParcelIntendedTargetSystem = null;
         fromFDN(fdn);
-    }
-
-
-
-    public boolean hasDataParcelSourceSystem(){
-        if(this.dataParcelSourceSystem == null){
-            return(false);
-        } else {
-            return(true);
-        }
-    }
-
-    public boolean hasDataParcelIntendedTargetSystem(){
-        if(this.dataParcelIntendedTargetSystem == null){
-            return(false);
-        } else {
-            return(true);
-        }
     }
 
     public DataParcelTypeEnum getDataParcelType() {
@@ -98,14 +72,6 @@ public class DataParcelToken extends DataParcelReference implements Serializable
 
     public void setDataParcelType(DataParcelTypeEnum dataParcelType) {
         this.dataParcelType = dataParcelType;
-    }
-
-    public String getDataParcelSourceSystem() {
-        return dataParcelSourceSystem;
-    }
-
-    public void setDataParcelSourceSystem(String dataParcelSourceSystem) {
-        this.dataParcelSourceSystem = dataParcelSourceSystem;
     }
 
     public DataParcelNormalisationStatusEnum getNormalisationStatus() {
@@ -124,19 +90,10 @@ public class DataParcelToken extends DataParcelReference implements Serializable
         this.validationStatus = validationStatus;
     }
 
-    public String getDataParcelIntendedTargetSystem() {
-        return dataParcelIntendedTargetSystem;
-    }
-
-    public void setDataParcelIntendedTargetSystem(String dataParcelIntendedTargetSystem) {
-        this.dataParcelIntendedTargetSystem = dataParcelIntendedTargetSystem;
-    }
-
     /**
      * This function removes the Discriminator from a TopicToken Identifier.
      */
     public void removeDiscriminator(){
-        setDataParcelSourceSystem(null);
         setDataParcelType(null);
     }
 
@@ -153,8 +110,6 @@ public class DataParcelToken extends DataParcelReference implements Serializable
                 ", normalisationStatus=" + normalisationStatus +
                 ", validationStatus=" + validationStatus +
                 ", dataParcelType=" + dataParcelType +
-                ", dataParcelSourceSystem='" + dataParcelSourceSystem + '\'' +
-                ", dataParcelIntendedTargetSystem='" + dataParcelIntendedTargetSystem + '\'' +
                 '}';
     }
 
@@ -163,12 +118,12 @@ public class DataParcelToken extends DataParcelReference implements Serializable
         if (this == o) return true;
         if (!(o instanceof DataParcelToken)) return false;
         DataParcelToken that = (DataParcelToken) o;
-        return getDataParcelDefiner().equals(that.getDataParcelDefiner()) && getDataParcelCategory().equals(that.getDataParcelCategory()) && getDataParcelSubCategory().equals(that.getDataParcelSubCategory()) && getDataParcelResource().equals(that.getDataParcelResource()) && Objects.equals(getDataParcelSegment(), that.getDataParcelSegment()) && Objects.equals(getDataParcelAttribute(), that.getDataParcelAttribute()) && getVersion().equals(that.getVersion()) && getNormalisationStatus() == that.getNormalisationStatus() && getValidationStatus() == that.getValidationStatus() && getDataParcelType() == that.getDataParcelType() && Objects.equals(getDataParcelSourceSystem(), that.getDataParcelSourceSystem()) && Objects.equals(getDataParcelIntendedTargetSystem(), that.getDataParcelIntendedTargetSystem());
+        return getDataParcelDefiner().equals(that.getDataParcelDefiner()) && getDataParcelCategory().equals(that.getDataParcelCategory()) && getDataParcelSubCategory().equals(that.getDataParcelSubCategory()) && getDataParcelResource().equals(that.getDataParcelResource()) && Objects.equals(getDataParcelSegment(), that.getDataParcelSegment()) && Objects.equals(getDataParcelAttribute(), that.getDataParcelAttribute()) && getVersion().equals(that.getVersion()) && getNormalisationStatus() == that.getNormalisationStatus() && getValidationStatus() == that.getValidationStatus() && getDataParcelType() == that.getDataParcelType();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getDataParcelDefiner(), getDataParcelCategory(), getDataParcelSubCategory(), getDataParcelResource(), getDataParcelSegment(), getDataParcelAttribute(), getVersion(), getNormalisationStatus(), getValidationStatus(), getDataParcelType(), getDataParcelSourceSystem(), getDataParcelIntendedTargetSystem());
+        return Objects.hash(getDataParcelDefiner(), getDataParcelCategory(), getDataParcelSubCategory(), getDataParcelResource(), getDataParcelSegment(), getDataParcelAttribute(), getVersion(), getNormalisationStatus(), getValidationStatus(), getDataParcelType());
     }
 
     @Override
@@ -195,12 +150,6 @@ public class DataParcelToken extends DataParcelReference implements Serializable
         fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_TYPE.getTopicKey(), getDataParcelType().getDataParcelTypeValue()));
         fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_NORMALISATION_STATUS.getTopicKey(), getNormalisationStatus().getNormalisationStatusValue()));
         fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_VALIDATION_STATUS.getTopicKey(), getValidationStatus().getValidationStatusValue()));
-        if(hasDataParcelSourceSystem()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SOURCE.getTopicKey(), getDataParcelSourceSystem()));
-        }
-        if(hasDataParcelIntendedTargetSystem()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_INTENDED_TARGET.getTopicKey(), getDataParcelIntendedTargetSystem()));
-        }
         if(hasVersion()) {
             fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_VERSION.getTopicKey(), getVersion()));
         }
@@ -236,9 +185,6 @@ public class DataParcelToken extends DataParcelReference implements Serializable
                 case DATASET_TYPE:
                     setDataParcelType(DataParcelTypeEnum.fromTypeValue(rdn.getValue()));
                     break;
-                case DATASET_DISCRIMINATOR_VALUE:
-                    setDataParcelSourceSystem(rdn.getValue());
-                    break;
                 case DATASET_NORMALISATION_STATUS:
                     setNormalisationStatus(DataParcelNormalisationStatusEnum.fromNormalisationStatusString(rdn.getValue()));
                     break;
@@ -247,12 +193,6 @@ public class DataParcelToken extends DataParcelReference implements Serializable
                     break;
                 case DATASET_VERSION:
                     setVersion(rdn.getValue());
-                    break;
-                case DATASET_SOURCE:
-                    setDataParcelSourceSystem(rdn.getValue());
-                    break;
-                case DATASET_INTENDED_TARGET:
-                    setDataParcelIntendedTargetSystem(rdn.getValue());
                     break;
             }
         }

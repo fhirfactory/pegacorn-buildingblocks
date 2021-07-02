@@ -28,6 +28,7 @@ public enum DataParcelTypeKeyEnum {
     DATASET_RESOURCE("resource"),
     DATASET_SEGMENT("segment"),
     DATASET_ATTRIBUTE("attribute"),
+    DATASET_DISCRIMINATOR_TYPE("discrimintor_type"),
     DATASET_DISCRIMINATOR_VALUE("discriminator_value"),
     DATASET_NORMALISATION_STATUS("normalisation_status"),
     DATASET_VALIDATION_STATUS("validation_status"),

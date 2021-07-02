@@ -21,7 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ public class HL7V2XTopicFactory {
      * @param version
      * @return
      */
-    public DataParcelToken newTopicToken(String triggerName, String version){
+    public DataParcelTypeDescriptor newDataParcelDescriptor(String triggerName, String version){
         LOG.debug(".createTopicToken(): Entry, messageName->{}, version->{}", triggerName, version);
         if(triggerName == null){
             LOG.debug(".createTopicToken(): Exit, messageName is null");
@@ -52,7 +53,7 @@ public class HL7V2XTopicFactory {
             LOG.debug(".createTopicToken(): Exit, version is null");
             return(null);
         }
-        DataParcelToken topicToken = newTopicToken(triggerName);
+        DataParcelTypeDescriptor topicToken = newDataParcelDescriptor(triggerName);
         topicToken.setVersion(version);
         LOG.debug(".createTopicToken(): Exit, topicToken->{}", topicToken);
         return(topicToken);
@@ -63,9 +64,9 @@ public class HL7V2XTopicFactory {
      * @param eventName
      * @return
      */
-    public DataParcelToken newTopicToken(String eventName) {
+    public DataParcelTypeDescriptor newDataParcelDescriptor(String eventName) {
         LOG.debug(".createTopicToken(): Entry, eventName->{}", eventName);
-        DataParcelToken topicToken = new DataParcelToken();
+        DataParcelTypeDescriptor topicToken = new DataParcelTypeDescriptor();
         topicToken.setDataParcelDefiner(HL7_MESSAGE_DEFINER);
         topicToken.setDataParcelCategory(HL7_MESSAGE_CATEGORY);
         switch (eventName) {
@@ -147,9 +148,9 @@ public class HL7V2XTopicFactory {
      * @param version
      * @return
      */
-    public DataParcelToken newTopicToken(String eventType, String eventTrigger, String version){
+    public DataParcelTypeDescriptor newDataParcelDescriptor(String eventType, String eventTrigger, String version){
         LOG.debug(".newTopicToken(): Entry, eventType->{}, eventTrigger->{}, version->{}", eventType, eventTrigger, version);
-        DataParcelToken dataParcelToken = new DataParcelToken();
+        DataParcelTypeDescriptor dataParcelToken = new DataParcelTypeDescriptor();
         dataParcelToken.setDataParcelDefiner(HL7_MESSAGE_DEFINER);
         dataParcelToken.setDataParcelCategory(HL7_MESSAGE_CATEGORY);
         dataParcelToken.setDataParcelSubCategory(eventType);
@@ -159,15 +160,22 @@ public class HL7V2XTopicFactory {
         return(dataParcelToken);
     }
 
-    public DataParcelToken newBadTopicToken(){
-        LOG.debug(".newBadTopicToken(): Entry");
-        DataParcelToken dataParcelToken = new DataParcelToken();
+    public DataParcelTypeDescriptor newBadDataParcelDescriptor(){
+        LOG.debug(".newBadDataParcelDescriptor(): Entry");
+        DataParcelTypeDescriptor dataParcelToken = new DataParcelTypeDescriptor();
         dataParcelToken.setDataParcelDefiner(HL7_MESSAGE_DEFINER);
         dataParcelToken.setDataParcelCategory(HL7_MESSAGE_CATEGORY);
         dataParcelToken.setDataParcelSubCategory(HL7_MESSAGE_UNKNOWN);
         dataParcelToken.setDataParcelResource(HL7_MESSAGE_UNKNOWN);
         dataParcelToken.setVersion("x.x.x");
-        LOG.debug(".newBadTopicToken(): Exit");
+        LOG.debug(".newBadDataParcelDescriptor(): Exit");
         return(dataParcelToken);
+    }
+
+    public DataParcelManifest newBadDataParcelManifest(){
+        LOG.debug(".newBadDataParcelManifest(): Entry");
+        DataParcelManifest badManifest = new DataParcelManifest();
+        badManifest.setContentDescriptor(newBadDataParcelDescriptor());
+        return(newBadDataParcelManifest());
     }
 }

@@ -73,6 +73,7 @@ public class GroupMemberActionExtensionEnricher {
         Extension newStatusExtension = new Extension();
         newStatusExtension.setUrlElement(MEMBERSHIP_ACTION_STATUS_MEANING);
         newStatusExtension.setValue(new StringType(newStatus.getMembershipStatus()));
+        membership.addExtension(newStatusExtension);
         LOG.debug(".injectGroupMemberActionStatusExtension(): Exit, membership->{}", membership);
     }
 }

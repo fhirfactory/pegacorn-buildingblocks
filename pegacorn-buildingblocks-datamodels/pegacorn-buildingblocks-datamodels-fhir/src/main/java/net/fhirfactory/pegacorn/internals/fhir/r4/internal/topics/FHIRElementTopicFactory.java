@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ public class FHIRElementTopicFactory {
 
     private static String HL7_MESSAGE_DEFINER = "HL7-FHIR";
 
-    public DataParcelToken newTopicToken(String resourceName, String version){
+    public DataParcelTypeDescriptor newTopicToken(String resourceName, String version){
         LOG.debug(".newTopicToken(): Entry, resourceName->{}, version->{}", resourceName, version);
         if(resourceName == null){
             LOG.debug(".newTopicToken(): Exit, resourceName is null");
@@ -43,15 +44,15 @@ public class FHIRElementTopicFactory {
             LOG.debug(".newTopicToken(): Exit, version is null");
             return(null);
         }
-        DataParcelToken newToken = newTopicToken(resourceName);
+        DataParcelTypeDescriptor newToken = newTopicToken(resourceName);
         newToken.setVersion(version);
         LOG.debug(".newTopicToken(): Exit, newToken->{}", newToken);
         return(newToken);
     }
 
-    public DataParcelToken newTopicToken(String resourceName){
+    public DataParcelTypeDescriptor newTopicToken(String resourceName){
         LOG.debug(".newTopicToken(): Entry, resourceName->{}", resourceName);
-        DataParcelToken token = new DataParcelToken();
+        DataParcelTypeDescriptor token = new DataParcelTypeDescriptor();
         token.setDataParcelDefiner(HL7_MESSAGE_DEFINER);
         switch(resourceName){
             case "IdType":{

@@ -28,9 +28,10 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
-import net.fhirfactory.pegacorn.deployment.topology.builders.PegacornSolutionBuilder;
+import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfaces.SolutionNodeFactoryInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
 import org.apache.camel.LoggingLevel;
@@ -40,10 +41,12 @@ import org.slf4j.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantInterface {
 
     private ProcessingPlantTopologyNode processingPlantNode;
+    private String instanceQualifier;
     private boolean isInitialised;
 
     @Inject
@@ -52,7 +55,8 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     abstract protected ClusterServiceDeliverySubsystemPropertyFile specifyPropertyFile();
     abstract protected Logger specifyLogger();
     abstract protected PegacornTopologyFactoryInterface specifyTopologyFactory();
-    abstract protected PegacornSolutionBuilder specifySolutionBuilder();
+    abstract protected SolutionNodeFactoryInterface specifySolutionNodeFactory();
+    abstract protected void executePostConstructActivities();
 
     protected Logger getLogger(){return(specifyLogger());}
     protected ClusterServiceDeliverySubsystemPropertyFile getPropertyFile(){return(specifyPropertyFile());}
@@ -65,6 +69,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     public ProcessingPlant() {
         super();
         this.isInitialised = false;
+        this.instanceQualifier = UUID.randomUUID().toString();
     }
 
     @PostConstruct
@@ -73,13 +78,15 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             getLogger().debug("StandardProcessingPlatform::initialise(): Invoked!");
             getLogger().debug("StandardProcessingPlatform::initialise(): Initialising TopologyIM --> Start");
             getTopologyIM().initialise();
+            getTopologyFactory().initialise();
             getLogger().debug("StandardProcessingPlatform::initialise(): Initialising TopologyIM --> Finish");
             getLogger().debug("StandardProcessingPlatform::initialise(): Initialising Building Subsystem Topology --> Start");
-            specifySolutionBuilder().initialiseSubsystemTopology();
+            specifySolutionNodeFactory().initialise();
             getLogger().debug("StandardProcessingPlatform::initialise(): Initialising Building Subsystem Topology --> Finish");
             getLogger().debug("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Start");
             resolveProcessingPlant();
             getLogger().debug("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Finish");
+            executePostConstructActivities();
             isInitialised = true;
         }
     }
@@ -130,7 +137,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
         from("timer://"+processingPlantName+"?delay=1000&repeatCount=1")
             .routeId("ProcessingPlant::"+processingPlantName)
-            .log(LoggingLevel.INFO, "Starting....");
+            .log(LoggingLevel.DEBUG, "Starting....");
     }
 
     private String getFriendlyName(){
@@ -173,11 +180,29 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     }
 
     public WorkshopTopologyNode getWorkshop(String workshopName){
-        getLogger().info(".getWorkshop(): Entry, workshopName --> {}", workshopName);
+        getLogger().debug(".getWorkshop(): Entry, workshopName --> {}", workshopName);
         String version = this.processingPlantNode.getNodeRDN().getNodeVersion();
         WorkshopTopologyNode workshop = getWorkshop(workshopName, version);
-        getLogger().info(".getWorkshop(): Exit");
+        getLogger().debug(".getWorkshop(): Exit");
         return(workshop);
     }
 
+    @Override
+    public String getSimpleFunctionName() {
+        TopologyNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
+        String functionName = functionRDN.getNodeName();
+        return (functionName);
+    }
+
+    @Override
+    public String getSimpleInstanceName() {
+        String instanceName = getSimpleFunctionName() + "(" + instanceQualifier + ")";
+        return (instanceName);
+    }
+
+    @Override
+    public NetworkSecurityZoneEnum getNetworkZone(){
+        NetworkSecurityZoneEnum securityZone = getProcessingPlantNode().getSecurityZone();
+        return(securityZone);
+    }
 }

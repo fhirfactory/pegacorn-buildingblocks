@@ -21,14 +21,18 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.group;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
-import net.fhirfactory.pegacorn.internals.communicate.entities.user.CommunicateUser;
-import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
-
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
+import net.fhirfactory.pegacorn.internals.communicate.entities.user.CommunicateUser;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.GroupESR;
+
 public class CommunicateGroup extends GroupESR{
+    
+    
     private ConcurrentHashMap<String, CommunicateRoomReference> allRooms;
     private CommunicateUser surrogateCommunicateUser;
 
@@ -56,9 +60,17 @@ public class CommunicateGroup extends GroupESR{
 
     @JsonIgnore
     public GroupESR getGroupESR(){
-        GroupESR group = new GroupESR();
+     //   GroupESR group = new GroupESR();
 
-        return(group);
+     //   return(group);
+        return null;
+    }
+
+    
+    @Override
+    public List<?> getGroupMembership() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @JsonIgnore
