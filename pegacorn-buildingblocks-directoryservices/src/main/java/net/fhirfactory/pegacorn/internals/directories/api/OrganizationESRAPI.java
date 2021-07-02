@@ -30,10 +30,10 @@ import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.resources.OrganizationESR;
-import net.fhirfactory.buildingblocks.esr.resources.RoleESR;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.OrganizationServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
+import net.fhirfactory.pegacorn.internals.esr.resources.OrganizationESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.RoleESR;
 
 @ApplicationScoped
 public class OrganizationESRAPI extends ResourceDirectoryAPI {

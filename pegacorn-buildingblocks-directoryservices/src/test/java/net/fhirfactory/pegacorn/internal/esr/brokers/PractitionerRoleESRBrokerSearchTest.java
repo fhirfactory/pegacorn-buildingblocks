@@ -5,12 +5,6 @@ import javax.inject.Inject;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.deployment.communicate.matrix.SystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.MatrixRoomESRBroker;
@@ -20,6 +14,12 @@ import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
 /**
  * Practitioner Role search tests.

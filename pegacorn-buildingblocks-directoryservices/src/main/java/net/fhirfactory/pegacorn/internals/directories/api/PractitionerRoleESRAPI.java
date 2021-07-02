@@ -30,10 +30,10 @@ import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.PractitionerRoleCareTeamListESDT;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PractitionerRoleServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.PractitionerRoleCareTeamListESDT;
 
 @ApplicationScoped
 public class PractitionerRoleESRAPI extends ResourceDirectoryAPI {

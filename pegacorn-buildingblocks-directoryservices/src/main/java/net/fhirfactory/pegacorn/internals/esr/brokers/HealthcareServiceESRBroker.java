@@ -27,19 +27,19 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
-import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.resources.HealthcareServiceESR;
-import net.fhirfactory.buildingblocks.esr.resources.OrganizationESR;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.IdentifierType;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.OrganisationStructure;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.HealthcareServiceESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.OrganizationESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.OrganisationStructure;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
 @ApplicationScoped
 public class HealthcareServiceESRBroker extends ESRBroker {

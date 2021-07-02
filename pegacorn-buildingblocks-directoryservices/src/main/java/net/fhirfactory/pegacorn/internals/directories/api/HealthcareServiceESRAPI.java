@@ -30,9 +30,9 @@ import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.resources.HealthcareServiceESR;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.HealthcareServiceServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
+import net.fhirfactory.pegacorn.internals.esr.resources.HealthcareServiceESR;
 
 @ApplicationScoped
 public class HealthcareServiceESRAPI extends ResourceDirectoryAPI {

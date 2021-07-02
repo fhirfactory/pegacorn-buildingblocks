@@ -26,13 +26,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
-import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingException;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 
 
 public abstract class ESRSearchResult {

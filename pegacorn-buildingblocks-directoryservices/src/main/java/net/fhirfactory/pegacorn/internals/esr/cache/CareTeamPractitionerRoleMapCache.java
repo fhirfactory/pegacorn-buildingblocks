@@ -9,8 +9,8 @@ import javax.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
 @ApplicationScoped
 public class CareTeamPractitionerRoleMapCache {

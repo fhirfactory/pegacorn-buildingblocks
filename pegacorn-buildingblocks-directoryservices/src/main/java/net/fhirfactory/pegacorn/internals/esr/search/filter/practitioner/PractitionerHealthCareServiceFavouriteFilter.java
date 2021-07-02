@@ -7,8 +7,8 @@ import javax.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.resources.HealthcareServiceESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.HealthcareServiceESR;
 
 
 /**

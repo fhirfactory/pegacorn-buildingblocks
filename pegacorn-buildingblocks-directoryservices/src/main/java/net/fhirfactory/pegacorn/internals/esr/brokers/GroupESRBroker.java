@@ -30,21 +30,21 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.group.GroupESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesFulfilledByPractitionerGroupESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionerRolesInCareTeamGroupESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.group.PractitionersFulfillingPractitionerRolesGroupESR;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
-import net.fhirfactory.buildingblocks.esr.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.ParticipantESDT;
-import net.fhirfactory.buildingblocks.esr.resources.datatypes.SystemManagedGroupTypesEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.CareTeamPractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.GroupESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.PractitionerRoleMapCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ParticipantESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.SystemManagedGroupTypesEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.CareTeamsContainingPractitionerRoleGroupESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.GroupESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.PractitionerRolesFulfilledByPractitionerGroupESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.PractitionerRolesInCareTeamGroupESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.PractitionersFulfillingPractitionerRolesGroupESR;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 
 @ApplicationScoped
 public class GroupESRBroker extends ESRBroker {
