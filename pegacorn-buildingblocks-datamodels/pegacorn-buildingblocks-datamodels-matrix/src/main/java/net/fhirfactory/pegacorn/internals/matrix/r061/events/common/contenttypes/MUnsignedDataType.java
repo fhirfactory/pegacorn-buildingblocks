@@ -21,13 +21,17 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class MUnsignedDataType {
     private Integer age;
 
+    @JsonProperty("age")
     public Integer getAge() {
         return age;
     }
 
+    @JsonProperty("age")
     public void setAge(Integer age) {
         this.age = age;
     }

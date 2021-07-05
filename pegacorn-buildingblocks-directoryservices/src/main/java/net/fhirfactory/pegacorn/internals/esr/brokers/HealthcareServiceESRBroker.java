@@ -21,33 +21,33 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.HealthcareServiceESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.HealthcareServiceESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.OrganizationESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.OrganisationStructure;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
-@ApplicationScoped
-public class HealthcareServiceESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(HealthcareServiceESRBroker.class);
+public abstract class HealthcareServiceESRBroker extends ESRBroker {
 
     @Inject
-    HealthcareServiceESRCache resourceCache;
-
-    @Override
-    protected Logger getLogger() {
-        return (LOG);
-    }
+    private HealthcareServiceESRCache healthCareServiceCache;
+    
+    @Inject
+    private OrganizationESRBroker organisationBroker;
 
     @Override
     protected PegacornESRCache specifyCache() {
-        return (resourceCache);
+        return (healthCareServiceCache);
     }
 
     //
@@ -60,11 +60,48 @@ public class HealthcareServiceESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.USUAL);
+
+        resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
     }
 
     @Override
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) {
 
     }
+    
+    public ESRMethodOutcome createHealthCareService(HealthcareServiceESR newHealthCareService) throws ResourceInvalidSearchException{
+        addOrganisationStructure(newHealthCareService);
+        
+        ESRMethodOutcome outcome = this.createDirectoryEntry(newHealthCareService);
+        
+        return outcome;
+    }
+    
+    
+    
+    /**
+     * Add the organisation structure.
+     * 
+     * @param directoryEntry
+     * @throws ResourceInvalidSearchException
+     */
+    private void addOrganisationStructure(HealthcareServiceESR directoryEntry) throws ResourceInvalidSearchException {      
+        if (directoryEntry.getPrimaryOrganizationID() != null) {
+            ESRMethodOutcome outcome = organisationBroker.searchForDirectoryEntryUsingLeafValue(directoryEntry.getPrimaryOrganizationID().toLowerCase());
+            
+            if (outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND)) {
+                OrganizationESR organisation = (OrganizationESR)outcome.getEntry();
+                
+                IdentifierESDT shortNameIdentifier = organisation.getIdentifierWithType(IdentifierType.SHORT_NAME);
+                
+                OrganisationStructure structure = new OrganisationStructure();
+                
+                structure.setIndex(1);
+                structure.setValue(shortNameIdentifier.getLeafValue());
+                structure.setType(organisation.getOrganizationType().getTypeDisplayValue());
+                directoryEntry.getOrganisationStructure().add(structure);
+            }
+        }
+    }
+
 }

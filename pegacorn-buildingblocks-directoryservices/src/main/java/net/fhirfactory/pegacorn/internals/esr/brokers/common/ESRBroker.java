@@ -23,18 +23,11 @@ package net.fhirfactory.pegacorn.internals.esr.brokers.common;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
@@ -42,23 +35,24 @@ import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringExcep
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingException;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSortException;
 
 public abstract class ESRBroker {
 
-    @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
 
     protected abstract Logger getLogger();
     protected abstract PegacornESRCache specifyCache();
     protected abstract void assignSimplifiedID(ExtremelySimplifiedResource resource);
 
+    protected abstract ExtremelySimplifiedResource synchroniseResource(ExtremelySimplifiedResource resource);
+
     protected PegacornESRCache getCache(){
         return(specifyCache());
     }
 
-    protected CommonIdentifierESDTTypes getCommonIdentifierTypes(){
-        return(commonIdentifierESDTTypes);
-    }
 
     //
     // Create
@@ -77,6 +71,11 @@ public abstract class ESRBroker {
     
     
     public ESRMethodOutcome getResource(String recordID) throws ResourceInvalidSearchException {
+    	return getResource(recordID, true);
+    }
+    
+    
+    public ESRMethodOutcome getResource(String recordID, boolean doEnrich) throws ResourceInvalidSearchException {
         getLogger().info(".getResource(): Entry, recordID --> {}", recordID);
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         ExtremelySimplifiedResource entry = getCache().getCacheEntry(recordID);
@@ -84,7 +83,14 @@ public abstract class ESRBroker {
             outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_NOT_FOUND);
             outcome.setId(recordID);
         } else {
-            enrichWithDirectoryEntryTypeSpecificInformation(entry);
+        	
+        	// We don't always want to do the enrich as this will cause circular dependencies.
+        	if (doEnrich) {
+        		enrichWithDirectoryEntryTypeSpecificInformation(entry);
+        	} else {
+        		clearAssociations(entry);
+        	}
+        	
             outcome.setEntry(entry);
             outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
             outcome.setId(entry.getSimplifiedID());
@@ -92,16 +98,31 @@ public abstract class ESRBroker {
         getLogger().info(".getResource(): Exit");
         return(outcome);
     }
+    
+    
+    /**
+     * Clear any associations we do not need.
+     * 
+     * @param entry
+     */
+    protected void clearAssociations(ExtremelySimplifiedResource entry) {
+    	// Do nothing by default
+	}
 
     
     public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
-    	return searchForDirectoryEntryUsingIdentifier(identifier, true);
+    	return searchForDirectoryEntryUsingIdentifier(identifier, true, true);
+    }
+    
+    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier,boolean containsMatch) throws ResourceInvalidSearchException {
+    	return searchForDirectoryEntryUsingIdentifier(identifier, containsMatch, true);
     }
 
+    
     //
     // Review (Search - by Identifier)
     //
-    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier, boolean containsMatch) throws ResourceInvalidSearchException {
+    public ESRMethodOutcome searchForDirectoryEntryUsingIdentifier(IdentifierESDT identifier, boolean containsMatch, boolean doEnrich) throws ResourceInvalidSearchException {
         getLogger().debug(".searchForDirectoryResourceRoleUsingIdentifier(): Entry, identifier --> {}", identifier);
         ESRMethodOutcome outcome = getCache().searchCacheForESRUsingIdentifier(identifier, containsMatch);
         boolean searchCompleted = outcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY) || outcome.getStatus().equals(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
@@ -119,7 +140,14 @@ public abstract class ESRBroker {
             } else {
                 getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Entry found");
                 outcome.setStatus(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
-                enrichWithDirectoryEntryTypeSpecificInformation(entry);
+                
+            	// We don't always want to do the enrich as this will cause circular dependencies.
+                if (doEnrich) {
+                	enrichWithDirectoryEntryTypeSpecificInformation(entry);
+                } else {
+                	clearAssociations(entry);
+                }
+                
                 outcome.setSearch(true);
                 getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
                 return (outcome);
@@ -128,8 +156,8 @@ public abstract class ESRBroker {
         if(outcome.getSearchResult().isEmpty()) {
             getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): No entry found");
             outcome.setSearchSuccessful(true);
-            outcome.getSearchResult().add(entry);
-            outcome.setId(entry.getSimplifiedID());
+      //      outcome.getSearchResult().add(entry);
+    //        outcome.setId(entry.getSimplifiedID());
             outcome.setSearch(true);
             getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
             return (outcome);
@@ -216,13 +244,16 @@ public abstract class ESRBroker {
             if(getLogger().isInfoEnabled()){
                 getLogger().info(".PegacornDirectoryEntry(): Attempting to retrieve PegacornDirectoryEntry for Id --> {}", entry.getSimplifiedID());
             }
-            foundResource = getCache().getCacheEntry(entry.getSimplifiedID());
+            foundResource = getCache().getCacheEntry(entry.getSimplifiedID().toLowerCase());
         }
         getLogger().info(".updatePractitionerEntry(): Check to see if we were able to retrieve existing Resource");
         if(foundResource != null){
             outcome.setId(entry.getSimplifiedID());
             outcome.setEntry(entry);
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
+            
+            getCache().updateCacheEntry(entry.getSimplifiedID(), entry);
+            
             return(outcome);
         } else {
             getLogger().info(".updatePractitionerEntry(): No Resource retrieved, trying individual Identifiers");

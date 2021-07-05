@@ -30,10 +30,9 @@ import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.CareTeamESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.CareTeamServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
+import net.fhirfactory.pegacorn.internals.esr.resources.CareTeamESR;
 
 @ApplicationScoped
 public class CareTeamESRAPI extends ResourceDirectoryAPI {
@@ -77,20 +76,21 @@ public class CareTeamESRAPI extends ResourceDirectoryAPI {
         //
 
         getRestGetDefinition()
-            .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}"
+            .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}}&allName={allName}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
                 .param().name("shortName").type(RestParamType.query).required(false).endParam()
                 .param().name("longName").type(RestParamType.query).required(false).endParam()
                 .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                .param().name("allName").type(RestParamType.query).required(false).endParam()
                 .param().name("leafValue").type(RestParamType.query).required(false).endParam()
                 .param().name("pageSize").type(RestParamType.query).required(false).endParam()
                 .param().name("page").type(RestParamType.query).required(false).endParam()
                 .param().name("sortBy").type(RestParamType.query).required(false).endParam()
                 .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
                 .to("direct:"+getESRName()+"SearchGET")
-            .post().type(RoleESR.class)
+            .post().type(CareTeamESR.class)
                 .to("direct:"+getESRName()+"POST")
-            .put().type(RoleESR.class)
+            .put().type(CareTeamESR.class)
                 .to("direct:"+getESRName()+"PUT")
 
 	        .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
@@ -119,9 +119,8 @@ public class CareTeamESRAPI extends ResourceDirectoryAPI {
                 .setBody(simple("Action not support for this Directory Entry"));
 
         from("direct:"+getESRName()+"PUT")
-                .log(LoggingLevel.INFO, "PUT Request --> ${body}")
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(501))
-                .setBody(simple("Action not support for this Directory Entry"));
+        	.bean(serviceHandler, "updateCareTeam")
+        	.log(LoggingLevel.INFO, "PUT Request --> ${body}");
 
         from("direct:"+getESRName()+"DELETE")
                 .log(LoggingLevel.INFO, "DELETE Request --> ${body}")

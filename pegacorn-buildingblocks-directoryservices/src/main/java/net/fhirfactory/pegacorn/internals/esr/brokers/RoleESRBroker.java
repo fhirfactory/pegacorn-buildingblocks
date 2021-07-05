@@ -21,32 +21,28 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.CommonIdentifierESDTTypes;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.RoleESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.RoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
 
-@ApplicationScoped
-public class RoleESRBroker extends ESRBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(RoleESRBroker.class);
+public abstract class RoleESRBroker extends ESRBroker {
+    private static final Logger LOG = LoggerFactory.getLogger(RoleCategoryESRBroker.class);
 
     @Inject
     private RoleESRCache roleCache;
 
-    @Inject
-    private CommonIdentifierESDTTypes commonIdentifierESDTTypes;
 
     @Override
     protected Logger getLogger() {
@@ -68,7 +64,9 @@ public class RoleESRBroker extends ESRBroker {
             getLogger().debug(".assignSimplifiedID(): Entry, resource is null, exiting");
             return;
         }
-        resource.assignSimplifiedID(true, getCommonIdentifierTypes().getShortName(), IdentifierESDTUseEnum.USUAL);
+
+        resource.assignSimplifiedID(true, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
+
     }
 
     //
@@ -92,7 +90,7 @@ public class RoleESRBroker extends ESRBroker {
             IdentifierESDT newRoleIdentifier = new IdentifierESDT();
             newRoleIdentifier.setValue(roleName);
             newRoleIdentifier.setUse(IdentifierESDTUseEnum.USUAL);
-            newRoleIdentifier.setType(commonIdentifierESDTTypes.getShortName());
+            newRoleIdentifier.setType(IdentifierType.SHORT_NAME);
             newRoleIdentifier.setLeafValue(roleName);
             newRole.getIdentifiers().add(newRoleIdentifier);
             newRole.setDisplayName(roleName);

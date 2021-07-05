@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MEventTypeEnum;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes.MUnsignedDataType;
@@ -33,6 +34,14 @@ public class MatrixEventBase extends MatrixEventKey{
     private MEventTypeEnum eventType;
     private Date timeStamp;
     private MUnsignedDataType unsigned;
+
+    public MatrixEventBase(){
+        super();
+        this.sender = null;
+        this.eventType = null;
+        this.timeStamp = null;
+        this.unsigned = null;
+    }
 
     @JsonProperty("unsigned")
     public MUnsignedDataType getUnsigned() {
@@ -72,5 +81,41 @@ public class MatrixEventBase extends MatrixEventKey{
     @JsonProperty("origin_server_ts")
     public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    @JsonIgnore
+    public boolean hasSender(){
+        if(this.sender == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasEventType(){
+        if(this.eventType == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasTimeStamp(){
+        if(this.timeStamp == null){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasUnsigned(){
+        if(this.unsigned == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 }

@@ -22,34 +22,34 @@
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.common.contenttypes;
 
 public enum MEventTypeEnum {
+    M_CALL_ANSWER("m.call.answer"),
+    M_CALL_CANDIDATES("m.call.candidates"),
+    M_CALL_HANGUP("m.call.hangup"),
+    M_CALL_INVITE("m.call.invite"),
+    M_DIRECT("m.direct"),
+    M_FULLY_READ("m.fully_read"),
+    M_IGNORED_USER_LIST("m.ignored_user_list"),
+    M_PRESENCE("m.presence"),
+    M_RECEIPT("m.receipt"),
+    M_TAG("m.tag"),
+    M_TYPING("m.typing"),
+    M_POLICY_RULE_ROOM("m.policy.rule.room"),
+    M_POLICY_RULE_SERVER("m.policy.rule.server"),
+    M_POLICY_RULE_USER("m.policy.rule.user"),
     M_ROOM_CANONICAL_ALIAS("m.room.canonical_alias"),
     M_ROOM_CREATE("m.room.create"),
+    M_ROOM_GUEST_ACCESS("m.room.guest_access"),
+    M_ROOM_HISTORY_VISIBILITY("m.room.history_visibility"),
     M_ROOM_JOIN_RULES("m.room.join_rules"),
     M_ROOM_MEMBER("m.room.member"),
+    M_ROOM_MESSAGE("m.room.message"),
+    M_ROOM_MESSAGE_FEEDBACK("m.room.message.feedback"),
+    M_ROOM_NAME("m.room.name"),
     M_ROOM_POWER_LEVELS("m.room.power_levels"),
     M_ROOM_REDACTION("m.room.redaction"),
-    M_ROOM_MESSAGE("m.room.message"),
-    M_CALL_INVITE("m.call.invite"),
-    M_CALL_CANDIDATES("m.call.candidates"),
-    M_CALL_ANSWER("m.call.answer"),
-    M_CALL_HANGUP("m.call.hangup"),
-    M_TYPING("m.typing"),
-    M_RECEIPT("m.receipt"),
-    M_FULLY_READ("m.fully_read"),
-    M_PRESENCE("m.presence"),
-    M_ROOM_HISTORY_VISIBILITY("m.room.history_visibility"),
-    M_ROOM_THIRD_PARTY_INVITE("m.room.third_party_invite"),
-    M_ROOM_GUEST_ACCESS("m.room.guest_access"),
-    M_TAG("m.tag"),
-    M_DIRECT("m.direct"),
-    M_IGNORED_USER_LIST("m.ignored_user_list"),
     M_ROOM_SERVER_ACL("m.room.server_acl"),
-    M_ROOM_TOMBSTONE("m.room.tombstone"),
-    M_POLICY_RULE_USER("m.policy.rule.user"),
-    M_POLICY_RULE_ROOM("m.policy.rule.room"),
-    M_POLICY_RULE_SERVER("m.policy.rule.server")
-
-    ;
+    M_ROOM_THIRD_PARTY_INVITE("m.room.third_party_invite"),
+    M_ROOM_TOMBSTONE("m.room.tombstone");
 
     private String eventType;
 
@@ -59,5 +59,14 @@ public enum MEventTypeEnum {
 
     public String getEventType() {
         return eventType;
+    }
+
+    public static MEventTypeEnum fromString(String text) {
+        for (MEventTypeEnum evType : MEventTypeEnum.values()) {
+            if (evType.eventType.equalsIgnoreCase(text)) {
+                return evType;
+            }
+        }
+        return null;
     }
 }

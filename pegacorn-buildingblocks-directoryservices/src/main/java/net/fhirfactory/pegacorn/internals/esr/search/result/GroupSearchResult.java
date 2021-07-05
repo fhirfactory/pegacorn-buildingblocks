@@ -27,8 +27,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.GroupESR;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
@@ -66,24 +66,24 @@ public class GroupSearchResult extends ESRSearchResult {
               
         GroupSearchResult result = (GroupSearchResult)instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(getSearchResultList());
-        switch(sort.getSortBy().toLowerCase()){
-            case "simplifiedid": {
+        switch(sort.getSortBy()){
+            case SIMPLIFIED_ID: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }
-            case "shortname": {
+            case SHORT_NAME: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierShortNameBasedComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierShortNameBasedComparator));
                 break;
             }
-            case "longname": {
+            case LONG_NAME: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.identifierLongNameTypeComparator : Collections.reverseOrder(ExtremelySimplifiedResource.identifierLongNameTypeComparator));
                 break;
             }
-            case "grouptype": {
+            case GROUP_TYPE: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? GroupESR.groupTypeComparator : Collections.reverseOrder(GroupESR.groupTypeComparator));
                 break;
             }
-            case "groupmanager": {
+            case GROUP_MANAGER: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? GroupESR.groupManagerComparator : Collections.reverseOrder(GroupESR.groupManagerComparator));
                 break;
 

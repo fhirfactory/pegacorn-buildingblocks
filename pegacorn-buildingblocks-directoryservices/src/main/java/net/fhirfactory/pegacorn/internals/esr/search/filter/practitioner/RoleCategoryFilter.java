@@ -6,15 +6,16 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.PractitionerRoleESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleCategoryESR;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.brokers.PractitionerRoleESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.RoleCategoryESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.RoleCategoryESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.RoleHistoryDetail;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
 
 /**
  * A practitioner role category filter.
@@ -49,7 +50,8 @@ public class RoleCategoryFilter extends BaseFilter {
 				return false;
 			}
 			
-			for (String role : practitioner.getCurrentPractitionerRoles()) {
+			for (RoleHistoryDetail roleHistoryDetail : practitioner.getRoleHistory().getAllCurrentRoles()) {
+				String role = roleHistoryDetail.getRole();
 			
 				// get the practitioner role.
 				ESRMethodOutcome practitionerRoleOutcome =  practitionerRoleBroker.getResource(role.toLowerCase());

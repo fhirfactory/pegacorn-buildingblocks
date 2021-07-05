@@ -26,16 +26,16 @@ import javax.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.GroupESR;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.search.result.GroupSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
 @ApplicationScoped
 public class GroupESRCache extends PegacornESRCache {
@@ -61,47 +61,7 @@ public class GroupESRCache extends PegacornESRCache {
         return(foundGroupEntry);
     }
 
-    public ESRMethodOutcome addMember(String groupPrimaryKey, String memberPrimaryKey){
-        GroupESR foundGroup = getGroup(groupPrimaryKey);
-        if(foundGroup == null || memberPrimaryKey == null){
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-            outcome.setStatusReason("Group does not exist");
-            return(outcome);
-        }
-        if(foundGroup.getRoleHistory().getAllCurrentRolesAsString().contains(memberPrimaryKey)){
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-            return(outcome);
-
-        } else {
-            foundGroup.getGroupMembership().add(memberPrimaryKey);
-        }
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
-            outcome.setId(foundGroup.getSimplifiedID());
-            outcome.setEntry(foundGroup);
-            return (outcome);
-    }
-
-    public ESRMethodOutcome removeMember(String groupPrimaryKey, String memberPrimaryKey){
-        GroupESR foundGroup = getGroup(groupPrimaryKey);
-        if(foundGroup == null || memberPrimaryKey == null){
-            ESRMethodOutcome outcome = new ESRMethodOutcome();
-            outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-            outcome.setStatusReason("Group does not exist");
-            return(outcome);
-        }
-        if(foundGroup.getRoleHistory().getAllCurrentRolesAsString().contains(memberPrimaryKey)){
-            foundGroup.getRoleHistory().getAllCurrentRolesAsString().remove(memberPrimaryKey);
-        }
-        ESRMethodOutcome outcome = new ESRMethodOutcome();
-        outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
-        outcome.setId(foundGroup.getSimplifiedID());
-        outcome.setEntry(foundGroup);
-        return(outcome);
-    }
-
+    
     //
     // Search Services
     //
@@ -113,26 +73,10 @@ public class GroupESRCache extends PegacornESRCache {
     }
 
     @Override
-    public Boolean supportsSearchType(String attributeName) {
-        String searchAttributeNameLowerCase = attributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "shortnmae":
-            case "longname":
-            case "displayname":
-            case "grouptype":
-            case "groupmanager":
-                return(true);
-            default:
-                return(false);
-        }
-    }
-
-    @Override
     public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
     	
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getParamName(), searchCriteria.getValue());
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getSearchParam().getName(), searchCriteria.getSearchParam().getValue());
         
         if(searchCriteria.isValueNull()){
             throw(new ResourceInvalidSearchException("Search Value is null"));
@@ -147,30 +91,34 @@ public class GroupESRCache extends PegacornESRCache {
             return(result);
         }
         
-        switch(searchCriteria.getParamName().toLowerCase()){
-            case "simplifiedid": {
+        switch(searchCriteria.getSearchParam().getName()) {
+            case SIMPLIFIED_ID: {
                 result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
-            case "shortname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", IdentifierESDTUseEnum.USUAL);
+            case SHORT_NAME: {
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "longname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
+            case LONG_NAME: {
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.LONG_NAME, IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "displayname": {
+            case DISPLAY_NAME: {
                 result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
             }
-            case "grouptype":{
+            case GROUP_TYPE:{
                 result = this.searchCacheUsingGroupType(searchCriteria);
                 return(result);
             }
-            case "groupmanager":{
+            case GROUP_MANAGER:{
                 result = this.searchCacheUsingGroupManager(searchCriteria);
                 return(result);
+            }
+            case ALL_NAME: {
+            	result = this.searchCacheUsingAllNames(searchCriteria, IdentifierESDTUseEnum.USUAL, IdentifierESDTUseEnum.USUAL);
+            	return result;
             }
             default: {
                 return (result);
@@ -185,7 +133,7 @@ public class GroupESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             GroupESR currentGroup = (GroupESR) currentResource;
-            if(currentGroup.getGroupType().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
+            if(currentGroup.getGroupType().toLowerCase().contains(searchCriteria.getSearchParam().getValue().toLowerCase())){
                 result.getSearchResultList().add(currentGroup);
             }
         }
@@ -199,7 +147,7 @@ public class GroupESRCache extends PegacornESRCache {
         }
         for(ExtremelySimplifiedResource currentResource: this.getSimplifiedID2ESRMap().values()){
             GroupESR currentGroup = (GroupESR) currentResource;
-            if(currentGroup.getGroupManager().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
+            if(currentGroup.getGroupManager().toLowerCase().contains(searchCriteria.getSearchParam().getValue().toLowerCase())){
                 result.getSearchResultList().add(currentGroup);
             }
         }

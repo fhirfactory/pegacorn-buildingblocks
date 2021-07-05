@@ -9,7 +9,7 @@ package net.fhirfactory.pegacorn.internals.esr.search;
 public class Sort {
 
 	private SortOrderEnum sortOrder = SortOrderEnum.ASCENDING;
-	private String sortBy = "simplifiedID";
+	private SortParamNames sortBy = SortParamNames.SIMPLIFIED_ID;
 
 	public Sort() {
 	}
@@ -17,15 +17,11 @@ public class Sort {
 	public Sort(String sortBy, String sortOrder) {
 		
 		if (sortBy != null) {
-			this.sortBy = sortBy;
+			this.sortBy = SortParamNames.get(sortBy);
 		}
 
 		if (sortOrder != null) {
-			if (sortOrder.equals("ascending")) {
-				this.sortOrder = SortOrderEnum.ASCENDING;
-			} else if (sortOrder.equals("descending")) {
-				this.sortOrder = SortOrderEnum.DESCENDING;
-			}
+		    this.sortOrder = SortOrderEnum.get(sortOrder);
 		}
 	}
 
@@ -37,11 +33,11 @@ public class Sort {
 		this.sortOrder = sortOrder;
 	}
 
-	public String getSortBy() {
+	public SortParamNames getSortBy() {
 		return sortBy;
 	}
 
-	public void setSortBy(String sortBy) {
+	public void setSortBy(SortParamNames sortBy) {
 		this.sortBy = sortBy;
 	}
 

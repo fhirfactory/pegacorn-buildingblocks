@@ -31,20 +31,22 @@ import org.slf4j.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceNotFoundException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParam;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingException;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSortException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceNotFoundException;
 
 
 public abstract class HandlerBase {
@@ -124,6 +126,7 @@ public abstract class HandlerBase {
     														@Header("shortName") String shortName,
                                                             @Header("longName") String longName,
                                                             @Header("displayName") String displayName,
+                                                            @Header("allName") String allName,
                                                             @Header("leafValue") String leafValue,
                                                             @Header("sortBy") String sortBy,
                                                             @Header("sortOrder") String sortOrder,
@@ -133,28 +136,27 @@ public abstract class HandlerBase {
         getLogger().info(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{},"+
                         "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
                 shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
-        String searchAttributeName = null;
-        String searchAttributeValue = null;
+
+        SearchParam searchParam = null;
+        
         if(simplifiedID != null) {
-            searchAttributeValue = simplifiedID;
-            searchAttributeName = "simplifiedID";
+            searchParam = new SearchParam(SearchParamNames.SIMPLIFIED_ID, simplifiedID);
         } else if(shortName != null) {
-            searchAttributeValue = shortName;
-            searchAttributeName = "shortName";
+            searchParam = new SearchParam(SearchParamNames.SHORT_NAME, shortName);
         } else if(longName != null){
-            searchAttributeValue = longName;
-            searchAttributeName = "longName";
+            searchParam = new SearchParam(SearchParamNames.LONG_NAME, longName);
         } else if(displayName != null){
-            searchAttributeValue = displayName;
-            searchAttributeName = "displayName";
+            searchParam = new SearchParam(SearchParamNames.DISPLAY_NAME, displayName);
         } else if(leafValue != null) {
-            searchAttributeValue = leafValue;
-            searchAttributeName = "leafValue";
-        } else {
+            searchParam = new SearchParam(SearchParamNames.LEAF_VALUE, leafValue);
+        } else if(allName != null) {
+            searchParam = new SearchParam(SearchParamNames.ALL_NAME, allName);
+        }
+        else {
             throw( new ResourceInvalidSearchException("Search parameter not specified"));
         }
         
-        SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
+        SearchCriteria searchCriteria = new SearchCriteria(searchParam);
         
         
         Integer pageSizeValue = null;

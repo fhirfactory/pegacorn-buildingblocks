@@ -30,17 +30,16 @@ import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.RoleESR;
-import net.fhirfactory.pegacorn.internals.directories.api.beans.LocationServiceHandler;
+import net.fhirfactory.pegacorn.internals.directories.api.beans.HealthcareServiceServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
+import net.fhirfactory.pegacorn.internals.esr.resources.HealthcareServiceESR;
 
 @ApplicationScoped
 public class HealthcareServiceESRAPI extends ResourceDirectoryAPI {
     private static final Logger LOG = LoggerFactory.getLogger(HealthcareServiceESRAPI.class);
 
     @Inject
-    private LocationServiceHandler serviceHandler;
+    private HealthcareServiceServiceHandler serviceHandler;
 
     @Override
     protected Logger getLogger(){return(LOG);}
@@ -78,21 +77,22 @@ public class HealthcareServiceESRAPI extends ResourceDirectoryAPI {
 
 
         getRestGetDefinition()
-                .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}"
+                .get("/search?shortName={shortName}&longName={longName}&displayName={displayName}}&allName={allName}"
                         + "&pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
-                .param().name("shortName").type(RestParamType.query).required(false).endParam()
-                .param().name("longName").type(RestParamType.query).required(false).endParam()
-                .param().name("displayName").type(RestParamType.query).required(false).endParam()
-                .param().name("leafValue").type(RestParamType.query).required(false).endParam()
-                .param().name("pageSize").type(RestParamType.query).required(false).endParam()
-                .param().name("page").type(RestParamType.query).required(false).endParam()
-                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
-                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
-                .to("direct:"+getESRName()+"SearchGET")
-                .post().type(RoleESR.class)
-                .to("direct:"+getESRName()+"POST")
-                .put().type(RoleESR.class)
-                .to("direct:"+getESRName()+"PUT")
+                    .param().name("shortName").type(RestParamType.query).required(false).endParam()
+                    .param().name("longName").type(RestParamType.query).required(false).endParam()
+                    .param().name("displayName").type(RestParamType.query).required(false).endParam()
+                    .param().name("allName").type(RestParamType.query).required(false).endParam()
+                    .param().name("leafValue").type(RestParamType.query).required(false).endParam()
+                    .param().name("pageSize").type(RestParamType.query).required(false).endParam()
+                    .param().name("page").type(RestParamType.query).required(false).endParam()
+                    .param().name("sortBy").type(RestParamType.query).required(false).endParam()
+                    .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
+                    .to("direct:"+getESRName()+"SearchGET")
+                    .post().type(HealthcareServiceESR.class)
+                    .to("direct:"+getESRName()+"POST")
+                    .put().type(HealthcareServiceESR.class)
+                    .to("direct:"+getESRName()+"PUT")
                 
 
     	        .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")

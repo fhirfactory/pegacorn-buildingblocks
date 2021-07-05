@@ -27,7 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
@@ -67,8 +67,8 @@ public class MatrixRoomSearchResult extends ESRSearchResult {
         MatrixRoomSearchResult result = (MatrixRoomSearchResult)instatiateNewESRSearchResult();
         result.getSearchResultList().addAll(getSearchResultList());
 
-        switch(sort.getSortBy().toLowerCase()){
-            case "simplifiedid": {
+        switch(sort.getSortBy()){
+            case SIMPLIFIED_ID: {
                 Collections.sort(result.getSearchResultList(), sort.isAscendingOrder() ? ExtremelySimplifiedResource.simplifiedIDComparator : Collections.reverseOrder(ExtremelySimplifiedResource.simplifiedIDComparator));
                 break;
             }

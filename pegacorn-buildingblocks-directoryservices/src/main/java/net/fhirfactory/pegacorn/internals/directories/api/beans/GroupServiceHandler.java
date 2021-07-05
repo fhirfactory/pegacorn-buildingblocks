@@ -16,23 +16,25 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSortException;
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceUpdateException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.GroupESR;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
 import net.fhirfactory.pegacorn.internals.esr.brokers.GroupESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.group.GroupESR;
 import net.fhirfactory.pegacorn.internals.esr.search.Pagination;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParam;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
 import net.fhirfactory.pegacorn.internals.esr.search.Sort;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRFilteringException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRPaginationException;
 import net.fhirfactory.pegacorn.internals.esr.search.exception.ESRSortingException;
 import net.fhirfactory.pegacorn.internals.esr.search.filter.BaseFilter;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSortException;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
 
 
 @Dependent
@@ -89,6 +91,7 @@ public class GroupServiceHandler extends HandlerBase {
     													   @Header("shortName") String shortName,
                                                            @Header("longName") String longName,
                                                            @Header("displayName") String displayName,
+                                                           @Header("allName") String allName,
                                                            @Header("groupType") String groupType,
                                                            @Header("groupManager") String groupManager,
                                                            @Header("sortBy") String sortBy,
@@ -99,28 +102,26 @@ public class GroupServiceHandler extends HandlerBase {
         getLogger().debug(".defaultSearch(): Entry, shortName->{}, longName->{}, displayName->{}"+
                         "sortBy->{}, sortOrder->{}, pageSize->{},page->{}",
                 shortName, longName, displayName, sortBy, sortOrder, pageSize, page);
-        String searchAttributeName = null;
-        String searchAttributeValue = null;
+
+        SearchParam searchParam = null;
+        
         if(shortName != null) {
-            searchAttributeValue = shortName;
-            searchAttributeName = "shortName";
+            searchParam = new SearchParam(SearchParamNames.SHORT_NAME, shortName);
         } else if(longName != null){
-            searchAttributeValue = longName;
-            searchAttributeName = "longName";
+            searchParam = new SearchParam(SearchParamNames.LONG_NAME, longName);
         } else if(displayName != null){
-            searchAttributeValue = displayName;
-            searchAttributeName = "displayName";
+            searchParam = new SearchParam(SearchParamNames.DISPLAY_NAME, displayName);
+        } else if(allName != null) {
+            searchParam = new SearchParam(SearchParamNames.ALL_NAME, allName);
         } else if(groupManager != null){
-            searchAttributeValue = groupManager;
-            searchAttributeName = "groupManager";
+            searchParam = new SearchParam(SearchParamNames.GROUP_MANAGER, groupManager);
         } else if(groupType != null){
-            searchAttributeValue = groupType;
-            searchAttributeName = "groupType";
+            searchParam = new SearchParam(SearchParamNames.GROUP_TYPE, groupType);
         } else {
             throw( new ResourceInvalidSearchException("Search parameter not specified"));
         }
         
-        SearchCriteria searchCriteria = new SearchCriteria(searchAttributeName, searchAttributeValue);
+        SearchCriteria searchCriteria = new SearchCriteria(searchParam);
         
         Integer pageSizeValue = null;
         Integer pageValue = null;

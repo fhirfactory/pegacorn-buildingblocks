@@ -13,7 +13,7 @@
     <artifactId>pegacorn-buildingblocks-processingplant</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: BuildingBlocks :: ProcessingPlant</name>
+    <name>Pegacorn :: Building Blocks :: Processing Plant</name>
     <description>The Archetype/Template for each Subsystem within the Pegacorn EcoSystem</description>
 
     <licenses>
@@ -120,6 +120,26 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-model</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-topology</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-buildingblocks-workshop</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+
         <!-- Infinispan -->
         <dependency>
             <groupId>org.infinispan</groupId>
@@ -183,6 +203,34 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-topology</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-topology</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!--         -->
+        <!-- Logging -->
+        <!--         -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>

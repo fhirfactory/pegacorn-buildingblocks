@@ -32,6 +32,12 @@ import javax.enterprise.context.ApplicationScoped;
 public class InteractWorkshop extends PetasosEnabledWorkshop {
     private static final Logger LOG = LoggerFactory.getLogger(InteractWorkshop.class);
 
+    private String WORKSHOP_VERSION = "1.0.0";
+
+    public InteractWorkshop(){
+        super();
+    }
+
     @Override
     protected Logger specifyLogger() {
         return (LOG);
@@ -44,7 +50,7 @@ public class InteractWorkshop extends PetasosEnabledWorkshop {
 
     @Override
     protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
+        return (WORKSHOP_VERSION);
     }
 
     @Override

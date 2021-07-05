@@ -1,19 +1,26 @@
 package net.fhirfactory.pegacorn.internals.esr.cache.common;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParam;
+import net.fhirfactory.pegacorn.internals.esr.search.SearchParamNames;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcomeEnum;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
 
 public abstract class PegacornESRCache {
@@ -26,8 +33,6 @@ public abstract class PegacornESRCache {
     abstract public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException;
     abstract protected ESRSearchResult instatiateNewESRSearchResult();
-
-    abstract public Boolean supportsSearchType(String attributeName);
 
     public PegacornESRCache(){
         identifier2ESRMap = new ConcurrentHashMap<>();
@@ -119,6 +124,19 @@ public abstract class PegacornESRCache {
         outcome.setEntry(entry);
         getLogger().info(".addCacheEntry(): Exit, entry added");
         return(outcome);
+    }
+    
+    
+    /**
+     * Updates an entry
+     * 
+     * @param id
+     * @param resource
+     * @return
+     */
+    public ESRMethodOutcome updateCacheEntry(String id, ExtremelySimplifiedResource entry) {
+        removeCacheEntry(id);
+        return addCacheEntry(entry);
     }
 
     protected void removeCacheEntry(IdentifierESDT identifier){
@@ -215,7 +233,7 @@ public abstract class PegacornESRCache {
 
     public ESRSearchResult searchCacheUsingSimplifiedID(SearchCriteria searchCriteria)
         throws ResourceInvalidSearchException {
-        getLogger().debug(".search(): Entry, parameterName->{}", searchCriteria.getValue());
+        getLogger().debug(".search(): Entry, parameterName->{}", searchCriteria.getSearchParam().getValue());
         
         if(searchCriteria.isValueNull()){
             throw(new ResourceInvalidSearchException("Search parameter value is null"));
@@ -236,7 +254,7 @@ public abstract class PegacornESRCache {
         Enumeration<String> idSet = this.simplifiedID2ESRMap.keys();
         while(idSet.hasMoreElements()){
             String currentID = idSet.nextElement();
-            if(currentID.toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
+            if(currentID.toLowerCase().contains(searchCriteria.getSearchParam().getValue().toLowerCase())){
                 ExtremelySimplifiedResource resource = this.simplifiedID2ESRMap.get(currentID);
                 result.getSearchResultList().add(resource);
             }
@@ -245,7 +263,7 @@ public abstract class PegacornESRCache {
     }
     
     public ESRMethodOutcome searchCacheForESRUsingIdentifier(IdentifierESDT identifier) throws ResourceInvalidSearchException {
-    	return searchCacheForESRUsingIdentifier(identifier, true);
+        return searchCacheForESRUsingIdentifier(identifier, true);
     }
 
     public ESRMethodOutcome searchCacheForESRUsingIdentifier(IdentifierESDT identifier, boolean containsMatch) throws ResourceInvalidSearchException {
@@ -256,7 +274,9 @@ public abstract class PegacornESRCache {
         }
         getLogger().info("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", identifier);
         
-        SearchCriteria searchCriteria = new SearchCriteria(identifier.getType(), identifier.getValue(), containsMatch);
+        
+        SearchParam searchParam = new SearchParam(SearchParamNames.get(identifier.getType().getValue()), identifier.getValue());
+        SearchCriteria searchCriteria = new SearchCriteria(searchParam, containsMatch);
         
         ESRSearchResult result = searchCacheForESRUsingIdentifierParameters(searchCriteria, identifier.getType(), identifier.getUse());
         ESRMethodOutcome outcome = result.toESRMethodOutcome();
@@ -275,10 +295,10 @@ public abstract class PegacornESRCache {
     
     
     protected ESRSearchResult searchCacheForESRUsingIdentifierParameters(SearchCriteria searchCriteria,
-                                                                         String type,
+                                                                         IdentifierType type,
                                                                          IdentifierESDTUseEnum use)
             throws ResourceInvalidSearchException {
-        getLogger().debug("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", searchCriteria.getValue(), type, use);
+        getLogger().debug("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", searchCriteria.getSearchParam().getValue(), type, use);
         // Search First
         getLogger().trace(".searchCacheForESRUsingIdentifierParameters(): First, let's do the search!");
         boolean valueIsNull = (searchCriteria.isValueNull());
@@ -294,22 +314,22 @@ public abstract class PegacornESRCache {
                 IdentifierESDT currentIdentifier = identifierSet.nextElement();
                 boolean valueMatches = false;
                 if(!valueIsNull){
-                	if (searchCriteria.isContainsMatch()) {
-                		
-	                    if(currentIdentifier.getValue().toLowerCase().contains(searchCriteria.getValue().toLowerCase())){
-	                        valueMatches = true;
-	                    }
-                	} else {
-                        if(currentIdentifier.getValue().toLowerCase().equals(searchCriteria.getValue().toLowerCase())){
-	                        valueMatches = true;
-	                    }
-                	}
+                    if (searchCriteria.isContainsMatch()) {
+                        
+                        if(currentIdentifier.getValue().toLowerCase().contains(searchCriteria.getSearchParam().getValue().toLowerCase())){
+                            valueMatches = true;
+                        }
+                    } else {
+                        if(currentIdentifier.getValue().toLowerCase().equals(searchCriteria.getSearchParam().getValue().toLowerCase())){
+                            valueMatches = true;
+                        }
+                    }
                 } else {
                     valueMatches = true;
                 }
                 boolean typeMatches = false;
                 if(!typeIsNull){
-                    if(currentIdentifier.getType().contains(type)){
+                    if(currentIdentifier.getType().equals(type)){
                         typeMatches = true;
                     }
                 } else {
@@ -335,7 +355,7 @@ public abstract class PegacornESRCache {
 
     public ESRSearchResult searchCacheUsingDisplayName(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
-        getLogger().debug(".searchCacheUsingDisplayName(): Entry, parameterName->{}", searchCriteria.getValue());
+        getLogger().debug(".searchCacheUsingDisplayName(): Entry, parameterName->{}", searchCriteria.getSearchParam().getValue());
         
         if(searchCriteria.isParamNameNull()){
             throw(new ResourceInvalidSearchException("Search parameter name empty"));
@@ -352,7 +372,7 @@ public abstract class PegacornESRCache {
         
         ESRSearchResult result = instatiateNewESRSearchResult();
         if(this.simplifiedID2ESRMap.isEmpty()){
-        	getLogger().info(".searchCacheUsingDisplayName(): Exit, map is empty, no entries found");
+            getLogger().info(".searchCacheUsingDisplayName(): Exit, map is empty, no entries found");
             return(result);
         }
 
@@ -360,8 +380,8 @@ public abstract class PegacornESRCache {
         Enumeration<String> displayNameSet = displayName2ESRMap.keys();
         while(displayNameSet.hasMoreElements()){
             String currentDisplayName = displayNameSet.nextElement();
-            getLogger().info(".searchCacheUsingDisplayName(): Iterating through ESR Elements, currentEntry.displayName->{}, searchForDisplayName->{}", currentDisplayName, searchCriteria.getValue());
-            if(currentDisplayName.toLowerCase().contains(searchCriteria.getValue().toLowerCase().toLowerCase())){
+            getLogger().info(".searchCacheUsingDisplayName(): Iterating through ESR Elements, currentEntry.displayName->{}, searchForDisplayName->{}", currentDisplayName, searchCriteria.getSearchParam().getValue());
+            if(currentDisplayName.toLowerCase().contains(searchCriteria.getSearchParam().getValue().toLowerCase())){
                 ExtremelySimplifiedResource resource = this.displayName2ESRMap.get(currentDisplayName);
                                 
                 result.getSearchResultList().add(resource);
@@ -400,4 +420,40 @@ public abstract class PegacornESRCache {
             return(result);
         }
     }
+    
+    
+    /**
+     * Search on shortname, longname, displayname and simplified id.
+     * 
+     * @param searchCriteria
+     * @return
+     * @throws ResourceInvalidSearchException
+     */
+    public ESRSearchResult searchCacheUsingAllNames(SearchCriteria searchCriteria, IdentifierESDTUseEnum shortNameUse, IdentifierESDTUseEnum longNameUse) throws ResourceInvalidSearchException {
+        Set<String>matchedKeys = new TreeSet<>();
+  
+        List<ExtremelySimplifiedResource>combinedESRSearchResultList = new ArrayList<>();
+        
+        // perform the individual searches
+        List<ESRSearchResult>searchResults = new ArrayList<>();
+        searchResults.add(this.searchCacheUsingSimplifiedID(searchCriteria));
+        searchResults.add(searchCacheUsingDisplayName(searchCriteria));
+        searchResults.add(searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.SHORT_NAME, shortNameUse));
+        searchResults.add(searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.LONG_NAME, longNameUse));
+        
+        
+        // Add the unique records to the final list.
+        for (ESRSearchResult searchResult : searchResults) {
+            for (ExtremelySimplifiedResource esr : searchResult.getSearchResultList()) {
+                if (matchedKeys.add(esr.getSimplifiedID())) {
+                    combinedESRSearchResultList.add(esr);
+                }
+            }
+        }
+
+        ESRSearchResult result = instatiateNewESRSearchResult();
+        result.setSearchResultList(combinedESRSearchResultList);
+        
+        return result;
+    }  
 }

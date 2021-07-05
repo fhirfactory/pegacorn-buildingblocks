@@ -26,16 +26,17 @@ import javax.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.buildingblocks.esr.models.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.buildingblocks.esr.models.resources.ExtremelySimplifiedResource;
-import net.fhirfactory.buildingblocks.esr.models.resources.HealthcareServiceESR;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.buildingblocks.esr.models.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.buildingblocks.esr.models.transaction.ESRMethodOutcome;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;
+import net.fhirfactory.pegacorn.internals.esr.resources.HealthcareServiceESR;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierType;
 import net.fhirfactory.pegacorn.internals.esr.search.ESRSearchResult;
 import net.fhirfactory.pegacorn.internals.esr.search.SearchCriteria;
 import net.fhirfactory.pegacorn.internals.esr.search.result.HealthcareServiceSearchResult;
+import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceInvalidSearchException;
 
 @ApplicationScoped
 public class HealthcareServiceESRCache extends PegacornESRCache {
@@ -71,24 +72,11 @@ public class HealthcareServiceESRCache extends PegacornESRCache {
         return(result);
     }
 
-    @Override
-    public Boolean supportsSearchType(String attributeName) {
-        String searchAttributeNameLowerCase = attributeName.toLowerCase();
-        switch(searchAttributeNameLowerCase){
-            case "simplifiedid":
-            case "shortnmae":
-            case "longname":
-            case "displayname":
-                return(true);
-            default:
-                return(false);
-        }
-    }
 
     @Override
     public ESRSearchResult search(SearchCriteria searchCriteria)
             throws ResourceInvalidSearchException {
-        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getParamName(), searchCriteria.getValue());
+        getLogger().debug(".search(): Entry, searchAttributeName->{}, searchAttributeValue->{}", searchCriteria.getSearchParam().getName(), searchCriteria.getSearchParam().getValue());
         
         if(searchCriteria.isValueNull()){
             throw(new ResourceInvalidSearchException("Search Value is null"));
@@ -105,22 +93,26 @@ public class HealthcareServiceESRCache extends PegacornESRCache {
         }
         
 
-        switch(searchCriteria.getParamName().toLowerCase()){
-            case "simplifiedid": {
+        switch(searchCriteria.getSearchParam().getName()) {
+            case SIMPLIFIED_ID: {
                 result = this.searchCacheUsingSimplifiedID(searchCriteria);
                 return (result);
             }
-            case "shortname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "ShortName", IdentifierESDTUseEnum.USUAL);
+            case SHORT_NAME: {
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.SHORT_NAME, IdentifierESDTUseEnum.USUAL);
                 return(result);
             }
-            case "longname": {
-                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, "LongName", IdentifierESDTUseEnum.USUAL);
+            case LONG_NAME: {
+                result = this.searchCacheForESRUsingIdentifierParameters(searchCriteria, IdentifierType.LONG_NAME, IdentifierESDTUseEnum.SECONDARY);
                 return(result);
             }
-            case "displayname": {
+            case DISPLAY_NAME: {
                 result = this.searchCacheUsingDisplayName(searchCriteria);
                 return(result);
+            }
+            case ALL_NAME : {
+            	result = this.searchCacheUsingAllNames(searchCriteria, IdentifierESDTUseEnum.USUAL, IdentifierESDTUseEnum.SECONDARY);
+            	return result;
             }
             default: {
                 return (result);

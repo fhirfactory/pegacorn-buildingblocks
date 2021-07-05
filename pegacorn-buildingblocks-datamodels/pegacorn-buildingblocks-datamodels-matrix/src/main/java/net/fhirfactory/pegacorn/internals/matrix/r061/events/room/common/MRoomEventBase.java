@@ -21,11 +21,17 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
 
 public class MRoomEventBase extends MatrixEventBase {
     private String stateKey;
+
+    public MRoomEventBase(){
+        super();
+        this.stateKey = null;
+    }
 
     @JsonProperty("state_key")
     public String getStateKey() {
@@ -35,5 +41,14 @@ public class MRoomEventBase extends MatrixEventBase {
     @JsonProperty("state_key")
     public void setStateKey(String stateKey) {
         this.stateKey = stateKey;
+    }
+
+    @JsonIgnore
+    public boolean hasStateKey(){
+        if(this.stateKey == null){
+            return(false);
+        } else {
+            return(true);
+        }
     }
 }

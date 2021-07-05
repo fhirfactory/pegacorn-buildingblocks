@@ -24,4 +24,15 @@ public enum SortOrderEnum {
 	public String toString() {
 		return getValue();
 	}
+	
+	
+    public static SortOrderEnum get(String searchValue) {
+        for (SortOrderEnum type : values()) {
+            if (type.getValue().equalsIgnoreCase(searchValue)) {
+                return type;
+            }
+        }
+        
+        return ASCENDING;
+    }
 }
