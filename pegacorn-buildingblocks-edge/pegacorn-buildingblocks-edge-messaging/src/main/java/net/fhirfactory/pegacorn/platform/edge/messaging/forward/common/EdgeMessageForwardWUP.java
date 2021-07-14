@@ -21,17 +21,21 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.forward.common;
 
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
-import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverFinisherBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketResponseDecoder;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
+import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionStatus;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.Exchange;
@@ -39,6 +43,7 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 
 import javax.inject.Inject;
+import java.util.List;
 
 public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWUP {
 
@@ -80,8 +85,8 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
                 .process(new NodeDetailInjector())
                 .bean(InterProcessingPlantHandoverPacketGenerationBean.class, "constructInterProcessingPlantHandoverPacket(*,  Exchange)")
                 .to(egressFeed())
-                .transform(simple("${bodyAs(String)}"))
-                .log(LoggingLevel.DEBUG, "Response Raw Message --> ${body}")
+//                .transform(simple("${bodyAs(String)}"))
+//                .log(LoggingLevel.DEBUG, "Response Raw Message --> ${body}")
                 .bean(InterProcessingPlantHandoverPacketResponseDecoder.class, "contextualiseInterProcessingPlantHandoverResponsePacket(*,  Exchange)")
                 .bean(InterProcessingPlantHandoverFinisherBean.class, "ipcSenderNotifyActivityFinished(*, Exchange)");
 
@@ -120,4 +125,29 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     public DataParcelSubscriptionIM getTopicServer(){
         return(this.topicServer);
     }
+
+    protected RemoteSubscriptionStatus subscribeToDataParcelSet(List<DataParcelManifest> contentSubscriptionList, PubSubParticipant subscriber) {
+        getLogger().debug(".subscribeToDataParcelSet(): Entry, contentSubscriptionList->{}, subscriber->{}", contentSubscriptionList, subscriber);
+        if(contentSubscriptionList == null || subscriber == null){
+            getLogger().debug(".contentSubscriptionList(): Exit, either contentSubscriptionList or subscriber is null");
+            RemoteSubscriptionStatus badStatus = new RemoteSubscriptionStatus();
+            badStatus.setSubscriptionSuccessful(false);
+            badStatus.setSubscriptionCommentary("Either contentSubscriptionList or subscriber is null!");
+            return(badStatus);
+        }
+        // Add LocalSubscriber Details (i.e. the local WUP)
+        IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
+        IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(getAssociatedTopologyNode().getNodeFDN().getToken());
+        localSubscriber.setIdentifier(identifier);
+        subscriber.setIntraSubsystemParticipant(localSubscriber);
+        // Now Register within the (Internal) PubSub Service
+        for(DataParcelManifest currentDataParcel: contentSubscriptionList) {
+            getTopicServer().addTopicSubscriber(currentDataParcel, subscriber);
+        }
+        RemoteSubscriptionStatus okStatus = new RemoteSubscriptionStatus();
+        okStatus.setSubscriptionSuccessful(true);
+        getLogger().debug(".contentSubscriptionList(): Exit, okStatus->{}", okStatus);
+        return (okStatus);
+    }
+
 }

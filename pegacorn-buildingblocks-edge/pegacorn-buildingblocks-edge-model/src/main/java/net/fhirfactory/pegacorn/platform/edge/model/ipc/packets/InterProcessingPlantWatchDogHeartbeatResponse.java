@@ -23,9 +23,10 @@ package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class InterProcessingPlantWatchDogHeartbeatResponse {
+public class InterProcessingPlantWatchDogHeartbeatResponse implements Serializable {
     private FDNToken processingPlantIdentifier;
     private String heartbeatIdentifier;
     private Date receivedDate;

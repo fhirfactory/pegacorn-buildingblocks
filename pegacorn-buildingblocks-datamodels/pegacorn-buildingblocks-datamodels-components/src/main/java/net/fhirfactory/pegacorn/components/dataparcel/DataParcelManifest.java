@@ -28,6 +28,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class DataParcelManifest implements Serializable {
+
+    public static String UOW_ATTRIBUTE_WILDCARD_CHARACTER = "*";
+
     private DataParcelTypeDescriptor contentDescriptor;
     private DataParcelTypeDescriptor containerDescriptor;
     private DataParcelQualityStatement payloadQuality;
@@ -47,7 +50,7 @@ public class DataParcelManifest implements Serializable {
         this.intendedTargetSystem = null;
         this.interSubsystemDistributable = false;
         this.dataParcelFlowDirection = null;
-        this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_ANY;
+        this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
         this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
@@ -60,7 +63,7 @@ public class DataParcelManifest implements Serializable {
         this.intendedTargetSystem = null;
         this.interSubsystemDistributable = false;
         this.dataParcelFlowDirection = null;
-        this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_ANY;
+        this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
         this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
@@ -201,33 +204,17 @@ public class DataParcelManifest implements Serializable {
                 '}';
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DataParcelManifest)) return false;
         DataParcelManifest that = (DataParcelManifest) o;
-        return  getEnforcementPointApprovalStatus() == that.getEnforcementPointApprovalStatus()
-                && isInterSubsystemDistributable() == that.isInterSubsystemDistributable()
-                && getContentDescriptor().equals(that.getContentDescriptor())
-                && getContainerDescriptor().equals(that.getContainerDescriptor())
-                && getNormalisationStatus() == that.getNormalisationStatus()
-                && getValidationStatus() == that.getValidationStatus()
-                && getDataParcelType() == that.getDataParcelType()
-                && getDataParcelFlowDirection() == that.getDataParcelFlowDirection()
-                && Objects.equals(getSourceSystem(), that.getSourceSystem());
+        return isInterSubsystemDistributable() == that.isInterSubsystemDistributable() && Objects.equals(getContentDescriptor(), that.getContentDescriptor()) && Objects.equals(getContainerDescriptor(), that.getContainerDescriptor()) && Objects.equals(getPayloadQuality(), that.getPayloadQuality()) && getNormalisationStatus() == that.getNormalisationStatus() && getValidationStatus() == that.getValidationStatus() && getDataParcelType() == that.getDataParcelType() && Objects.equals(getSourceSystem(), that.getSourceSystem()) && Objects.equals(getIntendedTargetSystem(), that.getIntendedTargetSystem()) && getEnforcementPointApprovalStatus() == that.getEnforcementPointApprovalStatus() && getDataParcelFlowDirection() == that.getDataParcelFlowDirection();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                getContentDescriptor(),
-                getContainerDescriptor(),
-                getNormalisationStatus(),
-                getValidationStatus(),
-                getDataParcelType(),
-                getSourceSystem(),
-                isInterSubsystemDistributable(),
-                getDataParcelFlowDirection(),
-                getEnforcementPointApprovalStatus());
+        return Objects.hash(getContentDescriptor(), getContainerDescriptor(), getPayloadQuality(), getNormalisationStatus(), getValidationStatus(), getDataParcelType(), getSourceSystem(), getIntendedTargetSystem(), getEnforcementPointApprovalStatus(), isInterSubsystemDistributable(), getDataParcelFlowDirection());
     }
 }

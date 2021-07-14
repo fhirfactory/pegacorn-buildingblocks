@@ -205,4 +205,16 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         NetworkSecurityZoneEnum securityZone = getProcessingPlantNode().getSecurityZone();
         return(securityZone);
     }
+
+    @Override
+    public String getIPCServiceName() {
+        return (getProcessingPlantNode().getSubsystemName());
+    }
+
+    @Override
+    public String getDeploymentSite() {
+        TopologyNodeRDN siteRDN = getProcessingPlantNode().getNodeFDN().extractRDNForNodeType(TopologyNodeTypeEnum.SITE);
+        String siteName = siteRDN.getNodeName();
+        return (siteName);
+    }
 }

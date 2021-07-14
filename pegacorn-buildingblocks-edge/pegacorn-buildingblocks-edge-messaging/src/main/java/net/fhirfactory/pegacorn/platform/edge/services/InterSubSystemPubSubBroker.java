@@ -45,28 +45,30 @@ public class InterSubSystemPubSubBroker implements InterSubSystemPubSubBrokerInt
     private JGroupsIntraZoneIPCEndpoint intraZoneIPCEndpoint;
 
     public RemoteSubscriptionResponse subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem){
-        LOG.debug(".subscribe(): Entry, dataParcelManifestList->{}, sourceSubSystem->{}", dataParcelManifestList, sourceSubSystem);
-        PubSubPublisher publisher = new PubSubPublisher();
-        DistributedPubSubPublisher distributedPublisher = new DistributedPubSubPublisher();
-        DistributedPubSubParticipantIdentifier distributedPublisherIdentifier = new DistributedPubSubParticipantIdentifier();
-        distributedPublisherIdentifier.setSubsystemName(sourceSubSystem);
+        LOG.info(".subscribe(): Entry, dataParcelManifestList->{}, sourceSubSystem->{}", dataParcelManifestList, sourceSubSystem);
+        PubSubParticipant publisher = new PubSubParticipant();
+        InterSubsystemPubSubParticipant distributedPublisher = new InterSubsystemPubSubParticipant();
+        InterSubsystemPubSubParticipantIdentifier distributedPublisherIdentifier = new InterSubsystemPubSubParticipantIdentifier();
+        distributedPublisherIdentifier.setServiceName(sourceSubSystem);
         distributedPublisher.setIdentifier(distributedPublisherIdentifier);
-        publisher.setDistributedPublisher(distributedPublisher);
-        if(interZoneIPCEndpoint.isPublisherAvailable(publisher)){
-            RemoteSubscriptionResponse interZoneResponse = interZoneIPCEndpoint.subscribe(dataParcelManifestList, publisher);
-            LOG.debug(".subscribe(): Exit, interZoneResponse->{}", interZoneResponse);
-            return(interZoneResponse);
-        }
-        if(intraZoneIPCEndpoint.isPublisherAvailable(publisher)){
-            RemoteSubscriptionResponse intraZoneResponse = intraZoneIPCEndpoint.subscribe(dataParcelManifestList, publisher);
-            LOG.debug(".subscribe(): Exit, intraZoneResponse->{}", intraZoneResponse);
-            return(intraZoneResponse);
-        }
-        RemoteSubscriptionResponse noSourceSystemResponse = new RemoteSubscriptionResponse();
-        noSourceSystemResponse.setSubscriptionSuccessful(false);
-        noSourceSystemResponse.setSubscriptionCommentary("Could not find Source Subsystem");
-        LOG.debug(".subscribe(): Exit, noSourceSystemResponse->{}", noSourceSystemResponse);
-        return(noSourceSystemResponse);
+        distributedPublisher.getIdentifier().setServiceName(sourceSubSystem);
+        publisher.setInterSubsystemParticipant(distributedPublisher);
+//        if(interZoneIPCEndpoint.isPublisherAvailable(publisher)){
+//            LOG.info(".subscribe(): Is InterZone based communications");
+//            RemoteSubscriptionResponse interZoneResponse = interZoneIPCEndpoint.subscribeToRemotePublishers(dataParcelManifestList, publisher);
+//            LOG.info(".subscribe(): Exit, interZoneResponse->{}", interZoneResponse);
+//            return(interZoneResponse);
+//        }
+//
+        LOG.info(".subscribe(): Is IntraZone based communications");
+        RemoteSubscriptionResponse intraZoneResponse = intraZoneIPCEndpoint.subscribeToRemotePublishers(dataParcelManifestList, publisher);
+        LOG.info(".subscribe(): Exit, intraZoneResponse->{}", intraZoneResponse);
+        return(intraZoneResponse);
+//        RemoteSubscriptionResponse noSourceSystemResponse = new RemoteSubscriptionResponse();
+//        noSourceSystemResponse.setSubscriptionSuccessful(false);
+//        noSourceSystemResponse.setSubscriptionCommentary("Could not find Source Subsystem");
+//        LOG.debug(".subscribe(): Exit, noSourceSystemResponse->{}", noSourceSystemResponse);
+//        return(noSourceSystemResponse);
     }
 
 }

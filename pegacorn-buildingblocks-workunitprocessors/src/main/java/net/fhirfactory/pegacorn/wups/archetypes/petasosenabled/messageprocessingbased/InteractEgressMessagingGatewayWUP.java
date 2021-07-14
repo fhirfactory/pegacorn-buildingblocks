@@ -22,20 +22,21 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
-    private static final Logger LOG = LoggerFactory.getLogger(InteractEgressMessagingGatewayWUP.class);
-
 
     public InteractEgressMessagingGatewayWUP() {
         super();
-//        LOG.debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
+
+    protected abstract String specifyEgressTopologyEndpointName();
+    protected abstract String specifyEgressEndpointVersion();
+
 
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){

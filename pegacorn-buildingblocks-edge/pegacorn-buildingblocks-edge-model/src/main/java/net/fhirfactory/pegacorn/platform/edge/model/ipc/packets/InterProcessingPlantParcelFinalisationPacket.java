@@ -3,9 +3,10 @@ package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class InterProcessingPlantParcelFinalisationPacket {
+public class InterProcessingPlantParcelFinalisationPacket implements Serializable {
     private FDNToken episodeIdentifier;
     private FDNToken successorEpisodeIdentifier;
     private ResilienceParcelProcessingStatusEnum outcomeStatus;

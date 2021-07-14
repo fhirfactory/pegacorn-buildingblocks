@@ -21,9 +21,10 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class InterProcessingPlantWatchDogHeartbeat {
+public class InterProcessingPlantWatchDogHeartbeat implements Serializable {
     private String heartbeatIdentifier;
     private LocalDateTime sendDate;
 

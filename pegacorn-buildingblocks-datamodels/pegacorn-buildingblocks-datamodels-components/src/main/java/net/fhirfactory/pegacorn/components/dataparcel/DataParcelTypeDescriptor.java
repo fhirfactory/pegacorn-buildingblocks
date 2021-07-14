@@ -53,15 +53,33 @@ public class DataParcelTypeDescriptor implements Serializable {
     }
 
     public DataParcelTypeDescriptor(DataParcelTypeDescriptor ori){
-        this.dataParcelDefiner = SerializationUtils.clone(ori.getDataParcelDefiner());
-        this.dataParcelCategory = SerializationUtils.clone(ori.getDataParcelCategory());
-        this.dataParcelSubCategory = SerializationUtils.clone(ori.getDataParcelSubCategory());
-        this.dataParcelResource = SerializationUtils.clone(ori.getDataParcelResource());
-        this.dataParcelSegment = SerializationUtils.clone(ori.getDataParcelSegment());
-        this.dataParcelAttribute = SerializationUtils.clone(ori.getDataParcelAttribute());
-        this.version = SerializationUtils.clone(ori.getVersion());
-        this.dataParcelDiscriminatorType = SerializationUtils.clone(ori.getDataParcelDiscriminatorType());
-        this.dataParcelDiscriminatorValue = SerializationUtils.clone(ori.getDataParcelDiscriminatorValue());
+        if(ori.hasDataParcelDefiner()) {
+            this.dataParcelDefiner = SerializationUtils.clone(ori.getDataParcelDefiner());
+        }
+        if(ori.hasDataParcelCategory()) {
+            this.dataParcelCategory = SerializationUtils.clone(ori.getDataParcelCategory());
+        }
+        if(ori.hasDataParcelSubCategory()) {
+            this.dataParcelSubCategory = SerializationUtils.clone(ori.getDataParcelSubCategory());
+        }
+        if(ori.hasDataParcelResource()) {
+            this.dataParcelResource = SerializationUtils.clone(ori.getDataParcelResource());
+        }
+        if(ori.hasDataParcelSegment()) {
+            this.dataParcelSegment = SerializationUtils.clone(ori.getDataParcelSegment());
+        }
+        if(ori.hasDataParcelAttribute()) {
+            this.dataParcelAttribute = SerializationUtils.clone(ori.getDataParcelAttribute());
+        }
+        if(ori.hasVersion()) {
+            this.version = SerializationUtils.clone(ori.getVersion());
+        }
+        if(ori.hasDataParcelDiscriminatorType()) {
+            this.dataParcelDiscriminatorType = SerializationUtils.clone(ori.getDataParcelDiscriminatorType());
+        }
+        if(ori.hasDataParcelDiscriminatorValue()) {
+            this.dataParcelDiscriminatorValue = SerializationUtils.clone(ori.getDataParcelDiscriminatorValue());
+        }
     }
 
     public boolean hasVersion(){
@@ -219,6 +237,9 @@ public class DataParcelTypeDescriptor implements Serializable {
         if (hasDataParcelSegment()) {
             fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SEGMENT.getTopicKey(), getDataParcelSegment()));
         }
+        if (hasDataParcelAttribute()) {
+            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_ATTRIBUTE.getTopicKey(), getDataParcelAttribute()));
+        }
         if (hasDataParcelDiscriminatorType()){
             fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DISCRIMINATOR_TYPE.getTopicKey(), getDataParcelDiscriminatorType()));
         }
@@ -228,7 +249,6 @@ public class DataParcelTypeDescriptor implements Serializable {
         if (hasVersion()) {
             fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_VERSION.getTopicKey(), getVersion()));
         }
-
         return (fdn);
     }
 

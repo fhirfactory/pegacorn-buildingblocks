@@ -22,14 +22,10 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.forward;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.components.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubParticipantIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubSubscriber;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.JGroupsInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.messaging.forward.common.EdgeMessageForwardWUP;
@@ -73,34 +69,6 @@ public class EdgeInterZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     }
 
     @Override
-    public RemoteSubscriptionStatus subscribeToDataParcelSet(List<DataParcelManifest> contentSubscriptionList, PubSubSubscriber subscriber) {
-        LOG.debug(".subscribeToDataParcelSet(): Entry, contentSubscriptionList->{}, subscriber->{}", contentSubscriptionList, subscriber);
-        if(contentSubscriptionList == null || subscriber == null){
-            LOG.debug(".contentSubscriptionList(): Exit, either contentSubscriptionList or subscriber is null");
-            RemoteSubscriptionStatus badStatus = new RemoteSubscriptionStatus();
-            badStatus.setSubscriptionSuccessful(false);
-            badStatus.setSubscriptionCommentary("Either contentSubscriptionList or subscriber is null!");
-            return(badStatus);
-        }
-        if(!subscriber.hasLocalSubscriber()){
-            LocalPubSubSubscriber localSubscriber = new LocalPubSubSubscriber();
-            LocalPubSubParticipantIdentifier identifier = new LocalPubSubParticipantIdentifier(getWUPTopologyNode().getNodeFDN().getToken());
-            localSubscriber.setIdentifier(identifier);
-            subscriber.setLocalSubscriber(localSubscriber);
-        }
-        for(DataParcelManifest currentDataParcel: contentSubscriptionList) {
-            currentDataParcel.setDataParcelFlowDirection(DataParcelDirectionEnum.INBOUND_DATA_PARCEL);
-            currentDataParcel.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
-            currentDataParcel.setInterSubsystemDistributable(true);
-            getTopicServer().addTopicSubscriber(currentDataParcel, subscriber);
-        }
-        RemoteSubscriptionStatus okStatus = new RemoteSubscriptionStatus();
-        okStatus.setSubscriptionSuccessful(true);
-        LOG.debug(".contentSubscriptionList(): Exit, okStatus->{}", okStatus);
-        return (okStatus);
-    }
-
-    @Override
     protected Logger specifyLogger() {
         return (LOG);
     }
@@ -137,5 +105,26 @@ public class EdgeInterZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     @Override
     public WorkUnitProcessorTopologyNode getWUPTopologyNode() {
         return (getAssociatedTopologyNode());
+    }
+
+    @Override
+    public RemoteSubscriptionStatus subscribeOnBehalfOfRemoteSubscriber(List<DataParcelManifest> contentSubscriptionList, PubSubParticipant subscriber) {
+        RemoteSubscriptionStatus status = this.subscribeToDataParcelSet(contentSubscriptionList, subscriber);
+        return(status);
+    }
+
+    @Override
+    public boolean supportsMultiSiteIPC() {
+        return (true);
+    }
+
+    @Override
+    public boolean supportsMultiZoneIPC() {
+        return (true);
+    }
+
+    @Override
+    public boolean supportsIntraZoneIPC() {
+        return false;
     }
 }

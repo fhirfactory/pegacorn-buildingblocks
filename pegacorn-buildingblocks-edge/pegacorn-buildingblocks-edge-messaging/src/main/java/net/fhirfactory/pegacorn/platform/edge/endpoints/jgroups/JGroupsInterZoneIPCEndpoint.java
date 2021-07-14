@@ -21,10 +21,9 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.AdditionalParametersListEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.InitialHostSpecification;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCEndpoint;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCPubSubEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.InterZoneEdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -39,7 +38,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 @ApplicationScoped
-public class JGroupsInterZoneIPCEndpoint extends JGroupsIPCEndpoint {
+public class JGroupsInterZoneIPCEndpoint extends JGroupsIPCPubSubEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(JGroupsInterZoneIPCEndpoint.class);
 
     private static String GOSSIP_ROUTER_HOSTS = "hosts";
@@ -51,16 +50,9 @@ public class JGroupsInterZoneIPCEndpoint extends JGroupsIPCEndpoint {
     @Inject
     private InterZoneEdgeForwarderService forwarderService;
 
-
     @Override
-    protected Logger getLogger() {
+    protected Logger specifyLogger() {
         return (LOG);
-    }
-
-    @Override
-    protected String specifyChannelName() {
-        String name = getProcessingPlantInterface().getSimpleInstanceName();
-        return (name);
     }
 
     @Override
@@ -84,6 +76,11 @@ public class JGroupsInterZoneIPCEndpoint extends JGroupsIPCEndpoint {
     }
 
     @Override
+    public EdgeForwarderService getEdgeForwarderService() {
+        return (forwarderService);
+    }
+
+    @Override
     protected InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket) {
         InterProcessingPlantHandoverResponsePacket response = (InterProcessingPlantHandoverResponsePacket)getCamelProducer()
                 .sendBody(getIPCComponentNames().getInterZoneIPCReceiverRouteEndpointName(), ExchangePattern.InOut, handoverPacket);
@@ -97,7 +94,7 @@ public class JGroupsInterZoneIPCEndpoint extends JGroupsIPCEndpoint {
         String bindPort = Integer.toString(getIPCTopologyEndpoint().getPortValue());
         getLogger().trace(".specifyProtocolStack(): bindPort sourced, value->{}", bindPort);
         getLogger().trace(".specifyProtocolStack(): Sourcing the bindAddress");
-        String bindAddress = getIPCTopologyEndpoint().getInterfaceDNSName();
+        String bindAddress = getIPCTopologyEndpoint().getHostDNSName();
         getLogger().trace(".specifyProtocolStack(): bindAddress sourced, value->{}", bindAddress);
         getLogger().trace(".specifyProtocolStack(): Sourcing the initialHosts");
         List<InitialHostSpecification> initialHosts = getIPCTopologyEndpoint().getInitialHosts();

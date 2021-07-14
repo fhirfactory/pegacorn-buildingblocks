@@ -40,9 +40,9 @@ public abstract class EdgeMessageReceiveWUP extends EdgeIngresMessagingGatewayWU
 
         fromIncludingPetasosServices(ingresFeed())
                 .routeId(getNameSet().getRouteCoreWUP())
-                .transform(simple("${bodyAs(String)}"))
+//                .transform(simple("${bodyAs(String)}"))
                 .bean(InterProcessingPlantHandoverPacketDecoderBean.class, "handoverPacketDecode(*)")
-                .bean(InterProcessingPlantHandoverRegistrationBean.class, "ipcReceiverActivityStart(*,  Exchange")
+                .bean(InterProcessingPlantHandoverRegistrationBean.class, "ipcReceiverActivityStart(*,  Exchange)")
                 .to(ExchangePattern.InOnly, getWUPContinuityRoute())
                 .bean(InterProcessingPlantHandoverResponseGenerationBean.class, "generateInterProcessingPlantHandoverResponse(*,  Exchange)")
                 .bean(InterProcessingPlantHandoverResponseEncoderBean.class, "responseEncoder(*)");

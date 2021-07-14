@@ -25,8 +25,14 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import java.util.ArrayList;
 import java.util.List;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +40,6 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
-    private static final Logger LOG = LoggerFactory.getLogger(InteractIngresMessagingGatewayWUP.class);
 
     private MessageBasedWUPEndpoint ingresEndpoint;
 
@@ -71,5 +76,42 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
     protected List<DataParcelManifest> specifySubscriptionTopics() {
         List<DataParcelManifest> subTopics = new ArrayList<>();
         return(subTopics);
+    }
+
+    /**
+     * @param uri
+     * @return the RouteBuilder.from(uri) with all exceptions logged but not handled
+     */
+    protected RouteDefinition fromInteractIngresService(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        SourceSystemDetailInjector sourceSystemDetailInjector = new SourceSystemDetailInjector();
+        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        route
+                .process(sourceSystemDetailInjector)
+                .process(nodeDetailInjector)
+        ;
+        return route;
+    }
+
+    protected String getSourceSystemName(){
+        String sourceSystemName = getIngresEndpoint().getEndpointTopologyNode().getConnectedSystemName();
+        return(sourceSystemName);
+    }
+
+    protected class SourceSystemDetailInjector implements Processor {
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            getLogger().debug("SourceSystemDetailInjector.process(): Entry");
+            boolean alreadyInPlace = false;
+            if(exchange.hasProperties()) {
+                String sourceSystem = exchange.getProperty(PetasosPropertyConstants.WUP_INTERACT_INGRES_SOURCE_SYSTEM_NAME, String.class);
+                if (sourceSystem != null) {
+                    alreadyInPlace = true;
+                }
+            }
+            if(!alreadyInPlace) {
+                exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_INGRES_SOURCE_SYSTEM_NAME, getSourceSystemName());
+            }
+        }
     }
 }

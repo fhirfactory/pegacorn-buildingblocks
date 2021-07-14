@@ -25,8 +25,10 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
@@ -40,7 +42,7 @@ import java.sql.Date;
 import java.time.Instant;
 
 @ApplicationScoped
-public class InterProcessingPlantHandoverResponseGenerationBean {
+public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPacketBeanCommon {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverResponseGenerationBean.class);
     @Inject
     TopologyIM topologyIM;
@@ -53,18 +55,15 @@ public class InterProcessingPlantHandoverResponseGenerationBean {
     public InterProcessingPlantHandoverResponsePacket generateInterProcessingPlantHandoverResponse(InterProcessingPlantHandoverPacket incomingPacket, Exchange camelExchange, String wupInstanceKey) {
         LOG.debug(".generateInterProcessingPlantHandoverResponse(): Entry, incomingPacket (InterProcessingPlantHandoverPacket) --> {}, wupInstanceKey (String) --> {}", incomingPacket, wupInstanceKey);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): reconstituted token, now attempting to retrieve NodeElement");
-        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
-        WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode)this.topologyIM.getNode(nodeFDNToken);
-        LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", wup);
+        WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
+        LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", node);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Extracting Job Card and Status Element from Exchange");
-        String jobcardPropertyKey = this.exchangePropertyNames.getExchangeJobCardPropertyName(wupInstanceKey);
-        String parcelStatusPropertyKey = this.exchangePropertyNames.getExchangeStatusElementPropertyName(wupInstanceKey);
-        WUPJobCard jobCard = (WUPJobCard)camelExchange.getProperty(jobcardPropertyKey, WUPJobCard.class);
-        ParcelStatusElement statusElement = (ParcelStatusElement)camelExchange.getProperty(parcelStatusPropertyKey, ParcelStatusElement.class);
+        WUPJobCard jobCard = (WUPJobCard)camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class);
+        ParcelStatusElement statusElement = (ParcelStatusElement)camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ParcelStatusElement.class);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message");
         InterProcessingPlantHandoverResponsePacket response = new InterProcessingPlantHandoverResponsePacket();
         response.setActivityID(jobCard.getActivityID());
-        String processingPlantName = wup.getNodeFDN().toTag();
+        String processingPlantName = node.getNodeFDN().toTag();
         response.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
         response.setSendDate(Date.from(Instant.now()));
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): We are at this point, so it is all good - so assign appropriate status");

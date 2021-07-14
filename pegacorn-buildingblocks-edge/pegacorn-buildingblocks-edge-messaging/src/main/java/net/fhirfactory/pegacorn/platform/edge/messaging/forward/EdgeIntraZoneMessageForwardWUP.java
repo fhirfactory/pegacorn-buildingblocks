@@ -25,9 +25,7 @@ import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubParticipantIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubSubscriber;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.JGroupsIntraZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.messaging.forward.common.EdgeMessageForwardWUP;
@@ -92,36 +90,6 @@ public class EdgeIntraZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     }
 
     @Override
-    public RemoteSubscriptionStatus subscribeToDataParcelSet(List<DataParcelManifest> contentSubscriptionList, PubSubSubscriber subscriber) {
-        LOG.debug(".subscribeToDataParcelSet(): Entry, contentSubscriptionList->{}, subscriber->{}", contentSubscriptionList, subscriber);
-        if(contentSubscriptionList == null || subscriber == null){
-            LOG.debug(".contentSubscriptionList(): Exit, either contentSubscriptionList or subscriber is null");
-            RemoteSubscriptionStatus badStatus = new RemoteSubscriptionStatus();
-            badStatus.setSubscriptionSuccessful(false);
-            badStatus.setSubscriptionCommentary("Either contentSubscriptionList or subscriber is null!");
-            return(badStatus);
-        }
-        if(!subscriber.hasLocalSubscriber()){
-            LocalPubSubSubscriber localSubscriber = new LocalPubSubSubscriber();
-            LocalPubSubParticipantIdentifier identifier = new LocalPubSubParticipantIdentifier(getWUPTopologyNode().getNodeFDN().getToken());
-            localSubscriber.setIdentifier(identifier);
-            subscriber.setLocalSubscriber(localSubscriber);
-        }
-        for(DataParcelManifest currentDataParcel: contentSubscriptionList) {
-            getTopicServer().addTopicSubscriber(currentDataParcel, subscriber);
-        }
-        RemoteSubscriptionStatus okStatus = new RemoteSubscriptionStatus();
-        okStatus.setSubscriptionSuccessful(true);
-        LOG.debug(".contentSubscriptionList(): Exit, okStatus->{}", okStatus);
-        return (okStatus);
-    }
-
-    @Override
-    public WorkUnitProcessorTopologyNode getWUPTopologyNode() {
-        return (getAssociatedTopologyNode());
-    }
-
-    @Override
     protected String specifyEgressInterfaceName() {
         return (getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
     }
@@ -132,5 +100,31 @@ public class EdgeIntraZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
         interfaceDefinition.setInterfaceFormalName("JGroups-Kube");
         interfaceDefinition.setInterfaceFormalVersion("1.0.0");
         return (interfaceDefinition);
+    }
+
+    @Override
+    public WorkUnitProcessorTopologyNode getWUPTopologyNode() {
+        return (getAssociatedTopologyNode());
+    }
+
+    @Override
+    public RemoteSubscriptionStatus subscribeOnBehalfOfRemoteSubscriber(List<DataParcelManifest> contentSubscriptionList, PubSubParticipant subscriber) {
+        RemoteSubscriptionStatus status = this.subscribeToDataParcelSet(contentSubscriptionList, subscriber);
+        return(status);
+    }
+
+    @Override
+    public boolean supportsMultiSiteIPC() {
+        return (false);
+    }
+
+    @Override
+    public boolean supportsMultiZoneIPC() {
+        return (false);
+    }
+
+    @Override
+    public boolean supportsIntraZoneIPC() {
+        return (true);
     }
 }
