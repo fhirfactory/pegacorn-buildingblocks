@@ -75,7 +75,7 @@
             <artifactId>commons-lang3</artifactId>
             <version>${version-org.apache.commons-lang3}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.camel/camel-netty-http -->
+
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-netty-http</artifactId>
