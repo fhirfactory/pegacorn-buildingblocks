@@ -98,6 +98,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
                 doSubscription = true;
             }
         }
+        getLogger().trace(".rpcRequestSubscriptionHandler(): doSubscription->{}", true);
         RemoteSubscriptionResponse response = new RemoteSubscriptionResponse();
         if (doSubscription) {
             RemoteSubscriptionStatus subscriptionStatus = getForwarderService().subscribeOnBehalfOfRemoteSubscriber(subscriptionList, subscriber);
@@ -148,7 +149,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
      * @return
      */
     public RemoteSubscriptionResponse requestSubscription(List<DataParcelManifest> subscriptionList, PubSubParticipant publisher ) {
-        getLogger().info(".requestSubscription(): Entry, subscriptionList->{}, publisher->{} ", subscriptionList, publisher);
+        getLogger().debug(".requestSubscription(): Entry, subscriptionList->{}, publisher->{} ", subscriptionList, publisher);
 
         boolean nothingToSubscribeTo = false;
         if(subscriptionList == null){
@@ -166,14 +167,14 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
             return(response);
         }
         RemoteSubscriptionResponse response = null;
-        getLogger().info(".requestSubscription(): Build subscriptionRequest (RemoteSubscriptionRequest)");
+        getLogger().trace(".requestSubscription(): Build subscriptionRequest (RemoteSubscriptionRequest)");
         RemoteSubscriptionRequest subscriptionRequest = new RemoteSubscriptionRequest();
         subscriptionRequest.setSubscriber(getPubsubParticipant());
         subscriptionRequest.setSubscriptionList(subscriptionList);
-        getLogger().info(".requestSubscription(): subscriptionRequest built, value->{}", subscriptionRequest);
-        getLogger().info(".requestSubscription(): Now ascertain if the publisher is actually available");
+        getLogger().trace(".requestSubscription(): subscriptionRequest built, value->{}", subscriptionRequest);
+        getLogger().trace(".requestSubscription(): Now ascertain if the publisher is actually available");
         if (isPublisherAvailable(publisher)) {
-            getLogger().info(".requestSubscription(): Publisher is available, so register");
+            getLogger().trace(".requestSubscription(): Publisher is available, so register");
             response = rpcRequestSubscription(getTargetAddress(publisher), subscriptionRequest);
         } else {
             getLogger().error(".requestSubscription(): Publisher ({}) is not available!!!", publisher);
@@ -182,7 +183,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
             response.setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_FAILED);
             response.setSubscriptionCommentary("Publisher ("+publisher+") is not available!");
         }
-        getLogger().info(".requestSubscription(): Exit, response->{}", response);
+        getLogger().debug(".requestSubscription(): Exit, response->{}", response);
         return (response);
     }
 
@@ -203,9 +204,9 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
      * @return
      */
     public boolean isPublisherAvailable(String publisherServiceName){
-        getLogger().info(".isPublisherAvailable(): Entry, publisherServiceName->{}", publisherServiceName);
+        getLogger().debug(".isPublisherAvailable(): Entry, publisherServiceName->{}", publisherServiceName);
         boolean publisherAvailable = getTargetAddress(publisherServiceName) != null;
-        getLogger().info(".isPublisherAvailable(): Exit, returning->{}", publisherAvailable);
+        getLogger().debug(".isPublisherAvailable(): Exit, returning->{}", publisherAvailable);
         return(publisherAvailable);
     }
 
@@ -267,16 +268,16 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
         getLogger().info(".rpcRegisterPublisherHandler(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherRegistration registration = null;
         if(getPublisherRegistrationMapIM().isPublisherRegistered(publisher)){
-            getLogger().info(".rpcRegisterPublisherHandler(): Publisher is already Registered");
+            getLogger().trace(".rpcRegisterPublisherHandler(): Publisher is already Registered");
             registration = getPublisherRegistrationMapIM().getPublisherInstanceRegistration(publisher);
         } else {
-            getLogger().info(".rpcRegisterPublisherHandler(): Publisher is not locally Registered, so add it");
+            getLogger().trace(".rpcRegisterPublisherHandler(): Publisher is not locally Registered, so add it");
             registration = getPublisherRegistrationMapIM().registerPublisherInstance(publisher);
-            getLogger().info(".rpcRegisterPublisherHandler(): Publisher Registered, registration->{}", registration);
+            getLogger().trace(".rpcRegisterPublisherHandler(): Publisher Registered, registration->{}", registration);
             if(registration.getPublisherStatus().equals(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED)){
-                getLogger().info(".rpcRegisterPublisherHandler(): Scheduling complete subscription check");
+                getLogger().trace(".rpcRegisterPublisherHandler(): Scheduling complete subscription check");
                 scheduleCompleteSubscriptionCheck();
-                getLogger().info(".rpcRegisterPublisherHandler(): Scheduling of complete subscription check completed");
+                getLogger().trace(".rpcRegisterPublisherHandler(): Scheduling of complete subscription check completed");
             }
         }
         getLogger().info("rpcRegisterPublisherHandler(): Exit, registration->{}", registration);
@@ -335,7 +336,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
      */
     protected void scheduleCompleteSubscriptionCheck(){
         synchronized(this.completeSubscriptionCheckScheduledLock) {
-            if (this.subscriptionCheckScheduled) {
+            if (this.completeSubscriptionCheckScheduled) {
                 // do nothing, it is already scheduled
             } else {
                 TimerTask completeSubscriptionCheckTask = new TimerTask() {
@@ -382,6 +383,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
         synchronized(this.completeSubscriptionCheckScheduledLock) {
             this.completeSubscriptionCheckScheduled = false;
         }
+        getLogger().info(".performCompleteSubscriptionCheck(): Exit");
     }
 
     /**
@@ -415,40 +417,40 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
         List<InterSubsystemPubSubPublisherSubscriptionRegistration> subscriptionRegistrationList = getPublisherRegistrationMapIM().getAllPublisherServiceSubscriptions();
         for(InterSubsystemPubSubPublisherSubscriptionRegistration currentServiceRegistration: subscriptionRegistrationList){
             if(currentServiceRegistration.getRegistrationStatus().equals(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS)) {
-                getLogger().info(".performSubscriptionCheck(): PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS found");
+                getLogger().trace(".performSubscriptionCheck(): PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS found");
                 String currentProviderServiceName = currentServiceRegistration.getPublisherServiceName();
                 List<InterSubsystemPubSubPublisherRegistration> publisherServiceProviders = getPublisherRegistrationMapIM().getPublisherServiceProviderInstanceRegistrations(currentProviderServiceName);
                 if (publisherServiceProviders.isEmpty()) {
-                    getLogger().info(".performSubscriptionCheck(): No suitable publishers in our registry, so let's scan for one");
+                    getLogger().trace(".performSubscriptionCheck(): No suitable publishers in our registry, so let's scan for one");
                     if(isPublisherAvailable(currentProviderServiceName)){
-                        getLogger().info(".performSubscriptionCheck(): Suitable Publisher is available on JGroups, so using");
+                        getLogger().trace(".performSubscriptionCheck(): Suitable Publisher is available on JGroups, so using");
                         PubSubParticipant publisher = new PubSubParticipant();
-                        getLogger().info(".performSubscriptionCheck(): Created new PubSubPublisher");
+                        getLogger().trace(".performSubscriptionCheck(): Created new PubSubPublisher");
                         publisher.setInterSubsystemParticipant(currentServiceRegistration.getPublisher());
-                        getLogger().info(".performSubscriptionCheck(): Added the DistributedPublisher aspect to the PubSubPublisher");
+                        getLogger().trace(".performSubscriptionCheck(): Added the DistributedPublisher aspect to the PubSubPublisher");
                         RemoteSubscriptionResponse subscriptionResponse = requestSubscription(currentServiceRegistration.getSubscriptionList(), publisher);
-                        getLogger().info(".performSubscriptionCheck(): Subscription attempted, subscriptionResponse->{}", subscriptionResponse);
+                        getLogger().trace(".performSubscriptionCheck(): Subscription attempted, subscriptionResponse->{}", subscriptionResponse);
                         if(subscriptionResponse.isSubscriptionSuccessful()){
-                            getLogger().info(".performSubscriptionCheck(): Subscription to Publisher was successful, setting subscription registration date");
+                            getLogger().trace(".performSubscriptionCheck(): Subscription to Publisher was successful, setting subscription registration date");
                             currentServiceRegistration.setRegistrationDate(Date.from(Instant.now()));
-                            getLogger().info(".performSubscriptionCheck(): Setting the registration status");
+                            getLogger().trace(".performSubscriptionCheck(): Setting the registration status");
                             currentServiceRegistration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_SUCCESSFUL);
-                            getLogger().info(".performSubscriptionCheck(): Subscription to Publisher was successful!");
+                            getLogger().trace(".performSubscriptionCheck(): Subscription to Publisher was successful!");
                             break;
                         }
                     }
                 } else {
-                    getLogger().info(".performSubscriptionCheck(): At least one publisher found");
+                    getLogger().trace(".performSubscriptionCheck(): At least one publisher found");
                     for (InterSubsystemPubSubPublisherRegistration currentPublisher : publisherServiceProviders) {
-                        getLogger().info(".performSubscriptionCheck(): iterating.... through publishers");
+                        getLogger().trace(".performSubscriptionCheck(): iterating.... through publishers");
                         if (currentPublisher.getPublisherStatus().equals(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED)) {
-                            getLogger().info(".performSubscriptionCheck(): this publisher is in the PUBLISHER_REGISTERED state");
+                            getLogger().trace(".performSubscriptionCheck(): this publisher is in the PUBLISHER_REGISTERED state");
                             PubSubParticipant publisher = new PubSubParticipant();
                             publisher.setInterSubsystemParticipant(currentPublisher.getPublisher());
                             List<DataParcelManifest> subscriptionList = currentServiceRegistration.getSubscriptionList();
-                            getLogger().info(".performSubscriptionCheck(): Subscribing to publisher");
+                            getLogger().trace(".performSubscriptionCheck(): Subscribing to publisher");
                             RemoteSubscriptionResponse remoteSubscriptionResponse = requestSubscription(subscriptionList, publisher);
-                            getLogger().info(".performSubscriptionCheck(): subscription finished, response->{}", remoteSubscriptionResponse);
+                            getLogger().trace(".performSubscriptionCheck(): subscription finished, response->{}", remoteSubscriptionResponse);
                             if (remoteSubscriptionResponse.isSubscriptionSuccessful()) {
                                 currentPublisher.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_ACTIVE);
                                 currentServiceRegistration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_SUCCESSFUL);
@@ -460,18 +462,18 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
                 }
             }
         }
-        getLogger().info(".performSubscriptionCheck(): iterated through, now seeing if i need to reschedule SubscriptionCheck again");
+        getLogger().trace(".performSubscriptionCheck(): iterated through, now seeing if i need to reschedule SubscriptionCheck again");
         for(InterSubsystemPubSubPublisherSubscriptionRegistration currentServiceRegistration: subscriptionRegistrationList) {
             if(currentServiceRegistration.getRegistrationStatus().equals(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS)) {
                 synchronized (this.subscriptionCheckScheduledLock) {
-                    this.subscriptionCheckScheduled = false;
-                    getLogger().info(".performSubscriptionCheck(): iterated through, another SubscriptionCheck is not needed");
-                    return(false);
+                    this.subscriptionCheckScheduled = true;
+                    getLogger().info(".performSubscriptionCheck(): iterated through, another SubscriptionCheck is needed");
+                    return(true);
                 }
             }
         }
-        getLogger().info(".performSubscriptionCheck(): iterated through, another SubscriptionCheck is needed");
-        return(true);
+        getLogger().info(".performSubscriptionCheck(): iterated through, another SubscriptionCheck is NOT needed");
+        return(false);
     }
 
     /**

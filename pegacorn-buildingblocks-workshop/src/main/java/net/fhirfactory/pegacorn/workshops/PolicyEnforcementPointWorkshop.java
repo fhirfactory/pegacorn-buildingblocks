@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class GatekeeperWorkshop extends PetasosEnabledWorkshop {
-    private static final Logger LOG = LoggerFactory.getLogger(GatekeeperWorkshop.class);
+public class PolicyEnforcementPointWorkshop extends PetasosEnabledWorkshop {
+    private static final Logger LOG = LoggerFactory.getLogger(PolicyEnforcementPointWorkshop.class);
 
     @Override
     protected Logger specifyLogger() {
@@ -39,7 +39,7 @@ public class GatekeeperWorkshop extends PetasosEnabledWorkshop {
 
     @Override
     protected String specifyWorkshopName() {
-        return (DefaultWorkshopSetEnum.GATEKEEPER_WORKSHOP.getWorkshop());
+        return (DefaultWorkshopSetEnum.POLICY_ENFORCEMENT_POINT_WORKSHOP.getWorkshop());
     }
 
     @Override

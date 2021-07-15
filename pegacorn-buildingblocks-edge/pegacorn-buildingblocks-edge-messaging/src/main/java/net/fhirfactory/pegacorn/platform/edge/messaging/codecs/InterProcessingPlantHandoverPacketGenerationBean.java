@@ -71,7 +71,7 @@ import java.time.Instant;
             theUoW.getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.SUBSYSTEM_IPC_DATA_PARCEL);
             forwardingPacket.setPayloadPacket(theUoW);
             forwardingPacket.setTarget(theUoW.getPayloadTopicID().getIntendedTargetSystem());
-            forwardingPacket.setSource(processingPlant.getSimpleFunctionName());
+            forwardingPacket.setSource(processingPlant.getIPCServiceName());
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): not push the UoW into Exchange as a property for extraction after IPC activity");
             if(camelExchange.getProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME) == null) {
                 camelExchange.setProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, theUoW);
