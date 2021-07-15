@@ -120,7 +120,7 @@ public abstract class InternalFHIRClientProxy extends HAPIServerSecureProxy {
                 PlatformTopologyNode platform = mapTraversalHelpers.selectPlatform(clusterService);
                 ProcessingPlantTopologyNode processingPlant = mapTraversalHelpers.selectProcessingPlant(platform, requiredInterfaceDef);
                 endpoint = mapTraversalHelpers.selectProcessingPlantEndpoint(processingPlant, requiredInterfaceDef);
-                dnsName = endpoint.getInterfaceDNSName();
+                dnsName = endpoint.getHostDNSName(); // changed this from "getInterfaceDNSName()" to "getHostDNSName()"!
                 portNumber = Integer.toString(endpoint.getPortValue());
                 getLogger().trace(".deriveTargetEndpointDetails(): processingPlant --> {}", processingPlant);
             }

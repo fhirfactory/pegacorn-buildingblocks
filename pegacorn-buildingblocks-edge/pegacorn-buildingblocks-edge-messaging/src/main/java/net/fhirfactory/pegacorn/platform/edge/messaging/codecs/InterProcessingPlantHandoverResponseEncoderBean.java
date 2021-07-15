@@ -39,9 +39,10 @@ public class InterProcessingPlantHandoverResponseEncoderBean {
         jsonMapper = new ObjectMapper();
     }
 
-    public String responseEncoder(InterProcessingPlantHandoverResponsePacket responsePacket) throws JsonProcessingException {
-        String outputPayload = jsonMapper.writeValueAsString(responsePacket);
-        LOG.debug(".responseEncoder(): Response Message --> {}", outputPayload);
-        return outputPayload;
+    public InterProcessingPlantHandoverResponsePacket responseEncoder(InterProcessingPlantHandoverResponsePacket incomingResponsePacket) throws JsonProcessingException {
+        LOG.debug(".responseEncoder(): Entry, incomingResponsePacket->{}", incomingResponsePacket);
+        InterProcessingPlantHandoverResponsePacket outgoingResponsePacket = incomingResponsePacket;
+        LOG.debug(".responseEncoder(): Exit, outgoingResponsePacket->{}", outgoingResponsePacket);
+        return (outgoingResponsePacket);
     }
 }

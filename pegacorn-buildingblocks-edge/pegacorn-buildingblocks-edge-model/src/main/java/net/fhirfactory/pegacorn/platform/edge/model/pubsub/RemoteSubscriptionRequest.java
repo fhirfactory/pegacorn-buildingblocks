@@ -22,8 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.model.pubsub;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.DistributedPubSubSubscriber;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -31,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class RemoteSubscriptionRequest implements Serializable {
-    private PubSubSubscriber subscriber;
+    private PubSubParticipant subscriber;
     private List<DataParcelManifest> subscriptionList;
     private Date subscriptionRequestDate;
 
@@ -48,11 +47,11 @@ public class RemoteSubscriptionRequest implements Serializable {
         this.subscriptionRequestDate = subscriptionRequestDate;
     }
 
-    public PubSubSubscriber getSubscriber() {
+    public PubSubParticipant getSubscriber() {
         return subscriber;
     }
 
-    public void setSubscriber(PubSubSubscriber subscriber) {
+    public void setSubscriber(PubSubParticipant subscriber) {
         this.subscriber = subscriber;
     }
 

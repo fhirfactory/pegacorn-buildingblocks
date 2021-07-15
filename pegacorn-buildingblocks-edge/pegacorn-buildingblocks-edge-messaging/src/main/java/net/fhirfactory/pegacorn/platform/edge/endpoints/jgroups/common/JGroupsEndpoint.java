@@ -1,16 +1,17 @@
 package net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common;
 
-import net.fhirfactory.pegacorn.petasos.model.pubsub.DistributedPubSubParticipantIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.DistributedPubSubPublisher;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubPublisher;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipantIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import org.jgroups.*;
 import org.jgroups.util.MessageBatch;
+import org.slf4j.Logger;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-public class JGroupsEndpoint implements Receiver{
+public abstract class JGroupsEndpoint implements Receiver{
 
     private JChannel ipcChannel;
     private boolean initialised;
@@ -20,14 +21,23 @@ public class JGroupsEndpoint implements Receiver{
         this.setInitialised(false);
     }
 
+    abstract protected Logger specifyLogger();
+
+    protected Logger getLogger(){
+        return(specifyLogger());
+    }
+
     @Override
     public void receive(Message message) {
+        getLogger().info(".receive(): Entry, message->{}", message);
 
     }
 
     @Override
-    public void viewAccepted(View new_view) {
-        Receiver.super.viewAccepted(new_view);
+    public void viewAccepted(View newView) {
+        getLogger().info(".viewAccepted(): Entry, newView->{}", newView);
+        Receiver.super.viewAccepted(newView);
+        getLogger().info(".viewAccepted(): Woo Hoo, we're here!!!!!!");
     }
 
     @Override
@@ -47,16 +57,19 @@ public class JGroupsEndpoint implements Receiver{
 
     @Override
     public void receive(MessageBatch batch) {
+        getLogger().info(".receive(): Entry, batch->{}", batch);
         Receiver.super.receive(batch);
     }
 
     @Override
     public void getState(OutputStream output) throws Exception {
+        getLogger().info(".getState(): Entry, output->{}", output);
         Receiver.super.getState(output);
     }
 
     @Override
     public void setState(InputStream input) throws Exception {
+        getLogger().info(".setState(): Entry, input->{}", input);
         Receiver.super.setState(input);
     }
 
@@ -76,15 +89,15 @@ public class JGroupsEndpoint implements Receiver{
         this.initialised = initialised;
     }
 
-    protected Address getTargetAddress(PubSubPublisher publisher){
+    protected Address getTargetAddress(PubSubParticipant publisher){
         if(publisher == null){
             return(null);
         }
-        Address address = getTargetAddress(publisher.getDistributedPublisher());
+        Address address = getTargetAddress(publisher.getInterSubsystemParticipant());
         return(address);
     }
 
-    protected Address getTargetAddress(DistributedPubSubPublisher publisher){
+    protected Address getTargetAddress(InterSubsystemPubSubParticipant publisher){
         if(publisher == null){
             return(null);
         }
@@ -92,24 +105,31 @@ public class JGroupsEndpoint implements Receiver{
         return(address);
     }
 
-    protected Address getTargetAddress(DistributedPubSubParticipantIdentifier identifier){
+    protected Address getTargetAddress(InterSubsystemPubSubParticipantIdentifier identifier){
         if(getIPCChannel() == null){
             return(null);
         }
-        Address address = getTargetAddress(identifier.getSubsystemName());
+        Address address = getTargetAddress(identifier.getServiceName());
         return(address);
     }
 
     protected Address getTargetAddress(String name){
+        getLogger().info(".getTargetAddress(): Entry, name->{}", name);
         if(getIPCChannel() == null){
+            getLogger().info(".getTargetAddress(): IPCChannel is null, exit returning (null)");
             return(null);
         }
+        getLogger().info(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
         List<Address> addressList = getIPCChannel().getView().getMembers();
+        getLogger().info(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
         for(Address currentAddress: addressList){
-            if(currentAddress.toString().startsWith(name, name.length())){
+            getLogger().info(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
+            if(currentAddress.toString().startsWith(name)){
+                getLogger().info(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
                 return(currentAddress);
             }
         }
+        getLogger().info(".getTargetAddress(): Exit, no suitable Address found!");
         return(null);
     }
 
@@ -120,4 +140,6 @@ public class JGroupsEndpoint implements Receiver{
         }
         return(null);
     }
+
+
 }

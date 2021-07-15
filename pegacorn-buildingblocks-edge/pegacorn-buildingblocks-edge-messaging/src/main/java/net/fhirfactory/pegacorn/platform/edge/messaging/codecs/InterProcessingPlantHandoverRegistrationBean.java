@@ -42,18 +42,19 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ import java.time.Instant;
 import java.util.Date;
 
 @ApplicationScoped
-public class InterProcessingPlantHandoverRegistrationBean {
+public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanCommon {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverRegistrationBean.class);
     @Inject
     TopologyIM topologyIM;
@@ -80,8 +81,7 @@ public class InterProcessingPlantHandoverRegistrationBean {
     public InterProcessingPlantHandoverPacket ipcReceiverActivityStart(InterProcessingPlantHandoverPacket thePacket, Exchange camelExchange, String wupInstanceKey) {
         LOG.debug(".ipcReceiverActivityStart(): Entry, thePacket --> {}, wupInstanceKey --> {}", thePacket, wupInstanceKey);
         LOG.trace(".ipcReceiverActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
-        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
-        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode)this.topologyIM.getNode(nodeFDNToken);
+        WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".ipcReceiverActivityStart(): Node Element retrieved --> {}", node);
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".ipcReceiverActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
@@ -100,10 +100,8 @@ public class InterProcessingPlantHandoverRegistrationBean {
         ParcelStatusElement statusElement = this.servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
         LOG.trace(".ipcReceiverActivityStart(): Registration aftermath: statusElement --> {}", statusElement);
         LOG.trace(".ipcReceiverActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
-        String jobcardPropertyKey = this.exchangePropertyNames.getExchangeJobCardPropertyName(wupInstanceKey);
-        String parcelStatusPropertyKey = this.exchangePropertyNames.getExchangeStatusElementPropertyName(wupInstanceKey);
-        camelExchange.setProperty(jobcardPropertyKey, activityJobCard);
-        camelExchange.setProperty(parcelStatusPropertyKey, statusElement);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, activityJobCard);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, statusElement);
         LOG.debug(".ipcReceiverActivityStart(): exit, my work is done!");
         return thePacket;
     }

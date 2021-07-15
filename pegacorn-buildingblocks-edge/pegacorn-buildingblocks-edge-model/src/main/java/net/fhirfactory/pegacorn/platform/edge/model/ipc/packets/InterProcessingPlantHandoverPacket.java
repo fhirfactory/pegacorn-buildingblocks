@@ -24,9 +24,10 @@ package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class InterProcessingPlantHandoverPacket {
+public class InterProcessingPlantHandoverPacket implements Serializable {
     private UoW payloadPacket;
     private String payloadType;
     private ActivityID activityID;

@@ -21,17 +21,20 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.model.pubsub;
 
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubPublisher;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubNetworkConnectionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
 public class RemoteSubscriptionResponse implements Serializable {
-    private PubSubPublisher publisher;
+    private PubSubParticipant publisher;
     private boolean subscriptionSuccessful;
     private String subscriptionCommentary;
-
+    private InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum subscriptionRegistrationStatus;
+    private PubSubNetworkConnectionStatusEnum networkConnectionStatus;
     private Date subscriptionRegistrationDate;
 
     public RemoteSubscriptionResponse(){
@@ -40,11 +43,19 @@ public class RemoteSubscriptionResponse implements Serializable {
         this.subscriptionRegistrationDate = null;
     }
 
-    public PubSubPublisher getPublisher() {
+    public InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum getSubscriptionRegistrationStatus() {
+        return subscriptionRegistrationStatus;
+    }
+
+    public void setSubscriptionRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum subscriptionRegistrationStatus) {
+        this.subscriptionRegistrationStatus = subscriptionRegistrationStatus;
+    }
+
+    public PubSubParticipant getPublisher() {
         return publisher;
     }
 
-    public void setPublisher(PubSubPublisher publisher) {
+    public void setPublisher(PubSubParticipant publisher) {
         this.publisher = publisher;
     }
 
@@ -72,14 +83,12 @@ public class RemoteSubscriptionResponse implements Serializable {
         this.subscriptionCommentary = subscriptionCommentary;
     }
 
-    @Override
-    public String toString() {
-        return "RemoteSubscriptionResponse{" +
-                "publisher=" + publisher +
-                ", subscriptionSuccessful=" + subscriptionSuccessful +
-                ", subscriptionCommentary='" + subscriptionCommentary + '\'' +
-                ", subscriptionRegistrationDate=" + subscriptionRegistrationDate +
-                '}';
+    public PubSubNetworkConnectionStatusEnum getNetworkConnectionStatus() {
+        return networkConnectionStatus;
+    }
+
+    public void setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum networkConnectionStatus) {
+        this.networkConnectionStatus = networkConnectionStatus;
     }
 
     @Override
@@ -87,11 +96,23 @@ public class RemoteSubscriptionResponse implements Serializable {
         if (this == o) return true;
         if (!(o instanceof RemoteSubscriptionResponse)) return false;
         RemoteSubscriptionResponse that = (RemoteSubscriptionResponse) o;
-        return isSubscriptionSuccessful() == that.isSubscriptionSuccessful() && Objects.equals(getPublisher(), that.getPublisher()) && Objects.equals(getSubscriptionCommentary(), that.getSubscriptionCommentary()) && Objects.equals(getSubscriptionRegistrationDate(), that.getSubscriptionRegistrationDate());
+        return isSubscriptionSuccessful() == that.isSubscriptionSuccessful() && Objects.equals(getPublisher(), that.getPublisher()) && Objects.equals(getSubscriptionCommentary(), that.getSubscriptionCommentary()) && getSubscriptionRegistrationStatus() == that.getSubscriptionRegistrationStatus() && getNetworkConnectionStatus() == that.getNetworkConnectionStatus() && Objects.equals(getSubscriptionRegistrationDate(), that.getSubscriptionRegistrationDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublisher(), isSubscriptionSuccessful(), getSubscriptionCommentary(), getSubscriptionRegistrationDate());
+        return Objects.hash(getPublisher(), isSubscriptionSuccessful(), getSubscriptionCommentary(), getSubscriptionRegistrationStatus(), getNetworkConnectionStatus(), getSubscriptionRegistrationDate());
+    }
+
+    @Override
+    public String toString() {
+        return "RemoteSubscriptionResponse{" +
+                "publisher=" + publisher +
+                ", subscriptionSuccessful=" + subscriptionSuccessful +
+                ", subscriptionCommentary='" + subscriptionCommentary + '\'' +
+                ", subscriptionRegistrationStatus=" + subscriptionRegistrationStatus +
+                ", networkConnectionStatus=" + networkConnectionStatus +
+                ", subscriptionRegistrationDate=" + subscriptionRegistrationDate +
+                '}';
     }
 }

@@ -71,7 +71,7 @@ public class FHIRElementTopicFactory {
             case "Person":
             case "Group":
             {
-                token.setDataParcelDefiner("Base");
+                token.setDataParcelCategory("Base");
                 token.setDataParcelSubCategory("Individuals");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -88,7 +88,7 @@ public class FHIRElementTopicFactory {
             case "BiologicallyDerivedProduct":
             case "Device":
             case "DeviceMetric": {
-                token.setDataParcelDefiner("Base");
+                token.setDataParcelCategory("Base");
                 token.setDataParcelSubCategory("Entities");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -102,7 +102,7 @@ public class FHIRElementTopicFactory {
             case "Schedule":
             case "Slot":
             case "VerificationResult": {
-                token.setDataParcelDefiner("Base");
+                token.setDataParcelCategory("Base");
                 token.setDataParcelSubCategory("Workflow");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -115,7 +115,7 @@ public class FHIRElementTopicFactory {
             case "List":
             case "Library":
             case "EpisodeOfCare": {
-                token.setDataParcelDefiner("Base");
+                token.setDataParcelCategory("Base");
                 token.setDataParcelSubCategory("Management");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -130,7 +130,7 @@ public class FHIRElementTopicFactory {
             case "FamilyMemberHistory":
             case "ClinicalImpression":
             case "DetectedIssue": {
-                token.setDataParcelDefiner("Clinical");
+                token.setDataParcelCategory("Clinical");
                 token.setDataParcelSubCategory("Summary");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -146,7 +146,7 @@ public class FHIRElementTopicFactory {
             case "ImagingStudy":
             case "QuestionnaireResponse":
             case "MolecularSequence": {
-                token.setDataParcelDefiner("Clinical");
+                token.setDataParcelCategory("Clinical");
                 token.setDataParcelSubCategory("Diagnostics");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -163,7 +163,7 @@ public class FHIRElementTopicFactory {
             case "Immunization":
             case "ImmunizationEvaluation":
             case "ImmunizationRecommendation": {
-                token.setDataParcelDefiner("Clinical");
+                token.setDataParcelCategory("Clinical");
                 token.setDataParcelSubCategory("Medications");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -179,7 +179,7 @@ public class FHIRElementTopicFactory {
             case "VisionPrescription":
             case "RiskAssessment":
             case "RequestGroup": {
-                token.setDataParcelDefiner("Clinical");
+                token.setDataParcelCategory("Clinical");
                 token.setDataParcelSubCategory("CareProvision");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -194,7 +194,7 @@ public class FHIRElementTopicFactory {
             case "GuidanceResponse":
             case "SupplyRequest":
             case "SupplyDelivery": {
-                token.setDataParcelDefiner("Clinical");
+                token.setDataParcelCategory("Clinical");
                 token.setDataParcelSubCategory("Request&Response");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -206,7 +206,7 @@ public class FHIRElementTopicFactory {
             case "DocumentManifest":
             case "DocumentReference":
             case "CatalogEntry": {
-                token.setDataParcelDefiner("Foundation");
+                token.setDataParcelCategory("Foundation");
                 token.setDataParcelSubCategory("Documents");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -222,7 +222,7 @@ public class FHIRElementTopicFactory {
             case "OperationOutcome":
             case "Parameters":
             case "Subscription": {
-                token.setDataParcelDefiner("Foundation");
+                token.setDataParcelCategory("Foundation");
                 token.setDataParcelSubCategory("Other");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -233,7 +233,7 @@ public class FHIRElementTopicFactory {
             case "AuditEvent":
             case "Provenance":
             case "Consent": {
-                token.setDataParcelDefiner("Foundation");
+                token.setDataParcelCategory("Foundation");
                 token.setDataParcelSubCategory("Security");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -246,7 +246,7 @@ public class FHIRElementTopicFactory {
             case "ConceptMap":
             case "NamingSystem":
             case "TerminologyCapabilities": {
-                token.setDataParcelDefiner("Foundation");
+                token.setDataParcelCategory("Foundation");
                 token.setDataParcelSubCategory("Terminology");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -264,7 +264,7 @@ public class FHIRElementTopicFactory {
             case "StructureMap":
             case "GraphDefinition":
             case "ExampleScenario": {
-                token.setDataParcelDefiner("Foundation");
+                token.setDataParcelCategory("Foundation");
                 token.setDataParcelSubCategory("Conformance");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -277,7 +277,7 @@ public class FHIRElementTopicFactory {
             case "CoverageEligibilityResponse":
             case "EnrollmentRequest":
             case "EnrollmentResponse": {
-                token.setDataParcelDefiner("Financial");
+                token.setDataParcelCategory("Financial");
                 token.setDataParcelSubCategory("Support");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -288,7 +288,7 @@ public class FHIRElementTopicFactory {
             case "Claim":
             case "ClaimResponse":
             case "Invoice": {
-                token.setDataParcelDefiner("Financial");
+                token.setDataParcelCategory("Financial");
                 token.setDataParcelSubCategory("Billing");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -298,7 +298,7 @@ public class FHIRElementTopicFactory {
             //
             case "PaymentNotice":
             case "PaymentReconciliation": {
-                token.setDataParcelDefiner("Financial");
+                token.setDataParcelCategory("Financial");
                 token.setDataParcelSubCategory("Payment");
                 token.setDataParcelResource(resourceName);
                 break;
@@ -312,7 +312,7 @@ public class FHIRElementTopicFactory {
             case "Contract":
             case "ExplanationOfBenefit":
             case "InsurancePlan": {
-                token.setDataParcelDefiner("Financial");
+                token.setDataParcelCategory("Financial");
                 token.setDataParcelSubCategory("General");
                 token.setDataParcelResource(resourceName);
                 break;

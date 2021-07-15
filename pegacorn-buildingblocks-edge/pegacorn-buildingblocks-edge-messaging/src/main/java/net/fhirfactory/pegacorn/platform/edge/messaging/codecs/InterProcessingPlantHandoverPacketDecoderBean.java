@@ -36,19 +36,10 @@ public class InterProcessingPlantHandoverPacketDecoderBean {
     public InterProcessingPlantHandoverPacketDecoderBean() {
     }
 
-    public InterProcessingPlantHandoverPacket handoverPacketDecode(String incomingMessage) {
-        LOG.debug(".handoverPacketDecode(): Entry, incomingMessage --> {}", incomingMessage);
-
-        InterProcessingPlantHandoverPacket handoverPacket;
-        try {
-            ObjectMapper jsonMapper = new ObjectMapper();
-            handoverPacket = (InterProcessingPlantHandoverPacket)jsonMapper.readValue(incomingMessage, InterProcessingPlantHandoverPacket.class);
-        } catch (JsonProcessingException var4) {
-            LOG.error(".handoverPacketDecode(): Failure to convert content... ", var4);
-            handoverPacket = null;
-        }
-
+    public InterProcessingPlantHandoverPacket handoverPacketDecode(InterProcessingPlantHandoverPacket incomingPacket) {
+        LOG.debug(".handoverPacketDecode(): Entry, incomingPacket --> {}", incomingPacket);
+        InterProcessingPlantHandoverPacket outgoingPacket = incomingPacket;
         LOG.debug(".handoverPacketDecode(): Exit");
-        return handoverPacket;
+        return outgoingPacket;
     }
 }

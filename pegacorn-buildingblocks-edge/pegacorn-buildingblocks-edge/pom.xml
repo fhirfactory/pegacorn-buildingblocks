@@ -19,5 +19,6 @@
         <module>../pegacorn-buildingblocks-edge-messaging</module>
         <module>../pegacorn-buildingblocks-edge-restful</module>
         <module>../pegacorn-buildingblocks-edge-model</module>
+        <module>../pegacorn-buildingblocks-edge-gossiprouter</module>
     </modules>
 </project>

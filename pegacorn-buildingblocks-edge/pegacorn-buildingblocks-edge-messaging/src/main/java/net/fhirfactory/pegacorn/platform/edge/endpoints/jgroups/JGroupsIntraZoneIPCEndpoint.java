@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.AdditionalParametersListEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCEndpoint;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCPubSubEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -37,7 +37,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class JGroupsIntraZoneIPCEndpoint extends JGroupsIPCEndpoint {
+public class JGroupsIntraZoneIPCEndpoint extends JGroupsIPCPubSubEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(JGroupsIntraZoneIPCEndpoint.class);
 
     private static String STACK_INITIAL_HOSTS = "hosts";
@@ -50,14 +50,8 @@ public class JGroupsIntraZoneIPCEndpoint extends JGroupsIPCEndpoint {
     }
 
     @Override
-    protected Logger getLogger() {
+    protected Logger specifyLogger() {
         return (LOG);
-    }
-
-    @Override
-    protected String specifyChannelName() {
-        String name = getProcessingPlantInterface().getSimpleInstanceName();
-        return (name);
     }
 
     @Override
@@ -86,6 +80,10 @@ public class JGroupsIntraZoneIPCEndpoint extends JGroupsIPCEndpoint {
         return (TopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_MESSAGING_SERVICE);
     }
 
+    @Override
+    public EdgeForwarderService getEdgeForwarderService() {
+        return (forwarderService);
+    }
 
     @Override
     protected ProtocolStack specifyProtocolStack() {
@@ -94,7 +92,7 @@ public class JGroupsIntraZoneIPCEndpoint extends JGroupsIPCEndpoint {
         String bindPort = Integer.toString(getIPCTopologyEndpoint().getPortValue());
         getLogger().trace(".specifyProtocolStack(): bindPort sourced, value->{}", bindPort);
         getLogger().trace(".specifyProtocolStack(): Sourcing the bindAddress");
-        String bindAddress = getIPCTopologyEndpoint().getInterfaceDNSName();
+        String bindAddress = getIPCTopologyEndpoint().getHostDNSName();
         getLogger().trace(".specifyProtocolStack(): bindAddress sourced, value->{}", bindAddress);
         getLogger().trace(".specifyProtocolStack(): Sourcing the nameSpace");
         String namespace = getProcessingPlantInterface().getProcessingPlantNode().getNameSpace();

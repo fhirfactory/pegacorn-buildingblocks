@@ -64,17 +64,9 @@ public class InterProcessingPlantHandoverPacketResponseDecoder extends IPCPacket
         return jsonMapper;
     }
 
-    public InterProcessingPlantHandoverContextualResponse contextualiseInterProcessingPlantHandoverResponsePacket(String responseMessage, Exchange camelExchange) {
-        LOG.debug(".contextualiseInterProcessingPlantHandoverResponsePacket(): Entry, responseMessage (String) --> {}, wupInstanceKey (String) --> {}", responseMessage);
+    public InterProcessingPlantHandoverContextualResponse contextualiseInterProcessingPlantHandoverResponsePacket(InterProcessingPlantHandoverResponsePacket responsePacket, Exchange camelExchange) {
+        LOG.debug(".contextualiseInterProcessingPlantHandoverResponsePacket(): Entry, responsePacket->{}", responsePacket);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Convert incoming message string to an InterProcessingPlantHandoverResponsePacket");
-        InterProcessingPlantHandoverResponsePacket responsePacket;
-        try {
-            responsePacket = getJSONMapper().readValue(responseMessage, InterProcessingPlantHandoverResponsePacket.class);
-            LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Converted incoming message to InterProcessingPlantHandoverResponsePacket");
-        } catch (JsonProcessingException jsonException) {
-            responsePacket = new InterProcessingPlantHandoverResponsePacket();
-            LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Could not convert incoming response message");
-        }
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Attempting to retrieve UoW from the Exchange");
         String uowPropertyKey = exchangePropertyNames.getExchangeUoWPropertyName(node.getNodeKey());

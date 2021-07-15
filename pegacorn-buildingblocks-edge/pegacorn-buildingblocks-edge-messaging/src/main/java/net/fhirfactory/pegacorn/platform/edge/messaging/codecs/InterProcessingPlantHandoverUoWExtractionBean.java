@@ -40,6 +40,12 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
     public InterProcessingPlantHandoverUoWExtractionBean() {
     }
 
+    /**
+     *
+     * @param thePacket
+     * @param camelExchange
+     * @return
+     */
     public UoW extractUoW(InterProcessingPlantHandoverPacket thePacket, Exchange camelExchange) {
         LOG.debug(".extractUoW(): Entry, thePacket --> {}", thePacket);
         UoW theUoW = thePacket.getPayloadPacket();

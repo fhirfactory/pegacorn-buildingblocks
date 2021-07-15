@@ -23,7 +23,9 @@ package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
-public class InterProcessingPlantHandoverContextualResponse {
+import java.io.Serializable;
+
+public class InterProcessingPlantHandoverContextualResponse implements Serializable {
     UoW theUoW;
     InterProcessingPlantHandoverResponsePacket responsePacket;
 
