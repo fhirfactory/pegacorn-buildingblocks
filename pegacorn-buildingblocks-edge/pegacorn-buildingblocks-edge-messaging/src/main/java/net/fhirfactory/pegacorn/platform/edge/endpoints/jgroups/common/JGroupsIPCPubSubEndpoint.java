@@ -593,31 +593,31 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
             // Now check to see the status of the registration and, if it is PUBLISHER_REGISTRATION_NOT_PRESENT,
             // add it to the registration cache (because there wasn't one registered prior)
             if(subscriptionRegistration.getRegistrationStatus().equals(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_NOT_PRESENT)) {
-                getLogger().info(".subscribeToRemotePublishers(): No existing subscription, so creating an entry in the registration map");
+                getLogger().trace(".subscribeToRemotePublishers(): No existing subscription, so creating an entry in the registration map");
                 subscriptionRegistration = getPublisherRegistrationMapIM().addSubscriptionToPublisher(subscriptionList, publisher.getInterSubsystemParticipant());
-                getLogger().info(".subscribeToRemotePublishers(): Subscription added, subscriptionRegistration->{}", subscriptionRegistration);
+                getLogger().trace(".subscribeToRemotePublishers(): Subscription added, subscriptionRegistration->{}", subscriptionRegistration);
             }
             // Now, we update the status of the Subscription to reflect the fact that there are not Providers able to
             // fulfill the request.
-            getLogger().info(".subscribeToRemotePublishers(): update the status of the Subscription to PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS");
+            getLogger().trace(".subscribeToRemotePublishers(): update the status of the Subscription to PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS");
             subscriptionRegistration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS);
             // Now, if there are no Providers available, but we've got some in our registry, then we should remove
             // them from the registry.
-            getLogger().info(".subscribeToRemotePublishers(): now check if there are any Providers in the Registry, because we think there shouldn't be");
+            getLogger().trace(".subscribeToRemotePublishers(): now check if there are any Providers in the Registry, because we think there shouldn't be");
             List<InterSubsystemPubSubPublisherRegistration> instanceRegistrations = getPublisherRegistrationMapIM().getPublisherServiceProviderInstanceRegistrations(publisher.getInterSubsystemParticipant().getIdentifier().getServiceName());
             if(instanceRegistrations.isEmpty()){
-                getLogger().info(".subscribeToRemotePublishers(): Provider Registry is empty for this publisherServiceName");
+                getLogger().trace(".subscribeToRemotePublishers(): Provider Registry is empty for this publisherServiceName");
                 // Do nothing, as there are none registered anyhow
             } else {
                 // There are some, but we can't see them on JGroups, so get rid of them...
-                getLogger().info(".subscribeToRemotePublishers(): Provider Registry is not empty for this publisherServiceName, so removing them");
+                getLogger().trace(".subscribeToRemotePublishers(): Provider Registry is not empty for this publisherServiceName, so removing them");
                 for(InterSubsystemPubSubPublisherRegistration currentRegistration: instanceRegistrations){
                     getPublisherRegistrationMapIM().unregisterPublisherInstance(currentRegistration.getPublisher());
                 }
             }
-            getLogger().info(".subscribeToRemotePublishers(): Scheduling a SubscriptionCheck");
+            getLogger().trace(".subscribeToRemotePublishers(): Scheduling a SubscriptionCheck");
             scheduleSubscriptionCheck();
-            getLogger().info(".subscribeToRemotePublishers(): Generating response");
+            getLogger().trace(".subscribeToRemotePublishers(): Generating response");
             RemoteSubscriptionResponse response = new RemoteSubscriptionResponse();
             response.setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_PUBLISHER_NOT_REACHABLE);
             response.setSubscriptionRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS);

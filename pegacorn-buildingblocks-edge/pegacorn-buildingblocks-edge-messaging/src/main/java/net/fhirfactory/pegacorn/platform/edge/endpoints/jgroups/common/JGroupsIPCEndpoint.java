@@ -98,29 +98,29 @@ public abstract class JGroupsIPCEndpoint extends JGroupsEndpoint {
 
     @PostConstruct
     public void initialise(TopologyNodeFDNToken fdnToken){
-        getLogger().info(".initialise(): Entry");
+        getLogger().debug(".initialise(): Entry");
         if(isInitialised()){
             getLogger().debug(".initialise(): Exit, already initialised!");
             return;
         }
-        getLogger().info(".initialise(): Get my IPCEndpoint Detail");
+        getLogger().trace(".initialise(): Get my IPCEndpoint Detail");
         deriveTopologyEndpoint();
-        getLogger().info(".initialise(): IPCEndpoint derived ->{}", getIPCTopologyEndpoint());
+        getLogger().trace(".initialise(): IPCEndpoint derived ->{}", getIPCTopologyEndpoint());
 
         // 1st, the IntraSubsystem Pub/Sub Participant} component
-        getLogger().info(".initialise(): Now create my intraSubsystemParticipant (LocalPubSubPublisher)");
+        getLogger().trace(".initialise(): Now create my intraSubsystemParticipant (LocalPubSubPublisher)");
 //        TopologyNodeFDNToken fdnToken = getForwarderService().getWUPTopologyNode().getNodeFDN().getToken();
-        getLogger().info(".initialise(): localPublisher TopologyNodeFDNToken is ->{}", fdnToken);
+        getLogger().trace(".initialise(): localPublisher TopologyNodeFDNToken is ->{}", fdnToken);
         IntraSubsystemPubSubParticipant intraSubsystemParticipant = new IntraSubsystemPubSubParticipant(fdnToken);
-        getLogger().info(".initialise(): intraSubsystemParticipant created -->{}", intraSubsystemParticipant);
-        getLogger().info(".initialise(): Now create my PubSubParticipant");
+        getLogger().trace(".initialise(): intraSubsystemParticipant created -->{}", intraSubsystemParticipant);
+        getLogger().trace(".initialise(): Now create my PubSubParticipant");
         PubSubParticipant partipant = new PubSubParticipant();
-        getLogger().info(".initialise(): Add the intraSubsystemParticipant aspect to the partipant");
+        getLogger().trace(".initialise(): Add the intraSubsystemParticipant aspect to the partipant");
         partipant.setIntraSubsystemParticipant(intraSubsystemParticipant);
 
         // Now the InterSubsystem Pub/Sub Participant component
-        getLogger().info(".initialise(): Create my interSubsystemParticipant aspect");
-        getLogger().info(".initialise(): First, my distributedPublisherIdentifier");
+        getLogger().trace(".initialise(): Create my interSubsystemParticipant aspect");
+        getLogger().trace(".initialise(): First, my distributedPublisherIdentifier");
         InterSubsystemPubSubParticipantIdentifier interParticipantIdentifier = new InterSubsystemPubSubParticipantIdentifier();
         interParticipantIdentifier.setServiceName(getProcessingPlantInterface().getIPCServiceName());
         String serviceInstanceName = getProcessingPlantInterface().getIPCServiceName() + "(" + UUID.randomUUID().toString() + ")";
@@ -132,20 +132,20 @@ public abstract class JGroupsIPCEndpoint extends JGroupsEndpoint {
         distributedPublisher.setIdentifier(interParticipantIdentifier);
         distributedPublisher.setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_NOT_ESTABLISHED);
         distributedPublisher.setConnectionEstablishmentDate(Date.from(Instant.now()));
-        getLogger().info(".initialise(): distributedPublisher (DistributedPubSubPublisher) created ->{}", distributedPublisher);
+        getLogger().trace(".initialise(): distributedPublisher (DistributedPubSubPublisher) created ->{}", distributedPublisher);
 
         // Now assemble the "Participant"
-        getLogger().info(".initialise(): Add the distributedPublisher aspect to the partipant");
+        getLogger().trace(".initialise(): Add the distributedPublisher aspect to the partipant");
         partipant.setInterSubsystemParticipant(distributedPublisher);
-        getLogger().info(".initialise(): distributedPublisher aspect added to the partipant, now assigning it to class variable");
+        getLogger().trace(".initialise(): distributedPublisher aspect added to the partipant, now assigning it to class variable");
         this.setPubsubParticipant(partipant);
-        getLogger().info(".initialise(): participant assigned to class variable, now initialising the associated JChannel!");
+        getLogger().trace(".initialise(): participant assigned to class variable, now initialising the associated JChannel!");
         establishJChannel(specifyFileName(), specifyGroupName(), serviceInstanceName);
-        getLogger().info(".initialise(): calling subclass post-construct methods");
+        getLogger().trace(".initialise(): calling subclass post-construct methods");
         additionalInitialisation();
-        getLogger().info(".initialise(): partipant created & JChannel initialised, set initialised state to true");
+        getLogger().trace(".initialise(): partipant created & JChannel initialised, set initialised state to true");
         this.setInitialised(true);
-        getLogger().info(".initialise(): Exit");
+        getLogger().debug(".initialise(): Exit");
     }
 
     //
@@ -208,26 +208,26 @@ public abstract class JGroupsIPCEndpoint extends JGroupsEndpoint {
     protected abstract ProtocolStack specifyProtocolStack();
 
     protected void establishJChannel(String fileName, String groupName, String channelName){
-        getLogger().info(".establishJChannel(): Entry, groupName->{}, channelName->{}", groupName, channelName);
+        getLogger().debug(".establishJChannel(): Entry, groupName->{}, channelName->{}", groupName, channelName);
         try {
-            getLogger().info(".establishJChannel(): Creating JChannel");
-            getLogger().info(".establishJChannel(): Getting the required ProtocolStack");
+            getLogger().trace(".establishJChannel(): Creating JChannel");
+            getLogger().trace(".establishJChannel(): Getting the required ProtocolStack");
             JChannel newChannel = new JChannel(fileName);
-            getLogger().info(".establishJChannel(): JChannel initialised, now setting JChannel name");
+            getLogger().trace(".establishJChannel(): JChannel initialised, now setting JChannel name");
             newChannel.name(channelName);
-            getLogger().info(".establishJChannel(): JChannel Name set, now set ensure we don't get our own messages");
+            getLogger().trace(".establishJChannel(): JChannel Name set, now set ensure we don't get our own messages");
             newChannel.setDiscardOwnMessages(true);
-            getLogger().info(".establishJChannel(): Now setting RPCDispatcher");
+            getLogger().trace(".establishJChannel(): Now setting RPCDispatcher");
             RpcDispatcher newRPCDispatcher = new RpcDispatcher(newChannel, this);
             newChannel.setReceiver(this);
-            getLogger().info(".establishJChannel(): RPCDispatcher assigned, now connect to JGroup");
+            getLogger().trace(".establishJChannel(): RPCDispatcher assigned, now connect to JGroup");
             newChannel.connect(groupName);
-            getLogger().info(".establishJChannel(): Connected to JGroup complete, now assigning class attributes");
+            getLogger().trace(".establishJChannel(): Connected to JGroup complete, now assigning class attributes");
             this.setIPCChannel(newChannel);
             this.setRPCDispatcher(newRPCDispatcher);
             this.getPubsubParticipant().getInterSubsystemParticipant().setConnectionEstablishmentDate(Date.from(Instant.now()));
             this.getPubsubParticipant().getInterSubsystemParticipant().setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
-            getLogger().info(".establishJChannel(): Exit, JChannel & RPCDispatcher created");
+            getLogger().trace(".establishJChannel(): Exit, JChannel & RPCDispatcher created");
             return;
         } catch (Exception e) {
             e.printStackTrace();

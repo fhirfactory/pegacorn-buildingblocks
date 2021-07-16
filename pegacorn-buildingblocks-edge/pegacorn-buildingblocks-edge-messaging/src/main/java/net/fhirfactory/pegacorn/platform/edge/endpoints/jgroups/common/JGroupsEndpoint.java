@@ -29,7 +29,7 @@ public abstract class JGroupsEndpoint implements Receiver{
 
     @Override
     public void receive(Message message) {
-        getLogger().info(".receive(): Entry, message->{}", message);
+        getLogger().debug(".receive(): Entry, message->{}", message);
 
     }
 
@@ -57,19 +57,19 @@ public abstract class JGroupsEndpoint implements Receiver{
 
     @Override
     public void receive(MessageBatch batch) {
-        getLogger().info(".receive(): Entry, batch->{}", batch);
+        getLogger().debug(".receive(): Entry, batch->{}", batch);
         Receiver.super.receive(batch);
     }
 
     @Override
     public void getState(OutputStream output) throws Exception {
-        getLogger().info(".getState(): Entry, output->{}", output);
+        getLogger().debug(".getState(): Entry, output->{}", output);
         Receiver.super.getState(output);
     }
 
     @Override
     public void setState(InputStream input) throws Exception {
-        getLogger().info(".setState(): Entry, input->{}", input);
+        getLogger().debug(".setState(): Entry, input->{}", input);
         Receiver.super.setState(input);
     }
 
@@ -114,22 +114,22 @@ public abstract class JGroupsEndpoint implements Receiver{
     }
 
     protected Address getTargetAddress(String name){
-        getLogger().info(".getTargetAddress(): Entry, name->{}", name);
+        getLogger().debug(".getTargetAddress(): Entry, name->{}", name);
         if(getIPCChannel() == null){
-            getLogger().info(".getTargetAddress(): IPCChannel is null, exit returning (null)");
+            getLogger().debug(".getTargetAddress(): IPCChannel is null, exit returning (null)");
             return(null);
         }
-        getLogger().info(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
+        getLogger().trace(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
         List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().info(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+        getLogger().trace(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
         for(Address currentAddress: addressList){
-            getLogger().info(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
+            getLogger().trace(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
             if(currentAddress.toString().startsWith(name)){
-                getLogger().info(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
+                getLogger().debug(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
                 return(currentAddress);
             }
         }
-        getLogger().info(".getTargetAddress(): Exit, no suitable Address found!");
+        getLogger().debug(".getTargetAddress(): Exit, no suitable Address found!");
         return(null);
     }
 
