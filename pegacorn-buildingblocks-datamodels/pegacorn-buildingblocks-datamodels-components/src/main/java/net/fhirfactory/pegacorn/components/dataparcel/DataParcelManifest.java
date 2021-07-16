@@ -70,8 +70,77 @@ public class DataParcelManifest implements Serializable {
     }
 
     public DataParcelManifest(DataParcelManifest ori){
-        this.containerDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContainerDescriptor());
-        this.contentDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContentDescriptor());
+        if(ori.hasContainerDescriptor()) {
+            this.containerDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContainerDescriptor());
+        } else {
+            this.containerDescriptor = null;
+        }
+        if(ori.hasContentDescriptor()) {
+            this.contentDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContentDescriptor());
+        } else {
+            this.contentDescriptor = null;
+        }
+        if(ori.hasSourceSystem()) {
+            this.setSourceSystem(ori.getSourceSystem());
+        } else {
+            this.setSourceSystem(null);
+        }
+        if(ori.hasIntendedTargetSystem()) {
+            this.setIntendedTargetSystem(ori.getIntendedTargetSystem());
+        } else {
+            this.setIntendedTargetSystem(null);
+        }
+        this.setInterSubsystemDistributable(ori.isInterSubsystemDistributable());
+        if(ori.hasDataParcelFlowDirection()) {
+            this.setDataParcelFlowDirection(ori.getDataParcelFlowDirection());
+        } else {
+            this.setDataParcelFlowDirection(null);
+        }
+        if(ori.hasEnforcementPointApprovalStatus()) {
+            this.setEnforcementPointApprovalStatus(ori.getEnforcementPointApprovalStatus());
+        } else {
+            this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
+        }
+        if(ori.hasNormalisationStatus()){
+            this.setNormalisationStatus(ori.getNormalisationStatus());
+        } else {
+            this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
+        }
+        if(ori.hasValidationStatus()){
+            this.setNormalisationStatus(ori.getNormalisationStatus());
+        } else {
+            this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
+        }
+        if(ori.hasDataParcelType()){
+            this.setDataParcelType(ori.getDataParcelType());
+        } else {
+            this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
+        }
+    }
+
+    public boolean hasDataParcelType(){
+        boolean has = this.dataParcelType != null;
+        return(has);
+    }
+
+    public boolean hasValidationStatus(){
+        boolean has = this.validationStatus != null;
+        return(has);
+    }
+
+    public boolean hasNormalisationStatus(){
+        boolean has = this.normalisationStatus != null;
+        return(has);
+    }
+
+    public boolean hasEnforcementPointApprovalStatus(){
+        boolean has = this.enforcementPointApprovalStatus != null;
+        return(has);
+    }
+
+    public boolean hasDataParcelFlowDirection(){
+        boolean has = this.dataParcelFlowDirection != null;
+        return(has);
     }
 
     public boolean hasContentDescriptor(){
