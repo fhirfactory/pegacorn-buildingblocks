@@ -195,7 +195,7 @@ public abstract class JGroupsIPCEndpoint extends JGroupsEndpoint {
     }
 
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String target, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().info(".sendIPCMessage(): Entry, target->{}, handoverPacker->{}", target, handoverPacket);
+        getLogger().debug(".sendIPCMessage(): Entry, target->{}, handoverPacker->{}", target, handoverPacket);
         Address targetAddress = getTargetAddress(target);
         InterProcessingPlantHandoverResponsePacket response = sendIPCMessage(targetAddress, handoverPacket);
         return(response);

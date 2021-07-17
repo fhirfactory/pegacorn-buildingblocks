@@ -29,7 +29,7 @@ import java.util.Objects;
 
 public class DataParcelManifest implements Serializable {
 
-    public static String UOW_ATTRIBUTE_WILDCARD_CHARACTER = "*";
+    public static String WILDCARD_CHARACTER = "*";
 
     private DataParcelTypeDescriptor contentDescriptor;
     private DataParcelTypeDescriptor containerDescriptor;
