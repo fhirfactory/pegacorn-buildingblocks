@@ -121,6 +121,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
         return(response);
     }
 
+
     /*
     public RemoteSubscriptionResponse rpcModifySubscription(RemoteSubscriptionRequest subscriptionRequest){
         getLogger().debug(".rpcModifySubscription(): Entry, subscriptionRequest->{}", subscriptionRequest);
@@ -341,8 +342,10 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
             } else {
                 TimerTask completeSubscriptionCheckTask = new TimerTask() {
                     public void run() {
-                        performCompleteSubscriptionCheck();
-                        cancel();
+                        boolean doAgain = performCompleteSubscriptionCheck();
+                        if(!doAgain) {
+                            cancel();
+                        }
                     }
                 };
                 Timer timer = new Timer("CompleteSubscriptionCheck");
@@ -355,8 +358,9 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
     /**
      *
      */
-    protected void performCompleteSubscriptionCheck(){
+    protected boolean performCompleteSubscriptionCheck(){
         getLogger().info(".performCompleteSubscriptionCheck(): Entry");
+        boolean doAgain = false;
         List<InterSubsystemPubSubPublisherSubscriptionRegistration> subscriptionRegistrationList = getPublisherRegistrationMapIM().getAllPublisherServiceSubscriptions();
         for(InterSubsystemPubSubPublisherSubscriptionRegistration currentServiceRegistration: subscriptionRegistrationList){
             String currentProviderServiceName = currentServiceRegistration.getPublisherServiceName();
@@ -375,6 +379,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
                             currentServiceRegistration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_SUCCESSFUL);
                         } else {
                             getLogger().error(".performSubscriptionCheck(): Cannot subscribe to Publisher->{}", publisher);
+                            doAgain = true;
                         }
                     }
                 }
@@ -383,7 +388,8 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
         synchronized(this.completeSubscriptionCheckScheduledLock) {
             this.completeSubscriptionCheckScheduled = false;
         }
-        getLogger().info(".performCompleteSubscriptionCheck(): Exit");
+        getLogger().info(".performCompleteSubscriptionCheck(): Exit, returning doAgain->{}", doAgain);
+        return(doAgain);
     }
 
     /**
@@ -541,7 +547,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
                         remoteSubscriptionResponse.setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_PUBLISHER_NOT_REACHABLE);
                         publisherInstanceRegistration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED);
                         remoteSubscriptionResponse.setSubscriptionRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_FAILED);
-
+                        scheduleSubscriptionCheck();
                     }
                     getLogger().info(".subscribeToRemotePublishers(): Exit, response->{}", remoteSubscriptionResponse);
                     return (remoteSubscriptionResponse);
@@ -568,6 +574,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
                     response.setSubscriptionSuccessful(false);
                     response.setSubscriptionCommentary("Publisher has failed");
                     getLogger().info(".subscribeToRemotePublishers(): Exit, response->{}", response);
+                    scheduleSubscriptionCheck();
                     return (response);
                 }
                 case PUBLISHER_NOT_REGISTERED:
@@ -580,6 +587,7 @@ public abstract class JGroupsIPCPubSubEndpoint extends JGroupsIPCEndpoint{
                     response.setSubscriptionSuccessful(false);
                     response.setSubscriptionCommentary(".subscribeToRemotePublishers(): Warning Will Robinson!!!! Danger Approaches");
                     getLogger().info(".subscribeToRemotePublishers(): Exit, response->{}", response);
+                    scheduleSubscriptionCheck();
                     return (response);
                 }
             }
