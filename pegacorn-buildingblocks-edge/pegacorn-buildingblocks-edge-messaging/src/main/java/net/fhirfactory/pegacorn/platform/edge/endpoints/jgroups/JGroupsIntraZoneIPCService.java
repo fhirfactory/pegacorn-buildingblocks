@@ -22,9 +22,8 @@
 package net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.InitialHostSpecification;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCPubSubEndpoint;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.InterZoneEdgeForwarderService;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCPubSubSubscriberService;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
@@ -35,20 +34,19 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.List;
 
 @ApplicationScoped
-public class JGroupsInterZoneIPCEndpoint extends JGroupsIPCPubSubEndpoint {
-    private static final Logger LOG = LoggerFactory.getLogger(JGroupsInterZoneIPCEndpoint.class);
+public class JGroupsIntraZoneIPCService extends JGroupsIPCPubSubSubscriberService {
+    private static final Logger LOG = LoggerFactory.getLogger(JGroupsIntraZoneIPCService.class);
 
-    private static String GOSSIP_ROUTER_HOSTS = "hosts";
-
-    public JGroupsInterZoneIPCEndpoint(){
-        super();
-    }
+    private static String STACK_INITIAL_HOSTS = "hosts";
 
     @Inject
-    private InterZoneEdgeForwarderService forwarderService;
+    private IntraZoneEdgeForwarderService forwarderService;
+
+    public JGroupsIntraZoneIPCService(){
+        super();
+    }
 
     @Override
     protected Logger specifyLogger() {
@@ -57,34 +55,33 @@ public class JGroupsInterZoneIPCEndpoint extends JGroupsIPCPubSubEndpoint {
 
     @Override
     protected String specifyGroupName() {
-        return (getIPCComponentNames().getInterZoneIPCGroupName());
-    }
-
-    @Override
-    protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
+        return (getIPCComponentNames().getIntraZoneIPCGroupName());
     }
 
     @Override
     protected String specifyFileName() {
-        return ("sitea.xml");
+        return ("privnet.xml");
+    }
+
+    @Override
+    protected String specifyIPCInterfaceName() {
+        return (getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
+    }
+
+    @Override
+    protected InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket) {
+        InterProcessingPlantHandoverResponsePacket response = (InterProcessingPlantHandoverResponsePacket)getCamelProducer().sendBody(getIPCComponentNames().getIntraZoneIPCReceiverRouteEndpointName(), ExchangePattern.InOut, handoverPacket);
+        return(response);
     }
 
     @Override
     protected TopologyEndpointTypeEnum specifyIPCType() {
-        return (TopologyEndpointTypeEnum.JGROUPS_INTERZONE_IPC_MESSAGING_SERVICE);
+        return (TopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_MESSAGING_SERVICE);
     }
 
     @Override
     public EdgeForwarderService getEdgeForwarderService() {
         return (forwarderService);
-    }
-
-    @Override
-    protected InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket) {
-        InterProcessingPlantHandoverResponsePacket response = (InterProcessingPlantHandoverResponsePacket)getCamelProducer()
-                .sendBody(getIPCComponentNames().getInterZoneIPCReceiverRouteEndpointName(), ExchangePattern.InOut, handoverPacket);
-        return(response);
     }
 
     @Override
@@ -96,18 +93,20 @@ public class JGroupsInterZoneIPCEndpoint extends JGroupsIPCPubSubEndpoint {
         getLogger().trace(".specifyProtocolStack(): Sourcing the bindAddress");
         String bindAddress = getIPCTopologyEndpoint().getHostDNSName();
         getLogger().trace(".specifyProtocolStack(): bindAddress sourced, value->{}", bindAddress);
-        getLogger().trace(".specifyProtocolStack(): Sourcing the initialHosts");
-        List<InitialHostSpecification> initialHosts = getIPCTopologyEndpoint().getInitialHosts();
-        getLogger().trace(".specifyProtocolStack(): initialHosts sourced, value->{}", initialHosts);
+        getLogger().trace(".specifyProtocolStack(): Sourcing the nameSpace");
+        String namespace = getProcessingPlantInterface().getProcessingPlantNode().getNameSpace();
+        getLogger().trace(".specifyProtocolStack(): nameSpace sourced, value->{}", namespace);
+        getLogger().trace(".specifyProtocolStack(): Sourcing the label");
+        String label = getIPCTopologyEndpoint().getSecurityZone().getNetworkSecurityZone();
+        getLogger().trace(".specifyProtocolStack(): label sourced, value->{}", label);
         ProtocolStack stack = null;
         try {
-            stack = getStacks().getInterZoneProtocolStack(bindAddress ,bindPort, initialHosts );
-            getLogger().debug(".specifyProtocolStack(): Exit, stack->{}", stack);
+            stack = getStacks().getIntraZoneProtocolStack(bindAddress, bindPort, namespace, label );
             return(stack);
         } catch (Exception e) {
             getLogger().error(".specifyProtocolStack(): Cannot resolve JGroups Stack, error->{}", e.getMessage());
-            return (null);
         }
+        return (null);
     }
 
     @Override

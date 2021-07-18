@@ -164,8 +164,14 @@ public abstract class JGroupsIPCEndpoint extends JGroupsEndpoint {
     //
     // Send Messages (via RPC invocations)
     //
+    public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket){
+        Address targetServiceAddress = getTargetServiceAddress(targetParticipantServiceName);
+        InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = sendIPCMessage(targetServiceAddress, handoverPacket);
+        return(interProcessingPlantHandoverResponsePacket);
+    }
 
-    private InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
+
+    public InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
         getLogger().debug(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
         try {
             Object objectSet[] = new Object[1];
@@ -194,12 +200,15 @@ public abstract class JGroupsIPCEndpoint extends JGroupsEndpoint {
         }
     }
 
+    /*
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String target, InterProcessingPlantHandoverPacket handoverPacket){
         getLogger().debug(".sendIPCMessage(): Entry, target->{}, handoverPacker->{}", target, handoverPacket);
-        Address targetAddress = getTargetAddress(target);
+        Address targetAddress = getTargetServiceAddress(target);
         InterProcessingPlantHandoverResponsePacket response = sendIPCMessage(targetAddress, handoverPacket);
         return(response);
     }
+
+     */
 
     //
     // Setup The Channel
@@ -219,7 +228,8 @@ public abstract class JGroupsIPCEndpoint extends JGroupsEndpoint {
             newChannel.setDiscardOwnMessages(true);
             getLogger().trace(".establishJChannel(): Now setting RPCDispatcher");
             RpcDispatcher newRPCDispatcher = new RpcDispatcher(newChannel, this);
-            newChannel.setReceiver(this);
+            newRPCDispatcher.setMembershipListener(this);
+//            newChannel.setReceiver(this);
             getLogger().trace(".establishJChannel(): RPCDispatcher assigned, now connect to JGroup");
             newChannel.connect(groupName);
             getLogger().trace(".establishJChannel(): Connected to JGroup complete, now assigning class attributes");
