@@ -53,11 +53,10 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
         String clonedPayload = SerializationUtils.clone(theUoW.getIngresContent().getPayload());
         outputPayload.setPayload(clonedPayload);
         DataParcelManifest parcelManifest = SerializationUtils.clone(theUoW.getPayloadTopicID());
-        parcelManifest.setSourceSystem(thePacket.getSource());
         parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.OUTBOUND_DATA_PARCEL);
         parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
         parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE);
-        parcelManifest.setContainerDescriptor(null);
+        parcelManifest.setInterSubsystemDistributable(false);
         outputPayload.setPayloadManifest(parcelManifest);
         theUoW.getEgressContent().addPayloadElement(outputPayload);
         theUoW.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_SUCCESS);

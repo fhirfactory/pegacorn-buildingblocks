@@ -1,8 +1,6 @@
 package net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common;
 
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipantIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import org.apache.commons.lang3.StringUtils;
 import org.jgroups.*;
 import org.jgroups.util.MessageBatch;
 import org.slf4j.Logger;
@@ -22,6 +20,7 @@ public abstract class JGroupsEndpoint implements Receiver{
     }
 
     abstract protected Logger specifyLogger();
+    abstract protected boolean performPubSubParticipantCheck();
 
     protected Logger getLogger(){
         return(specifyLogger());
@@ -29,15 +28,26 @@ public abstract class JGroupsEndpoint implements Receiver{
 
     @Override
     public void receive(Message message) {
-        getLogger().info(".receive(): Entry, message->{}", message);
+        getLogger().debug(".receive(): Entry, message->{}", message);
 
     }
 
     @Override
     public void viewAccepted(View newView) {
-        getLogger().info(".viewAccepted(): Entry, newView->{}", newView);
-        Receiver.super.viewAccepted(newView);
-        getLogger().info(".viewAccepted(): Woo Hoo, we're here!!!!!!");
+        getLogger().debug(".viewAccepted(): Entry, JGroups View Changed!");
+//        Receiver.super.viewAccepted(newView);
+        List<Address> addressList = newView.getMembers();
+        getLogger().trace(".viewAccepted(): Got the Address set via view, now iterate through and see if one is suitable");
+        if(getIPCChannel() != null) {
+            getLogger().warn("JGroupsCluster->{}", getIPCChannel().getClusterName());
+        }
+        for(Address currentAddress: addressList){
+            getLogger().warn("Visible Member->{}", currentAddress);
+        }
+        getLogger().trace(".viewAccepted(): Checking PubSub Participants");
+        performPubSubParticipantCheck();
+        getLogger().trace(".viewAccepted(): PubSub Participants check completed");
+        getLogger().debug(".viewAccepted(): Exit");
     }
 
     @Override
@@ -57,19 +67,19 @@ public abstract class JGroupsEndpoint implements Receiver{
 
     @Override
     public void receive(MessageBatch batch) {
-        getLogger().info(".receive(): Entry, batch->{}", batch);
+        getLogger().debug(".receive(): Entry, batch->{}", batch);
         Receiver.super.receive(batch);
     }
 
     @Override
     public void getState(OutputStream output) throws Exception {
-        getLogger().info(".getState(): Entry, output->{}", output);
+        getLogger().debug(".getState(): Entry, output->{}", output);
         Receiver.super.getState(output);
     }
 
     @Override
     public void setState(InputStream input) throws Exception {
-        getLogger().info(".setState(): Entry, input->{}", input);
+        getLogger().debug(".setState(): Entry, input->{}", input);
         Receiver.super.setState(input);
     }
 
@@ -89,48 +99,49 @@ public abstract class JGroupsEndpoint implements Receiver{
         this.initialised = initialised;
     }
 
-    protected Address getTargetAddress(PubSubParticipant publisher){
-        if(publisher == null){
-            return(null);
-        }
-        Address address = getTargetAddress(publisher.getInterSubsystemParticipant());
-        return(address);
-    }
 
-    protected Address getTargetAddress(InterSubsystemPubSubParticipant publisher){
-        if(publisher == null){
-            return(null);
-        }
-        Address address = getTargetAddress(publisher.getIdentifier());
-        return(address);
-    }
-
-    protected Address getTargetAddress(InterSubsystemPubSubParticipantIdentifier identifier){
+    protected Address getTargetServiceAddress(String name){
+        getLogger().debug(".getTargetAddress(): Entry, name->{}", name);
         if(getIPCChannel() == null){
+            getLogger().debug(".getTargetAddress(): IPCChannel is null, exit returning (null)");
             return(null);
         }
-        Address address = getTargetAddress(identifier.getServiceName());
-        return(address);
-    }
-
-    protected Address getTargetAddress(String name){
-        getLogger().info(".getTargetAddress(): Entry, name->{}", name);
-        if(getIPCChannel() == null){
-            getLogger().info(".getTargetAddress(): IPCChannel is null, exit returning (null)");
-            return(null);
-        }
-        getLogger().info(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
+        getLogger().trace(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
         List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().info(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+        getLogger().trace(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
         for(Address currentAddress: addressList){
-            getLogger().info(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
+            getLogger().trace(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
             if(currentAddress.toString().startsWith(name)){
-                getLogger().info(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
+                getLogger().debug(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
                 return(currentAddress);
             }
         }
-        getLogger().info(".getTargetAddress(): Exit, no suitable Address found!");
+        getLogger().debug(".getTargetAddress(): Exit, no suitable Address found!");
         return(null);
+    }
+
+    protected boolean isTargetAddressActive(String addressName){
+        getLogger().debug(".isTargetAddressActive(): Entry, addressName->{}", addressName);
+        if(getIPCChannel() == null){
+            getLogger().debug(".isTargetAddressActive(): IPCChannel is null, exit returning -false-");
+            return(false);
+        }
+        if(StringUtils.isEmpty(addressName)){
+            getLogger().debug(".isTargetAddressActive(): addressName is empty, exit returning -false-");
+            return(false);
+        }
+        getLogger().trace(".isTargetAddressActive(): IPCChannel is NOT null, get updated Address set via view");
+        List<Address> addressList = getIPCChannel().getView().getMembers();
+        getLogger().trace(".isTargetAddressActive(): Got the Address set via view, now iterate through and see our address is there");
+        for(Address currentAddress: addressList){
+            getLogger().trace(".isTargetAddressActive(): Iterating through Address list, current element->{}", currentAddress);
+            if(currentAddress.toString().contentEquals(addressName)){
+                getLogger().debug(".isTargetAddressActive(): Exit, A match!, returning -true-");
+                return(true);
+            }
+        }
+        getLogger().debug(".isTargetAddressActive(): Exit, no matching Address found!");
+        return(false);
     }
 
     protected Address getMyAddress(){

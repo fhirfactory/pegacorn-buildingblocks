@@ -149,7 +149,7 @@ public class HL7V2XTopicFactory {
      * @return
      */
     public DataParcelTypeDescriptor newDataParcelDescriptor(String eventType, String eventTrigger, String version){
-        LOG.info(".newTopicToken(): Entry, eventType->{}, eventTrigger->{}, version->{}", eventType, eventTrigger, version);
+        LOG.debug(".newTopicToken(): Entry, eventType->{}, eventTrigger->{}, version->{}", eventType, eventTrigger, version);
         DataParcelTypeDescriptor dataParcelToken = new DataParcelTypeDescriptor();
         dataParcelToken.setDataParcelDefiner(HL7_MESSAGE_DEFINER);
         dataParcelToken.setDataParcelCategory(HL7_MESSAGE_CATEGORY);

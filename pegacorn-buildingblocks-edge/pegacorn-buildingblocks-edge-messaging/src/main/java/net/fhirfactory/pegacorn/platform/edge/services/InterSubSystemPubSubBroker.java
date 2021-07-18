@@ -23,8 +23,8 @@ package net.fhirfactory.pegacorn.platform.edge.services;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.JGroupsInterZoneIPCEndpoint;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.JGroupsIntraZoneIPCEndpoint;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.JGroupsInterZoneIPCService;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.JGroupsIntraZoneIPCService;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.InterSubSystemPubSubBrokerInterface;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionResponse;
 import org.slf4j.Logger;
@@ -39,10 +39,10 @@ public class InterSubSystemPubSubBroker implements InterSubSystemPubSubBrokerInt
     private static final Logger LOG = LoggerFactory.getLogger(InterSubSystemPubSubBroker.class);
 
     @Inject
-    private JGroupsInterZoneIPCEndpoint interZoneIPCEndpoint;
+    private JGroupsInterZoneIPCService interZoneIPCEndpoint;
 
     @Inject
-    private JGroupsIntraZoneIPCEndpoint intraZoneIPCEndpoint;
+    private JGroupsIntraZoneIPCService intraZoneIPCEndpoint;
 
     public RemoteSubscriptionResponse subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem){
         LOG.info(".subscribe(): Entry, dataParcelManifestList->{}, sourceSubSystem->{}", dataParcelManifestList, sourceSubSystem);
