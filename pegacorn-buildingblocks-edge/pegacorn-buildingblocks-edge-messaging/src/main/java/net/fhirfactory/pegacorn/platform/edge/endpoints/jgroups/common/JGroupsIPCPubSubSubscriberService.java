@@ -35,6 +35,7 @@ import org.jgroups.blocks.ResponseMode;
 
 import java.sql.Date;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -178,7 +179,7 @@ public abstract class JGroupsIPCPubSubSubscriberService extends JGroupsIPCPubSub
      * @return
      */
     public RemoteSubscriptionResponse requestSubscription(List<DataParcelManifest> subscriptionList, PubSubParticipant publisher ) {
-        getLogger().debug(".requestSubscription(): Entry, subscriptionList->{}, publisher->{} ", subscriptionList, publisher);
+        getLogger().info(".requestSubscription(): Entry, subscriptionList->{}, publisher->{} ", subscriptionList, publisher);
 
         boolean nothingToSubscribeTo = false;
         if(subscriptionList == null){
@@ -196,19 +197,35 @@ public abstract class JGroupsIPCPubSubSubscriberService extends JGroupsIPCPubSub
             return(response);
         }
         RemoteSubscriptionResponse response = null;
-        getLogger().trace(".requestSubscription(): Build subscriptionRequest (RemoteSubscriptionRequest)");
+        getLogger().info(".requestSubscription(): Build subscriptionRequest (RemoteSubscriptionRequest)");
         RemoteSubscriptionRequest subscriptionRequest = new RemoteSubscriptionRequest();
         subscriptionRequest.setSubscriber(getPubsubParticipant());
         subscriptionRequest.setSubscriptionList(subscriptionList);
-        getLogger().trace(".requestSubscription(): subscriptionRequest built, value->{}", subscriptionRequest);
-        getLogger().trace(".requestSubscription(): Now ascertain if the publisher is actually available");
+        getLogger().info(".requestSubscription(): subscriptionRequest built, value->{}", subscriptionRequest);
+        getLogger().info(".requestSubscription(): Now ascertain if the publisher is actually available");
         if (isPublisherServiceAvailable(publisher)) {
-            getLogger().trace(".requestSubscription(): Publisher is available, so register");
-            Address addressForParticipantService = getAddressForParticipantService(publisher);
-            if(addressForParticipantService == null){
-                getLogger().error("Warning will robinson, address i null");
+            getLogger().info(".requestSubscription(): Publisher is available, so register");
+            List<RemoteSubscriptionResponse> responseSet = new ArrayList<>();
+            for(Address publisherInstances: getTargetServiceInstanceAddresses(publisher.getInterSubsystemParticipant().getIdentifier().getServiceName())) {
+                if (isParticipantInstanceAvailable(publisherInstances.toString())) {
+                    getLogger().info(".requestSubscription(): Subscribing to PublisherInstance->{}", publisherInstances);
+                    RemoteSubscriptionResponse currentResponse = rpcRequestSubscription(publisherInstances, subscriptionRequest);
+                    responseSet.add(currentResponse);
+                }
             }
-            response = rpcRequestSubscription(addressForParticipantService, subscriptionRequest);
+            for(RemoteSubscriptionResponse currentResponse: responseSet){
+                if(currentResponse.isSubscriptionSuccessful()){
+                    response = currentResponse;
+                    break;
+                }
+            }
+            if(response == null){
+                getLogger().error(".requestSubscription(): Publisher ({}) is not available!!!", publisher);
+                response = new RemoteSubscriptionResponse();
+                response.setSubscriptionSuccessful(false);
+                response.setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_FAILED);
+                response.setSubscriptionCommentary("Publisher ("+publisher+") is not available!");
+            }
         } else {
             getLogger().error(".requestSubscription(): Publisher ({}) is not available!!!", publisher);
             response = new RemoteSubscriptionResponse();
@@ -216,7 +233,7 @@ public abstract class JGroupsIPCPubSubSubscriberService extends JGroupsIPCPubSub
             response.setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_FAILED);
             response.setSubscriptionCommentary("Publisher ("+publisher+") is not available!");
         }
-        getLogger().debug(".requestSubscription(): Exit, response->{}", response);
+        getLogger().info(".requestSubscription(): Exit, response->{}", response);
         return (response);
     }
 
@@ -332,9 +349,15 @@ public abstract class JGroupsIPCPubSubSubscriberService extends JGroupsIPCPubSub
                         getLogger().trace(".performSubscriptionCheck(): Suitable Publisher is available on JGroups, so using");
                         PubSubParticipant publisher = new PubSubParticipant();
                         getLogger().trace(".performSubscriptionCheck(): Created new PubSubPublisher");
-                        publisher.setInterSubsystemParticipant(currentServiceRegistration.getPublisher());
+                        PubSubParticipant newPublisher = new PubSubParticipant();
+                        InterSubsystemPubSubParticipant distributedPublisher = new InterSubsystemPubSubParticipant();
+                        InterSubsystemPubSubParticipantIdentifier distributedPublisherIdentifier = new InterSubsystemPubSubParticipantIdentifier();
+                        distributedPublisherIdentifier.setServiceName(currentServiceRegistration.getPublisherServiceName());
+                        distributedPublisher.setIdentifier(distributedPublisherIdentifier);
+                        distributedPublisher.getIdentifier().setServiceName(currentServiceRegistration.getPublisherServiceName());
+                        newPublisher.setInterSubsystemParticipant(distributedPublisher);
                         getLogger().trace(".performSubscriptionCheck(): Added the DistributedPublisher aspect to the PubSubPublisher");
-                        RemoteSubscriptionResponse subscriptionResponse = requestSubscription(currentServiceRegistration.getSubscriptionList(), publisher);
+                        RemoteSubscriptionResponse subscriptionResponse = requestSubscription(currentServiceRegistration.getSubscriptionList(), newPublisher);
                         getLogger().trace(".performSubscriptionCheck(): Subscription attempted, subscriptionResponse->{}", subscriptionResponse);
                         if(subscriptionResponse.isSubscriptionSuccessful()){
                             getLogger().trace(".performSubscriptionCheck(): Subscription to Publisher was successful, setting subscription registration date");
@@ -377,6 +400,15 @@ public abstract class JGroupsIPCPubSubSubscriberService extends JGroupsIPCPubSub
         }
         getLogger().info(".performSubscriptionCheck(): iterated through, another SubscriptionCheck is NOT needed");
         return(false);
+    }
+
+    public String extractPublisherServiceName(String publisherInstanceName){
+        if(StringUtils.isEmpty(publisherInstanceName)){
+            return(null);
+        }
+        String[] split = StringUtils.split("(");
+        String serviceName = split[0];
+        return(serviceName);
     }
 
     /**
