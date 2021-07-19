@@ -110,15 +110,15 @@ public abstract class JGroupsIPCPubSubPublisherService extends JGroupsIPCPubSubP
         getLogger().info(".rpcRegisterPublisherHandler(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherRegistration registration = null;
         if(getPublisherRegistrationMapIM().isPublisherRegistered(publisher)){
-            getLogger().trace(".rpcRegisterPublisherHandler(): Publisher is already Registered");
+            getLogger().info(".rpcRegisterPublisherHandler(): Publisher is already Registered");
             registration = getPublisherRegistrationMapIM().getPublisherInstanceRegistration(publisher);
         } else {
-            getLogger().trace(".rpcRegisterPublisherHandler(): Publisher is not locally Registered, so add it");
+            getLogger().info(".rpcRegisterPublisherHandler(): Publisher is not locally Registered, so add it");
             registration = getPublisherRegistrationMapIM().registerPublisherInstance(publisher);
-            getLogger().trace(".rpcRegisterPublisherHandler(): Publisher Registered, registration->{}", registration);
+            getLogger().info(".rpcRegisterPublisherHandler(): Publisher Registered, registration->{}", registration);
             if(registration.getPublisherStatus().equals(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED)){
-                getLogger().trace(".rpcRegisterPublisherHandler(): Scheduling complete subscription check");
-                getLogger().trace(".rpcRegisterPublisherHandler(): Scheduling of complete subscription check completed");
+                getLogger().info(".rpcRegisterPublisherHandler(): Scheduling complete subscription check");
+                getLogger().info(".rpcRegisterPublisherHandler(): Scheduling of complete subscription check completed");
             }
         }
         getLogger().info("rpcRegisterPublisherHandler(): Exit, registration->{}", registration);
@@ -172,23 +172,29 @@ public abstract class JGroupsIPCPubSubPublisherService extends JGroupsIPCPubSubP
      *
      */
     protected void schedulePublisherCheck(){
+        getLogger().info(".schedulePublisherCheck(): Entry");
         synchronized(this.publisherCheckLock) {
+
             if (this.publisherCheckIsScheduled) {
                 // do nothing, it is already scheduled
             } else {
                 TimerTask publisherCheckTask = new TimerTask() {
                     public void run() {
+                        getLogger().info(".publisherCheckTask(): Entry");
                         boolean doAgain = performPubSubParticipantCheck();
                         if(!doAgain) {
                             publisherCheckIsScheduled = false;
                             cancel();
                         }
+                        getLogger().info(".publisherCheckTask(): Exit");
                     }
                 };
                 Timer timer = new Timer("PublisherCheck");
-                timer.schedule(publisherCheckTask, this.SUBSCRIPTION_CHECK_DELAY);
+                timer.schedule(publisherCheckTask, this.SUBSCRIPTION_CHECK_DELAY, this.SUBSCRIPTION_CHECK_DELAY);
+                publisherCheckIsScheduled = true;
             }
         }
+        getLogger().info(".schedulePublisherCheck(): Exit");
     }
 
     /**
@@ -199,26 +205,32 @@ public abstract class JGroupsIPCPubSubPublisherService extends JGroupsIPCPubSubP
         getLogger().info(".performPublisherCheck(): Entry");
         boolean doAgain = false;
 
+        getLogger().info(".performPublisherCheck(): Getting a list of all Publishers");
         List<String> allPublishers = getPublisherRegistrationMapIM().getAllPublishers();
-
+        getLogger().info(".performPublisherCheck(): Publisher List retrieved, now iterating through");
         for(String publisherInstanceName: allPublishers){
+            getLogger().info(".performPublisherCheck(): Checking Publisher->{}", publisherInstanceName);
             InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = null;
             if(isPublisherInstanceAvailable(publisherInstanceName)){
                 // Do Nothing!
+                getLogger().info(".performPublisherCheck(): Publisher->{} is still available, doing nothing!", publisherInstanceName);
             } else {
                 getLogger().info(".performPublisherCheck(): Publisher->{} is not available, removing!", publisherInstanceName);
                 InterSubsystemPubSubPublisherRegistration publisherInstanceRegistration = getPublisherRegistrationMapIM().getPublisherInstanceRegistration(publisherInstanceName);
                 subscriptionRegistration = getPublisherRegistrationMapIM().unregisterPublisherInstance(publisherInstanceRegistration.getPublisher());
             }
+            getLogger().info(".performPublisherCheck(): Now checking if there is an existing subscriptionRegistration");
             if(subscriptionRegistration != null) {
                 if (subscriptionRegistration.getRegistrationStatus().equals(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS)) {
                     getLogger().warn(".performPublisherCheck(): No publisher for service ({}) is available", subscriptionRegistration.getPublisherServiceName() );
+                } else {
+                    getLogger().warn(".performPublisherCheck(): Publisher for service ({}) is available", subscriptionRegistration.getPublisherServiceName() );
                 }
+            } else {
+                getLogger().info(".performPublisherCheck(): No subscription available");
             }
         }
-        synchronized(this.publisherCheckLock) {
-            this.publisherCheckIsScheduled = false;
-        }
+        getLogger().info(".performPublisherCheck(): Now scheduling a subscription check");
         scheduleSubscriptionCheck();
         getLogger().info(".performPublisherCheck(): Exit, returning doAgain->{}", doAgain);
         return(doAgain);

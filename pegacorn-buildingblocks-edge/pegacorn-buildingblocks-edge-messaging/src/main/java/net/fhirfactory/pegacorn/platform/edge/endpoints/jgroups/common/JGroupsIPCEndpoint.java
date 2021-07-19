@@ -240,8 +240,7 @@ public abstract class JGroupsIPCEndpoint extends JGroupsEndpoint {
             getLogger().trace(".establishJChannel(): Exit, JChannel & RPCDispatcher created");
             return;
         } catch (Exception e) {
-            e.printStackTrace();
-            getLogger().error(".establishJChannel(): Cannot establish JGroups Channel, error->{}", e.getMessage());
+            getLogger().error(".establishJChannel(): Cannot establish JGroups Channel, error->", e);
             this.getPubsubParticipant().getInterSubsystemParticipant().setConnectionEstablishmentDate(Date.from(Instant.now()));
             this.getPubsubParticipant().getInterSubsystemParticipant().setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_FAILED);
             return;
