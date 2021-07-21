@@ -362,7 +362,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
     //
 
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().debug(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
+        getLogger().info(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
@@ -370,7 +370,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
             classSet[0] = InterProcessingPlantHandoverPacket.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, RPC_UNICAST_TIMEOUT);
             InterProcessingPlantHandoverResponsePacket response = getRPCDispatcher().callRemoteMethod(targetAddress, "receiveIPCMessage", objectSet, classSet, requestOptions);
-            getLogger().debug(".sendIPCMessage(): Exit, response->{}", response);
+            getLogger().info(".sendIPCMessage(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
             getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());

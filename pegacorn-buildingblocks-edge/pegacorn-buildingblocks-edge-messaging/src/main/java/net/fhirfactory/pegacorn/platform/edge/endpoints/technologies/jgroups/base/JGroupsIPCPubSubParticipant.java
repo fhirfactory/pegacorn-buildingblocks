@@ -271,13 +271,16 @@ public abstract class JGroupsIPCPubSubParticipant extends JGroupsEndpointBase im
     // Send Messages (via RPC invocations)
     //
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket){
+        getLogger().info(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
         Address targetServiceAddress = getTargetServiceAddress(targetParticipantServiceName);
+        getLogger().info(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
         InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = sendIPCMessage(targetServiceAddress, handoverPacket);
         return(interProcessingPlantHandoverResponsePacket);
     }
 
 
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
+        getLogger().info(".sendIPCMessage(): Entry, targetAddress->{}, handoverPacket->{}", targetAddress, handoverPacket);
         InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = this.meAsPubSubClient.sendIPCMessage(targetAddress, handoverPacket);
         return(interProcessingPlantHandoverResponsePacket);
     }
