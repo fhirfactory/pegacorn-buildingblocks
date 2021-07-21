@@ -19,13 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.model.pubsub;
+package net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.restapi.client;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.restapi.common.HTTPEdgeIPCEndpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
 
-public interface InterSubSystemPubSubBrokerInterface {
-    public InterSubsystemPubSubPublisherSubscriptionRegistration subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem);
+@ApplicationScoped
+public class HTTPEdgeForwardIPCEndpoint extends HTTPEdgeIPCEndpoint {
+    private static final Logger LOG = LoggerFactory.getLogger(HTTPEdgeForwardIPCEndpoint.class);
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    @Override
+    protected String specifyServerHostName() {
+        return null;
+    }
+
+    @Override
+    protected String specifyServerHostPort() {
+        return null;
+    }
+
+    @Override
+    protected String specifyServerHostPath() {
+        return null;
+    }
+
+    @Override
+    public void configure() throws Exception {
+
+    }
 }

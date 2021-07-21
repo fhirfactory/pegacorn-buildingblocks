@@ -19,10 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups;
+package net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCPubSubSubscriberService;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.base.JGroupsIPCPubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -36,7 +36,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class JGroupsIntraZoneIPCService extends JGroupsIPCPubSubSubscriberService {
+public class JGroupsIntraZoneIPCService extends JGroupsIPCPubSubParticipant {
     private static final Logger LOG = LoggerFactory.getLogger(JGroupsIntraZoneIPCService.class);
 
     private static String STACK_INITIAL_HOSTS = "hosts";
@@ -46,6 +46,16 @@ public class JGroupsIntraZoneIPCService extends JGroupsIPCPubSubSubscriberServic
 
     public JGroupsIntraZoneIPCService(){
         super();
+    }
+
+    @Override
+    protected String specifyForwarderWUPName() {
+        return ("EdgeIntraZoneMessageForwardWUP");
+    }
+
+    @Override
+    protected String specifyForwarderWUPVersion() {
+        return ("1.0.0");
     }
 
     @Override
@@ -77,36 +87,6 @@ public class JGroupsIntraZoneIPCService extends JGroupsIPCPubSubSubscriberServic
     @Override
     protected TopologyEndpointTypeEnum specifyIPCType() {
         return (TopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_MESSAGING_SERVICE);
-    }
-
-    @Override
-    public EdgeForwarderService getEdgeForwarderService() {
-        return (forwarderService);
-    }
-
-    @Override
-    protected ProtocolStack specifyProtocolStack() {
-        getLogger().debug(".specifyProtocolStack(): Entry");
-        getLogger().trace(".specifyProtocolStack(): Sourcing the bindPort");
-        String bindPort = Integer.toString(getIPCTopologyEndpoint().getPortValue());
-        getLogger().trace(".specifyProtocolStack(): bindPort sourced, value->{}", bindPort);
-        getLogger().trace(".specifyProtocolStack(): Sourcing the bindAddress");
-        String bindAddress = getIPCTopologyEndpoint().getHostDNSName();
-        getLogger().trace(".specifyProtocolStack(): bindAddress sourced, value->{}", bindAddress);
-        getLogger().trace(".specifyProtocolStack(): Sourcing the nameSpace");
-        String namespace = getProcessingPlantInterface().getProcessingPlantNode().getNameSpace();
-        getLogger().trace(".specifyProtocolStack(): nameSpace sourced, value->{}", namespace);
-        getLogger().trace(".specifyProtocolStack(): Sourcing the label");
-        String label = getIPCTopologyEndpoint().getSecurityZone().getNetworkSecurityZone();
-        getLogger().trace(".specifyProtocolStack(): label sourced, value->{}", label);
-        ProtocolStack stack = null;
-        try {
-            stack = getStacks().getIntraZoneProtocolStack(bindAddress, bindPort, namespace, label );
-            return(stack);
-        } catch (Exception e) {
-            getLogger().error(".specifyProtocolStack(): Cannot resolve JGroups Stack, error->{}", e.getMessage());
-        }
-        return (null);
     }
 
     @Override

@@ -19,40 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.endpoints.restapi.client;
+package net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.restapi.common;
 
-import net.fhirfactory.pegacorn.platform.edge.endpoints.restapi.common.HTTPEdgeIPCEndpoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.topology.EdgeIPCEndpoint;
 
-import javax.enterprise.context.ApplicationScoped;
+public abstract class HTTPEdgeIPCEndpoint extends EdgeIPCEndpoint {
 
-@ApplicationScoped
-public class HTTPEdgeForwardIPCEndpoint extends HTTPEdgeIPCEndpoint {
-    private static final Logger LOG = LoggerFactory.getLogger(HTTPEdgeForwardIPCEndpoint.class);
+    abstract protected String specifyServerHostName();
+    abstract protected String specifyServerHostPort();
+    abstract protected String specifyServerHostPath();
 
-    @Override
-    protected Logger specifyLogger() {
-        return (LOG);
-    }
-
-    @Override
-    protected String specifyServerHostName() {
-        return null;
-    }
-
-    @Override
-    protected String specifyServerHostPort() {
-        return null;
-    }
-
-    @Override
-    protected String specifyServerHostPath() {
-        return null;
-    }
-
-    @Override
-    public void configure() throws Exception {
-
-    }
 }

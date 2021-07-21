@@ -19,40 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.endpoints.restapi.server;
+package net.fhirfactory.pegacorn.platform.edge.endpoints.roles.base;
 
-import net.fhirfactory.pegacorn.platform.edge.endpoints.restapi.common.HTTPEdgeIPCEndpoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.common.IPCEndpointAddress;
 
-import javax.enterprise.context.ApplicationScoped;
+import java.util.List;
 
-@ApplicationScoped
-public class HTTPEdgeReceiveIPCEndpoint extends HTTPEdgeIPCEndpoint {
-    private static final Logger LOG = LoggerFactory.getLogger(HTTPEdgeReceiveIPCEndpoint.class);
+public interface PubSubParticipantEndpointServiceInterface {
+    public IPCEndpointAddress getPubSubParticipantServiceCandidateAddress(String serviceName);
+    public IPCEndpointAddress getPubSubParticipantInstanceAddress(String serviceProviderInstanceName);
+    public boolean isPubSubParticipantInstanceActive(String serviceProviderInstanceName);
+    public boolean isPubSubParticipantInstanceActive(IPCEndpointAddress ipcEndpointID);
+    public List<IPCEndpointAddress> getTargetServiceInstanceAddresses(String serviceName);
+    public List<IPCEndpointAddress> getAllPubSubParticipantAddresses();
 
-    @Override
-    protected Logger specifyLogger() {
-        return (LOG);
-    }
-
-    @Override
-    protected String specifyServerHostName() {
-        return null;
-    }
-
-    @Override
-    protected String specifyServerHostPort() {
-        return null;
-    }
-
-    @Override
-    protected String specifyServerHostPath() {
-        return null;
-    }
-
-    @Override
-    public void configure() throws Exception {
-
-    }
 }

@@ -19,13 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.model.pubsub;
+package net.fhirfactory.pegacorn.platform.edge.endpoints.roles.common;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
-
-import java.util.List;
-
-public interface InterSubSystemPubSubBrokerInterface {
-    public InterSubsystemPubSubPublisherSubscriptionRegistration subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem);
+public enum IPCEndpointAddressTypeEnum {
+    ADDRESS_TYPE_JGROUPS,
+    ADDRESS_TYPE_HTTP
 }

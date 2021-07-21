@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionI
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.common.JGroupsIPCEndpoint;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.base.JGroupsIPCPubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverFinisherBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketResponseDecoder;
@@ -62,8 +62,8 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     }
 
     protected abstract String specifyIPCZoneType();
-    protected abstract JGroupsIPCEndpoint specifyIPCEndpoint();
-    protected JGroupsIPCEndpoint getIPCEndpoint(){return(specifyIPCEndpoint());}
+    protected abstract JGroupsIPCPubSubParticipant specifyIPCEndpoint();
+    protected JGroupsIPCPubSubParticipant getIPCEndpoint(){return(specifyIPCEndpoint());}
 
     //
     // Application Logic (Route Definition)
@@ -85,8 +85,6 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
                 .process(new NodeDetailInjector())
                 .bean(InterProcessingPlantHandoverPacketGenerationBean.class, "constructInterProcessingPlantHandoverPacket(*,  Exchange)")
                 .to(egressFeed())
-//                .transform(simple("${bodyAs(String)}"))
-//                .log(LoggingLevel.DEBUG, "Response Raw Message --> ${body}")
                 .bean(InterProcessingPlantHandoverPacketResponseDecoder.class, "contextualiseInterProcessingPlantHandoverResponsePacket(*,  Exchange)")
                 .bean(InterProcessingPlantHandoverFinisherBean.class, "ipcSenderNotifyActivityFinished(*, Exchange)");
 
@@ -111,7 +109,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
 
     @Override
     public void executePostInitialisationActivities(){
-        this.getIPCEndpoint().initialise(getAssociatedTopologyNode().getNodeFDN().getToken());
+        this.getIPCEndpoint().initialise();
     }
 
     //

@@ -22,14 +22,18 @@
 package net.fhirfactory.pegacorn.platform.edge.services;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.JGroupsInterZoneIPCService;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.jgroups.JGroupsIntraZoneIPCService;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipantIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.JGroupsInterZoneIPCService;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.JGroupsIntraZoneIPCService;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.InterSubSystemPubSubBrokerInterface;
-import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
@@ -39,36 +43,32 @@ public class InterSubSystemPubSubBroker implements InterSubSystemPubSubBrokerInt
     private static final Logger LOG = LoggerFactory.getLogger(InterSubSystemPubSubBroker.class);
 
     @Inject
-    private JGroupsInterZoneIPCService interZoneIPCEndpoint;
+    private PublisherRegistrationMapIM publisherRegistrationMapIM;
 
-    @Inject
-    private JGroupsIntraZoneIPCService intraZoneIPCEndpoint;
-
-    public RemoteSubscriptionResponse subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem){
-        LOG.info(".subscribe(): Entry, dataParcelManifestList->{}, sourceSubSystem->{}", dataParcelManifestList, sourceSubSystem);
-        PubSubParticipant publisher = new PubSubParticipant();
-        InterSubsystemPubSubParticipant distributedPublisher = new InterSubsystemPubSubParticipant();
-        InterSubsystemPubSubParticipantIdentifier distributedPublisherIdentifier = new InterSubsystemPubSubParticipantIdentifier();
-        distributedPublisherIdentifier.setServiceName(sourceSubSystem);
-        distributedPublisher.setIdentifier(distributedPublisherIdentifier);
-        distributedPublisher.getIdentifier().setServiceName(sourceSubSystem);
-        publisher.setInterSubsystemParticipant(distributedPublisher);
-//        if(interZoneIPCEndpoint.isPublisherAvailable(publisher)){
-//            LOG.info(".subscribe(): Is InterZone based communications");
-//            RemoteSubscriptionResponse interZoneResponse = interZoneIPCEndpoint.subscribeToRemotePublishers(dataParcelManifestList, publisher);
-//            LOG.info(".subscribe(): Exit, interZoneResponse->{}", interZoneResponse);
-//            return(interZoneResponse);
-//        }
-//
-        LOG.info(".subscribe(): Is IntraZone based communications");
-        RemoteSubscriptionResponse intraZoneResponse = intraZoneIPCEndpoint.subscribeToRemotePublishers(dataParcelManifestList, publisher);
-        LOG.info(".subscribe(): Exit, intraZoneResponse->{}", intraZoneResponse);
-        return(intraZoneResponse);
-//        RemoteSubscriptionResponse noSourceSystemResponse = new RemoteSubscriptionResponse();
-//        noSourceSystemResponse.setSubscriptionSuccessful(false);
-//        noSourceSystemResponse.setSubscriptionCommentary("Could not find Source Subsystem");
-//        LOG.debug(".subscribe(): Exit, noSourceSystemResponse->{}", noSourceSystemResponse);
-//        return(noSourceSystemResponse);
+    @PostConstruct
+    public void initialise(){
+        LOG.info(".initialise(): initialising......");;
+        LOG.info(".initialise(): Done....");
     }
 
+    @Override
+    public InterSubsystemPubSubPublisherSubscriptionRegistration subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem) {
+        LOG.info(".subscribe(): Entry, I am here in (InterSubSystemPubSubBroker), dataParcelManifestList->{}, sourceSubSystem->{}", dataParcelManifestList, sourceSubSystem);
+        PubSubParticipant publisher = new PubSubParticipant();
+        InterSubsystemPubSubParticipant distributedPublisher = new InterSubsystemPubSubParticipant();
+        LOG.info(".subscribe(): Creating InterSubsystemPubSubParticipantIdentifier");
+        InterSubsystemPubSubParticipantIdentifier distributedPublisherIdentifier = new InterSubsystemPubSubParticipantIdentifier();
+        LOG.info(".subscribe(): Adding sourceSubSystem");
+        distributedPublisherIdentifier.setServiceName(sourceSubSystem);
+        LOG.info(".subscribe(): setIdentifier(), distributedPublisherIdentifier->{}", distributedPublisherIdentifier);
+        distributedPublisher.setIdentifier(distributedPublisherIdentifier);
+        LOG.info(".subscribe(): getIdentifier().setServiceName()");
+        distributedPublisher.getIdentifier().setServiceName(sourceSubSystem);
+        LOG.info(".subscribe(): publisher.setInterSubsystemParticipant()");
+        publisher.setInterSubsystemParticipant(distributedPublisher);
+        LOG.info(".subscribe(): Registration subscriptions");
+        InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = publisherRegistrationMapIM.addSubscriptionToPublisher(dataParcelManifestList, publisher.getInterSubsystemParticipant());
+        LOG.info(".subscribe(): Exit, done->{}", subscriptionRegistration);
+        return (subscriptionRegistration);
+    }
 }

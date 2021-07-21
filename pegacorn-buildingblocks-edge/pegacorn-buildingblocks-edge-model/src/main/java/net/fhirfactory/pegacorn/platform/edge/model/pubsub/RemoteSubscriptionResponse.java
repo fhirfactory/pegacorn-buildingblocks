@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubNetworkConnectionStat
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
 
@@ -41,6 +42,13 @@ public class RemoteSubscriptionResponse implements Serializable {
         super();
         this.publisher = null;
         this.subscriptionRegistrationDate = null;
+    }
+
+    public RemoteSubscriptionResponse(boolean subscriptionSuccess, String commentary, PubSubNetworkConnectionStatusEnum status){
+        this.subscriptionSuccessful = subscriptionSuccess;
+        this.subscriptionCommentary = commentary;
+        this.networkConnectionStatus = status;
+        this.subscriptionRegistrationDate = Date.from(Instant.now());
     }
 
     public InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum getSubscriptionRegistrationStatus() {

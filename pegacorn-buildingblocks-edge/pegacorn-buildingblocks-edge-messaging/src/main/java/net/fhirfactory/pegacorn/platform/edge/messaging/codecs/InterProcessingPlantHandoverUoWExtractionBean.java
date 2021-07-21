@@ -25,6 +25,7 @@ import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelDirectionEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWProcessingOutcomeEnum;
@@ -34,8 +35,15 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+@ApplicationScoped
 public class InterProcessingPlantHandoverUoWExtractionBean {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverResponseGenerationBean.class);
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
 
     public InterProcessingPlantHandoverUoWExtractionBean() {
     }
@@ -57,6 +65,11 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
         parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
         parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE);
         parcelManifest.setInterSubsystemDistributable(false);
+        if(parcelManifest.hasIntendedTargetSystem()){
+            if(parcelManifest.getIntendedTargetSystem().contentEquals(processingPlant.getIPCServiceName())){
+                parcelManifest.setIntendedTargetSystem(null);
+            }
+        }
         outputPayload.setPayloadManifest(parcelManifest);
         theUoW.getEgressContent().addPayloadElement(outputPayload);
         theUoW.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_SUCCESS);
