@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDef
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.JGroupsIntraZoneIPCService;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.ipc.JGroupsIntraZoneIPCService;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.base.JGroupsIPCPubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.messaging.forward.common.EdgeMessageForwardWUP;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;

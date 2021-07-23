@@ -29,11 +29,12 @@ import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.base.PubSubParticipantEndpointServiceInterface;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.base.PubSubParticipantRoleBase;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.common.IPCEndpointAddress;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.activitycache.EndpointCheckSchedule;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.activitycache.datatypes.IPCEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionRequest;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionResponse;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionStatus;
-import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.RequestOptions;
@@ -48,16 +49,16 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PubSubParticipantServerRole extends PubSubParticipantRoleBase {
-    private static final Logger LOG = LoggerFactory.getLogger(PubSubParticipantServerRole.class);
+public class PubSubPublisherRole extends PubSubParticipantRoleBase {
+    private static final Logger LOG = LoggerFactory.getLogger(PubSubPublisherRole.class);
 
     private Object publisherCheckLock;
     private boolean publisherCheckScheduled;
+    private EndpointCheckSchedule publisherCheckSchedule;
+    private static Long MEMBERSHIP_CHECK_DELAY = 5000L;
 
-    private static Long MEMEBERSHIP_CHECK_DELAY = 5000L;
 
-
-    public PubSubParticipantServerRole(
+    public PubSubPublisherRole(
             ProcessingPlantInterface processingPlant,
             PubSubParticipantEndpointServiceInterface endpointServiceInterface,
             PubSubParticipant me,
@@ -68,6 +69,7 @@ public class PubSubParticipantServerRole extends PubSubParticipantRoleBase {
         super(processingPlant, endpointServiceInterface, me, publisherMapIM, channel, dispatcher, forwarderService);
         this.publisherCheckLock = new Object();
         this.publisherCheckScheduled = false;
+        this.publisherCheckSchedule = new EndpointCheckSchedule();
     }
 
     //
@@ -213,20 +215,65 @@ public class PubSubParticipantServerRole extends PubSubParticipantRoleBase {
             }
         }
         for(IPCEndpointAddress currentAddress: publishersAdded){
-            String participantInstanceName = currentAddress.getAddressName();
-            InterSubsystemPubSubPublisherRegistration publisherRegistration = getPublisherMapIM().getPublisherInstanceRegistration(participantInstanceName);
-            if(publisherRegistration == null){
-                String myName = getMe().getInterSubsystemParticipant().getIdentifier().getServiceInstanceName();
-                InterSubsystemPubSubParticipant distributedPublisher = requestParticipantDetail(currentAddress.getJGroupsAddress(),myName );
-                publisherRegistration = getPublisherMapIM().registerPublisherInstance(distributedPublisher);
-            }
+            publisherCheckSchedule.scheduleEndpointCheck(currentAddress, false, true);
         }
+        schedulePublisherCheck();
     }
 
     @Override
     protected void performSubscriberEventUpdateCheck(List<IPCEndpointAddress> subscribersRemoved, List<IPCEndpointAddress> subscribersAdded) {
 
     }
+
+    /**
+     *
+     */
+    public void schedulePublisherCheck() {
+        getLogger().info(".schedulePublisherCheck(): Entry (schedulePublisherCheck->{}", isPublisherCheckScheduled());
+        synchronized (getPublisherCheckLock()) {
+            if (isSubscriptionCheckScheduled()) {
+                // do nothing, it is already scheduled
+            } else {
+                TimerTask publisherCheckTask = new TimerTask() {
+                    public void run() {
+                        getLogger().info(".publisherCheckTask(): Entry");
+                        boolean doAgain = performPublisherCheckTask();
+                        getLogger().info(".publisherCheckTask(): doAgain ->{}", doAgain);
+                        if (!doAgain) {
+                            cancel();
+                            setPublisherCheckScheduled(false);
+                        }
+                        getLogger().info(".publisherCheckTask(): Exit");
+                    }
+                };
+                Timer timer = new Timer("publisherCheckTask");
+                timer.schedule(publisherCheckTask, getParticipantMembershipCheckDelay(), getParticipantMembershipCheckPeriod());
+                setSubscriptionCheckScheduled(true);
+            }
+        }
+        getLogger().info(".publisherCheckTask(): Exit");
+    }
+
+    public boolean performPublisherCheckTask(){
+        List<IPCEndpointCheckScheduleElement> endpointsToCheck = publisherCheckSchedule.getEndpointsToCheck();
+        for(IPCEndpointCheckScheduleElement currentScheduleElement: endpointsToCheck) {
+            if(currentScheduleElement.isEndpointAdded()) {
+                String participantInstanceName = currentScheduleElement.getEndpoint().getAddressName();
+                InterSubsystemPubSubPublisherRegistration publisherRegistration = getPublisherMapIM().getPublisherInstanceRegistration(participantInstanceName);
+                if (publisherRegistration == null) {
+                    String myName = getMe().getInterSubsystemParticipant().getIdentifier().getServiceInstanceName();
+                    InterSubsystemPubSubParticipant distributedPublisher = requestParticipantDetail(currentScheduleElement.getEndpoint().getJGroupsAddress(), myName);
+                    publisherRegistration = getPublisherMapIM().registerPublisherInstance(distributedPublisher);
+                }
+            }
+        }
+        if(publisherCheckSchedule.scheduleIsEmpty()){
+            return(false);
+        } else {
+            return(true);
+        }
+    }
+
 
     /**
      *
@@ -258,5 +305,26 @@ public class PubSubParticipantServerRole extends PubSubParticipantRoleBase {
         for(IPCEndpointAddress endpoint: allEndpoints){
             requestPublisherRegistration(endpoint, getMe().getInterSubsystemParticipant());
         }
+    }
+
+    //
+    // Getters and Setters
+    //
+
+
+    public Object getPublisherCheckLock() {
+        return publisherCheckLock;
+    }
+
+    public void setPublisherCheckLock(Object publisherCheckLock) {
+        this.publisherCheckLock = publisherCheckLock;
+    }
+
+    public boolean isPublisherCheckScheduled() {
+        return publisherCheckScheduled;
+    }
+
+    public void setPublisherCheckScheduled(boolean publisherCheckScheduled) {
+        this.publisherCheckScheduled = publisherCheckScheduled;
     }
 }

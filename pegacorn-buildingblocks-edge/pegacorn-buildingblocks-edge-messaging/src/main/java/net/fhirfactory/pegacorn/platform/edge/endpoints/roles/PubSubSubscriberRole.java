@@ -27,9 +27,9 @@ import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMa
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.base.PubSubParticipantEndpointServiceInterface;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.base.PubSubParticipantRoleBase;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.common.IPCEndpointAddress;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.common.IPCEndpointAddressTypeEnum;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.common.MultiPublisherResponseSet;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.common.*;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.activitycache.EndpointCheckSchedule;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.activitycache.datatypes.IPCEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionRequest;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionResponse;
@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Date;
-import java.text.spi.DateFormatProvider;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,11 +51,12 @@ import java.util.TimerTask;
 
 import static net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherStatusEnum.*;
 
-public class PubSubParticipantClientRole extends PubSubParticipantRoleBase {
-    private static final Logger LOG = LoggerFactory.getLogger(PubSubParticipantClientRole.class);
+public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
+    private static final Logger LOG = LoggerFactory.getLogger(PubSubSubscriberRole.class);
 
+    private EndpointCheckSchedule subscriptionCheckSchedule;
 
-    public PubSubParticipantClientRole(
+    public PubSubSubscriberRole(
             ProcessingPlantInterface processingPlant,
             PubSubParticipantEndpointServiceInterface endpointServiceInterface,
             PubSubParticipant me,
@@ -65,7 +65,17 @@ public class PubSubParticipantClientRole extends PubSubParticipantRoleBase {
             RpcDispatcher rpcDispatcher,
             EdgeForwarderService forwarderService){
         super(processingPlant, endpointServiceInterface, me, publisherMapIM, channel, rpcDispatcher, forwarderService);
+        subscriptionCheckSchedule = new EndpointCheckSchedule();
 
+        TimerTask subscriptionCheckTask = new TimerTask() {
+            public void run() {
+                getLogger().info(".subscriptionCheckTask(): Entry");
+                performSubscriptionCheck();
+                getLogger().info(".subscriptionCheckTask(): Exit");
+            }
+        };
+        Timer timer = new Timer("GeneralSubscriptionCheck");
+        timer.schedule(subscriptionCheckTask, 300000, 300000);
     }
 
     @Override
@@ -90,7 +100,7 @@ public class PubSubParticipantClientRole extends PubSubParticipantRoleBase {
     @Override
     protected void performPublisherEventUpdateCheck(List<IPCEndpointAddress> publishersRemoved, List<IPCEndpointAddress> publishersAdded) {
         for(IPCEndpointAddress currentAddress: publishersAdded){
-            doSubscriptionCheck(currentAddress);
+            subscriptionCheckSchedule.scheduleEndpointCheck(currentAddress, false, true);
         }
     }
 
@@ -99,68 +109,41 @@ public class PubSubParticipantClientRole extends PubSubParticipantRoleBase {
 
     }
 
-    /**
-     *
-     */
-    public void scheduleSubscriptionCheck(){
-        getLogger().info(".scheduleSubscriptionCheck(): Entry (subscriptionCheckScheduled->{}", isSubscriptionCheckScheduled());
-        synchronized(getSubscriptionCheckScheduledLock()) {
-            if (isSubscriptionCheckScheduled()) {
-                // do nothing, it is already scheduled
-            } else {
-                TimerTask subscriptionCheckTask = new TimerTask() {
-                    public void run() {
-                        getLogger().info(".subscriptionCheckTask(): Entry");
-                        boolean doAgain = performSubscriptionCheck();
-                        getLogger().info(".subscriptionCheckTask(): doAgain ->{}", doAgain);
-                        if(!doAgain) {
-                            cancel();
-                            setSubscriptionCheckScheduled(false);
-                        }
-                        getLogger().info(".subscriptionCheckTask(): Exit");
-                    }
-                };
-                Timer timer = new Timer("SubscriptionCheck");
-                timer.schedule(subscriptionCheckTask, getParticipantMembershipCheckDelay(), getParticipantMembershipCheckPeriod());
-                setSubscriptionCheckScheduled(true);
-            }
-        }
-        getLogger().info(".scheduleSubscriptionCheck(): Exit");
-    }
+
 
     /**
      *
      */
-    protected boolean performSubscriptionCheck(){
-        getLogger().info(".performSubscriptionCheck(): Entry");
+    protected void performSubscriptionCheck(){
+        getLogger().debug(".performSubscriptionCheck(): Entry");
         List<InterSubsystemPubSubPublisherSubscriptionRegistration> subscriptionRegistrationList = getPublisherMapIM().getAllPublisherServiceSubscriptions();
-        getLogger().info(".performSubscriptionCheck(): Iterate through Subscription Registrations");
+        getLogger().trace(".performSubscriptionCheck(): Iterate through Subscription Registrations");
         for(InterSubsystemPubSubPublisherSubscriptionRegistration currentServiceRegistration: subscriptionRegistrationList){
-            getLogger().info(".performSubscriptionCheck(): Looking for publisher->{}", currentServiceRegistration.getPublisherServiceName());
+            getLogger().trace(".performSubscriptionCheck(): Looking for publisher->{}", currentServiceRegistration.getPublisherServiceName());
             List<InterSubsystemPubSubPublisherRegistration> instanceRegistrations = getPublisherMapIM().getPublisherServiceProviderInstanceRegistrations(currentServiceRegistration.getPublisherServiceName());
-            getLogger().info(".performSubscriptionCheck(): Iterate through Publisher Registrations");
+            getLogger().trace(".performSubscriptionCheck(): Iterate through Publisher Registrations");
             for(InterSubsystemPubSubPublisherRegistration currentInstanceRegistration: instanceRegistrations){
-                getLogger().info(".performSubscriptionCheck(): Iterating, looking at publisher->{}", currentInstanceRegistration.getPublisher().getIdentifier().getServiceInstanceName());
+                getLogger().trace(".performSubscriptionCheck(): Iterating, looking at publisher->{}", currentInstanceRegistration.getPublisher().getIdentifier().getServiceInstanceName());
                 if(currentInstanceRegistration.getPublisherStatus().equals(PUBLISHER_REGISTERED) || currentInstanceRegistration.getPublisherStatus().equals(PUBLISHER_UNREACHABLE)){
-                    getLogger().info(".performSubscriptionCheck(): Checking....");
+                    getLogger().trace(".performSubscriptionCheck(): Checking....");
                     PubSubParticipant newPublisher = new PubSubParticipant();
                     newPublisher.setInterSubsystemParticipant(currentInstanceRegistration.getPublisher());
                     InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = subscribeToRemotePublishers(currentServiceRegistration.getSubscriptionList(), newPublisher);
                 }
             }
-            getLogger().info(".performSubscriptionCheck(): Looking now into JGroups itself for Publisher Service->{}", currentServiceRegistration.getPublisherServiceName());
+            getLogger().trace(".performSubscriptionCheck(): Looking now into JGroups itself for Publisher Service->{}", currentServiceRegistration.getPublisherServiceName());
             List<IPCEndpointAddress> serviceInstanceSet = getParticipantServiceInstanceSet(currentServiceRegistration.getPublisherServiceName());
             if(serviceInstanceSet != null){
-                getLogger().info(".performSubscriptionCheck(): there are publishers!, number->{}", serviceInstanceSet.size());
+                getLogger().trace(".performSubscriptionCheck(): there are publishers!, number->{}", serviceInstanceSet.size());
                 for(IPCEndpointAddress serviceProvider: serviceInstanceSet){
-                    getLogger().info(".performSubscriptionCheck(): checking participant->{}", serviceProvider);
+                    getLogger().trace(".performSubscriptionCheck(): checking participant->{}", serviceProvider);
                     String publisherInstanceName = serviceProvider.getAddressName();
                     String publisherServiceName = getServiceNameFromParticipantInstanceName(publisherInstanceName);
-                    getLogger().info(".performSubscriptionCheck(): Checking Participant->(participantServiceName->{}, participantInstanceName->{} ", publisherServiceName, publisherInstanceName);
+                    getLogger().trace(".performSubscriptionCheck(): Checking Participant->(participantServiceName->{}, participantInstanceName->{} ", publisherServiceName, publisherInstanceName);
                     InterSubsystemPubSubPublisherRegistration publisherRegistration = getPublisherMapIM().getPublisherInstanceRegistration(publisherInstanceName);
-                    getLogger().info(".performSubscriptionCheck(): Existing Publisher Registration->{}", publisherRegistration);
+                    getLogger().trace(".performSubscriptionCheck(): Existing Publisher Registration->{}", publisherRegistration);
                     if(publisherRegistration == null) {
-                        getLogger().info(".performSubscriptionCheck(): checking participant->{}", serviceProvider);
+                        getLogger().trace(".performSubscriptionCheck(): checking participant->{}", serviceProvider);
                         String myName = getMe().getInterSubsystemParticipant().getIdentifier().getServiceInstanceName();
                         InterSubsystemPubSubParticipant newParticipant = requestParticipantDetail(serviceProvider.getJGroupsAddress(), myName);
                         publisherRegistration = getPublisherMapIM().registerPublisherInstance(newParticipant);
@@ -175,53 +158,82 @@ public class PubSubParticipantClientRole extends PubSubParticipantRoleBase {
                 }
             }
         }
-        getLogger().trace(".performSubscriptionCheck(): iterated through, now seeing if i need to reschedule SubscriptionCheck again");
-        for(InterSubsystemPubSubPublisherSubscriptionRegistration currentServiceRegistration: subscriptionRegistrationList) {
-            if(currentServiceRegistration.getPublisherServiceRegistrationStatus().equals(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_PENDING_NO_PROVIDERS)) {
-                getLogger().info(".performSubscriptionCheck(): iterated through, another SubscriptionCheck is needed");
-                return(true);
-            }
-        }
-        getLogger().info(".performSubscriptionCheck(): iterated through, another SubscriptionCheck is NOT needed");
-        return(false);
     }
 
-    protected void doSubscriptionCheck(IPCEndpointAddress participantAddress){
-        getLogger().info(".doSubscriptionCheck(): Entry, participantAddress->{}", participantAddress);
-        String participantInstanceName = participantAddress.getAddressName();
-        String participantServiceName = extractPublisherServiceName(participantInstanceName);
-        if(StringUtils.isEmpty(participantInstanceName) || StringUtils.isEmpty(participantServiceName)) {
-            getLogger().info(".doSubscriptionCheck(): Exit, publisher name is bad...");
-            return;
+    /**
+     *
+     */
+    public void scheduleASubscriptionCheck() {
+        getLogger().info(".scheduleASubscriptionCheck(): Entry (subscriptionCheckScheduled->{}", isSubscriptionCheckScheduled());
+        synchronized (getSubscriptionCheckScheduledLock()) {
+            if (isSubscriptionCheckScheduled()) {
+                // do nothing, it is already scheduled
+            } else {
+                TimerTask subscriptionCheckTask = new TimerTask() {
+                    public void run() {
+                        getLogger().info(".subscriptionCheckTask(): Entry");
+                        boolean doAgain = doSubscriptionCheck();
+                        getLogger().info(".subscriptionCheckTask(): doAgain ->{}", doAgain);
+                        if (!doAgain) {
+                            cancel();
+                            setSubscriptionCheckScheduled(false);
+                        }
+                        getLogger().info(".subscriptionCheckTask(): Exit");
+                    }
+                };
+                Timer timer = new Timer("SubscriptionScheduleTimer");
+                timer.schedule(subscriptionCheckTask, getParticipantMembershipCheckDelay(), getParticipantMembershipCheckPeriod());
+                setSubscriptionCheckScheduled(true);
+            }
         }
-        InterSubsystemPubSubPublisherSubscriptionRegistration serviceSubscription = null;
-        InterSubsystemPubSubPublisherRegistration instanceRegistration = getPublisherMapIM().getPublisherInstanceRegistration(participantInstanceName);
-        if(instanceRegistration == null) {
-            getLogger().info(".doSubscriptionCheck(): There is no existing PublisherRegistration for this PubSubParticipant, creating");
-            serviceSubscription = getPublisherMapIM().getPublisherServiceSubscription(participantServiceName);
-            if (serviceSubscription == null) {
-                getLogger().info(".doSubscriptionCheck(): Exit, We have no interest in this publisher");
-                return;
+        getLogger().info(".scheduleASubscriptionCheck(): Exit");
+    }
+
+    protected boolean doSubscriptionCheck(){
+        getLogger().info(".doSubscriptionCheck(): Entry");
+        List<IPCEndpointCheckScheduleElement> endpointsToCheck = subscriptionCheckSchedule.getEndpointsToCheck();
+        for(IPCEndpointCheckScheduleElement currentScheduleElement: endpointsToCheck) {
+            IPCEndpointAddress participantAddress = currentScheduleElement.getEndpoint();
+            getLogger().info(".doSubscriptionCheck(): Entry, participantAddress->{}", participantAddress);
+            String participantInstanceName = participantAddress.getAddressName();
+            String participantServiceName = extractPublisherServiceName(participantInstanceName);
+            if (StringUtils.isEmpty(participantInstanceName) || StringUtils.isEmpty(participantServiceName)) {
+                getLogger().info(".doSubscriptionCheck(): Exit, publisher name is bad...");
+            } else {
+                InterSubsystemPubSubPublisherSubscriptionRegistration serviceSubscription = null;
+                InterSubsystemPubSubPublisherRegistration instanceRegistration = getPublisherMapIM().getPublisherInstanceRegistration(participantInstanceName);
+                if (instanceRegistration == null) {
+                    getLogger().info(".doSubscriptionCheck(): There is no existing PublisherRegistration for this PubSubParticipant, creating");
+                    serviceSubscription = getPublisherMapIM().getPublisherServiceSubscription(participantServiceName);
+                    if (serviceSubscription != null) {
+                        List<DataParcelManifest> subscriptionList = serviceSubscription.getSubscriptionList();
+                        if (subscriptionList != null) {
+                            getLogger().info(".doSubscriptionCheck(): Exit, We have no topics to register with this publisher");
+                            getLogger().trace(".doSubscriptionCheck(): Create new PubSubPublisher");
+                            String myName = getMe().getInterSubsystemParticipant().getIdentifier().getServiceInstanceName();
+                            InterSubsystemPubSubParticipant newParticipant = requestParticipantDetail(participantAddress.getJGroupsAddress(), myName);
+                            instanceRegistration = getPublisherMapIM().registerPublisherInstance(newParticipant);
+                        }
+                    }
+                }
+                if(instanceRegistration != null) {
+                    if (instanceRegistration.getPublisherStatus().equals(PUBLISHER_REGISTERED) || instanceRegistration.getPublisherStatus().equals(PUBLISHER_UNREACHABLE)) {
+                        PubSubParticipant newParticipant = new PubSubParticipant();
+                        newParticipant.setInterSubsystemParticipant(instanceRegistration.getPublisher());
+                        RemoteSubscriptionResponse subscriptionResponse = requestSubscriptionToPublisherInstance(serviceSubscription.getSubscriptionList(), newParticipant);
+                        if (subscriptionResponse.isSubscriptionSuccessful()) {
+                            instanceRegistration.setPublisherStatus(PUBLISHER_ACTIVE);
+                            instanceRegistration.setLastActivityDate(Date.from(Instant.now()));
+                            serviceSubscription.setPublisherServiceRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_ACTIVE);
+                        }
+                    }
+                }
             }
-            List<DataParcelManifest> subscriptionList = serviceSubscription.getSubscriptionList();
-            if (subscriptionList == null) {
-                getLogger().info(".doSubscriptionCheck(): Exit, We have no topics to register with this publisher");
-                return;
-            }
-            getLogger().trace(".doSubscriptionCheck(): Create new PubSubPublisher");
-            String myName = getMe().getInterSubsystemParticipant().getIdentifier().getServiceInstanceName();
-            InterSubsystemPubSubParticipant newParticipant = requestParticipantDetail(participantAddress.getJGroupsAddress(), myName);
-            instanceRegistration = getPublisherMapIM().registerPublisherInstance(newParticipant);
         }
-        if(instanceRegistration.getPublisherStatus().equals(PUBLISHER_REGISTERED) || instanceRegistration.getPublisherStatus().equals(PUBLISHER_UNREACHABLE)) {
-            PubSubParticipant newParticipant = new PubSubParticipant();
-            newParticipant.setInterSubsystemParticipant(instanceRegistration.getPublisher());
-            RemoteSubscriptionResponse subscriptionResponse = requestSubscriptionToPublisherInstance(serviceSubscription.getSubscriptionList(), newParticipant);
-            if(subscriptionResponse.isSubscriptionSuccessful()){
-                instanceRegistration.setPublisherStatus(PUBLISHER_ACTIVE);
-                instanceRegistration.setLastActivityDate(Date.from(Instant.now()));
-                serviceSubscription.setPublisherServiceRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_ACTIVE);
-            }
+        if(subscriptionCheckSchedule.scheduleIsEmpty()){
+            return(false);
+        } else {
+            return(true);
         }
     }
 
@@ -267,6 +279,7 @@ public class PubSubParticipantClientRole extends PubSubParticipantRoleBase {
             if (publisherAddress != null) {
                 getLogger().info(".requestSubscription(): Subscribing to PublisherInstance->{}", publisherInstanceName);
                 response = rpcRequestSubscription(publisherAddress, subscriptionRequest);
+                this.subscriptionCheckSchedule.scheduleEndpointCheck(publisherAddress, false, true);
             }
         }
         if(response == null){
@@ -319,7 +332,6 @@ public class PubSubParticipantClientRole extends PubSubParticipantRoleBase {
                         currentPublisherRegistration.setPublisherStatus(PUBLISHER_ACTIVE);
                     } else {
                         currentPublisherRegistration.setPublisherStatus(PUBLISHER_UNREACHABLE);
-                        scheduleSubscriptionCheck();
                     }
                 }
             }

@@ -19,25 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.itops;
+package net.fhirfactory.pegacorn.platform.edge.itops.apiservices;
 
+import net.fhirfactory.pegacorn.platform.edge.itops.apiservices.transactions.exceptions.ResourceNotFoundException;
+import net.fhirfactory.pegacorn.platform.edge.itops.apiservices.transactions.exceptions.ResourceUpdateException;
+import net.fhirfactory.pegacorn.platform.edge.itops.configuration.JGroupsGossipRouterNode;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.OnExceptionDefinition;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestConfigurationDefinition;
-import org.apache.camel.model.rest.RestDefinition;
-import org.apache.camel.model.rest.RestParamType;
 import org.slf4j.Logger;
 
-public abstract class APIServicesFacade extends RouteBuilder {
+public abstract class APIServicesFacadeBase extends RouteBuilder {
 
-    private static String CONTENT_SERVER_PORT = "8080";
-    private static String CONTENT_SERVER_HOST = "0.0.0.0";
+    JGroupsGossipRouterNode topologyNode;
 
-    @Override
-    public void configure() throws Exception {
+    public APIServicesFacadeBase(JGroupsGossipRouterNode node){
+        super();
+        topologyNode = node;
     }
 
     protected String getPathSuffix() {
@@ -46,23 +47,21 @@ public abstract class APIServicesFacade extends RouteBuilder {
     }
 
     abstract protected Logger getLogger();
-    abstract protected String specifyESRName();
-    abstract protected Class specifyESRClass();
 
-    public String getESRName(){
-        return(specifyESRName());
+    public String getServerPort() {
+        int portValue = topologyNode.getPropertyFile().getPrometheusPort().getPortValue();
+        String portValueAsString = Integer.toString(portValue);
+        return (portValueAsString);
     }
 
-    public Class getESRClass(){
-        return(specifyESRClass());
+    public String getServerHost() {
+        String hostValue = topologyNode.getPropertyFile().getPrometheusPort().getHostDNSEntry();
+        return (hostValue);
     }
 
-    public static String getServerPort() {
-        return (SERVER_PORT);
-    }
-
-    public static String getServerHost() {
-        return SERVER_HOST;
+    public String getWebContext(){
+        String webContext = topologyNode.getPropertyFile().getPrometheusPort().getWebServicePath();
+        return(webContext);
     }
 
     protected RestConfigurationDefinition getRestConfigurationDefinition() {
@@ -71,24 +70,8 @@ public abstract class APIServicesFacade extends RouteBuilder {
                 .scheme("http")
                 .bindingMode(RestBindingMode.json)
                 .dataFormatProperty("prettyPrint", "true")
-                .contextPath(getPegacornReferenceProperties().getPegacornResourceDirectoryR1Path()).host(getServerHost()).port(getServerPort())
-                .enableCORS(true)
-                .corsAllowCredentials(true)
-                .corsHeaderProperty("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, login");
+                .contextPath(getWebContext());
         return (restConf);
-    }
-
-    protected RestDefinition getRestGetDefinition() {
-        RestDefinition restDef = rest("/" + getESRName())
-            .get("/{simplifiedID}").outType(getESRClass())
-                .to("direct:" + getESRName() + "GET")
-            .get("?pageSize={pageSize}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}")
-                .param().name("pageSize").type(RestParamType.query).required(false).endParam()
-                .param().name("page").type(RestParamType.query).required(false).endParam()
-                .param().name("sortBy").type(RestParamType.query).required(false).endParam()
-                .param().name("sortOrder").type(RestParamType.query).required(false).endParam()
-                .to("direct:" + getESRName() + "ListGET");
-        return (restDef);
     }
 
     protected OnExceptionDefinition getResourceNotFoundException() {
@@ -96,8 +79,7 @@ public abstract class APIServicesFacade extends RouteBuilder {
                 .handled(true)
                 .log(LoggingLevel.INFO, "ResourceNotFoundException...")
                 // use HTTP status 404 when data was not found
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
-                .setBody(simple("${exception.message}\n"));
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404));
 
         return(exceptionDef);
     }
@@ -107,8 +89,7 @@ public abstract class APIServicesFacade extends RouteBuilder {
                 .handled(true)
                 .log(LoggingLevel.INFO, "ResourceUpdateException...")
                 // use HTTP status 404 when data was not found
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(400))
-                .setBody(simple("${exception.message}\n"));
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(400));
 
         return(exceptionDef);
     }
@@ -117,8 +98,7 @@ public abstract class APIServicesFacade extends RouteBuilder {
         OnExceptionDefinition exceptionDef = onException(Exception.class)
                 .handled(true)
                 // use HTTP status 500 when we had a server side error
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(500))
-                .setBody(simple("${exception.message}\n"));
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(500));
         return (exceptionDef);
     }
 

@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.platform.edge.itops.configuration.segments.*;
 import net.fhirfactory.pegacorn.platform.edge.itops.configuration.segments.ports.base.StandardClusterServiceServerPortSegment;
 import net.fhirfactory.pegacorn.platform.edge.itops.configuration.segments.ports.standard.HTTPProcessingPlantServerPortSegment;
 
-public class JGroupsGossipRouterNode {
+public class JGroupsGossipRouterNodeConfig {
 
     private SubsystemInstanceSegment subsystemInstant;
     private DeploymentModeSegment deploymentMode;
@@ -37,13 +37,15 @@ public class JGroupsGossipRouterNode {
     private HTTPProcessingPlantServerPortSegment prometheusPort;
     private HTTPProcessingPlantServerPortSegment jolokiaPort;
     private StandardClusterServiceServerPortSegment gossipRouterPort;
-
+    private LoadBalancerSegment loadBalancer;
     private SubsystemImageSegment subsystemImageProperties;
     private SecurityCredentialSegment trustStorePassword;
     private SecurityCredentialSegment keyPassword;
     private JavaDeploymentSegment javaDeploymentParameters;
+    private VolumeMountSegment volumeMounts;
+    private SecurityCredentialSegment hapiAPIKey;
 
-    public JGroupsGossipRouterNode() {
+    public JGroupsGossipRouterNodeConfig() {
         subsystemInstant = new SubsystemInstanceSegment();
         deploymentMode = new DeploymentModeSegment();
         deploymentSites = new DeploymentSiteSegment();
@@ -56,6 +58,33 @@ public class JGroupsGossipRouterNode {
         prometheusPort = new HTTPProcessingPlantServerPortSegment();
         deploymentZone = new DeploymentZoneSegment();
         gossipRouterPort = new StandardClusterServiceServerPortSegment();
+        loadBalancer = new LoadBalancerSegment();
+        volumeMounts = new VolumeMountSegment();
+        hapiAPIKey = new SecurityCredentialSegment();
+    }
+
+    public SecurityCredentialSegment getHapiAPIKey() {
+        return hapiAPIKey;
+    }
+
+    public void setHapiAPIKey(SecurityCredentialSegment hapiAPIKey) {
+        this.hapiAPIKey = hapiAPIKey;
+    }
+
+    public VolumeMountSegment getVolumeMounts() {
+        return volumeMounts;
+    }
+
+    public void setVolumeMounts(VolumeMountSegment volumeMounts) {
+        this.volumeMounts = volumeMounts;
+    }
+
+    public LoadBalancerSegment getLoadBalancer() {
+        return loadBalancer;
+    }
+
+    public void setLoadBalancer(LoadBalancerSegment loadBalancer) {
+        this.loadBalancer = loadBalancer;
     }
 
     public HTTPProcessingPlantServerPortSegment getKubeReadinessProbe() {
@@ -147,21 +176,38 @@ public class JGroupsGossipRouterNode {
         this.deploymentZone = deploymentZone;
     }
 
+    public StandardClusterServiceServerPortSegment getGossipRouterPort() {
+        return gossipRouterPort;
+    }
+
+    public void setGossipRouterPort(StandardClusterServiceServerPortSegment gossipRouterPort) {
+        this.gossipRouterPort = gossipRouterPort;
+    }
+
+    public JavaDeploymentSegment getJavaDeploymentParameters() {
+        return javaDeploymentParameters;
+    }
+
+    public void setJavaDeploymentParameters(JavaDeploymentSegment javaDeploymentParameters) {
+        this.javaDeploymentParameters = javaDeploymentParameters;
+    }
+
     @Override
     public String toString() {
-        return "BaseSubsystemPropertyFile{" +
+        return "JGroupsGossipRouterNodeConfig{" +
                 "subsystemInstant=" + subsystemInstant +
                 ", deploymentMode=" + deploymentMode +
                 ", deploymentSites=" + deploymentSites +
+                ", deploymentZone=" + deploymentZone +
                 ", kubeReadinessProbe=" + kubeReadinessProbe +
                 ", kubeLivelinessProbe=" + kubeLivelinessProbe +
                 ", prometheusPort=" + prometheusPort +
                 ", jolokiaPort=" + jolokiaPort +
+                ", gossipRouterPort=" + gossipRouterPort +
                 ", subsystemImageProperties=" + subsystemImageProperties +
                 ", trustStorePassword=" + trustStorePassword +
                 ", keyPassword=" + keyPassword +
-                ", deploymentZone=" + deploymentZone +
-                "," + super.toString() +
+                ", javaDeploymentParameters=" + javaDeploymentParameters +
                 '}';
     }
 }

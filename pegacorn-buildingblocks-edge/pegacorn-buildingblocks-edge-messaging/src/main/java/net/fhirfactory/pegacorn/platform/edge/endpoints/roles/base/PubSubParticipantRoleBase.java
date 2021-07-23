@@ -54,6 +54,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
     private JChannel channel;
     private RpcDispatcher dispatcher;
 
+
     private boolean subscriptionCheckScheduled;
     private Object subscriptionCheckScheduledLock;
 
@@ -370,7 +371,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
             classSet[0] = InterProcessingPlantHandoverPacket.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, RPC_UNICAST_TIMEOUT);
             InterProcessingPlantHandoverResponsePacket response = getRPCDispatcher().callRemoteMethod(targetAddress, "receiveIPCMessage", objectSet, classSet, requestOptions);
-            getLogger().info(".sendIPCMessage(): Exit, response->{}", response);
+            getLogger().debug(".sendIPCMessage(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
             getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());
@@ -389,4 +390,6 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
             return(response);
         }
     }
+
+
 }

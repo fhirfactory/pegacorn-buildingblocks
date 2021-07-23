@@ -27,8 +27,6 @@ import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPartici
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.JGroupsInterZoneIPCService;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.JGroupsIntraZoneIPCService;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.InterSubSystemPubSubBrokerInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

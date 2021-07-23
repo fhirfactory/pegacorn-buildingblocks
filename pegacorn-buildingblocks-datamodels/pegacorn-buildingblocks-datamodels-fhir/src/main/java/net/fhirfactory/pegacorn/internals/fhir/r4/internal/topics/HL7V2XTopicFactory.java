@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,10 +152,10 @@ public class HL7V2XTopicFactory {
     public DataParcelTypeDescriptor newDataParcelDescriptor(String eventType, String eventTrigger, String version){
         LOG.debug(".newTopicToken(): Entry, eventType->{}, eventTrigger->{}, version->{}", eventType, eventTrigger, version);
         DataParcelTypeDescriptor dataParcelToken = new DataParcelTypeDescriptor();
-        dataParcelToken.setDataParcelDefiner(HL7_MESSAGE_DEFINER);
-        dataParcelToken.setDataParcelCategory(HL7_MESSAGE_CATEGORY);
-        dataParcelToken.setDataParcelSubCategory(eventType);
-        dataParcelToken.setDataParcelResource(eventTrigger);
+        dataParcelToken.setDataParcelDefiner(SerializationUtils.clone(HL7_MESSAGE_DEFINER));
+        dataParcelToken.setDataParcelCategory(SerializationUtils.clone(HL7_MESSAGE_CATEGORY));
+        dataParcelToken.setDataParcelSubCategory(SerializationUtils.clone(eventType));
+        dataParcelToken.setDataParcelResource(SerializationUtils.clone(eventTrigger));
         dataParcelToken.setVersion(version);
         LOG.debug(".newTopicToken(): Exit, dataParcelToken->{}", dataParcelToken);
         return(dataParcelToken);
@@ -163,10 +164,10 @@ public class HL7V2XTopicFactory {
     public DataParcelTypeDescriptor newBadDataParcelDescriptor(){
         LOG.debug(".newBadDataParcelDescriptor(): Entry");
         DataParcelTypeDescriptor dataParcelToken = new DataParcelTypeDescriptor();
-        dataParcelToken.setDataParcelDefiner(HL7_MESSAGE_DEFINER);
-        dataParcelToken.setDataParcelCategory(HL7_MESSAGE_CATEGORY);
-        dataParcelToken.setDataParcelSubCategory(HL7_MESSAGE_UNKNOWN);
-        dataParcelToken.setDataParcelResource(HL7_MESSAGE_UNKNOWN);
+        dataParcelToken.setDataParcelDefiner(SerializationUtils.clone(HL7_MESSAGE_DEFINER));
+        dataParcelToken.setDataParcelCategory(SerializationUtils.clone(HL7_MESSAGE_CATEGORY));
+        dataParcelToken.setDataParcelSubCategory(SerializationUtils.clone(HL7_MESSAGE_UNKNOWN));
+        dataParcelToken.setDataParcelResource(SerializationUtils.clone(HL7_MESSAGE_UNKNOWN));
         dataParcelToken.setVersion("x.x.x");
         LOG.debug(".newBadDataParcelDescriptor(): Exit");
         return(dataParcelToken);

@@ -21,10 +21,19 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.base;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.PubSubSubscriberRole;
@@ -39,6 +48,7 @@ import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionReq
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionResponse;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.lang3.SerializationUtils;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.MembershipListener;
@@ -50,17 +60,21 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class JGroupsIPCPubSubParticipant extends JGroupsPubSubParticipantBase implements PubSubParticipantEndpointServiceInterface, MembershipListener {
+public abstract class JGroupsOAMPubSubParticipant extends JGroupsEndpointBase implements PubSubParticipantEndpointServiceInterface, MembershipListener {
 
-//    private StandardEdgeIPCEndpoint ipcTopologyEndpoint;
+    private StandardEdgeIPCEndpoint oamTopologyEndpoint;
 
     private PubSubSubscriberRole meAsPubSubClient;
     private PubSubPublisherRole meAsPubSubServer;
 
-
+    @Inject
+    private ProcessingPlantInterface processingPlantInterface;
 
     @Inject
-    private PegacornIPCCommonValues ipcFunctionalityNames;
+    private TopologyIM topologyIM;
+
+    @Inject
+    private PegacornIPCCommonValues oamFunctionalityNames;
 
     @Inject
     private PegacornCommonInterfaceNames interfaceNames;
@@ -74,11 +88,11 @@ public abstract class JGroupsIPCPubSubParticipant extends JGroupsPubSubParticipa
     //
     // Constructor
     //
-    public JGroupsIPCPubSubParticipant(){
-        super();
+    public JGroupsOAMPubSubParticipant(){
         this.setIPCChannel(null);
         this.setInitialised(false);
 
+        this.oamTopologyEndpoint = null;
         this.meAsPubSubClient = null;
         this.meAsPubSubServer = null;
     }
@@ -87,8 +101,13 @@ public abstract class JGroupsIPCPubSubParticipant extends JGroupsPubSubParticipa
     // Abstract Methods
     //
 
-
+    protected abstract String specifyGroupName();
+    protected abstract String specifyFileName();
+    protected abstract String specifyIPCInterfaceName();
+    protected abstract TopologyEndpointTypeEnum specifyIPCType();
     protected abstract EdgeForwarderService specifyForwarderService();
+    protected abstract String specifyForwarderWUPName();
+    protected abstract String specifyForwarderWUPVersion();
     protected EdgeForwarderService getForwarderService(){return(specifyForwarderService());}
 
     //
@@ -104,7 +123,7 @@ public abstract class JGroupsIPCPubSubParticipant extends JGroupsPubSubParticipa
         }
         getLogger().info(".initialise(): Get my IPCEndpoint Detail");
         deriveTopologyEndpoint();
-        getLogger().info(".initialise(): IPCEndpoint derived ->{}", getTopologyNode());
+        getLogger().info(".initialise(): IPCEndpoint derived ->{}", getOAMTopologyEndpoint());
 
         // 1st, the IntraSubsystem Pub/Sub Participant} component
         getLogger().info(".initialise(): Now create my intraSubsystemParticipant (LocalPubSubPublisher)");
@@ -277,15 +296,71 @@ public abstract class JGroupsIPCPubSubParticipant extends JGroupsPubSubParticipa
         return(interProcessingPlantHandoverResponsePacket);
     }
 
+    //
+    // Resolve my Endpoint Details
+    //
 
+    protected void deriveTopologyEndpoint(){
+        getLogger().debug(".deriveIPCTopologyEndpoint(): Entry");
+        for(TopologyNodeFDN currentEndpointFDN: getProcessingPlantInterface().getProcessingPlantNode().getEndpoints()){
+            IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
+            TopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
+            boolean endpointTypeMatches = endpointType.equals(specifyIPCType());
+            if(endpointTypeMatches){
+                if(currentEndpoint.getName().contentEquals(specifyIPCInterfaceName())) {
+                    setOAMTopologyEndpoint((StandardEdgeIPCEndpoint)currentEndpoint);
+                    getLogger().debug(".deriveIPCTopologyEndpoint(): Exit, found IPCTopologyEndpoint and assigned it");
+                    break;
+                }
+            }
+        }
+        getLogger().debug(".deriveIPCTopologyEndpoint(): Exit, Could not find appropriate Endpoint");
+    }
+
+    protected TopologyNodeFDNToken deriveAssociatedForwarderFDNToken(){
+        if(this.getOAMTopologyEndpoint() == null){
+            getLogger().error(".deriveAssociatedForwarderFDNToken(): Unresolvable endpoint");
+            return(null);
+        }
+        TopologyNodeFDN workshopNodeFDN = null;
+        for(TopologyNodeFDN currentWorkshopFDN: getProcessingPlantInterface().getProcessingPlantNode().getWorkshops()){
+            if(currentWorkshopFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WORKSHOP).getNodeName().equals(DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop())){
+                workshopNodeFDN = currentWorkshopFDN;
+                break;
+            }
+        }
+        if(workshopNodeFDN == null ){
+            getLogger().error(".deriveAssociatedForwarderFDNToken(): Unresolvable workshop");
+            return(null);
+        }
+        TopologyNodeFDN wupNodeFDN = SerializationUtils.clone(workshopNodeFDN);
+        wupNodeFDN.appendTopologyNodeRDN(new TopologyNodeRDN(TopologyNodeTypeEnum.WUP, specifyForwarderWUPName(), specifyForwarderWUPVersion()));
+        TopologyNodeFDNToken associatedForwarderWUPToken = wupNodeFDN.getToken();
+        return(associatedForwarderWUPToken);
+    }
 
     //
     // Getters and Setters
     //
 
+    public ProcessingPlantInterface getProcessingPlantInterface() {
+        return processingPlantInterface;
+    }
 
-    public PegacornIPCCommonValues getIPCComponentNames() {
-        return ipcFunctionalityNames;
+    public PegacornIPCCommonValues getOAMComponentNames() {
+        return oamFunctionalityNames;
+    }
+
+    protected TopologyIM getTopologyIM(){
+        return(this.topologyIM);
+    }
+
+    public StandardEdgeIPCEndpoint getOAMTopologyEndpoint() {
+        return oamTopologyEndpoint;
+    }
+
+    public void setOAMTopologyEndpoint(StandardEdgeIPCEndpoint oamEndpoint) {
+        this.oamTopologyEndpoint = oamEndpoint;
     }
 
     protected ProducerTemplate getCamelProducer() {

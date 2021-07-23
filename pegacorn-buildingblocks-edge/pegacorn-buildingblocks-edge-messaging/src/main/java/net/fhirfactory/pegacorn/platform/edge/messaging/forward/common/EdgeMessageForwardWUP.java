@@ -93,7 +93,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         InterProcessingPlantHandoverPacket packet = exchange.getIn().getBody(InterProcessingPlantHandoverPacket.class);
-                        getLogger().info(".configure().process(): packet->{}", packet);
+//                        getLogger().info(".configure().process(): packet->{}", packet);
                         InterProcessingPlantHandoverResponsePacket response = getIPCEndpoint().sendIPCMessage(packet.getTarget(), packet);
                         exchange.getIn().setBody(response);
                     }

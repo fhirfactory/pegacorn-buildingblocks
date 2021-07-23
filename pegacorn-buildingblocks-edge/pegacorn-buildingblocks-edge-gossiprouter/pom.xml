@@ -127,14 +127,39 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>${version-com.fasterxml.jackson.core-jackson-core}</version>
+            <scope>compile</scope>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${version-com.fasterxml.jackson.core-jackson-databind}</version>
+            <scope>compile</scope>
+            <type>jar</type>
         </dependency>
 
+        <!--                     -->
+        <!-- HAPI-FHIR Libraries -->
+        <!--                     -->
+
+        <!-- This dependency includes the core HAPI-FHIR classes -->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-base</artifactId>
+            <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+
+        <!-- At least one "structures" JAR must also be included -->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-structures-r4</artifactId>
+            <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+
+        <!--                   -->
+        <!-- Testing Libraries -->
+        <!--                   -->
 
         <!-- Testing -->
         <dependency>
@@ -203,7 +228,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        net.fhirfactory.pegacorn.platform.edge.messaging.PegacornIPCGossipRouter
+                                        net.fhirfactory.pegacorn.platform.edge.messaging.IPCGossipRouter
                                     </mainClass>
                                 </manifest>
                             </archive>
