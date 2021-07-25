@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionI
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroups.base.JGroupsIPCPubSubParticipant;
+import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroupsOLD.base.JGroupsIPCPetasosInterface;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverFinisherBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketResponseDecoder;
@@ -39,7 +39,6 @@ import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionSta
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.Exchange;
-import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 
 import javax.inject.Inject;
@@ -62,8 +61,8 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     }
 
     protected abstract String specifyIPCZoneType();
-    protected abstract JGroupsIPCPubSubParticipant specifyIPCEndpoint();
-    protected JGroupsIPCPubSubParticipant getIPCEndpoint(){return(specifyIPCEndpoint());}
+    protected abstract JGroupsIPCPetasosInterface specifyIPCEndpoint();
+    protected JGroupsIPCPetasosInterface getIPCEndpoint(){return(specifyIPCEndpoint());}
 
     //
     // Application Logic (Route Definition)

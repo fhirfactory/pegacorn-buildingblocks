@@ -50,23 +50,23 @@ public class EndpointIdentifierHelper {
     @Inject
     private DeploymentInstanceDetailInterface deploymentInstanceDetailInterface;
 
-    public Identifier constructEndpointIdentifier(String identifierValue){
+    public Identifier newEndpointIdentifier(String identifierValue){
         LOG.debug(".constructEndpointIdentifier(): Entry");
         String endpointSystem = deploymentInstanceDetailInterface.getDeploymentInstanceSystemEndpointSystem();
-        Identifier systemSystemEndpointIdentifier = constructEndpointIdentifier(endpointSystem, identifierValue);
+        Identifier systemSystemEndpointIdentifier = newEndpointIdentifier(endpointSystem, identifierValue);
         LOG.debug(".constructEndpointIdentifier(): Exit, created Identifier --> {}", systemSystemEndpointIdentifier);
         return systemSystemEndpointIdentifier;
     }
 
-    public Identifier constructEndpointIdentifier(String identifierSystem, String identifierValue){
+    public Identifier newEndpointIdentifier(String identifierSystem, String identifierValue){
         LOG.debug(".constructEndpointIdentifier(): Entry");
         Reference endpointOwner = deploymentInstanceDetailInterface.getDeploymentInstanceSystemOwnerOrganization();
-        Identifier systemSystemEndpointIdentifier = constructEndpointIdentifier(endpointOwner , identifierSystem, identifierValue);
+        Identifier systemSystemEndpointIdentifier = newEndpointIdentifier(endpointOwner , identifierSystem, identifierValue);
         LOG.debug(".constructEndpointIdentifier(): Exit, created Identifier --> {}", systemSystemEndpointIdentifier);
         return systemSystemEndpointIdentifier;
     }
 
-    public Identifier constructEndpointIdentifier(Reference identifierAssigner, String identifierSystem, String identifierValue){
+    public Identifier newEndpointIdentifier(Reference identifierAssigner, String identifierSystem, String identifierValue){
         LOG.debug(".constructEndpointIdentifier(): Entry");
         Identifier systemSystemEndpointIdentifier = new Identifier();
         systemSystemEndpointIdentifier.setUse(Identifier.IdentifierUse.SECONDARY);
@@ -83,7 +83,7 @@ public class EndpointIdentifierHelper {
     }
 
     public Reference buildDefaultEndpointReference(){
-        Identifier systemEndpointIdentifier = constructEndpointIdentifier(new Reference("Endpoint/"+systemWideProperties.getSystemDeploymentName()),pegacornIdentifierCodeSystemFactory.getPegacornIdentifierCodeSystem(), systemWideProperties.getSystemDeploymentName());
+        Identifier systemEndpointIdentifier = newEndpointIdentifier(new Reference("Endpoint/"+systemWideProperties.getSystemDeploymentName()),pegacornIdentifierCodeSystemFactory.getPegacornIdentifierCodeSystem(), systemWideProperties.getSystemDeploymentName());
         Reference systemEndpointReference = new Reference();
         systemEndpointReference.setIdentifier(systemEndpointIdentifier);
         systemEndpointReference.setType("Endpoint");

@@ -5,15 +5,15 @@
 
     <parent>
         <groupId>net.fhirfactory.pegacorn</groupId>
-        <artifactId>pegacorn-buildingblocks-edge</artifactId>
+        <artifactId>pegacorn-buildingblocks</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pegacorn-buildingblocks-edge</relativePath>
+        <relativePath>../pegacorn-buildingblocks</relativePath>
     </parent>
 
-    <artifactId>pegacorn-buildingblocks-edge-messaging</artifactId>
+    <artifactId>pegacorn-buildingblocks-endpoints</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Building Blocks :: Edge :: Messaging IPC</name>
+    <name>Pegacorn :: Building Blocks :: Endpoints</name>
 
     <licenses>
         <license>
@@ -241,12 +241,6 @@
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-buildingblocks-workunitprocessors</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-endpoints</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
