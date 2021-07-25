@@ -57,7 +57,7 @@ public abstract class EdgeMessageReceiveWUP extends EdgeIngresMessagingGatewayWU
     //
 
     protected TopologyEndpointTypeEnum specifyIPCType() {
-        return (TopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_MESSAGING_SERVICE);
+        return (TopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_SERVICE);
     }
 
     //

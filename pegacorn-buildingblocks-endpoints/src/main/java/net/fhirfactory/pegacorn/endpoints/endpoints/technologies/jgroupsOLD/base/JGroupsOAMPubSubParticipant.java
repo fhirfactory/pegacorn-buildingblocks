@@ -39,8 +39,8 @@ import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.PubSubSubscriberRole;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.PubSubPublisherRole;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.PubSubParticipantEndpointServiceInterface;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddressTypeEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
@@ -198,18 +198,18 @@ public abstract class JGroupsOAMPubSubParticipant extends JGroupsInterfaceBase i
     }
 
     @Override
-    public PetasosInterfaceAddress getPubSubParticipantServiceCandidateAddress(String serviceName) {
-        List<PetasosInterfaceAddress> instanceAddresses = getTargetServiceInstanceAddresses(serviceName);
+    public PetasosAdapterAddress getPubSubParticipantServiceCandidateAddress(String serviceName) {
+        List<PetasosAdapterAddress> instanceAddresses = getTargetServiceInstanceAddresses(serviceName);
         return(instanceAddresses.get(0));
     }
 
     @Override
-    public PetasosInterfaceAddress getPubSubParticipantInstanceAddress(String serviceProviderInstanceName) {
+    public PetasosAdapterAddress getPubSubParticipantInstanceAddress(String serviceProviderInstanceName) {
         Address address = getTargetMemberAddress(serviceProviderInstanceName);
-        PetasosInterfaceAddress ipcAddress = new PetasosInterfaceAddress();
+        PetasosAdapterAddress ipcAddress = new PetasosAdapterAddress();
         ipcAddress.setAddressName(address.toString());
         ipcAddress.setJGroupsAddress(address);
-        ipcAddress.setAddressType(PetasosInterfaceAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+        ipcAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
         return(ipcAddress);
     }
 
@@ -219,12 +219,12 @@ public abstract class JGroupsOAMPubSubParticipant extends JGroupsInterfaceBase i
     }
 
     @Override
-    public boolean isPubSubParticipantInstanceActive(PetasosInterfaceAddress ipcEndpointID) {
+    public boolean isPubSubParticipantInstanceActive(PetasosAdapterAddress ipcEndpointID) {
         return (isTargetAddressActive(ipcEndpointID.getAddressName()));
     }
 
     @Override
-    public List<PetasosInterfaceAddress> getAllPubSubParticipantAddresses() {
+    public List<PetasosAdapterAddress> getAllPubSubParticipantAddresses() {
         return (getAllTargets());
     }
 

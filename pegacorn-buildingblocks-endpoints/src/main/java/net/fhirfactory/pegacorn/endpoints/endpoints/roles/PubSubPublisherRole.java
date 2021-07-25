@@ -24,9 +24,8 @@ package net.fhirfactory.pegacorn.endpoints.endpoints.roles;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.PubSubParticipantEndpointServiceInterface;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.activitycache.EndpointCheckSchedule;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.PubSubParticipantRoleBase;
@@ -54,7 +53,7 @@ public class PubSubPublisherRole extends PubSubParticipantRoleBase {
 
     private Object publisherCheckLock;
     private boolean publisherCheckScheduled;
-    private EndpointCheckSchedule publisherCheckSchedule;
+    private PetasosEndpointCheckSchedule publisherCheckSchedule;
     private static Long MEMBERSHIP_CHECK_DELAY = 5000L;
 
 
@@ -69,7 +68,7 @@ public class PubSubPublisherRole extends PubSubParticipantRoleBase {
         super(processingPlant, endpointServiceInterface, me, publisherMapIM, channel, dispatcher, forwarderService);
         this.publisherCheckLock = new Object();
         this.publisherCheckScheduled = false;
-        this.publisherCheckSchedule = new EndpointCheckSchedule();
+        this.publisherCheckSchedule = new PetasosEndpointCheckSchedule();
     }
 
     //
@@ -207,21 +206,21 @@ public class PubSubPublisherRole extends PubSubParticipantRoleBase {
     }
 
     @Override
-    protected void performPublisherEventUpdateCheck(List<PetasosInterfaceAddress> publishersRemoved, List<PetasosInterfaceAddress> publishersAdded) {
-        for(PetasosInterfaceAddress currentAddress: publishersRemoved){
+    protected void performPublisherEventUpdateCheck(List<PetasosAdapterAddress> publishersRemoved, List<PetasosAdapterAddress> publishersAdded) {
+        for(PetasosAdapterAddress currentAddress: publishersRemoved){
             InterSubsystemPubSubPublisherRegistration publisherRegistration = getPublisherMapIM().getPublisherInstanceRegistration(currentAddress.getAddressName());
             if(publisherRegistration != null){
                 getPublisherMapIM().unregisterPublisherInstance(currentAddress.getAddressName());
             }
         }
-        for(PetasosInterfaceAddress currentAddress: publishersAdded){
+        for(PetasosAdapterAddress currentAddress: publishersAdded){
             publisherCheckSchedule.scheduleEndpointCheck(currentAddress, false, true);
         }
         schedulePublisherCheck();
     }
 
     @Override
-    protected void performSubscriberEventUpdateCheck(List<PetasosInterfaceAddress> subscribersRemoved, List<PetasosInterfaceAddress> subscribersAdded) {
+    protected void performSubscriberEventUpdateCheck(List<PetasosAdapterAddress> subscribersRemoved, List<PetasosAdapterAddress> subscribersAdded) {
 
     }
 
@@ -281,7 +280,7 @@ public class PubSubPublisherRole extends PubSubParticipantRoleBase {
      * @param publisher
      * @return
      */
-    public InterSubsystemPubSubPublisherRegistration requestPublisherRegistration(PetasosInterfaceAddress target, InterSubsystemPubSubParticipant publisher){
+    public InterSubsystemPubSubPublisherRegistration requestPublisherRegistration(PetasosAdapterAddress target, InterSubsystemPubSubParticipant publisher){
         getLogger().info(".requestPublisherRegistration(): Entry, target->{}, publisher->{}", target, publisher);
         Object objectSet[] = new Object[1];
         Class classSet[] = new Class[1];
@@ -301,8 +300,8 @@ public class PubSubPublisherRole extends PubSubParticipantRoleBase {
     }
 
     public void announceMeAsAPublisher(){
-        List<PetasosInterfaceAddress> allEndpoints = getIPCEndpoint().getAllPubSubParticipantAddresses();
-        for(PetasosInterfaceAddress endpoint: allEndpoints){
+        List<PetasosAdapterAddress> allEndpoints = getIPCEndpoint().getAllPubSubParticipantAddresses();
+        for(PetasosAdapterAddress endpoint: allEndpoints){
             requestPublisherRegistration(endpoint, getMe().getInterSubsystemParticipant());
         }
     }

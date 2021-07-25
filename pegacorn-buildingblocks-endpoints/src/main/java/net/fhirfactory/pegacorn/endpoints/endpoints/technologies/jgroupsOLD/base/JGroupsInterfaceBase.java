@@ -24,8 +24,8 @@ package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroupsOLD.bas
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubNetworkConnectionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.EndpointChangeNotificationActionInterface;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddressTypeEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -86,8 +86,8 @@ public abstract class JGroupsInterfaceBase implements MembershipListener {
             getLogger().warn("Visible Member->{}", currentAddress);
         }
         getLogger().trace(".viewAccepted(): Checking PubSub Participants");
-        List<PetasosInterfaceAddress> removals = getMembershipRemovals(previousScannedMembership, currentScannedMembership);
-        List<PetasosInterfaceAddress> additions = getMembershipAdditions(previousScannedMembership, currentScannedMembership);
+        List<PetasosAdapterAddress> removals = getMembershipRemovals(previousScannedMembership, currentScannedMembership);
+        List<PetasosAdapterAddress> additions = getMembershipAdditions(previousScannedMembership, currentScannedMembership);
         getLogger().info(".viewAccepted(): Changes(MembersAdded->{}, MembersRemoved->{}", additions.size(), removals.size());
         for(EndpointChangeNotificationActionInterface currentActionInterface: this.membershipEventListeners){
             getLogger().info(".viewAccepted(): Iterating through ActionInterfaces");
@@ -112,33 +112,33 @@ public abstract class JGroupsInterfaceBase implements MembershipListener {
         MembershipListener.super.unblock();
     }
 
-    private List<PetasosInterfaceAddress> getMembershipAdditions(List<Address> oldList, List<Address> newList){
-        List<PetasosInterfaceAddress> additions = new ArrayList<>();
+    private List<PetasosAdapterAddress> getMembershipAdditions(List<Address> oldList, List<Address> newList){
+        List<PetasosAdapterAddress> additions = new ArrayList<>();
         for(Address newListElement: newList){
             if(oldList.contains(newListElement)){
                 // do nothing
             } else {
-                PetasosInterfaceAddress currentPetasosInterfaceAddress = new PetasosInterfaceAddress();
-                currentPetasosInterfaceAddress.setAddressName(newListElement.toString());
-                currentPetasosInterfaceAddress.setJGroupsAddress(newListElement);
-                currentPetasosInterfaceAddress.setAddressType(PetasosInterfaceAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                additions.add(currentPetasosInterfaceAddress);
+                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+                currentPetasosAdapterAddress.setAddressName(newListElement.toString());
+                currentPetasosAdapterAddress.setJGroupsAddress(newListElement);
+                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+                additions.add(currentPetasosAdapterAddress);
             }
         }
         return(additions);
     }
 
-    private List<PetasosInterfaceAddress> getMembershipRemovals(List<Address> oldList, List<Address> newList){
-        List<PetasosInterfaceAddress> removals = new ArrayList<>();
+    private List<PetasosAdapterAddress> getMembershipRemovals(List<Address> oldList, List<Address> newList){
+        List<PetasosAdapterAddress> removals = new ArrayList<>();
         for(Address oldListElement: oldList){
             if(newList.contains(oldListElement)){
                 // no nothing
             } else {
-                PetasosInterfaceAddress currentPetasosInterfaceAddress = new PetasosInterfaceAddress();
-                currentPetasosInterfaceAddress.setAddressName(oldListElement.toString());
-                currentPetasosInterfaceAddress.setJGroupsAddress(oldListElement);
-                currentPetasosInterfaceAddress.setAddressType(PetasosInterfaceAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                removals.add(currentPetasosInterfaceAddress);
+                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+                currentPetasosAdapterAddress.setAddressName(oldListElement.toString());
+                currentPetasosAdapterAddress.setJGroupsAddress(oldListElement);
+                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+                removals.add(currentPetasosAdapterAddress);
             }
         }
         return(removals);
@@ -267,9 +267,9 @@ public abstract class JGroupsInterfaceBase implements MembershipListener {
         return(null);
     }
 
-    public List<PetasosInterfaceAddress> getTargetServiceInstanceAddresses(String name){
+    public List<PetasosAdapterAddress> getTargetServiceInstanceAddresses(String name){
         getLogger().debug(".getTargetServiceInstanceAddresses(): Entry, name->{}", name);
-        List<PetasosInterfaceAddress> addressSet = new ArrayList<>();
+        List<PetasosAdapterAddress> addressSet = new ArrayList<>();
         if(getIPCChannel() == null){
             getLogger().debug(".getTargetServiceInstanceAddresses(): IPCChannel is null, exit returning (null)");
             return(addressSet);
@@ -281,11 +281,11 @@ public abstract class JGroupsInterfaceBase implements MembershipListener {
             getLogger().trace(".getTargetServiceInstanceAddresses(): Iterating through Address list, current element->{}", currentAddress);
             if(currentAddress.toString().startsWith(name)){
                 getLogger().debug(".getTargetServiceInstanceAddresses(): Exit, A match!, returning address->{}", currentAddress);
-                PetasosInterfaceAddress currentPetasosInterfaceAddress = new PetasosInterfaceAddress();
-                currentPetasosInterfaceAddress.setJGroupsAddress(currentAddress);
-                currentPetasosInterfaceAddress.setAddressName(currentAddress.toString());
-                currentPetasosInterfaceAddress.setAddressType(PetasosInterfaceAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                addressSet.add(currentPetasosInterfaceAddress);
+                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+                currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
+                currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
+                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+                addressSet.add(currentPetasosAdapterAddress);
             }
         }
         getLogger().debug(".getTargetServiceInstanceAddresses(): Exit, addressSet->{}",addressSet);
@@ -324,24 +324,24 @@ public abstract class JGroupsInterfaceBase implements MembershipListener {
         return(nameParts[0]);
     }
 
-    public List<PetasosInterfaceAddress> getAllTargets(){
+    public List<PetasosAdapterAddress> getAllTargets(){
         List<Address> addressList = getIPCChannel().getView().getMembers();
-        List<PetasosInterfaceAddress> petasosInterfaceAddresses = new ArrayList<>();
+        List<PetasosAdapterAddress> petasosAdapterAddresses = new ArrayList<>();
         for(Address currentAddress: addressList){
             String serviceName = getServiceNameFromAddressInstanceName(currentAddress.toString());
             if(serviceName.contentEquals(getPubsubParticipant().getInterSubsystemParticipant().getIdentifier().getServiceName())){
                 // don't add, it's one of us!
             } else {
                 getLogger().trace(".getAllTargets(): Iterating through Address list, current element->{}", currentAddress);
-                PetasosInterfaceAddress currentPetasosInterfaceAddress = new PetasosInterfaceAddress();
-                currentPetasosInterfaceAddress.setAddressType(PetasosInterfaceAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                currentPetasosInterfaceAddress.setJGroupsAddress(currentAddress);
-                currentPetasosInterfaceAddress.setAddressName(currentAddress.toString());
-                petasosInterfaceAddresses.add(currentPetasosInterfaceAddress);
+                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+                currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
+                currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
+                petasosAdapterAddresses.add(currentPetasosAdapterAddress);
             }
 
         }
-        return(petasosInterfaceAddresses);
+        return(petasosAdapterAddresses);
     }
 
     protected Address getMyAddress(){

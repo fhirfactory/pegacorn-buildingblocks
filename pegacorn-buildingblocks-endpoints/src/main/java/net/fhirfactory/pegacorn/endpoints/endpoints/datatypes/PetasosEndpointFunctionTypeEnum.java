@@ -19,16 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.oam;
+package net.fhirfactory.pegacorn.endpoints.endpoints.datatypes;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.map.PetasosEndpointMap;
+public enum PetasosEndpointFunctionTypeEnum {
+    ENDPOINT_FUNCTION_PEGACORN_INTERACT("pegacorn_endpoint_function.interact"),
+    ENDPOINT_FUNCTION_PEGACORN_IPC("pegacorn_endpoint_function.IPC"),
+    ENDPOINT_FUNCTION_PEGACORN_OAM("pegacorn_endpoint_function.OAM");
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+    private String functionType;
 
-@ApplicationScoped
-public class PetasosOAMEndpointFacade {
+    private PetasosEndpointFunctionTypeEnum(String functionType ){
+        this.functionType = functionType;
+    }
 
-    @Inject
-    private PetasosEndpointMap endpointMap;
+    public String getFunctionType(){
+        return(this.functionType);
+    }
 }

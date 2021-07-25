@@ -217,4 +217,14 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         String siteName = siteRDN.getNodeName();
         return (siteName);
     }
+
+    @Override
+    public String getOAMStackConfigurationFileName() {
+        return (getPropertyFile().getDeploymentMode().getOamStackConfigFile());
+    }
+
+    @Override
+    public String getIPCStackConfigurationFileName() {
+        return (getPropertyFile().getDeploymentMode().getIpcStackConfigFile());
+    }
 }

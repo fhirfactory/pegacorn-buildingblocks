@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.endpoints.endpoints.roles.base;
 
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.common.IPCEndpointProxy;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
@@ -92,8 +92,8 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
     // Abstract Methods
     //
     abstract protected Logger specifyLogger();
-    abstract protected void performPublisherEventUpdateCheck(List<PetasosInterfaceAddress> publishersRemoved, List<PetasosInterfaceAddress> publishersAdded);
-    abstract protected void performSubscriberEventUpdateCheck(List<PetasosInterfaceAddress> subscribersRemoved, List<PetasosInterfaceAddress> subscribersAdded);
+    abstract protected void performPublisherEventUpdateCheck(List<PetasosAdapterAddress> publishersRemoved, List<PetasosAdapterAddress> publishersAdded);
+    abstract protected void performSubscriberEventUpdateCheck(List<PetasosAdapterAddress> subscribersRemoved, List<PetasosAdapterAddress> subscribersAdded);
 
 
     //
@@ -146,7 +146,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
 
     public String getAvailableParticipantInstanceName(String participantServiceName){
         getLogger().debug(".getAvailableParticipantInstanceName(): Entry, participantServiceName->{}", participantServiceName);
-        PetasosInterfaceAddress targetAddress = getIPCEndpoint().getPubSubParticipantServiceCandidateAddress(participantServiceName);
+        PetasosAdapterAddress targetAddress = getIPCEndpoint().getPubSubParticipantServiceCandidateAddress(participantServiceName);
         String participantInstanceName = targetAddress.toString();
         getLogger().debug(".getAvailableParticipantInstanceName(): Exit, participantInstanceName->{}", participantInstanceName);
         return(participantInstanceName);
@@ -159,75 +159,75 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
         return(participantInstanceNameStillActive);
     }
 
-    public boolean isParticipantInstanceAvailable(PetasosInterfaceAddress participantAddress){
+    public boolean isParticipantInstanceAvailable(PetasosAdapterAddress participantAddress){
         getLogger().debug(".isParticipantInstanceAvailable(): Entry, participantAddress->{}", participantAddress);
         boolean participantInstanceNameStillActive = getIPCEndpoint().isPubSubParticipantInstanceActive(participantAddress);
         getLogger().debug(".isParticipantInstanceAvailable(): Exit, participantInstanceNameStillActive->{}", participantInstanceNameStillActive);
         return(participantInstanceNameStillActive);
     }
 
-    public PetasosInterfaceAddress getAddressForParticipantInstance(PubSubParticipant publisher){
+    public PetasosAdapterAddress getAddressForParticipantInstance(PubSubParticipant publisher){
         if(publisher == null){
             return(null);
         }
-        PetasosInterfaceAddress instanceAddress = getAddressForParticipantInstance(publisher.getInterSubsystemParticipant());
+        PetasosAdapterAddress instanceAddress = getAddressForParticipantInstance(publisher.getInterSubsystemParticipant());
         return(instanceAddress);
     }
 
-    public PetasosInterfaceAddress getAddressForParticipantInstance(InterSubsystemPubSubParticipant publisherInterParticipant){
+    public PetasosAdapterAddress getAddressForParticipantInstance(InterSubsystemPubSubParticipant publisherInterParticipant){
         if(publisherInterParticipant == null){
             return(null);
         }
-        PetasosInterfaceAddress instanceAddress = getAddressForParticipantInstance(publisherInterParticipant.getIdentifier());
+        PetasosAdapterAddress instanceAddress = getAddressForParticipantInstance(publisherInterParticipant.getIdentifier());
         return(instanceAddress);
     }
 
-    public PetasosInterfaceAddress getAddressForParticipantInstance(InterSubsystemPubSubParticipantIdentifier publisherInterID){
+    public PetasosAdapterAddress getAddressForParticipantInstance(InterSubsystemPubSubParticipantIdentifier publisherInterID){
         if(publisherInterID == null){
             return(null);
         }
-        PetasosInterfaceAddress instanceAddress = getAddressForParticipantInstance(publisherInterID.getServiceInstanceName());
+        PetasosAdapterAddress instanceAddress = getAddressForParticipantInstance(publisherInterID.getServiceInstanceName());
         return(instanceAddress);
     }
 
-    public PetasosInterfaceAddress getAddressForParticipantInstance(String publisherInstanceName){
+    public PetasosAdapterAddress getAddressForParticipantInstance(String publisherInstanceName){
         if(StringUtils.isEmpty(publisherInstanceName)){
             return(null);
         }
-        PetasosInterfaceAddress instanceAddress = getIPCEndpoint().getPubSubParticipantInstanceAddress(publisherInstanceName);
+        PetasosAdapterAddress instanceAddress = getIPCEndpoint().getPubSubParticipantInstanceAddress(publisherInstanceName);
         return(instanceAddress);
     }
 
-    public PetasosInterfaceAddress getAddressForParticipantService(PubSubParticipant publisher){
+    public PetasosAdapterAddress getAddressForParticipantService(PubSubParticipant publisher){
         if(publisher == null){
             return(null);
         }
-        PetasosInterfaceAddress address = getAddressForParticipantService(publisher.getInterSubsystemParticipant());
+        PetasosAdapterAddress address = getAddressForParticipantService(publisher.getInterSubsystemParticipant());
         return(address);
     }
 
-    public PetasosInterfaceAddress getAddressForParticipantService(InterSubsystemPubSubParticipant publisher){
+    public PetasosAdapterAddress getAddressForParticipantService(InterSubsystemPubSubParticipant publisher){
         if(publisher == null){
             return(null);
         }
-        PetasosInterfaceAddress address = getAddressForParticipantService(publisher.getIdentifier());
+        PetasosAdapterAddress address = getAddressForParticipantService(publisher.getIdentifier());
         return(address);
     }
 
-    public PetasosInterfaceAddress getAddressForParticipantService(InterSubsystemPubSubParticipantIdentifier identifier){
+    public PetasosAdapterAddress getAddressForParticipantService(InterSubsystemPubSubParticipantIdentifier identifier){
         if(getEndpointProxy() == null){
             return(null);
         }
-        PetasosInterfaceAddress address = getIPCEndpoint().getPubSubParticipantServiceCandidateAddress(identifier.getServiceName());
+        PetasosAdapterAddress address = getIPCEndpoint().getPubSubParticipantServiceCandidateAddress(identifier.getServiceName());
         return(address);
     }
 
-    public List<PetasosInterfaceAddress> getParticipantServiceInstanceSet(String participantServiceName){
-        List<PetasosInterfaceAddress> addressSet = new ArrayList<>();
+    public List<PetasosAdapterAddress> getParticipantServiceInstanceSet(String participantServiceName){
+        List<PetasosAdapterAddress> addressSet = new ArrayList<>();
         if(StringUtils.isEmpty(participantServiceName)){
             return(addressSet);
         }
-        List<PetasosInterfaceAddress> targetServiceInstanceAddresses = getIPCEndpoint().getTargetServiceInstanceAddresses(participantServiceName);
+        List<PetasosAdapterAddress> targetServiceInstanceAddresses = getIPCEndpoint().getTargetServiceInstanceAddresses(participantServiceName);
         addressSet.addAll(targetServiceInstanceAddresses);
         return(addressSet);
     }
@@ -316,13 +316,13 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
 
 
     @Override
-    public void notifyMembershipChange(List<PetasosInterfaceAddress> endpointsAdded, List<PetasosInterfaceAddress> endpointsRemoved) {
+    public void notifyMembershipChange(List<PetasosAdapterAddress> endpointsAdded, List<PetasosAdapterAddress> endpointsRemoved) {
         performPublisherEventUpdateCheck(endpointsRemoved, endpointsAdded );
         performSubscriberEventUpdateCheck(endpointsRemoved, endpointsAdded);
     }
 
     @Override
-    public void notifyMembershipChange(PetasosInterfaceAddress changedEndpoint) {
+    public void notifyMembershipChange(PetasosAdapterAddress changedEndpoint) {
 
     }
 

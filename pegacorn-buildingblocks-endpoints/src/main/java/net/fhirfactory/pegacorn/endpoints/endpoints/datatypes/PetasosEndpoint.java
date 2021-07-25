@@ -27,47 +27,35 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class PetasosEndpoint implements Serializable {
-    String endpointName;
-    String endpointService;
-    String endpointZone;
-    String endpointGroup;
-    String endpointSite;
-    Endpoint representativeFHIREndpoint;
-    PetasosInterfaceStatusEnum status;
-    PetasosInterfaceFunctionTypeEnum interfaceFunction;
+    private PetasosEndpointIdentifier endpointID;
+    private String endpointService;
+    private String endpointDescription;
+    private Endpoint representativeFHIREndpoint;
+    private PetasosEndpointStatusEnum status;
+    private PetasosEndpointFunctionTypeEnum interfaceFunction;
 
     public PetasosEndpoint(){
-        this.endpointName = null;
+        this.endpointID = null;
         this.endpointService = null;
         this.representativeFHIREndpoint = null;
         this.status = null;
-        this.endpointGroup = null;
-        this.endpointZone = null;
-        this.endpointSite = null;
         this.interfaceFunction = null;
+        this.endpointDescription = null;
     }
 
-    public PetasosInterfaceFunctionTypeEnum getInterfaceFunction() {
+    public PetasosEndpointFunctionTypeEnum getInterfaceFunction() {
         return interfaceFunction;
     }
 
-    public void setInterfaceFunction(PetasosInterfaceFunctionTypeEnum interfaceFunction) {
+    public void setInterfaceFunction(PetasosEndpointFunctionTypeEnum interfaceFunction) {
         this.interfaceFunction = interfaceFunction;
-    }
-
-    public String getEndpointName() {
-        return endpointName;
-    }
-
-    public void setEndpointName(String endpointName) {
-        this.endpointName = endpointName;
     }
 
     public String getEndpointService() {
         return endpointService;
     }
 
-    public void setEndpointService(String endpointService) {
+    public void setEndpointServiceName(String endpointService) {
         this.endpointService = endpointService;
     }
 
@@ -79,36 +67,45 @@ public class PetasosEndpoint implements Serializable {
         this.representativeFHIREndpoint = representativeFHIREndpoint;
     }
 
-    public PetasosInterfaceStatusEnum getStatus() {
+    public PetasosEndpointStatusEnum getStatus() {
         return status;
     }
 
-    public void setStatus(PetasosInterfaceStatusEnum status) {
+    public void setStatus(PetasosEndpointStatusEnum status) {
         this.status = status;
     }
 
-    public String getEndpointZone() {
-        return endpointZone;
+
+    public String getEndpointDescription() {
+        return endpointDescription;
     }
 
-    public void setEndpointZone(String endpointZone) {
-        this.endpointZone = endpointZone;
+    public void setEndpointDescription(String endpointDescription) {
+        this.endpointDescription = endpointDescription;
     }
 
-    public String getEndpointGroup() {
-        return endpointGroup;
+    public PetasosEndpointIdentifier getEndpointID() {
+        return endpointID;
     }
 
-    public void setEndpointGroup(String endpointGroup) {
-        this.endpointGroup = endpointGroup;
+    public void setEndpointID(PetasosEndpointIdentifier endpointID) {
+        this.endpointID = endpointID;
     }
 
-    public String getEndpointSite() {
-        return endpointSite;
+    public void setEndpointService(String endpointService) {
+        this.endpointService = endpointService;
     }
 
-    public void setEndpointSite(String endpointSite) {
-        this.endpointSite = endpointSite;
+    @Override
+    public String toString() {
+        return "PetasosEndpoint{" +
+                "endpointID=" + endpointID +
+                ", endpointService='" + endpointService + '\'' +
+                ", endpointDescription='" + endpointDescription + '\'' +
+                ", representativeFHIREndpoint=" + representativeFHIREndpoint +
+                ", status=" + status +
+                ", interfaceFunction=" + interfaceFunction +
+                '}';
     }
 
     @Override
@@ -116,25 +113,11 @@ public class PetasosEndpoint implements Serializable {
         if (this == o) return true;
         if (!(o instanceof PetasosEndpoint)) return false;
         PetasosEndpoint that = (PetasosEndpoint) o;
-        return Objects.equals(getEndpointName(), that.getEndpointName()) && Objects.equals(getEndpointService(), that.getEndpointService()) && Objects.equals(getEndpointZone(), that.getEndpointZone()) && Objects.equals(getEndpointGroup(), that.getEndpointGroup()) && Objects.equals(getEndpointSite(), that.getEndpointSite()) && Objects.equals(getRepresentativeFHIREndpoint(), that.getRepresentativeFHIREndpoint()) && getStatus() == that.getStatus() && getInterfaceFunction() == that.getInterfaceFunction();
+        return Objects.equals(getEndpointID(), that.getEndpointID()) && Objects.equals(getEndpointService(), that.getEndpointService()) && Objects.equals(getEndpointDescription(), that.getEndpointDescription()) && Objects.equals(getRepresentativeFHIREndpoint(), that.getRepresentativeFHIREndpoint()) && getStatus() == that.getStatus() && getInterfaceFunction() == that.getInterfaceFunction();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getEndpointName(), getEndpointService(), getEndpointZone(), getEndpointGroup(), getEndpointSite(), getRepresentativeFHIREndpoint(), getStatus(), getInterfaceFunction());
-    }
-
-    @Override
-    public String toString() {
-        return "PetasosEndpoint{" +
-                "endpointName='" + endpointName + '\'' +
-                ", endpointService='" + endpointService + '\'' +
-                ", endpointZone='" + endpointZone + '\'' +
-                ", endpointGroup='" + endpointGroup + '\'' +
-                ", endpointSite='" + endpointSite + '\'' +
-                ", representativeFHIREndpoint=" + representativeFHIREndpoint +
-                ", status=" + status +
-                ", interfaceFunction=" + interfaceFunction +
-                '}';
+        return Objects.hash(getEndpointID(), getEndpointService(), getEndpointDescription(), getRepresentativeFHIREndpoint(), getStatus(), getInterfaceFunction());
     }
 }

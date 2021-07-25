@@ -21,10 +21,10 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.base;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceStatusEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointStatusEnum;
 
 public interface PetasosEndpointInterface {
-    public String identifySupportedService(PetasosInterfaceAddress interfaceAddress);
-    public PetasosInterfaceStatusEnum checkEndpoint(String endpointName);
+    public String identifySupportedService(PetasosAdapterAddress interfaceAddress);
+    public PetasosEndpointStatusEnum checkEndpoint(String endpointName);
 }

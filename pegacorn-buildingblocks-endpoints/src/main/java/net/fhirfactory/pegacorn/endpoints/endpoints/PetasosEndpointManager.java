@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.endpoints.endpoints;
 
 import net.fhirfactory.pegacorn.endpoints.endpoints.ipc.PetasosIPCEndpointFacade;
 import net.fhirfactory.pegacorn.endpoints.endpoints.map.PetasosEndpointMap;
-import net.fhirfactory.pegacorn.endpoints.endpoints.oam.PetasosOAMEndpointFacade;
+import net.fhirfactory.pegacorn.endpoints.endpoints.oam.PetasosOAMTopologySyncEndpointFacade;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -38,5 +38,5 @@ public class PetasosEndpointManager {
     PetasosIPCEndpointFacade ipcEndpointManager;
 
     @Inject
-    PetasosOAMEndpointFacade oamEndpointManager;
+    PetasosOAMTopologySyncEndpointFacade oamEndpointManager;
 }

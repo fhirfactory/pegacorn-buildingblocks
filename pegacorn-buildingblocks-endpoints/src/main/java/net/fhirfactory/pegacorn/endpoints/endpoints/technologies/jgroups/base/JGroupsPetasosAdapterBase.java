@@ -27,8 +27,9 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddressTypeEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 
@@ -36,7 +37,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class JGroupsPetasosInterfaceBase extends JGroupsInterfaceBase {
+public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     private StandardEdgeIPCEndpoint topologyNode;
 
     @Inject
@@ -45,11 +46,12 @@ public abstract class JGroupsPetasosInterfaceBase extends JGroupsInterfaceBase {
     @Inject
     private TopologyIM topologyIM;
 
+
     //
     // Constructor
     //
 
-    public JGroupsPetasosInterfaceBase(){
+    public JGroupsPetasosAdapterBase(){
         super();
     }
 
@@ -57,9 +59,8 @@ public abstract class JGroupsPetasosInterfaceBase extends JGroupsInterfaceBase {
     // Abstract Methods
     //
 
-    protected abstract String specifyFunctionNameSuffix();
-    protected abstract String specifyGroupName();
-    protected abstract String specifyFileName();
+    protected abstract PetasosEndpointIdentifier specifyEndpointID();
+    protected abstract String specifyEndpointServiceName();
     protected abstract String specifyIPCInterfaceName();
     protected abstract TopologyEndpointTypeEnum specifyIPCType();
 
@@ -82,6 +83,25 @@ public abstract class JGroupsPetasosInterfaceBase extends JGroupsInterfaceBase {
     public ProcessingPlantInterface getProcessingPlantInterface() {
         return processingPlantInterface;
     }
+
+    protected String getEndpointServiceName(){
+        return(specifyEndpointServiceName());
+    }
+
+    //
+    // Resolved Parameters
+    //
+
+    @Override
+    protected String specifyJGroupsClusterName() {
+        return specifyEndpointID().getEndpointGroup();
+    }
+
+    @Override
+    protected String specifyJGroupsChannelName() {
+        return specifyEndpointID().getEndpointName();
+    }
+
 
     //
     // Resolve my Endpoint Details
@@ -108,50 +128,64 @@ public abstract class JGroupsPetasosInterfaceBase extends JGroupsInterfaceBase {
     // Business Methods
     //
 
-    public List<PetasosInterfaceAddress> getTargetMemberInterfaceSetForFunction(String functionName){
-        getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Entry, functionName->{}", functionName);
-        List<PetasosInterfaceAddress> addressSet = new ArrayList<>();
+    public List<PetasosAdapterAddress> getTargetMemberAdapterSetForService(String serviceName){
+        getLogger().debug(".getTargetMemberAdapterSetForService(): Entry, serviceName->{}", serviceName);
+        List<PetasosAdapterAddress> addressSet = new ArrayList<>();
         if(getIPCChannel() == null){
-            getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Exit, IPCChannel is null, exit returning (null)");
+            getLogger().debug(".getTargetMemberAdapterSetForService(): Exit, IPCChannel is null, exit returning (null)");
             return(addressSet);
         }
-        getLogger().trace(".getTargetMemberInterfaceSetForFunction(): IPCChannel is NOT null, get updated Address set via view");
+        getLogger().trace(".getTargetMemberAdapterSetForService(): IPCChannel is NOT null, get updated Address set via view");
         List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().trace(".getTargetMemberInterfaceSetForFunction(): Got the Address set via view, now iterate through and see if one is suitable");
+        getLogger().trace(".getTargetMemberAdapterSetForService(): Got the Address set via view, now iterate through and see if one is suitable");
         for(Address currentAddress: addressList){
-            getLogger().trace(".getTargetMemberInterfaceSetForFunction(): Iterating through Address list, current element->{}", currentAddress);
-            if(currentAddress.toString().startsWith(functionName)){
-                getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Exit, A match!, returning address->{}", currentAddress);
-                PetasosInterfaceAddress currentPetasosInterfaceAddress = new PetasosInterfaceAddress();
-                currentPetasosInterfaceAddress.setJGroupsAddress(currentAddress);
-                currentPetasosInterfaceAddress.setAddressName(currentAddress.toString());
-                currentPetasosInterfaceAddress.setAddressType(PetasosInterfaceAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                addressSet.add(currentPetasosInterfaceAddress);
+            getLogger().trace(".getTargetMemberAdapterSetForService(): Iterating through Address list, current element->{}", currentAddress);
+            if(currentAddress.toString().startsWith(serviceName)){
+                getLogger().debug(".getTargetMemberAdapterSetForService(): Exit, A match!, returning address->{}", currentAddress);
+                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+                currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
+                currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
+                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+                addressSet.add(currentPetasosAdapterAddress);
             }
         }
-        getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Exit, addressSet->{}",addressSet);
+        getLogger().debug(".getTargetMemberAdapterSetForService(): Exit, addressSet->{}",addressSet);
         return(addressSet);
     }
 
-    public PetasosInterfaceAddress getTargetMemberInterfaceInstanceForFunction(String functionName){
-        getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Entry, functionName->{}", functionName);
+    public PetasosAdapterAddress getTargetMemberAdapterInstanceForService(String serviceName){
+        getLogger().debug(".getTargetMemberAdapterInstanceForService(): Entry, serviceName->{}", serviceName);
         if(getIPCChannel() == null){
-            getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Exit, IPCChannel is null, exit returning (null)");
+            getLogger().debug(".getTargetMemberAdapterInstanceForService(): Exit, IPCChannel is null, exit returning (null)");
             return(null);
         }
-        if(StringUtils.isEmpty(functionName)){
-            getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Exit, functionName is null, exit returning (null)");
+        if(StringUtils.isEmpty(serviceName)){
+            getLogger().debug(".getTargetMemberAdapterInstanceForService(): Exit, serviceName is null, exit returning (null)");
             return(null);
         }
-        List<PetasosInterfaceAddress> potentialInterfaces = getTargetMemberInterfaceSetForFunction(functionName);
+        List<PetasosAdapterAddress> potentialInterfaces = getTargetMemberAdapterSetForService(serviceName);
         if(potentialInterfaces.isEmpty()){
-            getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Exit, no available interfaces supporting function");
+            getLogger().debug(".getTargetMemberAdapterInstanceForService(): Exit, no available interfaces supporting function");
             return(null);
         } else {
-            PetasosInterfaceAddress selectedInterface = potentialInterfaces.get(0);
-            getLogger().debug(".getTargetMemberInterfaceSetForFunction(): Exit, selectedInterface->{}", selectedInterface);
+            PetasosAdapterAddress selectedInterface = potentialInterfaces.get(0);
+            getLogger().debug(".getTargetMemberAdapterInstanceForService(): Exit, selectedInterface->{}", selectedInterface);
             return(selectedInterface);
         }
+    }
+
+    public List<PetasosAdapterAddress> getAllGroupMembers(){
+        List<PetasosAdapterAddress> groupMembers = getAllClusterTargets();
+        List<PetasosAdapterAddress> sameServiceSet = new ArrayList<>();
+        for(PetasosAdapterAddress currentAdapterAddress: groupMembers){
+            if(StringUtils.startsWith(currentAdapterAddress.getAddressName(), specifyEndpointServiceName())){
+                sameServiceSet.add(currentAdapterAddress);
+            }
+        }
+        for(PetasosAdapterAddress sameServiceAddress: sameServiceSet){
+            groupMembers.remove(sameServiceAddress);
+        }
+        return(groupMembers);
     }
 
 }

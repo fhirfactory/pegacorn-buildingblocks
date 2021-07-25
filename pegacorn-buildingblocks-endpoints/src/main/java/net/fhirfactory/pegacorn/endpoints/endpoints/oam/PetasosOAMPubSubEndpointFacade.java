@@ -19,19 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.datatypes;
+package net.fhirfactory.pegacorn.endpoints.endpoints.oam;
 
-public enum PetasosInterfaceFunctionTypeEnum {
-    ENPOINT_FUNCTION_PEGACORN_IPC("Pegacorn.FHIR.R4.Endpoint.IPC"),
-    ENPOINT_FUNCTION_PEGACORN_OAM("Pegacorn.FHIR.R4.Endpoint.OAM");
+import net.fhirfactory.pegacorn.endpoints.endpoints.map.PetasosEndpointMap;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.petasos.PetasosInterZoneOAMTopologySyncEndpoint;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.petasos.PetasosIntraZoneOAMTopologySyncEndpoint;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.pubsub.PetasosInterZoneOAMPubSubEndpoint;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.pubsub.PetasosIntraZoneOAMPubSubEndpoint;
 
-    private String functionType;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
-    private PetasosInterfaceFunctionTypeEnum(String functionType ){
-        this.functionType = functionType;
-    }
+@ApplicationScoped
+public class PetasosOAMPubSubEndpointFacade {
 
-    public String getFunctionType(){
-        return(this.functionType);
-    }
+    @Inject
+    private PetasosEndpointMap endpointMap;
+
+    @Inject
+    private PetasosInterZoneOAMPubSubEndpoint interZoneOAMPubSubEndpoint;
+
+    @Inject
+    private PetasosIntraZoneOAMPubSubEndpoint intraZoneOAMPubSubEndpoint;
 }

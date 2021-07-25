@@ -19,9 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.datatypes;
+package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.adapterlock;
 
-public enum PetasosInterfaceAddressTypeEnum {
-    ADDRESS_TYPE_JGROUPS,
-    ADDRESS_TYPE_HTTP
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.adapterlock.base.EndpointLockBase;
+
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class OAMEndpointLock extends EndpointLockBase {
+
+    public OAMEndpointLock(){
+        super();
+    }
 }

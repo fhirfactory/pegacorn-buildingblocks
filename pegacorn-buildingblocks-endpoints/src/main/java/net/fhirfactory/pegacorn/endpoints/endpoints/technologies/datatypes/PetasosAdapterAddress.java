@@ -19,27 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.datatypes;
+package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes;
 
 import org.jgroups.Address;
 
 import java.net.URL;
 import java.util.Objects;
 
-public class PetasosInterfaceAddress {
+public class PetasosAdapterAddress {
     private Address jGroupsAddress;
     private URL hTTPAddress;
-    private PetasosInterfaceAddressTypeEnum addressType;
+    private PetasosAdapterAddressTypeEnum addressType;
     private String addressName;
 
-    public PetasosInterfaceAddress(){
+    public PetasosAdapterAddress(){
         this.addressType = null;
         this.jGroupsAddress = null;
         this.hTTPAddress = null;
         this.addressName = null;
     }
 
-    public PetasosInterfaceAddress(PetasosInterfaceAddress ori){
+    public PetasosAdapterAddress(PetasosAdapterAddress ori){
         setAddressType(ori.getAddressType());
         setHTTPAddress(ori.getHTTPAddress());
         setJGroupsAddress(ori.getJGroupsAddress());
@@ -70,11 +70,11 @@ public class PetasosInterfaceAddress {
         this.hTTPAddress = hTTPAddress;
     }
 
-    public PetasosInterfaceAddressTypeEnum getAddressType() {
+    public PetasosAdapterAddressTypeEnum getAddressType() {
         return addressType;
     }
 
-    public void setAddressType(PetasosInterfaceAddressTypeEnum addressType) {
+    public void setAddressType(PetasosAdapterAddressTypeEnum addressType) {
         this.addressType = addressType;
     }
 
@@ -91,8 +91,8 @@ public class PetasosInterfaceAddress {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PetasosInterfaceAddress)) return false;
-        PetasosInterfaceAddress that = (PetasosInterfaceAddress) o;
+        if (!(o instanceof PetasosAdapterAddress)) return false;
+        PetasosAdapterAddress that = (PetasosAdapterAddress) o;
         return Objects.equals(jGroupsAddress, that.jGroupsAddress) && Objects.equals(hTTPAddress, that.hTTPAddress) && getAddressType() == that.getAddressType() && Objects.equals(getAddressName(), that.getAddressName());
     }
 

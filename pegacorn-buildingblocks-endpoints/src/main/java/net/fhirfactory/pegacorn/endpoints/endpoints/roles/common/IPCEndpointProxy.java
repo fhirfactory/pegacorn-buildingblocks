@@ -21,15 +21,15 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.roles.common;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import org.jgroups.JChannel;
 
 public class IPCEndpointProxy {
-    private PetasosInterfaceAddress myAddress;
+    private PetasosAdapterAddress myAddress;
     private JChannel channel;
     private IPCEndpointProxyTypeEnum proxyType;
 
-    public IPCEndpointProxy(PetasosInterfaceAddress address, JChannel channel, IPCEndpointProxyTypeEnum proxyType) {
+    public IPCEndpointProxy(PetasosAdapterAddress address, JChannel channel, IPCEndpointProxyTypeEnum proxyType) {
         this.channel = channel;
         this.proxyType = proxyType;
         this.myAddress = address;
@@ -69,11 +69,11 @@ public class IPCEndpointProxy {
         this.proxyType = proxyType;
     }
 
-    public PetasosInterfaceAddress getMyAddress() {
+    public PetasosAdapterAddress getMyAddress() {
         return myAddress;
     }
 
-    public void setMyAddress(PetasosInterfaceAddress myAddress) {
+    public void setMyAddress(PetasosAdapterAddress myAddress) {
         this.myAddress = myAddress;
     }
 

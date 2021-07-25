@@ -19,14 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes;
 
-package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common;
-
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
-
-public interface PetasosInterfaceTechnologyInterface {
-
-    public void initialise();
-    public void registerInterfaceEventCallbacks(PetasosInterfaceDeltasInterface interfaceEventCallbacks);
-    public PetasosInterfaceStatusEnum checkInterfaceStatus(PetasosInterfaceAddress interfaceAddress);
+public enum PetasosAdapterAddressTypeEnum {
+    ADDRESS_TYPE_JGROUPS,
+    ADDRESS_TYPE_HTTP
 }

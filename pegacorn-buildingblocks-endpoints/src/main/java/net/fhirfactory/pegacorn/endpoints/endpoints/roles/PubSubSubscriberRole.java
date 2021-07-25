@@ -23,13 +23,12 @@ package net.fhirfactory.pegacorn.endpoints.endpoints.roles;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddressTypeEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.PubSubParticipantEndpointServiceInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.common.MultiPublisherResponseSet;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.activitycache.EndpointCheckSchedule;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.PubSubParticipantRoleBase;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.roles.common.*;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.activitycache.datatypes.IPCEndpointCheckScheduleElement;
@@ -57,7 +56,7 @@ import static net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSub
 public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
     private static final Logger LOG = LoggerFactory.getLogger(PubSubSubscriberRole.class);
 
-    private EndpointCheckSchedule subscriptionCheckSchedule;
+    private PetasosEndpointCheckSchedule subscriptionCheckSchedule;
 
     public PubSubSubscriberRole(
             ProcessingPlantInterface processingPlant,
@@ -68,7 +67,7 @@ public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
             RpcDispatcher rpcDispatcher,
             EdgeForwarderService forwarderService){
         super(processingPlant, endpointServiceInterface, me, publisherMapIM, channel, rpcDispatcher, forwarderService);
-        subscriptionCheckSchedule = new EndpointCheckSchedule();
+        subscriptionCheckSchedule = new PetasosEndpointCheckSchedule();
 
         TimerTask subscriptionCheckTask = new TimerTask() {
             public void run() {
@@ -101,14 +100,14 @@ public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
     }
 
     @Override
-    protected void performPublisherEventUpdateCheck(List<PetasosInterfaceAddress> publishersRemoved, List<PetasosInterfaceAddress> publishersAdded) {
-        for(PetasosInterfaceAddress currentAddress: publishersAdded){
+    protected void performPublisherEventUpdateCheck(List<PetasosAdapterAddress> publishersRemoved, List<PetasosAdapterAddress> publishersAdded) {
+        for(PetasosAdapterAddress currentAddress: publishersAdded){
             subscriptionCheckSchedule.scheduleEndpointCheck(currentAddress, false, true);
         }
     }
 
     @Override
-    protected void performSubscriberEventUpdateCheck(List<PetasosInterfaceAddress> subscribersRemoved, List<PetasosInterfaceAddress> subscribersAdded) {
+    protected void performSubscriberEventUpdateCheck(List<PetasosAdapterAddress> subscribersRemoved, List<PetasosAdapterAddress> subscribersAdded) {
 
     }
 
@@ -135,10 +134,10 @@ public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
                 }
             }
             getLogger().trace(".performSubscriptionCheck(): Looking now into JGroups itself for Publisher Service->{}", currentServiceRegistration.getPublisherServiceName());
-            List<PetasosInterfaceAddress> serviceInstanceSet = getParticipantServiceInstanceSet(currentServiceRegistration.getPublisherServiceName());
+            List<PetasosAdapterAddress> serviceInstanceSet = getParticipantServiceInstanceSet(currentServiceRegistration.getPublisherServiceName());
             if(serviceInstanceSet != null){
                 getLogger().trace(".performSubscriptionCheck(): there are publishers!, number->{}", serviceInstanceSet.size());
-                for(PetasosInterfaceAddress serviceProvider: serviceInstanceSet){
+                for(PetasosAdapterAddress serviceProvider: serviceInstanceSet){
                     getLogger().trace(".performSubscriptionCheck(): checking participant->{}", serviceProvider);
                     String publisherInstanceName = serviceProvider.getAddressName();
                     String publisherServiceName = getServiceNameFromParticipantInstanceName(publisherInstanceName);
@@ -196,7 +195,7 @@ public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
         getLogger().info(".doSubscriptionCheck(): Entry");
         List<IPCEndpointCheckScheduleElement> endpointsToCheck = subscriptionCheckSchedule.getEndpointsToCheck();
         for(IPCEndpointCheckScheduleElement currentScheduleElement: endpointsToCheck) {
-            PetasosInterfaceAddress participantAddress = currentScheduleElement.getEndpoint();
+            PetasosAdapterAddress participantAddress = currentScheduleElement.getEndpoint();
             getLogger().info(".doSubscriptionCheck(): Entry, participantAddress->{}", participantAddress);
             String participantInstanceName = participantAddress.getAddressName();
             String participantServiceName = extractPublisherServiceName(participantInstanceName);
@@ -278,7 +277,7 @@ public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
         String publisherInstanceName = publisher.getInterSubsystemParticipant().getIdentifier().getServiceInstanceName();
         if (isParticipantInstanceAvailable(publisherInstanceName)) {
             getLogger().info(".requestSubscription(): Publisher is available, so register");
-            PetasosInterfaceAddress publisherAddress = getAddressForParticipantInstance(publisherInstanceName);
+            PetasosAdapterAddress publisherAddress = getAddressForParticipantInstance(publisherInstanceName);
             if (publisherAddress != null) {
                 getLogger().info(".requestSubscription(): Subscribing to PublisherInstance->{}", publisherInstanceName);
                 response = rpcRequestSubscription(publisherAddress, subscriptionRequest);
@@ -365,7 +364,7 @@ public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
      * @return
      */
 
-    public RemoteSubscriptionResponse rpcRequestSubscription(PetasosInterfaceAddress publisherAddress, RemoteSubscriptionRequest subscriptionRequest){
+    public RemoteSubscriptionResponse rpcRequestSubscription(PetasosAdapterAddress publisherAddress, RemoteSubscriptionRequest subscriptionRequest){
         getLogger().info(".rpcRequestSubscription(): Entry, publisher->{}, subscriptionRequest.getSubscriber{}", publisherAddress, subscriptionRequest.getSubscriber());
         if(publisherAddress == null || subscriptionRequest == null){
             getLogger().error(".rpcRequestSubscription: publisherAddress or subscriptionRequest are null");
@@ -374,7 +373,7 @@ public class PubSubSubscriberRole extends PubSubParticipantRoleBase {
             response.setSubscriptionCommentary("Error (publisherAddress or subscriptionRequest are null)");
             return(response);
         }
-        if(!publisherAddress.getAddressType().equals(PetasosInterfaceAddressTypeEnum.ADDRESS_TYPE_JGROUPS)){
+        if(!publisherAddress.getAddressType().equals(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS)){
             getLogger().error(".rpcRequestSubscription: publisherAddress or subscriptionRequest are null");
             RemoteSubscriptionResponse response = new RemoteSubscriptionResponse();
             response.setSubscriptionSuccessful(false);

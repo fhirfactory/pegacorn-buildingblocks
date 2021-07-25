@@ -19,16 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.activitycache.base;
+package net.fhirfactory.pegacorn.endpoints.endpoints.oam;
 
-public abstract class EndpointLockBase {
-    private Object endpointLock;
+import net.fhirfactory.pegacorn.endpoints.endpoints.map.PetasosEndpointMap;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.petasos.PetasosInterZoneOAMTopologySyncEndpoint;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.petasos.PetasosIntraZoneOAMTopologySyncEndpoint;
 
-    public EndpointLockBase(){
-        this.endpointLock = new Object();
-    }
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
-    public Object getEndpointLock() {
-        return endpointLock;
-    }
+@ApplicationScoped
+public class PetasosOAMTopologySyncEndpointFacade {
+
+    @Inject
+    private PetasosEndpointMap endpointMap;
+
+    @Inject
+    private PetasosInterZoneOAMTopologySyncEndpoint interZoneOAMTopologyEndpoint;
+
+    @Inject
+    private PetasosIntraZoneOAMTopologySyncEndpoint intraZoneOAMTopologyEndpoint;
 }

@@ -23,16 +23,15 @@ package net.fhirfactory.pegacorn.endpoints.endpoints.base;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
 import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpoint;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosInterfaceTechnologyInterface;
-import org.hl7.fhir.r4.model.Endpoint;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosAdapterTechnologyInterface;
 
 public class PetasosEndpointImplementationBase {
     private StandardEdgeIPCEndpoint representativeTopologyNode;
     private PetasosEndpoint petasosEndpoint;
-    private PetasosInterfaceTechnologyInterface multiZoneOAMInterface;
-    private PetasosInterfaceTechnologyInterface multiZoneIPCInterface;
-    private PetasosInterfaceTechnologyInterface intraZoneOAMInterface;
-    private PetasosInterfaceTechnologyInterface intraZoneIPCInterface;
+    private PetasosAdapterTechnologyInterface multiZoneOAMInterface;
+    private PetasosAdapterTechnologyInterface multiZoneIPCInterface;
+    private PetasosAdapterTechnologyInterface intraZoneOAMInterface;
+    private PetasosAdapterTechnologyInterface intraZoneIPCInterface;
 
     //
     // Constructor

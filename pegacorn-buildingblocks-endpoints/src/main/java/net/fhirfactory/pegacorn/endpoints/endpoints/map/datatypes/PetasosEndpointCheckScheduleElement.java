@@ -19,25 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.activitycache.datatypes;
+package net.fhirfactory.pegacorn.endpoints.endpoints.map.datatypes;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosInterfaceAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointIdentifier;
 
 import java.time.Instant;
 
-public class EndpointCheckScheduleElement {
+public class PetasosEndpointCheckScheduleElement {
     private Instant targetTime;
-    private PetasosInterfaceAddress endpoint;
+    private PetasosEndpointIdentifier petasosEndpointID;
     private boolean endpointRemoved;
     private boolean endpointAdded;
 
-    public EndpointCheckScheduleElement(){
+    public PetasosEndpointCheckScheduleElement(){
         this.targetTime = null;
-        this.endpoint = null;
+        this.petasosEndpointID = null;
     }
 
-    public EndpointCheckScheduleElement(PetasosInterfaceAddress endpoint, boolean endpointRemoved, boolean endpointAdded){
-        this.endpoint = endpoint;
+    public PetasosEndpointCheckScheduleElement(PetasosEndpointIdentifier petasosEndpointID, boolean endpointRemoved, boolean endpointAdded){
+        this.petasosEndpointID = petasosEndpointID;
         targetTime = Instant.now().plusSeconds(10);
         this.endpointAdded = endpointAdded;
         this.endpointRemoved = endpointRemoved;
@@ -51,12 +51,12 @@ public class EndpointCheckScheduleElement {
         this.targetTime = targetTime;
     }
 
-    public PetasosInterfaceAddress getEndpoint() {
-        return endpoint;
+    public PetasosEndpointIdentifier getPetasosEndpointID() {
+        return petasosEndpointID;
     }
 
-    public void setEndpoint(PetasosInterfaceAddress endpoint) {
-        this.endpoint = endpoint;
+    public void setPetasosEndpointID(PetasosEndpointIdentifier petasosEndpointID) {
+        this.petasosEndpointID = petasosEndpointID;
     }
 
     public boolean isEndpointRemoved() {
@@ -79,7 +79,7 @@ public class EndpointCheckScheduleElement {
     public String toString() {
         return "IPCEndpointCheckScheduleElement{" +
                 "targetTime=" + targetTime +
-                ", endpoint=" + endpoint +
+                ", endpoint=" + petasosEndpointID +
                 ", endpointRemoved=" + endpointRemoved +
                 ", endpointAdded=" + endpointAdded +
                 '}';

@@ -19,16 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.activitycache;
+package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.adapterlock.base;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.activitycache.base.EndpointLockBase;
+public abstract class EndpointLockBase {
+    private Object endpointLock;
 
-import javax.enterprise.context.ApplicationScoped;
+    public EndpointLockBase(){
+        this.endpointLock = new Object();
+    }
 
-@ApplicationScoped
-public class IPCEndpointLock extends EndpointLockBase {
-
-    public IPCEndpointLock(){
-        super();
+    public Object getEndpointLock() {
+        return endpointLock;
     }
 }

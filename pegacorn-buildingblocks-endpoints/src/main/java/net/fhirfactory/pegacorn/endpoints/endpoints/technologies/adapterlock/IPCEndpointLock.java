@@ -19,18 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.roles.base;
+package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.adapterlock;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.adapterlock.base.EndpointLockBase;
 
-import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
 
-public interface PubSubParticipantEndpointServiceInterface {
-    public PetasosAdapterAddress getPubSubParticipantServiceCandidateAddress(String serviceName);
-    public PetasosAdapterAddress getPubSubParticipantInstanceAddress(String serviceProviderInstanceName);
-    public boolean isPubSubParticipantInstanceActive(String serviceProviderInstanceName);
-    public boolean isPubSubParticipantInstanceActive(PetasosAdapterAddress ipcEndpointID);
-    public List<PetasosAdapterAddress> getTargetServiceInstanceAddresses(String serviceName);
-    public List<PetasosAdapterAddress> getAllPubSubParticipantAddresses();
+@ApplicationScoped
+public class IPCEndpointLock extends EndpointLockBase {
 
+    public IPCEndpointLock(){
+        super();
+    }
 }

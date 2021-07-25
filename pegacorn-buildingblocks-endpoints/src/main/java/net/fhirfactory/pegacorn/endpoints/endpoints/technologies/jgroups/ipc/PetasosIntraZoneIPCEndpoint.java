@@ -19,11 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroupsOLD.ipc;
+package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.ipc;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroupsOLD.base.JGroupsIPCPetasosInterface;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.InterZoneEdgeForwarderService;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
@@ -35,41 +36,21 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class JGroupsInterZoneIPCService extends JGroupsIPCPetasosInterface {
-    private static final Logger LOG = LoggerFactory.getLogger(JGroupsInterZoneIPCService.class);
+public class PetasosIntraZoneIPCEndpoint extends JGroupsPetasosEndpointBase {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosIntraZoneIPCEndpoint.class);
 
-    private static String GOSSIP_ROUTER_HOSTS = "hosts";
-
-    public JGroupsInterZoneIPCService(){
-        super();
-    }
+    private static String STACK_INITIAL_HOSTS = "hosts";
 
     @Inject
-    private InterZoneEdgeForwarderService forwarderService;
+    private IntraZoneEdgeForwarderService forwarderService;
 
-    @Override
-    protected Logger specifyLogger() {
-        return (LOG);
-    }
-
-    @Override
-    protected String specifyGroupName() {
-        return (getIPCComponentNames().getInterZoneIPCGroupName());
-    }
-
-    @Override
-    protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
-    }
-
-    @Override
-    protected String specifyFileName() {
-        return ("sitea.xml");
+    public PetasosIntraZoneIPCEndpoint(){
+        super();
     }
 
     @Override
     protected String specifyForwarderWUPName() {
-        return ("EdgeInterZoneMessageForwardWUP");
+        return ("EdgeIntraZoneMessageForwardWUP");
     }
 
     @Override
@@ -78,15 +59,34 @@ public class JGroupsInterZoneIPCService extends JGroupsIPCPetasosInterface {
     }
 
     @Override
-    protected TopologyEndpointTypeEnum specifyIPCType() {
-        return (TopologyEndpointTypeEnum.JGROUPS_INTERZONE_IPC_MESSAGING_SERVICE);
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    @Override
+    protected String specifyGroupName() {
+        return (getIPCComponentNames().getIntraZoneIPCGroupName());
+    }
+
+    @Override
+    protected String specifyFileName() {
+        return ("privnet.xml");
+    }
+
+    @Override
+    protected String specifyIPCInterfaceName() {
+        return (getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
     }
 
     @Override
     protected InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket) {
-        InterProcessingPlantHandoverResponsePacket response = (InterProcessingPlantHandoverResponsePacket)getCamelProducer()
-                .sendBody(getIPCComponentNames().getInterZoneIPCReceiverRouteEndpointName(), ExchangePattern.InOut, handoverPacket);
+        InterProcessingPlantHandoverResponsePacket response = (InterProcessingPlantHandoverResponsePacket)getCamelProducer().sendBody(getIPCComponentNames().getIntraZoneIPCReceiverRouteEndpointName(), ExchangePattern.InOut, handoverPacket);
         return(response);
+    }
+
+    @Override
+    protected TopologyEndpointTypeEnum specifyIPCType() {
+        return (TopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_SERVICE);
     }
 
     @Override

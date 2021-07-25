@@ -19,16 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.activitycache;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.activitycache.base.EndpointLockBase;
+package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common;
 
-import javax.enterprise.context.ApplicationScoped;
+import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointStatusEnum;
 
-@ApplicationScoped
-public class OAMEndpointLock extends EndpointLockBase {
+public interface PetasosAdapterTechnologyInterface {
 
-    public OAMEndpointLock(){
-        super();
-    }
+    public void initialise();
+    public void registerInterfaceEventCallbacks(PetasosAdapterDeltasInterface interfaceEventCallbacks);
+    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID);
 }
