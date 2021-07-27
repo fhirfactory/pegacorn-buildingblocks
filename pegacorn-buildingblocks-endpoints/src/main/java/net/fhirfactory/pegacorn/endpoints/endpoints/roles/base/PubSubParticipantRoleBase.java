@@ -24,15 +24,10 @@ package net.fhirfactory.pegacorn.endpoints.endpoints.roles.base;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.common.IPCEndpointProxy;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
-import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.RequestOptions;
@@ -40,7 +35,6 @@ import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotificationActionInterface {
@@ -48,7 +42,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
     private ProcessingPlantInterface processingPlant;
     private PubSubParticipantEndpointServiceInterface ipcEndpoint;
     private PubSubParticipant me;
-    private PublisherRegistrationMapIM publisherMapIM;
+    private DistributedPubSubSubscriptionMapIM publisherMapIM;
     private IPCEndpointProxy endpointProxy;
     private EdgeForwarderService forwarderService;
     private JChannel channel;
@@ -71,7 +65,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
             ProcessingPlantInterface processingPlant,
             PubSubParticipantEndpointServiceInterface endpointServiceInterface,
             PubSubParticipant me,
-            PublisherRegistrationMapIM publisherMapIM,
+            DistributedPubSubSubscriptionMapIM publisherMapIM,
             JChannel channel,
             RpcDispatcher dispatcher,
             EdgeForwarderService forwarderService){
@@ -96,153 +90,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
     abstract protected void performSubscriberEventUpdateCheck(List<PetasosAdapterAddress> subscribersRemoved, List<PetasosAdapterAddress> subscribersAdded);
 
 
-    //
-    // Endpoint/Participant tests
-    //
 
-    protected boolean isParticipantServiceAvailable(PubSubParticipant participant){
-        getLogger().debug(".isParticipantAvailable(): Entry, participant->{}", participant);
-        boolean participantIsAvailable = false;
-        if(hasParticipantServiceName(participant)) {
-            String serviceName = participant.getInterSubsystemParticipant().getIdentifier().getServiceName();
-            participantIsAvailable = getIPCEndpoint().getPubSubParticipantServiceCandidateAddress(serviceName) != null;
-        } else {
-            participantIsAvailable = false;
-        }
-        getLogger().debug(".isParticipantAvailable(): Exit, returning->{}", participantIsAvailable);
-        return(participantIsAvailable);
-    }
-
-    protected boolean hasParticipantServiceName(PubSubParticipant participant){
-        if(participant != null){
-            if(participant.getInterSubsystemParticipant() != null){
-                if(participant.getInterSubsystemParticipant().getIdentifier() != null){
-                    if(participant.getInterSubsystemParticipant().getIdentifier().getServiceName() != null){
-                        return(true);
-                    }
-                }
-            }
-        }
-        return(false);
-    }
-
-    protected boolean isParticipantServiceAvailable(String participantServiceName){
-        getLogger().debug(".isParticipantAvailable(): Entry, publisherServiceName->{}", participantServiceName);
-        boolean participantIsAvailable = getIPCEndpoint().getPubSubParticipantServiceCandidateAddress(participantServiceName) != null;
-        getLogger().debug(".isParticipantAvailable(): Exit, returning->{}", participantIsAvailable);
-        return(participantIsAvailable);
-    }
-
-    protected String getAvailableParticipantInstanceName(PubSubParticipant participant){
-        getLogger().debug(".getAvailableParticipantInstanceName(): Entry, participant->{}", participant);
-        String serviceInstanceName = null;
-        if(hasParticipantServiceName(participant)) {
-            String publisherServiceName = participant.getInterSubsystemParticipant().getIdentifier().getServiceName();
-            serviceInstanceName = getAvailableParticipantInstanceName(publisherServiceName);
-        }
-        getLogger().debug(".getAvailableParticipantInstanceName(): Exit, serviceInstanceName->{}", serviceInstanceName);
-        return(serviceInstanceName);
-    }
-
-    public String getAvailableParticipantInstanceName(String participantServiceName){
-        getLogger().debug(".getAvailableParticipantInstanceName(): Entry, participantServiceName->{}", participantServiceName);
-        PetasosAdapterAddress targetAddress = getIPCEndpoint().getPubSubParticipantServiceCandidateAddress(participantServiceName);
-        String participantInstanceName = targetAddress.toString();
-        getLogger().debug(".getAvailableParticipantInstanceName(): Exit, participantInstanceName->{}", participantInstanceName);
-        return(participantInstanceName);
-    }
-
-    public boolean isParticipantInstanceAvailable(String participantInstanceName){
-        getLogger().debug(".isParticipantInstanceAvailable(): Entry, participantInstanceName->{}", participantInstanceName);
-        boolean participantInstanceNameStillActive = getIPCEndpoint().isPubSubParticipantInstanceActive(participantInstanceName);
-        getLogger().debug(".isParticipantInstanceAvailable(): Exit, participantInstanceNameStillActive->{}", participantInstanceNameStillActive);
-        return(participantInstanceNameStillActive);
-    }
-
-    public boolean isParticipantInstanceAvailable(PetasosAdapterAddress participantAddress){
-        getLogger().debug(".isParticipantInstanceAvailable(): Entry, participantAddress->{}", participantAddress);
-        boolean participantInstanceNameStillActive = getIPCEndpoint().isPubSubParticipantInstanceActive(participantAddress);
-        getLogger().debug(".isParticipantInstanceAvailable(): Exit, participantInstanceNameStillActive->{}", participantInstanceNameStillActive);
-        return(participantInstanceNameStillActive);
-    }
-
-    public PetasosAdapterAddress getAddressForParticipantInstance(PubSubParticipant publisher){
-        if(publisher == null){
-            return(null);
-        }
-        PetasosAdapterAddress instanceAddress = getAddressForParticipantInstance(publisher.getInterSubsystemParticipant());
-        return(instanceAddress);
-    }
-
-    public PetasosAdapterAddress getAddressForParticipantInstance(InterSubsystemPubSubParticipant publisherInterParticipant){
-        if(publisherInterParticipant == null){
-            return(null);
-        }
-        PetasosAdapterAddress instanceAddress = getAddressForParticipantInstance(publisherInterParticipant.getIdentifier());
-        return(instanceAddress);
-    }
-
-    public PetasosAdapterAddress getAddressForParticipantInstance(InterSubsystemPubSubParticipantIdentifier publisherInterID){
-        if(publisherInterID == null){
-            return(null);
-        }
-        PetasosAdapterAddress instanceAddress = getAddressForParticipantInstance(publisherInterID.getServiceInstanceName());
-        return(instanceAddress);
-    }
-
-    public PetasosAdapterAddress getAddressForParticipantInstance(String publisherInstanceName){
-        if(StringUtils.isEmpty(publisherInstanceName)){
-            return(null);
-        }
-        PetasosAdapterAddress instanceAddress = getIPCEndpoint().getPubSubParticipantInstanceAddress(publisherInstanceName);
-        return(instanceAddress);
-    }
-
-    public PetasosAdapterAddress getAddressForParticipantService(PubSubParticipant publisher){
-        if(publisher == null){
-            return(null);
-        }
-        PetasosAdapterAddress address = getAddressForParticipantService(publisher.getInterSubsystemParticipant());
-        return(address);
-    }
-
-    public PetasosAdapterAddress getAddressForParticipantService(InterSubsystemPubSubParticipant publisher){
-        if(publisher == null){
-            return(null);
-        }
-        PetasosAdapterAddress address = getAddressForParticipantService(publisher.getIdentifier());
-        return(address);
-    }
-
-    public PetasosAdapterAddress getAddressForParticipantService(InterSubsystemPubSubParticipantIdentifier identifier){
-        if(getEndpointProxy() == null){
-            return(null);
-        }
-        PetasosAdapterAddress address = getIPCEndpoint().getPubSubParticipantServiceCandidateAddress(identifier.getServiceName());
-        return(address);
-    }
-
-    public List<PetasosAdapterAddress> getParticipantServiceInstanceSet(String participantServiceName){
-        List<PetasosAdapterAddress> addressSet = new ArrayList<>();
-        if(StringUtils.isEmpty(participantServiceName)){
-            return(addressSet);
-        }
-        List<PetasosAdapterAddress> targetServiceInstanceAddresses = getIPCEndpoint().getTargetServiceInstanceAddresses(participantServiceName);
-        addressSet.addAll(targetServiceInstanceAddresses);
-        return(addressSet);
-    }
-
-    public String getServiceNameFromParticipantInstanceName(String participantInstanceName){
-        if(StringUtils.isEmpty(participantInstanceName)){
-            return(null);
-        }
-        String[] nameParts = StringUtils.split(participantInstanceName, "(");
-        return(nameParts[0]);
-    }
-
-    protected String extractPublisherServiceName(String participantInstanceName){
-        return(getServiceNameFromParticipantInstanceName(participantInstanceName));
-    }
 
     //
     // Getter and Setters
@@ -270,7 +118,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
         return(this.me);
     }
 
-    protected PublisherRegistrationMapIM getPublisherMapIM(){
+    protected DistributedPubSubSubscriptionMapIM getPublisherMapIM(){
         return(this.publisherMapIM);
     }
 
@@ -358,38 +206,7 @@ public abstract class PubSubParticipantRoleBase  implements EndpointChangeNotifi
 
 
 
-    //
-    // Message Senders
-    //
 
-    public InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().info(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
-        try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = handoverPacket;
-            classSet[0] = InterProcessingPlantHandoverPacket.class;
-            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, RPC_UNICAST_TIMEOUT);
-            InterProcessingPlantHandoverResponsePacket response = getRPCDispatcher().callRemoteMethod(targetAddress, "receiveIPCMessage", objectSet, classSet, requestOptions);
-            getLogger().debug(".sendIPCMessage(): Exit, response->{}", response);
-            return(response);
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());
-            InterProcessingPlantHandoverResponsePacket response = new InterProcessingPlantHandoverResponsePacket();
-            response.setActivityID(handoverPacket.getActivityID());
-            response.setStatus(InterProcessingPlantHandoverPacketStatusEnum.PACKET_SEND_FAILURE);
-            response.setStatusReason("Error (NoSuchMethodException)" + e.getMessage());
-            return(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getLogger().error(".sendIPCMessage: Error (GeneralException) ->{}", e.getMessage());
-            InterProcessingPlantHandoverResponsePacket response = new InterProcessingPlantHandoverResponsePacket();
-            response.setActivityID(handoverPacket.getActivityID());
-            response.setStatus(InterProcessingPlantHandoverPacketStatusEnum.PACKET_SEND_FAILURE);
-            response.setStatusReason("Error (GeneralException)" + e.getMessage());
-            return(response);
-        }
-    }
 
 
 }

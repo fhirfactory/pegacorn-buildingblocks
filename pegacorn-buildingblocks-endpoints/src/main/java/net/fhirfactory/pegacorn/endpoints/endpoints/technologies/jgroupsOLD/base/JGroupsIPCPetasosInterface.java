@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.PubSubSubscriberRole;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.PubSubPublisherRole;
@@ -33,8 +33,6 @@ import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.PubSubParticipant
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionRequest;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionResponse;
 import org.apache.camel.Produce;
@@ -69,7 +67,7 @@ public abstract class JGroupsIPCPetasosInterface extends JGroupsPetasosInterface
     private ProducerTemplate camelProducer;
 
     @Inject
-    private PublisherRegistrationMapIM publisherRegistrationMapIM;
+    private DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
 
     //
     // Constructor
@@ -123,14 +121,14 @@ public abstract class JGroupsIPCPetasosInterface extends JGroupsPetasosInterface
         InterSubsystemPubSubParticipantIdentifier interParticipantIdentifier = new InterSubsystemPubSubParticipantIdentifier();
         interParticipantIdentifier.setServiceName(getProcessingPlantInterface().getIPCServiceName());
         String serviceInstanceName = getProcessingPlantInterface().getIPCServiceName() + "(" + UUID.randomUUID().toString() + ")";
-        interParticipantIdentifier.setServiceInstanceName(serviceInstanceName);
+        interParticipantIdentifier.setPetasosEndpointName(serviceInstanceName);
         getLogger().info(".initialise(): interParticipantIdentifier Created -->{}", interParticipantIdentifier);
         InterSubsystemPubSubParticipant distributedPublisher = new InterSubsystemPubSubParticipant();
         distributedPublisher.setSecurityZone(getProcessingPlantInterface().getNetworkZone());
         distributedPublisher.setSite(getProcessingPlantInterface().getDeploymentSite());
         distributedPublisher.setIdentifier(interParticipantIdentifier);
-        distributedPublisher.setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_NOT_ESTABLISHED);
-        distributedPublisher.setConnectionEstablishmentDate(Date.from(Instant.now()));
+        distributedPublisher.setUtilisationStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_PARTICIPANT_NO_SUBSCRIBERS);
+        distributedPublisher.setUtilisationUpdateDate(Date.from(Instant.now()));
         getLogger().info(".initialise(): distributedPublisher (DistributedPubSubPublisher) created ->{}", distributedPublisher);
 
         // Now assemble the "Participant"
@@ -246,36 +244,7 @@ public abstract class JGroupsIPCPetasosInterface extends JGroupsPetasosInterface
     }
 
 
-    //
-    // Receive Messages (via RPC invocations)
-    //
 
-    protected abstract InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket);
-
-    public InterProcessingPlantHandoverResponsePacket receiveIPCMessage(InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().debug(".receiveIPCMessage(): Entry, handoverPacket->{}",handoverPacket);
-        InterProcessingPlantHandoverResponsePacket response = injectMessageIntoRoute(handoverPacket);
-        getLogger().debug(".receiveIPCMessage(): Exit, response->{}",response);
-        return(response);
-    }
-
-    //
-    // Send Messages (via RPC invocations)
-    //
-    public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().debug(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
-        Address targetServiceAddress = getTargetServiceAddress(targetParticipantServiceName);
-        getLogger().info(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
-        InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = sendIPCMessage(targetServiceAddress, handoverPacket);
-        return(interProcessingPlantHandoverResponsePacket);
-    }
-
-
-    public InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().debug(".sendIPCMessage(): Entry, targetAddress->{}, handoverPacket->{}", targetAddress, handoverPacket);
-        InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = this.meAsPubSubClient.sendIPCMessage(targetAddress, handoverPacket);
-        return(interProcessingPlantHandoverResponsePacket);
-    }
 
 
 
@@ -296,8 +265,8 @@ public abstract class JGroupsIPCPetasosInterface extends JGroupsPetasosInterface
         return (interfaceNames);
     }
 
-    public PublisherRegistrationMapIM getPublisherRegistrationMapIM() {
-        return publisherRegistrationMapIM;
+    public DistributedPubSubSubscriptionMapIM getPublisherRegistrationMapIM() {
+        return distributedPubSubSubscriptionMapIM;
     }
 
     public PubSubSubscriberRole getMeAsPubSubClient() {

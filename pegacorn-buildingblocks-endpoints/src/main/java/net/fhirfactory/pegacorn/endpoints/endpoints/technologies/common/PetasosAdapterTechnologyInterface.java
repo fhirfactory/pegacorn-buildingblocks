@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common;
 
+import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetasosHealthCheckCallBackInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointStatusEnum;
 
@@ -30,4 +31,5 @@ public interface PetasosAdapterTechnologyInterface {
     public void initialise();
     public void registerInterfaceEventCallbacks(PetasosAdapterDeltasInterface interfaceEventCallbacks);
     public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID);
+    public void registerHealthCheckCallback(PetasosHealthCheckCallBackInterface healthCheckCallback);
 }

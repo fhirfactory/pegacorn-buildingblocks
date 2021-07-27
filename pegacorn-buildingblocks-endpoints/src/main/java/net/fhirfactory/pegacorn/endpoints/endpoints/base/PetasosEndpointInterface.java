@@ -21,10 +21,11 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.base;
 
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointStatusEnum;
 
 public interface PetasosEndpointInterface {
     public String identifySupportedService(PetasosAdapterAddress interfaceAddress);
     public PetasosEndpointStatusEnum checkEndpoint(String endpointName);
+    public void registerHealthCheckCallback(PetasosHealthCheckCallBackInterface healthCheckCallback);
 }

@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.model.pubsub;
 
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubNetworkConnectionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipantUtilisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 
 import java.io.Serializable;
@@ -35,7 +35,6 @@ public class RemoteSubscriptionResponse implements Serializable {
     private boolean subscriptionSuccessful;
     private String subscriptionCommentary;
     private InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum subscriptionRegistrationStatus;
-    private PubSubNetworkConnectionStatusEnum networkConnectionStatus;
     private Date subscriptionRegistrationDate;
 
     public RemoteSubscriptionResponse(){
@@ -44,10 +43,9 @@ public class RemoteSubscriptionResponse implements Serializable {
         this.subscriptionRegistrationDate = null;
     }
 
-    public RemoteSubscriptionResponse(boolean subscriptionSuccess, String commentary, PubSubNetworkConnectionStatusEnum status){
+    public RemoteSubscriptionResponse(boolean subscriptionSuccess, String commentary, PubSubParticipantUtilisationStatusEnum status){
         this.subscriptionSuccessful = subscriptionSuccess;
         this.subscriptionCommentary = commentary;
-        this.networkConnectionStatus = status;
         this.subscriptionRegistrationDate = Date.from(Instant.now());
     }
 
@@ -91,25 +89,20 @@ public class RemoteSubscriptionResponse implements Serializable {
         this.subscriptionCommentary = subscriptionCommentary;
     }
 
-    public PubSubNetworkConnectionStatusEnum getNetworkConnectionStatus() {
-        return networkConnectionStatus;
-    }
-
-    public void setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum networkConnectionStatus) {
-        this.networkConnectionStatus = networkConnectionStatus;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof RemoteSubscriptionResponse)) return false;
         RemoteSubscriptionResponse that = (RemoteSubscriptionResponse) o;
-        return isSubscriptionSuccessful() == that.isSubscriptionSuccessful() && Objects.equals(getPublisher(), that.getPublisher()) && Objects.equals(getSubscriptionCommentary(), that.getSubscriptionCommentary()) && getSubscriptionRegistrationStatus() == that.getSubscriptionRegistrationStatus() && getNetworkConnectionStatus() == that.getNetworkConnectionStatus() && Objects.equals(getSubscriptionRegistrationDate(), that.getSubscriptionRegistrationDate());
+        return isSubscriptionSuccessful() == that.isSubscriptionSuccessful() && Objects.equals(getPublisher(), that.getPublisher())
+                && Objects.equals(getSubscriptionCommentary(), that.getSubscriptionCommentary())
+                && getSubscriptionRegistrationStatus() == that.getSubscriptionRegistrationStatus()
+                && Objects.equals(getSubscriptionRegistrationDate(), that.getSubscriptionRegistrationDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublisher(), isSubscriptionSuccessful(), getSubscriptionCommentary(), getSubscriptionRegistrationStatus(), getNetworkConnectionStatus(), getSubscriptionRegistrationDate());
+        return Objects.hash(getPublisher(), isSubscriptionSuccessful(), getSubscriptionCommentary(), getSubscriptionRegistrationStatus(), getSubscriptionRegistrationDate());
     }
 
     @Override
@@ -119,7 +112,6 @@ public class RemoteSubscriptionResponse implements Serializable {
                 ", subscriptionSuccessful=" + subscriptionSuccessful +
                 ", subscriptionCommentary='" + subscriptionCommentary + '\'' +
                 ", subscriptionRegistrationStatus=" + subscriptionRegistrationStatus +
-                ", networkConnectionStatus=" + networkConnectionStatus +
                 ", subscriptionRegistrationDate=" + subscriptionRegistrationDate +
                 '}';
     }

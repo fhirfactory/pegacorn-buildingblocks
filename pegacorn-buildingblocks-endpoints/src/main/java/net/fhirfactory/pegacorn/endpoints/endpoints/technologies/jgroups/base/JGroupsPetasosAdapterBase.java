@@ -21,13 +21,11 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.base;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +60,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     protected abstract PetasosEndpointIdentifier specifyEndpointID();
     protected abstract String specifyEndpointServiceName();
     protected abstract String specifyIPCInterfaceName();
-    protected abstract TopologyEndpointTypeEnum specifyIPCType();
+    protected abstract PetasosTopologyEndpointTypeEnum specifyIPCType();
 
     //
     // Getters and Setters
@@ -88,6 +86,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         return(specifyEndpointServiceName());
     }
 
+
     //
     // Resolved Parameters
     //
@@ -102,27 +101,6 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         return specifyEndpointID().getEndpointName();
     }
 
-
-    //
-    // Resolve my Endpoint Details
-    //
-
-    protected void deriveTopologyEndpoint(){
-        getLogger().debug(".deriveIPCTopologyEndpoint(): Entry");
-        for(TopologyNodeFDN currentEndpointFDN: getProcessingPlantInterface().getProcessingPlantNode().getEndpoints()){
-            IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
-            TopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
-            boolean endpointTypeMatches = endpointType.equals(specifyIPCType());
-            if(endpointTypeMatches){
-                if(currentEndpoint.getName().contentEquals(specifyIPCInterfaceName())) {
-                    setTopologyNode((StandardEdgeIPCEndpoint)currentEndpoint);
-                    getLogger().debug(".deriveIPCTopologyEndpoint(): Exit, found IPCTopologyEndpoint and assigned it");
-                    break;
-                }
-            }
-        }
-        getLogger().debug(".deriveIPCTopologyEndpoint(): Exit, Could not find appropriate Endpoint");
-    }
 
     //
     // Business Methods

@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.base;
 
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpoint;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosAdapterTechnologyInterface;
 
 public class PetasosEndpointImplementationBase {

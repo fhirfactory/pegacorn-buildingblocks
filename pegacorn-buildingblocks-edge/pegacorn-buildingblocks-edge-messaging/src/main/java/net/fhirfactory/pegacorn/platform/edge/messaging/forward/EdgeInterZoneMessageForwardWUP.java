@@ -24,10 +24,9 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.forward;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroupsOLD.ipc.JGroupsInterZoneIPCService;
-import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.jgroupsOLD.base.JGroupsIPCPetasosInterface;
 import net.fhirfactory.pegacorn.platform.edge.messaging.forward.common.EdgeMessageForwardWUP;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.InterZoneEdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionStatus;
@@ -46,7 +45,7 @@ public class EdgeInterZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     private static String WUP_VERSION = "1.0.0";
 
     @Inject
-    private JGroupsInterZoneIPCService ipcEndpoint;
+    private PetasosInterZoneIPCEndpoint ipcEndpoint;
 
     @Override
     protected MessageBasedWUPEndpoint specifyEgressEndpoint() {
@@ -64,7 +63,7 @@ public class EdgeInterZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     }
 
     @Override
-    protected JGroupsIPCPetasosInterface specifyIPCEndpoint() {
+    protected PetasosInterZoneIPCEndpoint specifyIPCEndpoint() {
         return (ipcEndpoint);
     }
 

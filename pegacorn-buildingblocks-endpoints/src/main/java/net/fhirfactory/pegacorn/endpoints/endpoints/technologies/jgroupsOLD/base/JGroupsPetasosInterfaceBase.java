@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
 import org.apache.commons.lang3.SerializationUtils;
@@ -59,7 +59,7 @@ public abstract class JGroupsPetasosInterfaceBase extends JGroupsInterfaceBase {
     protected abstract String specifyGroupName();
     protected abstract String specifyFileName();
     protected abstract String specifyIPCInterfaceName();
-    protected abstract TopologyEndpointTypeEnum specifyIPCType();
+    protected abstract PetasosTopologyEndpointTypeEnum specifyIPCType();
     protected abstract String specifyForwarderWUPName();
     protected abstract String specifyForwarderWUPVersion();
 
@@ -91,7 +91,7 @@ public abstract class JGroupsPetasosInterfaceBase extends JGroupsInterfaceBase {
         getLogger().debug(".deriveIPCTopologyEndpoint(): Entry");
         for(TopologyNodeFDN currentEndpointFDN: getProcessingPlantInterface().getProcessingPlantNode().getEndpoints()){
             IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
-            TopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
+            PetasosTopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
             boolean endpointTypeMatches = endpointType.equals(specifyIPCType());
             if(endpointTypeMatches){
                 if(currentEndpoint.getName().contentEquals(specifyIPCInterfaceName())) {

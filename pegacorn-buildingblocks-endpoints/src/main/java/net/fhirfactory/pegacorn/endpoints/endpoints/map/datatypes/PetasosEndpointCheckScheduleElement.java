@@ -21,7 +21,8 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.map.datatypes;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointIdentifier;
+
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
 
 import java.time.Instant;
 

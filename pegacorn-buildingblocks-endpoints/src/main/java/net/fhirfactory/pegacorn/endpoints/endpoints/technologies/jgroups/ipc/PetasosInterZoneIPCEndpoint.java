@@ -21,14 +21,15 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.ipc;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetasosHealthCheckCallBackInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroupsOLD.base.JGroupsIPCPetasosInterface;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.InterZoneEdgeForwarderService;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
-import org.apache.camel.ExchangePattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,44 +55,85 @@ public class PetasosInterZoneIPCEndpoint extends JGroupsPetasosEndpointBase {
     }
 
     @Override
-    protected String specifyGroupName() {
-        return (getIPCComponentNames().getInterZoneIPCGroupName());
-    }
-
-    @Override
     protected String specifyIPCInterfaceName() {
         return (getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
     }
 
     @Override
-    protected String specifyFileName() {
-        return ("sitea.xml");
+    protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
+        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_IPC_SERVICE);
     }
 
     @Override
-    protected String specifyForwarderWUPName() {
-        return ("EdgeInterZoneMessageForwardWUP");
+    public void registerHealthCheckCallback(PetasosHealthCheckCallBackInterface healthCheckCallback) {
+
     }
 
     @Override
-    protected String specifyForwarderWUPVersion() {
-        return ("1.0.0");
+    protected String specifyJGroupsStackFileName() {
+        return (getProcessingPlantInterface().getProcessingPlantNode().getInterZoneIPCStackConfigFile());
     }
 
     @Override
-    protected TopologyEndpointTypeEnum specifyIPCType() {
-        return (TopologyEndpointTypeEnum.JGROUPS_INTERZONE_IPC_SERVICE);
+    protected PetasosEndpointIdentifier specifyEndpointID() {
+        PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
+        String endpointName = getJgroupsParticipantInformationService().getMyInterZoneIPCEndpointName();
+        endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
+        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
+        String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getInterZoneIPCGroupName();
+        endpointID.setEndpointAddress(endpointAddress);
+        return (endpointID);
     }
 
     @Override
-    protected InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket) {
-        InterProcessingPlantHandoverResponsePacket response = (InterProcessingPlantHandoverResponsePacket)getCamelProducer()
-                .sendBody(getIPCComponentNames().getInterZoneIPCReceiverRouteEndpointName(), ExchangePattern.InOut, handoverPacket);
-        return(response);
+    protected String specifyEndpointServiceName() {
+        return (getProcessingPlantInterface().getIPCServiceName());
     }
 
     @Override
-    protected EdgeForwarderService specifyForwarderService() {
-        return (forwarderService);
+    protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT);
+    }
+
+    @Override
+    protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
+        return (EndpointPayloadTypeEnum.ENPOINT_PAYLOAD_PEGACORN_IPC);
+    }
+
+    @Override
+    protected void resolveTopologyEndpoint() {
+        setTopologyNode(getJgroupsParticipantInformationService().getMyInterZoneTopologyEndpoint());
+    }
+
+    @Override
+    protected boolean supportsInterZoneCommunication() {
+        return false;
+    }
+
+    @Override
+    protected boolean supportsInterSiteCommunication() {
+        return false;
+    }
+
+    @Override
+    protected boolean supportsIntraZoneCommunication() {
+        return false;
+    }
+
+    @Override
+    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID) {
+        return null;
+    }
+
+    @Override
+    protected PubSubParticipant specifyPubSubParticipant() {
+        return (getJgroupsParticipantInformationService().getMyInterZoneParticipantRole());
+    }
+
+    @Override
+    protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
+        getCoreSubsystemPetasosEndpointsWatchdog().setInterzoneIPC(this.getPetasosEndpoint());
     }
 }

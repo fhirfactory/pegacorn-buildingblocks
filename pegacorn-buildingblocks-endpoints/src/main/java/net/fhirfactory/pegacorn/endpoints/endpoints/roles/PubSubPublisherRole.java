@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantIn
 import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.PubSubParticipantEndpointServiceInterface;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.PubSubParticipantRoleBase;
 import net.fhirfactory.pegacorn.platform.edge.endpoints.technologies.activitycache.datatypes.IPCEndpointCheckScheduleElement;
@@ -61,7 +61,7 @@ public class PubSubPublisherRole extends PubSubParticipantRoleBase {
             ProcessingPlantInterface processingPlant,
             PubSubParticipantEndpointServiceInterface endpointServiceInterface,
             PubSubParticipant me,
-            PublisherRegistrationMapIM publisherMapIM,
+            DistributedPubSubSubscriptionMapIM publisherMapIM,
             JChannel channel,
             RpcDispatcher dispatcher,
             EdgeForwarderService forwarderService){
@@ -152,14 +152,14 @@ public class PubSubPublisherRole extends PubSubParticipantRoleBase {
             response.setSubscriptionRegistrationDate(Date.from(Instant.now()));
             response.setSubscriptionSuccessful(subscriptionStatus.isSubscriptionSuccessful());
             response.setSubscriptionCommentary(subscriptionStatus.getSubscriptionCommentary());
-            response.setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
+            response.setNetworkConnectionStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
             response.setSubscriptionRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_ACTIVE);
         } else {
             response.setPublisher(getMe());
             response.setSubscriptionRegistrationDate(Date.from(Instant.now()));
             response.setSubscriptionSuccessful(false);
             response.setSubscriptionCommentary("This IPC Endpoint does not support PubSub from Provided Node");
-            response.setNetworkConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_FAILED);
+            response.setNetworkConnectionStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_NETWORK_CONNECTION_FAILED);
             response.setSubscriptionRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_FAILED);
         }
 
@@ -260,7 +260,7 @@ public class PubSubPublisherRole extends PubSubParticipantRoleBase {
                 String participantInstanceName = currentScheduleElement.getEndpoint().getAddressName();
                 InterSubsystemPubSubPublisherRegistration publisherRegistration = getPublisherMapIM().getPublisherInstanceRegistration(participantInstanceName);
                 if (publisherRegistration == null) {
-                    String myName = getMe().getInterSubsystemParticipant().getIdentifier().getServiceInstanceName();
+                    String myName = getMe().getInterSubsystemParticipant().getIdentifier().getPetasosEndpointName();
                     InterSubsystemPubSubParticipant distributedPublisher = requestParticipantDetail(currentScheduleElement.getEndpoint().getJGroupsAddress(), myName);
                     publisherRegistration = getPublisherMapIM().registerPublisherInstance(distributedPublisher);
                 }

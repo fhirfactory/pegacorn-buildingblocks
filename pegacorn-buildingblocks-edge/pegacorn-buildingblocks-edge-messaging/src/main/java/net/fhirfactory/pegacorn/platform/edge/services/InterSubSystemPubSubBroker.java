@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.services;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
@@ -41,7 +41,7 @@ public class InterSubSystemPubSubBroker implements InterSubSystemPubSubBrokerInt
     private static final Logger LOG = LoggerFactory.getLogger(InterSubSystemPubSubBroker.class);
 
     @Inject
-    private PublisherRegistrationMapIM publisherRegistrationMapIM;
+    private DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
 
     @PostConstruct
     public void initialise(){
@@ -65,7 +65,7 @@ public class InterSubSystemPubSubBroker implements InterSubSystemPubSubBrokerInt
         LOG.info(".subscribe(): publisher.setInterSubsystemParticipant()");
         publisher.setInterSubsystemParticipant(distributedPublisher);
         LOG.info(".subscribe(): Registration subscriptions");
-        InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = publisherRegistrationMapIM.addSubscriptionToPublisher(dataParcelManifestList, publisher.getInterSubsystemParticipant());
+        InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = distributedPubSubSubscriptionMapIM.addSubscriptionToPublisher(dataParcelManifestList, publisher.getInterSubsystemParticipant());
         LOG.info(".subscribe(): Exit, done->{}", subscriptionRegistration);
         return (subscriptionRegistration);
     }

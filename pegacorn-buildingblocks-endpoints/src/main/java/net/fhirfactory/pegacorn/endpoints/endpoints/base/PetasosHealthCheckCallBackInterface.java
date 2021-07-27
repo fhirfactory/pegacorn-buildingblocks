@@ -19,24 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.endpoints.endpoints.oam;
+package net.fhirfactory.pegacorn.endpoints.endpoints.base;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.map.PetasosEndpointMap;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.petasos.PetasosInterZoneOAMTopologySyncEndpoint;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.petasos.PetasosIntraZoneOAMTopologySyncEndpoint;
+import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointStatusEnum;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-@ApplicationScoped
-public class PetasosOAMTopologySyncEndpointFacade {
-
-    @Inject
-    private PetasosEndpointMap endpointMap;
-
-    @Inject
-    private PetasosInterZoneOAMTopologySyncEndpoint interZoneOAMTopologyEndpoint;
-
-    @Inject
-    private PetasosIntraZoneOAMTopologySyncEndpoint intraZoneOAMTopologyEndpoint;
+public interface PetasosHealthCheckCallBackInterface {
+    public PetasosEndpointStatusEnum getAggregatePetasosEndpointStatus();
 }

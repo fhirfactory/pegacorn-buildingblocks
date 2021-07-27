@@ -31,10 +31,10 @@ import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornComm
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.PublisherRegistrationMapIM;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.PubSubSubscriberRole;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.PubSubPublisherRole;
@@ -55,10 +55,7 @@ import org.jgroups.MembershipListener;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.sql.Date;
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 public abstract class JGroupsOAMPubSubParticipant extends JGroupsInterfaceBase implements PubSubParticipantEndpointServiceInterface, MembershipListener {
 
@@ -83,7 +80,7 @@ public abstract class JGroupsOAMPubSubParticipant extends JGroupsInterfaceBase i
     private ProducerTemplate camelProducer;
 
     @Inject
-    private PublisherRegistrationMapIM publisherRegistrationMapIM;
+    private DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
 
     //
     // Constructor
@@ -104,7 +101,7 @@ public abstract class JGroupsOAMPubSubParticipant extends JGroupsInterfaceBase i
     protected abstract String specifyGroupName();
     protected abstract String specifyFileName();
     protected abstract String specifyIPCInterfaceName();
-    protected abstract TopologyEndpointTypeEnum specifyIPCType();
+    protected abstract PetasosTopologyEndpointTypeEnum specifyIPCType();
     protected abstract EdgeForwarderService specifyForwarderService();
     protected abstract String specifyForwarderWUPName();
     protected abstract String specifyForwarderWUPVersion();
@@ -125,43 +122,7 @@ public abstract class JGroupsOAMPubSubParticipant extends JGroupsInterfaceBase i
         deriveTopologyEndpoint();
         getLogger().info(".initialise(): IPCEndpoint derived ->{}", getOAMTopologyEndpoint());
 
-        // 1st, the IntraSubsystem Pub/Sub Participant} component
-        getLogger().info(".initialise(): Now create my intraSubsystemParticipant (LocalPubSubPublisher)");
-        TopologyNodeFDNToken topologyNodeFDNToken = deriveAssociatedForwarderFDNToken();
-        getLogger().info(".initialise(): localPublisher TopologyNodeFDNToken is ->{}", topologyNodeFDNToken);
-        IntraSubsystemPubSubParticipant intraSubsystemParticipant = new IntraSubsystemPubSubParticipant(topologyNodeFDNToken);
-        getLogger().info(".initialise(): intraSubsystemParticipant created -->{}", intraSubsystemParticipant);
-        getLogger().info(".initialise(): Now create my PubSubParticipant");
-        PubSubParticipant partipant = new PubSubParticipant();
-        getLogger().info(".initialise(): Add the intraSubsystemParticipant aspect to the partipant");
-        partipant.setIntraSubsystemParticipant(intraSubsystemParticipant);
 
-        // Now the InterSubsystem Pub/Sub Participant component
-        getLogger().info(".initialise(): Create my interSubsystemParticipant aspect");
-        getLogger().info(".initialise(): First, my distributedPublisherIdentifier");
-        InterSubsystemPubSubParticipantIdentifier interParticipantIdentifier = new InterSubsystemPubSubParticipantIdentifier();
-        interParticipantIdentifier.setServiceName(getProcessingPlantInterface().getIPCServiceName());
-        String serviceInstanceName = getProcessingPlantInterface().getIPCServiceName() + "(" + UUID.randomUUID().toString() + ")";
-        interParticipantIdentifier.setServiceInstanceName(serviceInstanceName);
-        getLogger().info(".initialise(): interParticipantIdentifier Created -->{}", interParticipantIdentifier);
-        InterSubsystemPubSubParticipant distributedPublisher = new InterSubsystemPubSubParticipant();
-        distributedPublisher.setSecurityZone(getProcessingPlantInterface().getNetworkZone());
-        distributedPublisher.setSite(getProcessingPlantInterface().getDeploymentSite());
-        distributedPublisher.setIdentifier(interParticipantIdentifier);
-        distributedPublisher.setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_NOT_ESTABLISHED);
-        distributedPublisher.setConnectionEstablishmentDate(Date.from(Instant.now()));
-        getLogger().info(".initialise(): distributedPublisher (DistributedPubSubPublisher) created ->{}", distributedPublisher);
-
-        // Now assemble the "Participant"
-        getLogger().info(".initialise(): Add the distributedPublisher aspect to the partipant");
-        partipant.setInterSubsystemParticipant(distributedPublisher);
-        getLogger().info(".initialise(): distributedPublisher aspect added to the partipant, now assigning it to class variable");
-        this.setPubsubParticipant(partipant);
-        getLogger().info(".initialise(): participant assigned to class variable, now initialising the associated JChannel!");
-        establishJChannel(specifyFileName(), specifyGroupName(), serviceInstanceName);
-        getLogger().info(".initialise(): calling subclass post-construct methods");
-        //additionalInitialisation();
-        getLogger().info(".initialise(): partipant created & JChannel initialised, set initialised state to true");
 
         // Now build my "Roles"
         getLogger().info(".initialise(): building meAsPubSubServer!");
@@ -304,7 +265,7 @@ public abstract class JGroupsOAMPubSubParticipant extends JGroupsInterfaceBase i
         getLogger().debug(".deriveIPCTopologyEndpoint(): Entry");
         for(TopologyNodeFDN currentEndpointFDN: getProcessingPlantInterface().getProcessingPlantNode().getEndpoints()){
             IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
-            TopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
+            PetasosTopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
             boolean endpointTypeMatches = endpointType.equals(specifyIPCType());
             if(endpointTypeMatches){
                 if(currentEndpoint.getName().contentEquals(specifyIPCInterfaceName())) {
@@ -371,8 +332,8 @@ public abstract class JGroupsOAMPubSubParticipant extends JGroupsInterfaceBase i
         return (interfaceNames);
     }
 
-    public PublisherRegistrationMapIM getPublisherRegistrationMapIM() {
-        return publisherRegistrationMapIM;
+    public DistributedPubSubSubscriptionMapIM getPublisherRegistrationMapIM() {
+        return distributedPubSubSubscriptionMapIM;
     }
 
     public PubSubSubscriberRole getMeAsPubSubClient() {

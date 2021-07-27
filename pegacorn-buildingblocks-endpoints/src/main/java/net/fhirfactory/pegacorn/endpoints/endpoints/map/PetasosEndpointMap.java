@@ -22,17 +22,16 @@
 package net.fhirfactory.pegacorn.endpoints.endpoints.map;
 
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.endpoints.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointConnectionTypeCodeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointConnectionTypeCodeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointPayloadTypeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpoint;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointStatusEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -41,8 +40,8 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.*;
 import java.util.Enumeration;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ApplicationScoped
@@ -173,6 +172,48 @@ public class PetasosEndpointMap {
         return(serviceMembership);
     }
 
+    public void updateServiceNameMembership(String petasosEndpointServiceName, String petasosEndpointName){
+        if (StringUtils.isEmpty(petasosEndpointName) || StringUtils.isEmpty(petasosEndpointServiceName)) {
+            return;
+        }
+        boolean alreadyMappedAsRequested = false;
+        boolean serviceEntryExists = false;
+        synchronized(this.endpointServiceMapLock) {
+            if (this.endpointServiceMap.containsKey(petasosEndpointServiceName)) {
+                serviceEntryExists = true;
+                List<String> endpointNames = this.endpointServiceMap.get(petasosEndpointServiceName);
+                if (endpointNames.contains(petasosEndpointName)) {
+                    alreadyMappedAsRequested = true;
+                }
+            }
+        }
+        if(alreadyMappedAsRequested) {
+            return;
+        }
+        boolean wasMappedElsewhere = false;
+        synchronized(this.endpointServiceMapLock) {
+            Enumeration<String> serviceNameEnumeration = this.endpointServiceMap.keys();
+            List<String> servicesToBeRemovedFromMap = new ArrayList<>();
+            while(serviceNameEnumeration.hasMoreElements()){
+                String currentServiceName = serviceNameEnumeration.nextElement();
+                List<String> endpointNames = this.endpointServiceMap.get(currentServiceName);
+                if (endpointNames.contains(petasosEndpointName)) {
+                    wasMappedElsewhere = true;
+                    endpointNames.remove(petasosEndpointName);
+                }
+                if(endpointNames.isEmpty()) {
+                    servicesToBeRemovedFromMap.add(currentServiceName);
+                }
+            }
+            if(!servicesToBeRemovedFromMap.isEmpty()) {
+                for (String currentServiceToBeRemoved : servicesToBeRemovedFromMap) {
+                    this.endpointServiceMap.remove(currentServiceToBeRemoved);
+                }
+            }
+        }
+        addServiceMembership(petasosEndpointServiceName, petasosEndpointName);
+    }
+
     //
     // EndpointMap Methods
     //
@@ -235,7 +276,7 @@ public class PetasosEndpointMap {
         petasosEndpoint.setEndpointServiceName(endpointServiceName);
         petasosEndpoint.setRepresentativeFHIREndpoint(fhirEndpoint);
         petasosEndpoint.setEndpointID(petasosEndpointID);
-        petasosEndpoint.setStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_DETECTED);
+        petasosEndpoint.setEndpointStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_DETECTED);
         return(petasosEndpoint);
     }
 
@@ -298,7 +339,7 @@ public class PetasosEndpointMap {
         }
 
         String endpointName = endpoint.getEndpointID().getEndpointName();
-        String endpointServiceName = endpoint.getEndpointService();
+        String endpointServiceName = endpoint.getEndpointServiceName();
         if(endpoints.containsKey(endpointName)){
             PetasosEndpoint retrievedEndpoint = endpoints.get(endpointName);
             getLogger().debug(".newEndpoint(): Exit, endpoint already registered, endpoint->{}", endpoint);

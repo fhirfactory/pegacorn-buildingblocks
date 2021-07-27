@@ -24,8 +24,9 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.forward.common;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.TopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
@@ -53,7 +54,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     private PegacornIPCCommonValues ipcFunctionalityNames;
 
     @Inject
-    DataParcelSubscriptionIM topicServer;
+    DataParcelSubscriptionMapIM topicServer;
 
     @Override
     protected WorkshopInterface specifyWorkshop() {
@@ -61,7 +62,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     }
 
     protected abstract String specifyIPCZoneType();
-    protected abstract JGroupsIPCPetasosInterface specifyIPCEndpoint();
+    protected abstract PetasosInterZoneIPCEndpoint specifyIPCEndpoint();
     protected JGroupsIPCPetasosInterface getIPCEndpoint(){return(specifyIPCEndpoint());}
 
     //
@@ -103,8 +104,8 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     // Application Logic (Establishing WUP)
     //
 
-    protected TopologyEndpointTypeEnum specifyIPCType() {
-        return (TopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_SERVICE);
+    protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
+        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_SERVICE);
     }
 
     @Override
@@ -120,7 +121,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
         return ipcFunctionalityNames;
     }
 
-    public DataParcelSubscriptionIM getTopicServer(){
+    public DataParcelSubscriptionMapIM getTopicServer(){
         return(this.topicServer);
     }
 

@@ -21,13 +21,11 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.base;
 
-import net.fhirfactory.pegacorn.endpoints.endpoints.datatypes.PetasosEndpointIdentifier;
+
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosAdapterDeltasInterface;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubNetworkConnectionStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
-import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.EndpointChangeNotificationActionInterface;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -36,8 +34,6 @@ import org.jgroups.View;
 import org.jgroups.blocks.RpcDispatcher;
 import org.slf4j.Logger;
 
-import java.sql.Date;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +64,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
     abstract protected String specifyJGroupsClusterName();
     abstract protected String specifyJGroupsChannelName();
     abstract protected String specifyJGroupsStackFileName();
+    abstract protected String deriveEndpointServiceName(String endpointName);
 
     //
     // JGroups Group/Cluster Membership Event Listener
@@ -258,8 +255,8 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
     }
 
 
-    public Address getTargetServiceAddress(String name){
-        getLogger().debug(".getTargetAddress(): Entry, name->{}", name);
+    public Address getCandidateTargetServiceAddress(String targetServiceName){
+        getLogger().debug(".getTargetAddress(): Entry, targetServiceName->{}", targetServiceName);
         if(getIPCChannel() == null){
             getLogger().debug(".getTargetAddress(): IPCChannel is null, exit returning (null)");
             return(null);
@@ -269,7 +266,8 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
         getLogger().trace(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
         for(Address currentAddress: addressList){
             getLogger().trace(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
-            if(currentAddress.toString().startsWith(name)){
+            String currentService = deriveEndpointServiceName(currentAddress.toString());
+            if(currentService.equals(targetServiceName)){
                 getLogger().debug(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
                 return(currentAddress);
             }

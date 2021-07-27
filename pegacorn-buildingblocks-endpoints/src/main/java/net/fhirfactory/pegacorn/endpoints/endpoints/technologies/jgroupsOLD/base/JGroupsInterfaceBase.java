@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroupsOLD.base;
 
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubNetworkConnectionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipantUtilisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.base.EndpointChangeNotificationActionInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
@@ -166,14 +166,14 @@ public abstract class JGroupsInterfaceBase implements MembershipListener {
             getLogger().trace(".establishJChannel(): Connected to JGroup complete, now assigning class attributes");
             this.setIPCChannel(newChannel);
             this.setRPCDispatcher(newRPCDispatcher);
-            this.getPubsubParticipant().getInterSubsystemParticipant().setConnectionEstablishmentDate(Date.from(Instant.now()));
-            this.getPubsubParticipant().getInterSubsystemParticipant().setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
+            this.getPubsubParticipant().getInterSubsystemParticipant().setUtilisationUpdateDate(Date.from(Instant.now()));
+            this.getPubsubParticipant().getInterSubsystemParticipant().setUtilisationStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
             getLogger().trace(".establishJChannel(): Exit, JChannel & RPCDispatcher created");
             return;
         } catch (Exception e) {
             getLogger().error(".establishJChannel(): Cannot establish JGroups Channel, error->", e);
-            this.getPubsubParticipant().getInterSubsystemParticipant().setConnectionEstablishmentDate(Date.from(Instant.now()));
-            this.getPubsubParticipant().getInterSubsystemParticipant().setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_FAILED);
+            this.getPubsubParticipant().getInterSubsystemParticipant().setUtilisationUpdateDate(Date.from(Instant.now()));
+            this.getPubsubParticipant().getInterSubsystemParticipant().setUtilisationStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_NETWORK_CONNECTION_FAILED);
             return;
         }
     }
