@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.pubsub;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
-import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetasosHealthCheckCallBackInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.pubsub.base.PetasosOAMPubSubEndpoint;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
@@ -37,20 +36,26 @@ import javax.inject.Inject;
 public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosInterZoneOAMPubSubEndpoint.class);
 
+    public PetasosInterZoneOAMPubSubEndpoint(){
+        super();
+    }
+
     @Inject
     private InterZoneEdgeForwarderService interzoneForwardingService;
 
     @Override
     protected Logger specifyLogger() {
-        return null;
+        return (LOG);
     }
 
     @Override
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
         String endpointName = getJgroupsParticipantInformationService().getMyInterZoneOAMPubSubEndpointName();
-        endpointID.setEndpointName(endpointName);
-        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone().toString());
+        endpointID.setEndpointCommonName(endpointName);
+        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneOAMPubSubEndpointKey();
+        endpointID.setEndpointName(endpointKey);
+        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
         String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
@@ -70,7 +75,7 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
 
     @Override
     protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
-        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_OAM_SERVICE);
+        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_SERVICE);
     }
 
     @Override
@@ -100,26 +105,6 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
     }
 
     @Override
-    public void registerHealthCheckCallback(PetasosHealthCheckCallBackInterface healthCheckCallback) {
-
-    }
-
-    @Override
-    protected boolean supportsInterZoneCommunication() {
-        return (true);
-    }
-
-    @Override
-    protected boolean supportsInterSiteCommunication() {
-        return (true);
-    }
-
-    @Override
-    protected boolean supportsIntraZoneCommunication() {
-        return (false);
-    }
-
-    @Override
     protected InterZoneEdgeForwarderService specifyEdgeForwarderService() {
         return (interzoneForwardingService);
     }
@@ -132,5 +117,10 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
     @Override
     protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
         getCoreSubsystemPetasosEndpointsWatchdog().setInterzoneOAMPubSub(this.getPetasosEndpoint());
+    }
+
+    @Override
+    protected PetasosEndpointScopeEnum specifyPetasosEndpointScope() {
+        return (PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERZONE);
     }
 }

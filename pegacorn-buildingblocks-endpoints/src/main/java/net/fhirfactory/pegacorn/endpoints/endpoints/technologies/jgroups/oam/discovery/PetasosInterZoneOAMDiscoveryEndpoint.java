@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.discovery;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
-import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetasosHealthCheckCallBackInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.discovery.base.PetasosOAMDiscoveryEndpoint;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
@@ -37,19 +36,26 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
 
     @Override
     protected Logger specifyLogger() {
-        return null;
+        return (LOG);
+    }
+
+    public PetasosInterZoneOAMDiscoveryEndpoint(){
+        super();
     }
 
     @Override
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
         String endpointName = getJgroupsParticipantInformationService().getMyInterZoneOAMDiscoveryEndpointName();
-        endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointCommonName(endpointName);
+        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneOAMDiscoveryEndpointKey();
+        endpointID.setEndpointName(endpointKey);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
         String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
         endpointID.setEndpointAddress(endpointAddress);
+        getLogger().info(".specifyEndpointID(): Exit, endpointID->{}", endpointID);
         return (endpointID);
     }
 
@@ -65,7 +71,7 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
 
     @Override
     protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
-        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_OAM_SERVICE);
+        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_SERVICE);
     }
 
     @Override
@@ -89,28 +95,8 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     }
 
     @Override
-    public void registerHealthCheckCallback(PetasosHealthCheckCallBackInterface healthCheckCallback) {
-
-    }
-
-    @Override
     public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID) {
         return null;
-    }
-
-    @Override
-    protected boolean supportsInterZoneCommunication() {
-        return true;
-    }
-
-    @Override
-    protected boolean supportsInterSiteCommunication() {
-        return true;
-    }
-
-    @Override
-    protected boolean supportsIntraZoneCommunication() {
-        return false;
     }
 
     @Override
@@ -121,5 +107,10 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     @Override
     protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
         getCoreSubsystemPetasosEndpointsWatchdog().setInterzoneOAMDiscovery(this.getPetasosEndpoint());
+    }
+
+    @Override
+    protected PetasosEndpointScopeEnum specifyPetasosEndpointScope() {
+        return (PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERZONE);
     }
 }

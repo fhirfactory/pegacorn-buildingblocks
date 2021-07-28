@@ -57,7 +57,7 @@ public abstract class EdgeMessageReceiveWUP extends EdgeIngresMessagingGatewayWU
     //
 
     protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
-        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_SERVICE);
+        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTRAZONE_SERVICE);
     }
 
     //

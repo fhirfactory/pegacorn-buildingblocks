@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.endpoints.endpoints;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetasosHealthCheckCallBackInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.map.PetasosEndpointMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class CoreSubsystemPetasosEndpointsWatchdog {
+public class CoreSubsystemPetasosEndpointsWatchdog implements PetasosHealthCheckCallBackInterface {
     private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosEndpointsWatchdog.class);
 
     private PetasosEndpoint intrazoneIPC;
@@ -90,7 +91,7 @@ public class CoreSubsystemPetasosEndpointsWatchdog {
         this.intersiteOAMPubSub = null;
         this.edgeAnswerHTTP = null;
         this.edgeAnswerRPC = null;
-        this.aggregateStatus = PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED;
+        this.aggregateStatus = PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED;
 
         this.initialised = false;
 
@@ -122,7 +123,7 @@ public class CoreSubsystemPetasosEndpointsWatchdog {
             public void run() {
                 getLogger().info(".startupWatchdogTask(): Entry");
                 startupWatchdog();
-                if (!getAggregateStatus().equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED)) {
+                if (!getAggregateStatus().equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED)) {
                     cancel();
                     scheduleOngoingStatusWatchdog();
                     startupCheckRequired = false;
@@ -143,32 +144,32 @@ public class CoreSubsystemPetasosEndpointsWatchdog {
         setLastCheckTime(timeRightNow);
         Long startupTimeSoFar = timeRightNow.getEpochSecond() - startupTime.getEpochSecond();
         if(startupTimeSoFar > MAX_STARTUP_DURATION){
-            setAggregateStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+            setAggregateStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
             getLogger().error(".startupWatchdog(): Core Petasos Endpoints have failed to startup (within defined startup period)!!!!");
             return;
         }
         PetasosEndpointStatusEnum currentStatus = deriveAggregateStatus(this.getAggregateStatus());
-        if(currentStatus.equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED)){
-            setAggregateStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED);
+        if(currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED)){
+            setAggregateStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
             getLogger().debug(".startupWatchdog(): Exit, Startup not completed, awaiting ports");
             return;
         }
-        if(currentStatus.equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_OPERATIONAL)){
+        if(currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL)){
             if(checkMinimumViablePortSetHasLaunched()) {
-                setAggregateStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_OPERATIONAL);
+                setAggregateStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
                 getLogger().debug(".startupWatchdog(): Exit, Core Petasos Endpoints Startup Completed");
             } else {
-                setAggregateStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED);
+                setAggregateStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
                 getLogger().debug(".startupWatchdog(): Exit, Startup not completed, awaiting ports");
             }
             return;
         }
-        if(currentStatus.equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED)){
+        if(currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED)){
             getLogger().debug(".startupWatchdog(): Exit, Core Petasos Endpoints Startup Continuing");
             return;
         }
-        if(currentStatus.equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED)) {
-            setAggregateStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+        if(currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED)) {
+            setAggregateStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
             getLogger().error(".startupWatchdog(): Core Petasos Endpoints Startup Failed!!!!");
             return;
         }
@@ -264,19 +265,19 @@ public class CoreSubsystemPetasosEndpointsWatchdog {
         setLastCheckTime(timeRightNow);
         PetasosEndpointStatusEnum currentStatus = deriveAggregateStatus(this.getAggregateStatus());
         switch(currentStatus){
-            case INTERFACE_STATUS_STARTED: {
+            case PETASOS_ENDPOINT_STATUS_STARTED: {
                 // Shouldn't be here....
-                setAggregateStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+                setAggregateStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
                 getLogger().error(".statusWatchDog(): Core Petasos Endpoints have failed!!!!");
                 return;
             }
-            case INTERFACE_STATUS_OPERATIONAL:{
+            case PETASOS_ENDPOINT_STATUS_OPERATIONAL:{
                 // Do nothing
                 return;
             }
-            case INTERFACE_STATUS_SUSPECT:{
+            case PETASOS_ENDPOINT_STATUS_SUSPECT:{
                 if(getSuspectIterationCount() > FAILED_ITERATION_MAX){
-                    setAggregateStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+                    setAggregateStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
                     getLogger().error(".statusWatchDog(): Core Petasos Endpoints have failed!!!!");
                     return;
                 } else {
@@ -285,11 +286,12 @@ public class CoreSubsystemPetasosEndpointsWatchdog {
                     return;
                 }
             }
-            case INTERFACE_STATUS_FAILED:
-            case INTERFACE_STATUS_DETECTED:
-            case INTERFACE_STATUS_REACHABLE:
+            case PETASOS_ENDPOINT_STATUS_FAILED:
+            case PETASOS_ENDPOINT_STATUS_DETECTED:
+            case PETASOS_ENDPOINT_STATUS_UNREACHABLE:
+            case PETASOS_ENDPOINT_STATUS_REACHABLE:
             default:{
-                setAggregateStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+                setAggregateStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
                 getLogger().warn(".statusWatchDog(): Core Petasos Endpoints have failed!!!!");
                 return;
             }
@@ -335,79 +337,79 @@ public class CoreSubsystemPetasosEndpointsWatchdog {
         }
         getLogger().trace(".deriveAggregateStatus(): If any of the PetasosEndpoints are FAILED, then they have ALL FAILED");
         for(PetasosEndpointStatusEnum currentStatus: statusList){
-            if(currentStatus.equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED)){
-                getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
-                return(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+            if(currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED)){
+                getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
+                return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
             }
         }
         getLogger().trace(".deriveAggregateStatus(): If any of the PetasosEndpoints are SUSPECT, then the the aggregate is SUSPECT");
         for(PetasosEndpointStatusEnum currentStatus: statusList){
-            if(currentStatus.equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_SUSPECT)){
-                getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.INTERFACE_STATUS_SUSPECT);
-                return(PetasosEndpointStatusEnum.INTERFACE_STATUS_SUSPECT);
+            if(currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SUSPECT)){
+                getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SUSPECT);
+                return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SUSPECT);
             }
         }
         getLogger().trace(".deriveAggregateStatus(): If any of the PetasosEndpoints are STARTED, then the the aggregate is STARTED");
         for(PetasosEndpointStatusEnum currentStatus: statusList){
-            if(currentStatus.equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED)){
-                getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED);
-                return(PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED);
+            if(currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED)){
+                getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
+                return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
             }
         }
         getLogger().trace(".deriveAggregateStatus(): Checking to see if that are ALL OPERATIONAL");
         boolean allOperational = true;
         for(PetasosEndpointStatusEnum currentStatus: statusList){
-            if(!currentStatus.equals(PetasosEndpointStatusEnum.INTERFACE_STATUS_OPERATIONAL)){
+            if(!currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL)){
                 allOperational = false;
             }
         }
         if(allOperational){
-            getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.INTERFACE_STATUS_OPERATIONAL);
-            return(PetasosEndpointStatusEnum.INTERFACE_STATUS_OPERATIONAL);
+            getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
         } else {
-            getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
-            return(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+            getLogger().debug(".deriveAggregateStatus(): Exit, returning->{}", PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
         }
     }
 
     private PetasosEndpointStatusEnum resolveStatusValue(PetasosEndpointStatusEnum currentStatus, PetasosEndpointStatusEnum newStatus){
         switch(currentStatus){
-            case INTERFACE_STATUS_STARTED:{
+            case PETASOS_ENDPOINT_STATUS_STARTED:{
                 switch(newStatus){
-                    case INTERFACE_STATUS_STARTED:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_STARTED);
-                    case INTERFACE_STATUS_OPERATIONAL:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_OPERATIONAL);
-                    case INTERFACE_STATUS_SUSPECT:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_SUSPECT);
+                    case PETASOS_ENDPOINT_STATUS_STARTED:
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
+                    case PETASOS_ENDPOINT_STATUS_OPERATIONAL:
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
+                    case PETASOS_ENDPOINT_STATUS_SUSPECT:
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SUSPECT);
                     default:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
                 }
             }
-            case INTERFACE_STATUS_OPERATIONAL:{
+            case PETASOS_ENDPOINT_STATUS_OPERATIONAL:{
                 switch(newStatus){
-                    case INTERFACE_STATUS_STARTED:
-                    case INTERFACE_STATUS_SUSPECT:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_SUSPECT);
-                    case INTERFACE_STATUS_OPERATIONAL:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_OPERATIONAL);
+                    case PETASOS_ENDPOINT_STATUS_STARTED:
+                    case PETASOS_ENDPOINT_STATUS_SUSPECT:
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SUSPECT);
+                    case PETASOS_ENDPOINT_STATUS_OPERATIONAL:
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
                     default:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
                 }
             }
-            case INTERFACE_STATUS_SUSPECT:{
+            case PETASOS_ENDPOINT_STATUS_SUSPECT:{
                 switch(newStatus){
-                    case INTERFACE_STATUS_OPERATIONAL:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_OPERATIONAL);
-                    case INTERFACE_STATUS_STARTED:
-                    case INTERFACE_STATUS_SUSPECT:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_SUSPECT);
+                    case PETASOS_ENDPOINT_STATUS_OPERATIONAL:
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
+                    case PETASOS_ENDPOINT_STATUS_STARTED:
+                    case PETASOS_ENDPOINT_STATUS_SUSPECT:
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SUSPECT);
                     default:
-                        return(PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+                        return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
                 }
             }
             default: {
-                return (PetasosEndpointStatusEnum.INTERFACE_STATUS_FAILED);
+                return (PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED);
             }
         }
     }
@@ -605,5 +607,10 @@ public class CoreSubsystemPetasosEndpointsWatchdog {
 
     public void setSuspectIterationCount(int suspectIterationCount) {
         this.suspectIterationCount = suspectIterationCount;
+    }
+
+    @Override
+    public PetasosEndpointStatusEnum getAggregatePetasosEndpointStatus() {
+        return (getAggregateStatus());
     }
 }

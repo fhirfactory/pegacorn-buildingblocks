@@ -130,6 +130,31 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         getLogger().debug(".getTargetMemberAdapterSetForService(): Exit, addressSet->{}",addressSet);
         return(addressSet);
     }
+    public PetasosAdapterAddress getTargetMemberAdapterAddress(String targetMemberKey){
+        getLogger().debug(".getTargetMemberAdapterAddress(): Entry, targetMemberKey->{}", targetMemberKey);
+        List<PetasosAdapterAddress> addressSet = new ArrayList<>();
+        if(getIPCChannel() == null){
+            getLogger().debug(".getTargetMemberAdapterAddress(): Exit, IPCChannel is null, exit returning (null)");
+            return(null);
+        }
+        getLogger().trace(".getTargetMemberAdapterAddress(): IPCChannel is NOT null, get updated Address set via view");
+        List<Address> addressList = getIPCChannel().getView().getMembers();
+        getLogger().trace(".getTargetMemberAdapterAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+        for(Address currentAddress: addressList){
+            getLogger().trace(".getTargetMemberAdapterAddress(): Iterating through Address list, current element->{}", currentAddress);
+            if(currentAddress.toString().contentEquals(targetMemberKey)){
+                getLogger().debug(".getTargetMemberAdapterAddress(): Exit, A match!, returning address->{}", currentAddress);
+                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+                currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
+                currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
+                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+                return(currentPetasosAdapterAddress);
+            }
+        }
+        getLogger().debug(".getTargetMemberAdapterAddress(): Exit, could not find it...");
+        return(null);
+    }
+
 
     public PetasosAdapterAddress getTargetMemberAdapterInstanceForService(String serviceName){
         getLogger().debug(".getTargetMemberAdapterInstanceForService(): Entry, serviceName->{}", serviceName);
@@ -141,6 +166,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
             getLogger().debug(".getTargetMemberAdapterInstanceForService(): Exit, serviceName is null, exit returning (null)");
             return(null);
         }
+
         List<PetasosAdapterAddress> potentialInterfaces = getTargetMemberAdapterSetForService(serviceName);
         if(potentialInterfaces.isEmpty()){
             getLogger().debug(".getTargetMemberAdapterInstanceForService(): Exit, no available interfaces supporting function");
@@ -153,6 +179,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     }
 
     public List<PetasosAdapterAddress> getAllGroupMembers(){
+        getLogger().info(".getAllGroupMembers(): Entry");
         List<PetasosAdapterAddress> groupMembers = getAllClusterTargets();
         List<PetasosAdapterAddress> sameServiceSet = new ArrayList<>();
         for(PetasosAdapterAddress currentAdapterAddress: groupMembers){
@@ -163,6 +190,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         for(PetasosAdapterAddress sameServiceAddress: sameServiceSet){
             groupMembers.remove(sameServiceAddress);
         }
+        getLogger().info(".getAllGroupMembers(): Exit, size->{}", groupMembers.size());
         return(groupMembers);
     }
 

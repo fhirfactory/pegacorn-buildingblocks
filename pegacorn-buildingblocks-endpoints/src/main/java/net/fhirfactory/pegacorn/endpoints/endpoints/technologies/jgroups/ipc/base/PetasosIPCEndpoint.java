@@ -21,15 +21,42 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.ipc.base;
 
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
+
+    @Produce
+    private ProducerTemplate camelProducer;
+
+    //
+    // Constructor
+    //
+
+    public PetasosIPCEndpoint(){
+        super();
+    }
+
+    //
+    // PostConstruct Activities
+    //
+
+    @Override
+    protected void executePostConstructActivities() {
+
+    }
 
 
     //
@@ -49,7 +76,7 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     // Send Messages (via RPC invocations)
     //
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().debug(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
+        getLogger().info(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
         Address targetServiceAddress = getCandidateIPCTargetAddress(targetParticipantServiceName);
         getLogger().info(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
         InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = sendIPCMessage(targetServiceAddress, handoverPacket);
@@ -90,11 +117,46 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
         }
     }
 
+    public List<Address> getIPCTargetAddressSet(String endpointServiceName){
+        getLogger().info(".getIPCTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
+        List<Address> endpointAddressSet = new ArrayList<>();
+        if(StringUtils.isEmpty(endpointServiceName)){
+            getLogger().info(".getIPCTargetAddressSet(): Exit, endpointServiceName is empty");
+            return(endpointAddressSet);
+        }
+        List<PetasosAdapterAddress> memberAdapterSetForService = getTargetMemberAdapterSetForService(endpointServiceName);
+        for(PetasosAdapterAddress currentMember: memberAdapterSetForService){
+            Address currentMemberAddress = currentMember.getJGroupsAddress();
+            if(currentMemberAddress != null){
+                endpointAddressSet.add(currentMemberAddress);
+            }
+        }
+        getLogger().info(".getIPCTargetAddressSet(): Exit, endpointAddressSet->{}", endpointAddressSet);
+        return(endpointAddressSet);
+    }
+
+    public Address getCandidateIPCTargetAddress(String endpointServiceName){
+        getLogger().info(".getCandidateIPCTargetAddress(): Entry, endpointServiceName->{}", endpointServiceName);
+        if(StringUtils.isEmpty(endpointServiceName)){
+            getLogger().info(".getCandidateIPCTargetAddress(): Exit, endpointServiceName is empty");
+            return(null);
+        }
+        List<Address> endpointAddressSet = getIPCTargetAddressSet(endpointServiceName);
+        if(endpointAddressSet.isEmpty()){
+            getLogger().info(".getCandidateIPCTargetAddress(): Exit, endpointAddressSet is empty");
+            return(null);
+        }
+        Address endpointJGroupsAddress = endpointAddressSet.get(0);
+        getLogger().info(".getCandidateIPCTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
+        return(endpointJGroupsAddress);
+    }
 
     //
     // Getters (and Setters)
     //
 
 
-
+    public ProducerTemplate getCamelProducer() {
+        return camelProducer;
+    }
 }

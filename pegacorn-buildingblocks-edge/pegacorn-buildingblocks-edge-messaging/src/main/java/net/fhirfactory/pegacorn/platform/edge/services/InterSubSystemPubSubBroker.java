@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.services;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.helpers.JGroupsBasedParticipantInformationService;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipantIdentifier;
@@ -43,6 +44,9 @@ public class InterSubSystemPubSubBroker implements InterSubSystemPubSubBrokerInt
     @Inject
     private DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
 
+    @Inject
+    private JGroupsBasedParticipantInformationService participantInformationService;
+
     @PostConstruct
     public void initialise(){
         LOG.info(".initialise(): initialising......");;
@@ -52,20 +56,8 @@ public class InterSubSystemPubSubBroker implements InterSubSystemPubSubBrokerInt
     @Override
     public InterSubsystemPubSubPublisherSubscriptionRegistration subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem) {
         LOG.info(".subscribe(): Entry, I am here in (InterSubSystemPubSubBroker), dataParcelManifestList->{}, sourceSubSystem->{}", dataParcelManifestList, sourceSubSystem);
-        PubSubParticipant publisher = new PubSubParticipant();
-        InterSubsystemPubSubParticipant distributedPublisher = new InterSubsystemPubSubParticipant();
-        LOG.info(".subscribe(): Creating InterSubsystemPubSubParticipantIdentifier");
-        InterSubsystemPubSubParticipantIdentifier distributedPublisherIdentifier = new InterSubsystemPubSubParticipantIdentifier();
-        LOG.info(".subscribe(): Adding sourceSubSystem");
-        distributedPublisherIdentifier.setServiceName(sourceSubSystem);
-        LOG.info(".subscribe(): setIdentifier(), distributedPublisherIdentifier->{}", distributedPublisherIdentifier);
-        distributedPublisher.setIdentifier(distributedPublisherIdentifier);
-        LOG.info(".subscribe(): getIdentifier().setServiceName()");
-        distributedPublisher.getIdentifier().setServiceName(sourceSubSystem);
-        LOG.info(".subscribe(): publisher.setInterSubsystemParticipant()");
-        publisher.setInterSubsystemParticipant(distributedPublisher);
         LOG.info(".subscribe(): Registration subscriptions");
-        InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = distributedPubSubSubscriptionMapIM.addSubscriptionToPublisher(dataParcelManifestList, publisher.getInterSubsystemParticipant());
+        InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = distributedPubSubSubscriptionMapIM.addSubscriptionToPublisher(dataParcelManifestList, sourceSubSystem);
         LOG.info(".subscribe(): Exit, done->{}", subscriptionRegistration);
         return (subscriptionRegistration);
     }

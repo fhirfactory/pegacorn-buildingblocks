@@ -14,8 +14,6 @@ public interface ProcessingPlantInterface {
     public String getDeploymentSite();
     public PegacornTopologyFactoryInterface getTopologyFactory();
     public ProcessingPlantTopologyNode getProcessingPlantNode();
-    public String getOAMStackConfigurationFileName();
-    public String getIPCStackConfigurationFileName();
     public WorkshopTopologyNode getWorkshop(String workshopName, String version);
     public WorkshopTopologyNode getWorkshop(String workshopName);
     public String getIPCServiceName();

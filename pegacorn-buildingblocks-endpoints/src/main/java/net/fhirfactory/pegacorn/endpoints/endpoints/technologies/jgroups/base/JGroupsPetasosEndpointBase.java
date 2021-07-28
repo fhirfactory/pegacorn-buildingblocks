@@ -23,18 +23,16 @@ package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.base;
 
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
 import net.fhirfactory.pegacorn.endpoints.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
 import net.fhirfactory.pegacorn.endpoints.endpoints.map.PetasosEndpointMap;
-import net.fhirfactory.pegacorn.endpoints.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosAdapterTechnologyInterface;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.helpers.JGroupsBasedParticipantInformationService;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -42,16 +40,12 @@ import org.jgroups.blocks.ResponseMode;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBase implements PetasosAdapterTechnologyInterface {
 
     private PetasosEndpoint petasosEndpoint;
     private PubSubParticipant participant;
-    private boolean endpointCheckScheduled;
+
 
     @Inject
     private PetasosEndpointMap endpointMap;
@@ -66,7 +60,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     private JGroupsBasedParticipantInformationService jgroupsParticipantInformationService;
 
     @Inject
-    CoreSubsystemPetasosEndpointsWatchdog coreSubsystemPetasosEndpointsWatchdog;
+    private CoreSubsystemPetasosEndpointsWatchdog coreSubsystemPetasosEndpointsWatchdog;
 
     //
     // Constructor
@@ -74,7 +68,6 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     public JGroupsPetasosEndpointBase(){
         super();
-        endpointCheckScheduled = false;
     }
 
     //
@@ -82,13 +75,12 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     //
 
     abstract protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType();
-    abstract protected boolean supportsInterZoneCommunication();
-    abstract protected boolean supportsInterSiteCommunication();
-    abstract protected boolean supportsIntraZoneCommunication();
     abstract protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType();
+    abstract protected PetasosEndpointScopeEnum specifyPetasosEndpointScope();
     abstract protected PubSubParticipant specifyPubSubParticipant();
     abstract protected void resolveTopologyEndpoint();
     abstract protected void registerWithCoreSubsystemPetasosEndpointsWatchdog();
+    abstract protected void executePostConstructActivities();
 
     //
     // PostConstruct Initialisation
@@ -108,8 +100,12 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
         // 2nd, the PetasosEndpoint
         getLogger().info(".initialise(): Step 2: Start ==> Creating my PetasosEndpoint");
-        PetasosEndpoint petasosEndpoint = getEndpointMap().addEndpoint(getEndpointID(), "JGroups", getEndpointServiceName(), getPetasosEndpointFunctionType(), getPetasosEndpointPayloadType());
+        this.setEndpointID(specifyEndpointID());
+        PetasosEndpoint petasosEndpoint = getEndpointMap().newPetasosEndpoint(
+                getEndpointID(), "JGroups", getEndpointServiceName(),
+                getPetasosEndpointFunctionType(), getPetasosEndpointPayloadType(), specifyPetasosEndpointScope());
         this.petasosEndpoint = petasosEndpoint;
+        this.getPetasosEndpoint().setEndpointStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
         getLogger().info(".initialise(): Step 2: Completed ==> PetasosEndpoint created ->{}", getPetasosEndpoint());
 
         // 3rd, Register with the CoreSubsystemPetasosEndpointsWatchdog
@@ -118,18 +114,27 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         getLogger().info(".initialise(): Step 3: Completed ==> Registered with CoreSubsystemPetasosEndpointsWatchdog");
 
         // 4th, the Participant
-        getLogger().info(".initialise(): [Create and bind the PubSubParticipant] Start");
+        getLogger().info(".initialise(): Step 4: Start ==> Create and bind the PubSubParticipant");
         this.participant = specifyPubSubParticipant();
-        getLogger().info(".initialise(): [Create and bind the PubSubParticipant] Complete, this.participant->{}", getParticipant());
+        getLogger().info(".initialise(): Step 4: Completed ==> Create and bind the PubSubParticipant, this.participant->{}", getParticipant());
 
         // 5th, Initialise my JChannel
-        getLogger().info(".initialise(): Step 3: Start ==> Initialise my JChannel Connection & Join Cluster/Group");
+        getLogger().info(".initialise(): Step 5: Start ==> Initialise my JChannel Connection & Join Cluster/Group");
         establishJChannel();
-        getLogger().info(".initialise(): Step 3: Completed ==> ipcChannel ->{}", getIPCChannel());
+        getLogger().info(".initialise(): Step 5: Completed ==> ipcChannel ->{}", getIPCChannel());
 
         //
-        // 6th, Schedule Basic Endpoint Validation
+        // 6th, Our Endpoint is Operational, So Assign Status
         //
+        getPetasosEndpoint().setEndpointStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
+
+        //
+        // 7th, Call any subclass PostConstruct methods.
+        //
+        executePostConstructActivities();
+
+        // We're done!
+        setInitialised(true);
 
     }
 
@@ -177,31 +182,24 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     //
     //
 
-    public void scheduleEndpointScan(){
-        List<PetasosAdapterAddress> groupMembers = getAllGroupMembers();
-        for(PetasosAdapterAddress currentGroupMember: groupMembers){
-            PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
-            endpointID.setEndpointName(currentGroupMember.getAddressName());
-            endpointID.setEndpointGroup(specifyJGroupsClusterName());
-            getEndpointMap().scheduleEndpointCheck(endpointID, false, true);
-        }
-    }
 
     /**
      *
-     * @param endpointID
+     * @param targetEndpointID
      * @param myEndpoint
      * @return
      */
-    public PetasosEndpoint probeEndpoint(PetasosEndpointIdentifier endpointID, PetasosEndpoint myEndpoint){
-        getLogger().info(".probeEndpoint(): Entry, endpointID->{}", endpointID);
+    public PetasosEndpoint probeEndpoint(PetasosEndpointIdentifier targetEndpointID, PetasosEndpoint myEndpoint){
+        getLogger().info(".probeEndpoint(): Entry, targetEndpointID->{}", targetEndpointID);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
             objectSet[0] = myEndpoint;
             classSet[0] = PetasosEndpoint.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Address endpointAddress = getTargetMemberAddress(endpointID.getEndpointName());
+//            String targetAddressWithoutSuffix = removeFunctionNameSuffixFromEndpointName(targetEndpointID.getEndpointKey());
+//            String targetWithIPCSuffix = addFunctionNameSuffixToEndpointName(targetAddressWithoutSuffix, PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT);
+            Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointName());
             PetasosEndpoint targetPetasosEndpoint = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointHandler", objectSet, classSet, requestOptions);
             getLogger().info(".probeEndpoint(): Exit, response->{}", targetPetasosEndpoint);
             return(targetPetasosEndpoint);
@@ -216,14 +214,64 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     /**
      *
-     * @param endpointID
+     * @param sourcePetasosEndpoint
      * @return
      */
-    public PetasosEndpoint probeEndpointHandler(PetasosEndpoint endpointID){
-        getLogger().info(".probeEndpointHandler(): Entry, endpointID->{}", endpointID);
-        getEndpointMap().addEndpoint(endpointID);
-        getLogger().info(".probeEndpointHandler(): Exit, returning->{}", getPetasosEndpoint());
-        return(getPetasosEndpoint());
+    public PetasosEndpoint probeEndpointHandler(PetasosEndpoint sourcePetasosEndpoint){
+        getLogger().info(".probeEndpointHandler(): Entry, sourcePetasosEndpoint->{}", sourcePetasosEndpoint);
+        getEndpointMap().addEndpoint(sourcePetasosEndpoint);
+        PetasosEndpoint myEndpoint = SerializationUtils.clone(getPetasosEndpoint());
+        myEndpoint.setEndpointStatus(getCoreSubsystemPetasosEndpointsWatchdog().getAggregatePetasosEndpointStatus());
+        getLogger().info(".probeEndpointHandler(): Exit, myEndpoint->{}", myEndpoint);
+        return(myEndpoint);
+    }
+
+    protected PetasosEndpoint cloneAndRemoveFunctionNameSuffixFromEndpointName(PetasosEndpoint originalEndpoint){
+        if(originalEndpoint == null){
+            return(null);
+        }
+        PetasosEndpoint endpoint = SerializationUtils.clone(originalEndpoint);
+        removeFunctionNameSuffixFromEndpointName(endpoint);
+        return(endpoint);
+    }
+
+    protected void removeFunctionNameSuffixFromEndpointName(PetasosEndpoint originalEndpoint) {
+        if (originalEndpoint == null) {
+            return;
+        }
+        if (originalEndpoint.getEndpointID() == null) {
+            return;
+        }
+        String endpointKey = originalEndpoint.getEndpointID().getEndpointName();
+        if (StringUtils.isEmpty(endpointKey)) {
+            return;
+        }
+        String newName = removeFunctionNameSuffixFromEndpointName(endpointKey);
+        originalEndpoint.getEndpointID().setEndpointName(newName);
+    }
+    protected String removeFunctionNameSuffixFromEndpointName(String endpointKey){
+        if (StringUtils.isEmpty(endpointKey)) {
+            return(null);
+        }
+        String newName = null;
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix(), "");
+        }
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix(), "");
+        }
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix(), "");
+        }
+        if(newName == null){
+            newName = endpointKey;
+        }
+        return(newName);
+    }
+
+    protected String addFunctionNameSuffixToEndpointName(String endpointName, PetasosEndpointFunctionTypeEnum functionType){
+        String functionInclusiveName = endpointName.replace("(", functionType.getFunctionSuffix()+"(");
+        return(functionInclusiveName);
     }
 
     @Override
@@ -243,125 +291,69 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         return(serviceName);
     }
 
-    //
-    // Basic Endpoint Validation Test
-    //
 
-    /**
-     *
-     */
-    public void scheduleEndpointValidation() {
-        getLogger().info(".schedulePublisherCheck(): Entry (isEndpointCheckScheduled->{})", endpointCheckScheduled);
-        if (endpointCheckScheduled) {
-            // do nothing, it is already scheduled
+
+    @Override
+    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID) {
+        PetasosEndpoint remotePetasosEndpoint = probeEndpoint(endpointID, getPetasosEndpoint());
+        PetasosEndpointStatusEnum endpointStatus = null;
+        if(remotePetasosEndpoint != null){
+            endpointStatus = remotePetasosEndpoint.getEndpointStatus();
         } else {
-            TimerTask endpointValidationTask = new TimerTask() {
-                public void run() {
-                    getLogger().info(".endpointValidationTask(): Entry");
-                    boolean doAgain = performEndpointValidationCheck();
-                    getLogger().info(".endpointValidationTask(): doAgain ->{}", doAgain);
-                    if (!doAgain) {
-                        cancel();
-                        endpointCheckScheduled = false;
-                    }
-                    getLogger().info(".publisherCheckTask(): Exit");
-                }
-            };
-            Timer timer = new Timer("EndpointValidationTask");
-            timer.schedule(endpointValidationTask, getJgroupsParticipantInformationService().getEndpointValidationStartDelay(), getJgroupsParticipantInformationService().getEndpointValidationPeriod());
-            endpointCheckScheduled = true;
+            endpointStatus = PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE;
         }
-
-        getLogger().info(".publisherCheckTask(): Exit");
+        return(endpointStatus);
     }
 
-    /**
-     * This method retrieves the list of "Endpoints" to be "Probed" from the EndpointMap.EndpointsToCheck
-     * (ConcurrentHashMap) and, if they are in the same Group (JGroups Cluster), attempts to retrieve their
-     * PetasosEndpoint instance.
-     *
-     * It then uses this PetasosEndpoint instance (returnedEndpointFromTarget) to update the EndpointMap with
-     * the current details (from the source, so to speak).
-     *
-     * It keeps a list of endpoints that it couldn't check and re-schedules their validation check.
-     *
-     * It also checks the Service-to-EndpointName map and ensures this aligns with the information provided.
-     *
-     * It then checks to see if there is a need to do another check/validation iteration and returns the result.
-     *
-     * @return True if another validation is required, false otherwise.
-     */
-    public boolean performEndpointValidationCheck(){
-        List<PetasosEndpointCheckScheduleElement> endpointsToCheck = getEndpointMap().getEndpointsToCheck();
-        List<PetasosEndpointCheckScheduleElement> unCheckedList = new ArrayList<>();
-        for(PetasosEndpointCheckScheduleElement currentScheduleElement: endpointsToCheck) {
-            if(currentScheduleElement.isEndpointAdded()) {
-                if( currentScheduleElement.getPetasosEndpointID().getEndpointGroup().equals(specifyJGroupsClusterName()) &&
-                    currentScheduleElement.getPetasosEndpointID().getEndpointName().contains(getPetasosEndpointFunctionType().getFunctionSuffix()))
-                {
-                    if(isTargetAddressActive(currentScheduleElement.getPetasosEndpointID().getEndpointName())){
-                        PetasosEndpoint returnedEndpointFromTarget = probeEndpoint(currentScheduleElement.getPetasosEndpointID(), getPetasosEndpoint());
-                        if(returnedEndpointFromTarget != null){
-                            PetasosEndpoint localCachedEndpoint = getEndpointMap().getEndpoint(currentScheduleElement.getPetasosEndpointID().getEndpointName());
-                            if (localCachedEndpoint == null) {
-                                getEndpointMap().addEndpoint(returnedEndpointFromTarget);
-                            } else {
-                                synchronized (getEndpointMap().getEndpointLock(currentScheduleElement.getPetasosEndpointID().getEndpointName())){
-                                    localCachedEndpoint.encrichPetasosEndpoint(returnedEndpointFromTarget);
-                                }
-                                if(!StringUtils.isEmpty(returnedEndpointFromTarget.getEndpointServiceName())){
-                                    getEndpointMap().updateServiceNameMembership(returnedEndpointFromTarget.getEndpointServiceName(), currentScheduleElement.getPetasosEndpointID().getEndpointName());
-                                }
-                            }
-                        }
-                    } else {
-                        unCheckedList.add(currentScheduleElement);
-                    }
-                }
+    protected boolean isWithinScopeOfEndpoint(InterSubsystemPubSubParticipant testParticipant) {
+        boolean inScope = testParticipant.getEndpointScope().equals(getPetasosEndpoint().getEndpointScope());
+        return(inScope);
+    }
+
+
+    protected boolean isWithinScopeOfEndpoint(PetasosEndpointIdentifier endpointID) {
+        boolean sameZone = endpointID.getEndpointZone().equals(getPetasosEndpoint().getEndpointID().getEndpointZone());
+        boolean sameSite = endpointID.getEndpointSite().contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
+        boolean doSubscription = false;
+        if (sameSite && sameZone) {
+            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTRAZONE)) {
+                doSubscription = true;
             }
         }
-        for(PetasosEndpointCheckScheduleElement uncheckedElement: unCheckedList){
-            getEndpointMap().scheduleEndpointCheck(uncheckedElement.getPetasosEndpointID(), false, true);
-        }
-        if(getEndpointMap().getEndpointsToCheck().isEmpty()){
-            return(false);
-        } else {
-            return(true);
-        }
-    }
-
-    public List<String> getIPCTargetSet(String endpointServiceName){
-        List<String> endpointNameSet = new ArrayList<>();
-        if(StringUtils.isEmpty(endpointServiceName)){
-            return(endpointNameSet);
-        }
-        endpointNameSet.addAll(getEndpointMap().getServiceNameMembership(endpointServiceName));
-        return(endpointNameSet);
-    }
-
-    public List<Address> getIPCTargetAddressSet(String endpointServiceName){
-        List<Address> endpointAddressSet = new ArrayList<>();
-        if(StringUtils.isEmpty(endpointServiceName)){
-            return(endpointAddressSet);
-        }
-        List<String> serviceNameMembership = getEndpointMap().getServiceNameMembership(endpointServiceName);
-        for(String currentMember: serviceNameMembership){
-            Address currentMemberAddress = getTargetMemberAddress(currentMember);
-            if(currentMemberAddress != null){
-                endpointAddressSet.add(currentMemberAddress);
+        if (sameSite && !sameZone) {
+            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERZONE)) {
+                doSubscription = true;
             }
         }
-        return(endpointAddressSet);
+        if (!sameSite) {
+            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERSITE)) {
+                doSubscription = true;
+            }
+        }
+        return(doSubscription);
     }
 
-    public Address getCandidateIPCTargetAddress(String endpointServiceName){
-        if(StringUtils.isEmpty(endpointServiceName)){
-            return(null);
+    protected boolean isWithinScopeBasedOnKey(String endpointKey) {
+        boolean channelIsInterSite = endpointKey.contains(getJgroupsParticipantInformationService().getInterSitePrefix());
+        boolean channelIsInterZone = endpointKey.contains(getJgroupsParticipantInformationService().getInterZonePrefix());
+        boolean channelIsIntraZone = endpointKey.contains(getJgroupsParticipantInformationService().getIntraZonePrefix());
+        boolean withinScope = false;
+        if (channelIsIntraZone) {
+            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTRAZONE)) {
+                withinScope = true;
+            }
         }
-        List<Address> endpointAddressSet = getIPCTargetAddressSet(endpointServiceName);
-        if(endpointAddressSet.isEmpty()){
-            return(null);
+        if (channelIsInterZone) {
+            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERZONE)) {
+                withinScope = true;
+            }
         }
-        return(endpointAddressSet.get(0));
+        if (channelIsInterSite) {
+            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERSITE)) {
+                withinScope = true;
+            }
+        }
+        return(withinScope);
     }
+
 }

@@ -22,10 +22,7 @@
 package net.fhirfactory.pegacorn.endpoints.endpoints.map;
 
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
 import net.fhirfactory.pegacorn.endpoints.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointConnectionTypeCodeFactory;
@@ -58,6 +55,8 @@ public class PetasosEndpointMap {
     private ConcurrentHashMap<String, List<String>> endpointServiceMap;
     private Object endpointServiceMapLock;
     private Object endpointCheckScheduleLock;
+
+    private int ENDPOINT_CHECK_DELAY=10;
 
     @Inject
     private PegacornIdentifierFactory identifierFactory;
@@ -197,12 +196,14 @@ public class PetasosEndpointMap {
             while(serviceNameEnumeration.hasMoreElements()){
                 String currentServiceName = serviceNameEnumeration.nextElement();
                 List<String> endpointNames = this.endpointServiceMap.get(currentServiceName);
-                if (endpointNames.contains(petasosEndpointName)) {
-                    wasMappedElsewhere = true;
-                    endpointNames.remove(petasosEndpointName);
-                }
-                if(endpointNames.isEmpty()) {
-                    servicesToBeRemovedFromMap.add(currentServiceName);
+                if(endpointNames != null) {
+                    if (endpointNames.contains(petasosEndpointName)) {
+                        wasMappedElsewhere = true;
+                        endpointNames.remove(petasosEndpointName);
+                    }
+                    if (endpointNames.isEmpty()) {
+                        servicesToBeRemovedFromMap.add(currentServiceName);
+                    }
                 }
             }
             if(!servicesToBeRemovedFromMap.isEmpty()) {
@@ -224,13 +225,13 @@ public class PetasosEndpointMap {
      * @return a FHIR::Endpoint representation of the logical endpoint identified by the EndpointAddress
      */
     protected Endpoint newEndpoint(PetasosEndpointIdentifier petasosEndpointID, String endpointAddressType, PetasosEndpointFunctionTypeEnum endpointType, EndpointPayloadTypeEnum payloadType){
-        getLogger().debug(".newEndpoint(): Entry, petasosEndpointID->{}", petasosEndpointID);
+        getLogger().info(".newEndpoint(): Entry, petasosEndpointID->{}", petasosEndpointID);
         if(petasosEndpointID == null){
-            getLogger().debug(".newEndpoint(): Exit, petasosEndpointID is null, returning null");
+            getLogger().info(".newEndpoint(): Exit, petasosEndpointID is null, returning null");
             return(null);
         }
         if(StringUtils.isEmpty(petasosEndpointID.getEndpointName()) || StringUtils.isEmpty(endpointAddressType)){
-            getLogger().debug(".newEndpoint(): Exit, newEndpointAddress.getAddressName() is empty or endpointAddressType null, returning null");
+            getLogger().info(".newEndpoint(): Exit, newEndpointAddress.getAddressName() is empty or endpointAddressType null, returning null");
             return(null);
         }
         Endpoint newEndpoint = new Endpoint();
@@ -249,7 +250,7 @@ public class PetasosEndpointMap {
         newEndpoint.addPayloadType(payloadTypeFactory.newPayloadType(payloadType));
         newEndpoint.getMeta().setLastUpdated(Date.from(Instant.now()));
         newEndpoint.getMeta().setSource(processingPlantInterface.getSimpleInstanceName());
-        getLogger().debug(".newEndpoint(): Exit, newEndpoint->{}", newEndpoint);
+        getLogger().info(".newEndpoint(): Exit, newEndpoint->{}", newEndpoint);
         return(newEndpoint);
     }
 
@@ -263,20 +264,24 @@ public class PetasosEndpointMap {
      * @param payloadType
      * @return
      */
-    protected PetasosEndpoint newPetasosEndpoint(PetasosEndpointIdentifier petasosEndpointID,
+    public PetasosEndpoint newPetasosEndpoint(PetasosEndpointIdentifier petasosEndpointID,
                                                  String endpointAddressType,
                                                  String endpointServiceName,
                                                  PetasosEndpointFunctionTypeEnum endpointType,
-                                                 EndpointPayloadTypeEnum payloadType){
+                                                 EndpointPayloadTypeEnum payloadType,
+                                                 PetasosEndpointScopeEnum scope){
+        getLogger().info(".newPetasosEndpoint(): Entry");
         Endpoint fhirEndpoint = newEndpoint(petasosEndpointID, endpointAddressType, endpointType, payloadType);
         if(fhirEndpoint == null){
             return(null);
         }
         PetasosEndpoint petasosEndpoint = new PetasosEndpoint();
+        petasosEndpoint.setEndpointScope(scope);
         petasosEndpoint.setEndpointServiceName(endpointServiceName);
         petasosEndpoint.setRepresentativeFHIREndpoint(fhirEndpoint);
         petasosEndpoint.setEndpointID(petasosEndpointID);
-        petasosEndpoint.setEndpointStatus(PetasosEndpointStatusEnum.INTERFACE_STATUS_DETECTED);
+        petasosEndpoint.setEndpointStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_DETECTED);
+        getLogger().info(".newPetasosEndpoint(): Entry");
         return(petasosEndpoint);
     }
 
@@ -291,26 +296,27 @@ public class PetasosEndpointMap {
                                        String endpointAddressType,
                                        String endpointService,
                                        PetasosEndpointFunctionTypeEnum endpointType,
-                                       EndpointPayloadTypeEnum payloadType){
-        getLogger().debug(".addEndpoint(): Entry, petasosEndpointID->{}", petasosEndpointID);
+                                       EndpointPayloadTypeEnum payloadType,
+                                       PetasosEndpointScopeEnum scope){
+        getLogger().info(".addEndpoint(): Entry, petasosEndpointID->{}", petasosEndpointID);
 
         if(petasosEndpointID == null){
-            getLogger().debug(".addEndpoint(): Exit, petasosEndpointID is null, return(null)");
+            getLogger().info(".addEndpoint(): Exit, petasosEndpointID is null, return(null)");
             return(null);
         }
         if(StringUtils.isEmpty(petasosEndpointID.getEndpointName())){
-            getLogger().debug(".addEndpoint(): Exit, petasosEndpointID.getAddressName() is empty, can't do anything! return(null)");
+            getLogger().info(".addEndpoint(): Exit, petasosEndpointID.getAddressName() is empty, can't do anything! return(null)");
             return(null);
         }
 
         String endpointName = petasosEndpointID.getEndpointName();
         if(endpoints.containsKey(endpointName)){
             PetasosEndpoint endpoint = endpoints.get(endpointName);
-            getLogger().debug(".addEndpoint(): Exit, endpoint already registered, endpoint->{}", endpoint);
+            getLogger().info(".addEndpoint(): Exit, endpoint already registered, endpoint->{}", endpoint);
             return(endpoint);
         }
 
-        PetasosEndpoint endpoint = newPetasosEndpoint(petasosEndpointID, endpointAddressType, endpointService, endpointType, payloadType);
+        PetasosEndpoint endpoint = newPetasosEndpoint(petasosEndpointID, endpointAddressType, endpointService, endpointType, payloadType, scope);
         endpoints.put(endpointName, endpoint);
         endpointLocks.put(endpointName, new Object());
         addServiceMembership(endpointService, petasosEndpointID.getEndpointName());
@@ -319,8 +325,19 @@ public class PetasosEndpointMap {
         // TODO add an audit event here (detailing the addition of a new Endpoint).
         //
         //
+        printMap();
         getLogger().debug(".newEndpoint(): Exit, endpoint added, endpoint->{}", endpoint);
         return(endpoint);
+    }
+
+    public void printMap(){
+        Enumeration<String> endpointNames = endpoints.keys();
+        getLogger().info("---------------EndpointMap-------------");
+        while(endpointNames.hasMoreElements()){
+            String endpointName = endpointNames.nextElement();
+            PetasosEndpoint petasosEndpoint = endpoints.get(endpointName);
+            getLogger().info("Endpoint->{}", petasosEndpoint);
+        }
     }
 
     /**
@@ -331,10 +348,10 @@ public class PetasosEndpointMap {
      * @return a PetasosEndpoint representing the IPC/OAM interface.
      */
     public PetasosEndpoint addEndpoint(PetasosEndpoint endpoint){
-        getLogger().debug(".addEndpoint(): Entry, endpoint->{}", endpoint);
+        getLogger().info(".addEndpoint(): Entry, endpoint->{}", endpoint);
 
         if(endpoint == null){
-            getLogger().debug(".addEndpoint(): Exit, endpoint is null, return(null)");
+            getLogger().info(".addEndpoint(): Exit, endpoint is null, return(null)");
             return(null);
         }
 
@@ -342,7 +359,7 @@ public class PetasosEndpointMap {
         String endpointServiceName = endpoint.getEndpointServiceName();
         if(endpoints.containsKey(endpointName)){
             PetasosEndpoint retrievedEndpoint = endpoints.get(endpointName);
-            getLogger().debug(".newEndpoint(): Exit, endpoint already registered, endpoint->{}", endpoint);
+            getLogger().info(".newEndpoint(): Exit, endpoint already registered, endpoint->{}", endpoint);
             return(retrievedEndpoint);
         } else {
             endpoints.put(endpointName, endpoint);
@@ -353,7 +370,8 @@ public class PetasosEndpointMap {
             // TODO add an audit event here (detailing the addition of a new Endpoint).
             //
             //
-            getLogger().debug(".addEndpoint(): Exit, endpoint added, endpoint->{}", endpoint);
+            printMap();
+            getLogger().info(".addEndpoint(): Exit, endpoint added, endpoint->{}", endpoint);
             return(endpoint);
         }
     }
@@ -428,6 +446,7 @@ public class PetasosEndpointMap {
             endpoints.remove(endpointName);
             endpointLocks.remove(endpointName);
             removeServiceNameMembership(endpointName);
+            printMap();
             getLogger().debug(".getEndpoint(): Exit, endpoint removed");
             return;
         } else {
@@ -453,18 +472,24 @@ public class PetasosEndpointMap {
     //
 
     public void scheduleEndpointCheck(PetasosEndpointIdentifier id, boolean endpointRemoved, boolean endpointAdded){
+        getLogger().info(".scheduleEndpointCheck(): Entry, id->{}, endpointRemoved->{}, endpointAdded->{} ", id, endpointRemoved, endpointAdded);
         if(this.endpointCheckSchedule.containsKey(id)){
+            getLogger().info(".scheduleEndpointCheck(): Exit, already scheduled");
             return;
         }
         PetasosEndpointCheckScheduleElement newScheduleElement = new PetasosEndpointCheckScheduleElement(id, endpointRemoved, endpointAdded);
         this.endpointCheckSchedule.put(id.getEndpointName(), newScheduleElement);
+        getLogger().info(".scheduleEndpointCheck(): Exit, check scheduled");
     }
 
     public void scheduleEndpointCheck(String endpointName, boolean endpointRemoved, boolean endpointAdded ){
+        getLogger().info(".scheduleEndpointCheck(): Entry, endpointName->{}, endpointRemoved->{}, endpointAdded->{} ", endpointName, endpointRemoved, endpointAdded);
         if(StringUtils.isEmpty(endpointName)){
+            getLogger().info(".scheduleEndpointCheck(): Exit, endpointName is empty");
             return;
         }
         if(!endpointRemoved && !endpointAdded){
+            getLogger().info(".scheduleEndpointCheck(): Exit, neither endpointRemoved or endpointAdded is set");
             return;
         }
         synchronized (this.endpointCheckScheduleLock) {
@@ -480,15 +505,20 @@ public class PetasosEndpointMap {
     }
 
     public List<PetasosEndpointCheckScheduleElement> getEndpointsToCheck(){
+        getLogger().info(".getEndpointsToCheck(): Entry");
         List<PetasosEndpointCheckScheduleElement> endpointSet = new ArrayList<>();
         if(this.endpointCheckSchedule.isEmpty()){
+            getLogger().info(".getEndpointsToCheck(): Exit, schedule is empty");
             return(endpointSet);
         }
         synchronized (this.endpointCheckScheduleLock) {
             Set<String> endpointNameSet = this.endpointCheckSchedule.keySet();
+
             for (String currentEndpointName : endpointNameSet) {
                 PetasosEndpointCheckScheduleElement currentElement = this.endpointCheckSchedule.get(currentEndpointName);
-                if (currentElement.getTargetTime().getEpochSecond() > (Instant.now().getEpochSecond() + 10)) {
+                getLogger().info(".getEndpointsToCheck(): Checking entry ->{}", currentElement);
+                if ((currentElement.getTargetTime().getEpochSecond() + ENDPOINT_CHECK_DELAY) < (Instant.now().getEpochSecond())) {
+                    getLogger().info(".getEndpointsToCheck(): Adding...");
                     endpointSet.add(currentElement);
                 }
             }
@@ -496,6 +526,7 @@ public class PetasosEndpointMap {
                 this.endpointCheckSchedule.remove(currentScheduleElement.getPetasosEndpointID());
             }
         }
+        getLogger().info(".getEndpointsToCheck(): Exit, size->{}", endpointSet.size());
         return(endpointSet);
     }
 

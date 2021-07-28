@@ -64,12 +64,19 @@ public class JGroupsBasedParticipantInformationService {
     private String myInterZoneOAMPubSubEndpointName;
     private String myIntraZoneOAMDiscoveryEndpointName;
     private String myInterZoneOAMDiscoveryEndpointName;
+    private String myIntraZoneIPCEndpointKey;
+    private String myInterZoneIPCEndpointKey;
+    private String myIntraZoneOAMPubSubEndpointKey;
+    private String myInterZoneOAMPubSubEndpointKey;
+    private String myIntraZoneOAMDiscoveryEndpointKey;
+    private String myInterZoneOAMDiscoveryEndpointKey;
 
     private String instanceQualifier;
 
     private static String EDGE_FORWARDER_WUP_NAME = "EdgeIntraZoneMessageForwardWUP";
     private static String EDGE_FORWARDER_WUP_VERSION = "1.0.0";
 
+    private static String INTERSITE_PREFIX = ".InterSite";
     private static String INTRAZONE_PREFIX = ".IntraZone";
     private static String INTERZONE_PREFIX = ".InterZone";
 
@@ -77,8 +84,10 @@ public class JGroupsBasedParticipantInformationService {
     private static String INTERZONE_IPC_GROUP_NAME = "InterZone.IPC";
     private static String INTRAZONE_OAM_GROUP_NAME = "IntraZone.OAM";
     private static String INTRAZONE_IPC_GROUP_NAME = "IntraZone.IPC";
+    private static String INTRASITE_OAM_GROUP_NAME = "IntraSite.OAM";
+    private static String INTRASITE_IPC_GROUP_NAME = "IntraSite.IPC";
 
-    private static Long ENDPOINT_VALIDATION_START_DELAY = 10000L;
+    private static Long ENDPOINT_VALIDATION_START_DELAY = 30000L;
     private static Long ENDPOINT_VALIDATION_PERIOD = 10000L;
 
     @Inject
@@ -115,36 +124,48 @@ public class JGroupsBasedParticipantInformationService {
             return;
         }
         getLogger().info(".initialise(): [build myIntraZoneIPCEndpointName] start");
-        String intraZoneIPCName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        String intraZoneIPCKey = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        this.myIntraZoneIPCEndpointKey = intraZoneIPCKey;
+        String intraZoneIPCName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myIntraZoneIPCEndpointName = intraZoneIPCName;
         getLogger().info(".initialise(): [build myIntraZoneIPCEndpointName] finish, myIntraZoneIPCEndpointName->{}", this.myIntraZoneIPCEndpointName);
         getLogger().info(".initialise(): [build myInterZoneIPCEndpointName] start");
-        String interZoneIPCName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX +  PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        String interZoneIPCKey = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX +  PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        this.myInterZoneIPCEndpointKey = interZoneIPCKey;
+        String interZoneIPCName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX +  "(" + getInstanceQualifier() + ")";
         this.myInterZoneIPCEndpointName = interZoneIPCName;
         getLogger().info(".initialise(): [build myInterZoneIPCEndpointName] finish, myInterZoneIPCEndpointName->{}", this.myInterZoneIPCEndpointName);
         getLogger().info(".initialise(): [build myIntraZoneOAMPubSubEndpointName] start");
-        String intraZoneOAMPubSubName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX +  PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        String intraZoneOAMPubSubKey = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX +  PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        this.myIntraZoneOAMPubSubEndpointKey = intraZoneOAMPubSubKey;
+        String intraZoneOAMPubSubName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myIntraZoneOAMPubSubEndpointName = intraZoneOAMPubSubName;
         getLogger().info(".initialise(): [build myIntraZoneOAMPubSubEndpointName] finish, myIntraZoneOAMPubSubEndpointName->{}", this.myIntraZoneOAMPubSubEndpointName);
         getLogger().info(".initialise(): [build myInterZoneOAMPubSubEndpointName] start");
-        String interZoneOAMPubSubName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        String interZoneOAMPubSubKey = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        this.myInterZoneOAMPubSubEndpointKey = interZoneOAMPubSubKey;
+        String interZoneOAMPubSubName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myInterZoneOAMPubSubEndpointName = interZoneOAMPubSubName;
         getLogger().info(".initialise(): [build myInterZoneOAMPubSubEndpointName] finish, myInterZoneOAMPubSubEndpointName->{}", this.myInterZoneOAMPubSubEndpointName);
         getLogger().info(".initialise(): [build myIntraZoneOAMTopologyEndpointName] start");
-        String intraZoneOAMTopologyName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        String intraZoneOAMTopologyKey = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        this.myIntraZoneOAMDiscoveryEndpointKey = intraZoneOAMTopologyKey;
+        String intraZoneOAMTopologyName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myIntraZoneOAMDiscoveryEndpointName = intraZoneOAMTopologyName;
         getLogger().info(".initialise(): [build myIntraZoneOAMTopologyEndpointName] finish, myIntraZoneOAMTopologyEndpointName->{}", this.myIntraZoneOAMDiscoveryEndpointName);
         getLogger().info(".initialise(): [build myInterZoneOAMTopologyEndpointName] start");
-        String interZoneOAMTopologyName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        String interZoneOAMTopologyKey = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
+        this.myInterZoneOAMDiscoveryEndpointKey = interZoneOAMTopologyKey;
+        String interZoneOAMTopologyName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myInterZoneOAMDiscoveryEndpointName = interZoneOAMTopologyName;
         getLogger().info(".initialise(): [build myInterZoneOAMTopologyEndpointName] finish, myInterZoneOAMTopologyEndpointName->{}", this.myInterZoneOAMDiscoveryEndpointName);
 
         // Derive the IPCEndpoints
         getLogger().info(".initialise(): [resolving interzone topology endpoint] Start");
-        this.myInterZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_IPC_SERVICE, getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
+        this.myInterZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_SERVICE, getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
         getLogger().info(".initialise(): [resolving interzone topology endpoint] finish, myInterZoneTopologyEndpoint->{}", this.myInterZoneTopologyEndpoint);
         getLogger().info(".initialise(): [resolving intrazone topology endpoint] Start");
-        this.myIntraZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum.JGROUPS_INTRAZONE_IPC_SERVICE, getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
+        this.myIntraZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum.JGROUPS_INTRAZONE_SERVICE, getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
         getLogger().info(".initialise(): [resolving intrazone topology endpoint] finish, myIntraZoneTopologyEndpoint->{}", this.myIntraZoneTopologyEndpoint);
 
         // Create the Participants
@@ -155,6 +176,24 @@ public class JGroupsBasedParticipantInformationService {
         this.myIntraZoneParticipantRole = buildParticipant(coreSubsystemPetasosEndpointsWatchdog.getIntrazoneIPC());
         getLogger().info(".initialise(): [create the intrazone participant] Finish, myIntraZoneParticipantRole->{}", this.myIntraZoneParticipantRole);
 
+    }
+
+    //
+    // Address a Race Condition
+    //
+
+    public PubSubParticipant buildMyInterZoneParticipantRole(PetasosEndpoint endpoint){
+        if(this.myInterZoneParticipantRole == null){
+            this.myInterZoneParticipantRole = buildParticipant(endpoint);
+        }
+        return(this.myInterZoneParticipantRole);
+    }
+
+    public PubSubParticipant buildMyIntraZoneParticipantRole(PetasosEndpoint endpoint){
+        if(this.myIntraZoneParticipantRole == null){
+            this.myIntraZoneParticipantRole = buildParticipant(endpoint);
+        }
+        return(this.myIntraZoneParticipantRole);
     }
 
     //
@@ -223,6 +262,30 @@ public class JGroupsBasedParticipantInformationService {
         return myInterZoneOAMDiscoveryEndpointName;
     }
 
+    public String getMyIntraZoneIPCEndpointKey() {
+        return myIntraZoneIPCEndpointKey;
+    }
+
+    public String getMyInterZoneIPCEndpointKey() {
+        return myInterZoneIPCEndpointKey;
+    }
+
+    public String getMyIntraZoneOAMPubSubEndpointKey() {
+        return myIntraZoneOAMPubSubEndpointKey;
+    }
+
+    public String getMyInterZoneOAMPubSubEndpointKey() {
+        return myInterZoneOAMPubSubEndpointKey;
+    }
+
+    public String getMyIntraZoneOAMDiscoveryEndpointKey() {
+        return myIntraZoneOAMDiscoveryEndpointKey;
+    }
+
+    public String getMyInterZoneOAMDiscoveryEndpointKey() {
+        return myInterZoneOAMDiscoveryEndpointKey;
+    }
+
     public String getInterZoneOAMGroupName() {
         return INTERZONE_OAM_GROUP_NAME;
     }
@@ -249,6 +312,18 @@ public class JGroupsBasedParticipantInformationService {
 
     public Long getEndpointValidationPeriod() {
         return ENDPOINT_VALIDATION_PERIOD;
+    }
+
+    public String getInterSitePrefix() {
+        return INTERSITE_PREFIX;
+    }
+
+    public String getIntraZonePrefix() {
+        return INTRAZONE_PREFIX;
+    }
+
+    public String getInterZonePrefix() {
+        return INTERZONE_PREFIX;
     }
 
     //
@@ -278,15 +353,16 @@ public class JGroupsBasedParticipantInformationService {
     //
 
     protected StandardEdgeIPCEndpoint deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum requiredEndpointType, String interfaceName){
-        getLogger().debug(".deriveIPCTopologyEndpoint(): Entry");
+        getLogger().info(".deriveIPCTopologyEndpoint(): Entry, requiredEndpointType->{}, interfaceName->{}", requiredEndpointType, interfaceName);
         for(TopologyNodeFDN currentEndpointFDN: getProcessingPlant().getProcessingPlantNode().getEndpoints()){
             IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
+            getLogger().info(".deriveIPCTopologyEndpoint(): currentEndpoint->{}",currentEndpoint);
             PetasosTopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
             boolean endpointTypeMatches = endpointType.equals(requiredEndpointType);
             if(endpointTypeMatches){
                 if(currentEndpoint.getName().contentEquals(interfaceName)) {
                     StandardEdgeIPCEndpoint resolvedEndpoint = (StandardEdgeIPCEndpoint)currentEndpoint;
-                    getLogger().debug(".deriveIPCTopologyEndpoint(): Exit, found IPCTopologyEndpoint and assigned it, resolvedEndpoint->{}", resolvedEndpoint);
+                    getLogger().info(".deriveIPCTopologyEndpoint(): Exit, found IPCTopologyEndpoint and assigned it, resolvedEndpoint->{}", resolvedEndpoint);
                     return(resolvedEndpoint);
                 }
             }
@@ -345,6 +421,46 @@ public class JGroupsBasedParticipantInformationService {
         String pubsubEndpointName = StringUtils.replace(ipcEndpointName,
                 PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix(),
                 PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix());
+        return(pubsubEndpointName);
+    }
+
+    public String derivePubSubEndpointNameFromDiscoveryEndpointName(String endpointName){
+        if(StringUtils.isEmpty(endpointName)){
+            return(null);
+        }
+        String pubsubEndpointName = StringUtils.replace(endpointName,
+                PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix(),
+                PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix());
+        return(pubsubEndpointName);
+    }
+
+    public String deriveDiscoveryEndpointNameFromPubSubEndpointName(String endpointName){
+        if(StringUtils.isEmpty(endpointName)){
+            return(null);
+        }
+        String pubsubEndpointName = StringUtils.replace(endpointName,
+                PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix(),
+                PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix());
+        return(pubsubEndpointName);
+    }
+
+    public String deriveIPCEndpointNameFromDiscoveryEndpointName(String endpointName){
+        if(StringUtils.isEmpty(endpointName)){
+            return(null);
+        }
+        String pubsubEndpointName = StringUtils.replace(endpointName,
+                PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix(),
+                PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix());
+        return(pubsubEndpointName);
+    }
+
+    public String deriveDiscoveryEndpointNameFromIPCEndpointName(String endpointName){
+        if(StringUtils.isEmpty(endpointName)){
+            return(null);
+        }
+        String pubsubEndpointName = StringUtils.replace(endpointName,
+                PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix(),
+                PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix());
         return(pubsubEndpointName);
     }
 }

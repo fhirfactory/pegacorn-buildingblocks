@@ -156,7 +156,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
     //
 
     protected void establishJChannel(){
-        getLogger().debug(".establishJChannel(): Entry, fileName->{}, groupName->{}, channelName->{}",  specifyJGroupsStackFileName(), specifyJGroupsChannelName(), specifyJGroupsChannelName());
+        getLogger().debug(".establishJChannel(): Entry, fileName->{}, groupName->{}, channelName->{}",  specifyJGroupsStackFileName(), specifyJGroupsClusterName(), specifyJGroupsChannelName());
         try {
             getLogger().trace(".establishJChannel(): Creating JChannel");
             getLogger().trace(".establishJChannel(): Getting the required ProtocolStack");
@@ -169,7 +169,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
             RpcDispatcher newRPCDispatcher = new RpcDispatcher(newChannel, this);
             newRPCDispatcher.setMembershipListener(this);
             getLogger().trace(".establishJChannel(): RPCDispatcher assigned, now connect to JGroup");
-            newChannel.connect( specifyJGroupsChannelName());
+            newChannel.connect( specifyJGroupsClusterName());
             getLogger().trace(".establishJChannel(): Connected to JGroup complete, now assigning class attributes");
             this.setIPCChannel(newChannel);
             this.setRPCDispatcher(newRPCDispatcher);
@@ -235,22 +235,22 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
     //
 
     public Address getTargetMemberAddress(String name){
-        getLogger().debug(".getTargetAddress(): Entry, name->{}", name);
+        getLogger().info(".getTargetAddress(): Entry, name->{}", name);
         if(getIPCChannel() == null){
             getLogger().debug(".getTargetAddress(): IPCChannel is null, exit returning (null)");
             return(null);
         }
-        getLogger().trace(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
+        getLogger().info(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
         List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().trace(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+        getLogger().info(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
         for(Address currentAddress: addressList){
-            getLogger().trace(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
+            getLogger().info(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
             if(currentAddress.toString().contentEquals(name)){
-                getLogger().debug(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
+                getLogger().info(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
                 return(currentAddress);
             }
         }
-        getLogger().debug(".getTargetAddress(): Exit, no suitable Address found!");
+        getLogger().info(".getTargetAddress(): Exit, no suitable Address found!");
         return(null);
     }
 
@@ -314,7 +314,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
         List<Address> addressList = getIPCChannel().getView().getMembers();
         List<PetasosAdapterAddress> petasosAdapterAddresses = new ArrayList<>();
         for(Address currentAddress: addressList){
-            getLogger().trace(".getAllTargets(): Iterating through Address list, current element->{}", currentAddress);
+            getLogger().info(".getAllTargets(): Iterating through Address list, current element->{}", currentAddress);
             PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
             currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
             currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
