@@ -197,9 +197,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             objectSet[0] = myEndpoint;
             classSet[0] = PetasosEndpoint.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-//            String targetAddressWithoutSuffix = removeFunctionNameSuffixFromEndpointName(targetEndpointID.getEndpointKey());
-//            String targetWithIPCSuffix = addFunctionNameSuffixToEndpointName(targetAddressWithoutSuffix, PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT);
-            Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointName());
+            Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointAddressName());
             PetasosEndpoint targetPetasosEndpoint = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointHandler", objectSet, classSet, requestOptions);
             getLogger().info(".probeEndpoint(): Exit, response->{}", targetPetasosEndpoint);
             return(targetPetasosEndpoint);
@@ -242,12 +240,12 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         if (originalEndpoint.getEndpointID() == null) {
             return;
         }
-        String endpointKey = originalEndpoint.getEndpointID().getEndpointName();
+        String endpointKey = originalEndpoint.getEndpointID().getEndpointAddressName();
         if (StringUtils.isEmpty(endpointKey)) {
             return;
         }
         String newName = removeFunctionNameSuffixFromEndpointName(endpointKey);
-        originalEndpoint.getEndpointID().setEndpointName(newName);
+        originalEndpoint.getEndpointID().setEndpointAddressName(newName);
     }
     protected String removeFunctionNameSuffixFromEndpointName(String endpointKey){
         if (StringUtils.isEmpty(endpointKey)) {

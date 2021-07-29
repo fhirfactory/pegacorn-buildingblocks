@@ -64,12 +64,12 @@ public class JGroupsBasedParticipantInformationService {
     private String myInterZoneOAMPubSubEndpointName;
     private String myIntraZoneOAMDiscoveryEndpointName;
     private String myInterZoneOAMDiscoveryEndpointName;
-    private String myIntraZoneIPCEndpointKey;
-    private String myInterZoneIPCEndpointKey;
-    private String myIntraZoneOAMPubSubEndpointKey;
-    private String myInterZoneOAMPubSubEndpointKey;
-    private String myIntraZoneOAMDiscoveryEndpointKey;
-    private String myInterZoneOAMDiscoveryEndpointKey;
+    private String myIntraZoneIPCEndpointAddressName;
+    private String myInterZoneIPCEndpointAddressName;
+    private String myIntraZoneOAMPubSubEndpointAddressName;
+    private String myInterZoneOAMPubSubEndpointAddressName;
+    private String myIntraZoneOAMDiscoveryEndpointAddressName;
+    private String myInterZoneOAMDiscoveryEndpointAddressName;
 
     private String instanceQualifier;
 
@@ -125,37 +125,37 @@ public class JGroupsBasedParticipantInformationService {
         }
         getLogger().info(".initialise(): [build myIntraZoneIPCEndpointName] start");
         String intraZoneIPCKey = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
-        this.myIntraZoneIPCEndpointKey = intraZoneIPCKey;
+        this.myIntraZoneIPCEndpointAddressName = intraZoneIPCKey;
         String intraZoneIPCName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myIntraZoneIPCEndpointName = intraZoneIPCName;
         getLogger().info(".initialise(): [build myIntraZoneIPCEndpointName] finish, myIntraZoneIPCEndpointName->{}", this.myIntraZoneIPCEndpointName);
         getLogger().info(".initialise(): [build myInterZoneIPCEndpointName] start");
         String interZoneIPCKey = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX +  PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
-        this.myInterZoneIPCEndpointKey = interZoneIPCKey;
+        this.myInterZoneIPCEndpointAddressName = interZoneIPCKey;
         String interZoneIPCName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX +  "(" + getInstanceQualifier() + ")";
         this.myInterZoneIPCEndpointName = interZoneIPCName;
         getLogger().info(".initialise(): [build myInterZoneIPCEndpointName] finish, myInterZoneIPCEndpointName->{}", this.myInterZoneIPCEndpointName);
         getLogger().info(".initialise(): [build myIntraZoneOAMPubSubEndpointName] start");
         String intraZoneOAMPubSubKey = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX +  PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
-        this.myIntraZoneOAMPubSubEndpointKey = intraZoneOAMPubSubKey;
+        this.myIntraZoneOAMPubSubEndpointAddressName = intraZoneOAMPubSubKey;
         String intraZoneOAMPubSubName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myIntraZoneOAMPubSubEndpointName = intraZoneOAMPubSubName;
         getLogger().info(".initialise(): [build myIntraZoneOAMPubSubEndpointName] finish, myIntraZoneOAMPubSubEndpointName->{}", this.myIntraZoneOAMPubSubEndpointName);
         getLogger().info(".initialise(): [build myInterZoneOAMPubSubEndpointName] start");
         String interZoneOAMPubSubKey = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
-        this.myInterZoneOAMPubSubEndpointKey = interZoneOAMPubSubKey;
+        this.myInterZoneOAMPubSubEndpointAddressName = interZoneOAMPubSubKey;
         String interZoneOAMPubSubName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myInterZoneOAMPubSubEndpointName = interZoneOAMPubSubName;
         getLogger().info(".initialise(): [build myInterZoneOAMPubSubEndpointName] finish, myInterZoneOAMPubSubEndpointName->{}", this.myInterZoneOAMPubSubEndpointName);
         getLogger().info(".initialise(): [build myIntraZoneOAMTopologyEndpointName] start");
         String intraZoneOAMTopologyKey = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
-        this.myIntraZoneOAMDiscoveryEndpointKey = intraZoneOAMTopologyKey;
+        this.myIntraZoneOAMDiscoveryEndpointAddressName = intraZoneOAMTopologyKey;
         String intraZoneOAMTopologyName = getProcessingPlant().getIPCServiceName() + INTRAZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myIntraZoneOAMDiscoveryEndpointName = intraZoneOAMTopologyName;
         getLogger().info(".initialise(): [build myIntraZoneOAMTopologyEndpointName] finish, myIntraZoneOAMTopologyEndpointName->{}", this.myIntraZoneOAMDiscoveryEndpointName);
         getLogger().info(".initialise(): [build myInterZoneOAMTopologyEndpointName] start");
         String interZoneOAMTopologyKey = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix() + "(" + getInstanceQualifier() + ")";
-        this.myInterZoneOAMDiscoveryEndpointKey = interZoneOAMTopologyKey;
+        this.myInterZoneOAMDiscoveryEndpointAddressName = interZoneOAMTopologyKey;
         String interZoneOAMTopologyName = getProcessingPlant().getIPCServiceName() + INTERZONE_PREFIX + "(" + getInstanceQualifier() + ")";
         this.myInterZoneOAMDiscoveryEndpointName = interZoneOAMTopologyName;
         getLogger().info(".initialise(): [build myInterZoneOAMTopologyEndpointName] finish, myInterZoneOAMTopologyEndpointName->{}", this.myInterZoneOAMDiscoveryEndpointName);
@@ -262,28 +262,28 @@ public class JGroupsBasedParticipantInformationService {
         return myInterZoneOAMDiscoveryEndpointName;
     }
 
-    public String getMyIntraZoneIPCEndpointKey() {
-        return myIntraZoneIPCEndpointKey;
+    public String getMyIntraZoneIPCEndpointAddressName() {
+        return myIntraZoneIPCEndpointAddressName;
     }
 
-    public String getMyInterZoneIPCEndpointKey() {
-        return myInterZoneIPCEndpointKey;
+    public String getMyInterZoneIPCEndpointAddressName() {
+        return myInterZoneIPCEndpointAddressName;
     }
 
-    public String getMyIntraZoneOAMPubSubEndpointKey() {
-        return myIntraZoneOAMPubSubEndpointKey;
+    public String getMyIntraZoneOAMPubSubEndpointAddressName() {
+        return myIntraZoneOAMPubSubEndpointAddressName;
     }
 
-    public String getMyInterZoneOAMPubSubEndpointKey() {
-        return myInterZoneOAMPubSubEndpointKey;
+    public String getMyInterZoneOAMPubSubEndpointAddressName() {
+        return myInterZoneOAMPubSubEndpointAddressName;
     }
 
-    public String getMyIntraZoneOAMDiscoveryEndpointKey() {
-        return myIntraZoneOAMDiscoveryEndpointKey;
+    public String getMyIntraZoneOAMDiscoveryEndpointAddressName() {
+        return myIntraZoneOAMDiscoveryEndpointAddressName;
     }
 
-    public String getMyInterZoneOAMDiscoveryEndpointKey() {
-        return myInterZoneOAMDiscoveryEndpointKey;
+    public String getMyInterZoneOAMDiscoveryEndpointAddressName() {
+        return myInterZoneOAMDiscoveryEndpointAddressName;
     }
 
     public String getInterZoneOAMGroupName() {

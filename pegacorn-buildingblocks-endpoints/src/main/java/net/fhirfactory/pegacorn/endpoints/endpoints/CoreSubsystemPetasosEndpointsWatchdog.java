@@ -23,8 +23,12 @@ package net.fhirfactory.pegacorn.endpoints.endpoints;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetaosPubSubEndpointChangeCallbackRegistrationInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetasosHealthCheckCallBackInterface;
+import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetasosPubSubEndpointChangeInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.map.PetasosEndpointMap;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +42,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class CoreSubsystemPetasosEndpointsWatchdog implements PetasosHealthCheckCallBackInterface {
+public class CoreSubsystemPetasosEndpointsWatchdog
+        implements  PetasosHealthCheckCallBackInterface,
+                    PetasosPubSubEndpointChangeInterface,
+                    PetaosPubSubEndpointChangeCallbackRegistrationInterface {
     private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosEndpointsWatchdog.class);
 
     private PetasosEndpoint intrazoneIPC;
@@ -72,6 +79,8 @@ public class CoreSubsystemPetasosEndpointsWatchdog implements PetasosHealthCheck
 
     private int FAILED_ITERATION_MAX = 3;
 
+    private List<PetasosPubSubEndpointChangeInterface> publisherChangeCallbacks;
+
     @Inject
     PetasosEndpointMap endpointMap;
 
@@ -99,6 +108,8 @@ public class CoreSubsystemPetasosEndpointsWatchdog implements PetasosHealthCheck
         this.watchdogCheckRequired = false;
 
         this.startupTime = Instant.now();
+
+        this.publisherChangeCallbacks = new ArrayList<>();
     }
 
     //
@@ -415,6 +426,25 @@ public class CoreSubsystemPetasosEndpointsWatchdog implements PetasosHealthCheck
     }
 
     //
+    // New publisher Status
+    //
+
+    @Override
+    public void notifyNewPublisher(InterSubsystemPubSubParticipant newPublisher) {
+        if(newPublisher == null){
+            return;
+        }
+        for(PetasosPubSubEndpointChangeInterface currentCallback: this.publisherChangeCallbacks){
+            currentCallback.notifyNewPublisher(newPublisher);
+        }
+    }
+
+    @Override
+    public void registerPubSubCallbackChange(PetasosPubSubEndpointChangeInterface publisherChangeCallback) {
+        this.publisherChangeCallbacks.add(publisherChangeCallback);
+    }
+
+//
     // Getters (and Setters)
     //
 

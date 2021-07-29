@@ -68,14 +68,14 @@ public class PetasosIntraZoneIPCEndpoint extends PetasosIPCEndpoint {
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
         String endpointName = getJgroupsParticipantInformationService().getMyIntraZoneIPCEndpointName();
-        endpointID.setEndpointCommonName(endpointName);
-        String endpointKey = getJgroupsParticipantInformationService().getMyIntraZoneIPCEndpointKey();
-        endpointID.setEndpointName(endpointKey);
+        endpointID.setEndpointName(endpointName);
+        String endpointKey = getJgroupsParticipantInformationService().getMyIntraZoneIPCEndpointAddressName();
+        endpointID.setEndpointAddressName(endpointKey);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getIntraZoneIPCGroupName());
         String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getIntraZoneIPCGroupName();
-        endpointID.setEndpointAddress(endpointAddress);
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
         return (endpointID);
     }
 

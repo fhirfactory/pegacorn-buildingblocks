@@ -243,7 +243,7 @@ public class PetasosEndpointMap {
         newEndpoint.addIdentifier(identifier);
         newEndpoint.setConnectionType(connectionTypeCodeFactory.newPegacornEndpointJGroupsConnectionCodeSystem("JGroups", endpointType.getFunctionType()));
         UrlType urlType = new UrlType();
-        urlType.setId(petasosEndpointID.getEndpointAddress());
+        urlType.setId(petasosEndpointID.getEndpointDetailedAddressName());
         newEndpoint.setAddressElement(urlType);
         String endpointFullName = petasosEndpointID.getEndpointSite() + "." + petasosEndpointID.getEndpointZone() + "." + petasosEndpointID.getEndpointGroup() + "." + petasosEndpointID.getEndpointName();
         newEndpoint.setNameElement(new StringType(endpointFullName));
@@ -470,6 +470,19 @@ public class PetasosEndpointMap {
     //
     // Check Schedule Management
     //
+
+    public void scheduleEndpointCheck(PetasosEndpointIdentifier id, boolean endpointRemoved, boolean endpointAdded, int retryCountSoFar){
+        getLogger().info(".scheduleEndpointCheck(): Entry, id->{}, endpointRemoved->{}, endpointAdded->{} ", id, endpointRemoved, endpointAdded);
+        if(this.endpointCheckSchedule.containsKey(id)){
+            getLogger().info(".scheduleEndpointCheck(): Exit, already scheduled");
+            PetasosEndpointCheckScheduleElement petasosEndpointCheckScheduleElement = this.endpointCheckSchedule.get(id);
+            petasosEndpointCheckScheduleElement.setRetryCount(retryCountSoFar);
+            return;
+        }
+        PetasosEndpointCheckScheduleElement newScheduleElement = new PetasosEndpointCheckScheduleElement(id, endpointRemoved, endpointAdded, retryCountSoFar);
+        this.endpointCheckSchedule.put(id.getEndpointName(), newScheduleElement);
+        getLogger().info(".scheduleEndpointCheck(): Exit, check scheduled");
+    }
 
     public void scheduleEndpointCheck(PetasosEndpointIdentifier id, boolean endpointRemoved, boolean endpointAdded){
         getLogger().info(".scheduleEndpointCheck(): Entry, id->{}, endpointRemoved->{}, endpointAdded->{} ", id, endpointRemoved, endpointAdded);
