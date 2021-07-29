@@ -52,14 +52,14 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
         String endpointName = getJgroupsParticipantInformationService().getMyInterZoneOAMPubSubEndpointName();
-        endpointID.setEndpointCommonName(endpointName);
-        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneOAMPubSubEndpointKey();
-        endpointID.setEndpointName(endpointKey);
+        endpointID.setEndpointName(endpointName);
+        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneOAMPubSubEndpointAddressName();
+        endpointID.setEndpointAddressName(endpointKey);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
         String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
-        endpointID.setEndpointAddress(endpointAddress);
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
         return (endpointID);
     }
 
@@ -76,12 +76,6 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
     @Override
     protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
         return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_SERVICE);
-    }
-
-    @Override
-    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier interfaceAddress) {
-        PetasosEndpoint petasosEndpoint = probeEndpoint(interfaceAddress, getPetasosEndpoint());
-        return(petasosEndpoint.getEndpointStatus());
     }
 
     @Override

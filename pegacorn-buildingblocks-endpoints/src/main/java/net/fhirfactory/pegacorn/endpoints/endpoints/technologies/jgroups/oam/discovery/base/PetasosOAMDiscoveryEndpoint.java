@@ -6,6 +6,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.Petas
 import net.fhirfactory.pegacorn.endpoints.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
@@ -13,6 +14,7 @@ import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublish
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -21,6 +23,8 @@ import java.util.TimerTask;
 public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpointBase implements PetasosAdapterDeltasInterface {
 
     private boolean endpointCheckScheduled;
+
+    private int MAX_PROBE_RETRIES = 5;
 
     @Inject
     DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
@@ -81,7 +85,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         if(isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType) {
             PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
             endpointID.setEndpointName(removeFunctionNameSuffixFromEndpointName(addedInterface.getAddressName()));
-            endpointID.setEndpointName(addedInterface.getAddressName());
+            endpointID.setEndpointAddressName(addedInterface.getAddressName());
             endpointID.setEndpointGroup(specifyJGroupsClusterName());
             getEndpointMap().scheduleEndpointCheck(endpointID, false, true);
             scheduleEndpointValidation();
@@ -96,7 +100,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         if(isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType) {
             PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
             endpointID.setEndpointName(removeFunctionNameSuffixFromEndpointName(removedInterface.getAddressName()));
-            endpointID.setEndpointName(removedInterface.getAddressName());
+            endpointID.setEndpointAddressName(removedInterface.getAddressName());
             endpointID.setEndpointGroup(specifyJGroupsClusterName());
             getEndpointMap().scheduleEndpointCheck(endpointID, true, false);
             scheduleEndpointValidation();
@@ -114,7 +118,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             if(currentGroupMember.getAddressName().contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix())) {
                 PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
                 endpointID.setEndpointName(removeFunctionNameSuffixFromEndpointName(currentGroupMember.getAddressName()));
-                endpointID.setEndpointName(currentGroupMember.getAddressName());
+                endpointID.setEndpointAddressName(currentGroupMember.getAddressName());
                 endpointID.setEndpointGroup(specifyJGroupsClusterName());
                 getEndpointMap().scheduleEndpointCheck(endpointID, false, true);
                 getLogger().info(".scheduleEndpointScan(): Added ->{} to scan", endpointID);
@@ -203,9 +207,10 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
     protected boolean checkEndpointAddition(PetasosEndpointCheckScheduleElement currentScheduleElement){
         getLogger().info(".checkEndpointAddition(): Entry, currentScheduleElement->{}", currentScheduleElement);
         if(isWithinScopeBasedOnKey(currentScheduleElement.getPetasosEndpointID().getEndpointName())) {
-            if (currentScheduleElement.getPetasosEndpointID().getEndpointGroup().equals(specifyJGroupsClusterName()) &&
-                    currentScheduleElement.getPetasosEndpointID().getEndpointName().contains(getPetasosEndpointFunctionType().getFunctionSuffix())) {
-                if (isTargetAddressActive(currentScheduleElement.getPetasosEndpointID().getEndpointName())) {
+            boolean sameGroup = currentScheduleElement.getPetasosEndpointID().getEndpointGroup().equals(specifyJGroupsClusterName());
+            boolean sameEndpointType = currentScheduleElement.getPetasosEndpointID().getEndpointAddressName().contains(getPetasosEndpointFunctionType().getFunctionSuffix());
+            if ( sameGroup && sameEndpointType){
+                if (isTargetAddressActive(currentScheduleElement.getPetasosEndpointID().getEndpointAddressName())) {
                     PetasosEndpoint returnedEndpointFromTarget = probeEndpoint(currentScheduleElement.getPetasosEndpointID(), getPetasosEndpoint());
                     getLogger().info(".checkEndpointAddition(): returnedEndpointFromTarget->{}", returnedEndpointFromTarget);
                     if (returnedEndpointFromTarget != null) {
@@ -224,6 +229,16 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
                             }
                             addPublisherToRegistry(localCachedEndpoint);
                         }
+                    } else {
+                        int retryCountSoFar = currentScheduleElement.getRetryCount();
+                        if(retryCountSoFar > MAX_PROBE_RETRIES){
+                            getLogger().info(".checkEndpointAddition(): we've tried to probe endpoint MAX_PROBE_RETRIES ({}) times and failed, so delete it", MAX_PROBE_RETRIES);
+                            getEndpointMap().scheduleEndpointCheck(currentScheduleElement.getPetasosEndpointID(), true, false);
+                        } else {
+                            getLogger().info(".checkEndpointAddition(): probe has failed ({}) times, but we will try again", retryCountSoFar);
+                            retryCountSoFar += 1;
+                            getEndpointMap().scheduleEndpointCheck(currentScheduleElement.getPetasosEndpointID(), false, true, retryCountSoFar);
+                        }
                     }
                 }
                 getLogger().info(".performEndpointValidationCheck(): Exit, was checked->true");
@@ -236,9 +251,9 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
 
     protected void checkEndpointRemoval(PetasosEndpointCheckScheduleElement currentScheduleElement){
         getLogger().info(".checkEndpointRemoval(): Entry, currentScheduleElement->{}", currentScheduleElement);
-        if( currentScheduleElement.getPetasosEndpointID().getEndpointGroup().equals(specifyJGroupsClusterName()) &&
-                currentScheduleElement.getPetasosEndpointID().getEndpointName().contains(getPetasosEndpointFunctionType().getFunctionSuffix()))
-        {
+        boolean sameGroup = currentScheduleElement.getPetasosEndpointID().getEndpointGroup().equals(specifyJGroupsClusterName());
+        boolean sameEndpointType = currentScheduleElement.getPetasosEndpointID().getEndpointAddressName().contains(getPetasosEndpointFunctionType().getFunctionSuffix());
+        if( sameGroup && sameEndpointType ){
             boolean wasRemoved = removePublisher(currentScheduleElement.getPetasosEndpointID().getEndpointName());
             getEndpointMap().deleteEndpoint(currentScheduleElement.getPetasosEndpointID().getEndpointName());
         }
@@ -256,6 +271,8 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             getLogger().info(".addPublisherToRegistry(): Publisher doesn't exist in cache, so adding");
             InterSubsystemPubSubParticipant publisher = new InterSubsystemPubSubParticipant(addedPetasosEndpoint);
             publisherRegistration = getDistributedPubSubSubscriptionMapIM().registerPublisherInstance(publisher);
+            getCoreSubsystemPetasosEndpointsWatchdog().notifyNewPublisher(publisher);
+
         }
         getLogger().info(".addPublisherToRegistry(): Exit, publisherRegistration->{}",publisherRegistration);
     }

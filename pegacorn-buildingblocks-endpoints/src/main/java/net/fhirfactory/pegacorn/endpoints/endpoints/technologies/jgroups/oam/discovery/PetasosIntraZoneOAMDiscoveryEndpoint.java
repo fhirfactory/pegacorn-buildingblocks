@@ -46,15 +46,15 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     @Override
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
-        String endpointKey = getJgroupsParticipantInformationService().getMyIntraZoneOAMDiscoveryEndpointKey();
-        endpointID.setEndpointName(endpointKey);
+        String endpointKey = getJgroupsParticipantInformationService().getMyIntraZoneOAMDiscoveryEndpointAddressName();
+        endpointID.setEndpointAddressName(endpointKey);
         String endpointName = getJgroupsParticipantInformationService().getMyIntraZoneOAMDiscoveryEndpointName();
-        endpointID.setEndpointCommonName(endpointName);
+        endpointID.setEndpointName(endpointName);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getIntraZoneOAMGroupName());
         String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getIntraZoneOAMGroupName();
-        endpointID.setEndpointAddress(endpointAddress);
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
         return (endpointID);
     }
 
@@ -76,7 +76,11 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     @Override
     public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier interfaceAddress) {
         PetasosEndpoint petasosEndpoint = probeEndpoint(interfaceAddress, getPetasosEndpoint());
-        return(petasosEndpoint.getEndpointStatus());
+        if(petasosEndpoint == null){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        } else {
+            return (petasosEndpoint.getEndpointStatus());
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.pu
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
+import net.fhirfactory.pegacorn.endpoints.endpoints.base.PetasosPubSubEndpointChangeInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.roles.common.MultiPublisherResponseSet;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
@@ -28,7 +29,7 @@ import java.util.TimerTask;
 
 import static net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherStatusEnum.*;
 
-public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBase implements PetasosAdapterDeltasInterface{
+public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBase implements PetasosAdapterDeltasInterface, PetasosPubSubEndpointChangeInterface {
 
     private boolean subscriptionCheckScheduled;
     private Object subscriptionCheckLock;
@@ -55,6 +56,7 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
 
     @Override
     protected void executePostConstructActivities(){
+        getCoreSubsystemPetasosEndpointsWatchdog().registerPubSubCallbackChange(this);
         scheduleASubscriptionCheck();
     }
 
@@ -161,7 +163,7 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
             getLogger().debug(".subscribeToRemotePublishers(): Cannot resolve service name, exiting");
             return (null);
         }
-        getLogger().trace(".subscribeToRemotePublishers(): DistributedPublisher ServiceName exists, now looking for a publisher to match");
+        getLogger().info(".subscribeToRemotePublishers(): DistributedPublisher ServiceName exists, now looking for a publisher to match");
         List<InterSubsystemPubSubPublisherRegistration> publisherRegistrations = getDistributedPubSubSubscriptionMapIM().getPublisherServiceProviderInstanceRegistrations(publisherServiceName);
         List<InterSubsystemPubSubPublisherRegistration> scopedPublisherRegistrations = new ArrayList<>();
         for(InterSubsystemPubSubPublisherRegistration currentRegistration: publisherRegistrations){
@@ -170,23 +172,26 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
             }
         }
         if (scopedPublisherRegistrations.isEmpty()) {
-            getLogger().trace(".subscribeToRemotePublishers(): There are no potential publishers at the moment, so register request");
+            getLogger().info(".subscribeToRemotePublishers(): There are no potential publishers at the moment, so register request");
             InterSubsystemPubSubPublisherSubscriptionRegistration newPubSubRegistration = getDistributedPubSubSubscriptionMapIM().addSubscriptionToPublisher(subscriptionList, publisherServiceName);
             newPubSubRegistration.setPublisherServiceRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_PENDING_NO_PROVIDERS);
             newPubSubRegistration.setRegistrationCommentary("Cannot locate suitable publisher");
             return (newPubSubRegistration);
         }
-        getLogger().trace(".subscribeToRemotePublishers(): A publisher is available");
+        getLogger().info(".subscribeToRemotePublishers(): A publisher is available");
         // Now we are going to Subscribe to each Publisher, and we will let the Petasos framework handle
         // the fact we don't want duplicate messages
-        getLogger().trace(".subscribeToRemotePublishers(): Now subscribing to each of the potential publishers");
+        getLogger().info(".subscribeToRemotePublishers(): Now subscribing to each of the potential publishers");
         List<MultiPublisherResponseSet> responseSetList = new ArrayList<>();
         boolean aSubscriptionWasSuccessful = false;
         RemoteSubscriptionResponse aSuccessfulResponse = null;
+        getLogger().info(".subscribeToRemotePublishers(): Now subscribing to each of the potential publishers");
         for (InterSubsystemPubSubPublisherRegistration currentPublisherRegistration : scopedPublisherRegistrations) {
             InterSubsystemPubSubParticipant currentPublisher = currentPublisherRegistration.getPublisher();
             if (currentPublisher.getEndpointStatus().equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL)) {
-                RemoteSubscriptionResponse remoteSubscriptionResponse = subscribeToPublisherInstance(subscriptionList, currentPublisher.getEndpointID().getEndpointName());
+                String publisherInstanceName = currentPublisher.getEndpointID().getEndpointAddressName();
+                getLogger().info(".subscribeToRemotePublishers(): subscribing to: {}", publisherInstanceName);
+                RemoteSubscriptionResponse remoteSubscriptionResponse = subscribeToPublisherInstance(subscriptionList,publisherInstanceName);
                 updatePublisherRegistration(remoteSubscriptionResponse);
                 if (remoteSubscriptionResponse.isSubscriptionSuccessful()) {
                     aSubscriptionWasSuccessful = aSubscriptionWasSuccessful || true;
@@ -240,28 +245,37 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
      * @param subscriptionResponse
      */
     protected void updatePublisherRegistration(RemoteSubscriptionResponse subscriptionResponse) {
+        getLogger().info(".updatePublisherRegistration(): Entry, subscriptionResponse->{}", subscriptionResponse);
         boolean aSubscriptionWasSuccessful = subscriptionResponse.isSubscriptionSuccessful();
         PubSubParticipant publisher = subscriptionResponse.getPublisher();
         if (publisher == null) {
+            getLogger().info(".updatePublisherRegistration(): Exit, publisher is not within subscription response");
             return;
         }
         InterSubsystemPubSubParticipant interSubsystemParticipant = publisher.getInterSubsystemParticipant();
         if (interSubsystemParticipant == null) {
+            getLogger().info(".updatePublisherRegistration(): Exit, interSubsystemParticipant is not within subscription response");
             return;
         }
         PetasosEndpointIdentifier endpointID = interSubsystemParticipant.getEndpointID();
         if (endpointID == null) {
+            getLogger().info(".updatePublisherRegistration(): Exit, endpointID is not within subscription response");
             return;
         }
         String publisherEndpointName = endpointID.getEndpointName();
         if (StringUtils.isEmpty(publisherEndpointName)) {
+            getLogger().info(".updatePublisherRegistration(): Exit, publisherEndpointNmae is not within subscription response");
             return;
         }
+        getLogger().info(".updatePublisherRegistration(): processing response for->{}", publisherEndpointName);
         InterSubsystemPubSubPublisherRegistration cachedPublisherRegistration = getDistributedPubSubSubscriptionMapIM().getPublisherInstanceRegistration(publisherEndpointName);
+        getLogger().info(".updatePublisherRegistration(): cachedPublisherRegistration->{}", cachedPublisherRegistration);
         if (cachedPublisherRegistration == null) {
+            getLogger().info(".updatePublisherRegistration(): Adding publisher instance to cache");
             getEndpointMap().addEndpoint(publisher.getInterSubsystemParticipant());
             cachedPublisherRegistration = getDistributedPubSubSubscriptionMapIM().registerPublisherInstance(publisher.getInterSubsystemParticipant());
         } else {
+            getLogger().info(".updatePublisherRegistration(): Updating content in cached entry");
             synchronized (getEndpointMap().getEndpointLock(publisherEndpointName)) {
                 cachedPublisherRegistration.getPublisher().encrichPetasosEndpoint(subscriptionResponse.getPublisher().getInterSubsystemParticipant());
             }
@@ -398,8 +412,9 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
                 boolean publisherIsOperational = currentInstanceRegistration.getPublisher().getEndpointStatus().equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
                 boolean isWithinScope = currentInstanceRegistration.getPublisher().getEndpointScope().equals(getPetasosEndpoint().getEndpointScope());
                 if (isWithinScope && weNeedToSubscribeToPublisher && publisherIsOperational) {
-                    getLogger().info(".performSubscriptionCheck(): Subscribing....");
-                    RemoteSubscriptionResponse remoteSubscriptionResponse = subscribeToPublisherInstance(currentServiceRegistration.getSubscriptionList(), currentInstanceRegistration.getPublisher().getEndpointID().getEndpointName());
+                    String publisherInstanceName = currentInstanceRegistration.getPublisher().getEndpointID().getEndpointAddressName();
+                    getLogger().info(".performSubscriptionCheck(): Subscribing.... to isntance ->{}", publisherInstanceName);
+                    RemoteSubscriptionResponse remoteSubscriptionResponse = subscribeToPublisherInstance(currentServiceRegistration.getSubscriptionList(), publisherInstanceName);
                     if(remoteSubscriptionResponse.isSubscriptionSuccessful()){
                         currentServiceRegistration.setPublisherServiceRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_ACTIVE);
                     }
@@ -524,6 +539,40 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
 
     protected String extractPublisherServiceName(String participantInstanceName){
         return(getServiceNameFromParticipantInstanceName(participantInstanceName));
+    }
+
+    @Override
+    public void notifyNewPublisher(InterSubsystemPubSubParticipant newPublisher) {
+        getLogger().info(".notifyNewPublisher(): Entry, newPublisher->{}", newPublisher);
+        boolean inScope = newPublisher.getEndpointScope().equals(getPetasosEndpoint().getEndpointScope());
+        if(inScope) {
+            InterSubsystemPubSubPublisherRegistration publisherInstanceRegistration = getDistributedPubSubSubscriptionMapIM().getPublisherInstanceRegistration(newPublisher);
+            if(publisherInstanceRegistration == null){
+                publisherInstanceRegistration = getDistributedPubSubSubscriptionMapIM().registerPublisherInstance(newPublisher);
+            }
+            if(publisherInstanceRegistration == null){
+                getLogger().error(".notifyNewPublisher(): Cannot register publisher->{}",newPublisher);
+                return;
+            }
+            String endpointServiceName = newPublisher.getEndpointServiceName();
+            InterSubsystemPubSubPublisherSubscriptionRegistration publisherServiceSubscription = getDistributedPubSubSubscriptionMapIM().getPublisherServiceSubscription(endpointServiceName);
+            if(publisherServiceSubscription == null){
+                getLogger().info(".notifyNewPublisher(): Nothing is interested in this publisher!");
+                return;
+            }
+            String publisherInstanceName = newPublisher.getEndpointID().getEndpointAddressName();
+            getLogger().info(".notifyNewPublisher(): Subscribing.... to instance ->{}", publisherInstanceName);
+            RemoteSubscriptionResponse remoteSubscriptionResponse = subscribeToPublisherInstance(publisherServiceSubscription.getSubscriptionList(), publisherInstanceName);
+            if(remoteSubscriptionResponse.isSubscriptionSuccessful()){
+                getLogger().info(".notifyNewPublisher(): Subscription to {} Successful", publisherInstanceName);
+                publisherServiceSubscription.setPublisherServiceRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_ACTIVE);
+            } else {
+                getLogger().info(".notifyNewPublisher(): Subscription to {} Failed, reason->{}", publisherInstanceName, remoteSubscriptionResponse.getSubscriptionCommentary());
+            }
+            getLogger().info(".notifyNewPublisher(): Updating publisher");
+            updatePublisherRegistration(remoteSubscriptionResponse);
+            getLogger().info(".notifyNewPublisher(): Updating publisher.... finished, exiting");
+        }
     }
 
     //

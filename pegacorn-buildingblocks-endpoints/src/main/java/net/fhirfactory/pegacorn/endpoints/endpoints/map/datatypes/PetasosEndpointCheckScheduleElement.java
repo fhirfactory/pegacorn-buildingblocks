@@ -31,17 +31,36 @@ public class PetasosEndpointCheckScheduleElement {
     private PetasosEndpointIdentifier petasosEndpointID;
     private boolean endpointRemoved;
     private boolean endpointAdded;
+    private int retryCount;
 
     public PetasosEndpointCheckScheduleElement(){
         this.targetTime = null;
         this.petasosEndpointID = null;
+        this.retryCount = 0;
     }
 
     public PetasosEndpointCheckScheduleElement(PetasosEndpointIdentifier petasosEndpointID, boolean endpointRemoved, boolean endpointAdded){
         this.petasosEndpointID = petasosEndpointID;
-        targetTime = Instant.now().plusSeconds(10);
+        this.targetTime = Instant.now().plusSeconds(10);
         this.endpointAdded = endpointAdded;
         this.endpointRemoved = endpointRemoved;
+        this.retryCount = 0;
+    }
+
+    public PetasosEndpointCheckScheduleElement(PetasosEndpointIdentifier petasosEndpointID, boolean endpointRemoved, boolean endpointAdded, int currentRetries){
+        this.petasosEndpointID = petasosEndpointID;
+        this.targetTime = Instant.now().plusSeconds(10);
+        this.endpointAdded = endpointAdded;
+        this.endpointRemoved = endpointRemoved;
+        this.retryCount = currentRetries;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
     }
 
     public Instant getTargetTime() {
@@ -78,11 +97,12 @@ public class PetasosEndpointCheckScheduleElement {
 
     @Override
     public String toString() {
-        return "IPCEndpointCheckScheduleElement{" +
+        return "PetasosEndpointCheckScheduleElement{" +
                 "targetTime=" + targetTime +
-                ", endpoint=" + petasosEndpointID +
+                ", petasosEndpointID=" + petasosEndpointID +
                 ", endpointRemoved=" + endpointRemoved +
                 ", endpointAdded=" + endpointAdded +
+                ", retryCount=" + retryCount +
                 '}';
     }
 }

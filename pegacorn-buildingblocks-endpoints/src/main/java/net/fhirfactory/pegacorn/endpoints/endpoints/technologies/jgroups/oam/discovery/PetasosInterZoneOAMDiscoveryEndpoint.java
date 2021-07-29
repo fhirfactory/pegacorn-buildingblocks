@@ -47,14 +47,14 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
         String endpointName = getJgroupsParticipantInformationService().getMyInterZoneOAMDiscoveryEndpointName();
-        endpointID.setEndpointCommonName(endpointName);
-        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneOAMDiscoveryEndpointKey();
-        endpointID.setEndpointName(endpointKey);
+        endpointID.setEndpointName(endpointName);
+        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneOAMDiscoveryEndpointAddressName();
+        endpointID.setEndpointAddressName(endpointKey);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
         String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
-        endpointID.setEndpointAddress(endpointAddress);
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
         getLogger().info(".specifyEndpointID(): Exit, endpointID->{}", endpointID);
         return (endpointID);
     }

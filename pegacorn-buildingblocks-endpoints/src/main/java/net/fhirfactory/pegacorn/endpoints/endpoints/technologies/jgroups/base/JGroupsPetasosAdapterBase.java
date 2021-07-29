@@ -98,7 +98,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
 
     @Override
     protected String specifyJGroupsChannelName() {
-        return specifyEndpointID().getEndpointName();
+        return specifyEndpointID().getEndpointAddressName();
     }
 
 
