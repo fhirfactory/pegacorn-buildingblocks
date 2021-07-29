@@ -331,6 +331,7 @@ public class JGroupsBasedParticipantInformationService {
     //
 
     protected TopologyNodeFDNToken deriveAssociatedForwarderFDNToken(){
+        getLogger().info(".deriveAssociatedForwarderFDNToken(): Entry");
         TopologyNodeFDN workshopNodeFDN = null;
         for(TopologyNodeFDN currentWorkshopFDN: getProcessingPlant().getProcessingPlantNode().getWorkshops()){
             getLogger().info(".deriveAssociatedForwarderFDNToken(): Entry->{}", currentWorkshopFDN);
@@ -340,7 +341,11 @@ public class JGroupsBasedParticipantInformationService {
             }
         }
         if(workshopNodeFDN == null ){
-            getLogger().error(".deriveAssociatedForwarderFDNToken(): Unresolvable workshop");
+            String availableWorkshops = new String();
+            for(TopologyNodeFDN currentWorkshopFDN: getProcessingPlant().getProcessingPlantNode().getWorkshops()){
+                availableWorkshops += currentWorkshopFDN.toTag() + ",";
+            }
+            getLogger().error(".deriveAssociatedForwarderFDNToken(): Unresolvable workshop, available workshops --> {}", availableWorkshops);
             return(null);
         }
         TopologyNodeFDN wupNodeFDN = SerializationUtils.clone(workshopNodeFDN);
@@ -377,12 +382,18 @@ public class JGroupsBasedParticipantInformationService {
     //
 
     protected PubSubParticipant buildParticipant(PetasosEndpoint petasosEndpoint){
+        getLogger().info(".buildParticipant(): Entry, petasosEndpoint->{}", petasosEndpoint);
         if(petasosEndpoint == null){
+            getLogger().info(".buildParticipant(): Exit, petasosEndpoint is null");
             return(null);
         }
         // 1st, the IntraSubsystem Pub/Sub Participant} component
         getLogger().info(".initialise(): Now create my intraSubsystemParticipant (LocalPubSubPublisher)");
         TopologyNodeFDNToken topologyNodeFDNToken = deriveAssociatedForwarderFDNToken();
+        if(topologyNodeFDNToken == null){
+            getLogger().info(".buildParticipant(): Exit, unable to resolve associatedForwarderFDNToken");
+            return(null);
+        }
         getLogger().info(".initialise(): localPublisher TopologyNodeFDNToken is ->{}", topologyNodeFDNToken);
         IntraSubsystemPubSubParticipant intraSubsystemParticipant = new IntraSubsystemPubSubParticipant(topologyNodeFDNToken);
         getLogger().info(".initialise(): intraSubsystemParticipant created -->{}", intraSubsystemParticipant);
