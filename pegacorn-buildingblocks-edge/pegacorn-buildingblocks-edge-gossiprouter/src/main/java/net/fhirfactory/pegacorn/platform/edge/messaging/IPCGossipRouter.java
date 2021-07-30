@@ -67,8 +67,8 @@ public class IPCGossipRouter{
         while(true) {
             try {
                 Thread.sleep(10000);
-                petasosServices.updateDate();
-//                printSomeStatistics();
+                // petasosServices.updateDate();
+                printSomeStatistics();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

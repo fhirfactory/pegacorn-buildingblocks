@@ -76,7 +76,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     abstract protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType();
     abstract protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType();
-    abstract protected PetasosEndpointScopeEnum specifyPetasosEndpointScope();
+    abstract protected PetasosEndpointChannelScopeEnum specifyPetasosEndpointScope();
     abstract protected PubSubParticipant specifyPubSubParticipant();
     abstract protected void resolveTopologyEndpoint();
     abstract protected void registerWithCoreSubsystemPetasosEndpointsWatchdog();
@@ -93,6 +93,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             getLogger().info(".initialise(): Exit, already initialised!");
             return;
         }
+
         // 1st, Derive my Endpoint (Topology)
         getLogger().info(".initialise(): Step 1: Start ==> Get my IPCEndpoint Detail");
         resolveTopologyEndpoint();
@@ -171,7 +172,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     }
 
     public PubSubParticipant getParticipant(){
-        return(participant);
+        return(specifyPubSubParticipant());
     }
 
     protected CoreSubsystemPetasosEndpointsWatchdog getCoreSubsystemPetasosEndpointsWatchdog(){
@@ -183,46 +184,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     //
 
 
-    /**
-     *
-     * @param targetEndpointID
-     * @param myEndpoint
-     * @return
-     */
-    public PetasosEndpoint probeEndpoint(PetasosEndpointIdentifier targetEndpointID, PetasosEndpoint myEndpoint){
-        getLogger().info(".probeEndpoint(): Entry, targetEndpointID->{}", targetEndpointID);
-        try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = myEndpoint;
-            classSet[0] = PetasosEndpoint.class;
-            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointAddressName());
-            PetasosEndpoint targetPetasosEndpoint = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointHandler", objectSet, classSet, requestOptions);
-            getLogger().info(".probeEndpoint(): Exit, response->{}", targetPetasosEndpoint);
-            return(targetPetasosEndpoint);
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".probeEndpoint(): Error (NoSuchMethodException)->", e);
-            return(null);
-        } catch (Exception e) {
-            getLogger().error(".probeEndpoint: Error (GeneralException) ->",e);
-            return(null);
-        }
-    }
 
-    /**
-     *
-     * @param sourcePetasosEndpoint
-     * @return
-     */
-    public PetasosEndpoint probeEndpointHandler(PetasosEndpoint sourcePetasosEndpoint){
-        getLogger().info(".probeEndpointHandler(): Entry, sourcePetasosEndpoint->{}", sourcePetasosEndpoint);
-        getEndpointMap().addEndpoint(sourcePetasosEndpoint);
-        PetasosEndpoint myEndpoint = SerializationUtils.clone(getPetasosEndpoint());
-        myEndpoint.setEndpointStatus(getCoreSubsystemPetasosEndpointsWatchdog().getAggregatePetasosEndpointStatus());
-        getLogger().info(".probeEndpointHandler(): Exit, myEndpoint->{}", myEndpoint);
-        return(myEndpoint);
-    }
 
     protected PetasosEndpoint cloneAndRemoveFunctionNameSuffixFromEndpointName(PetasosEndpoint originalEndpoint){
         if(originalEndpoint == null){
@@ -240,12 +202,12 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         if (originalEndpoint.getEndpointID() == null) {
             return;
         }
-        String endpointKey = originalEndpoint.getEndpointID().getEndpointAddressName();
+        String endpointKey = originalEndpoint.getEndpointID().getEndpointChannelName();
         if (StringUtils.isEmpty(endpointKey)) {
             return;
         }
         String newName = removeFunctionNameSuffixFromEndpointName(endpointKey);
-        originalEndpoint.getEndpointID().setEndpointAddressName(newName);
+        originalEndpoint.getEndpointID().setEndpointChannelName(newName);
     }
     protected String removeFunctionNameSuffixFromEndpointName(String endpointKey){
         if (StringUtils.isEmpty(endpointKey)) {
@@ -279,79 +241,28 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     @Override
     protected String deriveEndpointServiceName(String endpointName) {
-        getLogger().info(".deriveEndpointServiceName(): Entry, endpointName->{}", endpointName);
+        getLogger().debug(".deriveEndpointServiceName(): Entry, endpointName->{}", endpointName);
         if(StringUtils.isEmpty(endpointName)){
             return(null);
         }
         String[] split = StringUtils.split(endpointName, ".");
         String serviceName = split[0];
-        getLogger().info(".deriveEndpointServiceName(): Exit, serviceName->{}", serviceName);
+        getLogger().debug(".deriveEndpointServiceName(): Exit, serviceName->{}", serviceName);
         return(serviceName);
     }
 
 
 
-    @Override
-    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID) {
-        PetasosEndpoint remotePetasosEndpoint = probeEndpoint(endpointID, getPetasosEndpoint());
-        PetasosEndpointStatusEnum endpointStatus = null;
-        if(remotePetasosEndpoint != null){
-            endpointStatus = remotePetasosEndpoint.getEndpointStatus();
-        } else {
-            endpointStatus = PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE;
-        }
-        return(endpointStatus);
-    }
 
-    protected boolean isWithinScopeOfEndpoint(InterSubsystemPubSubParticipant testParticipant) {
-        boolean inScope = testParticipant.getEndpointScope().equals(getPetasosEndpoint().getEndpointScope());
+
+    protected boolean isRightChannel(InterSubsystemPubSubParticipant testParticipant) {
+        boolean inScope = testParticipant.getEndpointChannelScope().equals(getPetasosEndpoint().getEndpointChannelScope());
         return(inScope);
     }
 
 
-    protected boolean isWithinScopeOfEndpoint(PetasosEndpointIdentifier endpointID) {
-        boolean sameZone = endpointID.getEndpointZone().equals(getPetasosEndpoint().getEndpointID().getEndpointZone());
-        boolean sameSite = endpointID.getEndpointSite().contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
-        boolean doSubscription = false;
-        if (sameSite && sameZone) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTRAZONE)) {
-                doSubscription = true;
-            }
-        }
-        if (sameSite && !sameZone) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERZONE)) {
-                doSubscription = true;
-            }
-        }
-        if (!sameSite) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERSITE)) {
-                doSubscription = true;
-            }
-        }
-        return(doSubscription);
-    }
 
-    protected boolean isWithinScopeBasedOnKey(String endpointKey) {
-        boolean channelIsInterSite = endpointKey.contains(getJgroupsParticipantInformationService().getInterSitePrefix());
-        boolean channelIsInterZone = endpointKey.contains(getJgroupsParticipantInformationService().getInterZonePrefix());
-        boolean channelIsIntraZone = endpointKey.contains(getJgroupsParticipantInformationService().getIntraZonePrefix());
-        boolean withinScope = false;
-        if (channelIsIntraZone) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTRAZONE)) {
-                withinScope = true;
-            }
-        }
-        if (channelIsInterZone) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERZONE)) {
-                withinScope = true;
-            }
-        }
-        if (channelIsInterSite) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERSITE)) {
-                withinScope = true;
-            }
-        }
-        return(withinScope);
-    }
+
+
 
 }

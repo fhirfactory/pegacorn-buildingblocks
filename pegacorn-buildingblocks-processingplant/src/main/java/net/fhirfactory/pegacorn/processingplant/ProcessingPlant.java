@@ -75,18 +75,20 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     @PostConstruct
     public void initialise() {
         if (!isInitialised) {
-            getLogger().debug("StandardProcessingPlatform::initialise(): Invoked!");
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising TopologyIM --> Start");
+            getLogger().info("StandardProcessingPlatform::initialise(): Entry!");
+            getLogger().info("StandardProcessingPlatform::initialise(): Initialising TopologyIM --> Start");
             getTopologyIM().initialise();
             getTopologyFactory().initialise();
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising TopologyIM --> Finish");
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising Building Subsystem Topology --> Start");
+            getLogger().info("StandardProcessingPlatform::initialise(): Initialising TopologyIM --> Finish");
+            getLogger().info("StandardProcessingPlatform::initialise(): Initialising Building Subsystem Topology --> Start");
             specifySolutionNodeFactory().initialise();
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising Building Subsystem Topology --> Finish");
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Start");
+            getLogger().info("StandardProcessingPlatform::initialise(): Initialising Building Subsystem Topology --> Finish");
+            getLogger().info("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Start");
             resolveProcessingPlant();
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Finish");
+            getLogger().info("StandardProcessingPlatform::initialise(): Calling Subclass Initialisation Methods --> Start");
             executePostConstructActivities();
+            getLogger().info("StandardProcessingPlatform::initialise(): Calling Subclass Initialisation Methods --> Finish");
+            getLogger().info("StandardProcessingPlatform::initialise(): Exit");
             isInitialised = true;
         }
     }

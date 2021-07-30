@@ -98,7 +98,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
 
     @Override
     protected String specifyJGroupsChannelName() {
-        return specifyEndpointID().getEndpointAddressName();
+        return specifyEndpointID().getEndpointChannelName();
     }
 
 
@@ -179,7 +179,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     }
 
     public List<PetasosAdapterAddress> getAllGroupMembers(){
-        getLogger().info(".getAllGroupMembers(): Entry");
+        getLogger().debug(".getAllGroupMembers(): Entry");
         List<PetasosAdapterAddress> groupMembers = getAllClusterTargets();
         List<PetasosAdapterAddress> sameServiceSet = new ArrayList<>();
         for(PetasosAdapterAddress currentAdapterAddress: groupMembers){
@@ -190,7 +190,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         for(PetasosAdapterAddress sameServiceAddress: sameServiceSet){
             groupMembers.remove(sameServiceAddress);
         }
-        getLogger().info(".getAllGroupMembers(): Exit, size->{}", groupMembers.size());
+        getLogger().debug(".getAllGroupMembers(): Exit, size->{}", groupMembers.size());
         return(groupMembers);
     }
 

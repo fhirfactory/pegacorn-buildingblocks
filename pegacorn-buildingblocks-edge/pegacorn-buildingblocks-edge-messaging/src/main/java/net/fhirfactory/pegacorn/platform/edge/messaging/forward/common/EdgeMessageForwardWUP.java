@@ -33,6 +33,7 @@ import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverFinisherBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketResponseDecoder;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.IPCMessageSenderInterface;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionStatus;
@@ -55,13 +56,17 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     @Inject
     DataParcelSubscriptionMapIM topicServer;
 
+    public EdgeMessageForwardWUP(){
+        super();
+    }
+
     @Override
     protected WorkshopInterface specifyWorkshop() {
         return (edgeWorkshop);
     }
 
     protected abstract String specifyIPCZoneType();
-    protected abstract PetasosIPCEndpoint specifyIPCEndpoint();
+    protected abstract IPCMessageSenderInterface specifyIPCEndpoint();
 
     //
     // Application Logic (Route Definition)
@@ -92,7 +97,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
                     public void process(Exchange exchange) throws Exception {
                         InterProcessingPlantHandoverPacket packet = exchange.getIn().getBody(InterProcessingPlantHandoverPacket.class);
 //                        getLogger().info(".configure().process(): packet->{}", packet);
-                        InterProcessingPlantHandoverResponsePacket response = getIPCEndpoint().sendIPCMessage(packet.getTarget(), packet);
+                        InterProcessingPlantHandoverResponsePacket response = getIPCEndpoint().sendIPCMessagePlease(packet.getTarget(), packet);
                         exchange.getIn().setBody(response);
                     }
                 });
@@ -108,7 +113,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
 
     @Override
     public void executePostInitialisationActivities(){
-        this.getIPCEndpoint().initialise();
+//        this.getIPCEndpoint().initialise();
     }
 
     //
@@ -123,7 +128,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
         return(this.topicServer);
     }
 
-    protected PetasosIPCEndpoint getIPCEndpoint(){
+    protected IPCMessageSenderInterface getIPCEndpoint(){
         return(specifyIPCEndpoint());
     }
 

@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.messaging.forward.common.EdgeMessageForwardWUP;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.IPCMessageSenderInterface;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,10 @@ public class EdgeIntraZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     @Inject
     private PetasosIntraZoneIPCEndpoint ipcEndpoint;
 
+    public EdgeIntraZoneMessageForwardWUP(){
+        super();
+    }
+
     @Override
     protected String specifyWUPInstanceName() {
         return (this.getClass().getSimpleName());
@@ -64,7 +69,7 @@ public class EdgeIntraZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     }
 
     @Override
-    protected PetasosIPCEndpoint specifyIPCEndpoint() {
+    protected IPCMessageSenderInterface specifyIPCEndpoint() {
         return (ipcEndpoint);
     }
 

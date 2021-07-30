@@ -122,6 +122,7 @@ public class CoreSubsystemPetasosEndpointsWatchdog
             return;
         }
         scheduleStartupWatchdog();
+        initialised = true;
     }
 
     //

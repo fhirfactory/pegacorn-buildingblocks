@@ -21,7 +21,6 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.base;
 
-
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.datatypes.PetasosAdapterAddress;
@@ -44,8 +43,8 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
     private JChannel ipcChannel;
     private RpcDispatcher rpcDispatcher;
 
-    private ArrayList<Address> previousScannedMembership;
-    private ArrayList<Address> currentScannedMembership;
+    private ArrayList<String> previousScannedMembership;
+    private ArrayList<String> currentScannedMembership;
     private ArrayList<PetasosAdapterDeltasInterface> membershipEventListeners;
 
     private static Long RPC_UNICAST_TIMEOUT = 5000L;
@@ -72,36 +71,36 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
 
     @Override
     public void viewAccepted(View newView) {
-        getLogger().debug(".viewAccepted(): Entry, JGroups View Changed!");
+        getLogger().info(".viewAccepted(): Entry, JGroups View Changed!");
         List<Address> addressList = newView.getMembers();
-        getLogger().trace(".viewAccepted(): Got the Address set via view, now iterate through and see if one is suitable");
+        getLogger().info(".viewAccepted(): Got the Address set via view, now iterate through and see if one is suitable");
         if(getIPCChannel() != null) {
-            getLogger().warn("JGroupsCluster->{}", getIPCChannel().getClusterName());
+            getLogger().info("JGroupsCluster->{}", getIPCChannel().getClusterName());
         } else {
-            getLogger().warn("JGroupsCluster still Forming");
+            getLogger().info("JGroupsCluster still Forming");
         }
         this.previousScannedMembership.clear();
         this.previousScannedMembership.addAll(this.currentScannedMembership);
         this.currentScannedMembership.clear();
         for(Address currentAddress: addressList){
-            this.currentScannedMembership.add(currentAddress);
-            getLogger().warn("Visible Member->{}", currentAddress);
+            this.currentScannedMembership.add(currentAddress.toString());
+            getLogger().info("Visible Member->{}", currentAddress);
         }
-        getLogger().trace(".viewAccepted(): Checking PubSub Participants");
-        List<PetasosAdapterAddress> removals = getMembershipRemovals(previousScannedMembership, currentScannedMembership);
-        List<PetasosAdapterAddress> additions = getMembershipAdditions(previousScannedMembership, currentScannedMembership);
+        getLogger().info(".viewAccepted(): Checking PubSub Participants");
+        List<String> removals = getMembershipRemovals(previousScannedMembership, currentScannedMembership);
+        List<String> additions = getMembershipAdditions(previousScannedMembership, currentScannedMembership);
         getLogger().info(".viewAccepted(): Changes(MembersAdded->{}, MembersRemoved->{}", additions.size(), removals.size());
         for(PetasosAdapterDeltasInterface currentActionInterface: this.membershipEventListeners){
             getLogger().info(".viewAccepted(): Iterating through ActionInterfaces");
-            for(PetasosAdapterAddress currentAddedElement: additions){
+            for(String currentAddedElement: additions){
                 currentActionInterface.interfaceAdded(currentAddedElement);
             }
-            for(PetasosAdapterAddress currentRemovedElement: removals){
+            for(String currentRemovedElement: removals){
                 currentActionInterface.interfaceRemoved(currentRemovedElement);
             }
         }
-        getLogger().trace(".viewAccepted(): PubSub Participants check completed");
-        getLogger().debug(".viewAccepted(): Exit");
+        getLogger().info(".viewAccepted(): PubSub Participants check completed");
+        getLogger().info(".viewAccepted(): Exit");
     }
 
     @Override
@@ -119,33 +118,25 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
         MembershipListener.super.unblock();
     }
 
-    private List<PetasosAdapterAddress> getMembershipAdditions(List<Address> oldList, List<Address> newList){
-        List<PetasosAdapterAddress> additions = new ArrayList<>();
-        for(Address newListElement: newList){
+    private List<String> getMembershipAdditions(List<String> oldList, List<String> newList){
+        List<String> additions = new ArrayList<>();
+        for(String newListElement: newList){
             if(oldList.contains(newListElement)){
                 // do nothing
             } else {
-                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
-                currentPetasosAdapterAddress.setAddressName(newListElement.toString());
-                currentPetasosAdapterAddress.setJGroupsAddress(newListElement);
-                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                additions.add(currentPetasosAdapterAddress);
+                additions.add(newListElement);
             }
         }
         return(additions);
     }
 
-    private List<PetasosAdapterAddress> getMembershipRemovals(List<Address> oldList, List<Address> newList){
-        List<PetasosAdapterAddress> removals = new ArrayList<>();
-        for(Address oldListElement: oldList){
+    private List<String> getMembershipRemovals(List<String> oldList, List<String> newList){
+        List<String> removals = new ArrayList<>();
+        for(String oldListElement: oldList){
             if(newList.contains(oldListElement)){
                 // no nothing
             } else {
-                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
-                currentPetasosAdapterAddress.setAddressName(oldListElement.toString());
-                currentPetasosAdapterAddress.setJGroupsAddress(oldListElement);
-                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                removals.add(currentPetasosAdapterAddress);
+                removals.add(oldListElement);
             }
         }
         return(removals);
@@ -235,22 +226,22 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
     //
 
     public Address getTargetMemberAddress(String name){
-        getLogger().info(".getTargetAddress(): Entry, name->{}", name);
+        getLogger().debug(".getTargetAddress(): Entry, name->{}", name);
         if(getIPCChannel() == null){
             getLogger().debug(".getTargetAddress(): IPCChannel is null, exit returning (null)");
             return(null);
         }
-        getLogger().info(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
+        getLogger().trace(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
         List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().info(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+        getLogger().trace(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
         for(Address currentAddress: addressList){
-            getLogger().info(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
+            getLogger().trace(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
             if(currentAddress.toString().contentEquals(name)){
-                getLogger().info(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
+                getLogger().debug(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
                 return(currentAddress);
             }
         }
-        getLogger().info(".getTargetAddress(): Exit, no suitable Address found!");
+        getLogger().debug(".getTargetAddress(): Exit, no suitable Address found!");
         return(null);
     }
 
@@ -294,11 +285,11 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
         for(Address currentAddress: addressList){
             getLogger().trace(".isTargetAddressActive(): Iterating through Address list, current element->{}", currentAddress);
             if(currentAddress.toString().contentEquals(addressName)){
-                getLogger().info(".isTargetAddressActive(): Exit, A match!, returning -true-");
+                getLogger().debug(".isTargetAddressActive(): Exit, A match!, returning -true-");
                 return(true);
             }
         }
-        getLogger().info(".isTargetAddressActive(): Exit, no matching Address found!");
+        getLogger().debug(".isTargetAddressActive(): Exit, no matching Address found!");
         return(false);
     }
 
@@ -314,7 +305,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
         List<Address> addressList = getIPCChannel().getView().getMembers();
         List<PetasosAdapterAddress> petasosAdapterAddresses = new ArrayList<>();
         for(Address currentAddress: addressList){
-            getLogger().info(".getAllTargets(): Iterating through Address list, current element->{}", currentAddress);
+            getLogger().debug(".getAllTargets(): Iterating through Address list, current element->{}", currentAddress);
             PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
             currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
             currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);

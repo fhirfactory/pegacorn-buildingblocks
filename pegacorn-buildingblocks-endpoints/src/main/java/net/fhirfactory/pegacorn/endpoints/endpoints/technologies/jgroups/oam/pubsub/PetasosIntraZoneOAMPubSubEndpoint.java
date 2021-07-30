@@ -21,8 +21,11 @@
  */
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.pubsub;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.pubsub.base.PetasosOAMPubSubEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.pubsub.base.PetasosOAMPubSubEndpointSupervisoryFunctionLayer;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;
@@ -34,7 +37,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class PetasosIntraZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint {
+public class PetasosIntraZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpointSupervisoryFunctionLayer {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosIntraZoneOAMPubSubEndpoint.class);
 
     public PetasosIntraZoneOAMPubSubEndpoint(){
@@ -55,7 +58,7 @@ public class PetasosIntraZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
         String endpointName = getJgroupsParticipantInformationService().getMyIntraZoneOAMPubSubEndpointName();
         endpointID.setEndpointName(endpointName);
         String endpointKey = getJgroupsParticipantInformationService().getMyIntraZoneOAMPubSubEndpointAddressName();
-        endpointID.setEndpointAddressName(endpointKey);
+        endpointID.setEndpointChannelName(endpointKey);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getIntraZoneOAMGroupName());
@@ -106,7 +109,8 @@ public class PetasosIntraZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
 
     @Override
     protected PubSubParticipant specifyPubSubParticipant() {
-        return (getJgroupsParticipantInformationService().getMyIntraZoneParticipantRole());
+        PubSubParticipant myIntraZoneParticipantRole = getJgroupsParticipantInformationService().getMyIntraZoneParticipantRole(getPetasosEndpoint());
+        return (myIntraZoneParticipantRole);
     }
 
     @Override
@@ -115,7 +119,7 @@ public class PetasosIntraZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
     }
 
     @Override
-    protected PetasosEndpointScopeEnum specifyPetasosEndpointScope() {
-        return (PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTRAZONE);
+    protected PetasosEndpointChannelScopeEnum specifyPetasosEndpointScope() {
+        return (PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE);
     }
 }

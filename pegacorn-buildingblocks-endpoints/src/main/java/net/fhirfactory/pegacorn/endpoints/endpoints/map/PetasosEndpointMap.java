@@ -269,14 +269,14 @@ public class PetasosEndpointMap {
                                                  String endpointServiceName,
                                                  PetasosEndpointFunctionTypeEnum endpointType,
                                                  EndpointPayloadTypeEnum payloadType,
-                                                 PetasosEndpointScopeEnum scope){
+                                                 PetasosEndpointChannelScopeEnum scope){
         getLogger().info(".newPetasosEndpoint(): Entry");
         Endpoint fhirEndpoint = newEndpoint(petasosEndpointID, endpointAddressType, endpointType, payloadType);
         if(fhirEndpoint == null){
             return(null);
         }
         PetasosEndpoint petasosEndpoint = new PetasosEndpoint();
-        petasosEndpoint.setEndpointScope(scope);
+        petasosEndpoint.setEndpointChannelScope(scope);
         petasosEndpoint.setEndpointServiceName(endpointServiceName);
         petasosEndpoint.setRepresentativeFHIREndpoint(fhirEndpoint);
         petasosEndpoint.setEndpointID(petasosEndpointID);
@@ -297,7 +297,7 @@ public class PetasosEndpointMap {
                                        String endpointService,
                                        PetasosEndpointFunctionTypeEnum endpointType,
                                        EndpointPayloadTypeEnum payloadType,
-                                       PetasosEndpointScopeEnum scope){
+                                       PetasosEndpointChannelScopeEnum scope){
         getLogger().info(".addEndpoint(): Entry, petasosEndpointID->{}", petasosEndpointID);
 
         if(petasosEndpointID == null){
@@ -518,10 +518,10 @@ public class PetasosEndpointMap {
     }
 
     public List<PetasosEndpointCheckScheduleElement> getEndpointsToCheck(){
-        getLogger().info(".getEndpointsToCheck(): Entry");
+        getLogger().debug(".getEndpointsToCheck(): Entry");
         List<PetasosEndpointCheckScheduleElement> endpointSet = new ArrayList<>();
         if(this.endpointCheckSchedule.isEmpty()){
-            getLogger().info(".getEndpointsToCheck(): Exit, schedule is empty");
+            getLogger().debug(".getEndpointsToCheck(): Exit, schedule is empty");
             return(endpointSet);
         }
         synchronized (this.endpointCheckScheduleLock) {
@@ -529,7 +529,7 @@ public class PetasosEndpointMap {
 
             for (String currentEndpointName : endpointNameSet) {
                 PetasosEndpointCheckScheduleElement currentElement = this.endpointCheckSchedule.get(currentEndpointName);
-                getLogger().info(".getEndpointsToCheck(): Checking entry ->{}", currentElement);
+                getLogger().trace(".getEndpointsToCheck(): Checking entry ->{}", currentElement);
                 if ((currentElement.getTargetTime().getEpochSecond() + ENDPOINT_CHECK_DELAY) < (Instant.now().getEpochSecond())) {
                     getLogger().info(".getEndpointsToCheck(): Adding...");
                     endpointSet.add(currentElement);
@@ -539,7 +539,7 @@ public class PetasosEndpointMap {
                 this.endpointCheckSchedule.remove(currentScheduleElement.getPetasosEndpointID());
             }
         }
-        getLogger().info(".getEndpointsToCheck(): Exit, size->{}", endpointSet.size());
+        getLogger().debug(".getEndpointsToCheck(): Exit, size->{}", endpointSet.size());
         return(endpointSet);
     }
 

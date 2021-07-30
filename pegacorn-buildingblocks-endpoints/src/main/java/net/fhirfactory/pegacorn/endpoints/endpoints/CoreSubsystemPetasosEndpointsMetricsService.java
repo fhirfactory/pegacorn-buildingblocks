@@ -20,8 +20,11 @@ import javax.inject.Inject;
 public class CoreSubsystemPetasosEndpointsMetricsService extends RouteBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosEndpointsMetricsService.class);
 
+    private boolean initialised;
+
     @Inject
     private ProcessingPlantInterface processingPlant;
+
 
     @Inject
     private PetasosInterZoneIPCEndpoint interZoneIPCEndpoint;
@@ -41,19 +44,29 @@ public class CoreSubsystemPetasosEndpointsMetricsService extends RouteBuilder {
     @Inject
     private PetasosInterZoneOAMPubSubEndpoint interZoneOAMPubSubEndpoint;
 
+
+
     public CoreSubsystemPetasosEndpointsMetricsService(){
         super();
+        this.initialised = false;
     }
 
     @PostConstruct
     public void initialise(){
+        if(this.initialised){
+            return;
+        }
         LOG.info(".initialise(): Entry");
+
         LOG.info(".initialise(): interZoneIPCEndpoint ==> {}", interZoneIPCEndpoint.getEndpointID());
         LOG.info(".initialise(): intraZoneIPCEndpoint ==> {}", intraZoneIPCEndpoint.getEndpointID());
         LOG.info(".initialise(): intraZoneOAMPubSubEndpoint ==> {}", intraZoneOAMPubSubEndpoint.getEndpointID());
         LOG.info(".initialise(): interZoneOAMPubSubEndpoint ==> {}", interZoneOAMPubSubEndpoint.getEndpointID());
         LOG.info(".initialise(): intraZoneOAMDiscoveryEndpoint ==> {}", intraZoneOAMDiscoveryEndpoint.getEndpointID());
         LOG.info(".initialise(): interZoneOAMDiscoveryEndpoint ==> {}", interZoneOAMDiscoveryEndpoint.getEndpointID());
+
+
+        this.initialised = true;
     }
 
     @Override
@@ -66,6 +79,6 @@ public class CoreSubsystemPetasosEndpointsMetricsService extends RouteBuilder {
 
         from("timer://"+friendlyName+"?delay=1000&repeatCount=1")
                 .routeId("ProcessingPlant::"+friendlyName)
-                .log(LoggingLevel.DEBUG, "Starting....");
+                .log(LoggingLevel.INFO, "Starting....");
     }
 }

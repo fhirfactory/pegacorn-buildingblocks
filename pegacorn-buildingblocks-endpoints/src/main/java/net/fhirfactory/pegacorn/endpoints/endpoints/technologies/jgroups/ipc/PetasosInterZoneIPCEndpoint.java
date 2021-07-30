@@ -23,11 +23,12 @@ package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.ipc;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointScopeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointChannelScopeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.InterZoneIPCMessageSenderInterface;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import org.apache.camel.ExchangePattern;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class PetasosInterZoneIPCEndpoint extends PetasosIPCEndpoint {
+public class PetasosInterZoneIPCEndpoint extends PetasosIPCEndpoint implements InterZoneIPCMessageSenderInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosInterZoneIPCEndpoint.class);
 
     public PetasosInterZoneIPCEndpoint(){
@@ -68,7 +69,7 @@ public class PetasosInterZoneIPCEndpoint extends PetasosIPCEndpoint {
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
         String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneIPCEndpointAddressName();
-        endpointID.setEndpointAddressName(endpointKey);
+        endpointID.setEndpointChannelName(endpointKey);
         String endpointName = getJgroupsParticipantInformationService().getMyInterZoneIPCEndpointName();
         endpointID.setEndpointName(endpointName);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
@@ -101,10 +102,7 @@ public class PetasosInterZoneIPCEndpoint extends PetasosIPCEndpoint {
 
     @Override
     protected PubSubParticipant specifyPubSubParticipant() {
-        PubSubParticipant myInterZoneParticipantRole = getJgroupsParticipantInformationService().getMyInterZoneParticipantRole();
-        if(myInterZoneParticipantRole == null){
-            myInterZoneParticipantRole = getJgroupsParticipantInformationService().buildMyInterZoneParticipantRole(getPetasosEndpoint());
-        }
+        PubSubParticipant myInterZoneParticipantRole = getJgroupsParticipantInformationService().getMyInterZoneParticipantRole(getPetasosEndpoint());
         return (myInterZoneParticipantRole);
     }
 
@@ -121,7 +119,13 @@ public class PetasosInterZoneIPCEndpoint extends PetasosIPCEndpoint {
     }
 
     @Override
-    protected PetasosEndpointScopeEnum specifyPetasosEndpointScope() {
-        return (PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTERZONE);
+    protected PetasosEndpointChannelScopeEnum specifyPetasosEndpointScope() {
+        return (PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE);
+    }
+
+    @Override
+    public InterProcessingPlantHandoverResponsePacket sendIPCMessagePlease(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket) {
+        InterProcessingPlantHandoverResponsePacket responsePacket = sendIPCMessage(targetParticipantServiceName, handoverPacket);
+        return(responsePacket);
     }
 }

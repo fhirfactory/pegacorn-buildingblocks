@@ -77,11 +77,17 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     @PostConstruct
     private void initialise() {
         if (!isInitialised) {
-            getLogger().debug("StandardWorkshop::initialise(): Invoked!");
+            getLogger().info("StandardWorkshop::initialise(): Entry!");
+            getLogger().info("StandardWorkshop::initialise(): Initialising my ProcessingPlant (Link) --> Start!");
             processingPlant.initialisePlant();
+            getLogger().info("StandardWorkshop::initialise(): Initialising my ProcessingPlant (Link) --> Finish!");
+            getLogger().info("StandardWorkshop::initialise(): Building my Workshop --> Start!");
             buildWorkshop();
+            getLogger().info("StandardWorkshop::initialise(): Building my Workshop --> Finish!");
+            getLogger().info("StandardWorkshop::initialise(): Invoking Sub-Class PostConstruct Functions --> Start!");
             invokePostConstructInitialisation();
-            getLogger().trace("StandardWorkshop::initialise(): Node --> {}", getWorkshopNode());
+            getLogger().info("StandardWorkshop::initialise(): Invoking Sub-Class PostConstruct Functions --> Finish!");
+            getLogger().info("StandardWorkshop::initialise(): Exit, Node->{}", getWorkshopNode());
             isInitialised = true;
         }
     }

@@ -44,12 +44,13 @@ public class InterSubSystemPubSubBroker implements InterSubSystemPubSubBrokerInt
     @Inject
     private DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
 
-    @Inject
-    private JGroupsBasedParticipantInformationService participantInformationService;
+//    @Inject
+//    private JGroupsBasedParticipantInformationService participantInformationService;
 
     @PostConstruct
     public void initialise(){
         LOG.info(".initialise(): initialising......");;
+        // participantInformationService.initialise();
         LOG.info(".initialise(): Done....");
     }
 

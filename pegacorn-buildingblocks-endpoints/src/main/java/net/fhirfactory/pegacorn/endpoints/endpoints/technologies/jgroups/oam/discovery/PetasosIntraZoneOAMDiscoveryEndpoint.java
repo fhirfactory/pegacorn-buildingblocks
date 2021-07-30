@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.discovery;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.discovery.base.PetasosOAMDiscoveryEndpoint;
+import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.oam.discovery.base.PetasosOAMDiscoveryEndpointSupervisoryFunctionLayer;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEndpoint {
+public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEndpointSupervisoryFunctionLayer {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosIntraZoneOAMDiscoveryEndpoint.class);
 
     public PetasosIntraZoneOAMDiscoveryEndpoint(){
@@ -47,7 +47,7 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
         String endpointKey = getJgroupsParticipantInformationService().getMyIntraZoneOAMDiscoveryEndpointAddressName();
-        endpointID.setEndpointAddressName(endpointKey);
+        endpointID.setEndpointChannelName(endpointKey);
         String endpointName = getJgroupsParticipantInformationService().getMyIntraZoneOAMDiscoveryEndpointName();
         endpointID.setEndpointName(endpointName);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
@@ -105,7 +105,8 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
 
     @Override
     protected PubSubParticipant specifyPubSubParticipant() {
-        return (getJgroupsParticipantInformationService().getMyIntraZoneParticipantRole());
+        PubSubParticipant myIntraZoneParticipantRole = getJgroupsParticipantInformationService().getMyIntraZoneParticipantRole(getPetasosEndpoint());
+        return (myIntraZoneParticipantRole);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     }
 
     @Override
-    protected PetasosEndpointScopeEnum specifyPetasosEndpointScope() {
-        return (PetasosEndpointScopeEnum.ENDPOINT_SCOPE_INTRAZONE);
+    protected PetasosEndpointChannelScopeEnum specifyPetasosEndpointScope() {
+        return (PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE);
     }
 }

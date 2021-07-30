@@ -78,7 +78,7 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket){
         getLogger().info(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
         Address targetServiceAddress = getCandidateIPCTargetAddress(targetParticipantServiceName);
-        getLogger().info(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
+        getLogger().trace(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
         InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = sendIPCMessage(targetServiceAddress, handoverPacket);
         return(interProcessingPlantHandoverResponsePacket);
     }
@@ -89,7 +89,7 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     //
 
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().info(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
+        getLogger().debug(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
@@ -118,10 +118,10 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     }
 
     public List<Address> getIPCTargetAddressSet(String endpointServiceName){
-        getLogger().info(".getIPCTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
+        getLogger().debug(".getIPCTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
         List<Address> endpointAddressSet = new ArrayList<>();
         if(StringUtils.isEmpty(endpointServiceName)){
-            getLogger().info(".getIPCTargetAddressSet(): Exit, endpointServiceName is empty");
+            getLogger().debug(".getIPCTargetAddressSet(): Exit, endpointServiceName is empty");
             return(endpointAddressSet);
         }
         List<PetasosAdapterAddress> memberAdapterSetForService = getTargetMemberAdapterSetForService(endpointServiceName);
@@ -131,23 +131,23 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
                 endpointAddressSet.add(currentMemberAddress);
             }
         }
-        getLogger().info(".getIPCTargetAddressSet(): Exit, endpointAddressSet->{}", endpointAddressSet);
+        getLogger().debug(".getIPCTargetAddressSet(): Exit, endpointAddressSet->{}", endpointAddressSet);
         return(endpointAddressSet);
     }
 
     public Address getCandidateIPCTargetAddress(String endpointServiceName){
-        getLogger().info(".getCandidateIPCTargetAddress(): Entry, endpointServiceName->{}", endpointServiceName);
+        getLogger().debug(".getCandidateIPCTargetAddress(): Entry, endpointServiceName->{}", endpointServiceName);
         if(StringUtils.isEmpty(endpointServiceName)){
-            getLogger().info(".getCandidateIPCTargetAddress(): Exit, endpointServiceName is empty");
+            getLogger().debug(".getCandidateIPCTargetAddress(): Exit, endpointServiceName is empty");
             return(null);
         }
         List<Address> endpointAddressSet = getIPCTargetAddressSet(endpointServiceName);
         if(endpointAddressSet.isEmpty()){
-            getLogger().info(".getCandidateIPCTargetAddress(): Exit, endpointAddressSet is empty");
+            getLogger().debug(".getCandidateIPCTargetAddress(): Exit, endpointAddressSet is empty");
             return(null);
         }
         Address endpointJGroupsAddress = endpointAddressSet.get(0);
-        getLogger().info(".getCandidateIPCTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
+        getLogger().debug(".getCandidateIPCTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
         return(endpointJGroupsAddress);
     }
 
