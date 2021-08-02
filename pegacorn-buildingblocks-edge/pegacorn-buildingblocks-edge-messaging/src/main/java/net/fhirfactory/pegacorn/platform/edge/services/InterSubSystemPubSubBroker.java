@@ -22,12 +22,9 @@
 package net.fhirfactory.pegacorn.platform.edge.services;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.helpers.JGroupsBasedParticipantInformationService;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.JGroupsBasedParticipantInformationService;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.InterSubSystemPubSubBrokerInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

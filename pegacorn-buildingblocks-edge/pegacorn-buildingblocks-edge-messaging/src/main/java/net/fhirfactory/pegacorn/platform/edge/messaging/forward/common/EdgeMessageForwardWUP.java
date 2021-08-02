@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.endpoints.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
@@ -132,7 +132,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     //
 
     protected RemoteSubscriptionStatus subscribeToDataParcelSet(List<DataParcelManifest> contentSubscriptionList, PubSubParticipant subscriber) {
-        getLogger().debug(".subscribeToDataParcelSet(): Entry, contentSubscriptionList->{}, subscriber->{}", contentSubscriptionList, subscriber);
+        getLogger().warn(".subscribeToDataParcelSet(): Entry, contentSubscriptionList->{}, subscriber->{}", contentSubscriptionList, subscriber);
         if(contentSubscriptionList == null || subscriber == null){
             getLogger().debug(".contentSubscriptionList(): Exit, either contentSubscriptionList or subscriber is null");
             RemoteSubscriptionStatus badStatus = new RemoteSubscriptionStatus();
