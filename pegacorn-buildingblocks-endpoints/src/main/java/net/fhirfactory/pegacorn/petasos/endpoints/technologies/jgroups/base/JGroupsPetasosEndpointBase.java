@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsW
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterTechnologyInterface;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.EndpointNameUtilities;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.JGroupsBasedParticipantInformationService;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
@@ -62,6 +63,9 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     @Inject
     private CoreSubsystemPetasosEndpointsWatchdog coreSubsystemPetasosEndpointsWatchdog;
 
+    @Inject
+    private EndpointNameUtilities endpointNameUtilities;
+
     //
     // Constructor
     //
@@ -76,7 +80,6 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     abstract protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType();
     abstract protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType();
-    abstract protected PetasosEndpointChannelScopeEnum specifyPetasosEndpointScope();
     abstract protected PubSubParticipant specifyPubSubParticipant();
     abstract protected void resolveTopologyEndpoint();
     abstract protected void registerWithCoreSubsystemPetasosEndpointsWatchdog();
@@ -178,10 +181,13 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         return(coreSubsystemPetasosEndpointsWatchdog);
     }
 
-    //
-    //
-    //
+    protected EndpointNameUtilities getEndpointNameUtilities(){
+        return(endpointNameUtilities);
+    }
 
+    //
+    //
+    //
 
     /**
      *
@@ -197,7 +203,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             objectSet[0] = myEndpoint;
             classSet[0] = PetasosEndpoint.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointAddressName());
+            Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointChannelName());
             PetasosEndpoint targetPetasosEndpoint = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointHandler", objectSet, classSet, requestOptions);
             getLogger().info(".probeEndpoint(): Exit, response->{}", targetPetasosEndpoint);
             return(targetPetasosEndpoint);
@@ -233,6 +239,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         return(endpoint);
     }
 
+    @Deprecated
     protected void removeFunctionNameSuffixFromEndpointName(PetasosEndpoint originalEndpoint) {
         if (originalEndpoint == null) {
             return;
@@ -240,26 +247,28 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         if (originalEndpoint.getEndpointID() == null) {
             return;
         }
-        String endpointKey = originalEndpoint.getEndpointID().getEndpointAddressName();
+        String endpointKey = originalEndpoint.getEndpointID().getEndpointChannelName();
         if (StringUtils.isEmpty(endpointKey)) {
             return;
         }
         String newName = removeFunctionNameSuffixFromEndpointName(endpointKey);
-        originalEndpoint.getEndpointID().setEndpointAddressName(newName);
+        originalEndpoint.getEndpointID().setEndpointChannelName(newName);
     }
+
+    @Deprecated
     protected String removeFunctionNameSuffixFromEndpointName(String endpointKey){
         if (StringUtils.isEmpty(endpointKey)) {
             return(null);
         }
         String newName = null;
-        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix())){
-            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionSuffix(), "");
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionName())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionName(), "");
         }
-        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix())){
-            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionSuffix(), "");
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName(), "");
         }
-        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix())){
-            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionSuffix(), "");
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionName())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionName(), "");
         }
         if(newName == null){
             newName = endpointKey;
@@ -268,7 +277,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     }
 
     protected String addFunctionNameSuffixToEndpointName(String endpointName, PetasosEndpointFunctionTypeEnum functionType){
-        String functionInclusiveName = endpointName.replace("(", functionType.getFunctionSuffix()+"(");
+        String functionInclusiveName = endpointName.replace("(", functionType.getFunctionName()+"(");
         return(functionInclusiveName);
     }
 
@@ -293,6 +302,17 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     @Override
     public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID) {
+        if(endpointID == null){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        }
+        if(StringUtils.isEmpty(endpointID.getEndpointName())){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        }
+        String targetService = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(endpointID.getEndpointName());
+        String myServiceName = getEndpointServiceName();
+        if(targetService.contentEquals(myServiceName)){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SAME);
+        }
         PetasosEndpoint remotePetasosEndpoint = probeEndpoint(endpointID, getPetasosEndpoint());
         PetasosEndpointStatusEnum endpointStatus = null;
         if(remotePetasosEndpoint != null){
@@ -331,27 +351,59 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         return(doSubscription);
     }
 
-    protected boolean isWithinScopeBasedOnKey(String endpointKey) {
-        boolean channelIsInterSite = endpointKey.contains(getJgroupsParticipantInformationService().getInterSitePrefix());
-        boolean channelIsInterZone = endpointKey.contains(getJgroupsParticipantInformationService().getInterZonePrefix());
-        boolean channelIsIntraZone = endpointKey.contains(getJgroupsParticipantInformationService().getIntraZonePrefix());
-        boolean withinScope = false;
-        if (channelIsIntraZone) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE)) {
-                withinScope = true;
+    protected boolean isWithinScopeBasedOnChannelName(String endpointChannelName) {
+        getLogger().info(".isWithinScopeBasedOnChannelName(): Entry, endpointChannelName->{}", endpointChannelName);
+        boolean sameSite = getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
+        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Site.... result->{}", sameSite);
+        boolean sameZone = getEndpointNameUtilities().getEndpointZoneFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointZone().getNetworkSecurityZoneCamelCase());
+        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Zone.... result->{}", sameZone);
+        String otherChannelScope = getEndpointNameUtilities().getEndpointScopeFromChannelName(endpointChannelName);
+        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking endpoint channel scope->{}", otherChannelScope);
+        switch(specifyPetasosEndpointScope()){
+            case ENDPOINT_CHANNEL_SCOPE_INTRAZONE:{
+                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTRAZONE");
+                if (otherChannelScope.contentEquals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE.getEndpointScopeName())) {
+                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
+                    if(sameSite && sameZone){
+                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
+                        return(true);
+                    } else {
+                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
+                        return(false);
+                    }
+                }
+                break;
+            }
+            case ENDPOINT_CHANNEL_SCOPE_INTERZONE:{
+                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTERZONE");
+                if (otherChannelScope.contentEquals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE.getEndpointScopeName())) {
+                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
+                    if(sameSite && !sameZone){
+                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
+                        return(true);
+                    } else {
+                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
+                        return(false);
+                    }
+                }
+                break;
+            }
+            case ENDPOINT_CHANNEL_SCOPE_INTERSITE:{
+                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTERSITE");
+                if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERSITE)) {
+                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
+                    if(!sameSite){
+                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
+                        return(true);
+                    } else {
+                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
+                        return(false);
+                    }
+                }
+                break;
             }
         }
-        if (channelIsInterZone) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE)) {
-                withinScope = true;
-            }
-        }
-        if (channelIsInterSite) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERSITE)) {
-                withinScope = true;
-            }
-        }
-        return(withinScope);
+        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, default returning False");
+        return(false);
     }
-
 }

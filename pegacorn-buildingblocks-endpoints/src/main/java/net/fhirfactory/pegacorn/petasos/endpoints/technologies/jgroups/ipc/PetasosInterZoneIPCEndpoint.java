@@ -67,14 +67,24 @@ public class PetasosInterZoneIPCEndpoint extends PetasosIPCEndpoint {
     @Override
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
-        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneIPCEndpointAddressName();
-        endpointID.setEndpointAddressName(endpointKey);
-        String endpointName = getJgroupsParticipantInformationService().getMyInterZoneIPCEndpointName();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointScopeName = specifyPetasosEndpointScope().getEndpointScopeName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getNetworkSecurityZoneCamelCase();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointScopeName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointScopeName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
         endpointID.setEndpointName(endpointName);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneIPCGroupName());
-        String endpointAddress = "JGroups:" + endpointKey + ":" + getJgroupsParticipantInformationService().getInterZoneIPCGroupName();
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getInterZoneIPCGroupName();
         endpointID.setEndpointDetailedAddressName(endpointAddress);
         return (endpointID);
     }

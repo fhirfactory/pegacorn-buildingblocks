@@ -25,6 +25,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.base.PetasosOAMDiscoveryEndpoint;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +47,26 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     @Override
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
-        String endpointKey = getJgroupsParticipantInformationService().getMyIntraZoneOAMDiscoveryEndpointAddressName();
-        endpointID.setEndpointAddressName(endpointKey);
-        String endpointName = getJgroupsParticipantInformationService().getMyIntraZoneOAMDiscoveryEndpointName();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointScopeName = specifyPetasosEndpointScope().getEndpointScopeName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getNetworkSecurityZoneCamelCase();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointScopeName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointScopeName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
         endpointID.setEndpointName(endpointName);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getIntraZoneOAMGroupName());
-        String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getIntraZoneOAMGroupName();
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getIntraZoneOAMGroupName();
         endpointID.setEndpointDetailedAddressName(endpointAddress);
-        return (endpointID);
+        return(endpointID);
     }
 
     @Override
@@ -74,8 +85,19 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     }
 
     @Override
-    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier interfaceAddress) {
-        PetasosEndpoint petasosEndpoint = probeEndpoint(interfaceAddress, getPetasosEndpoint());
+    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID) {
+        if(endpointID == null){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        }
+        if(StringUtils.isEmpty(endpointID.getEndpointName())){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        }
+        String targetService = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(endpointID.getEndpointName());
+        String myServiceName = getEndpointServiceName();
+        if(targetService.contentEquals(myServiceName)){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SAME);
+        }
+        PetasosEndpoint petasosEndpoint = probeEndpoint(endpointID, getPetasosEndpoint());
         if(petasosEndpoint == null){
             return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
         } else {

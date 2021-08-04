@@ -58,7 +58,6 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
 
     }
 
-
     //
     // Receive Messages (via RPC invocations)
     //

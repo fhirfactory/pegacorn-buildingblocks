@@ -25,6 +25,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.base.PetasosOAMDiscoveryEndpoint;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,17 +47,26 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
     @Override
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
-        String endpointName = getJgroupsParticipantInformationService().getMyInterZoneOAMDiscoveryEndpointName();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointScopeName = specifyPetasosEndpointScope().getEndpointScopeName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getNetworkSecurityZoneCamelCase();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointScopeName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointScopeName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
         endpointID.setEndpointName(endpointName);
-        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneOAMDiscoveryEndpointAddressName();
-        endpointID.setEndpointAddressName(endpointKey);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
-        String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
         endpointID.setEndpointDetailedAddressName(endpointAddress);
-        getLogger().info(".specifyEndpointID(): Exit, endpointID->{}", endpointID);
-        return (endpointID);
+        return(endpointID);
     }
 
     @Override
@@ -96,7 +106,23 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
 
     @Override
     public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID) {
-        return null;
+        if(endpointID == null){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        }
+        if(StringUtils.isEmpty(endpointID.getEndpointName())){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        }
+        String targetService = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(endpointID.getEndpointName());
+        String myServiceName = getEndpointServiceName();
+        if(targetService.contentEquals(myServiceName)){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SAME);
+        }
+        PetasosEndpoint petasosEndpoint = probeEndpoint(endpointID, getPetasosEndpoint());
+        if(petasosEndpoint == null){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        } else {
+            return (petasosEndpoint.getEndpointStatus());
+        }
     }
 
     @Override

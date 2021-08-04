@@ -156,7 +156,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
     //
 
     protected void establishJChannel(){
-        getLogger().debug(".establishJChannel(): Entry, fileName->{}, groupName->{}, channelName->{}",  specifyJGroupsStackFileName(), specifyJGroupsClusterName(), specifyJGroupsChannelName());
+        getLogger().info(".establishJChannel(): Entry, fileName->{}, groupName->{}, channelName->{}",  specifyJGroupsStackFileName(), specifyJGroupsClusterName(), specifyJGroupsChannelName());
         try {
             getLogger().trace(".establishJChannel(): Creating JChannel");
             getLogger().trace(".establishJChannel(): Getting the required ProtocolStack");

@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.map;
 
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
@@ -29,6 +30,7 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.E
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointPayloadTypeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.EndpointNameUtilities;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -69,6 +71,9 @@ public class PetasosEndpointMap {
 
     @Inject
     private ProcessingPlantInterface processingPlantInterface;
+
+    @Inject
+    private EndpointNameUtilities endpointNameUtilities;
 
     public PetasosEndpointMap(){
         this.endpoints = new ConcurrentHashMap<>();
@@ -336,7 +341,7 @@ public class PetasosEndpointMap {
         while(endpointNames.hasMoreElements()){
             String endpointName = endpointNames.nextElement();
             PetasosEndpoint petasosEndpoint = endpoints.get(endpointName);
-            getLogger().info("Endpoint->{}", petasosEndpoint);
+            getLogger().info("Endpoint->{}", petasosEndpoint.getEndpointID().getEndpointName());
         }
     }
 
@@ -473,32 +478,36 @@ public class PetasosEndpointMap {
 
     public void scheduleEndpointCheck(PetasosEndpointIdentifier id, boolean endpointRemoved, boolean endpointAdded, int retryCountSoFar){
         getLogger().info(".scheduleEndpointCheck(): Entry, id->{}, endpointRemoved->{}, endpointAdded->{} ", id, endpointRemoved, endpointAdded);
-        if(this.endpointCheckSchedule.containsKey(id)){
-            getLogger().info(".scheduleEndpointCheck(): Exit, already scheduled");
-            PetasosEndpointCheckScheduleElement petasosEndpointCheckScheduleElement = this.endpointCheckSchedule.get(id);
-            petasosEndpointCheckScheduleElement.setRetryCount(retryCountSoFar);
-            return;
+        synchronized(endpointCheckScheduleLock) {
+            if (this.endpointCheckSchedule.containsKey(id.getEndpointName())) {
+                getLogger().info(".scheduleEndpointCheck(): Exit, already scheduled");
+                PetasosEndpointCheckScheduleElement petasosEndpointCheckScheduleElement = this.endpointCheckSchedule.get(id.getEndpointName());
+                petasosEndpointCheckScheduleElement.setRetryCount(retryCountSoFar);
+            } else {
+                PetasosEndpointCheckScheduleElement newScheduleElement = new PetasosEndpointCheckScheduleElement(id, endpointRemoved, endpointAdded, retryCountSoFar);
+                this.endpointCheckSchedule.put(id.getEndpointName(), newScheduleElement);
+                getLogger().info(".scheduleEndpointCheck(): Exit, check scheduled");
+            }
         }
-        PetasosEndpointCheckScheduleElement newScheduleElement = new PetasosEndpointCheckScheduleElement(id, endpointRemoved, endpointAdded, retryCountSoFar);
-        this.endpointCheckSchedule.put(id.getEndpointName(), newScheduleElement);
-        getLogger().info(".scheduleEndpointCheck(): Exit, check scheduled");
     }
 
     public void scheduleEndpointCheck(PetasosEndpointIdentifier id, boolean endpointRemoved, boolean endpointAdded){
         getLogger().info(".scheduleEndpointCheck(): Entry, id->{}, endpointRemoved->{}, endpointAdded->{} ", id, endpointRemoved, endpointAdded);
-        if(this.endpointCheckSchedule.containsKey(id)){
-            getLogger().info(".scheduleEndpointCheck(): Exit, already scheduled");
-            return;
+        synchronized (endpointCheckScheduleLock) {
+            if (this.endpointCheckSchedule.containsKey(id.getEndpointName())) {
+                getLogger().info(".scheduleEndpointCheck(): Exit, already scheduled");
+            } else {
+                PetasosEndpointCheckScheduleElement newScheduleElement = new PetasosEndpointCheckScheduleElement(id, endpointRemoved, endpointAdded);
+                this.endpointCheckSchedule.put(id.getEndpointName(), newScheduleElement);
+                getLogger().info(".scheduleEndpointCheck(): Exit, check scheduled");
+            }
         }
-        PetasosEndpointCheckScheduleElement newScheduleElement = new PetasosEndpointCheckScheduleElement(id, endpointRemoved, endpointAdded);
-        this.endpointCheckSchedule.put(id.getEndpointName(), newScheduleElement);
-        getLogger().info(".scheduleEndpointCheck(): Exit, check scheduled");
     }
 
-    public void scheduleEndpointCheck(String endpointName, boolean endpointRemoved, boolean endpointAdded ){
-        getLogger().info(".scheduleEndpointCheck(): Entry, endpointName->{}, endpointRemoved->{}, endpointAdded->{} ", endpointName, endpointRemoved, endpointAdded);
-        if(StringUtils.isEmpty(endpointName)){
-            getLogger().info(".scheduleEndpointCheck(): Exit, endpointName is empty");
+    public void scheduleEndpointCheck(String endpointChannelName, boolean endpointRemoved, boolean endpointAdded ){
+        getLogger().info(".scheduleEndpointCheck(): Entry, endpointChannelName->{}, endpointRemoved->{}, endpointAdded->{} ", endpointChannelName, endpointRemoved, endpointAdded);
+        if(StringUtils.isEmpty(endpointChannelName)){
+            getLogger().info(".scheduleEndpointCheck(): Exit, endpointChannelName is empty");
             return;
         }
         if(!endpointRemoved && !endpointAdded){
@@ -507,17 +516,23 @@ public class PetasosEndpointMap {
         }
         synchronized (this.endpointCheckScheduleLock) {
             PetasosEndpointIdentifier endpointID = null;
+            String endpointName = endpointNameUtilities.buildEndpointNameFromChannelName(endpointChannelName);
             if (this.endpoints.containsKey(endpointName)) {
                 endpointID = this.endpoints.get(endpointName).getEndpointID();
             } else {
                 endpointID = new PetasosEndpointIdentifier();
                 endpointID.setEndpointName(endpointName);
+                endpointID.setEndpointChannelName(endpointChannelName);
+                String endpointSite = endpointNameUtilities.getEndpointSiteFromChannelName(endpointChannelName);
+                endpointID.setEndpointSite(endpointSite);
+                NetworkSecurityZoneEnum zone = NetworkSecurityZoneEnum.fromSecurityZoneCamelCaseString(endpointNameUtilities.getEndpointZoneFromChannelName(endpointChannelName));
+                endpointID.setEndpointZone(zone);
             }
             scheduleEndpointCheck(endpointID, endpointRemoved, endpointAdded);
         }
     }
 
-    public List<PetasosEndpointCheckScheduleElement> getEndpointsToCheck(){
+    public List<PetasosEndpointCheckScheduleElement> getEndpointsToCheck(PetasosEndpointChannelScopeEnum channelScope){
         getLogger().info(".getEndpointsToCheck(): Entry");
         List<PetasosEndpointCheckScheduleElement> endpointSet = new ArrayList<>();
         if(this.endpointCheckSchedule.isEmpty()){
@@ -530,7 +545,11 @@ public class PetasosEndpointMap {
             for (String currentEndpointName : endpointNameSet) {
                 PetasosEndpointCheckScheduleElement currentElement = this.endpointCheckSchedule.get(currentEndpointName);
                 getLogger().info(".getEndpointsToCheck(): Checking entry ->{}", currentElement);
-                if ((currentElement.getTargetTime().getEpochSecond() + ENDPOINT_CHECK_DELAY) < (Instant.now().getEpochSecond())) {
+                String endpointChannelName = currentElement.getPetasosEndpointID().getEndpointChannelName();
+                String endpointScopeName = endpointNameUtilities.getEndpointScopeFromChannelName(endpointChannelName);
+                boolean scopeMatches = endpointScopeName.contentEquals(channelScope.getEndpointScopeName());
+                boolean appropriateDelayPassed = (currentElement.getTargetTime().getEpochSecond() + ENDPOINT_CHECK_DELAY) < (Instant.now().getEpochSecond());
+                if (scopeMatches && appropriateDelayPassed) {
                     getLogger().info(".getEndpointsToCheck(): Adding...");
                     endpointSet.add(currentElement);
                 }
@@ -539,11 +558,15 @@ public class PetasosEndpointMap {
                 this.endpointCheckSchedule.remove(currentScheduleElement.getPetasosEndpointID());
             }
         }
-        getLogger().info(".getEndpointsToCheck(): Exit, size->{}", endpointSet.size());
+        getLogger().info(".getEndpointsToCheck(): Exit, size->{}, remaining entries size->{}", endpointSet.size(), this.endpointCheckSchedule.size());
         return(endpointSet);
     }
 
     public boolean isCheckScheduleIsEmpty(){
+        Set<String> endpointNameSet = this.endpointCheckSchedule.keySet();
+        for(String currentName: endpointNameSet){
+            getLogger().info(".isCheckScheduleIsEmpty(): Entry->{}", currentName);
+        }
         if(this.endpointCheckSchedule.isEmpty()){
             return(true);
         } else {

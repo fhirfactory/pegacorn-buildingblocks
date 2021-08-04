@@ -51,16 +51,26 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
     @Override
     protected PetasosEndpointIdentifier specifyEndpointID() {
         PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
-        String endpointName = getJgroupsParticipantInformationService().getMyInterZoneOAMPubSubEndpointName();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointScopeName = specifyPetasosEndpointScope().getEndpointScopeName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getNetworkSecurityZoneCamelCase();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointScopeName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointScopeName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
         endpointID.setEndpointName(endpointName);
-        String endpointKey = getJgroupsParticipantInformationService().getMyInterZoneOAMPubSubEndpointAddressName();
-        endpointID.setEndpointAddressName(endpointKey);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
-        String endpointAddress = "JGroups:" + endpointName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
         endpointID.setEndpointDetailedAddressName(endpointAddress);
-        return (endpointID);
+        return(endpointID);
     }
 
     @Override
@@ -85,7 +95,7 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
-        return (PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT);
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT);
     }
 
     @Override
