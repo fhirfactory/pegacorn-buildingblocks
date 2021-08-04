@@ -68,7 +68,7 @@ public class IPCGossipRouter{
             try {
                 Thread.sleep(10000);
                 petasosServices.updateDate();
-//                printSomeStatistics();
+                printSomeStatistics();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -76,7 +76,7 @@ public class IPCGossipRouter{
     }
 
     public void printSomeStatistics(){
-        getLogger().info(".printSomeStatistics(): Print some statistics!!!!(" + Date.from(Instant.now()).toString() +")");
+        getLogger().info(".printSomeStatistics(): Print Details(" + Date.from(Instant.now()).toString() +")");
         String addresssMappings = gossipRouter.dumpAddresssMappings();
         String routingTable = gossipRouter.dumpRoutingTable();
         getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", addresssMappings);
