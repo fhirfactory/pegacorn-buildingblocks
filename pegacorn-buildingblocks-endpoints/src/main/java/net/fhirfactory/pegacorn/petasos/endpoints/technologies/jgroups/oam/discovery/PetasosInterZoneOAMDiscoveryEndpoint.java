@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
+import net.fhirfactory.pegacorn.components.endpoints.*;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.base.PetasosOAMDiscoveryEndpoint;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
@@ -96,7 +96,7 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
 
     @Override
     protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
-        return (EndpointPayloadTypeEnum.ENPOINT_PAYLOAD_PEGACORN_OAM);
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_PEGACORN_OAM);
     }
 
     @Override

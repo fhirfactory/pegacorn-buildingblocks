@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointChannelScopeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointFunctionTypeEnum;
 import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;

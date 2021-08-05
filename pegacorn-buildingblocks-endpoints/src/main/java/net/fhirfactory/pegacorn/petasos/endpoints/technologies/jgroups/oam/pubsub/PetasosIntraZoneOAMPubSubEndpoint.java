@@ -21,7 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
+import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.components.endpoints.PetasosTopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.base.PetasosOAMPubSubEndpoint;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
@@ -101,7 +104,7 @@ public class PetasosIntraZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
 
     @Override
     protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
-        return (EndpointPayloadTypeEnum.ENPOINT_PAYLOAD_PEGACORN_OAM);
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_PEGACORN_OAM);
     }
 
     @Override

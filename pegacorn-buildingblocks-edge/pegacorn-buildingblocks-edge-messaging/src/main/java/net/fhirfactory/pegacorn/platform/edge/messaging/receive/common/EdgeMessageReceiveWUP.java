@@ -2,7 +2,7 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.receive.common;
 
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.components.endpoints.PetasosTopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.*;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeIngresMessagingGatewayWUP;

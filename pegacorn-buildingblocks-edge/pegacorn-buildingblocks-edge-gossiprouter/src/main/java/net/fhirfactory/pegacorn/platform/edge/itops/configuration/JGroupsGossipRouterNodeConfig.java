@@ -36,7 +36,9 @@ public class JGroupsGossipRouterNodeConfig {
     private HTTPProcessingPlantServerPortSegment kubeLivelinessProbe;
     private HTTPProcessingPlantServerPortSegment prometheusPort;
     private HTTPProcessingPlantServerPortSegment jolokiaPort;
-    private StandardClusterServiceServerPortSegment gossipRouterPort;
+    private StandardClusterServiceServerPortSegment ipcGossipRouterPort;
+    private StandardClusterServiceServerPortSegment oamGossipRouterPort;
+    private StandardClusterServiceServerPortSegment taskingGossipRouterPort;
     private LoadBalancerSegment loadBalancer;
     private SubsystemImageSegment subsystemImageProperties;
     private SecurityCredentialSegment trustStorePassword;
@@ -57,7 +59,9 @@ public class JGroupsGossipRouterNodeConfig {
         jolokiaPort = new HTTPProcessingPlantServerPortSegment();
         prometheusPort = new HTTPProcessingPlantServerPortSegment();
         deploymentZone = new DeploymentZoneSegment();
-        gossipRouterPort = new StandardClusterServiceServerPortSegment();
+        ipcGossipRouterPort = new StandardClusterServiceServerPortSegment();
+        oamGossipRouterPort = new StandardClusterServiceServerPortSegment();
+        taskingGossipRouterPort = new StandardClusterServiceServerPortSegment();
         loadBalancer = new LoadBalancerSegment();
         volumeMounts = new VolumeMountSegment();
         hapiAPIKey = new SecurityCredentialSegment();
@@ -176,12 +180,12 @@ public class JGroupsGossipRouterNodeConfig {
         this.deploymentZone = deploymentZone;
     }
 
-    public StandardClusterServiceServerPortSegment getGossipRouterPort() {
-        return gossipRouterPort;
+    public StandardClusterServiceServerPortSegment getIpcGossipRouterPort() {
+        return ipcGossipRouterPort;
     }
 
-    public void setGossipRouterPort(StandardClusterServiceServerPortSegment gossipRouterPort) {
-        this.gossipRouterPort = gossipRouterPort;
+    public void setIpcGossipRouterPort(StandardClusterServiceServerPortSegment ipcGossipRouterPort) {
+        this.ipcGossipRouterPort = ipcGossipRouterPort;
     }
 
     public JavaDeploymentSegment getJavaDeploymentParameters() {
@@ -190,6 +194,22 @@ public class JGroupsGossipRouterNodeConfig {
 
     public void setJavaDeploymentParameters(JavaDeploymentSegment javaDeploymentParameters) {
         this.javaDeploymentParameters = javaDeploymentParameters;
+    }
+
+    public StandardClusterServiceServerPortSegment getOamGossipRouterPort() {
+        return oamGossipRouterPort;
+    }
+
+    public void setOamGossipRouterPort(StandardClusterServiceServerPortSegment oamGossipRouterPort) {
+        this.oamGossipRouterPort = oamGossipRouterPort;
+    }
+
+    public StandardClusterServiceServerPortSegment getTaskingGossipRouterPort() {
+        return taskingGossipRouterPort;
+    }
+
+    public void setTaskingGossipRouterPort(StandardClusterServiceServerPortSegment taskingGossipRouterPort) {
+        this.taskingGossipRouterPort = taskingGossipRouterPort;
     }
 
     @Override
@@ -203,11 +223,16 @@ public class JGroupsGossipRouterNodeConfig {
                 ", kubeLivelinessProbe=" + kubeLivelinessProbe +
                 ", prometheusPort=" + prometheusPort +
                 ", jolokiaPort=" + jolokiaPort +
-                ", gossipRouterPort=" + gossipRouterPort +
+                ", ipcGossipRouterPort=" + ipcGossipRouterPort +
+                ", oamGossipRouterPort=" + oamGossipRouterPort +
+                ", taskingGossipRouterPort=" + taskingGossipRouterPort +
+                ", loadBalancer=" + loadBalancer +
                 ", subsystemImageProperties=" + subsystemImageProperties +
                 ", trustStorePassword=" + trustStorePassword +
                 ", keyPassword=" + keyPassword +
                 ", javaDeploymentParameters=" + javaDeploymentParameters +
+                ", volumeMounts=" + volumeMounts +
+                ", hapiAPIKey=" + hapiAPIKey +
                 '}';
     }
 }

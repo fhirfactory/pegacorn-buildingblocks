@@ -33,7 +33,9 @@ import java.time.Instant;
 public class IPCGossipRouter{
     private static final Logger LOG = LoggerFactory.getLogger(IPCGossipRouter.class);
 
-    GossipRouter gossipRouter;
+    GossipRouter ipcGossipRouter;
+    GossipRouter oamGossipRouter;
+    GossipRouter taskingGossipRouter;
     PetasosITOpsService petasosServices;
     JGroupsGossipRouterNode gossipRouterNode;
 
@@ -52,15 +54,25 @@ public class IPCGossipRouter{
 
     private void initialiseGossipRouter(){
 
-        String ipAddress = gossipRouterNode.getPropertyFile().getGossipRouterPort().getHostDNSEntry();
-        int portNumber = gossipRouterNode.getPropertyFile().getGossipRouterPort().getPortValue();
-        gossipRouter = new GossipRouter(ipAddress, portNumber);
+        String ipcHostAddress = gossipRouterNode.getPropertyFile().getIpcGossipRouterPort().getHostDNSEntry();
+        int ipcPortNumber = gossipRouterNode.getPropertyFile().getIpcGossipRouterPort().getPortValue();
+        ipcGossipRouter = new GossipRouter(ipcHostAddress, ipcPortNumber);
+        String oamHostAddress = gossipRouterNode.getPropertyFile().getOamGossipRouterPort().getHostDNSEntry();
+        int oamPortNumber = gossipRouterNode.getPropertyFile().getOamGossipRouterPort().getPortValue();
+        oamGossipRouter = new GossipRouter(oamHostAddress, oamPortNumber);
+        String taskingHostAddress = gossipRouterNode.getPropertyFile().getIpcGossipRouterPort().getHostDNSEntry();
+        int taskingPortNumber = gossipRouterNode.getPropertyFile().getIpcGossipRouterPort().getPortValue();
+        taskingGossipRouter = new GossipRouter(taskingHostAddress, taskingPortNumber);
         try {
-            gossipRouter.start();
+            ipcGossipRouter.start();
+            oamGossipRouter.start();
+            taskingGossipRouter.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        getLogger().info("initialiseGossipRouter(): Bound To = Address->{}, Port->{}",gossipRouter.bindAddress(), gossipRouter.port());
+        getLogger().info("initialiseGossipRouter(): ipcGossipRoute = Address->{}, Port->{}", ipcGossipRouter.bindAddress(), ipcGossipRouter.port());
+        getLogger().info("initialiseGossipRouter(): oamGossipRoute = Address->{}, Port->{}", oamGossipRouter.bindAddress(), oamGossipRouter.port());
+        getLogger().info("initialiseGossipRouter(): taskingGossipRoute = Address->{}, Port->{}", taskingGossipRouter.bindAddress(), taskingGossipRouter.port());
     }
 
     private void eventLoop(){
@@ -76,10 +88,22 @@ public class IPCGossipRouter{
     }
 
     public void printSomeStatistics(){
+        getLogger().info(".printSomeStatistics(): -----------------------------------------------------------");
         getLogger().info(".printSomeStatistics(): Print Details(" + Date.from(Instant.now()).toString() +")");
-        String addresssMappings = gossipRouter.dumpAddresssMappings();
-        String routingTable = gossipRouter.dumpRoutingTable();
+        getLogger().info(".printSomeStatistics(): ----------- IPC Gossip Router -----------------------------");
+        String addresssMappings = ipcGossipRouter.dumpAddresssMappings();
+        String routingTable = ipcGossipRouter.dumpRoutingTable();
         getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", addresssMappings);
         getLogger().info(".printSomeStatistics(): Routing Table ->{}", routingTable);
+        getLogger().info(".printSomeStatistics(): ----------- OAM Gossip Router -----------------------------");
+        String oamAddresssMappings = oamGossipRouter.dumpAddresssMappings();
+        String oamRoutingTable = oamGossipRouter.dumpRoutingTable();
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", oamAddresssMappings);
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", oamRoutingTable);
+        getLogger().info(".printSomeStatistics(): ----------- Tasking Gossip Router ------------------------");
+        String taskingAddresssMappings = taskingGossipRouter.dumpAddresssMappings();
+        String taskingRoutingTable = taskingGossipRouter.dumpRoutingTable();
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", taskingAddresssMappings);
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", taskingRoutingTable);
     }
 }
