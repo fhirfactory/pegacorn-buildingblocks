@@ -24,23 +24,23 @@
 
 package net.fhirfactory.pegacorn.deployment.topology.factories.archetypes;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.connectedsystems.ConnectedSystemPort;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.connectedsystems.ConnectedSystemProperties;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.base.InterfaceDefinitionSegment;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.interact.ClusterServiceInteractServerPortSegment;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.interact.StandardInteractClientPortSegment;
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.common.PetasosEnabledSubsystemTopologyFactory;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.ExternalSystemIPCEndpoint;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.interact.ClusteredInteractServerTopologyEndpointPort;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.interact.StandardInteractClientTopologyEndpointPort;
-import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.common.EndpointProviderInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.external.ConnectedExternalSystemTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterface;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.ExternalSystemIPCEndpoint;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ClusteredInteractServerTopologyEndpointPort;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.common.EndpointProviderInterface;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.external.ConnectedExternalSystemTopologyNode;
 
 /**
  * 

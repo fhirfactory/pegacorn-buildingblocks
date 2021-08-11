@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 
 import java.io.Serializable;

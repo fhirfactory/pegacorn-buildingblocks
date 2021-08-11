@@ -1,7 +1,7 @@
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common;
 
-import net.fhirfactory.pegacorn.core.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionStatus;
 

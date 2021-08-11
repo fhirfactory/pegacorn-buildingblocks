@@ -25,10 +25,10 @@ package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.generalid.RDN;
 
 /**
  * @author Mark A. Hunter

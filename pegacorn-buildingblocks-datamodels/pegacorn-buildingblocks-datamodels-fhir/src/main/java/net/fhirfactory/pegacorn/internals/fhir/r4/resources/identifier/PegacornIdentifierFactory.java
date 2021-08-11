@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier;
 
-import net.fhirfactory.pegacorn.deployment.properties.codebased.DeploymentSystemIdentificationInterface;
-import net.fhirfactory.pegacorn.deployment.properties.codebased.DeploymentSystemSiteIdentificationInterface;
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.model.properties.DeploymentSystemIdentificationInterface;
+import net.fhirfactory.pegacorn.core.model.properties.DeploymentSystemSiteIdentificationInterface;
+import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;

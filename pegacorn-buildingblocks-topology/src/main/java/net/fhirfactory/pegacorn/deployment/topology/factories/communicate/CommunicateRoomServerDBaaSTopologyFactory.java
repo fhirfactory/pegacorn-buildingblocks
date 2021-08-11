@@ -21,14 +21,14 @@
  */
 package net.fhirfactory.pegacorn.deployment.topology.factories.communicate;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.deployment.names.functionality.subsystem.CommunicateRoomServerComponentNames;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.DBaaSSubSystemPropertyFile;
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.common.PegacornTopologyFactoryBase;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.StandardEdgeIPCEndpoint;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopologyNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

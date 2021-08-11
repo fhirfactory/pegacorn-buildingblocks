@@ -22,11 +22,11 @@
 package net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.core.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.core.transaction.model.TransactionTypeEnum;
-import net.fhirfactory.pegacorn.deployment.properties.codebased.DeploymentSystemIdentificationInterface;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
+import net.fhirfactory.pegacorn.core.model.properties.DeploymentSystemIdentificationInterface;
+import net.fhirfactory.pegacorn.core.model.transaction.model.TransactionTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;

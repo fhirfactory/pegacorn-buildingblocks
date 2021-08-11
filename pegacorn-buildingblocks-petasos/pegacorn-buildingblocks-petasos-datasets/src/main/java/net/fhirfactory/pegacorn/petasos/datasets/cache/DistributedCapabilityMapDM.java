@@ -21,13 +21,13 @@
  */
 package net.fhirfactory.pegacorn.petasos.datasets.cache;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.core.tasks.PetasosCapabilityDeliveryNode;
-import net.fhirfactory.pegacorn.core.tasks.PetasosCapabilityDeliveryNodeRegistration;
-import net.fhirfactory.pegacorn.core.tasks.base.PetasosCapabilityCommonName;
-import net.fhirfactory.pegacorn.core.tasks.base.PetasosCapabilityDefinition;
-import net.fhirfactory.pegacorn.core.tasks.PetasosCapabilityDeliveryNodeSet;
-import net.fhirfactory.pegacorn.core.tasks.valuesets.PetasosCapabilityDeliveryNodeRegistrationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityDeliveryNode;
+import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityDeliveryNodeRegistration;
+import net.fhirfactory.pegacorn.core.model.tasks.base.PetasosCapabilityCommonName;
+import net.fhirfactory.pegacorn.core.model.tasks.base.PetasosCapabilityDefinition;
+import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityDeliveryNodeSet;
+import net.fhirfactory.pegacorn.core.model.tasks.valuesets.PetasosCapabilityDeliveryNodeRegistrationStatusEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

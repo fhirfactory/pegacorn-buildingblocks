@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.internals.communicate.workflow.model.behaviours.CDTBehaviourIdentifier;
 import net.fhirfactory.pegacorn.internals.communicate.workflow.model.CDTIdentifier;
 

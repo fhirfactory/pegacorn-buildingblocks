@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.Exchange;
 

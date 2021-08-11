@@ -1,22 +1,22 @@
 package net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.common;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.PetasosEnabledSubsystemPropertyFile;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.base.InterfaceDefinitionSegment;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.ipc.HTTPIPCServerPortSegment;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.ipc.JGroupsIPCServerPortSegment;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.ipc.JGroupsInitialHostSegment;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.technologies.HTTPServerClusterServiceTopologyEndpointPort;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.InitialHostSpecification;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.common.EndpointProviderInterface;
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterface;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.common.valuesets.NetworkSecurityZoneEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.technologies.HTTPServerClusterServiceTopologyEndpointPort;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.InitialHostSpecification;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.StandardEdgeIPCEndpoint;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.common.EndpointProviderInterface;
+import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornReferenceProperties;
 
 import javax.inject.Inject;
 

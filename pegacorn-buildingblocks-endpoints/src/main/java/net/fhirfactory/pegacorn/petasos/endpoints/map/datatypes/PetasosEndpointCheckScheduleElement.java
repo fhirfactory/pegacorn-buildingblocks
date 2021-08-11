@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.map.datatypes;
 
 
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointIdentifier;
 
 import java.time.Instant;
 

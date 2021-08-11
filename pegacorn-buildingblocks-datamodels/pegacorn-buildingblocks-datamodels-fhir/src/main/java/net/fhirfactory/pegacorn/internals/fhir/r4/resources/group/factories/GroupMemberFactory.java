@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.factories;
 
-import net.fhirfactory.pegacorn.common.model.dates.EffectivePeriod;
+import net.fhirfactory.pegacorn.core.model.dates.EffectivePeriod;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.extensions.GroupMemberTypeExtensionEnricher;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.valuesets.GroupMemberContextualTypeExtensionEnum;
 import org.hl7.fhir.r4.model.Group;

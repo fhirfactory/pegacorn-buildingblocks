@@ -30,6 +30,6 @@
         <module>../pegacorn-buildingblocks-properties</module>
         <module>../pegacorn-buildingblocks-topology</module>
         <module>../pegacorn-buildingblocks-commoncode</module>
-        <module>../pegacorn-buildingblocks-orphaned</module>
+        <!-- <module>../pegacorn-buildingblocks-orphaned</module> -->
     </modules>
 </project>

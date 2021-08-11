@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
-import net.fhirfactory.pegacorn.core.tasks.PetasosCapabilityDeliveryNode;
-import net.fhirfactory.pegacorn.core.tasks.PetasosCapabilityDeliveryNodeRegistration;
-import net.fhirfactory.pegacorn.core.tasks.base.PetasosCapabilityCommonName;
+import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityDeliveryNode;
+import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityDeliveryNodeRegistration;
+import net.fhirfactory.pegacorn.core.model.tasks.base.PetasosCapabilityCommonName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

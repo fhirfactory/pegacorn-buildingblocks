@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.deployment.topology.manager;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterface;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterfaceDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

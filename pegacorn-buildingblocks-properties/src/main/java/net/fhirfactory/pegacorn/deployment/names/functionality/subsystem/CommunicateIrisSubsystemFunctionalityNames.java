@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.deployment.names.functionality.subsystem;
 
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNamesBase;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterfaceDefinition;
 
 import javax.enterprise.context.ApplicationScoped;
 

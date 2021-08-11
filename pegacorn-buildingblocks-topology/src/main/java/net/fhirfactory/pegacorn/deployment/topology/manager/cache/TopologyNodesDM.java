@@ -21,13 +21,13 @@
  */
 package net.fhirfactory.pegacorn.deployment.topology.manager.cache;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
-import net.fhirfactory.pegacorn.deployment.properties.codebased.DeploymentSystemIdentificationInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SolutionTopologyNode;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.topology.common.valuesets.NetworkSecurityZoneEnum;
+import net.fhirfactory.pegacorn.core.model.properties.DeploymentSystemIdentificationInterface;
+import net.fhirfactory.pegacorn.core.model.topology.common.TopologyNode;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

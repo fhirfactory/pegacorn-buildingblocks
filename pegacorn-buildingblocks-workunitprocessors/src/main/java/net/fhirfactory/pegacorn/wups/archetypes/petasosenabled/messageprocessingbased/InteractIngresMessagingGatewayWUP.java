@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import java.util.ArrayList;
 import java.util.List;
 
-import net.fhirfactory.pegacorn.core.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.Exchange;

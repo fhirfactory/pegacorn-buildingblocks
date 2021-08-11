@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.map;
 
-import net.fhirfactory.pegacorn.core.endpoints.*;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
+import net.fhirfactory.pegacorn.core.model.endpoints.*;
+import net.fhirfactory.pegacorn.core.model.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.topology.common.valuesets.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointConnectionTypeCodeFactory;

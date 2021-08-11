@@ -21,17 +21,17 @@
  */
 package net.fhirfactory.pegacorn.deployment.topology.factories.communicate;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.deployment.names.functionality.subsystem.CommunicateIrisSubsystemFunctionalityNames;
 import net.fhirfactory.pegacorn.deployment.names.functionality.subsystem.CommunicateRoomServerComponentNames;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.communicate.roomserver.im.CommunicateRoomServerIMPropertyFile;
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.common.PetasosEnabledSubsystemTopologyFactory;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.technologies.HTTPProcessingPlantTopologyEndpointPort;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ClusterServiceTopologyNode;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCClusteredServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.technologies.HTTPProcessingPlantTopologyEndpointPort;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.ClusterServiceTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopologyNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

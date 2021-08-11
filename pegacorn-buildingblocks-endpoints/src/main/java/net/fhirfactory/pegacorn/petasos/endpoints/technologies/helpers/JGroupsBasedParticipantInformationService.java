@@ -21,20 +21,20 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpoint;
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointChannelScopeEnum;
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.core.endpoints.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.StandardEdgeIPCEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;

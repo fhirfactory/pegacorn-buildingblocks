@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.resources.datatypes;
 
-import net.fhirfactory.pegacorn.common.model.dates.EffectivePeriod;
+import net.fhirfactory.pegacorn.core.model.dates.EffectivePeriod;
 
 import java.util.ArrayList;
 import java.util.Objects;

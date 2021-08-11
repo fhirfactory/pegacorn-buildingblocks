@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpoint;
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetaosPubSubEndpointChangeCallbackRegistrationInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosHealthCheckCallBackInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosTopologyEndpointChangeInterface;

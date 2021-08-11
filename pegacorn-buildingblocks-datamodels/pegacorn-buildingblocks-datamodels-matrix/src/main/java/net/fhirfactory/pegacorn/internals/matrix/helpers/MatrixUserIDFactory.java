@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.matrix.helpers;
 
-import net.fhirfactory.pegacorn.deployment.communicate.matrix.CommunicateConfigurationInterface;
-import net.fhirfactory.pegacorn.deployment.communicate.matrix.SynapseServerConfigurationInterface;
-import org.apache.maven.shared.utils.StringUtils;
+import net.fhirfactory.pegacorn.deployment.properties.codebased.communicate.CommunicateConfigurationInterface;
+import net.fhirfactory.pegacorn.deployment.properties.codebased.communicate.SynapseServerConfigurationInterface;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointChannelScopeEnum;
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.core.endpoints.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.StandardEdgeIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
 import org.apache.commons.lang3.StringUtils;

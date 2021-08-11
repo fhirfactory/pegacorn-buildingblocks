@@ -23,7 +23,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.valuesets;
 
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornReferenceProperties;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.deployment.topology.factories.helpers;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.*;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterface;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCClusteredServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

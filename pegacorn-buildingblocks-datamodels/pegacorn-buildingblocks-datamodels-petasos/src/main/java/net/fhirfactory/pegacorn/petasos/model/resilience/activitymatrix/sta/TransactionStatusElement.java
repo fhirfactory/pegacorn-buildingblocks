@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta;
 
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionStatusEnum;
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.transaction.model.TransactionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.transaction.model.TransactionTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 

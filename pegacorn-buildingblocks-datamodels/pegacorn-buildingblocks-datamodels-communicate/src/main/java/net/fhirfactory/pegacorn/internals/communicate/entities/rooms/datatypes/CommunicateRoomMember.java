@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes;
 
-import net.fhirfactory.pegacorn.common.model.dates.EffectivePeriod;
+import net.fhirfactory.pegacorn.core.model.dates.EffectivePeriod;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.CommunicateUser;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.valuesets.GroupMemberContextualTypeExtensionEnum;
 

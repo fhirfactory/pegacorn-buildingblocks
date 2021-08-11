@@ -1,8 +1,8 @@
 package net.fhirfactory.pegacorn.platform.edge.answer.resourceproxies.common;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle.BundleContentHelper;
-import net.fhirfactory.pegacorn.core.transaction.model.TransactionMethodOutcome;
+import net.fhirfactory.pegacorn.core.model.transaction.model.TransactionMethodOutcome;
 import net.fhirfactory.pegacorn.platform.edge.model.common.ResourceAccessorInterfaceBase;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;

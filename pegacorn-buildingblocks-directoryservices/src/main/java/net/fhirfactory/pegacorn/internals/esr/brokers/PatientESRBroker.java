@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.brokers;
 
-import net.fhirfactory.pegacorn.deployment.communicate.matrix.CommunicateSystemManagedRoomNames;
+import net.fhirfactory.pegacorn.deployment.properties.codebased.communicate.CommunicateSystemManagedRoomNames;
 import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
 import net.fhirfactory.pegacorn.internals.esr.cache.PatientESRCache;
 import net.fhirfactory.pegacorn.internals.esr.cache.common.PegacornESRCache;

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.helpers;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 public class ESRTopicTokenFactory {

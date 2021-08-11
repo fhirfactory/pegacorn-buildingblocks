@@ -21,18 +21,18 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.ask.http;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeTypeEnum;
 
 import net.fhirfactory.pegacorn.deployment.names.sites.SiteKeyNames;
+import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.factories.helpers.TopologyMapTraversalHelpers;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCClusteredServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.common.TopologyNode;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.*;
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
-import net.fhirfactory.pegacorn.platform.edge.ask.http.HAPIServerSecureProxy;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.*;
+
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.base;
 
-import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 
 public interface PetasosEndpointInterface {

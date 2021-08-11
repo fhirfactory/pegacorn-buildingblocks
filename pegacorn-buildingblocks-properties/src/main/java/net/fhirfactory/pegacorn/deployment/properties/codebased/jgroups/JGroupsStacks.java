@@ -1,11 +1,7 @@
 package net.fhirfactory.pegacorn.deployment.properties.codebased.jgroups;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.InitialHostSpecification;
-import org.apache.commons.lang3.StringUtils;
-import org.jgroups.JChannel;
-import org.jgroups.conf.ProtocolStackConfigurator;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.InitialHostSpecification;
 import org.jgroups.protocols.*;
-import org.jgroups.protocols.kubernetes.KUBE_PING;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.protocols.pbcast.NAKACK2;
 import org.jgroups.protocols.pbcast.STABLE;
