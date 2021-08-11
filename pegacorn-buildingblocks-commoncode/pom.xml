@@ -37,42 +37,78 @@
         </dependencies>
     </dependencyManagement>
 
+    <!--*******************************************************************-->
+    <!--                                                                   -->
+    <!-- D E P E N D E N C I E S                                           -->
+    <!--                                                                   -->
+    <!--*******************************************************************-->
+
     <dependencies>
+
+        <!--*******************************************************************-->
+        <!-- Jakarta / Wildfly Libaries                                        -->
+        <!--*******************************************************************-->
+
         <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core</artifactId>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>${version-javax.enterprise-cdi-api}</version>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
         </dependency>
+
+        <!--*******************************************************************-->
+        <!-- Eclipse HTTP/IO Server Libaries                                   -->
+        <!--*******************************************************************-->
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-io</artifactId>
+            <version>${version-org.eclipse.jetty.plugin-9}</version>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- Apache Camel Libraries                                            -->
+        <!--*******************************************************************-->
+
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- HAPI FHIR Libraries                                               -->
+        <!--*******************************************************************-->
+
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-base</artifactId>
+            <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>org.hl7.fhir.r4</artifactId>
             <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
 
+        <!--*******************************************************************-->
+        <!-- Apache Commons Libraries                                          -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
-        <!-- JSON Encoding/Decoding Libraries -->
+        <!--*******************************************************************-->
+        <!-- JSON/XML Manipulation Libraries                                   -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -85,37 +121,57 @@
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-io</artifactId>
-            <version>${version-org.eclipse.jetty.plugin-9}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <version>${version-javax.enterprise-cdi-api}</version>
-            <scope>provided</scope>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
 
-        <!--         -->
-        <!-- Logging -->
-        <!--         -->
+        <!--*******************************************************************-->
+        <!-- Testing Libraries/Modules                                         -->
+        <!--*******************************************************************-->
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- Logging Libraries/Modules                                         -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${version-ch.qos.logback-classic}</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${version-ch.qos.logback-classic}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-xml</artifactId>
-        </dependency>
+
     </dependencies>
+
+    <!--*******************************************************************-->
+    <!--                                                                   -->
+    <!-- B U I L D                                                         -->
+    <!--                                                                   -->
+    <!--*******************************************************************-->
 
     <build>
         <plugins>

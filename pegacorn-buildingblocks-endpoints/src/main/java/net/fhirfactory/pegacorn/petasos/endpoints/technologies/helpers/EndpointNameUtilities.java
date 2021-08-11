@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers;
 
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointChannelScopeEnum;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointFunctionTypeEnum;
 import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -34,13 +34,6 @@ public class EndpointNameUtilities {
     private String currentUUID;
 
     private String CHANNEL_NAME_SEPARATOR = "::";
-
-    private static String INTERZONE_OAM_GROUP_NAME = "InterZone.OAM";
-    private static String INTERZONE_IPC_GROUP_NAME = "InterZone.IPC";
-    private static String INTRAZONE_OAM_GROUP_NAME = "IntraZone.OAM";
-    private static String INTRAZONE_IPC_GROUP_NAME = "IntraZone.IPC";
-    private static String INTRASITE_OAM_GROUP_NAME = "IntraSite.OAM";
-    private static String INTRASITE_IPC_GROUP_NAME = "IntraSite.IPC";
 
     private static int ENDPOINT_SITE_POSITION_IN_CHANNEL_NAME = 0;
     private static int ENDPOINT_ZONE_POSITION_IN_CHANNEL_NAME = 1;

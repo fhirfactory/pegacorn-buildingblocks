@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery;
 
-import net.fhirfactory.pegacorn.components.endpoints.*;
+import net.fhirfactory.pegacorn.core.endpoints.*;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.base.PetasosOAMDiscoveryEndpoint;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
@@ -61,6 +61,7 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
         // Build EndpointID
         endpointID.setEndpointChannelName(endpointChannelName);
         endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointServiceName(specifyEndpointServiceName());
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());

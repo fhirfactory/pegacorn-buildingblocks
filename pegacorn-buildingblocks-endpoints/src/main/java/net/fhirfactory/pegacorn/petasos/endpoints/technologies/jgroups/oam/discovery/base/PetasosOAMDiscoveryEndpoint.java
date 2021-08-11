@@ -1,8 +1,8 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.base;
 
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpoint;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;

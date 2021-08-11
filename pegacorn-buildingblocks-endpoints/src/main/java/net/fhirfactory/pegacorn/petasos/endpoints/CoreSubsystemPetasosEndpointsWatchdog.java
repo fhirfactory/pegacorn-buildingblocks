@@ -21,11 +21,11 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpoint;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetaosPubSubEndpointChangeCallbackRegistrationInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosHealthCheckCallBackInterface;
-import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosPubSubEndpointChangeInterface;
+import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosTopologyEndpointChangeInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ import java.util.TimerTask;
 @ApplicationScoped
 public class CoreSubsystemPetasosEndpointsWatchdog
         implements PetasosHealthCheckCallBackInterface,
-        PetasosPubSubEndpointChangeInterface,
+        PetasosTopologyEndpointChangeInterface,
         PetaosPubSubEndpointChangeCallbackRegistrationInterface {
     private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosEndpointsWatchdog.class);
 
@@ -78,7 +78,7 @@ public class CoreSubsystemPetasosEndpointsWatchdog
 
     private int FAILED_ITERATION_MAX = 3;
 
-    private List<PetasosPubSubEndpointChangeInterface> publisherChangeCallbacks;
+    private List<PetasosTopologyEndpointChangeInterface> publisherChangeCallbacks;
 
     @Inject
     PetasosEndpointMap endpointMap;
@@ -433,13 +433,13 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         if(newPublisher == null){
             return;
         }
-        for(PetasosPubSubEndpointChangeInterface currentCallback: this.publisherChangeCallbacks){
+        for(PetasosTopologyEndpointChangeInterface currentCallback: this.publisherChangeCallbacks){
             currentCallback.notifyNewPublisher(newPublisher);
         }
     }
 
     @Override
-    public void registerPubSubCallbackChange(PetasosPubSubEndpointChangeInterface publisherChangeCallback) {
+    public void registerTopologyCallbackChange(PetasosTopologyEndpointChangeInterface publisherChangeCallback) {
         this.publisherChangeCallbacks.add(publisherChangeCallback);
     }
 

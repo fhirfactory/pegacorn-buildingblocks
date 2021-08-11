@@ -36,46 +36,69 @@
         </developer>
     </developers>
 
+    <!--*******************************************************************-->
+    <!--                                                                   -->
+    <!-- D E P E N D E N C I E S                                           -->
+    <!--                                                                   -->
+    <!--*******************************************************************-->
+
     <dependencies>
 
-        <!--                                 -->
-        <!-- Jakarta/JEE & Wildfly Libraries -->
-        <!--                                 -->
+        <!--*******************************************************************-->
+        <!-- Jakarta EE / Wildfly Libaries                                     -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>${version-javax.enterprise-cdi-api}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.ejb</groupId>
-            <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.jms</groupId>
-            <artifactId>jboss-jms-api_2.0_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.servlet</groupId>
-            <artifactId>jboss-servlet-api_4.0_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.ws.rs</groupId>
-            <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.jboss.spec.javax.annotation</groupId>
             <artifactId>jboss-annotations-api_1.3_spec</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!--                          -->
-        <!-- Apache Commons Libraries -->
-        <!--                          -->
+        <!--*******************************************************************-->
+        <!-- Wildfly EJB Libaries                                              -->
+        <!--*******************************************************************-->
+
+        <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- Wildfly JMS Libaries                                              -->
+        <!--*******************************************************************-->
+        <dependency>
+            <groupId>org.jboss.spec.javax.jms</groupId>
+            <artifactId>jboss-jms-api_2.0_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- Wildfly HTTP Server Libaries                                      -->
+        <!--*******************************************************************-->
+
+        <dependency>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_4.0_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.spec.javax.ws.rs</groupId>
+            <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- Apache Commons Libraries                                          -->
+        <!--*******************************************************************-->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -83,25 +106,29 @@
             <version>${version-org.apache.commons-lang3}</version>
         </dependency>
 
-        <!--                                   -->
-        <!-- Apache Camel Components Libraries -->
-        <!--                                   -->
+        <!--*******************************************************************-->
+        <!-- Apache Camel Libraries                                            -->
+        <!--*******************************************************************-->
 
-        <!-- https://mvnrepository.com/artifact/org.apache.camel/camel-netty-http -->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-netty-http</artifactId>
             <version>${version-org.apache.camel}</version>
         </dependency>
+
+        <!--*******************************************************************-->
+        <!-- Apache HTTP Components (Not Camel Based) Libraries                -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>${version-org.apache.httpcomponents-httpclient}</version>
         </dependency>
 
-        <!--                             -->
-        <!-- JSON Manipulation Libraries -->
-        <!--                             -->
+        <!--*******************************************************************-->
+        <!-- JSON Manipulation Libraries                                       -->
+        <!--*******************************************************************-->
 
         <dependency>
             <groupId>org.json</groupId>
@@ -116,59 +143,59 @@
             <version>${version-com.fasterxml.jackson.core-jackson-core}</version>
         </dependency>
 
-        <!--                  -->
-        <!-- Pegacorn Modules -->
-        <!--                  -->
+        <!--*******************************************************************-->
+        <!-- Pegacorn Modules                                                  -->
+        <!--*******************************************************************-->
 
-        <!-- Pegacorn Deployment Model -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-model</artifactId>
+            <artifactId>pegacorn-buildingblocks-datamodels-core</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Deployment Topology -->
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-topology</artifactId>
+            <artifactId>pegacorn-buildingblocks-topology</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Deployment Properties -->
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-properties</artifactId>
+            <artifactId>pegacorn-buildingblocks-properties</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Common Code -->
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-platform-commoncode</artifactId>
+            <artifactId>pegacorn-buildingblocks-commoncode</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Petasos Information Model -->
+
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-platform-petasos-model</artifactId>
+            <artifactId>pegacorn-buildingblocks-datamodels-petasos</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Petasos Information Core -->
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-platform-petasos-core</artifactId>
+            <artifactId>pegacorn-buildingblocks-petasos-core</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Core Data Models (FHIR) -->
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-buildingblocks-datamodels-fhir</artifactId>
@@ -176,32 +203,21 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Core Data Models (FHIR) -->
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-datamodels-components</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-datasets</artifactId>
+            <artifactId>pegacorn-buildingblocks-petasos-datasets</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-datamodels-components</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-buildingblocks-workshop</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-buildingblocks-edge-model</artifactId>
@@ -210,73 +226,93 @@
         </dependency>
 
 
-        <!--                   -->
-        <!-- HAPI FHIR Modules -->
-        <!--                   -->
+        <!--*******************************************************************-->
+        <!-- HAPI FHIR Libraries                                               -->
+        <!--*******************************************************************-->
 
-        <!-- This dependency includes the core HAPI-FHIR classes -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-base</artifactId>
             <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
 
-        <!-- This dependency is for the HAPI-FHIR Client -->
-        <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-client</artifactId>
-            <version>${version-ca.uhn.hapi.fhir}</version>
-        </dependency>
-        <!-- At least one "structures" JAR must also be included -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-structures-r4</artifactId>
             <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
+
+        <!--*******************************************************************-->
+        <!-- HAPI FHIR Client (Framework)                                      -->
+        <!--*******************************************************************-->
+
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-client</artifactId>
+            <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- HAPI FHIR Server (Framework)                                      -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-server</artifactId>
             <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
-        <!-- HAPI Narrative Generation -->
+
+        <!--*******************************************************************-->
+        <!-- HAPI FHIR Narrative Generator Library                             -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
             <version>${version-org.thymeleaf}</version>
         </dependency>
 
-        <!-- Testing -->
+        <!--*******************************************************************-->
+        <!-- Testing Libraries/Modules                                         -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-core</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
             <scope>test</scope>
             <version>${version-org.wildfly.arquillian-wildfly-arquillian-container-managed}</version>
         </dependency>
+
         <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-depchain</artifactId>
@@ -284,29 +320,31 @@
             <scope>test</scope>
         </dependency>
 
-        <!--         -->
-        <!-- Logging -->
-        <!--         -->
+        <!--*******************************************************************-->
+        <!-- Logging Libraries/Modules                                         -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${version-ch.qos.logback-classic}</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${version-ch.qos.logback-classic}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-properties</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
 
     </dependencies>
+
+    <!--*******************************************************************-->
+    <!--                                                                   -->
+    <!-- B U I L D                                                         -->
+    <!--                                                                   -->
+    <!--*******************************************************************-->
 
     <build>
         <plugins>

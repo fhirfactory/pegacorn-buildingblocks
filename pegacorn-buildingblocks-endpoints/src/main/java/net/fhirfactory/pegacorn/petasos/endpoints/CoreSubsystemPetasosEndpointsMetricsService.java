@@ -1,12 +1,12 @@
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosInterZoneOAMDiscoveryEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosIntraZoneOAMDiscoveryEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.PetasosInterZoneOAMPubSubEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.PetasosIntraZoneOAMPubSubEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.messagepubsub.PetasosInterZoneOAMMessagePubSubEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.messagepubsub.PetasosIntraZoneOAMMessagePubSubEndpoint;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class CoreSubsystemPetasosEndpointsMetricsService extends RouteBuilder {
     private PetasosIntraZoneIPCEndpoint intraZoneIPCEndpoint;
 
     @Inject
-    private PetasosIntraZoneOAMPubSubEndpoint intraZoneOAMPubSubEndpoint;
+    private PetasosIntraZoneOAMMessagePubSubEndpoint intraZoneOAMPubSubEndpoint;
 
     @Inject
     private PetasosIntraZoneOAMDiscoveryEndpoint intraZoneOAMDiscoveryEndpoint;
@@ -39,7 +39,7 @@ public class CoreSubsystemPetasosEndpointsMetricsService extends RouteBuilder {
     private PetasosInterZoneOAMDiscoveryEndpoint interZoneOAMDiscoveryEndpoint;
 
     @Inject
-    private PetasosInterZoneOAMPubSubEndpoint interZoneOAMPubSubEndpoint;
+    private PetasosInterZoneOAMMessagePubSubEndpoint interZoneOAMPubSubEndpoint;
 
     public CoreSubsystemPetasosEndpointsMetricsService(){
         super();

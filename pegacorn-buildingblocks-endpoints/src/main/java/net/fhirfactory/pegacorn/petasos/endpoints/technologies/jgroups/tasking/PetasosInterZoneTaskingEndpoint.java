@@ -21,10 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasking;
 
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointChannelScopeEnum;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.components.endpoints.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosTopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasking.base.PetasosTaskingEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;

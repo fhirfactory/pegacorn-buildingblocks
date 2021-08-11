@@ -25,17 +25,49 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
         </license>
     </licenses>
+
+    <!--*******************************************************************-->
+    <!--                                                                   -->
+    <!-- D E P E N D E N C I E S                                           -->
+    <!--                                                                   -->
+    <!--*******************************************************************-->
+
     <dependencies>
+
+        <!--*******************************************************************-->
+        <!-- Jakarta EE / Wildfly Libaries                                     -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>${version-javax.enterprise-cdi-api}</version>
             <type>jar</type>
         </dependency>
+
+        <dependency>
+            <groupId>org.jboss.spec.javax.annotation</groupId>
+            <artifactId>jboss-annotations-api_1.3_spec</artifactId>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- Apache Commons Libraries                                          -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${version-org.apache.commons-lang3}</version>
+        </dependency>
+
+        <!--*******************************************************************-->
+        <!-- JSON Manipulation Libraries                                       -->
+        <!--*******************************************************************-->
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${version-com.fasterxml.jackson.core-jackson-core}</version>
         </dependency>
 
         <dependency>
@@ -43,19 +75,16 @@
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>2.10.4</version>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.11.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.annotation</groupId>
-            <artifactId>jboss-annotations-api_1.3_spec</artifactId>
-        </dependency>
 
-        <!--                    -->
-        <!-- Pegacorn Libraries -->
-        <!--                    -->
+        <!--*******************************************************************-->
+        <!-- Pegacorn Modules                                                  -->
+        <!--*******************************************************************-->
 
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
@@ -66,14 +95,14 @@
 
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-platform-commoncode</artifactId>
+            <artifactId>pegacorn-buildingblocks-commoncode</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
-        <!--                             -->
-        <!-- JGroups Manipulation Libraries -->
-        <!--                             -->
+        <!--*******************************************************************-->
+        <!-- JGroups Modules                                                  -->
+        <!--*******************************************************************-->
 
         <dependency>
             <groupId>org.jgroups</groupId>
@@ -88,21 +117,25 @@
             <version>${version-org.jgroups.kubernetes-jgroups-kubernetes}</version>
             <scope>compile</scope>
         </dependency>
-        <!--         -->
-        <!-- Logging -->
-        <!--         -->
+
+        <!--*******************************************************************-->
+        <!-- Logging Libraries/Modules                                         -->
+        <!--*******************************************************************-->
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${version-ch.qos.logback-classic}</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${version-ch.qos.logback-classic}</version>
             <scope>compile</scope>
         </dependency>
+
     </dependencies>
 
 </project>

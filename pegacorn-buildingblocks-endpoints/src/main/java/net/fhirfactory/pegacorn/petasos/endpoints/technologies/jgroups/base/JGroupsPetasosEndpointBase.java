@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base;
 
-import net.fhirfactory.pegacorn.components.endpoints.*;
+import net.fhirfactory.pegacorn.core.endpoints.*;
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;

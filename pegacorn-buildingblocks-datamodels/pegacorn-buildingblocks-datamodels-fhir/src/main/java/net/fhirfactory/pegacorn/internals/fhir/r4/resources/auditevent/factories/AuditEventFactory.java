@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories;
 
+import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,4 +30,12 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class AuditEventFactory {
     private static final Logger LOG = LoggerFactory.getLogger(AuditEventFactory.class);
+
+    public AuditEvent newAuditEvent(){
+        AuditEvent auditEvent = new AuditEvent();
+
+
+        return(auditEvent);
+    }
+
 }

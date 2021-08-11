@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.base;
 
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointStatusEnum;
 
 public interface PetasosHealthCheckCallBackInterface {
     public PetasosEndpointStatusEnum getAggregatePetasosEndpointStatus();

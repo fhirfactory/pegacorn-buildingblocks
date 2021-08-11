@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base;
 
 
-import net.fhirfactory.pegacorn.components.endpoints.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.endpoints.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionTypeEnum;
+import net.fhirfactory.pegacorn.core.transaction.model.TransactionTypeEnum;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParcel2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
