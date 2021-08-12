@@ -33,6 +33,7 @@ public class PetasosCapabilityDeliveryNode {
     private List<PetasosCapabilityDefinition> supportedCapabilities;
     private PetasosEndpointIdentifier routingEndpointID;
     private TopologyNodeFDNToken deliveryNodeID;
+    private String entryPoint;
     private PetasosCapabilityDeliveryNodeStatusEnum capabilityDeliveryNodeStatus;
 
     public List<PetasosCapabilityDefinition> getSupportedCapabilities() {
@@ -41,6 +42,22 @@ public class PetasosCapabilityDeliveryNode {
 
     public void setSupportedCapabilities(List<PetasosCapabilityDefinition> supportedCapabilities) {
         this.supportedCapabilities = supportedCapabilities;
+    }
+
+    public String getEntryPoint() {
+        return entryPoint;
+    }
+
+    public void setEntryPoint(String entryPoint) {
+        this.entryPoint = entryPoint;
+    }
+
+    public PetasosCapabilityDeliveryNodeStatusEnum getCapabilityDeliveryNodeStatus() {
+        return capabilityDeliveryNodeStatus;
+    }
+
+    public void setCapabilityDeliveryNodeStatus(PetasosCapabilityDeliveryNodeStatusEnum capabilityDeliveryNodeStatus) {
+        this.capabilityDeliveryNodeStatus = capabilityDeliveryNodeStatus;
     }
 
     public PetasosEndpointIdentifier getRoutingEndpointID() {
@@ -60,24 +77,26 @@ public class PetasosCapabilityDeliveryNode {
     }
 
     @Override
-    public String toString() {
-        return "TaskCompletionEngine{" +
-                "supportedCapabilities=" + supportedCapabilities +
-                ", routingEndpointID=" + routingEndpointID +
-                ", taskCompletionEngineWUP=" + deliveryNodeID +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PetasosCapabilityDeliveryNode)) return false;
         PetasosCapabilityDeliveryNode that = (PetasosCapabilityDeliveryNode) o;
-        return Objects.equals(getSupportedCapabilities(), that.getSupportedCapabilities()) && Objects.equals(getRoutingEndpointID(), that.getRoutingEndpointID()) && Objects.equals(getDeliveryNodeID(), that.getDeliveryNodeID());
+        return Objects.equals(getSupportedCapabilities(), that.getSupportedCapabilities()) && Objects.equals(getRoutingEndpointID(), that.getRoutingEndpointID()) && Objects.equals(getDeliveryNodeID(), that.getDeliveryNodeID()) && Objects.equals(getEntryPoint(), that.getEntryPoint()) && getCapabilityDeliveryNodeStatus() == that.getCapabilityDeliveryNodeStatus();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSupportedCapabilities(), getRoutingEndpointID(), getDeliveryNodeID());
+        return Objects.hash(getSupportedCapabilities(), getRoutingEndpointID(), getDeliveryNodeID(), getEntryPoint(), getCapabilityDeliveryNodeStatus());
+    }
+
+    @Override
+    public String toString() {
+        return "PetasosCapabilityDeliveryNode{" +
+                "supportedCapabilities=" + supportedCapabilities +
+                ", routingEndpointID=" + routingEndpointID +
+                ", deliveryNodeID=" + deliveryNodeID +
+                ", entryPoint='" + entryPoint + '\'' +
+                ", capabilityDeliveryNodeStatus=" + capabilityDeliveryNodeStatus +
+                '}';
     }
 }

@@ -23,11 +23,10 @@ package net.fhirfactory.pegacorn.petasos.endpoints;
 
 import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointStatusEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.base.PetaosPubSubEndpointChangeCallbackRegistrationInterface;
+import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosEndpointChangeCallbackRegistrationInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosHealthCheckCallBackInterface;
-import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosTopologyEndpointChangeInterface;
+import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosEndpointChangeInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +42,8 @@ import java.util.TimerTask;
 @ApplicationScoped
 public class CoreSubsystemPetasosEndpointsWatchdog
         implements PetasosHealthCheckCallBackInterface,
-        PetasosTopologyEndpointChangeInterface,
-        PetaosPubSubEndpointChangeCallbackRegistrationInterface {
+        PetasosEndpointChangeInterface,
+        PetasosEndpointChangeCallbackRegistrationInterface {
     private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosEndpointsWatchdog.class);
 
     private PetasosEndpoint intrazoneIPC;
@@ -78,7 +77,7 @@ public class CoreSubsystemPetasosEndpointsWatchdog
 
     private int FAILED_ITERATION_MAX = 3;
 
-    private List<PetasosTopologyEndpointChangeInterface> publisherChangeCallbacks;
+    private List<PetasosEndpointChangeInterface> publisherChangeCallbacks;
 
     @Inject
     PetasosEndpointMap endpointMap;
@@ -429,18 +428,18 @@ public class CoreSubsystemPetasosEndpointsWatchdog
     //
 
     @Override
-    public void notifyNewPublisher(InterSubsystemPubSubParticipant newPublisher) {
-        if(newPublisher == null){
+    public void notifyNewEndpoint(PetasosEndpoint changedEndpoint) {
+        if(changedEndpoint == null){
             return;
         }
-        for(PetasosTopologyEndpointChangeInterface currentCallback: this.publisherChangeCallbacks){
-            currentCallback.notifyNewPublisher(newPublisher);
+        for(PetasosEndpointChangeInterface currentCallback: this.publisherChangeCallbacks){
+            currentCallback.notifyNewEndpoint(changedEndpoint);
         }
     }
 
     @Override
-    public void registerTopologyCallbackChange(PetasosTopologyEndpointChangeInterface publisherChangeCallback) {
-        this.publisherChangeCallbacks.add(publisherChangeCallback);
+    public void registerTopologyCallbackChange(PetasosEndpointChangeInterface endpointChangeCallback) {
+        this.publisherChangeCallbacks.add(endpointChangeCallback);
     }
 
 //

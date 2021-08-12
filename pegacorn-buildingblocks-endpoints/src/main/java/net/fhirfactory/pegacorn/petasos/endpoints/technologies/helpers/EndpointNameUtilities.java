@@ -85,6 +85,22 @@ public class EndpointNameUtilities {
         return(endpointName);
     }
 
+    public String getOAMCapabilityEndpointChannelNameFromOtherChannelName(String channelName){
+        if(StringUtils.isEmpty(channelName)){
+            return(null);
+        }
+        String oamPubSubName = remapFuncitonTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_OAM_CAPABILITY_MGT_ENDPOINT);
+        return(oamPubSubName);
+    }
+
+    public String getTaskingEndpointChannelNameFromOtherChannelName(String channelName){
+        if(StringUtils.isEmpty(channelName)){
+            return(null);
+        }
+        String oamPubSubName = remapFuncitonTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_TASKING_ENDPOINT);
+        return(oamPubSubName);
+    }
+
     public String getOAMPubSubEndpointChannelNameFromOtherChannelName(String channelName){
         if(StringUtils.isEmpty(channelName)){
             return(null);

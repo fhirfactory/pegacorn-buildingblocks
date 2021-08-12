@@ -18,10 +18,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- */package net.fhirfactory.pegacorn.petasos.endpoints.base;
+ */
+package net.fhirfactory.pegacorn.core.model.tasks.valuesets;
 
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
-
-public interface PetasosTopologyEndpointChangeInterface {
-    public void notifyNewPublisher(InterSubsystemPubSubParticipant newPublisher);
+public enum PetasosCapabilityRoutingEndpointDiscoveryStatusEnum {
+    ROUTING_ENDPOINT_DETECTED,
+    ROUTING_ENDPOINT_OPERATIONAL,
+    ROUTING_ENDPOINT_SUSPECT,
+    ROUTING_ENDPOINT_FAILED
 }

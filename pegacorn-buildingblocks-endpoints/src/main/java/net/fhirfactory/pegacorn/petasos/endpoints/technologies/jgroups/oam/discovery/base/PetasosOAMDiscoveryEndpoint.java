@@ -337,6 +337,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             switch(synchronisedEndpoint.getEndpointStatus()){
                 case PETASOS_ENDPOINT_STATUS_OPERATIONAL:{
                     addPublisherToRegistry(synchronisedEndpoint);
+                    addCapabilityDeliveryRoutingEndpointToRegistry(synchronisedEndpoint);
                     getEndpointMap().updateServiceNameMembership(synchronisedEndpoint.getEndpointServiceName(), currentScheduleElement.getPetasosEndpointID().getEndpointName());
                     getLogger().debug(".checkEndpointAddition(): Does not need re-checking, returning -true- (was processed)");
                     return(true);
@@ -367,6 +368,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         boolean sameEndpointType = currentScheduleElement.getPetasosEndpointID().getEndpointChannelName().contains(getPetasosEndpointFunctionType().getFunctionName());
         if( sameGroup && sameEndpointType ){
             boolean wasRemoved = removePublisher(currentScheduleElement.getPetasosEndpointID().getEndpointName());
+            removeCapabilityDeliveryRoutingEndpointFromRegistry(currentScheduleElement.getPetasosEndpointID());
             getEndpointMap().deleteEndpoint(currentScheduleElement.getPetasosEndpointID().getEndpointName());
         }
         getLogger().debug(".checkEndpointRemoval(): Exit");
@@ -386,7 +388,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             getLogger().trace(".addPublisherToRegistry(): Registering the publisher into the PupSub Map");
             publisherRegistration = getDistributedPubSubSubscriptionMapIM().registerPublisherInstance(publisher);
             getLogger().trace(".addPublisherToRegistry(): Notifying other Modules that a new Publisher is available");
-            getCoreSubsystemPetasosEndpointsWatchdog().notifyNewPublisher(publisher);
+            getCoreSubsystemPetasosEndpointsWatchdog().notifyNewEndpoint(publisher);
             getLogger().trace(".addPublisherToRegistry(): Add Publisher ===> Finish");
         }
         getLogger().debug(".addPublisherToRegistry(): Exit, publisherRegistration->{}",publisherRegistration);
@@ -405,5 +407,18 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             return (true);
         }
         return (false);
+    }
+
+    //
+    // CapabilityNode Management
+    //
+
+    protected void addCapabilityDeliveryRoutingEndpointToRegistry(PetasosEndpoint petasosEndpoint){
+        getLogger().debug(".addCapabilityDeliveryRoutingEndpointToRegistry(): Entry, petasosEndpoint->{}", petasosEndpoint);
+
+    }
+
+    protected void removeCapabilityDeliveryRoutingEndpointFromRegistry(PetasosEndpointIdentifier petasosEndpointName){
+
     }
 }

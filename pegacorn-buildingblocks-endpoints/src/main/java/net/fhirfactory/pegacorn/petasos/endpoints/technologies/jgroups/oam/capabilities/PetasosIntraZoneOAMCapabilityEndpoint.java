@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.capabilityadvertising;
+package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.capabilities;
 
 import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointChannelScopeEnum;
 import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointFunctionTypeEnum;

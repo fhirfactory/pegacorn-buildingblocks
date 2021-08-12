@@ -21,9 +21,13 @@
  */
 package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityDeliveryNode;
 import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityDeliveryNodeRegistration;
+import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityDeliveryNodeSet;
+import net.fhirfactory.pegacorn.core.model.tasks.PetasosCapabilityRoutingEndpoint;
 import net.fhirfactory.pegacorn.core.model.tasks.base.PetasosCapabilityCommonName;
+import net.fhirfactory.pegacorn.petasos.datasets.cache.DistributedCapabilityMapDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,46 +40,94 @@ public class DistributedCapabilityMapIM {
     private static final Logger LOG = LoggerFactory.getLogger(DistributedCapabilityMapIM.class);
 
     @Inject
-    private DistributedCapabilityMapIM capabilityMapIM;
+    private DistributedCapabilityMapDM capabilityMapDM;
 
-    public PetasosCapabilityDeliveryNodeRegistration registerTaskCompletionEngine(PetasosCapabilityDeliveryNode ptce) {
-        LOG.info(".registerTaskCompletionEngine(): Entry, ptce->{}", ptce);
-        PetasosCapabilityDeliveryNodeRegistration petasosCapabilityDeliveryNodeRegistration = capabilityMapIM.registerTaskCompletionEngine(ptce);
-        LOG.debug(".registerTaskCompletionEngine(): Exit, registration->{}", petasosCapabilityDeliveryNodeRegistration);
+    public void addLocalCapabilityNode(PetasosCapabilityDeliveryNode localNode){
+        LOG.info(".addLocalCapabilityNode(): Entry, localNode->{}", localNode);
+        capabilityMapDM.addLocalCapabilityNode(localNode);
+        LOG.info(".addLocalCapabilityNode(): Exit");
+    }
+
+    public void removeLocalCapabilityNode(PetasosCapabilityDeliveryNode localNode){
+        LOG.info(".removeLocalCapabilityNode(): Entry, localNode->{}", localNode);
+        capabilityMapDM.removeLocalCapabilityNode(localNode);
+        LOG.info(".removeLocalCapabilityNode(): Exit");
+    }
+
+    public void removeLocalCapabilityNode(TopologyNodeFDNToken localNodeID){
+        LOG.info(".removeLocalCapabilityNode(): Entry, localNodeID->{}", localNodeID);
+        capabilityMapDM.removeLocalCapabilityNode(localNodeID);
+        LOG.info(".removeLocalCapabilityNode(): Exit");
+    }
+
+    public PetasosCapabilityDeliveryNodeSet getLocalCapabilityNodeSet(){
+        LOG.info(".getLocalCapabilityNodeSet(): Entry");
+        PetasosCapabilityDeliveryNodeSet nodeSet = capabilityMapDM.getLocalCapabilityNodeSet();
+        LOG.info(".getLocalCapabilityNodeSet(): Exit");
+        return(nodeSet);
+    }
+
+    public List<PetasosCapabilityDeliveryNodeRegistration> registerCapabilityDeliveryNodeSet(PetasosCapabilityDeliveryNodeSet nodeSet) {
+        LOG.info(".registerCapabilityDeliveryNodeSet(): Entry, nodeSet->{}", nodeSet);
+        List<PetasosCapabilityDeliveryNodeRegistration> registrationSet = capabilityMapDM.registerCapabilityDeliveryNodeSet(nodeSet);
+        LOG.debug(".registerCapabilityDeliveryNodeSet(): Exit, registrationSet->{}", registrationSet);
+        return (registrationSet);
+    }
+
+    public PetasosCapabilityDeliveryNodeRegistration registerCapabilityDeliveryNode(PetasosCapabilityDeliveryNode ptce) {
+        LOG.info(".registerCapabilityDeliveryNode(): Entry, ptce->{}", ptce);
+        PetasosCapabilityDeliveryNodeRegistration petasosCapabilityDeliveryNodeRegistration = capabilityMapDM.registerCapabilityDeliveryNode(ptce);
+        LOG.debug(".registerCapabilityDeliveryNode(): Exit, registration->{}", petasosCapabilityDeliveryNodeRegistration);
         return (petasosCapabilityDeliveryNodeRegistration);
     }
 
-    public void unregisterTaskCompletionEngine(String petasosRoutingEndpointName) {
-        LOG.info(".unregisterTaskCompletionEngine(): Entry, petasosRoutingEndpointName->{}", petasosRoutingEndpointName);
-        capabilityMapIM.unregisterTaskCompletionEngine(petasosRoutingEndpointName);
-        LOG.debug(".unregisterTaskCompletionEngine(): Exit");
+    public void unregisterCapabilityDeliveryNode(String petasosRoutingEndpointName) {
+        LOG.info(".unregisterCapabilityDeliveryNode(): Entry, petasosRoutingEndpointName->{}", petasosRoutingEndpointName);
+        capabilityMapDM.unregisterCapabilityDeliveryNode(petasosRoutingEndpointName);
+        LOG.debug(".unregisterCapabilityDeliveryNode(): Exit");
     }
 
-    public PetasosCapabilityDeliveryNodeRegistration getTaskEngineRegistration(String ptceRoutingEndpointName) {
-        LOG.debug(".getTaskEngineRegistration(): Entry, ptceRoutingEndpointName->{}", ptceRoutingEndpointName);
-        PetasosCapabilityDeliveryNodeRegistration taskEngineRegistration = capabilityMapIM.getTaskEngineRegistration(ptceRoutingEndpointName);
-        LOG.debug(".getTaskEngineRegistration(): Exit, registration->{}", taskEngineRegistration);
-        return (taskEngineRegistration);
+    public PetasosCapabilityDeliveryNodeRegistration getCapabilityDeliveryNodeRegistration(String deliveryEndpointName) {
+        LOG.debug(".getCapabilityDeliveryNodeRegistration(): Entry, deliveryEndpointName->{}", deliveryEndpointName);
+        PetasosCapabilityDeliveryNodeRegistration registration = capabilityMapDM.getCapabilityDeliveryNodeRegistration(deliveryEndpointName);
+        LOG.debug(".getCapabilityDeliveryNodeRegistration(): Exit, registration->{}", registration);
+        return (registration);
     }
 
-    public List<PetasosCapabilityDeliveryNodeRegistration> getTaskExecutionEngineServiceRegistrationSet(PetasosCapabilityCommonName capabilityName) {
-        LOG.info(".getTaskExecutionEngineServiceSet(): Entry, capabilityName->{}", capabilityName);
-        List<PetasosCapabilityDeliveryNodeRegistration> engineRegistrations = capabilityMapIM.getTaskExecutionEngineServiceRegistrationSet(capabilityName);
-        LOG.debug(".getTaskExecutionEngineServiceSet(): Exit");
+    public List<PetasosCapabilityDeliveryNodeRegistration> getDeliveryNodeRegistrationSet(PetasosCapabilityCommonName capabilityName) {
+        LOG.info(".getDeliveryNodeRegistrationSet(): Entry, capabilityName->{}", capabilityName);
+        List<PetasosCapabilityDeliveryNodeRegistration> engineRegistrations = capabilityMapDM.getDeliveryNodeRegistrationSet(capabilityName);
+        LOG.debug(".getDeliveryNodeRegistrationSet(): Exit");
         return (engineRegistrations);
     }
 
-    public boolean isTaskExecutionEngineRegistered(String engineRoutingEndpointName) {
-        LOG.debug(".isTaskExecutionEngineRegistered(): Entry, engineRoutingEndpointName->{}", engineRoutingEndpointName);
-        boolean taskExecutionEngineRegistered = capabilityMapIM.isTaskExecutionEngineRegistered(engineRoutingEndpointName);
-        LOG.debug(".isTaskExecutionEngineRegistered(): Exit, returning->{}", taskExecutionEngineRegistered);
+    public boolean isCapabilityDeliveryNodeRegistered(String engineRoutingEndpointName) {
+        LOG.debug(".isCapabilityDeliveryNodeRegistered(): Entry, engineRoutingEndpointName->{}", engineRoutingEndpointName);
+        boolean taskExecutionEngineRegistered = capabilityMapDM.isCapabilityDeliveryNodeRegistered(engineRoutingEndpointName);
+        LOG.debug(".isCapabilityDeliveryNodeRegistered(): Exit, returning->{}", taskExecutionEngineRegistered);
         return (taskExecutionEngineRegistered);
     }
 
-    public boolean isTaskExecutionEngineAvailableToSupportCapability(PetasosCapabilityCommonName commonName) {
-        LOG.debug(".isTaskExecutionEngineAvailableToSupportCapability(): Entry, commonName->{}", commonName);
-        boolean engineAvailableToSupportCapability = capabilityMapIM.isTaskExecutionEngineAvailableToSupportCapability(commonName);
-        LOG.debug(".isTaskExecutionEngineAvailableToSupportCapability(): Exit, returning->{}", engineAvailableToSupportCapability);
+    public boolean isCapabilityDeliveryNodeAvailableForCapability(PetasosCapabilityCommonName commonName) {
+        LOG.debug(".isCapabilityDeliveryNodeAvailableForCapability(): Entry, commonName->{}", commonName);
+        boolean engineAvailableToSupportCapability = capabilityMapDM.isCapabilityDeliveryNodeAvailableForCapability(commonName);
+        LOG.debug(".isCapabilityDeliveryNodeAvailableForCapability(): Exit, returning->{}", engineAvailableToSupportCapability);
         return (engineAvailableToSupportCapability);
+    }
+
+    //
+    // Routing Endpoint Map
+    //
+
+    public void addCapabilityRoutingEndpoint(PetasosCapabilityRoutingEndpoint routingEndpoint){
+        LOG.debug(".addCapabilityRoutingEndpoint(): Entry, routingEndpoint->{}", routingEndpoint);
+        capabilityMapDM.addCapabilityRoutingEndpoint(routingEndpoint);
+        LOG.debug(".addCapabilityROutingEndpoint(): Exit");
+    }
+
+    public void removeCapabilityRoutingEndpoint(PetasosCapabilityRoutingEndpoint routingEndpoint){
+        LOG.debug(".removeCapabilityRoutingEndpoint(): Entry, routingEndpoint->{}", routingEndpoint);
+        capabilityMapDM.removeCapabilityRoutingEndpoint(routingEndpoint);
+        LOG.debug(".removeCapabilityRoutingEndpoint(): Exit");
     }
 }

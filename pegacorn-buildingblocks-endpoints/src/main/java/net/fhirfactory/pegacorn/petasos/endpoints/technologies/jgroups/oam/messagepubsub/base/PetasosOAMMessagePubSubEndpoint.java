@@ -1,10 +1,11 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.messagepubsub.base;
 
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.core.model.endpoints.PetasosEndpointStatusEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosTopologyEndpointChangeInterface;
+import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosEndpointChangeInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.roles.common.MultiPublisherResponseSet;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
@@ -31,7 +32,7 @@ import java.util.TimerTask;
 
 import static net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherStatusEnum.*;
 
-public abstract class PetasosOAMMessagePubSubEndpoint extends JGroupsPetasosEndpointBase implements PetasosAdapterDeltasInterface, PetasosTopologyEndpointChangeInterface {
+public abstract class PetasosOAMMessagePubSubEndpoint extends JGroupsPetasosEndpointBase implements PetasosAdapterDeltasInterface, PetasosEndpointChangeInterface {
 
     private boolean subscriptionCheckScheduled;
     private Object subscriptionCheckLock;
@@ -547,10 +548,11 @@ public abstract class PetasosOAMMessagePubSubEndpoint extends JGroupsPetasosEndp
     }
 
     @Override
-    public void notifyNewPublisher(InterSubsystemPubSubParticipant newPublisher) {
-        getLogger().info(".notifyNewPublisher(): Entry, newPublisher->{}", newPublisher);
-        boolean inScope = newPublisher.getEndpointScope().equals(getPetasosEndpoint().getEndpointScope());
+    public void notifyNewEndpoint(PetasosEndpoint changedEnpoint) {
+        getLogger().info(".notifyNewPublisher(): Entry, newPublisher->{}", changedEnpoint);
+        boolean inScope = changedEnpoint.getEndpointScope().equals(getPetasosEndpoint().getEndpointScope());
         if(inScope) {
+            InterSubsystemPubSubParticipant newPublisher = new InterSubsystemPubSubParticipant(changedEnpoint);
             InterSubsystemPubSubPublisherRegistration publisherInstanceRegistration = getDistributedPubSubSubscriptionMapIM().getPublisherInstanceRegistration(newPublisher);
             if(publisherInstanceRegistration == null){
                 publisherInstanceRegistration = getDistributedPubSubSubscriptionMapIM().registerPublisherInstance(newPublisher);
