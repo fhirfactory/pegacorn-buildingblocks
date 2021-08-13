@@ -66,7 +66,7 @@ public abstract class GroupESRBroker extends ESRBroker {
     // Create
     //
     public ESRMethodOutcome createGroupDE(GroupESR directoryEntry){
-        getLogger().info(".createGroup(): Entry, directoryEntry --> {}", directoryEntry);
+        getLogger().debug(".createGroup(): Entry, directoryEntry --> {}", directoryEntry);
         ESRMethodOutcome outcome = groupCache.addGroup(directoryEntry);
         if(directoryEntry.isSystemManaged() && !directoryEntry.getGroupMembership().isEmpty()) {
             switch (SystemManagedGroupTypesEnum.fromTypeCode(directoryEntry.getGroupType())) {
@@ -89,7 +89,7 @@ public abstract class GroupESRBroker extends ESRBroker {
                     // Do nothing more for now
             }
         }
-        getLogger().info(".createGroup(): Exit, outcome --> {}", outcome.getStatus());
+        getLogger().debug(".createGroup(): Exit, outcome --> {}", outcome.getStatus());
         return(outcome);
     }
 
@@ -99,20 +99,20 @@ public abstract class GroupESRBroker extends ESRBroker {
 
     @Override
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource directoryEntry) {
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry, directoryEntry --> {}", directoryEntry);
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry, directoryEntry --> {}", directoryEntry);
         GroupESR groupEntry = (GroupESR) directoryEntry;
         if(directoryEntry.isSystemManaged()) {
-            getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Is System Managed");
+            getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Is System Managed");
             switch (SystemManagedGroupTypesEnum.fromTypeCode(groupEntry.getGroupType())) {
                 case PRACTITIONEROLE_MAP_PRACTITIONER_GROUP: {
-                    getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->Practitioner group");
+                    getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->Practitioner group");
                     List<String> practitionerList = roleMapCache.getListOfPractitionersFulfillingPractitionerRole(groupEntry.getGroupManager());
                     groupEntry.getGroupMembership().clear();
                     groupEntry.getGroupMembership().addAll(practitionerList);
                     break;
                 }
                 case PRACTITONERROLE_MAP_PRACTITIONERROLE_GROUP: {
-                    getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->PractitionerRole group");
+                    getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): is a PractitionerRoleMap->PractitionerRole group");
                     List<String> practitionerRoleList = roleMapCache.getListOfPractitionerRolesFulfilledByPractitioner(groupEntry.getGroupManager());
                     groupEntry.getGroupMembership().clear();
                     groupEntry.getGroupMembership().addAll(practitionerRoleList);
@@ -120,11 +120,11 @@ public abstract class GroupESRBroker extends ESRBroker {
                 }
                 case GENERAL:
                 default:
-                    getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): unknown type");
+                    getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): unknown type");
                     // Do nothing more for now
             }
         }
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
     }
 
     //
@@ -141,7 +141,7 @@ public abstract class GroupESRBroker extends ESRBroker {
             cachedGroup = (GroupESR) groupCache.getCacheEntry(group.getSimplifiedID());
             groupOutcome = new ESRMethodOutcome();
             groupOutcome.setEntry(cachedGroup);
-            getLogger().info(".updateGroup(): There are no modifiable attributes in the Group PegacornDirectoryEntry superclass, only membership");
+            getLogger().debug(".updateGroup(): There are no modifiable attributes in the Group PegacornDirectoryEntry superclass, only membership");
             groupOutcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
             groupOutcome.setId(cachedGroup.getSimplifiedID());
         }

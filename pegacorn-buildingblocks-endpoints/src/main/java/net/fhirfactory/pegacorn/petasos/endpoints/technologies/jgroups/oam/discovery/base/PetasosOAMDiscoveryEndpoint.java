@@ -147,20 +147,20 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
      *
      */
     public void scheduleEndpointValidation() {
-        getLogger().info(".scheduleEndpointValidation(): Entry (isEndpointCheckScheduled->{})", endpointCheckScheduled);
+        getLogger().debug(".scheduleEndpointValidation(): Entry (isEndpointCheckScheduled->{})", endpointCheckScheduled);
         if (endpointCheckScheduled) {
             // do nothing, it is already scheduled
         } else {
             TimerTask endpointValidationTask = new TimerTask() {
                 public void run() {
-                    getLogger().info(".endpointValidationTask(): Entry");
+                    getLogger().debug(".endpointValidationTask(): Entry");
                     boolean doAgain = performEndpointValidationCheck();
-                    getLogger().info(".endpointValidationTask(): doAgain ->{}", doAgain);
+                    getLogger().debug(".endpointValidationTask(): doAgain ->{}", doAgain);
                     if (!doAgain) {
                         cancel();
                         endpointCheckScheduled = false;
                     }
-                    getLogger().info(".endpointValidationTask(): Exit");
+                    getLogger().debug(".endpointValidationTask(): Exit");
                 }
             };
             String timerName = "EndpointValidationWatchdogTask-" + specifyPetasosEndpointScope().getEndpointScopeName();
@@ -168,7 +168,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             timer.schedule(endpointValidationTask, getJgroupsParticipantInformationService().getEndpointValidationStartDelay(), getJgroupsParticipantInformationService().getEndpointValidationPeriod());
             endpointCheckScheduled = true;
         }
-        getLogger().info(".scheduleEndpointValidation(): Exit");
+        getLogger().debug(".scheduleEndpointValidation(): Exit");
     }
 
     /**

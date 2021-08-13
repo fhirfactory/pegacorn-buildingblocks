@@ -122,7 +122,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     @Override
     public WorkUnitProcessorTopologyNode getWUP(String wupName, String wupVersion) {
-        getLogger().info(".getWUP(): Entry, wupName --> {}, wupVersion --> {}", wupName, wupVersion);
+        getLogger().debug(".getWUP(): Entry, wupName --> {}, wupVersion --> {}", wupName, wupVersion);
         boolean found = false;
         WorkUnitProcessorTopologyNode foundWorkshop = null;
         for (TopologyNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
@@ -141,7 +141,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     }
 
     public WorkUnitProcessorTopologyNode getWUP(String workshopName){
-        getLogger().info(".getWorkshop(): Entry, workshopName --> {}", workshopName);
+        getLogger().debug(".getWorkshop(): Entry, workshopName --> {}", workshopName);
         String version = this.workshopNode.getNodeRDN().getNodeVersion();
         WorkUnitProcessorTopologyNode workshop = getWUP(workshopName, version);
         return(workshop);

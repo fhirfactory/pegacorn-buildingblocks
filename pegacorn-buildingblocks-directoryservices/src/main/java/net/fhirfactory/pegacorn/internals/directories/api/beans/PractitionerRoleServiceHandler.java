@@ -143,7 +143,7 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
     //
 
     public void deletePractitionerRole(String id){
-        getLogger().info(".deletePractitionerRole(): Entry, id --> {}", id);
+        getLogger().debug(".deletePractitionerRole(): Entry, id --> {}", id);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
         if(outcome.isSearchSuccessful()){
             for(Integer counter = 0; counter < outcome.getSearchResult().size(); counter += 1){
                 PractitionerRoleESR currentEntry = (PractitionerRoleESR)outcome.getSearchResult().get(counter);
-                getLogger().info("Info: Entry --> {} :: {}", currentEntry.getPrimaryRoleCategoryID(), currentEntry.getDisplayName() );
+                getLogger().debug("Info: Entry --> {} :: {}", currentEntry.getPrimaryRoleCategoryID(), currentEntry.getDisplayName() );
             }
         }
     }

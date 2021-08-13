@@ -51,12 +51,12 @@ public class GroupMemberActionExtensionEnricher {
     {
         LOG.debug(".extractGroupMemberActionStatusExtension(): Entry, membership->{}", membership);
         if (!membership.hasExtension(this.MEMBERSHIP_ACTION_STATUS_MEANING.asStringValue())) {
-            LOG.warn(".extractGroupMemberStatusExtension(): Group::member does not contain the GroupMemberStatus extension");
+            LOG.debug(".extractGroupMemberStatusExtension(): Group::member does not contain the GroupMemberStatus extension");
             return(null);
         }
         Extension extractedStatusExtension = membership.getExtensionByUrl(MEMBERSHIP_ACTION_STATUS_MEANING.asStringValue());
         if( !(extractedStatusExtension.getValue() instanceof StringType)){
-            LOG.warn("extractGroupMemberStatusExtension(): FHIR::Group.member contains the GroupMemberStatus extension value type, but it is not a String");
+            LOG.debug("extractGroupMemberStatusExtension(): FHIR::Group.member contains the GroupMemberStatus extension value type, but it is not a String");
             return(null);
         }
         StringType extractedStatusStringType = (StringType) (extractedStatusExtension.getValue());

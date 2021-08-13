@@ -87,33 +87,33 @@ public abstract class PegacornESRCache {
             entry.setOtherID(newUUID);
         }
         if(entry.getSimplifiedID() == null){
-            getLogger().info(".addCacheEntry(): creating an primaryKey");
+            getLogger().trace(".addCacheEntry(): creating an primaryKey");
             entry.assignSimplifiedID(entry.getOtherID(), "OtherID");
-            getLogger().info(".addCacheEntry(): New Id --> {}", entry.getSimplifiedID());
+            getLogger().trace(".addCacheEntry(): New Id --> {}", entry.getSimplifiedID());
         } else {
-            getLogger().info(".addCacheEntry(): Resource has an Id already... attempting to retrieve associated Resource");
+            getLogger().trace(".addCacheEntry(): Resource has an Id already... attempting to retrieve associated Resource");
             ExtremelySimplifiedResource foundEntry = getCacheEntry(entry.getSimplifiedID());
             if(foundEntry != null){
-                getLogger().info(".addCacheEntry(): Resource already exists, so cant create it again.... ");
+                getLogger().trace(".addCacheEntry(): Resource already exists, so cant create it again.... ");
                 ESRMethodOutcome outcome = new ESRMethodOutcome();
                 outcome.setStatus(ESRMethodOutcomeEnum.CREATE_ENTRY_DUPLICATE);
                 outcome.setId(foundEntry.getSimplifiedID());
                 outcome.setCreated(false);
                 outcome.setEntry(foundEntry);
-                getLogger().info(".addCacheEntry(): Exit, resource already exists");
+                getLogger().debug(".addCacheEntry(): Exit, resource already exists");
                 return(outcome);
             }
         }
-        getLogger().info(".addCacheEntry(): Adding to Identifier based Cache");
+        getLogger().trace(".addCacheEntry(): Adding to Identifier based Cache");
         for(IdentifierESDT identifier: entry.getIdentifiers() ){
             this.identifier2ESRMap.put(identifier, entry);
         }
-        getLogger().info(".addCacheEntry(): Adding to displayName based Cache");
+        getLogger().trace(".addCacheEntry(): Adding to displayName based Cache");
         if(entry.getDisplayName() == null){
             entry.setDisplayName(entry.getSimplifiedID());
         }
         this.displayName2ESRMap.putIfAbsent(entry.getDisplayName().toLowerCase(), entry);
-        getLogger().info(".addCacheEntry(): Adding to simplifiedID based Cache");
+        getLogger().trace(".addCacheEntry(): Adding to simplifiedID based Cache");
         this.simplifiedID2ESRMap.putIfAbsent(entry.getSimplifiedID().toLowerCase(), entry);
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         outcome.setStatus(ESRMethodOutcomeEnum.CREATE_ENTRY_SUCCESSFUL);
@@ -153,37 +153,37 @@ public abstract class PegacornESRCache {
     }
 
     protected ExtremelySimplifiedResource getCacheEntry(IdentifierESDT identifier){
-        getLogger().info(".getCacheEntry(): Entry (using IdentifierDE), identifier --> {}", identifier);
+        getLogger().debug(".getCacheEntry(): Entry (using IdentifierDE), identifier --> {}", identifier);
         if(identifier == null){
-            getLogger().info(".getCacheEntry(): Exit, Identifier is null, so exiting");
+            getLogger().debug(".getCacheEntry(): Exit, Identifier is null, so exiting");
             return(null);
         }
         ExtremelySimplifiedResource foundEntry = this.identifier2ESRMap.get(identifier);
         if(foundEntry == null) {
-            getLogger().info(".getCacheEntry(): Exit, couldn't find element, returning NULL");
+            getLogger().debug(".getCacheEntry(): Exit, couldn't find element, returning NULL");
             return(null);
         } else {
-            getLogger().info(".getCacheEntry(): Exit, value retrieved, returning it!");
+            getLogger().debug(".getCacheEntry(): Exit, value retrieved, returning it!");
             return(foundEntry);
         }
     }
 
     public ExtremelySimplifiedResource getCacheEntry(String idValue){
-        getLogger().info(".getCacheEntry(): Entry (using Id), idValue --> {}", idValue);
+        getLogger().debug(".getCacheEntry(): Entry (using Id), idValue --> {}", idValue);
         if(idValue == null){
-            getLogger().info(".getCacheEntry(): Exit, id is NULL, so exiting");
+            getLogger().debug(".getCacheEntry(): Exit, id is NULL, so exiting");
             return(null);
         }
         if(simplifiedID2ESRMap.isEmpty()){
-            getLogger().info(".getCacheEntry(): Exit, Cache is empty, so exiting");
+            getLogger().debug(".getCacheEntry(): Exit, Cache is empty, so exiting");
             return(null);
         }
         ExtremelySimplifiedResource entry = this.simplifiedID2ESRMap.get(idValue);
         if(entry != null){
-            getLogger().info(".getCacheEntry(): Exit, entry found");
+            getLogger().debug(".getCacheEntry(): Exit, entry found");
             return(entry);
         } else {
-            getLogger().info(".getCacheEntry(): Exit, entry not found");
+            getLogger().debug(".getCacheEntry(): Exit, entry not found");
             return (null);
         }
     }
@@ -247,7 +247,7 @@ public abstract class PegacornESRCache {
             outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_NOT_FOUND);
             return(outcome);
         }
-        getLogger().info("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", identifier);
+        getLogger().trace("searchCacheForESRUsingIdentifierParameters(): Entry, value->{}, type->{}, use->{}", identifier);
         ESRSearchResult result = searchCacheForESRUsingIdentifierParameters(identifier.getValue(), identifier.getType(), identifier.getUse());
         ESRMethodOutcome outcome = result.toESRMethodOutcome();
         if(result.getSearchResultList().size() == 1){
@@ -351,7 +351,7 @@ public abstract class PegacornESRCache {
 
     protected ESRSearchResult searchCacheForESRUsingIdentifierLeafValue(String leafValue)
             throws ResourceInvalidSearchException {
-        getLogger().info("searchCacheForESRUsingIdentifierLeafValue(): Entry, leafValue->{}", leafValue);
+        getLogger().debug("searchCacheForESRUsingIdentifierLeafValue(): Entry, leafValue->{}", leafValue);
         boolean valueIsNull = (leafValue == null);
         ESRSearchResult result = instatiateNewESRSearchResult();
         if(valueIsNull) {

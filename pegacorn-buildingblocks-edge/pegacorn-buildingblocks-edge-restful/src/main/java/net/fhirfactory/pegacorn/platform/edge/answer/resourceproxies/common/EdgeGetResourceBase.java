@@ -75,7 +75,7 @@ public abstract class EdgeGetResourceBase extends EdgeProxyBase {
     protected Identifier tokenParam2Identifier(TokenParam identifierParam){
         getLogger().debug(".tokenParam2Identifier(): Entry, identifierParam (TokenParam) --> {}", identifierParam);
         if(identifierParam == null){
-            getLogger().warn(".tokenParam2Identifier(): Parameter identifierParam (TokenParam) is null");
+            getLogger().info(".tokenParam2Identifier(): Parameter identifierParam (TokenParam) is null");
             return(null);
         }
         if(getLogger().isDebugEnabled()){

@@ -70,7 +70,7 @@ public abstract class ESRBroker {
     abstract protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException;
 
     public ESRMethodOutcome getResource(String recordID) throws ResourceInvalidSearchException {
-        getLogger().info(".getResource(): Entry, recordID --> {}", recordID);
+        getLogger().debug(".getResource(): Entry, recordID --> {}", recordID);
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         ExtremelySimplifiedResource entry = getCache().getCacheEntry(recordID);
         if(entry == null){
@@ -82,7 +82,7 @@ public abstract class ESRBroker {
             outcome.setStatus(ESRMethodOutcomeEnum.REVIEW_ENTRY_FOUND);
             outcome.setId(entry.getSimplifiedID());
         }
-        getLogger().info(".getResource(): Exit");
+        getLogger().debug(".getResource(): Exit");
         return(outcome);
     }
 
@@ -104,34 +104,34 @@ public abstract class ESRBroker {
         if(searchCompleted && searchFoundOnlyOneEntry && outcome.isSearchSuccessful()) {
             entry = outcome.getSearchResult().get(0);
             if (entry == null) {
-                getLogger().error(".searchForDirectoryResourceRoleUsingIdentifier(): Incongruous state, search found result, but no entry provided");
+                getLogger().warn(".searchForDirectoryResourceRoleUsingIdentifier(): Incongruous state, search found result, but no entry provided");
                 outcome.setSearchSuccessful(false);
                 outcome.setSearch(true);
                 outcome.setStatus(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
-                getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
+                getLogger().debug(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
                 return (outcome);
             } else {
-                getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Entry found");
+                getLogger().trace(".searchForDirectoryResourceRoleUsingIdentifier(): Entry found");
                 outcome.setStatus(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
                 enrichWithDirectoryEntryTypeSpecificInformation(entry);
                 outcome.setSearch(true);
-                getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
+                getLogger().debug(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
                 return (outcome);
             }
         }
         if(outcome.getSearchResult().isEmpty()) {
-            getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): No entry found");
+            getLogger().trace(".searchForDirectoryResourceRoleUsingIdentifier(): No entry found");
             outcome.setSearchSuccessful(true);
             outcome.getSearchResult().add(entry);
             outcome.setId(entry.getSimplifiedID());
             outcome.setSearch(true);
-            getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
+            getLogger().debug(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
             return (outcome);
         } else {
-            getLogger().error(".searchForDirectoryResourceRoleUsingIdentifier(): multiple Entries found... Error");
+            getLogger().warn(".searchForDirectoryResourceRoleUsingIdentifier(): multiple Entries found... Error");
             outcome.setSearchSuccessful(false);
             outcome.setSearch(true);
-            getLogger().info(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
+            getLogger().debug(".searchForDirectoryResourceRoleUsingIdentifier(): Exit");
             return (outcome);
         }
     }
@@ -198,25 +198,25 @@ public abstract class ESRBroker {
     //
 
     protected ESRMethodOutcome updateDirectoryEntry(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
-        getLogger().info(".PegacornDirectoryEntry(): Entry");
+        getLogger().debug(".PegacornDirectoryEntry(): Entry");
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         ExtremelySimplifiedResource foundResource = null;
-        getLogger().info(".PegacornDirectoryEntry(): Attempting to retrieve existing Resource");
+        getLogger().trace(".PegacornDirectoryEntry(): Attempting to retrieve existing Resource");
         if(entry.getSimplifiedID() != null){
-            getLogger().info(".PegacornDirectoryEntry(): The PegId is not-Null, so we should be able to retrieve Resource with it");
+            getLogger().trace(".PegacornDirectoryEntry(): The PegId is not-Null, so we should be able to retrieve Resource with it");
             if(getLogger().isInfoEnabled()){
-                getLogger().info(".PegacornDirectoryEntry(): Attempting to retrieve PegacornDirectoryEntry for Id --> {}", entry.getSimplifiedID());
+                getLogger().trace(".PegacornDirectoryEntry(): Attempting to retrieve PegacornDirectoryEntry for Id --> {}", entry.getSimplifiedID());
             }
             foundResource = getCache().getCacheEntry(entry.getSimplifiedID());
         }
-        getLogger().info(".updatePractitionerEntry(): Check to see if we were able to retrieve existing Resource");
+        getLogger().trace(".updatePractitionerEntry(): Check to see if we were able to retrieve existing Resource");
         if(foundResource != null){
             outcome.setId(entry.getSimplifiedID());
             outcome.setEntry(entry);
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL);
             return(outcome);
         } else {
-            getLogger().info(".updatePractitionerEntry(): No Resource retrieved, trying individual Identifiers");
+            getLogger().trace(".updatePractitionerEntry(): No Resource retrieved, trying individual Identifiers");
             boolean entryWithIdentifier = false;
             for(IdentifierESDT identifier: entry.getIdentifiers()) {
                 if (!getCache().getIdentifier2ESRMap().containsKey(identifier)){
@@ -224,22 +224,22 @@ public abstract class ESRBroker {
                     break;
                 }
             }
-            getLogger().info(".updatePractitionerEntry(): Completed per-Identifier retrieval process, checking result");
+            getLogger().trace(".updatePractitionerEntry(): Completed per-Identifier retrieval process, checking result");
             if(!entryWithIdentifier) {
-                getLogger().info(".updatePractitionerEntry(): Nope, no existing resource... that's odd... generating one");
+                getLogger().trace(".updatePractitionerEntry(): Nope, no existing resource... that's odd... generating one");
                 assignSimplifiedID(entry);
                 getCache().addCacheEntry(entry);
                 outcome.setId(entry.getSimplifiedID());
                 outcome.setEntry(entry);
                 outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE);
-                getLogger().info(".updatePractitionerEntry(): Exit, we've just written this resource since there wasn't one there.");
+                getLogger().debug(".updatePractitionerEntry(): Exit, we've just written this resource since there wasn't one there.");
                 return (outcome);
             }
         }
         outcome.setId(entry.getSimplifiedID());
         outcome.setEntry(entry);
         outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_INVALID);
-        getLogger().info(".updatePractitionerEntry(): Exit, problem retrieving/updating original entry");
+        getLogger().debug(".updatePractitionerEntry(): Exit, problem retrieving/updating original entry");
         return(outcome);
     }
 }

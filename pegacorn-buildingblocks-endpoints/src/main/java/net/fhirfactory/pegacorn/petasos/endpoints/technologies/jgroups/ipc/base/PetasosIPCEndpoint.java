@@ -21,6 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base;
 
+import net.fhirfactory.pegacorn.components.tasks.hl7v2tasks.A19QueryCapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.components.tasks.hl7v2tasks.A19QueryTask;
+import net.fhirfactory.pegacorn.components.tasks.hl7v2tasks.A19QueryTaskOutcome;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -33,6 +36,7 @@ import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +44,9 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
 
     @Produce
     private ProducerTemplate camelProducer;
+
+    @Inject
+    private A19QueryCapabilityFulfillmentInterface a19QueryExecutor;
 
     //
     // Constructor
@@ -75,9 +82,9 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     // Send Messages (via RPC invocations)
     //
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().info(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
+        getLogger().debug(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
         Address targetServiceAddress = getCandidateIPCTargetAddress(targetParticipantServiceName);
-        getLogger().info(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
+        getLogger().debug(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
         InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = sendIPCMessage(targetServiceAddress, handoverPacket);
         return(interProcessingPlantHandoverResponsePacket);
     }
@@ -88,7 +95,7 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     //
 
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().info(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
+        getLogger().debug(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
@@ -117,10 +124,10 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     }
 
     public List<Address> getIPCTargetAddressSet(String endpointServiceName){
-        getLogger().info(".getIPCTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
+        getLogger().debug(".getIPCTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
         List<Address> endpointAddressSet = new ArrayList<>();
         if(StringUtils.isEmpty(endpointServiceName)){
-            getLogger().info(".getIPCTargetAddressSet(): Exit, endpointServiceName is empty");
+            getLogger().debug(".getIPCTargetAddressSet(): Exit, endpointServiceName is empty");
             return(endpointAddressSet);
         }
         List<PetasosAdapterAddress> memberAdapterSetForService = getTargetMemberAdapterSetForService(endpointServiceName);
@@ -130,24 +137,77 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
                 endpointAddressSet.add(currentMemberAddress);
             }
         }
-        getLogger().info(".getIPCTargetAddressSet(): Exit, endpointAddressSet->{}", endpointAddressSet);
+        getLogger().debug(".getIPCTargetAddressSet(): Exit, endpointAddressSet->{}", endpointAddressSet);
         return(endpointAddressSet);
     }
 
     public Address getCandidateIPCTargetAddress(String endpointServiceName){
-        getLogger().info(".getCandidateIPCTargetAddress(): Entry, endpointServiceName->{}", endpointServiceName);
+        getLogger().debug(".getCandidateIPCTargetAddress(): Entry, endpointServiceName->{}", endpointServiceName);
         if(StringUtils.isEmpty(endpointServiceName)){
-            getLogger().info(".getCandidateIPCTargetAddress(): Exit, endpointServiceName is empty");
+            getLogger().debug(".getCandidateIPCTargetAddress(): Exit, endpointServiceName is empty");
             return(null);
         }
         List<Address> endpointAddressSet = getIPCTargetAddressSet(endpointServiceName);
         if(endpointAddressSet.isEmpty()){
-            getLogger().info(".getCandidateIPCTargetAddress(): Exit, endpointAddressSet is empty");
+            getLogger().debug(".getCandidateIPCTargetAddress(): Exit, endpointAddressSet is empty");
             return(null);
         }
         Address endpointJGroupsAddress = endpointAddressSet.get(0);
-        getLogger().info(".getCandidateIPCTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
+        getLogger().debug(".getCandidateIPCTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
         return(endpointJGroupsAddress);
+    }
+
+    //
+    // ****Tactical****
+    // A19 Query Task Execution / Capability Utilisation Services
+    //
+
+    public A19QueryTaskOutcome requestA19Query(String capabilityProviderName, A19QueryTask a19QueryTask){
+        getLogger().debug(".requestA19Query(): Entry, capabilityProviderName->{}, a19QueryTask->{}", capabilityProviderName, a19QueryTask);
+        Address targetAddress = getCandidateIPCTargetAddress(capabilityProviderName);
+        try {
+            Object objectSet[] = new Object[1];
+            Class classSet[] = new Class[1];
+            objectSet[0] = a19QueryTask;
+            classSet[0] = A19QueryTask.class;
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            A19QueryTaskOutcome response = getRPCDispatcher().callRemoteMethod(targetAddress, "request19QueryHandler", objectSet, classSet, requestOptions);
+            getLogger().debug(".requestA19Query(): Exit, response->{}", response);
+            return(response);
+        } catch (NoSuchMethodException e) {
+            getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            A19QueryTaskOutcome response = new A19QueryTaskOutcome();
+            response.setAssociatedRequestID(a19QueryTask.getRequestID());
+            response.setSuccessful(false);
+            return(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            getLogger().error(".sendIPCMessage: Error (GeneralException) ->{}", e.getMessage());
+            A19QueryTaskOutcome response = new A19QueryTaskOutcome();
+            response.setAssociatedRequestID(a19QueryTask.getRequestID());
+            response.setSuccessful(false);
+            return(response);
+        }
+    }
+
+    public A19QueryTaskOutcome request19QueryHandler(A19QueryTask a19QueryTask){
+        getLogger().debug(".request19QueryHandler(): Entry, a19QueryTask->{}", a19QueryTask);
+        A19QueryTaskOutcome response = a19QueryExecutor.fulfillA19QueryCapability(a19QueryTask);
+        getLogger().debug(".request19QueryHandler(): Exit, response->{}", response);
+        return(response);
+    }
+
+    public boolean capabilityProviderIsInScope(String capabilityProviderServiceName){
+        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
+        if(memberSetBasedOnService.isEmpty()){
+            return(false);
+        }
+        for(String currentName: memberSetBasedOnService){
+            if(isWithinScopeBasedOnChannelName(currentName)){
+                return(true);
+            }
+        }
+        return(false);
     }
 
     //

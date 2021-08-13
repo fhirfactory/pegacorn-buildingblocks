@@ -113,7 +113,7 @@ public class TransactionalWUPAuditEntryManager {
                 payloadManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
                 payload.setPayloadManifest(payloadManifest);
             } catch (Exception Ex) {
-                LOG.error(".beginTransaction(): Failed to Encode --> {}", Ex.toString());
+                LOG.info(".beginTransaction(): Failed to Encode --> {}", Ex.toString());
                 errorString = Ex.toString();
                 encodingFailure = true;
             }

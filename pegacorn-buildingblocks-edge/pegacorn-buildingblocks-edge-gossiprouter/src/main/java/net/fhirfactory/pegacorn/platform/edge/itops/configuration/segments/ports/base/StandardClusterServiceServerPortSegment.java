@@ -60,7 +60,7 @@ public class StandardClusterServiceServerPortSegment extends StandardServerPortS
 
     public Integer getClusterServicePortIncludingOffset(Integer offset){
         if(clusterServicePortOffsetValue == null){
-            getLogger().error(".getEdgeReceiveCommunicationClusterServicePort(): Not such port type defined");
+            getLogger().warn(".getEdgeReceiveCommunicationClusterServicePort(): Not such port type defined");
             return(0);
         }
         Integer servicePortNumber = offset + getClusterServicePortOffsetValue();

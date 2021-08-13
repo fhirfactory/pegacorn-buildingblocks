@@ -132,7 +132,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     //
 
     protected RemoteSubscriptionStatus subscribeToDataParcelSet(List<DataParcelManifest> contentSubscriptionList, PubSubParticipant subscriber) {
-        getLogger().warn(".subscribeToDataParcelSet(): Entry, contentSubscriptionList->{}, subscriber->{}", contentSubscriptionList, subscriber);
+        getLogger().info(".subscribeToDataParcelSet(): Entry, contentSubscriptionList->{}, subscriber->{}", contentSubscriptionList, subscriber);
         if(contentSubscriptionList == null || subscriber == null){
             getLogger().debug(".contentSubscriptionList(): Exit, either contentSubscriptionList or subscriber is null");
             RemoteSubscriptionStatus badStatus = new RemoteSubscriptionStatus();

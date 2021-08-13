@@ -91,40 +91,40 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     @PostConstruct
     public void initialise() {
-        getLogger().warn(".initialise(): Entry");
+        getLogger().debug(".initialise(): Entry");
         if (isInitialised()) {
-            getLogger().warn(".initialise(): Exit, already initialised!");
+            getLogger().debug(".initialise(): Exit, already initialised!");
             return;
         }
         // 1st, Derive my Endpoint (Topology)
-        getLogger().warn(".initialise(): Step 1: Start ==> Get my IPCEndpoint Detail");
+        getLogger().info(".initialise(): Step 1: Start ==> Get my IPCEndpoint Detail");
         resolveTopologyEndpoint();
-        getLogger().warn(".initialise(): Step 1: Complete ==> IPCEndpoint derived ->{}", getTopologyNode());
+        getLogger().info(".initialise(): Step 1: Complete ==> IPCEndpoint derived ->{}", getTopologyNode());
 
         // 2nd, the PetasosEndpoint
-        getLogger().warn(".initialise(): Step 2: Start ==> Creating my PetasosEndpoint");
+        getLogger().info(".initialise(): Step 2: Start ==> Creating my PetasosEndpoint");
         this.setEndpointID(specifyEndpointID());
         PetasosEndpoint petasosEndpoint = getEndpointMap().newPetasosEndpoint(
                 getEndpointID(), "JGroups", getEndpointServiceName(),
                 getPetasosEndpointFunctionType(), getPetasosEndpointPayloadType(), specifyPetasosEndpointScope());
         this.petasosEndpoint = petasosEndpoint;
         this.getPetasosEndpoint().setEndpointStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
-        getLogger().warn(".initialise(): Step 2: Completed ==> PetasosEndpoint created ->{}", getPetasosEndpoint());
+        getLogger().info(".initialise(): Step 2: Completed ==> PetasosEndpoint created ->{}", getPetasosEndpoint());
 
         // 3rd, Register with the CoreSubsystemPetasosEndpointsWatchdog
-        getLogger().warn(".initialise(): Step 3: Start ==> Registering with CoreSubsystemPetasosEndpointsWatchdog");
+        getLogger().info(".initialise(): Step 3: Start ==> Registering with CoreSubsystemPetasosEndpointsWatchdog");
         registerWithCoreSubsystemPetasosEndpointsWatchdog();
-        getLogger().warn(".initialise(): Step 3: Completed ==> Registered with CoreSubsystemPetasosEndpointsWatchdog");
+        getLogger().info(".initialise(): Step 3: Completed ==> Registered with CoreSubsystemPetasosEndpointsWatchdog");
 
         // 4th, the Participant
-        getLogger().warn(".initialise(): Step 4: Start ==> Create and bind the PubSubParticipant");
+        getLogger().info(".initialise(): Step 4: Start ==> Create and bind the PubSubParticipant");
         this.participant = specifyPubSubParticipant();
-        getLogger().warn(".initialise(): Step 4: Completed ==> Create and bind the PubSubParticipant, this.participant->{}", getParticipant());
+        getLogger().info(".initialise(): Step 4: Completed ==> Create and bind the PubSubParticipant, this.participant->{}", getParticipant());
 
         // 5th, Initialise my JChannel
-        getLogger().warn(".initialise(): Step 5: Start ==> Initialise my JChannel Connection & Join Cluster/Group");
+        getLogger().info(".initialise(): Step 5: Start ==> Initialise my JChannel Connection & Join Cluster/Group");
         establishJChannel();
-        getLogger().warn(".initialise(): Step 5: Completed ==> ipcChannel ->{}", getIPCChannel());
+        getLogger().info(".initialise(): Step 5: Completed ==> ipcChannel ->{}", getIPCChannel());
 
         //
         // 6th, Our Endpoint is Operational, So Assign Status
@@ -196,7 +196,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
      * @return
      */
     public PetasosEndpoint probeEndpoint(PetasosEndpointIdentifier targetEndpointID, PetasosEndpoint myEndpoint){
-        getLogger().info(".probeEndpoint(): Entry, targetEndpointID->{}", targetEndpointID);
+        getLogger().debug(".probeEndpoint(): Entry, targetEndpointID->{}", targetEndpointID);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
@@ -205,7 +205,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointChannelName());
             PetasosEndpoint targetPetasosEndpoint = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointHandler", objectSet, classSet, requestOptions);
-            getLogger().info(".probeEndpoint(): Exit, response->{}", targetPetasosEndpoint);
+            getLogger().debug(".probeEndpoint(): Exit, response->{}", targetPetasosEndpoint);
             return(targetPetasosEndpoint);
         } catch (NoSuchMethodException e) {
             getLogger().error(".probeEndpoint(): Error (NoSuchMethodException)->", e);
@@ -222,7 +222,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
      * @return
      */
     public PetasosEndpoint probeEndpointHandler(PetasosEndpoint sourcePetasosEndpoint){
-        getLogger().info(".probeEndpointHandler(): Entry, sourcePetasosEndpoint->{}", sourcePetasosEndpoint);
+        getLogger().debug(".probeEndpointHandler(): Entry, sourcePetasosEndpoint->{}", sourcePetasosEndpoint);
         getEndpointMap().addEndpoint(sourcePetasosEndpoint);
         PetasosEndpoint myEndpoint = SerializationUtils.clone(getPetasosEndpoint());
         myEndpoint.setEndpointStatus(getCoreSubsystemPetasosEndpointsWatchdog().getAggregatePetasosEndpointStatus());

@@ -60,9 +60,9 @@ public abstract class HandlerBase {
     //
 
     protected ESRMethodOutcome getResource(@Header("simplifiedID") String id) throws ResourceInvalidSearchException {
-        getLogger().info(".getEntry(): Entry, pathValue --> {}", id);
+        getLogger().debug(".getEntry(): Entry, pathValue --> {}", id);
         ESRMethodOutcome outcome = getResourceBroker().getResource(id.toLowerCase());
-        getLogger().info(".getEntry(): Exit, outcome --> {}", outcome.getStatus());
+        getLogger().debug(".getEntry(): Exit, outcome --> {}", outcome.getStatus());
         return(outcome);
     }
 

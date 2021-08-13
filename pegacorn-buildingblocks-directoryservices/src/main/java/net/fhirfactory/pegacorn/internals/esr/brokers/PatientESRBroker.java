@@ -68,10 +68,10 @@ public abstract class PatientESRBroker extends ESRBroker {
     // Create
     //
     public ESRMethodOutcome createPatientDE(PatientESR entry){
-        getLogger().info(".createPatientDE(): Entry");
+        getLogger().debug(".createPatientDE(): Entry");
         ESRMethodOutcome outcome = patientCache.addPatient(entry);
         //createSystemManagedMatrixRooms(entry);
-        getLogger().info(".createPatientDE(): Exit");
+        getLogger().debug(".createPatientDE(): Exit");
         return(outcome);
     }
 
@@ -81,7 +81,7 @@ public abstract class PatientESRBroker extends ESRBroker {
 
     @Override
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
         PatientESR patientESR = (PatientESR) entry;
         getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
     }

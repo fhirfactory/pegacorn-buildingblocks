@@ -76,16 +76,16 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
         List<Address> addressList = newView.getMembers();
         getLogger().trace(".viewAccepted(): Got the Address set via view, now iterate through and see if one is suitable");
         if(getIPCChannel() != null) {
-            getLogger().warn("JGroupsCluster->{}", getIPCChannel().getClusterName());
+            getLogger().info("JGroupsCluster->{}", getIPCChannel().getClusterName());
         } else {
-            getLogger().warn("JGroupsCluster still Forming");
+            getLogger().info("JGroupsCluster still Forming");
         }
         this.previousScannedMembership.clear();
         this.previousScannedMembership.addAll(this.currentScannedMembership);
         this.currentScannedMembership.clear();
         for(Address currentAddress: addressList){
             this.currentScannedMembership.add(currentAddress);
-            getLogger().warn("Visible Member->{}", currentAddress);
+            getLogger().info("Visible Member->{}", currentAddress);
         }
         getLogger().trace(".viewAccepted(): Checking PubSub Participants");
         List<PetasosAdapterAddress> removals = getMembershipRemovals(previousScannedMembership, currentScannedMembership);

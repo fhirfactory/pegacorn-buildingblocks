@@ -44,11 +44,11 @@ public class PegacornIdentifierDataTypeHelpers {
     public Identifier getBestIdentifier(List<Identifier> identifierSet){
         LOG.debug(".getBestIdentifier(): Entry");
         if(identifierSet == null){
-            LOG.error(".getBestIdentifier(): identifierSet is null");
+            LOG.warn(".getBestIdentifier(): identifierSet is null");
             return(null);
         }
         if(identifierSet.isEmpty()){
-            LOG.error(".getBestIdentifier(): identifierSet is empty");
+            LOG.warn(".getBestIdentifier(): identifierSet is empty");
             return(null);
         }
         for(Identifier identifier: identifierSet){

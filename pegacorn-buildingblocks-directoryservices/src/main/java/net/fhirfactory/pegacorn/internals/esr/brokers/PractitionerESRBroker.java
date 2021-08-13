@@ -91,7 +91,7 @@ public abstract class PractitionerESRBroker extends ESRBroker {
     // Create
     //
     public ESRMethodOutcome createPractitionerDE(PractitionerESR entry){
-        getLogger().info(".createPractitioner(): Entry");
+        getLogger().debug(".createPractitioner(): Entry");
         ESRMethodOutcome outcome = practitionerCache.addPractitioner(entry);
         GroupESR activePractitionerSet = new GroupESR();
         activePractitionerSet.setGroupManager(entry.getSimplifiedID());
@@ -101,7 +101,7 @@ public abstract class PractitionerESRBroker extends ESRBroker {
         activePractitionerSet.getIdentifiers().add(entry.getIdentifierWithType("EmailAddress"));
         ESRMethodOutcome groupCreateOutcome = groupBroker.createGroupDE(activePractitionerSet);
         //createSystemManagedMatrixRooms(entry);
-        getLogger().info(".createPractitioner(): Exit");
+        getLogger().debug(".createPractitioner(): Exit");
         return(outcome);
     }
 
@@ -111,25 +111,25 @@ public abstract class PractitionerESRBroker extends ESRBroker {
 
     @Override
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
         PractitionerESR practitionerESR = (PractitionerESR) entry;
         ESRMethodOutcome groupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("EmailAddress"));
         if(groupGetOutcome.isSearch()){
             if (!groupGetOutcome.getSearchResult().isEmpty()) {
-                getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
+                getLogger().trace(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
                 practitionerESR.getCurrentPractitionerRoles().clear();
                 practitionerESR.getCurrentPractitionerRoles().addAll(practitionerRolesGroup.getGroupMembership());
             }
         } else {
             if (groupGetOutcome.getEntry() != null) {
-                getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
+                getLogger().trace(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
                 practitionerESR.getCurrentPractitionerRoles().clear();
                 practitionerESR.getCurrentPractitionerRoles().addAll(practitionerRolesGroup.getGroupMembership());
             }
         }
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
     }
 
     //
@@ -137,24 +137,24 @@ public abstract class PractitionerESRBroker extends ESRBroker {
     //
 
     public ESRMethodOutcome updatePractitioner(PractitionerESR entry) throws ResourceInvalidSearchException {
-        getLogger().info(".updatePractitioner(): Entry");
+        getLogger().debug(".updatePractitioner(): Entry");
         ESRMethodOutcome entryUpdate = updateDirectoryEntry(entry);
         if(entryUpdate.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL) || entryUpdate.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
-            getLogger().info(".updatePractitioner(): Entry itself is updated, so updating its associated fulfilledPractitionerRole details");
+            getLogger().trace(".updatePractitioner(): Entry itself is updated, so updating its associated fulfilledPractitionerRole details");
             ESRMethodOutcome practitionerRolesGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("EmailAddress"));
             boolean searchCompleted = practitionerRolesGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
             boolean searchFoundOneResultOnly = practitionerRolesGroupGetOutcome.getSearchResult().size() == 1;
             if(searchCompleted && searchFoundOneResultOnly && practitionerRolesGroupGetOutcome.isSearchSuccessful()){
-                getLogger().info(".updatePractitioner(): updating the associated group");
+                getLogger().trace(".updatePractitioner(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR)practitionerRolesGroupGetOutcome.getSearchResult().get(0);
                 practitionerRolesGroup.getGroupMembership().clear();
                 practitionerRolesGroup.getGroupMembership().addAll(entry.getCurrentPractitionerRoles());
                 ESRMethodOutcome groupUpdateOutcome = groupBroker.updateGroup(practitionerRolesGroup);
             }
         } else {
-            getLogger().info(".updatePractitioner(): Update processed failed for the superclass PegacornDirectoryEntry, reason --> {}", entryUpdate.getStatusReason());
+            getLogger().trace(".updatePractitioner(): Update processed failed for the superclass PegacornDirectoryEntry, reason --> {}", entryUpdate.getStatusReason());
         }
-        getLogger().info(".updatePractitioner(): Exit");
+        getLogger().debug(".updatePractitioner(): Exit");
         return(entryUpdate);
     }
 

@@ -55,12 +55,12 @@ public class GroupMemberTypeExtensionEnricher {
     public GroupMemberActionExtensionEnum extractGroupMemberTypeExtension(Group.GroupMemberComponent membership) {
         LOG.debug(".extractGroupMemberTypeExtension(): Entry, membership->{}", membership);
         if (!membership.hasExtension(this.MEMBERSHIP_TYPE_MEANING.asStringValue())) {
-            LOG.warn(".extractGroupMemberTypeExtension(): Group::member does not contain the GroupMemberType extension");
+            LOG.debug(".extractGroupMemberTypeExtension(): Group::member does not contain the GroupMemberType extension");
             return(null);
         }
         Extension extractedStatusExtension = membership.getExtensionByUrl(MEMBERSHIP_TYPE_MEANING.asStringValue());
         if( !(extractedStatusExtension.getValue() instanceof StringType)){
-            LOG.warn(".extractGroupMemberTypeExtension(): Group::member contains the GroupMemberType extension value type");
+            LOG.debug(".extractGroupMemberTypeExtension(): Group::member contains the GroupMemberType extension value type");
             return(null);
         }
         StringType extractedStatusStringType = (StringType) (extractedStatusExtension.getValue());

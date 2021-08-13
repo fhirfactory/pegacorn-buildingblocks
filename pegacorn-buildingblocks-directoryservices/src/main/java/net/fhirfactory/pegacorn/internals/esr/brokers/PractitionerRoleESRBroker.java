@@ -70,7 +70,7 @@ public abstract class PractitionerRoleESRBroker extends ESRBroker {
     // Create
     //
     public ESRMethodOutcome createPractitionerRole(PractitionerRoleESR directoryEntry){
-        getLogger().info(".createPractitionerRole(): Entry, directoryEntry --> {}", directoryEntry);
+        getLogger().debug(".createPractitionerRole(): Entry, directoryEntry --> {}", directoryEntry);
         ESRMethodOutcome outcome = practitionerRoleCache.addPractitionerRole(directoryEntry);
         GroupESR activePractitionerSet = new GroupESR();
         activePractitionerSet.setGroupManager(directoryEntry.getSimplifiedID());
@@ -79,7 +79,7 @@ public abstract class PractitionerRoleESRBroker extends ESRBroker {
         activePractitionerSet.setDisplayName("Practitioners-Fulfilling-PractitionerRole-"+directoryEntry.getIdentifierWithType("ShortName").getValue());
         activePractitionerSet.getIdentifiers().add(directoryEntry.getIdentifierWithType("ShortName"));
         ESRMethodOutcome groupCreateOutcome = groupBroker.createGroupDE(activePractitionerSet);
-        getLogger().info(".createPractitionerRole(): Exit");
+        getLogger().debug(".createPractitionerRole(): Exit");
         return(outcome);
     }
 
@@ -90,32 +90,32 @@ public abstract class PractitionerRoleESRBroker extends ESRBroker {
 
     @Override
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
         PractitionerRoleESR practitionerRoleESR = (PractitionerRoleESR) entry;
         ESRMethodOutcome groupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"));
         if(groupGetOutcome.isSearch()) {
             if (!groupGetOutcome.getSearchResult().isEmpty()) {
-                getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
+                getLogger().trace(".enrichWithDirectoryEntryTypeSpecificInformation(): is a search and found directory entry, using first");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getSearchResult().get(0);
                 practitionerRoleESR.getActivePractitionerSet().clear();
                 practitionerRoleESR.getActivePractitionerSet().addAll(practitionerRolesGroup.getGroupMembership());
             }
         } else {
             if (groupGetOutcome.getEntry() != null) {
-                getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
+                getLogger().trace(".enrichWithDirectoryEntryTypeSpecificInformation(): found associated Group entry");
                 GroupESR practitionerRolesGroup = (GroupESR) groupGetOutcome.getEntry();
                 practitionerRoleESR.getActivePractitionerSet().clear();
                 practitionerRoleESR.getActivePractitionerSet().addAll(practitionerRolesGroup.getGroupMembership());
             }
         }
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
     }
 
     //
     // Update
     //
     public ESRMethodOutcome updatePractitionerRole(PractitionerRoleESR entry) throws ResourceInvalidSearchException {
-        getLogger().info(".updatePractitionerRole(): Entry");
+        getLogger().debug(".updatePractitionerRole(): Entry");
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         PractitionerRoleESR foundEntry = null;
         if(entry.getSimplifiedID() != null){
@@ -142,12 +142,12 @@ public abstract class PractitionerRoleESRBroker extends ESRBroker {
             outcome.setStatus(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE);
         }
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL) ||outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
-            getLogger().info(".updatePractitioner(): Entry itself is updated, so updating its associated fulfilledPractitionerRole details");
+            getLogger().trace(".updatePractitioner(): Entry itself is updated, so updating its associated fulfilledPractitionerRole details");
             ESRMethodOutcome practitionersGroupGetOutcome = groupBroker.searchForDirectoryEntryUsingIdentifier(entry.getIdentifierWithType("ShortName"));
             boolean searchCompleted = practitionersGroupGetOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
             boolean searchFoundSomething = practitionersGroupGetOutcome.getSearchResult().size() == 1;
             if(searchCompleted && searchFoundSomething){
-                getLogger().info(".updatePractitioner(): updating the associated group");
+                getLogger().trace(".updatePractitioner(): updating the associated group");
                 GroupESR practitionerRolesGroup = (GroupESR)practitionersGroupGetOutcome.getSearchResult().get(0);
                 practitionerRolesGroup.getGroupMembership().clear();
                 practitionerRolesGroup.getGroupMembership().addAll(entry.getActivePractitionerSet());

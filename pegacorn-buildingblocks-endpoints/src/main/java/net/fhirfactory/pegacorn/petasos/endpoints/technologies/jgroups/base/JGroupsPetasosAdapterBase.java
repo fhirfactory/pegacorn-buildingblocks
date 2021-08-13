@@ -96,15 +96,15 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
 
     @Override
     protected String specifyJGroupsClusterName() {
-        getLogger().info(".specifyJGroupsClusterName(): Entry");
+        getLogger().debug(".specifyJGroupsClusterName(): Entry");
         if(specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE)) {
             String clusterName = specifyEndpointID().getEndpointZone().getNetworkSecurityZoneCamelCase()+"-"+specifyEndpointID().getEndpointGroup();
-            getLogger().info(".specifyJGroupsClusterName(): IntraZone Scope, returning->{}", clusterName);
+            getLogger().debug(".specifyJGroupsClusterName(): IntraZone Scope, returning->{}", clusterName);
             return (clusterName);
         }
         if(specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE)){
             String clusterName = specifyEndpointID().getEndpointSite()+"-"+specifyEndpointID().getEndpointGroup();
-            getLogger().info(".specifyJGroupsClusterName(): InterZone Scope, returning->{}", clusterName);
+            getLogger().debug(".specifyJGroupsClusterName(): InterZone Scope, returning->{}", clusterName);
             return(clusterName);
         }
         String interSiteClusterName = specifyEndpointID().getEndpointGroup();
@@ -362,6 +362,39 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
             return(myAddress);
         }
         return(null);
+    }
+
+    /**
+     * This method gets all the members of a JGroups Cluster whose name CONTAINS the given service name parameter.
+     * A simple "contains()" string method is applied to each member retrieved from the JGroups View (where their
+     * address is converted to a String - via .toString()).
+     *
+     * @param serviceName A string to be checked against using the String function "startsWith()"
+     * @return a list of String's representing all members whose name begins with the given prefix
+     */
+    public List<String> getClusterMemberSetBasedOnService(String serviceName){
+        getLogger().debug(".getClusterMemberSetBasedOnPrefix(): Entry, serviceName->{}", serviceName);
+        List<String> memberListForService = new ArrayList<>();
+        if(getIPCChannel() == null){
+            getLogger().debug(".getClusterMemberSetBasedOnService(): Exit, IPCChannel is null, returning empty set");
+            return(memberListForService);
+        }
+        if(StringUtils.isEmpty(serviceName)){
+            getLogger().debug(".getClusterMemberSetBasedOnService(): Exit, namePrefix is null, returning empty set");
+            return(memberListForService);
+        }
+        getLogger().trace(".getClusterMemberSetBasedOnService(): IPCChannel is NOT null & serviceName is not empty, let's get updated Address set via view");
+        List<String> memberList = getAllClusterMembers();
+        getLogger().trace(".getClusterMemberSetBasedOnService(): Got the Address set via view, now iterate through and see if one is suitable");
+        for(String currentMemberName: memberList){
+            getLogger().trace(".getClusterMemberSetBasedOnService(): Iterating through Address list, current element->{}", currentMemberName);
+            if(currentMemberName.toString().contains(serviceName)){
+                getLogger().debug(".getClusterMemberSetBasedOnService(): currentMemberName is a match for given serviceName, so adding it to list");
+                memberListForService.add(currentMemberName);
+            }
+        }
+        getLogger().debug(".getClusterMemberSetBasedOnService(): Exit, memberListBasedOnPrefix->{}",memberListForService);
+        return(memberListForService);
     }
 
 }

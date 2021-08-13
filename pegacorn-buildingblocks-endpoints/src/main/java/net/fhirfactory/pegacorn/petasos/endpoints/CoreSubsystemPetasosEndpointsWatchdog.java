@@ -128,24 +128,24 @@ public class CoreSubsystemPetasosEndpointsWatchdog
     //
 
     public void scheduleStartupWatchdog() {
-        getLogger().info(".scheduleStartupWatchdog(): Entry");
+        getLogger().debug(".scheduleStartupWatchdog(): Entry");
         TimerTask startupWatchdogTask = new TimerTask() {
             public void run() {
-                getLogger().info(".startupWatchdogTask(): Entry");
+                getLogger().debug(".startupWatchdogTask(): Entry");
                 startupWatchdog();
                 if (!getAggregateStatus().equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED)) {
                     cancel();
                     scheduleOngoingStatusWatchdog();
                     startupCheckRequired = false;
                 }
-                getLogger().info(".startupWatchdogTask(): Exit");
+                getLogger().debug(".startupWatchdogTask(): Exit");
             }
         };
         if(startupCheckRequired) {
             Timer timer = new Timer("scheduleStartupWatchdog");
             timer.schedule(startupWatchdogTask, STARTUP_CHECK_INITIAL_DELAY, STARTUP_CHECK_PERIOD);
         }
-        getLogger().info(".scheduleStartupWatchdog(): Exit");
+        getLogger().debug(".scheduleStartupWatchdog(): Exit");
     }
 
     public void startupWatchdog(){
@@ -255,18 +255,18 @@ public class CoreSubsystemPetasosEndpointsWatchdog
     //
 
     public void scheduleOngoingStatusWatchdog() {
-        getLogger().info(".scheduleOngoingStatusWatchdog(): Entry");
+        getLogger().debug(".scheduleOngoingStatusWatchdog(): Entry");
         TimerTask ongoingWatchdogTask = new TimerTask() {
             public void run() {
-                getLogger().info(".ongoingWatchdogTask(): Entry");
+                getLogger().debug(".ongoingWatchdogTask(): Entry");
                 statusWatchDog();
-                getLogger().info(".ongoingWatchdogTask(): Exit");
+                getLogger().debug(".ongoingWatchdogTask(): Exit");
             }
         };
         Timer timer = new Timer("scheduleOngoingStatusWatchdog");
         timer.schedule(ongoingWatchdogTask, WATCHDOG_INITIAL_START_DELAY, WATCHDOG_SCAN_PERIOD);
 
-        getLogger().info(".scheduleOngoingStatusWatchdog(): Exit");
+        getLogger().debug(".scheduleOngoingStatusWatchdog(): Exit");
     }
 
     public void statusWatchDog(){

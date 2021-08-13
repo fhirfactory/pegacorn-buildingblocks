@@ -87,8 +87,8 @@ public abstract class CommunicateSessionESRBroker extends ESRBroker {
 
     @Override
     protected void enrichWithDirectoryEntryTypeSpecificInformation(ExtremelySimplifiedResource entry) {
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
-        getLogger().info(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Entry");
+        getLogger().debug(".enrichWithDirectoryEntryTypeSpecificInformation(): Exit");
     }
 
     //
@@ -97,21 +97,21 @@ public abstract class CommunicateSessionESRBroker extends ESRBroker {
 
     @Override
     public ESRMethodOutcome updateDirectoryEntry(ExtremelySimplifiedResource entry) throws ResourceInvalidSearchException {
-        getLogger().info(".updateDirectoryEntry(): Entry");
+        getLogger().debug(".updateDirectoryEntry(): Entry");
         ESRMethodOutcome outcome = new ESRMethodOutcome();
         ExtremelySimplifiedResource foundEntry = null;
-        getLogger().info(".updateDirectoryEntry(): Attempting to retrieve existing Resource");
+        getLogger().trace(".updateDirectoryEntry(): Attempting to retrieve existing Resource");
         if(entry.getSimplifiedID() != null){
-            getLogger().info(".updateDirectoryEntry(): The PegId is not-Null, so we should be able to retrieve Resource with it");
+            getLogger().trace(".updateDirectoryEntry(): The PegId is not-Null, so we should be able to retrieve Resource with it");
             if(getLogger().isInfoEnabled()){
-                getLogger().info(".updateDirectoryEntry(): Attempting to retrieve PegacornDirectoryEntry for Id --> {}", entry.getSimplifiedID());
+                getLogger().trace(".updateDirectoryEntry(): Attempting to retrieve PegacornDirectoryEntry for Id --> {}", entry.getSimplifiedID());
             }
             foundEntry = getCache().getCacheEntry(entry.getSimplifiedID());
         } else {
-            getLogger().info(".PegacornDirectoryEntry(): The PegId is Null, so seeing if a suitable Identifier is available");
+            getLogger().trace(".PegacornDirectoryEntry(): The PegId is Null, so seeing if a suitable Identifier is available");
             IdentifierESDT entryIdentifier = entry.getIdentifierWithType(IdentifierESDTTypesEnum.ESR_IDENTIFIER_TYPE_COMMUNICATE_SESSION);
             if(entryIdentifier != null){
-                getLogger().info(".PegacornDirectoryEntry(): Have a suitable Identifier, now retrieving");
+                getLogger().trace(".PegacornDirectoryEntry(): Have a suitable Identifier, now retrieving");
                 if(entryIdentifier.getUse().equals(IdentifierESDTUseEnum.OFFICIAL)){
                     ESRMethodOutcome retrievalOutcome = getCache().searchCacheForESRUsingIdentifier(entryIdentifier);
                     boolean searchCompleted = retrievalOutcome.getStatus().equals(ESRMethodOutcomeEnum.SEARCH_COMPLETED_SUCCESSFULLY);
@@ -122,10 +122,10 @@ public abstract class CommunicateSessionESRBroker extends ESRBroker {
                 }
             }
         }
-        getLogger().info(".updateDirectoryEntry(): Check to see if we were able to retrieve existing Resource");
+        getLogger().trace(".updateDirectoryEntry(): Check to see if we were able to retrieve existing Resource");
         ESRMethodOutcome entryUpdate = updateDirectoryEntry(entry);
 
-        getLogger().info(".updateDirectoryEntry(): Exit");
+        getLogger().debug(".updateDirectoryEntry(): Exit");
         return(entryUpdate);
     }
 

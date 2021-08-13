@@ -67,7 +67,7 @@ public abstract class EdgeProxyBase {
     }
 
     protected Bundle searchProcessHasFailed(String searchMethod){
-        getLogger().warn(searchMethod + ": A resource search has failed (not just not finding any matching resources, but the search process itself)");
+        getLogger().info(searchMethod + ": A resource search has failed (not just not finding any matching resources, but the search process itself)");
         Bundle outputBundle = new Bundle();
         outputBundle.setType(Bundle.BundleType.SEARCHSET);
         outputBundle.setTimestamp(Date.from(Instant.now()));
