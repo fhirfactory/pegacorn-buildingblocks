@@ -21,9 +21,11 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.components.tasks.hl7v2tasks.A19QueryTask;
-import net.fhirfactory.pegacorn.components.tasks.hl7v2tasks.A19QueryTaskOutcome;
-import net.fhirfactory.pegacorn.components.tasks.CapabilityUtilisationBrokerInterface;
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTask;
+import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTaskOutcome;
+import net.fhirfactory.pegacorn.components.capabilities.CapabilityUtilisationBrokerInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
 import org.slf4j.Logger;
@@ -44,24 +46,24 @@ public class CapabilityUtilisationBroker implements CapabilityUtilisationBrokerI
     private PetasosIntraZoneIPCEndpoint intraZoneIPCEndpoint;
 
     @Override
-    public A19QueryTaskOutcome useA19QueryCapability(String preferredCapabilityProvider, A19QueryTask a19QueryTask) {
+    public CapabilityUtilisationResponse executeTask(String preferredCapabilityProvider, CapabilityUtilisationRequest a19QueryTask) {
         LOG.debug(".useA19QueryCapability(): Entry, preferredCapabilityProvider->{}, a19QueryTask->{}", preferredCapabilityProvider, a19QueryTask);
 
         if(intraZoneIPCEndpoint.capabilityProviderIsInScope(preferredCapabilityProvider)){
             LOG.trace(".useA19QueryCapability(): Using intra-zone communication framework");
-            A19QueryTaskOutcome a19QueryTaskOutcome = intraZoneIPCEndpoint.requestA19Query(preferredCapabilityProvider, a19QueryTask);
+            CapabilityUtilisationResponse a19QueryTaskOutcome = intraZoneIPCEndpoint.executeTask(preferredCapabilityProvider, a19QueryTask);
             LOG.debug(".useA19QueryCapability(): Exit, outcome->{}", a19QueryTaskOutcome);
             return(a19QueryTaskOutcome);
         }
         if(interZoneIPCEndpoint.capabilityProviderIsInScope(preferredCapabilityProvider)){
             LOG.trace(".useA19QueryCapability(): Using inter-zone communication framework");
-            A19QueryTaskOutcome a19QueryTaskOutcome = intraZoneIPCEndpoint.requestA19Query(preferredCapabilityProvider, a19QueryTask);
+            CapabilityUtilisationResponse a19QueryTaskOutcome = intraZoneIPCEndpoint.executeTask(preferredCapabilityProvider, a19QueryTask);
             LOG.debug(".useA19QueryCapability(): Exit, outcome->{}", a19QueryTaskOutcome);
             return(a19QueryTaskOutcome);
         }
 
         LOG.trace(".useA19QueryCapability(): Can't find suitable capability provider");
-        A19QueryTaskOutcome outcome = new A19QueryTaskOutcome();
+        CapabilityUtilisationResponse outcome = new CapabilityUtilisationResponse();
         outcome.setSuccessful(false);
         outcome.setInScope(false);
         outcome.setDateCompleted(Instant.now());

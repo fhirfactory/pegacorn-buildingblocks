@@ -19,8 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.components.tasks.hl7v2tasks;
+package net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks;
 
-public interface A19QueryCapabilityFulfillmentInterface {
-    public A19QueryTaskOutcome fulfillA19QueryCapability(A19QueryTask a19QueryTask);
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
+
+public class A19QueryTask extends CapabilityUtilisationRequest {
+
+    private String a19QueryString;
+
+    public String getA19QueryString() {
+        return a19QueryString;
+    }
+
+    public void setA19QueryString(String a19QueryString) {
+        this.a19QueryString = a19QueryString;
+    }
+
+    @Override
+    public String toString() {
+        return "A19QueryTask{" +
+                "a19QueryString='" + a19QueryString + '\'' +
+                ", requestID='" + getRequestID() + '\'' +
+                ", requestDate=" + getRequestDate() +
+                '}';
+    }
 }

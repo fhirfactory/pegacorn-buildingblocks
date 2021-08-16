@@ -19,56 +19,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.components.tasks.base;
+package net.fhirfactory.pegacorn.components.capabilities.base;
 
 import java.io.Serializable;
 import java.time.Instant;
 
-public class CapabilityUtilisationResponseBase implements Serializable {
-    private String associatedRequestID;
-    private boolean inScope;
-    private boolean successful;
-    private Instant dateCompleted;
+public class CapabilityUtilisationRequest implements Serializable {
+    private String requestID;
+    private String requiredCapabilityName;
+    private Instant requestDate;
+    private String requestContent;
 
-    public String getAssociatedRequestID() {
-        return associatedRequestID;
+    public String getRequestContent() {
+        return requestContent;
     }
 
-    public void setAssociatedRequestID(String associatedRequestID) {
-        this.associatedRequestID = associatedRequestID;
+    public void setRequestContent(String requestContent) {
+        this.requestContent = requestContent;
     }
 
-    public boolean isInScope() {
-        return inScope;
+    public String getRequiredCapabilityName() {
+        return requiredCapabilityName;
     }
 
-    public void setInScope(boolean inScope) {
-        this.inScope = inScope;
+    public void setRequiredCapabilityName(String requiredCapabilityName) {
+        this.requiredCapabilityName = requiredCapabilityName;
     }
 
-    public boolean isSuccessful() {
-        return successful;
+    public String getRequestID() {
+        return requestID;
     }
 
-    public void setSuccessful(boolean successful) {
-        this.successful = successful;
+    public void setRequestID(String requestID) {
+        this.requestID = requestID;
     }
 
-    public Instant getDateCompleted() {
-        return dateCompleted;
+    public Instant getRequestDate() {
+        return requestDate;
     }
 
-    public void setDateCompleted(Instant dateCompleted) {
-        this.dateCompleted = dateCompleted;
+    public void setRequestDate(Instant requestDate) {
+        this.requestDate = requestDate;
     }
 
     @Override
     public String toString() {
-        return "CapabilityUtilisationResponseBase{" +
-                "associatedRequestID='" + associatedRequestID + '\'' +
-                ", inScope=" + inScope +
-                ", successful=" + successful +
-                ", dateCompleted=" + dateCompleted +
+        return "CapabilityUtilisationRequest{" +
+                "requestID='" + requestID + '\'' +
+                ", requiredCapabilityName='" + requiredCapabilityName + '\'' +
+                ", requestDate=" + requestDate +
+                ", requestContent='" + requestContent + '\'' +
                 '}';
     }
 }

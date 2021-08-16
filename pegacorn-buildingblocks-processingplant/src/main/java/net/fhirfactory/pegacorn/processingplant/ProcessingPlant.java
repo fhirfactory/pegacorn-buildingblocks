@@ -25,6 +25,10 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.components.capabilities.CapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.components.capabilities.CapabilityFulfillmentManagementInterface;
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
@@ -40,14 +44,19 @@ import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantInterface {
 
     private ProcessingPlantTopologyNode processingPlantNode;
     private String instanceQualifier;
     private boolean isInitialised;
+
+    ConcurrentHashMap<String, CapabilityFulfillmentInterface> capabilityDeliveryServices;
 
     @Inject
     private TopologyIM topologyIM;
@@ -86,6 +95,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             getLogger().debug("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Start");
             resolveProcessingPlant();
             getLogger().debug("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Finish");
+
+            capabilityDeliveryServices = new ConcurrentHashMap<>();
+
             executePostConstructActivities();
             isInitialised = true;
         }
@@ -216,5 +228,35 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         TopologyNodeRDN siteRDN = getProcessingPlantNode().getNodeFDN().extractRDNForNodeType(TopologyNodeTypeEnum.SITE);
         String siteName = siteRDN.getNodeName();
         return (siteName);
+    }
+
+
+    @Override
+    public void registerCapabilityFulfillmentService(String capabilityName, CapabilityFulfillmentInterface fulfillmentInterface) {
+        if(fulfillmentInterface == null){
+            return;
+        }
+        this.capabilityDeliveryServices.put(capabilityName, fulfillmentInterface);
+    }
+
+    @Override
+    public CapabilityUtilisationResponse executeTask(CapabilityUtilisationRequest request) {
+        if(request == null){
+            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
+            response.setDateCompleted(Instant.now());
+            response.setSuccessful(false);
+            return(response);
+        }
+        String capabilityName = request.getRequiredCapabilityName();
+        CapabilityFulfillmentInterface interfaceToUse = this.capabilityDeliveryServices.get(capabilityName);
+        if(interfaceToUse == null){
+            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
+            response.setDateCompleted(Instant.now());
+            response.setSuccessful(false);
+            response.setInScope(false);
+            return(response);
+        }
+        CapabilityUtilisationResponse capabilityUtilisationResponse = interfaceToUse.executeTask(request);
+        return(capabilityUtilisationResponse);
     }
 }

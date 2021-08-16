@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2020 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,28 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.components.tasks.hl7v2tasks;
+package net.fhirfactory.pegacorn.workshops;
 
-import net.fhirfactory.pegacorn.components.tasks.base.CapabilityUtilisationRequestBase;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class A19QueryTask extends CapabilityUtilisationRequestBase {
+import javax.enterprise.context.ApplicationScoped;
 
-    private String a19QueryString;
+@ApplicationScoped
+public class PolicyEnforcementWorkshop extends PetasosEnabledWorkshop {
+    private static final Logger LOG = LoggerFactory.getLogger(PolicyEnforcementWorkshop.class);
 
-    public String getA19QueryString() {
-        return a19QueryString;
-    }
-
-    public void setA19QueryString(String a19QueryString) {
-        this.a19QueryString = a19QueryString;
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
     }
 
     @Override
-    public String toString() {
-        return "A19QueryTask{" +
-                "a19QueryString='" + a19QueryString + '\'' +
-                ", requestID='" + getRequestID() + '\'' +
-                ", requestDate=" + getRequestDate() +
-                '}';
+    protected String specifyWorkshopName() {
+        return (DefaultWorkshopSetEnum.POLICY_ENFORCEMENT_WORKSHOP.getWorkshop());
+    }
+
+    @Override
+    protected String specifyWorkshopVersion() {
+        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
+    }
+
+    @Override
+    protected void invokePostConstructInitialisation() {
+
     }
 }

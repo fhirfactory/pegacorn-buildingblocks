@@ -19,36 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.components.tasks.base;
+package net.fhirfactory.pegacorn.components.capabilities;
 
-import java.io.Serializable;
-import java.time.Instant;
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
 
-public class CapabilityUtilisationRequestBase implements Serializable {
-    private String requestID;
-    private Instant requestDate;
-
-    public String getRequestID() {
-        return requestID;
-    }
-
-    public void setRequestID(String requestID) {
-        this.requestID = requestID;
-    }
-
-    public Instant getRequestDate() {
-        return requestDate;
-    }
-
-    public void setRequestDate(Instant requestDate) {
-        this.requestDate = requestDate;
-    }
-
-    @Override
-    public String toString() {
-        return "CapabilityUtilisationRequestBase{" +
-                "requestID='" + requestID + '\'' +
-                ", requestDate=" + requestDate +
-                '}';
-    }
+public interface CapabilityUtilisationBrokerInterface {
+    public CapabilityUtilisationResponse executeTask(String preferredCapabilityProvider, CapabilityUtilisationRequest taskRequest);
 }

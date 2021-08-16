@@ -21,9 +21,11 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base;
 
-import net.fhirfactory.pegacorn.components.tasks.hl7v2tasks.A19QueryCapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.components.tasks.hl7v2tasks.A19QueryTask;
-import net.fhirfactory.pegacorn.components.tasks.hl7v2tasks.A19QueryTaskOutcome;
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryCapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTask;
+import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTaskOutcome;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -44,9 +46,6 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
 
     @Produce
     private ProducerTemplate camelProducer;
-
-    @Inject
-    private A19QueryCapabilityFulfillmentInterface a19QueryExecutor;
 
     //
     // Constructor
@@ -162,37 +161,37 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     // A19 Query Task Execution / Capability Utilisation Services
     //
 
-    public A19QueryTaskOutcome requestA19Query(String capabilityProviderName, A19QueryTask a19QueryTask){
+    public CapabilityUtilisationResponse executeTask(String capabilityProviderName, CapabilityUtilisationRequest a19QueryTask){
         getLogger().debug(".requestA19Query(): Entry, capabilityProviderName->{}, a19QueryTask->{}", capabilityProviderName, a19QueryTask);
         Address targetAddress = getCandidateIPCTargetAddress(capabilityProviderName);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
             objectSet[0] = a19QueryTask;
-            classSet[0] = A19QueryTask.class;
+            classSet[0] = CapabilityUtilisationRequest.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            A19QueryTaskOutcome response = getRPCDispatcher().callRemoteMethod(targetAddress, "request19QueryHandler", objectSet, classSet, requestOptions);
+            CapabilityUtilisationResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "request19QueryHandler", objectSet, classSet, requestOptions);
             getLogger().debug(".requestA19Query(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
             getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());
-            A19QueryTaskOutcome response = new A19QueryTaskOutcome();
+            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
             response.setAssociatedRequestID(a19QueryTask.getRequestID());
             response.setSuccessful(false);
             return(response);
         } catch (Exception e) {
             e.printStackTrace();
             getLogger().error(".sendIPCMessage: Error (GeneralException) ->{}", e.getMessage());
-            A19QueryTaskOutcome response = new A19QueryTaskOutcome();
+            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
             response.setAssociatedRequestID(a19QueryTask.getRequestID());
             response.setSuccessful(false);
             return(response);
         }
     }
 
-    public A19QueryTaskOutcome request19QueryHandler(A19QueryTask a19QueryTask){
+    public CapabilityUtilisationResponse request19QueryHandler(CapabilityUtilisationRequest a19QueryTask){
         getLogger().debug(".request19QueryHandler(): Entry, a19QueryTask->{}", a19QueryTask);
-        A19QueryTaskOutcome response = a19QueryExecutor.fulfillA19QueryCapability(a19QueryTask);
+        CapabilityUtilisationResponse response = getProcessingPlantInterface().executeTask(a19QueryTask);
         getLogger().debug(".request19QueryHandler(): Exit, response->{}", response);
         return(response);
     }

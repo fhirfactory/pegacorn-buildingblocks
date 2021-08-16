@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,36 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.workshops;
+package net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
-import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
-public class PolicyEnforcementPointWorkshop extends PetasosEnabledWorkshop {
-    private static final Logger LOG = LoggerFactory.getLogger(PolicyEnforcementPointWorkshop.class);
-
-    @Override
-    protected Logger specifyLogger() {
-        return (LOG);
-    }
-
-    @Override
-    protected String specifyWorkshopName() {
-        return (DefaultWorkshopSetEnum.POLICY_ENFORCEMENT_POINT_WORKSHOP.getWorkshop());
-    }
-
-    @Override
-    protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
-    }
-
-    @Override
-    protected void invokePostConstructInitialisation() {
-
-    }
+public interface A19QueryCapabilityFulfillmentInterface {
+    public A19QueryTaskOutcome fulfillA19QueryCapability(A19QueryTask a19QueryTask);
 }
