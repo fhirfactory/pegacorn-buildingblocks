@@ -23,7 +23,6 @@
 	<module>../pegacorn-buildingblocks-edge/pegacorn-buildingblocks-edge</module>
         <module>../pegacorn-buildingblocks-fhirim</module>
         <module>../pegacorn-buildingblocks-workunitprocessors</module>
-	<module>../pegacorn-buildingblocks-endpoints</module>
         <module>../pegacorn-buildingblocks-auditservices</module>
     </modules>
 </project>

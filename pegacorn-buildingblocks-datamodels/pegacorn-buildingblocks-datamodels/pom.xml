@@ -17,7 +17,6 @@
 
     <modules>
         <module>../pegacorn-buildingblocks-datamodels-components</module>
-        <module>../pegacorn-buildingblocks-datamodels-fhir</module>
         <module>../pegacorn-buildingblocks-datamodels-matrix</module>
         <module>../pegacorn-buildingblocks-datamodels-esr</module>
         <module>../pegacorn-buildingblocks-datamodels-synapse</module>
