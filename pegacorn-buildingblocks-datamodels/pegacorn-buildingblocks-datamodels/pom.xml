@@ -22,5 +22,6 @@
         <module>../pegacorn-buildingblocks-datamodels-esr</module>
         <module>../pegacorn-buildingblocks-datamodels-synapse</module>
         <module>../pegacorn-buildingblocks-datamodels-communicate</module>
+		<module>../pegacorn-buildingblocks-datamodels-ldap</module>
     </modules>
 </project>
