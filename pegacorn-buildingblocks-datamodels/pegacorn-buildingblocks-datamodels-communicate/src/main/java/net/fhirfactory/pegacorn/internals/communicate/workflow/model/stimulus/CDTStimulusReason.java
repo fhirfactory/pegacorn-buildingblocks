@@ -21,11 +21,11 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosNodeFDN;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 
 public class CDTStimulusReason {
-    private TopologyNodeFDN pegacornEntryPoint;
+    private PetasosNodeFDN pegacornEntryPoint;
     private ExtremelySimplifiedResource why;
     private CDTStimulusReasonTypeEnum reasonType;
     private String originalSource;
@@ -47,11 +47,11 @@ public class CDTStimulusReason {
         this.originalSource = ori.getOriginalSource();
     }
 
-    public TopologyNodeFDN getPegacornEntryPoint() {
+    public PetasosNodeFDN getPegacornEntryPoint() {
         return pegacornEntryPoint;
     }
 
-    public void setPegacornEntryPoint(TopologyNodeFDN pegacornEntryPoint) {
+    public void setPegacornEntryPoint(PetasosNodeFDN pegacornEntryPoint) {
         this.pegacornEntryPoint = pegacornEntryPoint;
     }
 
