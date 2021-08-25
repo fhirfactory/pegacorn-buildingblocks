@@ -1,6 +1,8 @@
 package net.fhirfactory.pegacorn.buildingblocks.datamodels.ldap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.directory.api.ldap.model.entry.Entry;
@@ -14,7 +16,7 @@ import org.json.JSONObject;
  *
  */
 public class PractitionerLdapEntry {
-	private Map<LdapAttributeNameEnum, LdapAttribute> attributes = new HashMap<>();
+	private Map<LdapAttributeNameEnum, String> attributes = new HashMap<>();
 	
 	private String baseDN;
 
@@ -95,7 +97,9 @@ public class PractitionerLdapEntry {
 		
 		if (entry.get(LdapAttributeNameEnum.IRN.getName()) != null) {
 			setIRN(entry.get(LdapAttributeNameEnum.IRN.getName()).getString());
-		}
+		}	
+		
+		setCommonName(entry.get(LdapAttributeNameEnum.COMMON_NAME.getName()).getString());
 	}
 	
 	/**
@@ -112,8 +116,16 @@ public class PractitionerLdapEntry {
 		for (String attributeName : attributeNames) {
 			LdapAttributeNameEnum attributeEnumVal = LdapAttributeNameEnum.get(attributeName);
 			
-			attributes.put(attributeEnumVal, new LdapAttribute(attributeEnumVal, entry.get(attributeName).toString()));
+			attributes.put(attributeEnumVal, entry.get(attributeName).toString());
 		}
+	}
+	
+	public String getDN() {
+		return LdapAttributeNameEnum.COMMON_NAME.getName() + "=" + (getCommonName().replace(",","\\,")) + "," + baseDN;
+	}
+
+	public String getCommonName() {
+		return nullSafeGet(LdapAttributeNameEnum.COMMON_NAME);
 	}
 
 	public String getGivenName() {
@@ -121,7 +133,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setGivenName(String firstName) {
-		attributes.put(LdapAttributeNameEnum.GIVEN_NAME, new LdapAttribute(LdapAttributeNameEnum.GIVEN_NAME, firstName));
+		attributes.put(LdapAttributeNameEnum.GIVEN_NAME, firstName);
 	}
 
 	public String getSurname() {
@@ -129,7 +141,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setSurname(String lastName) {
-		attributes.put(LdapAttributeNameEnum.SURNAME, new LdapAttribute(LdapAttributeNameEnum.SURNAME, lastName));
+		attributes.put(LdapAttributeNameEnum.SURNAME, lastName);
 	}
 
 	public String getPersonalTitle() {
@@ -137,7 +149,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setPersonalTitle(String title) {
-		attributes.put(LdapAttributeNameEnum.PERSONAL_TITLE, new LdapAttribute(LdapAttributeNameEnum.PERSONAL_TITLE, title));
+		attributes.put(LdapAttributeNameEnum.PERSONAL_TITLE, title);
 	}
 
 	public String getPreferredName() {
@@ -145,7 +157,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setPreferredName(String preferredName) {
-		attributes.put(LdapAttributeNameEnum.PREFERRED_NAME, new LdapAttribute(LdapAttributeNameEnum.PREFERRED_NAME, preferredName));
+		attributes.put(LdapAttributeNameEnum.PREFERRED_NAME, preferredName);
 	}
 
 	public String getSuffix() {
@@ -153,7 +165,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setSuffix(String suffixes) {
-		attributes.put(LdapAttributeNameEnum.SUFFIX, new LdapAttribute(LdapAttributeNameEnum.SUFFIX, suffixes));
+		attributes.put(LdapAttributeNameEnum.SUFFIX, suffixes);
 	}
 
 	public String getEmailAddress() {
@@ -161,7 +173,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setEmailAddress(String emailAddress) {
-		attributes.put(LdapAttributeNameEnum.EMAIL, new LdapAttribute(LdapAttributeNameEnum.EMAIL, emailAddress));
+		attributes.put(LdapAttributeNameEnum.EMAIL, emailAddress);
 	}
 
 	public String getPhoneNumber() {
@@ -169,7 +181,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setTelephoneNumber(String phoneNumber) {
-		attributes.put(LdapAttributeNameEnum.TELEPHONE_NUMBER, new LdapAttribute(LdapAttributeNameEnum.TELEPHONE_NUMBER, phoneNumber));
+		attributes.put(LdapAttributeNameEnum.TELEPHONE_NUMBER, phoneNumber);
 	}
 
 	public String getMobileNumber() {
@@ -177,7 +189,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setMobileNumber(String mobileNumber) {
-		attributes.put(LdapAttributeNameEnum.MOBILE, new LdapAttribute(LdapAttributeNameEnum.MOBILE, mobileNumber));
+		attributes.put(LdapAttributeNameEnum.MOBILE, mobileNumber);
 	}
 
 	public String getPager() {
@@ -185,7 +197,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setPager(String pager) {
-		attributes.put(LdapAttributeNameEnum.PAGER, new LdapAttribute(LdapAttributeNameEnum.PAGER, pager));
+		attributes.put(LdapAttributeNameEnum.PAGER, pager);
 	}
 
 	public String getJobTitle() {
@@ -193,7 +205,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setJobTitle(String jobTitle) {
-		attributes.put(LdapAttributeNameEnum.JOB_TITLE, new LdapAttribute(LdapAttributeNameEnum.JOB_TITLE, jobTitle));
+		attributes.put(LdapAttributeNameEnum.JOB_TITLE, jobTitle);
 	}
 
 	public String getBusinessUnit() {
@@ -201,7 +213,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setBusinessUnit(String businessUnit) {
-		attributes.put(LdapAttributeNameEnum.BUSINESS_UNIT, new LdapAttribute(LdapAttributeNameEnum.BUSINESS_UNIT, businessUnit));
+		attributes.put(LdapAttributeNameEnum.BUSINESS_UNIT, businessUnit);
 	}
 
 	public String getDivision() {
@@ -209,7 +221,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setDivision(String division) {
-		attributes.put(LdapAttributeNameEnum.DIVISION, new LdapAttribute(LdapAttributeNameEnum.DIVISION, division));
+		attributes.put(LdapAttributeNameEnum.DIVISION, division);
 	}
 
 	public String getBranch() {
@@ -217,7 +229,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setBranch(String branch) {
-		attributes.put(LdapAttributeNameEnum.BRANCH, new LdapAttribute(LdapAttributeNameEnum.BRANCH, branch));
+		attributes.put(LdapAttributeNameEnum.BRANCH, branch);
 	}
 
 	public String getSection() {
@@ -225,7 +237,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setSection(String section) {
-		attributes.put(LdapAttributeNameEnum.SECTION, new LdapAttribute(LdapAttributeNameEnum.SECTION, section));
+		attributes.put(LdapAttributeNameEnum.SECTION, section);
 	}
 
 	public String getSubSection() {
@@ -233,7 +245,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setSubSection(String subSection) {
-		attributes.put(LdapAttributeNameEnum.SUB_SECTION, new LdapAttribute(LdapAttributeNameEnum.SUB_SECTION, subSection));
+		attributes.put(LdapAttributeNameEnum.SUB_SECTION, subSection);
 	}
 
 	public String getAgsNumber() {
@@ -241,7 +253,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setAgsNumber(String agsNumber) {
-		attributes.put(LdapAttributeNameEnum.EMPLOYEE_NUMBER, new LdapAttribute(LdapAttributeNameEnum.EMPLOYEE_NUMBER, agsNumber));
+		attributes.put(LdapAttributeNameEnum.EMPLOYEE_NUMBER, agsNumber);
 	}
 	
 	public String getGS1() {
@@ -249,7 +261,7 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setGS1(String gs1) {
-		attributes.put(LdapAttributeNameEnum.GS1, new LdapAttribute(LdapAttributeNameEnum.GS1, gs1));
+		attributes.put(LdapAttributeNameEnum.GS1, gs1);
 	}
 
 	public String getIRN() {
@@ -257,32 +269,23 @@ public class PractitionerLdapEntry {
 	}
 
 	public void setIRN(String irn) {
-		attributes.put(LdapAttributeNameEnum.IRN, new LdapAttribute(LdapAttributeNameEnum.IRN, irn));
+		attributes.put(LdapAttributeNameEnum.IRN, irn);
 	}
 	
-	public String getDN() {
-		return "cn=" + (getCommonName().replace(",","\\,")) + "," + baseDN;
+	public void setDN(String dn) {
+		attributes.put(LdapAttributeNameEnum.DISTINGUISHED_NAME, dn); 
 	}
 
-	public String getCommonName() {
-		return getSurname() + ", " + getGivenName();
-	}
-
-	public Map<LdapAttributeNameEnum, LdapAttribute> getAttributes() {
-		return attributes;
-	}
-	
-	
-	public String getDisplayName() {
-		return getCommonName();
+	public void setCommonName(String commonName) {
+		attributes.put(LdapAttributeNameEnum.COMMON_NAME, commonName); 
 	}
 	
 	
 	public JSONObject asJson() {
 		JSONObject entry = new JSONObject();
 		
-		for (Map.Entry<LdapAttributeNameEnum, LdapAttribute> attribute : this.getAttributes().entrySet()) {
-			entry.put(attribute.getKey().getName(), attribute.getValue().getValue());
+		for (Map.Entry<LdapAttributeNameEnum, String> attribute : this.getAttributes().entrySet()) {
+			entry.put(attribute.getKey().getName(), attribute.getValue());
 		}
 		
 		return entry;
@@ -295,11 +298,53 @@ public class PractitionerLdapEntry {
 	}
 	
 	
+	public Map<LdapAttributeNameEnum, String> getAttributes() {
+		return attributes;
+	}
+	
+	
 	private String nullSafeGet(LdapAttributeNameEnum attributeName) {
 		if (attributes.get(attributeName) != null) {
-			return attributes.get(attributeName).getValue();
+			return attributes.get(attributeName);
 		}
 		
 		return "";
+	}
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+		PractitionerLdapEntry other = (PractitionerLdapEntry)obj;
+		
+		for (Map.Entry<LdapAttributeNameEnum, String> attribute : this.getAttributes().entrySet()) {
+			String otherAttribute = other.getAttributes().get(attribute.getKey());
+			
+			if (!otherAttribute.equals(attribute.getValue())) {
+				return false; // Don't match.
+			}
+		}
+		
+		return true;
+	}
+
+	
+	/**
+	 * Returns a list of the attributes which have changed.
+	 * 
+	 * @param other
+	 * @return
+	 */
+	public List<LdapAttributeNameEnum>getModifiedAttributeNames(PractitionerLdapEntry other) {
+		List<LdapAttributeNameEnum> changed = new ArrayList<>();
+		
+		for (Map.Entry<LdapAttributeNameEnum, String> attribute : this.getAttributes().entrySet()) {
+			String otherAttribute = other.getAttributes().get(attribute.getKey());
+			
+			if (!otherAttribute.equals(attribute.getValue())) {
+				changed.add(attribute.getKey());
+			}
+		}		
+		
+		return changed;
 	}
 }

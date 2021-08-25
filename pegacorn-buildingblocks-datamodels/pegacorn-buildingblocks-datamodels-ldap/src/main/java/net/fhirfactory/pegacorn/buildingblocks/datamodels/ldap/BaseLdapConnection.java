@@ -6,6 +6,7 @@ import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.filter.FilterEncoder;
 import org.apache.directory.api.ldap.model.message.Response;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
 import org.apache.directory.api.ldap.model.message.SearchRequestImpl;
@@ -68,24 +69,15 @@ public abstract class BaseLdapConnection {
 	}
 	
 	
-	/**
-	 * Returns an entry from a given name and a surname.
-	 * 
-	 * @param givenName
-	 * @param surname
-	 * @return
-	 * @throws LdapException
-	 * @throws CursorException 
-	 */
-	public PractitionerLdapEntry getEntry(String givenName, String surname) throws LdapException, CursorException {
-		
+	public PractitionerLdapEntry getEntry(String commonName) throws LdapException, CursorException {
+	
 		 // Create the SearchRequest object
 	    SearchRequest searchRequest = new SearchRequestImpl();
 	    searchRequest.setScope(SearchScope.ONELEVEL);
 	    searchRequest.addAttributes("*","+");
 	    searchRequest.setTimeLimit(0);
-	    searchRequest.setBase(new Dn(baseDN));
-	    searchRequest.setFilter("(&(objectclass=*)(sn=" + surname + ")(gn=" + givenName + "))");
+	    searchRequest.setBase(new Dn(baseDN));    
+	    searchRequest.setFilter(FilterEncoder.format("(&(objectclass=*)(cn={0}))", commonName));
 
 		 SearchCursor searchCursor = connection.search(searchRequest);
 
@@ -104,39 +96,7 @@ public abstract class BaseLdapConnection {
 	}
 	
 	
-	public PractitionerLdapEntry getEntry(String emailAddress) throws LdapException, CursorException {
-		
-		 // Create the SearchRequest object
-	    SearchRequest searchRequest = new SearchRequestImpl();
-	    searchRequest.setScope(SearchScope.ONELEVEL);
-	    searchRequest.addAttributes("*","+");
-	    searchRequest.setTimeLimit(0);
-	    searchRequest.setBase(new Dn(baseDN));
-	    searchRequest.setFilter("(&(objectclass=*)(mail=" + emailAddress + "))");
-
-		 SearchCursor searchCursor = connection.search(searchRequest);
-
-		 while (searchCursor.next()) {
-	        Response response = searchCursor.get();
-			
-			if (response instanceof SearchResultEntry) {
-				
-				Entry resultEntry = ((SearchResultEntry) response).getEntry();
-				
-				return new PractitionerLdapEntry(resultEntry, baseDN);
-	        }
-		 }
-		 
-		 return null;
-	}
-	
-	
-	public boolean exists(String emailAddress) throws CursorException, LdapException {
-		return getEntry(emailAddress) != null;
-	}
-	
-	
-	public boolean exists(String givenName, String surname) throws CursorException, LdapException {
-		return getEntry(givenName, surname) != null;
+	public boolean exists(String dn) throws CursorException, LdapException {
+		return getEntry(dn) != null;
 	}
 }

@@ -24,7 +24,9 @@ public enum LdapAttributeNameEnum {
 	EMAIL("mail"),
 	PAGER("pager"),
 	GS1("GS1"),
-	IRN("IRN");
+	IRN("IRN"),
+	COMMON_NAME("cn"),
+	DISTINGUISHED_NAME("dn");
 	
 	private String name;
 	
