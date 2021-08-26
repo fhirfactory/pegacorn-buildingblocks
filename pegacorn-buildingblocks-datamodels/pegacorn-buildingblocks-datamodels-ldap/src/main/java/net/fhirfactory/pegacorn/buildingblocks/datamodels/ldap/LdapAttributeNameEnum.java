@@ -22,13 +22,19 @@ public enum LdapAttributeNameEnum {
 	DIVISION("division"),
 	SECTION("section"),
 	SUB_SECTION("subSection"),
+	DEPARTMENT("department"),
 	EMAIL("mail"),
 	PAGER("pager"),
 	GS1("GS1"),
 	IRN("IRN"),
 	COMMON_NAME("cn"),
 	DISTINGUISHED_NAME("dn"),
-	ACCOUNT_NAME("sAMAccountName");
+	ACCOUNT_NAME("sAMAccountName"),
+	STREET_ADDRESS("streetAddress"),
+	SUB_DEPT("SUBDEPT"),
+	EXTENSION_ATTRIBUTE_4("extensionAttribute4");
+	
+	
 	
 	private String name;
 	

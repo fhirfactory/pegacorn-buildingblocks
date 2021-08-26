@@ -69,6 +69,10 @@ public class PractitionerLdapEntry {
 			setDivision(entry.get(LdapAttributeNameEnum.DIVISION.getName()).getString());
 		}
 		
+		if (entry.get(LdapAttributeNameEnum.DEPARTMENT.getName()) != null) {
+			setDepartment(entry.get(LdapAttributeNameEnum.DEPARTMENT.getName()).getString());
+		}
+		
 		if (entry.get(LdapAttributeNameEnum.BRANCH.getName()) != null) {
 			setBranch(entry.get(LdapAttributeNameEnum.BRANCH.getName()).getString());
 		}
@@ -103,6 +107,18 @@ public class PractitionerLdapEntry {
 		
 		if (entry.get(LdapAttributeNameEnum.TITLE.getName()) != null) {
 			setTitle(entry.get(LdapAttributeNameEnum.TITLE.getName()).getString());
+		}			
+		
+		if (entry.get(LdapAttributeNameEnum.SUB_DEPT.getName()) != null) {
+			setSubDepartment(entry.get(LdapAttributeNameEnum.SUB_DEPT.getName()).getString());
+		}	
+		
+		if (entry.get(LdapAttributeNameEnum.STREET_ADDRESS.getName()) != null) {
+			setStreetAddress(entry.get(LdapAttributeNameEnum.STREET_ADDRESS.getName()).getString());
+		}	
+		
+		if (entry.get(LdapAttributeNameEnum.EXTENSION_ATTRIBUTE_4.getName()) != null) {
+			setExtensionAttribute4(entry.get(LdapAttributeNameEnum.EXTENSION_ATTRIBUTE_4.getName()).getString());
 		}	
 		
 		setCommonName(entry.get(LdapAttributeNameEnum.COMMON_NAME.getName()).getString());
@@ -237,6 +253,14 @@ public class PractitionerLdapEntry {
 	public void setBranch(String branch) {
 		attributes.put(LdapAttributeNameEnum.BRANCH, branch);
 	}
+	
+	public String getDepartment() {
+		return nullSafeGet(LdapAttributeNameEnum.DEPARTMENT);
+	}
+
+	public void setDepartment(String department) {
+		attributes.put(LdapAttributeNameEnum.DEPARTMENT, department);
+	}
 
 	public String getSection() {
 		return nullSafeGet(LdapAttributeNameEnum.SECTION);
@@ -300,6 +324,30 @@ public class PractitionerLdapEntry {
 
 	public void setAccountName(String title) {
 		attributes.put(LdapAttributeNameEnum.ACCOUNT_NAME, title);
+	}
+	
+	public void setSubDepartment(String subDepartment) {
+		attributes.put(LdapAttributeNameEnum.SUB_DEPT, subDepartment);
+	}
+
+	public String getSubDepartment() {
+		return nullSafeGet(LdapAttributeNameEnum.SUB_DEPT);
+	}
+	
+	public void setStreetAddress(String streetAddress) {
+		attributes.put(LdapAttributeNameEnum.STREET_ADDRESS, streetAddress);
+	}
+
+	public String getStreetAddress() {
+		return nullSafeGet(LdapAttributeNameEnum.STREET_ADDRESS);
+	}
+	
+	public void setExtensionAttribute4(String extensionAttribute4) {
+		attributes.put(LdapAttributeNameEnum.EXTENSION_ATTRIBUTE_4, extensionAttribute4);
+	}
+
+	public String getExtensionAttribute4() {
+		return nullSafeGet(LdapAttributeNameEnum.EXTENSION_ATTRIBUTE_4);
 	}
 	
 	
