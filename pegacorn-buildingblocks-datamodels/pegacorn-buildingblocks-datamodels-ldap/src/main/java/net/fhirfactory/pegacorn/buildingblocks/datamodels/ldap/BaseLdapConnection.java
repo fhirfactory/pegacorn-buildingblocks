@@ -1,9 +1,12 @@
 package net.fhirfactory.pegacorn.buildingblocks.datamodels.ldap;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
+import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.filter.FilterEncoder;
@@ -60,8 +63,6 @@ public abstract class BaseLdapConnection {
 		connection = new LdapNetworkConnection(host, port, true);
 		connection.bind(name, credentials);
 		connection.setTimeOut(0);
-		
-		getLogger().info("Brendan: name and credentials: {} --> {}", name, credentials);
 	}
 	
 	public boolean isConnected() {
@@ -87,10 +88,52 @@ public abstract class BaseLdapConnection {
 			if (response instanceof SearchResultEntry) {
 				
 				Entry resultEntry = ((SearchResultEntry) response).getEntry();
-				
+		
 				return new PractitionerLdapEntry(resultEntry, baseDN);
 	        }
 		 }
+		 
+		 return null;
+	}
+	
+	
+	/**
+	 * Gets the attributes for an entry.
+	 * 
+	 * @param commonName
+	 * @return
+	 * @throws LdapException
+	 * @throws CursorException
+	 */
+	public List<Attribute>getAttributes(String commonName) throws LdapException, CursorException {
+		 // Create the SearchRequest object
+	    SearchRequest searchRequest = new SearchRequestImpl();
+	    searchRequest.setScope(SearchScope.ONELEVEL);
+	    searchRequest.addAttributes("*");
+	    searchRequest.setTimeLimit(0);
+	    searchRequest.setBase(new Dn(baseDN));    
+	    searchRequest.setFilter(FilterEncoder.format("(&(objectclass=*)(cn={0}))", commonName));
+
+		 SearchCursor searchCursor = connection.search(searchRequest);
+		 
+		 List<Attribute>attributes = new ArrayList<>();
+
+		 while (searchCursor.next()) {
+	        Response response = searchCursor.get();
+			
+			if (response instanceof SearchResultEntry) {
+				
+				Entry resultEntry = ((SearchResultEntry) response).getEntry();
+				
+				for (Attribute attribute : resultEntry.getAttributes()) {
+					if (!attribute.getId().startsWith("objectclass")) { // ignore this one.
+						attributes.add(attribute);
+					}
+				}
+				
+				 return attributes;	
+	        }
+		 }	
 		 
 		 return null;
 	}

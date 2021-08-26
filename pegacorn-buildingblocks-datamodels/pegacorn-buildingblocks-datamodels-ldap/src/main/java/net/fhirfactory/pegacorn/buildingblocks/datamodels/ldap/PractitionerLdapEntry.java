@@ -1,8 +1,6 @@
 package net.fhirfactory.pegacorn.buildingblocks.datamodels.ldap;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.directory.api.ldap.model.entry.Entry;
@@ -333,42 +331,5 @@ public class PractitionerLdapEntry {
 		}
 		
 		return "";
-	}
-	
-	
-	@Override
-	public boolean equals(Object obj) {
-		PractitionerLdapEntry other = (PractitionerLdapEntry)obj;
-		
-		for (Map.Entry<LdapAttributeNameEnum, String> attribute : this.getAttributes().entrySet()) {
-			String otherAttribute = other.getAttributes().get(attribute.getKey());
-			
-			if (!otherAttribute.equals(attribute.getValue())) {
-				return false; // Don't match.
-			}
-		}
-		
-		return true;
-	}
-
-	
-	/**
-	 * Returns a list of the attributes which have changed.
-	 * 
-	 * @param other
-	 * @return
-	 */
-	public List<LdapAttributeNameEnum>getModifiedAttributeNames(PractitionerLdapEntry other) {
-		List<LdapAttributeNameEnum> changed = new ArrayList<>();
-		
-		for (Map.Entry<LdapAttributeNameEnum, String> attribute : this.getAttributes().entrySet()) {
-			String otherAttribute = other.getAttributes().get(attribute.getKey());
-			
-			if (!otherAttribute.equals(attribute.getValue())) {
-				changed.add(attribute.getKey());
-			}
-		}		
-		
-		return changed;
 	}
 }
