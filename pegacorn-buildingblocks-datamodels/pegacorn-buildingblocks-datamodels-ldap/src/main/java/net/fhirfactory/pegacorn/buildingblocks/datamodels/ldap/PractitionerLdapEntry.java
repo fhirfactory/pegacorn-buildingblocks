@@ -99,6 +99,14 @@ public class PractitionerLdapEntry {
 			setIRN(entry.get(LdapAttributeNameEnum.IRN.getName()).getString());
 		}	
 		
+		if (entry.get(LdapAttributeNameEnum.ACCOUNT_NAME.getName()) != null) {
+			setAccountName(entry.get(LdapAttributeNameEnum.ACCOUNT_NAME.getName()).getString());
+		}	
+		
+		if (entry.get(LdapAttributeNameEnum.TITLE.getName()) != null) {
+			setTitle(entry.get(LdapAttributeNameEnum.TITLE.getName()).getString());
+		}	
+		
 		setCommonName(entry.get(LdapAttributeNameEnum.COMMON_NAME.getName()).getString());
 	}
 	
@@ -256,6 +264,14 @@ public class PractitionerLdapEntry {
 		attributes.put(LdapAttributeNameEnum.EMPLOYEE_NUMBER, agsNumber);
 	}
 	
+	public String getTitle() {
+		return nullSafeGet(LdapAttributeNameEnum.TITLE);
+	}
+
+	public void setTitle(String title) {
+		attributes.put(LdapAttributeNameEnum.TITLE, title);
+	}
+	
 	public String getGS1() {
 		return nullSafeGet(LdapAttributeNameEnum.GS1);
 	}
@@ -278,6 +294,14 @@ public class PractitionerLdapEntry {
 
 	public void setCommonName(String commonName) {
 		attributes.put(LdapAttributeNameEnum.COMMON_NAME, commonName); 
+	}
+	
+	public String getAccountName() {
+		return nullSafeGet(LdapAttributeNameEnum.ACCOUNT_NAME);
+	}
+
+	public void setAccountName(String title) {
+		attributes.put(LdapAttributeNameEnum.ACCOUNT_NAME, title);
 	}
 	
 	

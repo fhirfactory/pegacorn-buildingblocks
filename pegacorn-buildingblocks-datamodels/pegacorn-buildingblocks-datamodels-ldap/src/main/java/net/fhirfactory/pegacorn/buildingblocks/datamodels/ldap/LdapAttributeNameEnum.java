@@ -14,6 +14,7 @@ public enum LdapAttributeNameEnum {
 	TELEPHONE_NUMBER("telephoneNumber"),
 	EMPLOYEE_NUMBER("AGS"),
 	PERSONAL_TITLE("personalTitle"),
+	TITLE("TITLE"),
 	PREFERRED_NAME("preferredFirstName"),
 	SUFFIX("suffix"),
 	BUSINESS_UNIT("businessUnit"),
@@ -26,7 +27,8 @@ public enum LdapAttributeNameEnum {
 	GS1("GS1"),
 	IRN("IRN"),
 	COMMON_NAME("cn"),
-	DISTINGUISHED_NAME("dn");
+	DISTINGUISHED_NAME("dn"),
+	ACCOUNT_NAME("sAMAccountName");
 	
 	private String name;
 	
