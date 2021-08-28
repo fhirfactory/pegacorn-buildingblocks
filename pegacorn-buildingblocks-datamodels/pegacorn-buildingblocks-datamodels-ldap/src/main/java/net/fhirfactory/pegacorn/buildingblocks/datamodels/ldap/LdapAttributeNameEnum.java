@@ -32,7 +32,8 @@ public enum LdapAttributeNameEnum {
 	ACCOUNT_NAME("sAMAccountName"),
 	STREET_ADDRESS("streetAddress"),
 	SUB_DEPT("SUBDEPT"),
-	EXTENSION_ATTRIBUTE_4("extensionAttribute4");
+	EXTENSION_ATTRIBUTE_4("extensionAttribute4"),
+	OBJECT_CATEGORY("objectCategory");
 	
 	
 	

@@ -121,6 +121,10 @@ public class PractitionerLdapEntry {
 			setExtensionAttribute4(entry.get(LdapAttributeNameEnum.EXTENSION_ATTRIBUTE_4.getName()).getString());
 		}	
 		
+		if (entry.get(LdapAttributeNameEnum.OBJECT_CATEGORY.getName()) != null) {
+			setObjectCategory(entry.get(LdapAttributeNameEnum.OBJECT_CATEGORY.getName()).getString());
+		}	
+		
 		setCommonName(entry.get(LdapAttributeNameEnum.COMMON_NAME.getName()).getString());
 	}
 	
@@ -348,6 +352,14 @@ public class PractitionerLdapEntry {
 
 	public String getExtensionAttribute4() {
 		return nullSafeGet(LdapAttributeNameEnum.EXTENSION_ATTRIBUTE_4);
+	}
+	
+	public void setObjectCategory(String objectCategory) {
+		attributes.put(LdapAttributeNameEnum.OBJECT_CATEGORY, objectCategory);
+	}
+
+	public String getObjectCategory() {
+		return nullSafeGet(LdapAttributeNameEnum.OBJECT_CATEGORY);
 	}
 	
 	
