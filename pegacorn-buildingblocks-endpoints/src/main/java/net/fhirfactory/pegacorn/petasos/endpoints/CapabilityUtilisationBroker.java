@@ -46,29 +46,29 @@ public class CapabilityUtilisationBroker implements CapabilityUtilisationBrokerI
     private PetasosIntraZoneIPCEndpoint intraZoneIPCEndpoint;
 
     @Override
-    public CapabilityUtilisationResponse executeTask(String preferredCapabilityProvider, CapabilityUtilisationRequest a19QueryTask) {
-        LOG.debug(".useA19QueryCapability(): Entry, preferredCapabilityProvider->{}, a19QueryTask->{}", preferredCapabilityProvider, a19QueryTask);
+    public CapabilityUtilisationResponse executeTask(String preferredCapabilityProvider, CapabilityUtilisationRequest task) {
+        LOG.debug(".executeTask(): Entry, preferredCapabilityProvider->{}, task->{}", preferredCapabilityProvider, task);
 
         if(intraZoneIPCEndpoint.capabilityProviderIsInScope(preferredCapabilityProvider)){
-            LOG.trace(".useA19QueryCapability(): Using intra-zone communication framework");
-            CapabilityUtilisationResponse a19QueryTaskOutcome = intraZoneIPCEndpoint.executeTask(preferredCapabilityProvider, a19QueryTask);
-            LOG.debug(".useA19QueryCapability(): Exit, outcome->{}", a19QueryTaskOutcome);
-            return(a19QueryTaskOutcome);
+            LOG.trace(".executeTask(): Using intra-zone communication framework");
+            CapabilityUtilisationResponse taskOutcome = intraZoneIPCEndpoint.executeTask(preferredCapabilityProvider, task);
+            LOG.debug(".executeTask(): Exit, outcome->{}", taskOutcome);
+            return(taskOutcome);
         }
         if(interZoneIPCEndpoint.capabilityProviderIsInScope(preferredCapabilityProvider)){
-            LOG.trace(".useA19QueryCapability(): Using inter-zone communication framework");
-            CapabilityUtilisationResponse a19QueryTaskOutcome = intraZoneIPCEndpoint.executeTask(preferredCapabilityProvider, a19QueryTask);
-            LOG.debug(".useA19QueryCapability(): Exit, outcome->{}", a19QueryTaskOutcome);
-            return(a19QueryTaskOutcome);
+            LOG.trace(".executeTask(): Using inter-zone communication framework");
+            CapabilityUtilisationResponse taskOutcome = interZoneIPCEndpoint.executeTask(preferredCapabilityProvider, task);
+            LOG.debug(".executeTask(): Exit, outcome->{}", taskOutcome);
+            return(taskOutcome);
         }
 
-        LOG.trace(".useA19QueryCapability(): Can't find suitable capability provider");
+        LOG.trace(".executeTask(): Can't find suitable capability provider");
         CapabilityUtilisationResponse outcome = new CapabilityUtilisationResponse();
         outcome.setSuccessful(false);
         outcome.setInScope(false);
         outcome.setDateCompleted(Instant.now());
-        outcome.setAssociatedRequestID(a19QueryTask.getRequestID());
-        LOG.debug(".useA19QueryCapability(): Exit, failed to find capability provider, outcome->{}", outcome);
+        outcome.setAssociatedRequestID(task.getRequestID());
+        LOG.debug(".executeTask(): Exit, failed to find capability provider, outcome->{}", outcome);
         return(outcome);
     }
 }

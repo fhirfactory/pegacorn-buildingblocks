@@ -158,41 +158,41 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
 
     //
     // ****Tactical****
-    // A19 Query Task Execution / Capability Utilisation Services
+    // Task Execution / Capability Utilisation Services
     //
 
-    public CapabilityUtilisationResponse executeTask(String capabilityProviderName, CapabilityUtilisationRequest a19QueryTask){
-        getLogger().debug(".requestA19Query(): Entry, capabilityProviderName->{}, a19QueryTask->{}", capabilityProviderName, a19QueryTask);
+    public CapabilityUtilisationResponse executeTask(String capabilityProviderName, CapabilityUtilisationRequest task){
+        getLogger().debug(".executeTask(): Entry, capabilityProviderName->{}, task->{}", capabilityProviderName, task);
         Address targetAddress = getCandidateIPCTargetAddress(capabilityProviderName);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
-            objectSet[0] = a19QueryTask;
+            objectSet[0] = task;
             classSet[0] = CapabilityUtilisationRequest.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            CapabilityUtilisationResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "request19QueryHandler", objectSet, classSet, requestOptions);
-            getLogger().debug(".requestA19Query(): Exit, response->{}", response);
+            CapabilityUtilisationResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "executeTaskHandler", objectSet, classSet, requestOptions);
+            getLogger().debug(".executeTask(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
-            getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".executeTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setAssociatedRequestID(a19QueryTask.getRequestID());
+            response.setAssociatedRequestID(task.getRequestID());
             response.setSuccessful(false);
             return(response);
         } catch (Exception e) {
             e.printStackTrace();
-            getLogger().error(".sendIPCMessage: Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".executeTask: Error (GeneralException) ->{}", e.getMessage());
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setAssociatedRequestID(a19QueryTask.getRequestID());
+            response.setAssociatedRequestID(task.getRequestID());
             response.setSuccessful(false);
             return(response);
         }
     }
 
-    public CapabilityUtilisationResponse request19QueryHandler(CapabilityUtilisationRequest a19QueryTask){
-        getLogger().debug(".request19QueryHandler(): Entry, a19QueryTask->{}", a19QueryTask);
-        CapabilityUtilisationResponse response = getProcessingPlantInterface().executeTask(a19QueryTask);
-        getLogger().debug(".request19QueryHandler(): Exit, response->{}", response);
+    public CapabilityUtilisationResponse executeTaskHandler(CapabilityUtilisationRequest task){
+        getLogger().debug(".executeTaskHandler(): Entry, task->{}", task);
+        CapabilityUtilisationResponse response = getProcessingPlantInterface().executeTask(task);
+        getLogger().debug(".executeTaskHandler(): Exit, response->{}", response);
         return(response);
     }
 

@@ -21,12 +21,84 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories;
 
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSubTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.AuditEvent;
+import org.hl7.fhir.r4.model.Period;
+import org.hl7.fhir.r4.model.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.Date;
 
 @ApplicationScoped
 public class AuditEventFactory {
     private static final Logger LOG = LoggerFactory.getLogger(AuditEventFactory.class);
+
+    @Inject
+    private PegacornIdentifierFactory identifierFactory;
+
+    public AuditEvent newAuditEvent(Reference petasosNodeReference,
+                                    String sourceSystem,
+                                    String sourceHost,
+                                    String sourceComponentName,
+                                    Reference eventLocation,
+                                    AuditEventSourceTypeEnum sourceType,
+                                    AuditEventTypeEnum eventType,
+                                    AuditEventSubTypeEnum eventSubType,
+                                    AuditEvent.AuditEventAction eventAction,
+                                    AuditEvent.AuditEventOutcome eventOutcome,
+                                    String eventOutcomeCommentary,
+                                    Period eventPeriod,
+                                    AuditEvent.AuditEventEntityComponent auditEntity){
+
+        AuditEvent auditEvent = new AuditEvent();
+
+        auditEvent.setType(eventType.getTypeCoding());
+        auditEvent.addSubtype(eventSubType.getSubTypeCoding());
+
+        AuditEvent.AuditEventAgentComponent agent = new AuditEvent.AuditEventAgentComponent();
+        agent.setRequestor(false);
+        if(petasosNodeReference != null){
+            agent.setWho(petasosNodeReference);
+        }
+        if(eventLocation != null){
+            agent.setLocation(eventLocation);
+        }
+        AuditEvent.AuditEventAgentNetworkComponent agentNetwork = new AuditEvent.AuditEventAgentNetworkComponent();
+        agentNetwork.setAddress(sourceHost);
+        agentNetwork.setType(AuditEvent.AuditEventAgentNetworkType._1);
+        agent.setNetwork(agentNetwork);
+        agent.setName(sourceSystem);
+        auditEvent.addAgent(agent);
+
+        auditEvent.setAction(eventAction);
+        auditEvent.setOutcome(eventOutcome);
+        if(!StringUtils.isEmpty(eventOutcomeCommentary)){
+            auditEvent.setOutcomeDesc(eventOutcomeCommentary);
+        }
+
+        if(eventPeriod != null){
+            auditEvent.setPeriod(eventPeriod);
+        }
+
+        auditEvent.setRecorded(Date.from(Instant.now()));
+
+        AuditEvent.AuditEventSourceComponent sourceComponent = new AuditEvent.AuditEventSourceComponent();
+        sourceComponent.setObserver(petasosNodeReference);
+        sourceComponent.addType(sourceType.getSourceTypeCoding());
+        sourceComponent.setSite(sourceComponentName);
+
+        auditEvent.setSource(sourceComponent);
+
+        auditEvent.addEntity(auditEntity);
+
+        return(auditEvent);
+    }
 }

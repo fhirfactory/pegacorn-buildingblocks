@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter
+ * Copyright (c) 2020 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,41 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package net.fhirfactory.pegacorn.platform.edge.ask.http;
 
-package net.fhirfactory.pegacorn.services.audit.logger.base;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.deployment.names.sites.SiteKeyNames;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.factories.helpers.TopologyMapTraversalHelpers;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 
-import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.util.FHIRContextUtility;
-import org.hl7.fhir.r4.model.AuditEvent;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.*;
+import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.List;
 
-/**
- *
- * @author Mark A. Hunter
- * @since 2020-09-01
- */
-@ApplicationScoped
-public class AuditEntryPrettyPrinter {
-    private static final Logger LOG = LoggerFactory.getLogger(AuditEntryPrettyPrinter.class);
+public abstract class InternalFHIRClientProxy extends HAPIServerSecureProxy {
 
-    private IParser jsonParser;
+    protected abstract Logger getLogger();
+
+    protected abstract String deriveTargetEndpointDetails();
 
     @PostConstruct
     public void initialise(){
-        this.jsonParser = contextUtility.getJsonParser();
+        newRestfulGenericClient(deriveTargetEndpointDetails());
     }
 
-    @Inject
-    FHIRContextUtility contextUtility;
-
-    public void prettyPrintAuditEntry(AuditEvent auditTrailEntry){
-        String resourceToString = jsonParser.encodeResourceToString(auditTrailEntry);
-        LOG.info("Audit Entry --> " + resourceToString);
-    }
 }

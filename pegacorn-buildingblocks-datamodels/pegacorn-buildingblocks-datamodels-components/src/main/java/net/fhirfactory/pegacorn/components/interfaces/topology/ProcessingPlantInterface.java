@@ -13,6 +13,7 @@ public interface ProcessingPlantInterface extends CapabilityFulfillmentManagemen
     public String getSimpleFunctionName();
     public String getSimpleInstanceName();
     public NetworkSecurityZoneEnum getNetworkZone();
+    public String getHostName();
     public String getDeploymentSite();
     public PegacornTopologyFactoryInterface getTopologyFactory();
     public ProcessingPlantTopologyNode getProcessingPlantNode();

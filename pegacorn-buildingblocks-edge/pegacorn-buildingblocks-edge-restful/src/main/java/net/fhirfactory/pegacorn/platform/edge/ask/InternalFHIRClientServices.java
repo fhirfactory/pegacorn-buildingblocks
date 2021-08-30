@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 import javax.inject.Inject;
 
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle.BundleContentHelper;
-import net.fhirfactory.pegacorn.platform.edge.ipc.frameworks.fhirapi.InternalFHIRClientProxy;
+import net.fhirfactory.pegacorn.platform.edge.ask.http.InternalFHIRClientProxy;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;

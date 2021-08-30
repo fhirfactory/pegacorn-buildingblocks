@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacorn.platform.edge.ipc.frameworks.fhirapi.resourcespecific;
+package net.fhirfactory.pegacorn.platform.edge.ask.http.resourcespecific;
 
 import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.param.TokenParam;

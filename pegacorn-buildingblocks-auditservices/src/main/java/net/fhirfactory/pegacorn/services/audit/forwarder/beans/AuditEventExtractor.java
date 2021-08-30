@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,54 +19,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.services.audit.logger;
+package net.fhirfactory.pegacorn.services.audit.forwarder.beans;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
-import net.fhirfactory.pegacorn.services.audit.logger.base.AuditEntryLoggerServiceBase;
+import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.AuditEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class TransactionAuditEntryLoggerService extends AuditEntryLoggerServiceBase {
-    private static final Logger LOG = LoggerFactory.getLogger(TransactionAuditEntryLoggerService.class);
+public class AuditEventExtractor {
 
-    private static final String FHIR_VERSION = "4.0.1";
-
-    @Override
-    protected Logger specifyLogger(){return(LOG);}
-    
-    @Inject 
-    private FHIRContextUtility FHIRContextUtility;
-    
-    private IParser parserR4;
+    private IParser jsonFHIRParser;
 
     @Inject
-    private FHIRElementTopicFactory topicIDBuilder;
-
+    private FHIRContextUtility fhirContextUtility;
 
     @PostConstruct
-    protected void initialise() {
-        LOG.debug(".initialise(): Entry");
-        this.parserR4 = FHIRContextUtility.getJsonParser();
-        LOG.debug(".initialise(): Exit");
+    public void initialise(){
+        jsonFHIRParser = fhirContextUtility.getJsonParser();
     }
 
-    public AuditEvent beginTransaction(AuditEvent rawAuditEvent) {
-        LOG.debug(".beginTransaction(): Entry, rawAuditEvent->{}",rawAuditEvent);
-        // Do some magic
-        return (rawAuditEvent);
-    }
-
-    public void endTransaction(AuditEvent rawAuditEvent) {
-        LOG.debug(".endTransaction(): Entry, rawAuditEvent->{}",rawAuditEvent);
-        // Do some magic
-        return;
+    public AuditEvent extractAuditEvent(UoW uow){
+        AuditEvent auditEvent = new AuditEvent();
+        if(uow == null){
+            return(auditEvent);
+        }
+        UoWPayload ingresContent = uow.getIngresContent();
+        if (ingresContent == null) {
+            return(auditEvent);
+        }
+        String payload = ingresContent.getPayload();
+        if(StringUtils.isEmpty(payload)){
+            return(auditEvent);
+        }
+        auditEvent = jsonFHIRParser.parseResource(AuditEvent.class, payload);
+        return(auditEvent);
     }
 }
