@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.platform.edge.answer.resourceproxies.common;
 
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionStatusEnum;
+import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionStatusEnum;
 import net.fhirfactory.pegacorn.components.transaction.model.TransactionMethodOutcome;
 import org.hl7.fhir.r4.model.*;
 

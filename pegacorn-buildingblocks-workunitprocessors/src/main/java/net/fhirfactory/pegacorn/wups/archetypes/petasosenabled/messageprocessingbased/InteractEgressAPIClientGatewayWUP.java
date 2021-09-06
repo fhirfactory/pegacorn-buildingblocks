@@ -37,6 +37,8 @@ public abstract class InteractEgressAPIClientGatewayWUP extends GenericMessageBa
 //        LOG.debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
 
+    protected abstract String specifyEgressTopologyEndpointName();
+
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT);

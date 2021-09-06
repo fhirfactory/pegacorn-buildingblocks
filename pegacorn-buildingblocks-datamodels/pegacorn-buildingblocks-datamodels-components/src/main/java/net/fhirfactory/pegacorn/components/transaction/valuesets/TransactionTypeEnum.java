@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2020 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,22 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message;
+package net.fhirfactory.pegacorn.components.transaction.valuesets;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEventBase;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.room.message.contenttypes.MAudioContentType;
-
-public class MRoomAudioMessageEvent extends MatrixEventBase {
-    private MAudioContentType content;
-
-    @JsonProperty("content")
-    public MAudioContentType getContent() {
-        return content;
-    }
-
-    @JsonProperty("content")
-    public void setContent(MAudioContentType content) {
-        this.content = content;
-    }
+public enum TransactionTypeEnum {
+    CREATE,
+    REVIEW,
+    UPDATE,
+    DELETE,
+    SEARCH,
+    SYNC
 }

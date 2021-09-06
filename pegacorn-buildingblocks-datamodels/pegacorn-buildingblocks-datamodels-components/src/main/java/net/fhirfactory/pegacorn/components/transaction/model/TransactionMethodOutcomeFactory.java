@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.components.transaction.model;
 
+import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionStatusEnum;
+import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
 import org.hl7.fhir.r4.model.*;
 
 import javax.enterprise.context.ApplicationScoped;

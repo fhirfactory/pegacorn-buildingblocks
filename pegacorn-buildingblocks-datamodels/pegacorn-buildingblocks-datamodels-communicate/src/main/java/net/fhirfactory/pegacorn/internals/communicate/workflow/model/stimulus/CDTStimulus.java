@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
 
+import net.fhirfactory.pegacorn.communicate.matrix.model.r061.events.common.MatrixEvent;
 import net.fhirfactory.pegacorn.internals.communicate.workflow.model.CDTIdentifier;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.internals.matrix.r061.events.common.MatrixEvent;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWIdentifier;
 import org.hl7.fhir.r4.model.Resource;
 

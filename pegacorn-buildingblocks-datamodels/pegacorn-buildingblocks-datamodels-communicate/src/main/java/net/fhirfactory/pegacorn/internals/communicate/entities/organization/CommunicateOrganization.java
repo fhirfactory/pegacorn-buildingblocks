@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.internals.communicate.entities.organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
 import net.fhirfactory.pegacorn.internals.esr.resources.OrganizationESR;
-import net.fhirfactory.pegacorn.internals.synapse.api.SynapseUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

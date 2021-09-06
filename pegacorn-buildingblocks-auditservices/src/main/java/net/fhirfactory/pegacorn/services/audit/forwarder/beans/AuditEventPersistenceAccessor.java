@@ -27,12 +27,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.components.transaction.model.SimpleResourceID;
+import net.fhirfactory.pegacorn.components.transaction.model.SimpleTransactionOutcome;
 import net.fhirfactory.pegacorn.petasos.endpoints.CapabilityUtilisationBroker;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.AuditEvent;
+import org.hl7.fhir.r4.model.IdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,7 +145,25 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
             return(outcome);
         }
         try {
-            MethodOutcome methodOutcome = getJSONMapper().readValue(methodOutcomeString, MethodOutcome.class);
+            SimpleTransactionOutcome transactionOutcome = getJSONMapper().readValue(methodOutcomeString, SimpleTransactionOutcome.class);
+            MethodOutcome methodOutcome = new MethodOutcome();
+            String resourceURL = null;
+            String resourceType = "AuditEvent";
+            String resourceValue = transactionOutcome.getResourceID().getValue();
+            String resourceVersion = SimpleResourceID.DEFAULT_VERSION;
+            if(transactionOutcome.getResourceID().getResourceType() != null){
+                resourceType = transactionOutcome.getResourceID().getResourceType();
+            }
+            if(transactionOutcome.getResourceID().getVersion() != null){
+                resourceVersion = transactionOutcome.getResourceID().getVersion();
+            }
+            if(transactionOutcome.getResourceID().getUrl() != null){
+                resourceURL = transactionOutcome.getResourceID().getUrl();
+            }
+            IdType id = new IdType();
+            id.setParts(resourceURL, resourceType, resourceValue, resourceVersion);
+            methodOutcome.setId(id);
+            methodOutcome.setCreated(transactionOutcome.isTransactionSuccessful());
             return(methodOutcome);
         } catch (JsonProcessingException e) {
             getLogger().error(".convertToMethodOutcome(): Cannot parse MethodOutcome object! ", e);

@@ -99,7 +99,11 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
     }
 
     protected String getSourceSystemName(){
-        String sourceSystemName = getIngresEndpoint().getEndpointTopologyNode().getConnectedSystemName();
+        getLogger().debug(".getSourceSystemName(): Entry, ingresEndpoint->{}", getIngresEndpoint());
+        IPCTopologyEndpoint endpointTopologyNode = getIngresEndpoint().getEndpointTopologyNode();
+        getLogger().trace(".getSourceSystemName(): endpointTopologyNode->{}", endpointTopologyNode);
+        String sourceSystemName = endpointTopologyNode.getConnectedSystemName();
+        getLogger().debug(".getSourceSystemName(): Exit, sourceSystemName->{}", sourceSystemName);
         return(sourceSystemName);
     }
 
