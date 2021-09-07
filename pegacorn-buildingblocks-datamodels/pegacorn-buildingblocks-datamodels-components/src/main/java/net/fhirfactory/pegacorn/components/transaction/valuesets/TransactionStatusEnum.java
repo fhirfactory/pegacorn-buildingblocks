@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.components.transaction.valuesets;
 
-public enum TransactionStatusEnum {
+public enum  TransactionStatusEnum {
     CREATION_START,
     CREATION_IN_PROGRESS,
     CREATION_FINISH,
