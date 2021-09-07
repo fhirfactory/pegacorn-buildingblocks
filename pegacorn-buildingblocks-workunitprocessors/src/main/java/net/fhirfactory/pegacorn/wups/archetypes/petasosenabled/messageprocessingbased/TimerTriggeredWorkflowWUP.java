@@ -30,9 +30,9 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBasedWUPTemplate {
+public abstract class TimerTriggeredWorkflowWUP extends GenericMessageBasedWUPTemplate {
     
-    public LadonTimerTriggeredBehaviourWUP() {
+    public TimerTriggeredWorkflowWUP() {
         super();
 //        getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
@@ -42,7 +42,7 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBase
 
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
-        return(WUPArchetypeEnum.WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR);
+        return(WUPArchetypeEnum.WUP_NATURE_TIMER_TRIGGERED_WORKFLOW);
     }
 
     @Override
