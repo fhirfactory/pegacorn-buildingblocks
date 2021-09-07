@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.components.transaction.valuesets;
 
-public enum TransactionTypeEnum {
+public enum  TransactionTypeEnum {
     CREATE,
     REVIEW,
     UPDATE,

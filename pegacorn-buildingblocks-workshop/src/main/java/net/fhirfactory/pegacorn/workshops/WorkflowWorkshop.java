@@ -19,41 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.components.transaction.valuesets;
+package net.fhirfactory.pegacorn.workshops;
 
-public enum  TransactionStatusEnum {
-    CREATION_START,
-    CREATION_IN_PROGRESS,
-    CREATION_FINISH,
-    CREATION_FAILURE,
-    CREATION_NOT_REQUIRED,
-    CREATED_PAUSED,
-    UPDATE_START,
-    UPDATE_IN_PROGRESS,
-    UPDATE_FINISH,
-    UPDATE_FAILURE,
-    UPDATE_PAUSED,
-    UPDATE_NOT_REQUIRED,
-    DELETE_START,
-    DELETE_IN_PROGRESS,
-    DELETE_FINISH,
-    DELETE_FAILURE,
-    DELETE_PAUSED,
-    REVIEW_START,
-    REVIEW_IN_PROGRESS,
-    REVIEW_FINISH,
-    REVIEW_RESOURCE_NOT_IN_CACHE,
-    REVIEW_FAILURE,
-    REVIEW_PAUSED,
-    SYNCHRONISING,
-    LOADING_START,
-    LOADING_IN_PROGRESS,
-    LOADING_FINISH,
-    LOADING_FAILURE,
-    SEARCH_FINISHED,
-    SEARCH_FAILURE,
-    SYNC_FINISHED,
-    SYNC_FAILURE,
-    INDETERMINANT
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class WorkflowWorkshop extends PetasosEnabledWorkshop {
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowWorkshop.class);
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    @Override
+    protected String specifyWorkshopName() {
+        return (DefaultWorkshopSetEnum.WORKFLOW_WORKSHOP.getWorkshop());
+    }
+
+    @Override
+    protected String specifyWorkshopVersion() {
+        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
+    }
+
+    @Override
+    protected void invokePostConstructInitialisation() {
+
+    }
 }

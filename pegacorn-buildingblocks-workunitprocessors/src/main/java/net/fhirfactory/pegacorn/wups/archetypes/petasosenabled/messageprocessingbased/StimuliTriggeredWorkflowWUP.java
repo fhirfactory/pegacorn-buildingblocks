@@ -25,15 +25,15 @@ import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
-public abstract class LadonStimuliTriggeredBehaviourWUP extends GenericMessageBasedWUPTemplate {
+public abstract class StimuliTriggeredWorkflowWUP extends GenericMessageBasedWUPTemplate {
 
-    public LadonStimuliTriggeredBehaviourWUP() {
+    public StimuliTriggeredWorkflowWUP() {
         super();
     }
     
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
-        return(WUPArchetypeEnum.WUP_NATURE_LAODN_STIMULI_TRIGGERED_BEHAVIOUR);
+        return(WUPArchetypeEnum.WUP_NATURE_STIMULI_TRIGGERED_WORKFLOW);
     }
 
     @Override
