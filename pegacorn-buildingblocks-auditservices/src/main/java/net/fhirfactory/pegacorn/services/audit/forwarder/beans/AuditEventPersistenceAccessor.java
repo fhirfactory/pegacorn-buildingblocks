@@ -144,31 +144,42 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
             outcome.setCreated(false);
             return(outcome);
         }
+        SimpleTransactionOutcome transactionOutcome = null;
         try {
-            SimpleTransactionOutcome transactionOutcome = getJSONMapper().readValue(methodOutcomeString, SimpleTransactionOutcome.class);
-            MethodOutcome methodOutcome = new MethodOutcome();
-            String resourceURL = null;
-            String resourceType = "AuditEvent";
-            String resourceValue = transactionOutcome.getResourceID().getValue();
-            String resourceVersion = SimpleResourceID.DEFAULT_VERSION;
-            if(transactionOutcome.getResourceID().getResourceType() != null){
-                resourceType = transactionOutcome.getResourceID().getResourceType();
-            }
-            if(transactionOutcome.getResourceID().getVersion() != null){
-                resourceVersion = transactionOutcome.getResourceID().getVersion();
-            }
-            if(transactionOutcome.getResourceID().getUrl() != null){
-                resourceURL = transactionOutcome.getResourceID().getUrl();
-            }
-            IdType id = new IdType();
-            id.setParts(resourceURL, resourceType, resourceValue, resourceVersion);
-            methodOutcome.setId(id);
-            methodOutcome.setCreated(transactionOutcome.isTransactionSuccessful());
-            return(methodOutcome);
+            transactionOutcome = getJSONMapper().readValue(methodOutcomeString, SimpleTransactionOutcome.class);
         } catch (JsonProcessingException e) {
             getLogger().error(".convertToMethodOutcome(): Cannot parse MethodOutcome object! ", e);
-            return(null);
         }
+        MethodOutcome methodOutcome = null;
+        if(transactionOutcome != null){
+            String resourceURL = null;
+            String resourceType = "AuditEvent";
+            if(transactionOutcome.isTransactionSuccessful()) {
+                String resourceValue = transactionOutcome.getResourceID().getValue();
+                String resourceVersion = SimpleResourceID.DEFAULT_VERSION;
+                if(transactionOutcome.getResourceID() != null) {
+                    if (transactionOutcome.getResourceID().getResourceType() != null) {
+                        resourceType = transactionOutcome.getResourceID().getResourceType();
+                    }
+                    if (transactionOutcome.getResourceID().getVersion() != null) {
+                        resourceVersion = transactionOutcome.getResourceID().getVersion();
+                    }
+                    if (transactionOutcome.getResourceID().getUrl() != null) {
+                        resourceURL = transactionOutcome.getResourceID().getUrl();
+                    }
+                    IdType id = new IdType();
+                    id.setParts(resourceURL, resourceType, resourceValue, resourceVersion);
+                    methodOutcome = new MethodOutcome();
+                    methodOutcome.setId(id);
+                    methodOutcome.setCreated(transactionOutcome.isTransactionSuccessful());
+                }
+            }
+        }
+        if(methodOutcome == null) {
+            methodOutcome = new MethodOutcome();
+            methodOutcome.setCreated(false);
+        }
+        return(methodOutcome);
     }
 
     protected ObjectMapper getJSONMapper(){

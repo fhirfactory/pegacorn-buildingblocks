@@ -3,6 +3,7 @@ package net.fhirfactory.pegacorn.components.dataparcel.valuesets;
 public enum DataParcelDirectionEnum {
     INBOUND_DATA_PARCEL("dataparcel.flow-direction.inbound"),
     OUTBOUND_DATA_PARCEL("dataparcel.flow-direction.outbound"),
+    WORKFLOW_OUTPUT_DATA_PARCEL("dataparcel.flow-direction.transient"),
     SUBSYSTEM_IPC_DATA_PARCEL("dataparcel.flow-direction.subsystem_ipc");
 
     private String dataParcelDirectionValue;
