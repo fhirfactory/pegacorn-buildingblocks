@@ -17,13 +17,13 @@
 
     <modules>
         <module>../pegacorn-buildingblocks-datamodels/pegacorn-buildingblocks-datamodels</module>
-	<module>../pegacorn-buildingblocks-directoryservices</module>
+	    <module>../pegacorn-buildingblocks-directoryservices</module>
         <module>../pegacorn-buildingblocks-workshop</module>
         <module>../pegacorn-buildingblocks-processingplant</module>
-	<module>../pegacorn-buildingblocks-edge/pegacorn-buildingblocks-edge</module>
+	    <module>../pegacorn-buildingblocks-edge/pegacorn-buildingblocks-edge</module>
         <module>../pegacorn-buildingblocks-fhirim</module>
         <module>../pegacorn-buildingblocks-workunitprocessors</module>
-	<module>../pegacorn-buildingblocks-endpoints</module>
+	    <module>../pegacorn-buildingblocks-endpoints</module>
         <module>../pegacorn-buildingblocks-auditservices</module>
     </modules>
 </project>
