@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,35 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
+package net.fhirfactory.pegacorn.internals.esr.resources;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.common.valuesets.CommunicateResourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class CDTStimulusIdentifier {
-    private String id;
-    private CommunicateResourceTypeEnum resourceType;
+public class MediaESR extends ExtremelySimplifiedResource {
+    private static final Logger LOG = LoggerFactory.getLogger(MediaESR.class);
+    public static String CUMULATIVE_SHORT_NAME_IDENTIFIER_TYPE = "CumulativeShortName";
+    public static String CUMULATIVE_LONG_NAME_IDENTIFIER_TYPE = "CumulativeLongName";
+    public static String CUMULATIVE_NAME_SEPARATOR = "+";
 
-    public String getId() {
-        return id;
-    }
+    @Override
+    protected Logger getLogger(){return(LOG);}
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public CommunicateResourceTypeEnum getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(CommunicateResourceTypeEnum resourceType) {
-        this.resourceType = resourceType;
+    public MediaESR(){
+        super();
+        this.setResourceESRType(ExtremelySimplifiedResourceTypeEnum.ESR_MEDIA);
     }
 
     @Override
-    public String toString() {
-        return "CDTStimulusIdentifier{" +
-                "id='" + id + '\'' +
-                ", resourceType=" + resourceType +
-                '}';
+    protected ResourceType specifyResourceType() {
+        return (ResourceType.Media);
     }
 }

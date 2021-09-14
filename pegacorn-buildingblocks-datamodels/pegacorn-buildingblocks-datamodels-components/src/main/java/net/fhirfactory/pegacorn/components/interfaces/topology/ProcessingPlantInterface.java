@@ -20,4 +20,5 @@ public interface ProcessingPlantInterface extends CapabilityFulfillmentManagemen
     public WorkshopTopologyNode getWorkshop(String workshopName, String version);
     public WorkshopTopologyNode getWorkshop(String workshopName);
     public String getIPCServiceName();
+    public boolean isITOpsNode();
 }

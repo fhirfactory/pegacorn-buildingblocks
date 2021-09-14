@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacorn.petasos.endpoints.oam;
+package net.fhirfactory.pegacorn.petasos.endpoints.oam.interfaces;
 
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosEndpointInterface;
 import org.hl7.fhir.r4.model.Endpoint;

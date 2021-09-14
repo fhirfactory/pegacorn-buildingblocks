@@ -25,11 +25,12 @@ import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.C
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionID;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionParticipant;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.valuesets.CommunicateSessionTypeEnum;
+import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateSessionESR;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommunicateSession {
+public class CommunicateSession extends CommunicateSessionESR {
     private CommunicateSessionID sessionID;
     private List<CommunicateSessionParticipant> sessionParticipants;
     private CommunicateRoomReference sessionRoom;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,35 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
+package net.fhirfactory.pegacorn.petasos.endpoints.topology;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.common.valuesets.CommunicateResourceTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 
-public class CDTStimulusIdentifier {
-    private String id;
-    private CommunicateResourceTypeEnum resourceType;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-    public String getId() {
-        return id;
+public class TopologyNodeList implements Serializable {
+    List<TopologyNode> nodeList;
+
+    public TopologyNodeList(){
+        nodeList = new ArrayList<>();
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public List<TopologyNode> getNodeList() {
+        return nodeList;
     }
 
-    public CommunicateResourceTypeEnum getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(CommunicateResourceTypeEnum resourceType) {
-        this.resourceType = resourceType;
-    }
-
-    @Override
-    public String toString() {
-        return "CDTStimulusIdentifier{" +
-                "id='" + id + '\'' +
-                ", resourceType=" + resourceType +
-                '}';
+    public void setNodeList(List<TopologyNode> nodeList) {
+        this.nodeList = nodeList;
     }
 }

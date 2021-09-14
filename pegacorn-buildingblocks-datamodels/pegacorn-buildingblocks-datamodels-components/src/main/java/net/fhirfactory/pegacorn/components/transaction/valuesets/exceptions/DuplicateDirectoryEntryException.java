@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter
+ * Copyright (c) 2021 Mark Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,35 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
+package net.fhirfactory.pegacorn.components.transaction.valuesets.exceptions;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.common.valuesets.CommunicateResourceTypeEnum;
+public class DuplicateDirectoryEntryException extends Exception{
 
-public class CDTStimulusIdentifier {
-    private String id;
-    private CommunicateResourceTypeEnum resourceType;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public CommunicateResourceTypeEnum getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(CommunicateResourceTypeEnum resourceType) {
-        this.resourceType = resourceType;
-    }
-
-    @Override
-    public String toString() {
-        return "CDTStimulusIdentifier{" +
-                "id='" + id + '\'' +
-                ", resourceType=" + resourceType +
-                '}';
+    public DuplicateDirectoryEntryException(String message){
+        super(message);
     }
 }

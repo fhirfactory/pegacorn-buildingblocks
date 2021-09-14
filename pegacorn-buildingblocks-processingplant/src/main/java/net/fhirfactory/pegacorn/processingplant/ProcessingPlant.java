@@ -281,4 +281,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         getLogger().debug(".executeTask(): Exit, capabilityUtilisationResponse->{}", capabilityUtilisationResponse);
         return(capabilityUtilisationResponse);
     }
+
+    @Override
+    public boolean isITOpsNode() {
+        return (false);
+    }
 }

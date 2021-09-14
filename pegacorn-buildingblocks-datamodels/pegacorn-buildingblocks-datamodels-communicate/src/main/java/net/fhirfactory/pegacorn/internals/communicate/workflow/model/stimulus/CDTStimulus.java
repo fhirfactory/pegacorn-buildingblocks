@@ -21,11 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
 
-import net.fhirfactory.pegacorn.communicate.matrix.model.r061.events.common.MatrixEvent;
 import net.fhirfactory.pegacorn.internals.communicate.workflow.model.CDTIdentifier;
 import net.fhirfactory.pegacorn.internals.esr.resources.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWIdentifier;
-import org.hl7.fhir.r4.model.Resource;
 
 import java.util.Date;
 
@@ -34,8 +32,6 @@ public class CDTStimulus {
     private CDTIdentifier matrixTwinID;
     private ExtremelySimplifiedResource resource;
     private UoWIdentifier originalUoW;
-    private MatrixEvent matrixEventTrigger;
-    private Resource fhirEventTrigger;
     private Date creationDate;
 
     public CDTStimulusIdentifier getStimulusID() {
@@ -60,22 +56,6 @@ public class CDTStimulus {
 
     public void setResource(ExtremelySimplifiedResource resource) {
         this.resource = resource;
-    }
-
-    public MatrixEvent getMatrixEventTrigger() {
-        return matrixEventTrigger;
-    }
-
-    public void setMatrixEventTrigger(MatrixEvent matrixEventTrigger) {
-        this.matrixEventTrigger = matrixEventTrigger;
-    }
-
-    public Resource getFhirEventTrigger() {
-        return fhirEventTrigger;
-    }
-
-    public void setFhirEventTrigger(Resource fhirEventTrigger) {
-        this.fhirEventTrigger = fhirEventTrigger;
     }
 
     public Date getCreationDate() {
