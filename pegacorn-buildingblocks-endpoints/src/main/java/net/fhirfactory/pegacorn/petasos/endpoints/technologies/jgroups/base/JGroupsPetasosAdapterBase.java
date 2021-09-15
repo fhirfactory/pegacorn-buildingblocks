@@ -130,42 +130,31 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
             return(addressSet);
         }
         getLogger().trace(".getTargetMemberAdapterSetForService(): IPCChannel is NOT null, get updated Address set via view");
-        List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().trace(".getTargetMemberAdapterSetForService(): Got the Address set via view, now iterate through and see if one is suitable");
-        for(Address currentAddress: addressList){
-            getLogger().trace(".getTargetMemberAdapterSetForService(): Iterating through Address list, current element->{}", currentAddress);
-            if(currentAddress.toString().contains(serviceName)){
-                getLogger().debug(".getTargetMemberAdapterSetForService(): Exit, A match!, returning address->{}", currentAddress);
-                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
-                currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
-                currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
-                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                addressSet.add(currentPetasosAdapterAddress);
+        synchronized (getCurrentScannedMembershipLock()) {
+            List<Address> addressList = getCurrentScannedMembership();
+            for (Address currentAddress : addressList) {
+                if (currentAddress.toString().contains(serviceName)) {
+                    PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+                    currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
+                    currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
+                    currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+                    addressSet.add(currentPetasosAdapterAddress);
+                }
             }
         }
-        getLogger().debug(".getTargetMemberAdapterSetForService(): Exit, addressSet->{}",addressSet);
-        return(addressSet);
+        getLogger().debug(".getTargetMemberAdapterSetForService(): Exit, addressSet->{}", addressSet);
+        return (addressSet);
     }
     public PetasosAdapterAddress getTargetMemberAdapterAddress(String targetMemberKey){
         getLogger().debug(".getTargetMemberAdapterAddress(): Entry, targetMemberKey->{}", targetMemberKey);
-        List<PetasosAdapterAddress> addressSet = new ArrayList<>();
-        if(getIPCChannel() == null){
-            getLogger().debug(".getTargetMemberAdapterAddress(): Exit, IPCChannel is null, exit returning (null)");
-            return(null);
-        }
-        getLogger().trace(".getTargetMemberAdapterAddress(): IPCChannel is NOT null, get updated Address set via view");
-        List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().trace(".getTargetMemberAdapterAddress(): Got the Address set via view, now iterate through and see if one is suitable");
-        for(Address currentAddress: addressList){
-            getLogger().trace(".getTargetMemberAdapterAddress(): Iterating through Address list, current element->{}", currentAddress);
-            if(currentAddress.toString().contentEquals(targetMemberKey)){
-                getLogger().debug(".getTargetMemberAdapterAddress(): Exit, A match!, returning address->{}", currentAddress);
-                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
-                currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
-                currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
-                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-                return(currentPetasosAdapterAddress);
-            }
+        Address targetAddress = getTargetMemberAddress(targetMemberKey);
+        if(targetAddress != null){
+            getLogger().debug(".getTargetMemberAdapterAddress(): Exit, A match!, returning address->{}", targetAddress);
+            PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+            currentPetasosAdapterAddress.setJGroupsAddress(targetAddress);
+            currentPetasosAdapterAddress.setAddressName(targetAddress.toString());
+            currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+            return(currentPetasosAdapterAddress);
         }
         getLogger().debug(".getTargetMemberAdapterAddress(): Exit, could not find it...");
         return(null);
@@ -220,13 +209,14 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
      * @return A List of Strings containing the names of all the members of the JGroups Cluster this interface is connected to.
      */
     public List<String> getAllClusterMembers(){
-        getLogger().debug(".getAllClusterMembers(): Enty");
-        List<Address> memberAddressList = getIPCChannel().getView().getMembers();
+        getLogger().debug(".getAllClusterMembers(): Entry");
         List<String> memberNameList = new ArrayList<>();
-        for(Address currentAddress: memberAddressList){
-            getLogger().debug(".getAllClusterMembers(): Iterating through Address list, current element->{}", currentAddress);
-            String currentMemberName = currentAddress.toString();
-            memberNameList.add(currentMemberName);
+        synchronized (getCurrentScannedMembershipLock()) {
+            List<Address> memberAddressList = getCurrentScannedMembership();
+            for (Address currentAddress : memberAddressList) {
+                String currentMemberName = currentAddress.toString();
+                memberNameList.add(currentMemberName);
+            }
         }
         getLogger().debug(".getAllClusterMembers(): Exit");
         return(memberNameList);
@@ -266,34 +256,15 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     }
 
     /**
-     * This method returns the JGroups Address (interface) for the given cluster member name (memberName). It does this
-     * by retrieving a list of all member Address(es) from the JGroups Cluster and then comparing the provided name
-     * (memberName) with the member address (.toString()). If a match is found, it is returned.
+     * This method returns the JGroups Address (interface) for the given cluster member name (memberName).
      * @param memberName The Cluster Member name for which we would like the JGroups Address of
      * @return The JGroups Address matching the given memberName or -null- if not found within the JGroups Cluster
      */
     public Address getTargetAddressForClusterMember(String memberName){
         getLogger().debug(".getTargetAddressForClusterMember(): Entry, memberName->{}", memberName);
-        if(getIPCChannel() == null){
-            getLogger().debug(".getTargetAddressForClusterMember(): Exit, IPCChannel is null, returning -null-");
-            return(null);
-        }
-        if(StringUtils.isEmpty(memberName)){
-            getLogger().debug(".getClusterMemberSetBasedOnPrefix(): Exit, namePrefix is null, returning -null-");
-            return(null);
-        }
-        getLogger().trace(".getTargetAddressForClusterMember(): IPCChannel is NOT null & memberName is not empty, get updated Address set via view");
-        List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().trace(".getTargetAddressForClusterMember(): Got the Address set via view, now iterate through and see if one is suitable");
-        for(Address currentAddress: addressList){
-            getLogger().trace(".getTargetAddressForClusterMember(): Iterating through Address list, current element->{}", currentAddress);
-            if(currentAddress.toString().contentEquals(memberName)){
-                getLogger().debug(".getTargetAddressForClusterMember(): Exit, A match!, returning address->{}", currentAddress);
-                return(currentAddress);
-            }
-        }
-        getLogger().debug(".getTargetAddressForClusterMember(): Exit, could not find it...");
-        return(null);
+        Address targetAddress = getTargetMemberAddress(memberName);
+        getLogger().debug(".getTargetAddressForClusterMember(): Exit, targetAddress->{}", targetAddress);
+        return(targetAddress);
     }
 
     /**
@@ -330,25 +301,8 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
      */
     protected boolean isTargetClusterAddressActive(String memberName){
         getLogger().debug(".isTargetAddressActive(): Entry, memberName->{}", memberName);
-        if(getIPCChannel() == null){
-            getLogger().debug(".isTargetAddressActive(): IPCChannel is null, exit returning -false-");
-            return(false);
-        }
-        if(StringUtils.isEmpty(memberName)){
-            getLogger().debug(".isTargetAddressActive(): memberName is empty, exit returning -false-");
-            return(false);
-        }
-        getLogger().trace(".isTargetAddressActive(): IPCChannel is NOT null, get updated Address set via view");
-        List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().trace(".isTargetAddressActive(): Got the Address set via view, now iterate through and see our address is there");
-        for(Address currentAddress: addressList){
-            getLogger().trace(".isTargetAddressActive(): Iterating through Address list, current element->{}", currentAddress);
-            if(currentAddress.toString().contentEquals(memberName)){
-                getLogger().debug(".isTargetAddressActive(): Exit, A match!, returning -true-");
-                return(true);
-            }
-        }
-        getLogger().debug(".isTargetAddressActive(): Exit, no matching Address found!");
+        boolean isActive = isTargetAddressActive(memberName);
+        getLogger().debug(".isTargetAddressActive(): Exit, isActive->{}", isActive);
         return(false);
     }
 

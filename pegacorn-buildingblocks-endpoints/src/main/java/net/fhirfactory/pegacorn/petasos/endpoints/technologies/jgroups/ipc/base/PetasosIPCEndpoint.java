@@ -72,7 +72,9 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
 
     public InterProcessingPlantHandoverResponsePacket receiveIPCMessage(InterProcessingPlantHandoverPacket handoverPacket){
         getLogger().debug(".receiveIPCMessage(): Entry, handoverPacket->{}",handoverPacket);
+        getLogger().warn(".sendIPCMessage(): Message.RECEIVED: handoverPacker->{}", handoverPacket);
         InterProcessingPlantHandoverResponsePacket response = injectMessageIntoRoute(handoverPacket);
+        getLogger().warn(".sendIPCMessage(): Message.RECEIVED.RESPONSE: response->{}", response);
         getLogger().debug(".receiveIPCMessage(): Exit, response->{}",response);
         return(response);
     }
@@ -101,8 +103,9 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
             objectSet[0] = handoverPacket;
             classSet[0] = InterProcessingPlantHandoverPacket.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            getLogger().warn(".sendIPCMessage(): Message.SEND: targetAddress->{}, handoverPacket->{}", targetAddress, handoverPacket);
             InterProcessingPlantHandoverResponsePacket response = getRPCDispatcher().callRemoteMethod(targetAddress, "receiveIPCMessage", objectSet, classSet, requestOptions);
-            getLogger().debug(".sendIPCMessage(): Exit, response->{}", response);
+            getLogger().warn(".sendIPCMessage(): Message.SEND.RESPONSE: response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
             getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());
