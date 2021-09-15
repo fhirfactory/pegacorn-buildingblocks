@@ -21,9 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.base.PetasosOAMPubSubEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.base.PetasosOAMPubSubEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeForwarderService;
@@ -85,8 +88,8 @@ public class PetasosIntraZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
     }
 
     @Override
-    protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
-        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTRAZONE_SERVICE);
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTRAZONE_SERVICE);
     }
 
     @Override

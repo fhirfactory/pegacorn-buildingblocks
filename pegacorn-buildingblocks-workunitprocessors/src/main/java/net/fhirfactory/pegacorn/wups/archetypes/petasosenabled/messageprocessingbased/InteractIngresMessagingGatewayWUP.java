@@ -25,19 +25,15 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import java.util.ArrayList;
 import java.util.List;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;

@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc;
 
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointChannelScopeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointChannelScopeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
@@ -55,8 +55,8 @@ public class PetasosInterZoneIPCEndpoint extends PetasosIPCEndpoint {
     }
 
     @Override
-    protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
-        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_SERVICE);
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTERZONE_SERVICE);
     }
 
     @Override

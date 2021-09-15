@@ -59,6 +59,7 @@ public class ITOpsDiscoveredNodesDM {
             throw (new IllegalArgumentException(".addTopologyNode(): bad elementID within newElement"));
         }
         switch(newElement.getComponentType()){
+            case ENDPOINT:
             case WUP:
             case OAM_WORK_UNIT_PROCESSOR:
             case PROCESSING_PLANT:
@@ -135,8 +136,8 @@ public class ITOpsDiscoveredNodesDM {
         return (elementSet);
     }
 
-    public TopologyNode nodeSearch(TopologyNodeFDN nodeID) {
-        LOG.debug(".getTopologyNode(): Entry, nodeID --> {}", nodeID);
+    public TopologyNode getTopologyNode(TopologyNodeFDN nodeID) {
+        LOG.info(".getTopologyNode(): Entry, nodeID --> {}", nodeID);
         if (nodeID == null) {
             LOG.debug(".getTopologyNode(): Exit, provided a null nodeID , so returning null");
             return (null);
@@ -144,17 +145,15 @@ public class ITOpsDiscoveredNodesDM {
         Enumeration<TopologyNodeFDN> list = this.nodeSet.keys();
         while (list.hasMoreElements()) {
             TopologyNodeFDN currentNodeID = list.nextElement();
-            if (LOG.isTraceEnabled()) {
-                LOG.trace(".getTopologyNode(): Cache Entry --> {}", currentNodeID.toTag());
-            }
+            LOG.info(".getTopologyNode(): Cache Entry --> {}", currentNodeID);
             if (currentNodeID.equals(nodeID)) {
-                LOG.trace(".getTopologyNode(): Node found!!! WooHoo!");
+                LOG.info(".getTopologyNode(): Node found!!! WooHoo!");
                 TopologyNode retrievedNode = this.nodeSet.get(currentNodeID);
-                LOG.debug(".getTopologyNode(): Exit, returning Endpoint --> {}", retrievedNode);
+                LOG.info(".getTopologyNode(): Exit, returning Endpoint --> {}", retrievedNode);
                 return (retrievedNode);
             }
         }
-        LOG.debug(".getNode(): Exit, returning null as an element with the specified ID was not in the map");
+        LOG.info(".getTopologyNode(): Exit, returning null as an element with the specified ID was not in the map");
         return (null);
     }
 

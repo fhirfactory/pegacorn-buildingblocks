@@ -24,9 +24,9 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.forward.common;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
@@ -102,8 +102,8 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     // Application Logic (Establishing WUP)
     //
 
-    protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
-        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTRAZONE_SERVICE);
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTRAZONE_SERVICE);
     }
 
     @Override

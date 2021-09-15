@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantIn
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointChannelScopeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddressTypeEnum;
@@ -63,7 +63,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     protected abstract PetasosEndpointIdentifier specifyEndpointID();
     protected abstract String specifyEndpointServiceName();
     protected abstract String specifyIPCInterfaceName();
-    protected abstract PetasosTopologyEndpointTypeEnum specifyIPCType();
+    protected abstract PetasosEndpointTopologyTypeEnum specifyIPCType();
     abstract protected PetasosEndpointChannelScopeEnum specifyPetasosEndpointScope();
 
     //
