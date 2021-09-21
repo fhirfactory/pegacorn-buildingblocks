@@ -61,7 +61,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     //
 
     protected abstract PetasosEndpointIdentifier specifyEndpointID();
-    protected abstract String specifyEndpointServiceName();
+//    protected abstract String specifyEndpointServiceName();
     protected abstract String specifyIPCInterfaceName();
     protected abstract PetasosEndpointTopologyTypeEnum specifyIPCType();
     abstract protected PetasosEndpointChannelScopeEnum specifyPetasosEndpointScope();

@@ -27,10 +27,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TopologyNodeList implements Serializable {
+public class EndpointNodeList implements Serializable {
     List<TopologyNode> nodeList;
 
-    public TopologyNodeList(){
+    public EndpointNodeList(){
         nodeList = new ArrayList<>();
     }
 

@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
@@ -58,6 +58,8 @@ public class InterProcessingPlantHandoverPacketResponseDecoder extends IPCPacket
     @PostConstruct
     public void initiate(){
         jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
     }
 
     public ObjectMapper getJSONMapper() {
@@ -69,7 +71,7 @@ public class InterProcessingPlantHandoverPacketResponseDecoder extends IPCPacket
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Convert incoming message string to an InterProcessingPlantHandoverResponsePacket");
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Attempting to retrieve UoW from the Exchange");
-        String uowPropertyKey = exchangePropertyNames.getExchangeUoWPropertyName(node.getNodeKey());
+        String uowPropertyKey = exchangePropertyNames.getExchangeUoWPropertyName(node.getComponentID());
         UoW theUoW = camelExchange.getProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, UoW.class);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Retrieved UoW --> {}", theUoW);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Creating the Response message");

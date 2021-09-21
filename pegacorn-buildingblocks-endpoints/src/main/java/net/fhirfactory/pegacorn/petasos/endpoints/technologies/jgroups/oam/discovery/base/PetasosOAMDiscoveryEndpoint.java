@@ -1,16 +1,15 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.base;
 
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
-import net.fhirfactory.pegacorn.petasos.endpoints.oam.itops.ITOpsDiscoveredNodesDM;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.endpoints.topology.TopologyNodeList;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherRegistration;
 import org.apache.commons.lang3.StringUtils;
@@ -29,9 +28,6 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
 
     @Inject
     private DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
-
-    @Inject
-    private ITOpsDiscoveredNodesDM nodesDM;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -346,9 +342,6 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
                 case PETASOS_ENDPOINT_STATUS_OPERATIONAL:{
                     addPublisherToRegistry(synchronisedEndpoint);
                     getEndpointMap().updateServiceNameMembership(synchronisedEndpoint.getEndpointServiceName(), currentScheduleElement.getPetasosEndpointID().getEndpointName());
-                    if(processingPlant.isITOpsNode()){
-                        addSubsystemToITOpsMap(synchronisedEndpoint);
-                    }
                     getLogger().debug(".checkEndpointAddition(): Does not need re-checking, returning -true- (was processed)");
                     return(true);
                 }
@@ -379,9 +372,6 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         if( sameGroup && sameEndpointType ){
             boolean wasRemoved = removePublisher(currentScheduleElement.getPetasosEndpointID().getEndpointName());
             getEndpointMap().deleteEndpoint(currentScheduleElement.getPetasosEndpointID().getEndpointName());
-            if(processingPlant.isITOpsNode()){
-                removeSubsystemFromITOpsMap(currentScheduleElement.getPetasosEndpointID());
-            }
         }
         getLogger().debug(".checkEndpointRemoval(): Exit");
     }
@@ -419,26 +409,5 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             return (true);
         }
         return (false);
-    }
-
-    //
-    // Topology Map Management
-    //
-
-    protected void addSubsystemToITOpsMap(PetasosEndpoint addedPetasosEndpoint){
-        getLogger().debug(".addSubsystemToITOpsMap(): Entry, addedPetasosEndpoint->{}", addedPetasosEndpoint);
-        TopologyNodeList topologyNodeList = probeEndpointTopologyDetail(addedPetasosEndpoint.getEndpointID());
-        if(topologyNodeList != null) {
-            for (TopologyNode currentNode : topologyNodeList.getNodeList()) {
-                nodesDM.addTopologyNode(addedPetasosEndpoint.getEndpointID(), currentNode);
-            }
-        }
-        getLogger().debug(".addSubsystemToITOpsMap(): Exit");
-    }
-
-    protected void removeSubsystemFromITOpsMap(PetasosEndpointIdentifier removedPetasosEndpoint){
-        getLogger().debug(".removeSubsystemFromITOpsMap(): Entry, removedPetasosEndpoint->{}", removedPetasosEndpoint);
-        nodesDM.removeDiscoveredProcessingPlant(removedPetasosEndpoint);
-        getLogger().debug(".removeSubsystemFromITOpsMap(): Exit");
     }
 }

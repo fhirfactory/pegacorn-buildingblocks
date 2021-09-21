@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
@@ -64,6 +65,8 @@ public class InterProcessingPlantHandoverFinisherBean extends IPCPacketBeanCommo
     @PostConstruct
     public void initialise() {
         this.jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
     }
 
 

@@ -2,6 +2,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.communication.exten
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import org.hl7.fhir.r4.model.Communication;
 import org.hl7.fhir.r4.model.Extension;
@@ -21,6 +22,8 @@ public class CommunicationPayloadTypeExtensionEnricher {
     public CommunicationPayloadTypeExtensionEnricher(){
         super();
         jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
     }
 
     private static UriType PAYLOAD_TYPE_MEANING = new UriType("http://www.fhirfactory.net/pegacorn/FHIR/R4/Communication/communication_payload_type_extension");

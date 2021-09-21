@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base;
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
@@ -33,7 +32,7 @@ import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAda
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.EndpointNameUtilities;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.JGroupsBasedParticipantInformationService;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.topology.TopologyNodeList;
+import net.fhirfactory.pegacorn.petasos.endpoints.topology.EndpointNodeList;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import org.apache.commons.lang3.SerializationUtils;
@@ -44,7 +43,6 @@ import org.jgroups.blocks.ResponseMode;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.List;
 
 public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBase implements PetasosAdapterTechnologyInterface {
 
@@ -418,7 +416,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     // Topology (Detailed) Information Collection
     //
 
-    protected TopologyNodeList probeEndpointTopologyDetail(PetasosEndpointIdentifier targetEndpointID){
+    protected EndpointNodeList probeEndpointTopologyDetail(PetasosEndpointIdentifier targetEndpointID){
         getLogger().debug(".probeEndpointTopologyDetail(): Entry, targetEndpointID->{}", targetEndpointID);
         try {
             Object objectSet[] = new Object[1];
@@ -427,7 +425,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             classSet[0] = String.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointChannelName());
-            TopologyNodeList nodeList = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointTopologyDetailHandler", objectSet, classSet, requestOptions);
+            EndpointNodeList nodeList = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointTopologyDetailHandler", objectSet, classSet, requestOptions);
             getLogger().debug(".probeEndpointTopologyDetail(): Exit, response->{}", nodeList);
             return(nodeList);
         } catch (NoSuchMethodException e) {
@@ -439,9 +437,9 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         }
     }
 
-    public TopologyNodeList probeEndpointTopologyDetailHandler(String sourceForRequest) {
+    public EndpointNodeList probeEndpointTopologyDetailHandler(String sourceForRequest) {
         getLogger().debug(".probeEndpointTopologyDetailHandler(): Entry, sourceForRequest->{}", sourceForRequest);
-        TopologyNodeList myNodeList = new TopologyNodeList();
+        EndpointNodeList myNodeList = new EndpointNodeList();
         myNodeList.getNodeList().addAll(topologyIM.getNodeElementSet());
         return(myNodeList);
     }
