@@ -97,6 +97,7 @@ public class ITOpsTopologyReportForwarder extends ITOpsReportForwarderCommon {
         //
         LOG.info(".forwardTopologyDetails(): [Grab Current Topology Graph] Start");
         ITOpsTopologyGraph currentState = itOpsTopologyDM.getCurrentState();
+        currentState.setDeploymentName(getProcessingPlant().getSolutionNode().getNodeRDN().getNodeName());
         LOG.info(".forwardTopologyDetails(): [Grab Current Topology Graph] Finish");
         //
         // Build Query
