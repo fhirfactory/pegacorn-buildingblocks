@@ -29,6 +29,7 @@ public class CapabilityUtilisationRequest implements Serializable {
     private String requiredCapabilityName;
     private Instant requestDate;
     private String requestContent;
+    private String requestSourceComponentID;
 
     public String getRequestContent() {
         return requestContent;
@@ -44,6 +45,14 @@ public class CapabilityUtilisationRequest implements Serializable {
 
     public void setRequiredCapabilityName(String requiredCapabilityName) {
         this.requiredCapabilityName = requiredCapabilityName;
+    }
+
+    public String getRequestSourceComponentID() {
+        return requestSourceComponentID;
+    }
+
+    public void setRequestSourceComponentID(String requestSourceComponentID) {
+        this.requestSourceComponentID = requestSourceComponentID;
     }
 
     public String getRequestID() {
@@ -69,6 +78,7 @@ public class CapabilityUtilisationRequest implements Serializable {
                 ", requiredCapabilityName='" + requiredCapabilityName + '\'' +
                 ", requestDate=" + requestDate +
                 ", requestContent='" + requestContent + '\'' +
+                ", requestSourceComponentID='" + requestSourceComponentID + '\'' +
                 '}';
     }
 }
