@@ -165,7 +165,7 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     //
 
     public CapabilityUtilisationResponse executeTask(String capabilityProviderName, CapabilityUtilisationRequest task){
-        getLogger().debug(".executeTask(): Entry, capabilityProviderName->{}, task->{}", capabilityProviderName, task);
+        getLogger().warn(".executeTask(): Entry, capabilityProviderName->{}, task->{}", capabilityProviderName, task);
         Address targetAddress = getCandidateIPCTargetAddress(capabilityProviderName);
         try {
             Object objectSet[] = new Object[1];
