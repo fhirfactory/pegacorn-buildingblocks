@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointIdentifierHelper;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornMessageHeaderCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
@@ -36,7 +36,7 @@ import javax.inject.Inject;
 public class MessageHeaderHelper {
 
     @Inject
-    private EndpointIdentifierHelper endpointIdentifierHelper;
+    private EndpointIdentifierFactory endpointIdentifierFactory;
 
     @Inject
     private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;

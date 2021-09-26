@@ -38,8 +38,8 @@ import java.time.Instant;
 import java.util.Date;
 
 @ApplicationScoped
-public class EndpointIdentifierHelper {
-    private static final Logger LOG = LoggerFactory.getLogger(EndpointIdentifierHelper.class);
+public class EndpointIdentifierFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(EndpointIdentifierFactory.class);
 
     @Inject
     private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
