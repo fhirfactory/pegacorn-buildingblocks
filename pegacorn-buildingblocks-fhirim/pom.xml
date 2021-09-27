@@ -13,7 +13,7 @@
     <artifactId>pegacorn-buildingblocks-fhirim</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: BuildingBlocks :: FHIR Information Manager</name>
+    <name>Pegacorn :: Building Blocks :: FHIR Information Manager</name>
     <description>The base FHIR Information Manager framework</description>
 
     <licenses>
