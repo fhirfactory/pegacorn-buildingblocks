@@ -34,6 +34,7 @@ public enum ExtremelySimplifiedResourceTypeEnum {
     ESR_PRACTITIONER("esr.resource-type.practitioner"),
     ESR_PRACTITIONER_ROLE("esr.resource-type.practitioner-role"),
     ESR_ROLE_CATEGORY("esr.resource-type.role-category"),
+    ESR_MEDIA("esr.resource-type.media"),
     ESR_ROLE("esr.resource-type.role");
 
     private String resourceType;

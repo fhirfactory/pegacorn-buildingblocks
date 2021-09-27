@@ -23,6 +23,8 @@ package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base;
 
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
@@ -31,6 +33,7 @@ import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAda
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.EndpointNameUtilities;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.JGroupsBasedParticipantInformationService;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
+import net.fhirfactory.pegacorn.petasos.endpoints.topology.TopologyNodeList;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import org.apache.commons.lang3.SerializationUtils;
@@ -41,6 +44,7 @@ import org.jgroups.blocks.ResponseMode;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.util.List;
 
 public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBase implements PetasosAdapterTechnologyInterface {
 
@@ -65,6 +69,9 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     @Inject
     private EndpointNameUtilities endpointNameUtilities;
+
+    @Inject
+    private TopologyIM topologyIM;
 
     //
     // Constructor
@@ -288,13 +295,13 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
 
     @Override
     protected String deriveEndpointServiceName(String endpointName) {
-        getLogger().info(".deriveEndpointServiceName(): Entry, endpointName->{}", endpointName);
+        getLogger().debug(".deriveEndpointServiceName(): Entry, endpointName->{}", endpointName);
         if(StringUtils.isEmpty(endpointName)){
             return(null);
         }
         String[] split = StringUtils.split(endpointName, ".");
         String serviceName = split[0];
-        getLogger().info(".deriveEndpointServiceName(): Exit, serviceName->{}", serviceName);
+        getLogger().debug(".deriveEndpointServiceName(): Exit, serviceName->{}", serviceName);
         return(serviceName);
     }
 
@@ -352,58 +359,91 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     }
 
     protected boolean isWithinScopeBasedOnChannelName(String endpointChannelName) {
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Entry, endpointChannelName->{}", endpointChannelName);
+        getLogger().debug(".isWithinScopeBasedOnChannelName(): Entry, endpointChannelName->{}", endpointChannelName);
         boolean sameSite = getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Site.... result->{}", sameSite);
+        getLogger().trace(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Site.... result->{}", sameSite);
         boolean sameZone = getEndpointNameUtilities().getEndpointZoneFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointZone().getNetworkSecurityZoneCamelCase());
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Zone.... result->{}", sameZone);
+        getLogger().trace(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Zone.... result->{}", sameZone);
         String otherChannelScope = getEndpointNameUtilities().getEndpointScopeFromChannelName(endpointChannelName);
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking endpoint channel scope->{}", otherChannelScope);
+        getLogger().trace(".isWithinScopeBasedOnChannelName(): Checking endpoint channel scope->{}", otherChannelScope);
         switch(specifyPetasosEndpointScope()){
             case ENDPOINT_CHANNEL_SCOPE_INTRAZONE:{
-                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTRAZONE");
+                getLogger().trace(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTRAZONE");
                 if (otherChannelScope.contentEquals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE.getEndpointScopeName())) {
-                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
+                    getLogger().trace(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
                     if(sameSite && sameZone){
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
+                        getLogger().debug(".isWithinScopeBasedOnChannelName(): Exit, returning True");
                         return(true);
                     } else {
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
+                        getLogger().debug(".isWithinScopeBasedOnChannelName(): Exit, returning False");
                         return(false);
                     }
                 }
                 break;
             }
             case ENDPOINT_CHANNEL_SCOPE_INTERZONE:{
-                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTERZONE");
+                getLogger().trace(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTERZONE");
                 if (otherChannelScope.contentEquals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE.getEndpointScopeName())) {
-                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
+                    getLogger().trace(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
                     if(sameSite && !sameZone){
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
+                        getLogger().debug(".isWithinScopeBasedOnChannelName(): Exit, returning True");
                         return(true);
                     } else {
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
+                        getLogger().debug(".isWithinScopeBasedOnChannelName(): Exit, returning False");
                         return(false);
                     }
                 }
                 break;
             }
             case ENDPOINT_CHANNEL_SCOPE_INTERSITE:{
-                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTERSITE");
+                getLogger().debug(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTERSITE");
                 if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERSITE)) {
-                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
+                    getLogger().trace(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
                     if(!sameSite){
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
+                        getLogger().debug(".isWithinScopeBasedOnChannelName(): Exit, returning True");
                         return(true);
                     } else {
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
+                        getLogger().debug(".isWithinScopeBasedOnChannelName(): Exit, returning False");
                         return(false);
                     }
                 }
                 break;
             }
         }
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, default returning False");
+        getLogger().debug(".isWithinScopeBasedOnChannelName(): Exit, default returning False");
         return(false);
     }
+
+    //
+    // Topology (Detailed) Information Collection
+    //
+
+    protected TopologyNodeList probeEndpointTopologyDetail(PetasosEndpointIdentifier targetEndpointID){
+        getLogger().debug(".probeEndpointTopologyDetail(): Entry, targetEndpointID->{}", targetEndpointID);
+        try {
+            Object objectSet[] = new Object[1];
+            Class classSet[] = new Class[1];
+            objectSet[0] = getPetasosEndpoint().getEndpointID().getEndpointName();
+            classSet[0] = String.class;
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointChannelName());
+            TopologyNodeList nodeList = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointTopologyDetailHandler", objectSet, classSet, requestOptions);
+            getLogger().debug(".probeEndpointTopologyDetail(): Exit, response->{}", nodeList);
+            return(nodeList);
+        } catch (NoSuchMethodException e) {
+            getLogger().error(".probeEndpointTopologyDetail(): Error (NoSuchMethodException)->", e);
+            return(null);
+        } catch (Exception e) {
+            getLogger().error(".probeEndpointTopologyDetail: Error (GeneralException) ->",e);
+            return(null);
+        }
+    }
+
+    public TopologyNodeList probeEndpointTopologyDetailHandler(String sourceForRequest) {
+        getLogger().debug(".probeEndpointTopologyDetailHandler(): Entry, sourceForRequest->{}", sourceForRequest);
+        TopologyNodeList myNodeList = new TopologyNodeList();
+        myNodeList.getNodeList().addAll(topologyIM.getNodeElementSet());
+        return(myNodeList);
+    }
+
 }

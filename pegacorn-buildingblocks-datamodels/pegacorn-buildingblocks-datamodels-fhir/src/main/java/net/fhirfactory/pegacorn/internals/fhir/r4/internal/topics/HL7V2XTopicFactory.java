@@ -34,7 +34,7 @@ public class HL7V2XTopicFactory {
     private static final Logger LOG = LoggerFactory.getLogger(HL7V2XTopicFactory.class);
 
     private static String HL7_MESSAGE_DEFINER = "HL7";
-    private static String HL7_MESSAGE_CATEGORY = "Messages (Version 2.x)";
+    private static String HL7_MESSAGE_CATEGORY = "Message";
 
     private static String HL7_MESSAGE_UNKNOWN = "Unknown";
 

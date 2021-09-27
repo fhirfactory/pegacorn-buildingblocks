@@ -21,8 +21,11 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
 
+import net.fhirfactory.pegacorn.internals.communicate.entities.common.valuesets.CommunicateResourceTypeEnum;
+
 public class CDTStimulusIdentifier {
     private String id;
+    private CommunicateResourceTypeEnum resourceType;
 
     public String getId() {
         return id;
@@ -30,5 +33,21 @@ public class CDTStimulusIdentifier {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public CommunicateResourceTypeEnum getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(CommunicateResourceTypeEnum resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    @Override
+    public String toString() {
+        return "CDTStimulusIdentifier{" +
+                "id='" + id + '\'' +
+                ", resourceType=" + resourceType +
+                '}';
     }
 }

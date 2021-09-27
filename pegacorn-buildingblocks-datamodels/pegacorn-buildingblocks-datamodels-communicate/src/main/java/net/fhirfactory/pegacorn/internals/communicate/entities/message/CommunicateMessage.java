@@ -26,8 +26,9 @@ import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes
 import net.fhirfactory.pegacorn.internals.communicate.entities.message.valuesets.CommunicateMessageTypeEnum;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
+import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateMessageESR;
 
-public class CommunicateMessage {
+public class CommunicateMessage extends CommunicateMessageESR {
     private CommunicateMessageIdentifier messageIdentifier;
     private CommunicateRoomReference sourceRoom;
     private CommunicateUserReference sourceUser;

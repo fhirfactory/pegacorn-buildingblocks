@@ -25,16 +25,15 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import java.util.ArrayList;
 import java.util.List;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
@@ -85,16 +84,22 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
     protected RouteDefinition fromInteractIngresService(String uri) {
         NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
         SourceSystemDetailInjector sourceSystemDetailInjector = new SourceSystemDetailInjector();
+        PortDetailInjector portDetailInjector = new PortDetailInjector();
         RouteDefinition route = fromWithStandardExceptionHandling(uri);
         route
                 .process(sourceSystemDetailInjector)
+                .process(portDetailInjector)
                 .process(nodeDetailInjector)
         ;
         return route;
     }
 
     protected String getSourceSystemName(){
-        String sourceSystemName = getIngresEndpoint().getEndpointTopologyNode().getConnectedSystemName();
+        getLogger().debug(".getSourceSystemName(): Entry, ingresEndpoint->{}", getIngresEndpoint());
+        IPCTopologyEndpoint endpointTopologyNode = getIngresEndpoint().getEndpointTopologyNode();
+        getLogger().trace(".getSourceSystemName(): endpointTopologyNode->{}", endpointTopologyNode);
+        String sourceSystemName = endpointTopologyNode.getConnectedSystemName();
+        getLogger().debug(".getSourceSystemName(): Exit, sourceSystemName->{}", sourceSystemName);
         return(sourceSystemName);
     }
 
@@ -114,4 +119,39 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
             }
         }
     }
+
+    protected class PortDetailInjector implements Processor {
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            getLogger().debug("PortDetailInjector.process(): Entry");
+            boolean alreadyInPlace = false;
+            if(exchange.hasProperties()) {
+                String ingresPort = exchange.getProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, String.class);
+                if (ingresPort != null) {
+                    alreadyInPlace = true;
+                }
+            }
+            if (!alreadyInPlace) {
+                switch(getIngresEndpoint().getEndpointTopologyNode().getEndpointType()) {
+                    case MLLP_SERVER: {
+                        IPCServerTopologyEndpoint serverTopologyEndpoint = (IPCServerTopologyEndpoint) getIngresEndpoint().getEndpointTopologyNode();
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, serverTopologyEndpoint.getEndpointType().getEndpointType());
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, serverTopologyEndpoint.getPortValue());
+                        break;
+                    }
+                    case MLLP_CLIENT:{
+                        StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getEgressEndpoint().getEndpointTopologyNode();
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getEndpointType());
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, getEgressEndpoint().getEndpointSpecification());
+                    }
+                    default:{
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, "Undisclosed");
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, "Undisclosed");
+                    }
+                }
+
+            }
+        }
+    }
+
 }

@@ -46,6 +46,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
 
     private ArrayList<Address> previousScannedMembership;
     private ArrayList<Address> currentScannedMembership;
+    private Object currentScannedMembershipLock;
     private ArrayList<PetasosAdapterDeltasInterface> membershipEventListeners;
 
     private static Long RPC_UNICAST_TIMEOUT = 5000L;
@@ -57,6 +58,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
         this.currentScannedMembership = new ArrayList<>();
         this.membershipEventListeners = new ArrayList<>();
         this.rpcDispatcher = null;
+        this.currentScannedMembershipLock = new Object();
     }
 
     abstract protected Logger specifyLogger();
@@ -72,27 +74,31 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
 
     @Override
     public void viewAccepted(View newView) {
-        getLogger().debug(".viewAccepted(): Entry, JGroups View Changed!");
+        getLogger().warn(".viewAccepted(): Entry, JGroups View Changed!");
         List<Address> addressList = newView.getMembers();
         getLogger().trace(".viewAccepted(): Got the Address set via view, now iterate through and see if one is suitable");
         if(getIPCChannel() != null) {
-            getLogger().info("JGroupsCluster->{}", getIPCChannel().getClusterName());
+            getLogger().debug("JGroupsCluster->{}", getIPCChannel().getClusterName());
         } else {
-            getLogger().info("JGroupsCluster still Forming");
+            getLogger().debug("JGroupsCluster still Forming");
         }
-        this.previousScannedMembership.clear();
-        this.previousScannedMembership.addAll(this.currentScannedMembership);
-        this.currentScannedMembership.clear();
-        for(Address currentAddress: addressList){
-            this.currentScannedMembership.add(currentAddress);
-            getLogger().info("Visible Member->{}", currentAddress);
+        synchronized (this.currentScannedMembershipLock) {
+            this.previousScannedMembership.clear();
+            this.previousScannedMembership.addAll(this.currentScannedMembership);
+            this.currentScannedMembership.clear();
+            this.currentScannedMembership.addAll(addressList);
+            if(getLogger().isTraceEnabled()) {
+                for (Address currentAddress : addressList) {
+                    getLogger().trace("Visible Member->{}", currentAddress);
+                }
+            }
         }
         getLogger().trace(".viewAccepted(): Checking PubSub Participants");
         List<PetasosAdapterAddress> removals = getMembershipRemovals(previousScannedMembership, currentScannedMembership);
         List<PetasosAdapterAddress> additions = getMembershipAdditions(previousScannedMembership, currentScannedMembership);
-        getLogger().info(".viewAccepted(): Changes(MembersAdded->{}, MembersRemoved->{}", additions.size(), removals.size());
+        getLogger().trace(".viewAccepted(): Changes(MembersAdded->{}, MembersRemoved->{}", additions.size(), removals.size());
         for(PetasosAdapterDeltasInterface currentActionInterface: this.membershipEventListeners){
-            getLogger().info(".viewAccepted(): Iterating through ActionInterfaces");
+            getLogger().trace(".viewAccepted(): Iterating through ActionInterfaces");
             for(PetasosAdapterAddress currentAddedElement: additions){
                 currentActionInterface.interfaceAdded(currentAddedElement);
             }
@@ -230,28 +236,44 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
         return(RPC_UNICAST_TIMEOUT);
     }
 
+    public ArrayList<Address> getCurrentScannedMembership() {
+        return currentScannedMembership;
+    }
+
+    public void setCurrentScannedMembership(ArrayList<Address> currentScannedMembership) {
+        this.currentScannedMembership = currentScannedMembership;
+    }
+
+    public Object getCurrentScannedMembershipLock() {
+        return currentScannedMembershipLock;
+    }
+
     //
     // JGroups Membership Methods
     //
 
     public Address getTargetMemberAddress(String name){
-        getLogger().info(".getTargetAddress(): Entry, name->{}", name);
+        getLogger().debug(".getTargetAddress(): Entry, name->{}", name);
         if(getIPCChannel() == null){
             getLogger().debug(".getTargetAddress(): IPCChannel is null, exit returning (null)");
             return(null);
         }
-        getLogger().info(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
-        List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().info(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
-        for(Address currentAddress: addressList){
-            getLogger().info(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
-            if(currentAddress.toString().contentEquals(name)){
-                getLogger().info(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
-                return(currentAddress);
+        getLogger().trace(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
+        Address foundAddress = null;
+        synchronized (this.currentScannedMembershipLock) {
+            List<Address> addressList = getCurrentScannedMembership();
+            getLogger().trace(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+            for (Address currentAddress : addressList) {
+                getLogger().trace(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
+                if (currentAddress.toString().contentEquals(name)) {
+                    getLogger().trace(".getTargetAddress(): Exit, A match!");
+                    foundAddress = currentAddress;
+                    break;
+                }
             }
         }
-        getLogger().info(".getTargetAddress(): Exit, no suitable Address found!");
-        return(null);
+        getLogger().debug(".getTargetAddress(): Exit, address->{}", foundAddress);
+        return(foundAddress);
     }
 
 
@@ -262,18 +284,22 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
             return(null);
         }
         getLogger().trace(".getTargetAddress(): IPCChannel is NOT null, get updated Address set via view");
-        List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().trace(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
-        for(Address currentAddress: addressList){
-            getLogger().trace(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
-            String currentService = deriveEndpointServiceName(currentAddress.toString());
-            if(currentService.equals(targetServiceName)){
-                getLogger().debug(".getTargetAddress(): Exit, A match!, returning address->{}", currentAddress);
-                return(currentAddress);
+        Address foundAddress = null;
+        synchronized (this.currentScannedMembershipLock) {
+            List<Address> addressList = getCurrentScannedMembership();
+            getLogger().trace(".getTargetAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+            for (Address currentAddress : addressList) {
+                getLogger().trace(".getTargetAddress(): Iterating through Address list, current element->{}", currentAddress);
+                String currentService = deriveEndpointServiceName(currentAddress.toString());
+                if (currentService.equals(targetServiceName)) {
+                    getLogger().debug(".getTargetAddress(): Exit, A match!");
+                    foundAddress = currentAddress;
+                    break;
+                }
             }
         }
-        getLogger().debug(".getTargetAddress(): Exit, no suitable Address found!");
-        return(null);
+        getLogger().debug(".getTargetAddress(): Exit, foundAddress->{}",foundAddress );
+        return(foundAddress);
     }
 
 
@@ -289,17 +315,21 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
             return(false);
         }
         getLogger().trace(".isTargetAddressActive(): IPCChannel is NOT null, get updated Address set via view");
-        List<Address> addressList = getIPCChannel().getView().getMembers();
-        getLogger().trace(".isTargetAddressActive(): Got the Address set via view, now iterate through and see our address is there");
-        for(Address currentAddress: addressList){
-            getLogger().trace(".isTargetAddressActive(): Iterating through Address list, current element->{}", currentAddress);
-            if(currentAddress.toString().contentEquals(addressName)){
-                getLogger().info(".isTargetAddressActive(): Exit, A match!, returning -true-");
-                return(true);
+        boolean addressIsActive = false;
+        synchronized (this.currentScannedMembershipLock) {
+            List<Address> addressList = getCurrentScannedMembership();
+            getLogger().trace(".isTargetAddressActive(): Got the Address set via view, now iterate through and see our address is there");
+            for (Address currentAddress : addressList) {
+                getLogger().trace(".isTargetAddressActive(): Iterating through Address list, current element->{}", currentAddress);
+                if (currentAddress.toString().contentEquals(addressName)) {
+                    getLogger().trace(".isTargetAddressActive(): Exit, A match");
+                    addressIsActive = true;
+                    break;
+                }
             }
         }
-        getLogger().info(".isTargetAddressActive(): Exit, no matching Address found!");
-        return(false);
+        getLogger().debug(".isTargetAddressActive(): Exit, addressIsActive->{}",addressIsActive);
+        return(addressIsActive);
     }
 
     public String getServiceNameFromAddressInstanceName(String participantInstanceName){
@@ -311,15 +341,17 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
     }
 
     public List<PetasosAdapterAddress> getAllClusterTargets(){
-        List<Address> addressList = getIPCChannel().getView().getMembers();
+        List<Address> addressList = getCurrentScannedMembership();
         List<PetasosAdapterAddress> petasosAdapterAddresses = new ArrayList<>();
-        for(Address currentAddress: addressList){
-            getLogger().info(".getAllTargets(): Iterating through Address list, current element->{}", currentAddress);
-            PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
-            currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
-            currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
-            currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
-            petasosAdapterAddresses.add(currentPetasosAdapterAddress);
+        synchronized (this.currentScannedMembershipLock) {
+            for (Address currentAddress : addressList) {
+                getLogger().trace(".getAllTargets(): Iterating through Address list, current element->{}", currentAddress);
+                PetasosAdapterAddress currentPetasosAdapterAddress = new PetasosAdapterAddress();
+                currentPetasosAdapterAddress.setAddressType(PetasosAdapterAddressTypeEnum.ADDRESS_TYPE_JGROUPS);
+                currentPetasosAdapterAddress.setJGroupsAddress(currentAddress);
+                currentPetasosAdapterAddress.setAddressName(currentAddress.toString());
+                petasosAdapterAddresses.add(currentPetasosAdapterAddress);
+            }
         }
         return(petasosAdapterAddresses);
     }

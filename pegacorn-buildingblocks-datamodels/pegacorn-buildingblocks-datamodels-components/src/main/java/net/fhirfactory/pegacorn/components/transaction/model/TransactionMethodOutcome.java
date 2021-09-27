@@ -22,16 +22,16 @@
 package net.fhirfactory.pegacorn.components.transaction.model;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionTypeEnum;
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionStatusEnum;
+import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
+import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionStatusEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.OperationOutcome;
 
 public class TransactionMethodOutcome extends MethodOutcome {
-    TransactionStatusEnum statusEnum;
-    TransactionTypeEnum causalAction;
-    Identifier identifier;
+    private TransactionStatusEnum statusEnum;
+    private TransactionTypeEnum causalAction;
+    private Identifier identifier;
 
     public boolean hasResource(){
         if(getResource()==null){

@@ -38,6 +38,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantInterface {
 
     private ProcessingPlantTopologyNode processingPlantNode;
+    private String hostName;
     private String instanceQualifier;
     private boolean isInitialised;
 
@@ -60,6 +62,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Inject
     private TopologyIM topologyIM;
+
+    @Inject
+    private PegacornEnvironmentProperties environmentProperties;
 
     abstract protected ClusterServiceDeliverySubsystemPropertyFile specifyPropertyFile();
     abstract protected Logger specifyLogger();
@@ -77,8 +82,10 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     public ProcessingPlant() {
         super();
+
         this.isInitialised = false;
         this.instanceQualifier = UUID.randomUUID().toString();
+
     }
 
     @PostConstruct
@@ -98,6 +105,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
             capabilityDeliveryServices = new ConcurrentHashMap<>();
 
+            String myPodName = environmentProperties.getMandatoryProperty("MY_POD_NAME");
+            setHostName(myPodName);
+
             executePostConstructActivities();
             isInitialised = true;
         }
@@ -108,6 +118,14 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         initialise();
     }
 
+    @Override
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
 
     public TopologyIM getTopologyIM() {
         return (topologyIM);
@@ -241,10 +259,12 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public CapabilityUtilisationResponse executeTask(CapabilityUtilisationRequest request) {
+        getLogger().debug(".executeTask(): Entry, request->{}", request);
         if(request == null){
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
             response.setDateCompleted(Instant.now());
             response.setSuccessful(false);
+            getLogger().debug(".executeTask(): Exit, request is null, response->{}", response);
             return(response);
         }
         String capabilityName = request.getRequiredCapabilityName();
@@ -254,9 +274,16 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             response.setDateCompleted(Instant.now());
             response.setSuccessful(false);
             response.setInScope(false);
+            getLogger().debug(".executeTask(): Exit, not registered capability, response->{}", response);
             return(response);
         }
         CapabilityUtilisationResponse capabilityUtilisationResponse = interfaceToUse.executeTask(request);
+        getLogger().debug(".executeTask(): Exit, capabilityUtilisationResponse->{}", capabilityUtilisationResponse);
         return(capabilityUtilisationResponse);
+    }
+
+    @Override
+    public boolean isITOpsNode() {
+        return (false);
     }
 }

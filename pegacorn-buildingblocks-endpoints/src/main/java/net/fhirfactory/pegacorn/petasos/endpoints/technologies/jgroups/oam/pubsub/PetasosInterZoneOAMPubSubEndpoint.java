@@ -84,8 +84,8 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
     }
 
     @Override
-    protected PetasosTopologyEndpointTypeEnum specifyIPCType() {
-        return (PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_SERVICE);
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTERZONE_SERVICE);
     }
 
     @Override

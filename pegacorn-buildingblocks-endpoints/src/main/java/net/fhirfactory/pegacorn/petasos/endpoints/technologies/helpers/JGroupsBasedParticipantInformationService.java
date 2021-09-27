@@ -29,10 +29,7 @@ import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantIn
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointChannelScopeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosTopologyEndpointTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
@@ -164,10 +161,10 @@ public class JGroupsBasedParticipantInformationService {
 
         // Derive the IPCEndpoints
         getLogger().info(".initialise(): [resolving interzone topology endpoint] Start");
-        this.myInterZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum.JGROUPS_INTERZONE_SERVICE, getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
+        this.myInterZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosEndpointTopologyTypeEnum.JGROUPS_INTERZONE_SERVICE, getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
         getLogger().info(".initialise(): [resolving interzone topology endpoint] finish, myInterZoneTopologyEndpoint->{}", this.myInterZoneTopologyEndpoint);
         getLogger().info(".initialise(): [resolving intrazone topology endpoint] Start");
-        this.myIntraZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum.JGROUPS_INTRAZONE_SERVICE, getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
+        this.myIntraZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosEndpointTopologyTypeEnum.JGROUPS_INTRAZONE_SERVICE, getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
         getLogger().info(".initialise(): [resolving intrazone topology endpoint] finish, myIntraZoneTopologyEndpoint->{}", this.myIntraZoneTopologyEndpoint);
 
         // Create the Participants
@@ -358,12 +355,12 @@ public class JGroupsBasedParticipantInformationService {
     // Resolve my Endpoint Details
     //
 
-    protected StandardEdgeIPCEndpoint deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum requiredEndpointType, String interfaceName){
+    protected StandardEdgeIPCEndpoint deriveTopologyEndpoint(PetasosEndpointTopologyTypeEnum requiredEndpointType, String interfaceName){
         getLogger().info(".deriveIPCTopologyEndpoint(): Entry, requiredEndpointType->{}, interfaceName->{}", requiredEndpointType, interfaceName);
         for(TopologyNodeFDN currentEndpointFDN: getProcessingPlant().getProcessingPlantNode().getEndpoints()){
             IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
             getLogger().info(".deriveIPCTopologyEndpoint(): currentEndpoint->{}",currentEndpoint);
-            PetasosTopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
+            PetasosEndpointTopologyTypeEnum endpointType = currentEndpoint.getEndpointType();
             boolean endpointTypeMatches = endpointType.equals(requiredEndpointType);
             if(endpointTypeMatches){
                 if(currentEndpoint.getName().contentEquals(interfaceName)) {

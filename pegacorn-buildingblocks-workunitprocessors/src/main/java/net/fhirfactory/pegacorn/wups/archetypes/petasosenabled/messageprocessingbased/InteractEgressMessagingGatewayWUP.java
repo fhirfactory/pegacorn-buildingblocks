@@ -22,9 +22,14 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +40,6 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
     }
 
     protected abstract String specifyEgressTopologyEndpointName();
-    protected abstract String specifyEgressEndpointVersion();
 
 
     @Override
@@ -51,5 +55,32 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
         ingressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPIngres());
         getLogger().debug(".specifyIngresTopologyEndpoint(): Exit");
         return(ingressEndpoint);
+    }
+
+    public class PortDetailInjector implements Processor {
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            getLogger().debug("PortDetailInjector.process(): Entry");
+            boolean alreadyInPlace = false;
+            if(exchange.hasProperties()) {
+                String egressPortType = exchange.getProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, String.class);
+                if (egressPortType != null) {
+                    alreadyInPlace = true;
+                }
+            }
+            if (!alreadyInPlace) {
+                switch(getEgressEndpoint().getEndpointTopologyNode().getEndpointType()) {
+                    case MLLP_CLIENT:{
+                        StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getEgressEndpoint().getEndpointTopologyNode();
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getEndpointType());
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, getEgressEndpoint().getEndpointSpecification());
+                    }
+                    default:{
+                        // Do nothing
+                    }
+                }
+
+            }
+        }
     }
 }
