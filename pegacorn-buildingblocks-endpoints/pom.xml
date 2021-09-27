@@ -201,6 +201,12 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-platform-petasos-itops</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Pegacorn Core Data Models (FHIR) -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>

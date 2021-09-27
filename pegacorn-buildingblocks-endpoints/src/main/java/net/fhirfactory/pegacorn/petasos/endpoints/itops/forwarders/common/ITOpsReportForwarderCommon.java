@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.components.capabilities.CapabilityUtilisationBrokerInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.petasos.itops.caches.common.ITOpsLocalDMRefreshBase;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -39,7 +38,7 @@ public abstract class ITOpsReportForwarderCommon {
     private ObjectMapper jsonMapper;
 
     abstract protected Logger specifyLogger();
-    abstract protected ITOpsLocalDMRefreshBase specifyLocalDM();
+//    abstract protected ITOpsLocalDMRefreshBase specifyLocalDM();
 
     @Inject
     private CapabilityUtilisationBrokerInterface capabilityUtilisationBroker;
@@ -55,9 +54,9 @@ public abstract class ITOpsReportForwarderCommon {
         jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
-    protected ITOpsLocalDMRefreshBase getLocalDM(){
-        return(specifyLocalDM());
-    }
+//    protected ITOpsLocalDMRefreshBase getLocalDM(){
+//        return(specifyLocalDM());
+//    }
 
     protected Logger getLogger(){
         return(specifyLogger());

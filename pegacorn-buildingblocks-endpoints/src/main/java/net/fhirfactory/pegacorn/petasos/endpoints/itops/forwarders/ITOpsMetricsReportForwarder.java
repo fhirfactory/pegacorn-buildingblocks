@@ -67,11 +67,6 @@ public class ITOpsMetricsReportForwarder extends ITOpsReportForwarderCommon {
         return (LOG);
     }
 
-    @Override
-    protected ITOpsLocalDMRefreshBase specifyLocalDM() {
-        return (metricsDM);
-    }
-
     @PostConstruct
     public void initialise(){
         getLogger().debug(".initialise(): Entry");

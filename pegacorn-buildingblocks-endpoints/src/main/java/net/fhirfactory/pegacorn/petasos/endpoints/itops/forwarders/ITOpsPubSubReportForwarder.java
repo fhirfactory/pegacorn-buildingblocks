@@ -28,7 +28,6 @@ import net.fhirfactory.pegacorn.deployment.names.capabilities.CapabilityProvider
 import net.fhirfactory.pegacorn.deployment.names.capabilities.CapabilityProviderTitlesEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.itops.forwarders.common.ITOpsReportForwarderCommon;
 import net.fhirfactory.pegacorn.petasos.itops.caches.ITOpsPubSubMapLocalDM;
-import net.fhirfactory.pegacorn.petasos.itops.caches.common.ITOpsLocalDMRefreshBase;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsPubSubCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.itops.valuesets.ITOpsCapabilityNamesEnum;
 import net.fhirfactory.pegacorn.petasos.model.itops.subscriptions.ITOpsPubSubReport;
@@ -76,11 +75,6 @@ public class ITOpsPubSubReportForwarder extends ITOpsReportForwarderCommon {
     @Override
     protected Logger specifyLogger() {
         return (LOG);
-    }
-
-    @Override
-    protected ITOpsLocalDMRefreshBase specifyLocalDM() {
-        return (pubsubMapDM);
     }
 
     protected void forwardPubSubReports() {
