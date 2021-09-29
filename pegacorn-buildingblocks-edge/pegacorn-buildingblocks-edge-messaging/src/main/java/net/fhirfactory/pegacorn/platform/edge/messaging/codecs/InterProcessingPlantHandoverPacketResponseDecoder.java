@@ -69,7 +69,7 @@ public class InterProcessingPlantHandoverPacketResponseDecoder extends IPCPacket
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Convert incoming message string to an InterProcessingPlantHandoverResponsePacket");
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Attempting to retrieve UoW from the Exchange");
-        String uowPropertyKey = exchangePropertyNames.getExchangeUoWPropertyName(node.getNodeKey());
+        String uowPropertyKey = exchangePropertyNames.getExchangeUoWPropertyName(node.getComponentID());
         UoW theUoW = camelExchange.getProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, UoW.class);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Retrieved UoW --> {}", theUoW);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Creating the Response message");

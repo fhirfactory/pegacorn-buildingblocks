@@ -85,7 +85,7 @@ public class ITOpsDiscoveredNodesDM {
                 break;
             }
         }
-        String simpleName = newElement.getNodeKey();
+        String simpleName = newElement.getComponentID();
         if (elementFound) {
             this.nodeSet.remove(currentNodeID);
             this.nodeSet.put(currentNodeID, newElement);

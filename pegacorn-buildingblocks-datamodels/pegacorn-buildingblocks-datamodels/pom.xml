@@ -19,6 +19,6 @@
         <module>../pegacorn-buildingblocks-datamodels-components</module>
         <module>../pegacorn-buildingblocks-datamodels-fhir</module>
         <module>../pegacorn-buildingblocks-datamodels-esr</module>
-        <module>../pegacorn-buildingblocks-datamodels-communicate</module>
+        <!--module>../pegacorn-buildingblocks-datamodels-communicate</module-->
     </modules>
 </project>
