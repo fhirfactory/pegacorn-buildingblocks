@@ -98,7 +98,7 @@ public class DeploymentModeSegment {
                 ", processingPlantReplicationCount=" + processingPlantReplicationCount +
                 ", concurrent=" + concurrent +
                 ", usingInternalEncryption=" + usingInternalEncryption +
-                ", deploymentConfig='" + deploymentConfig + '\'' +
+                ", deploymentConfig=" + deploymentConfig +
                 '}';
     }
 }

@@ -70,8 +70,8 @@ public class LoadBalancerSegment {
     @Override
     public String toString() {
         return "LoadBalancerSegment{" +
-                "type='" + type + '\'' +
-                ", ipAddress='" + ipAddress + '\'' +
+                "type=" + type +
+                ", ipAddress=" + ipAddress +
                 '}';
     }
 }

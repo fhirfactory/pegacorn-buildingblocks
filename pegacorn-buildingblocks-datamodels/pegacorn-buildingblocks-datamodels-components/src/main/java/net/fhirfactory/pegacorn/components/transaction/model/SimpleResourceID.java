@@ -119,10 +119,10 @@ public class SimpleResourceID {
     @Override
     public String toString() {
         return "ResourceID{" +
-                "url='" + url + '\'' +
-                ", resourceType='" + resourceType + '\'' +
-                ", value='" + value + '\'' +
-                ", version='" + version + '\'' +
+                "url=" + url +
+                ", resourceType=" + resourceType +
+                ", value=" + value +
+                ", version=" + version +
                 '}';
     }
 }

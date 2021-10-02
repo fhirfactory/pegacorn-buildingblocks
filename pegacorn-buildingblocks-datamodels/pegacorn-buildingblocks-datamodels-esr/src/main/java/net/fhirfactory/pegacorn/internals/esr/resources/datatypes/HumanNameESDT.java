@@ -123,10 +123,10 @@ public class HumanNameESDT {
     public String toString() {
         return "HumanNameESDT{" +
                 "nameUse=" + nameUse +
-                ", displayName='" + displayName + '\'' +
-                ", familyName='" + familyName + '\'' +
+                ", displayName=" + displayName +
+                ", familyName=" + familyName +
                 ", givenNames=" + givenNames +
-                ", preferredGivenName='" + preferredGivenName + '\'' +
+                ", preferredGivenName=" + preferredGivenName +
                 ", prefixes=" + prefixes +
                 ", suffixes=" + suffixes +
                 ", period=" + period +

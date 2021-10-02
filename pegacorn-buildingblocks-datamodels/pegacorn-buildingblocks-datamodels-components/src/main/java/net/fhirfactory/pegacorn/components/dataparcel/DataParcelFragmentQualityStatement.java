@@ -54,13 +54,13 @@ public class DataParcelFragmentQualityStatement extends DataParcelTypeDescriptor
     @Override
     public String toString() {
         return "DataParcelFragmentQualityStatement{" +
-                "dataParcelDefiner='" + getDataParcelDefiner() + '\'' +
-                ", dataParcelCategory='" + getDataParcelCategory() + '\'' +
-                ", dataParcelSubCategory='" + getDataParcelSubCategory() + '\'' +
-                ", dataParcelResource='" + getDataParcelResource() + '\'' +
-                ", dataParcelSegment='" + getDataParcelSegment() + '\'' +
-                ", dataParcelAttribute='" + getDataParcelAttribute() + '\'' +
-                ", version='" + getVersion() + '\'' +
+                "dataParcelDefiner=" + getDataParcelDefiner() +
+                ", dataParcelCategory=" + getDataParcelCategory() +
+                ", dataParcelSubCategory=" + getDataParcelSubCategory() +
+                ", dataParcelResource=" + getDataParcelResource() +
+                ", dataParcelSegment=" + getDataParcelSegment() +
+                ", dataParcelAttribute=" + getDataParcelAttribute() +
+                ", version=" + getVersion() +
                 ", fragmentQuality=" + fragmentQuality +
                 '}';
     }

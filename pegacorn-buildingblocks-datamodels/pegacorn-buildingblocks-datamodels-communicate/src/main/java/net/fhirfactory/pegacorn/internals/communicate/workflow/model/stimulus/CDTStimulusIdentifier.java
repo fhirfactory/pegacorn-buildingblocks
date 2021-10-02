@@ -46,7 +46,7 @@ public class CDTStimulusIdentifier {
     @Override
     public String toString() {
         return "CDTStimulusIdentifier{" +
-                "id='" + id + '\'' +
+                "id=" + id +
                 ", resourceType=" + resourceType +
                 '}';
     }

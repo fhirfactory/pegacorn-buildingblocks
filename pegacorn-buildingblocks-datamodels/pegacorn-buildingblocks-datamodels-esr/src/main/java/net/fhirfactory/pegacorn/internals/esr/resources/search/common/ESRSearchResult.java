@@ -170,7 +170,7 @@ public abstract class ESRSearchResult {
     public String toString() {
         return "ESRSearchResult{" +
                 "searchResultList=" + searchResultList +
-                ", statusReason='" + statusReason + '\'' +
+                ", statusReason=" + statusReason +
                 ", searchSuccessful=" + searchSuccessful +
                 '}';
     }

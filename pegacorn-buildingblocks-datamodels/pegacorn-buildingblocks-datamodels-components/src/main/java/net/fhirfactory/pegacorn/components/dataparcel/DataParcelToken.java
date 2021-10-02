@@ -100,13 +100,13 @@ public class DataParcelToken extends DataParcelTypeDescriptor implements Seriali
     @Override
     public String toString() {
         return "DataParcelToken{" +
-                "dataParcelDefiner='" + getDataParcelDefiner() + '\'' +
-                ", dataParcelCategory='" + getDataParcelCategory() + '\'' +
-                ", dataParcelSubCategory='" + getDataParcelSubCategory() + '\'' +
-                ", dataParcelResource='" + getDataParcelResource() + '\'' +
-                ", dataParcelSegment='" + getDataParcelSegment() + '\'' +
-                ", dataParcelAttribute='" + getDataParcelAttribute() + '\'' +
-                ", version='" + getVersion() + '\'' +
+                "dataParcelDefiner=" + getDataParcelDefiner() +
+                ", dataParcelCategory=" + getDataParcelCategory() +
+                ", dataParcelSubCategory=" + getDataParcelSubCategory() +
+                ", dataParcelResource=" + getDataParcelResource() +
+                ", dataParcelSegment=" + getDataParcelSegment() +
+                ", dataParcelAttribute=" + getDataParcelAttribute() +
+                ", version=" + getVersion() +
                 ", normalisationStatus=" + normalisationStatus +
                 ", validationStatus=" + validationStatus +
                 ", dataParcelType=" + dataParcelType +

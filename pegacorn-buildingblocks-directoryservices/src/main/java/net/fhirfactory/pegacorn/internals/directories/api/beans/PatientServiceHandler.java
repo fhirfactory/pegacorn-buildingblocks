@@ -47,34 +47,34 @@ public class PatientServiceHandler extends HandlerBase {
 
     public String updatePatient(String inputBody,  Exchange camelExchange)
             throws ResourceUpdateException, ResourceInvalidSearchException {
-        LOG.info(".updatePatient(): Entry, inputBody --> {}", inputBody);
+        getLogger().info(".updatePatient(): Entry, inputBody --> {}", inputBody);
         PatientESR entry = null;
         try{
-            LOG.info(".updatePatient(): Attempting to parse Resource");
+            getLogger().info(".updatePatient(): Attempting to parse Resource");
             JsonMapper jsonMapper = new JsonMapper();
             entry = jsonMapper.readValue(inputBody, PatientESR.class);
-            LOG.info(".updatePatient(): Resource parsing successful");
+            getLogger().info(".updatePatient(): Resource parsing successful");
         } catch (JsonMappingException mappingException) {
             throw(new ResourceUpdateException("Unable to parse (map) message, error --> " + mappingException.getMessage()));
         } catch (JsonProcessingException processingException) {
             throw(new ResourceUpdateException("Unable to process message, error --> " + processingException.getMessage()));
         }
-        LOG.info(".updatePatient(): Requesting update from the Directory Resource Broker");
+        getLogger().info(".updatePatient(): Requesting update from the Directory Resource Broker");
         ESRMethodOutcome outcome = patientDirectoryResourceBroker.updatePatient(entry);
-        LOG.info(".updatePatient(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
+        getLogger().info(".updatePatient(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             String result = convertToJSONString(outcome.getEntry());
             camelExchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
-            LOG.info(".updatePatient(): Exit, returning updated resource");
+            getLogger().info(".updatePatient(): Exit, returning updated resource");
             return(result);
         }
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
             String result = convertToJSONString(outcome.getEntry());
             camelExchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, constant(201));
-            LOG.info(".update(): Exit, returning updated resource (after creating it)");
+            getLogger().info(".update(): Exit, returning updated resource (after creating it)");
             return(result);
         }
-        LOG.info(".update(): Exit, something has gone wrong.....");
+        getLogger().info(".update(): Exit, something has gone wrong.....");
         return("Hmmm... not good!");
     }
 

@@ -126,13 +126,13 @@ public abstract class StandardServerPortSegment {
     public String toString() {
         return "StandardServerPortSegment{" +
                 "portValue=" + portValue +
-                ", portType='" + portType + '\'' +
+                ", portType=" + portType +
                 ", isServer=" + isServer +
                 ", isEncrypted=" + isEncrypted +
-                ", hostDNSEntry='" + hostDNSEntry + '\'' +
+                ", hostDNSEntry=" + hostDNSEntry +
                 ", supportedInterfaceProfiles=" + supportedInterfaceProfiles +
                 ", startupDelay=" + startupDelay +
-                ", name='" + name + '\'' +
+                ", name=" + name +
                 ", server=" + getServer() +
                 ", server=" + isServer() +
                 ", encrypted=" + getEncrypted() +

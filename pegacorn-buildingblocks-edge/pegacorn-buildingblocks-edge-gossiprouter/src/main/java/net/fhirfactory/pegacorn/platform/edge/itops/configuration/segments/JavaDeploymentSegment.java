@@ -70,8 +70,8 @@ public class JavaDeploymentSegment {
     @Override
     public String toString() {
         return "JavaDeploymentSegment{" +
-                "jmxMaxHeapSizeMB='" + jmxMaxHeapSizeMB + '\'' +
-                ", jvmMemSizeMB='" + jvmMemSizeMB + '\'' +
+                "jmxMaxHeapSizeMB=" + jmxMaxHeapSizeMB +
+                ", jvmMemSizeMB=" + jvmMemSizeMB +
                 '}';
     }
 }

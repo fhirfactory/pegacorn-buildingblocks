@@ -64,10 +64,10 @@ public class CommunicateMessageIdentifier {
     @Override
     public String toString() {
         return "CommunicateMessageIdentifier{" +
-                "messageID='" + messageID + '\'' +
-                ", sourceRoomID='" + sourceRoomID + '\'' +
-                ", sourceUserID='" + sourceUserID + '\'' +
+                "messageID=" + messageID + 
+                ", sourceRoomID=" + sourceRoomID + 
+                ", sourceUserID=" + sourceUserID + 
                 ", messageDate=" + messageDate +
-                '}';
+                "}";
     }
 }

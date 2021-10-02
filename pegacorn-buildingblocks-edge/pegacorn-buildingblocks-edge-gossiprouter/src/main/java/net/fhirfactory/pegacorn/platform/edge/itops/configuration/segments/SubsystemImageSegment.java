@@ -106,10 +106,10 @@ public class SubsystemImageSegment {
     @Override
     public String toString() {
         return "SubsystemImageSegment{" +
-                "repository='" + repository + '\'' +
-                ", imageName='" + imageName + '\'' +
-                ", imageVersion='" + imageVersion + '\'' +
-                ", pullPolicy='" + pullPolicy + '\'' +
+                "repository=" + repository +
+                ", imageName=" + imageName +
+                ", imageVersion=" + imageVersion +
+                ", pullPolicy=" + pullPolicy +
                 '}';
     }
 }

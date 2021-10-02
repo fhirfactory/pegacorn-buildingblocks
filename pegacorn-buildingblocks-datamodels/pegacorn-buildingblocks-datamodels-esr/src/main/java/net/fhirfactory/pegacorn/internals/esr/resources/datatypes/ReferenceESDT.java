@@ -79,7 +79,7 @@ public class ReferenceESDT {
     @Override
     public String toString() {
         return "ReferenceESDT{" +
-                "simplifiedID='" + simplifiedID + '\'' +
+                "simplifiedID=" + simplifiedID +
                 ", identifier=" + identifier +
                 ", resourceType=" + resourceType +
                 '}';

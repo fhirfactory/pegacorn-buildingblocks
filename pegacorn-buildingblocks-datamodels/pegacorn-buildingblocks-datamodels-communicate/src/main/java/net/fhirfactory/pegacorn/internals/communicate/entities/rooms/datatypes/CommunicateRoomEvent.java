@@ -87,7 +87,7 @@ public class CommunicateRoomEvent {
         return "CommunicateRoomEvent{" +
                 "roomReference=" + roomReference +
                 ", roomEventType=" + roomEventType +
-                ", roomEventID='" + roomEventID + '\'' +
+                ", roomEventID=" + roomEventID +
                 ", roomEventSource=" + roomEventSource +
                 ", roomEventTimestamp=" + roomEventTimestamp +
                 ", roomEventContent=" + roomEventContent +

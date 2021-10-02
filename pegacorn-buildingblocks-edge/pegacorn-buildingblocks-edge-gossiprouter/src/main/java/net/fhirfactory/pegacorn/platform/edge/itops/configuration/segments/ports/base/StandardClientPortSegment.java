@@ -108,13 +108,13 @@ public abstract class StandardClientPortSegment {
     @Override
     public String toString() {
         return "StandardClientPortSegment{" +
-                "portType='" + portType + '\'' +
-                ", portParameters='" + portParameters + '\'' +
-                ", defaultRetryCount='" + defaultRetryCount + '\'' +
-                ", defaultRetryWait='" + defaultRetryWait + '\'' +
-                ", defaultTimeout='" + defaultTimeout + '\'' +
+                "portType=" + portType +
+                ", portParameters=" + portParameters +
+                ", defaultRetryCount=" + defaultRetryCount +
+                ", defaultRetryWait=" + defaultRetryWait +
+                ", defaultTimeout=" + defaultTimeout +
                 ", connectedSystem=" + connectedSystem +
-                ", name='" + name + '\'' +
+                ", name=" + name +
                 '}';
     }
 }

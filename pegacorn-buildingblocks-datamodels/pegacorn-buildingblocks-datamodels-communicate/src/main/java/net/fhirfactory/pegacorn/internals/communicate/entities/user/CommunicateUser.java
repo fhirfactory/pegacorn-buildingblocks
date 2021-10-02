@@ -151,7 +151,7 @@ public class CommunicateUser extends CommunicateUserESR {
                 ", administrator=" + administrator +
                 ", deactivated=" + deactivated +
                 ", shadowBanned=" + shadowBanned +
-                ", avatarURL='" + avatarURL + '\'' +
+                ", avatarURL=" + avatarURL +
                 ", communicateUserType=" + communicateUserType +
                 '}';
     }

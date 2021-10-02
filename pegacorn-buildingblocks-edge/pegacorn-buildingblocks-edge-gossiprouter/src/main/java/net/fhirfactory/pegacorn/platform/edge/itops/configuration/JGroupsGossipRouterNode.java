@@ -78,13 +78,13 @@ public class JGroupsGossipRouterNode {
     }
 
     protected String specifyPropertyFileName() {
-        LOG.info(".specifyPropertyFileName(): Entry");
+        getLogger().info(".specifyPropertyFileName(): Entry");
         String configurationFileName = getProperty("DEPLOYMENT_CONFIG_FILE");
 //        String configurationFileName = System.getenv("SUBSYSTEM_CONFIG_FILE");
         if(configurationFileName == null){
             throw(new RuntimeException("Cannot load configuration file!!!! (SUBSYSTEM-CONFIG_FILE="+configurationFileName+")"));
         }
-        LOG.info(".specifyPropertyFileName(): Exit, filename->{}", configurationFileName);
+        getLogger().info(".specifyPropertyFileName(): Exit, filename->{}", configurationFileName);
         return configurationFileName;
     }
 

@@ -52,7 +52,7 @@ public class CommunicateRoomAliasEventContent extends CommunicateRoomEventConten
     @Override
     public String toString() {
         return "CommunicateRoomAliasEventContent{" +
-                "canonicalAlias='" + canonicalAlias + '\'' +
+                "canonicalAlias=" + canonicalAlias +
                 ", otherAliases=" + otherAliases +
                 '}';
     }

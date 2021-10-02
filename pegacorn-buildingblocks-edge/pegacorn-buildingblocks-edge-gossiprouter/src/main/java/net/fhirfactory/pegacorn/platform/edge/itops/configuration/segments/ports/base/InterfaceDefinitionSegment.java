@@ -45,8 +45,8 @@ public class InterfaceDefinitionSegment {
     @Override
     public String toString() {
         return "InterfaceDefinitionSegment{" +
-                "interfaceDefinitionName='" + interfaceDefinitionName + '\'' +
-                ", interfaceDefinitionVersion='" + interfaceDefinitionVersion + '\'' +
+                "interfaceDefinitionName=" + interfaceDefinitionName +
+                ", interfaceDefinitionVersion=" + interfaceDefinitionVersion +
                 '}';
     }
 }

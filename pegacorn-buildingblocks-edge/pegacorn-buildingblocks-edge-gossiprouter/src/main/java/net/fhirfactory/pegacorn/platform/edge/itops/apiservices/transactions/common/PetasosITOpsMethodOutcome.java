@@ -81,10 +81,10 @@ public class PetasosITOpsMethodOutcome {
     @Override
     public String toString() {
         return "PetasosITOpsMethodOutcome{" +
-                "id='" + id + '\'' +
-                ", entry='" + entry + '\'' +
+                "id=" + id +
+                ", entry=" + entry +
                 ", status=" + status +
-                ", statusReason='" + statusReason + '\'' +
+                ", statusReason=" + statusReason +
                 ", date=" + date +
                 '}';
     }

@@ -70,8 +70,8 @@ public class DeploymentZoneSegment {
     @Override
     public String toString() {
         return "DeploymentZoneSegment{" +
-                "zoneName='" + securityZoneName + '\'' +
-                ", nameSpace='" + nameSpace + '\'' +
+                "zoneName=" + securityZoneName +
+                ", nameSpace=" + nameSpace +
                 '}';
     }
 }

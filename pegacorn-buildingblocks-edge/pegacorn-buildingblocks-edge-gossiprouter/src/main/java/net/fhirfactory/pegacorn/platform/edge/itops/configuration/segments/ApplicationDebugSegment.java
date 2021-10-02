@@ -95,13 +95,13 @@ public class ApplicationDebugSegment {
     @Override
     public String toString() {
         return "ApplicationDebugSegment{" +
-                "wildflyLogLevel='" + wildflyLogLevel + '\'' +
-                ", wildflyLogEnable='" + wildflyLogEnable + '\'' +
-                ", pegacornLogLevel='" + pegacornLogLevel + '\'' +
-                ", pegacornLogCategory='" + pegacornLogCategory + '\'' +
-                ", aetherLogLevel='" + aetherLogLevel + '\'' +
-                ", aetherLogCategory='" + aetherLogCategory + '\'' +
-                ", javaxNetDebug='" + javaxNetDebug + '\'' +
+                "wildflyLogLevel=" + wildflyLogLevel +
+                ", wildflyLogEnable=" + wildflyLogEnable +
+                ", pegacornLogLevel=" + pegacornLogLevel +
+                ", pegacornLogCategory=" + pegacornLogCategory +
+                ", aetherLogLevel=" + aetherLogLevel +
+                ", aetherLogCategory=" + aetherLogCategory +
+                ", javaxNetDebug=" + javaxNetDebug +
                 '}';
     }
 

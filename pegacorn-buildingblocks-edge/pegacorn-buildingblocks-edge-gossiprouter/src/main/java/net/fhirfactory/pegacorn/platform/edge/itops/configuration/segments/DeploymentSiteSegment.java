@@ -102,9 +102,9 @@ public class DeploymentSiteSegment {
     public String toString() {
         return "DeploymentSiteSegment{" +
                 "siteCount=" + siteCount +
-                ", site1Name='" + site1Name + '\'' +
-                ", site2Name='" + site2Name + '\'' +
-                ", site3Name='" + site3Name + '\'' +
+                ", site1Name=" + site1Name +
+                ", site2Name=" + site2Name +
+                ", site3Name=" + site3Name +
                 '}';
     }
 }

@@ -106,10 +106,10 @@ public class SecurityCredentialSegment {
     @Override
     public String toString() {
         return "SecurityCredentialSegment{" +
-                "credentialName='" + credentialName + '\'' +
-                ", credentialPassword='" + credentialPassword + '\'' +
-                ", credentialReferenceName='" + credentialReferenceName + '\'' +
-                ", credentialReferenceKey='" + credentialReferenceKey + '\'' +
+                "credentialName=" + credentialName +
+                ", credentialPassword=" + credentialPassword +
+                ", credentialReferenceName=" + credentialReferenceName +
+                ", credentialReferenceKey=" + credentialReferenceKey +
                 '}';
     }
 }

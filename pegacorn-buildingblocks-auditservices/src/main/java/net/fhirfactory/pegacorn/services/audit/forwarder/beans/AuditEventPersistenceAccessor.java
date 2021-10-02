@@ -74,9 +74,9 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
 
     @Override
     public AuditEvent logAuditEventAsynchronously(AuditEvent auditEvent) {
-        LOG.debug(".logAuditEventAsynchronously(): Entry, auditEvent->{}", auditEvent);
+        getLogger().debug(".logAuditEventAsynchronously(): Entry, auditEvent->{}", auditEvent);
         if(auditEvent == null){
-            LOG.debug(".logAuditEventAsynchronously(): Exit, auditEvent is null");
+            getLogger().debug(".logAuditEventAsynchronously(): Exit, auditEvent is null");
             return(null);
         }
         MethodOutcome outcome = utiliseAuditEventPersistenceCapability(auditEvent);
@@ -84,15 +84,15 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
         if(id != null){
             auditEvent.setId(id);
         }
-        LOG.debug(".logAuditEventAsynchronously(): Exit, outcome->{}", outcome);
+        getLogger().debug(".logAuditEventAsynchronously(): Exit, outcome->{}", outcome);
         return(auditEvent);
     }
 
     @Override
     public AuditEvent logAuditEventSynchronously(AuditEvent auditEvent) {
-        LOG.debug(".logAuditEventSynchronously(): Entry, auditEvent->{}", auditEvent);
+        getLogger().debug(".logAuditEventSynchronously(): Entry, auditEvent->{}", auditEvent);
         if(auditEvent == null){
-            LOG.debug(".logAuditEventSynchronously(): Exit, auditEvent is null");
+            getLogger().debug(".logAuditEventSynchronously(): Exit, auditEvent is null");
             return(null);
         }
         MethodOutcome outcome = utiliseAuditEventPersistenceCapability(auditEvent);
@@ -100,12 +100,12 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
         if(id != null){
             auditEvent.setId(id);
         }
-        LOG.debug(".logAuditEventSynchronously(): Exit, outcome->{}", outcome);
+        getLogger().debug(".logAuditEventSynchronously(): Exit, outcome->{}", outcome);
         return(auditEvent);
     }
 
     public  MethodOutcome utiliseAuditEventPersistenceCapability(AuditEvent auditEvent){
-        LOG.debug(".utiliseAuditEventPersistenceCapability(): Entry, auditEvent --> {}", auditEvent);
+        getLogger().debug(".utiliseAuditEventPersistenceCapability(): Entry, auditEvent --> {}", auditEvent);
         //
         // Build Write
         //
@@ -124,7 +124,7 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
         //
         String resultString = auditEventWriteOutcome.getResponseContent();
         MethodOutcome methodOutcome = convertToMethodOutcome(resultString);
-        LOG.debug(".utiliseAuditEventPersistenceCapability(): Entry, methodOutcome --> {}", methodOutcome);
+        getLogger().debug(".utiliseAuditEventPersistenceCapability(): Entry, methodOutcome --> {}", methodOutcome);
         return(methodOutcome);
     }
 

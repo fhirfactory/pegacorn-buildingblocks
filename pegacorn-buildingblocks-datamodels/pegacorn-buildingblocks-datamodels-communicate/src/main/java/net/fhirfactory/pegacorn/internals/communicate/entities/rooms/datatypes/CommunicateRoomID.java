@@ -24,7 +24,7 @@ public class CommunicateRoomID {
     @Override
     public String toString() {
         return "CommunicateRoomID{" +
-                "value='" + value + '\'' +
+                "value=" + value +
                 '}';
     }
 

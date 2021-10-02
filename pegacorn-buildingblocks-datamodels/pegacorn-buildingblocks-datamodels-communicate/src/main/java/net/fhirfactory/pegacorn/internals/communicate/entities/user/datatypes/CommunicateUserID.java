@@ -43,7 +43,7 @@ public class CommunicateUserID {
     @Override
     public String toString() {
         return "CommunicateUserID{" +
-                "value='" + value + '\'' +
+                "value=" + value +
                 '}';
     }
 }

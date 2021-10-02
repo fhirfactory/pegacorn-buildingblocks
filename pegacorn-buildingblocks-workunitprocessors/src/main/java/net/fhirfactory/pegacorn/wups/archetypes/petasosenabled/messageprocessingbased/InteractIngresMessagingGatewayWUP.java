@@ -44,7 +44,7 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
 
     public InteractIngresMessagingGatewayWUP() {
         super();
-//        LOG.debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
+//        getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
 
     protected abstract String specifyIngresTopologyEndpointName();

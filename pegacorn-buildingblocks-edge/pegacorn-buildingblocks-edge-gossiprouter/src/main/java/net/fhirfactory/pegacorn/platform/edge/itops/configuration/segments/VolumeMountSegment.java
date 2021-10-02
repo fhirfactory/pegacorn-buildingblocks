@@ -106,10 +106,10 @@ public class VolumeMountSegment {
     @Override
     public String toString() {
         return "VolumeMountSegment{" +
-                "volumeMountName='" + volumeMountName + '\'' +
-                ", volumeMountPath='" + volumeMountPath + '\'' +
-                ", volumeName='" + volumeName + '\'' +
-                ", volumeHostPath='" + volumeHostPath + '\'' +
+                "volumeMountName=" + volumeMountName +
+                ", volumeMountPath=" + volumeMountPath +
+                ", volumeName=" + volumeName +
+                ", volumeHostPath=" + volumeHostPath +
                 '}';
     }
 }

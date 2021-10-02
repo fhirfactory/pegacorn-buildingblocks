@@ -265,8 +265,8 @@ public class DataParcelManifest implements Serializable {
                 ", normalisationStatus=" + normalisationStatus +
                 ", validationStatus=" + validationStatus +
                 ", dataParcelType=" + dataParcelType +
-                ", sourceSystem='" + sourceSystem + '\'' +
-                ", intendedTargetSystem='" + intendedTargetSystem + '\'' +
+                ", sourceSystem=" + sourceSystem +
+                ", intendedTargetSystem=" + intendedTargetSystem +
                 ", interSubsystemDistributable=" + interSubsystemDistributable +
                 ", enforcementPointApprovalStatus=" + getEnforcementPointApprovalStatus() +
                 ", dataParcelFlowDirection=" + getDataParcelFlowDirection() +

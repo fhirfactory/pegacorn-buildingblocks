@@ -74,11 +74,11 @@ public class GroupESR extends ExtremelySimplifiedResource {
         return "GroupDirectoryEntry{" +
                 "id=" + this.getSimplifiedID() +
                 ", identifiers=" + this.getIdentifiers() +
-                ", displayName='" + this.getDisplayName() + '\'' +
+                ", displayName=" + this.getDisplayName() +
                 ", systemManaged=" + this.isSystemManaged() +
                 ", groupManager=" + this.getGroupManager() +
                 ", groupMembership=" + this.getGroupMembership() +
-                ", groupType='" + this.getGroupType() + '\'' +
+                ", groupType=" + this.getGroupType() +
                 '}';
     }
 

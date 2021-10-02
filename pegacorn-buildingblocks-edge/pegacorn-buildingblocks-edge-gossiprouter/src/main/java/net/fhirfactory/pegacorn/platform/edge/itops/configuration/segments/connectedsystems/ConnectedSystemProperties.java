@@ -107,12 +107,12 @@ public class ConnectedSystemProperties {
     @Override
     public String toString() {
         return "ConnectedSystemProperties{" +
-                "owningOrganizationName='" + owningOrganizationName + '\'' +
-                ", solutionName='" + solutionName + '\'' +
-                ", subsystemName='" + subsystemName + '\'' +
-                ", subsystemVersion='" + subsystemVersion + '\'' +
-                ", externalisedServiceName='" + externalisedServiceName + '\'' +
-                ", externalisedServiceEndpointName='" + externalisedServiceEndpointName + '\'' +
+                "owningOrganizationName=" + owningOrganizationName +
+                ", solutionName=" + solutionName +
+                ", subsystemName=" + subsystemName +
+                ", subsystemVersion=" + subsystemVersion +
+                ", externalisedServiceName=" + externalisedServiceName +
+                ", externalisedServiceEndpointName=" + externalisedServiceEndpointName +
                 ", targetPort1=" + targetPort1 +
                 ", targetPort2=" + targetPort2 +
                 ", targetPort3=" + targetPort3 +

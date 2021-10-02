@@ -289,20 +289,20 @@ public class SubsystemInstanceSegment {
     @Override
     public String toString() {
         return "SubsystemInstanceSegment{" +
-                "owningOrganizationName='" + owningOrganizationName + '\'' +
-                ", solutionName='" + solutionName + '\'' +
-                ", subsystemName='" + subsystemName + '\'' +
-                ", subsystemVersion='" + subsystemVersion + '\'' +
-                ", externalisedServiceName='" + externalisedServiceName + '\'' +
-                ", externalisedServiceDNSName='" + externalisedServiceDNSName + '\'' +
-                ", externalisedServiceEndpointName='" + externalisedServiceEndpointName + '\'' +
-                ", clusterServiceName='" + clusterServiceName + '\'' +
-                ", clusterServiceDNSName='" + clusterServiceDNSName + '\'' +
-                ", processingPlantName='" + processingPlantName + '\'' +
-                ", processingPlantDNSName='" + processingPlantDNSName + '\'' +
-                ", processingPlantVersion='" + processingPlantVersion + '\'' +
-                ", solutionGroup='" + solutionGroup + '\'' +
-                ", solutionDescription='" + solutionDescription + '\'' +
+                "owningOrganizationName=" + owningOrganizationName +
+                ", solutionName=" + solutionName +
+                ", subsystemName=" + subsystemName +
+                ", subsystemVersion=" + subsystemVersion +
+                ", externalisedServiceName=" + externalisedServiceName +
+                ", externalisedServiceDNSName=" + externalisedServiceDNSName +
+                ", externalisedServiceEndpointName=" + externalisedServiceEndpointName +
+                ", clusterServiceName=" + clusterServiceName +
+                ", clusterServiceDNSName=" + clusterServiceDNSName +
+                ", processingPlantName=" + processingPlantName +
+                ", processingPlantDNSName=" + processingPlantDNSName +
+                ", processingPlantVersion=" + processingPlantVersion +
+                ", solutionGroup=" + solutionGroup +
+                ", solutionDescription=" + solutionDescription +
                 '}';
     }
 }
