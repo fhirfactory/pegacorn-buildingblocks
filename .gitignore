@@ -1,6 +1,13 @@
-/target/
 *.iml
-*.output
+.idea
+target/
 .classpath
 .project
-/.settings
+.settings
+
+.DS_Store
+
+*.DS_Store
+
+*.output
+.factorypath
