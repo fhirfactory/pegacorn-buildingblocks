@@ -69,9 +69,9 @@ public class JGroupsGossipRouterNode {
             getLogger().trace(".readPropertyFile(): Exit, file loaded, propertyFile->{}", this.propertyFile);
             return(this.propertyFile);
         } catch(FileNotFoundException noFile){
-            getLogger().error(".readPropertyFile(): Configuration File->{} is not found, error->{}", propertyFileName, noFile.getMessage());
+            getLogger().error(".readPropertyFile(): Configuration File->{} is not found, error->{}", propertyFileName, noFile);
         } catch(IOException ioError){
-            getLogger().error(".readPropertyFile(): Configuration File->{} could not be loaded, error->{}", propertyFileName, ioError.getMessage());
+            getLogger().error(".readPropertyFile(): Configuration File->{} could not be loaded, error->{}", propertyFileName, ioError);
         }
         getLogger().info(".readPropertyFile(): failed to load file");
         return(null);

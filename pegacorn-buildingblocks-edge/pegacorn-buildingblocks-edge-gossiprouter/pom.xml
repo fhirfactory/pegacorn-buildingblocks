@@ -13,7 +13,7 @@
     <artifactId>pegacorn-buildingblocks-edge-gossiprouter</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Building Blocks :: Edge :: IPC (GossipRouter)</name>
+    <name>Pegacorn :: Building Blocks :: Edge :: InterZoneRepeater</name>
 
     <licenses>
         <license>

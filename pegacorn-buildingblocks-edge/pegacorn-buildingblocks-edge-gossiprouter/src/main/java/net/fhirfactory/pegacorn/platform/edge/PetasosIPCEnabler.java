@@ -1,10 +1,10 @@
 package net.fhirfactory.pegacorn.platform.edge;
 
-import net.fhirfactory.pegacorn.platform.edge.messaging.IPCGossipRouter;
+import net.fhirfactory.pegacorn.platform.edge.messaging.InterZoneRepeater;
 
 public abstract class PetasosIPCEnabler {
 
-    private static IPCGossipRouter ipcRouter = new IPCGossipRouter();
+    private static InterZoneRepeater ipcRouter = new InterZoneRepeater();
 
     public static void main(String[] args) {
         ipcRouter.run();
