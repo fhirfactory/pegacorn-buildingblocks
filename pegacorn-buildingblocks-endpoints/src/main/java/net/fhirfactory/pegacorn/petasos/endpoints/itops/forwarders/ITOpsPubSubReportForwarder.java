@@ -84,45 +84,45 @@ public class ITOpsPubSubReportForwarder extends ITOpsReportForwarderCommon {
     }
 
     protected void forwardPubSubReports() {
-        LOG.info(".forwardPubSubReports(): Entry");
+        LOG.debug(".forwardPubSubReports(): Entry");
         //
         // Build Map
         //
-        LOG.info(".forwardPubSubReports(): [Build ProcessingPlant PubSub Summary] Start");
+        LOG.trace(".forwardPubSubReports(): [Build ProcessingPlant PubSub Summary] Start");
         pubSubCollectionAgent.refreshLocalProcessingPlantPubSubMap();
-        LOG.info(".forwardPubSubReports(): [Build ProcessingPlant PubSub Summary] Finish");
-        LOG.info(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Summaries] Start");
+        LOG.trace(".forwardPubSubReports(): [Build ProcessingPlant PubSub Summary] Finish");
+        LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Summaries] Start");
         pubSubCollectionAgent.refreshWorkUnitProcessorPubSubMap();
-        LOG.info(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Summaries] Finish");
+        LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Summaries] Finish");
         //
         // Get Data to be Reported ON
         //
-        LOG.info(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Report] Start");
+        LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Report] Start");
         ITOpsPubSubReport pubSubReport = pubsubMapDM.getPubSubReport();
         pubSubReport.setProcessingPlantComponentID(getProcessingPlant().getProcessingPlantNode().getComponentID());
-        LOG.info(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Report] Start");
+        LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Report] Start");
         //
         // Build Task
         //
-        LOG.info(".forwardPubSubReports(): [Build Report Submission Task] Start");
+        LOG.trace(".forwardPubSubReports(): [Build Report Submission Task] Start");
         CapabilityUtilisationRequest task = new CapabilityUtilisationRequest();
         task.setRequestID(UUID.randomUUID().toString());
         String pubsubReportString = convertToJSONString(pubSubReport);
         if(StringUtils.isEmpty(pubsubReportString)){
-            LOG.info(".forwardPubSubReports(): [Build Report Submission Task] Terminate Activity, Nothing To Report");
+            LOG.trace(".forwardPubSubReports(): [Build Report Submission Task] Terminate Activity, Nothing To Report");
             return;
         }
         task.setRequestContent(pubsubReportString);
         task.setRequiredCapabilityName(ITOpsCapabilityNamesEnum.IT_OPS_PUBSUB_REPORT_COLLATOR.getCapabilityName());
         task.setRequestDate(Instant.now());
-        LOG.info(".forwardPubSubReports(): [Build Report Submission Task] Finish");
+        LOG.trace(".forwardPubSubReports(): [Build Report Submission Task] Finish");
         //
         // Execute Task
         //
-        LOG.info(".forwardPubSubReports(): [Execute Report Submission Task] Start");
+        LOG.trace(".forwardPubSubReports(): [Execute Report Submission Task] Start");
         String serviceProvider = capabilityProviderNameResolver.resolveCapabilityServiceProvider(CapabilityProviderTitlesEnum.CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS);
         CapabilityUtilisationResponse response = getCapabilityUtilisationBroker().executeTask(serviceProvider, task);
-        LOG.info(".forwardPubSubReports(): [Execute Report Submission Task] Finish");
+        LOG.trace(".forwardPubSubReports(): [Execute Report Submission Task] Finish");
         //
         // Extract the response
         //

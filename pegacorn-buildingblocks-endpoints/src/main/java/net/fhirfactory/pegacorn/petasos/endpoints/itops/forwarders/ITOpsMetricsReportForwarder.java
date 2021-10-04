@@ -113,7 +113,7 @@ public class ITOpsMetricsReportForwarder extends ITOpsReportForwarderCommon {
     }
 
     protected boolean sendMetricsUpdate(ITOpsMetricsSet metricsSet) {
-        LOG.info(".sendMetricsUpdate(): Entry");
+        LOG.debug(".sendMetricsUpdate(): Entry");
         //
         // Build Query
         //

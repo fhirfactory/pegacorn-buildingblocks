@@ -85,41 +85,42 @@ public class ITOpsTopologyReportForwarder extends ITOpsReportForwarderCommon {
 
 
     protected void forwardTopologyDetails() {
-        LOG.info(".forwardTopologyDetails(): Entry");
+        LOG.debug(".forwardTopologyDetails(): Entry");
         //
         // Building Map
         //
-        LOG.info(".forwardTopologyDetails(): [Build Topology Graph] Start");
+        LOG.trace(".forwardTopologyDetails(): [Build Topology Graph] Start");
         topologyCollectionAgent.refreshLocalTopologyGraph();
-        LOG.info(".forwardTopologyDetails(): [Build Topology Graph] Finish");
+        LOG.trace(".forwardTopologyDetails(): [Build Topology Graph] Finish");
         //
         // Get Data to be Reported ON
         //
-        LOG.info(".forwardTopologyDetails(): [Grab Current Topology Graph] Start");
+        LOG.trace(".forwardTopologyDetails(): [Grab Current Topology Graph] Start");
         ITOpsTopologyGraph currentState = itOpsTopologyDM.getCurrentState();
         currentState.setDeploymentName(getProcessingPlant().getSolutionNode().getNodeRDN().getNodeName());
-        LOG.info(".forwardTopologyDetails(): [Grab Current Topology Graph] Finish");
+        LOG.trace(".forwardTopologyDetails(): [Grab Current Topology Graph] Finish");
         //
         // Build Query
         //
-        LOG.info(".forwardTopologyDetails(): [Create Task] Start");
+        LOG.trace(".forwardTopologyDetails(): [Create Task] Start");
         CapabilityUtilisationRequest task = new CapabilityUtilisationRequest();
         task.setRequestID(UUID.randomUUID().toString());
         String topologyGraphAsJSONString = convertToJSONString(currentState);
         if(StringUtils.isEmpty(topologyGraphAsJSONString)){
+            LOG.debug(".forwardTopologyDetails(): Exit");
             return;
         }
         task.setRequestContent(topologyGraphAsJSONString);
         task.setRequiredCapabilityName(ITOpsCapabilityNamesEnum.IT_OPS_TOPOLOGY_REPORT_COLLATOR.getCapabilityName());
         task.setRequestDate(Instant.now());
-        LOG.info(".forwardTopologyDetails(): [Create Task] Finish");
+        LOG.trace(".forwardTopologyDetails(): [Create Task] Finish");
         //
         // Do Query
         //
-        LOG.info(".forwardTopologyDetails(): [Execute RPC Call] Start");
+        LOG.trace(".forwardTopologyDetails(): [Execute RPC Call] Start");
         String serviceProvider = capabilityProviderNameResolver.resolveCapabilityServiceProvider(CapabilityProviderTitlesEnum.CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS);
         CapabilityUtilisationResponse response = getCapabilityUtilisationBroker().executeTask(serviceProvider, task);
-        LOG.info(".forwardTopologyDetails(): [Execute RPC Call] Finish");
+        LOG.trace(".forwardTopologyDetails(): [Execute RPC Call] Finish");
         //
         // Extract the response
         //
