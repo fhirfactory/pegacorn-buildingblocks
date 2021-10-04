@@ -86,11 +86,11 @@ public class InterProcessingPlantHandoverResponsePacket implements Serializable 
     public String toString() {
         return "InterProcessingPlantHandoverResponsePacket{" +
                 "activityID=" + activityID +
-                ", messageIdentifier='" + messageIdentifier + '\'' +
+                ", messageIdentifier=" + messageIdentifier +
                 ", messageSize=" + messageSize +
                 ", sendDate=" + sendDate +
                 ", status=" + status +
-                ", statusReason='" + statusReason + '\'' +
+                ", statusReason=" + statusReason +
                 '}';
     }
 }

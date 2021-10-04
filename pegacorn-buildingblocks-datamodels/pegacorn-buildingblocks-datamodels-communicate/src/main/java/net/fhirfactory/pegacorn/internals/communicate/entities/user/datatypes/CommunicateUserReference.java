@@ -51,7 +51,7 @@ public class CommunicateUserReference extends ReferenceESDT {
     public String toString() {
         return "CommunicateUserReference{" +
                 "userType=" + userType +
-                ", userID='" + getUserID() + '\'' +
+                ", userID=" + getUserID() +
                 ", identifier=" + getIdentifier() +
                 ", resourceType=" + getResourceType() +
                 '}';

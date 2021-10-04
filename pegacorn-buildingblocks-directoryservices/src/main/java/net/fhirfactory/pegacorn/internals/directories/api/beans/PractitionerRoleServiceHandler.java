@@ -46,7 +46,7 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
     //
 
     public void createPractitionerRole(PractitionerRoleESR entryToUpdate, Exchange camelExchange){
-        LOG.info(".update(): Entry, inputBody --> {}", entryToUpdate);
+        getLogger().info(".update(): Entry, inputBody --> {}", entryToUpdate);
     }
 
     //
@@ -125,17 +125,17 @@ public class PractitionerRoleServiceHandler extends HandlerBase {
 
     public void updatePractitionerRole(PractitionerRoleESR entryToUpdate, Exchange camelExchange)
             throws ResourceUpdateException, ResourceInvalidSearchException {
-        LOG.info(".update(): Entry, inputBody --> {}", entryToUpdate);
+        getLogger().info(".update(): Entry, inputBody --> {}", entryToUpdate);
         PractitionerRoleESR entry = entryToUpdate;
-        LOG.info(".update(): Requesting update from the Directory Resource Broker");
+        getLogger().info(".update(): Requesting update from the Directory Resource Broker");
         ESRMethodOutcome outcome = practitionerRoleDirectoryResourceBroker.updatePractitionerRole(entry);
-        LOG.info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
+        getLogger().info(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             String result = convertToJSONString(outcome.getEntry());
-            LOG.info(".update(): Exit, returning updated resource");
+            getLogger().info(".update(): Exit, returning updated resource");
             return;
         }
-        LOG.info(".update(): Exit, something has gone wrong.....");
+        getLogger().info(".update(): Exit, something has gone wrong.....");
     }
 
     //

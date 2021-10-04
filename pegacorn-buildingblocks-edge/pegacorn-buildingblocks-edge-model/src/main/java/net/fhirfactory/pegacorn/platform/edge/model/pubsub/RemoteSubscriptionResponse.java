@@ -110,7 +110,7 @@ public class RemoteSubscriptionResponse implements Serializable {
         return "RemoteSubscriptionResponse{" +
                 "publisher=" + publisher +
                 ", subscriptionSuccessful=" + subscriptionSuccessful +
-                ", subscriptionCommentary='" + subscriptionCommentary + '\'' +
+                ", subscriptionCommentary=" + subscriptionCommentary +
                 ", subscriptionRegistrationStatus=" + subscriptionRegistrationStatus +
                 ", subscriptionRegistrationDate=" + subscriptionRegistrationDate +
                 '}';

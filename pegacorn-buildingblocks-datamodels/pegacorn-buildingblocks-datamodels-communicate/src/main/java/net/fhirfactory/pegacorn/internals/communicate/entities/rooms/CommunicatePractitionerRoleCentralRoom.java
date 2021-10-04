@@ -52,9 +52,9 @@ public class CommunicatePractitionerRoleCentralRoom extends CommunicateRoom {
     }
 
     public void addCommunicatePractitionerRoleFulfillmentRoom( CommunicatePractitionerRoleFulfilmentRoom fulfilmentRoom){
-        LOG.debug(".addCommunicatePractitionerRoleFulfillmentRoom(): Entry, fulfilmentRoom->{}", fulfilmentRoom);
+        getLogger().debug(".addCommunicatePractitionerRoleFulfillmentRoom(): Entry, fulfilmentRoom->{}", fulfilmentRoom);
         if(fulfilmentRoom == null){
-            LOG.debug(".addCommunicatePractitionerRoleFulfillmentRoom(): Exit, fulfilmentRoom is null, doing nothing");
+            getLogger().debug(".addCommunicatePractitionerRoleFulfillmentRoom(): Exit, fulfilmentRoom is null, doing nothing");
             return;
         }
         if(!fulfilmentRoom.hasClientPractitionerID()){

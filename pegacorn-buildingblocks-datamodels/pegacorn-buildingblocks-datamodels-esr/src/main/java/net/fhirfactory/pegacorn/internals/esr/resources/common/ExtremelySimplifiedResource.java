@@ -247,13 +247,13 @@ public abstract class  ExtremelySimplifiedResource {
     @Override
     public String toString() {
         return "ExtremelySimplifiedResource{" +
-                "simplifiedID='" + simplifiedID + '\'' +
+                "simplifiedID=" + simplifiedID +
                 ", simplifiedIDMetadata=" + simplifiedIDMetadata +
                 ", identifiers=" + identifiers +
-                ", displayName='" + displayName + '\'' +
-                ", description='" + description + '\'' +
+                ", displayName=" + displayName +
+                ", description=" + description +
                 ", systemManaged=" + systemManaged +
-                ", otherID='" + otherID + '\'' +
+                ", otherID=" + otherID +
                 '}';
     }
 

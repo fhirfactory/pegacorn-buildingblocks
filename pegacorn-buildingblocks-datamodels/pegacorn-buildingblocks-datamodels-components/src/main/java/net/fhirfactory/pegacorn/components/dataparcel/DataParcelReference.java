@@ -227,13 +227,13 @@ public class DataParcelReference implements Serializable {
     @Override
     public String toString() {
         return "DataParcelReference{" +
-                "dataParcelDefiner='" + dataParcelDefiner + '\'' +
-                ", dataParcelCategory='" + dataParcelCategory + '\'' +
-                ", dataParcelSubCategory='" + dataParcelSubCategory + '\'' +
-                ", dataParcelResource='" + dataParcelResource + '\'' +
-                ", dataParcelSegment='" + dataParcelSegment + '\'' +
-                ", dataParcelAttribute='" + dataParcelAttribute + '\'' +
-                ", version='" + version + '\'' +
+                "dataParcelDefiner=" + dataParcelDefiner +
+                ", dataParcelCategory=" + dataParcelCategory +
+                ", dataParcelSubCategory=" + dataParcelSubCategory +
+                ", dataParcelResource=" + dataParcelResource +
+                ", dataParcelSegment=" + dataParcelSegment +
+                ", dataParcelAttribute=" + dataParcelAttribute +
+                ", version=" + version +
                 '}';
     }
 

@@ -86,8 +86,8 @@ public class ContactPointESDT {
     @Override
     public String toString() {
         return "ContactPointESDT{" +
-                "name='" + name + '\'' +
-                ", value='" + value + '\'' +
+                "name=" + name +
+                ", value=" + value +
                 ", rank=" + rank +
                 ", type=" + type +
                 ", use=" + use +

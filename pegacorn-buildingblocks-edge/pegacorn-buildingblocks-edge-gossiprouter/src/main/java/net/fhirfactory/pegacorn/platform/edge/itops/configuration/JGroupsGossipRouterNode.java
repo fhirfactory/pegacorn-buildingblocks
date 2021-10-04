@@ -69,22 +69,22 @@ public class JGroupsGossipRouterNode {
             getLogger().trace(".readPropertyFile(): Exit, file loaded, propertyFile->{}", this.propertyFile);
             return(this.propertyFile);
         } catch(FileNotFoundException noFile){
-            getLogger().error(".readPropertyFile(): Configuration File->{} is not found, error->{}", propertyFileName, noFile.getMessage());
+            getLogger().error(".readPropertyFile(): Configuration File->{} is not found, error->{}", propertyFileName, noFile);
         } catch(IOException ioError){
-            getLogger().error(".readPropertyFile(): Configuration File->{} could not be loaded, error->{}", propertyFileName, ioError.getMessage());
+            getLogger().error(".readPropertyFile(): Configuration File->{} could not be loaded, error->{}", propertyFileName, ioError);
         }
         getLogger().info(".readPropertyFile(): failed to load file");
         return(null);
     }
 
     protected String specifyPropertyFileName() {
-        LOG.info(".specifyPropertyFileName(): Entry");
+        getLogger().info(".specifyPropertyFileName(): Entry");
         String configurationFileName = getProperty("DEPLOYMENT_CONFIG_FILE");
 //        String configurationFileName = System.getenv("SUBSYSTEM_CONFIG_FILE");
         if(configurationFileName == null){
             throw(new RuntimeException("Cannot load configuration file!!!! (SUBSYSTEM-CONFIG_FILE="+configurationFileName+")"));
         }
-        LOG.info(".specifyPropertyFileName(): Exit, filename->{}", configurationFileName);
+        getLogger().info(".specifyPropertyFileName(): Exit, filename->{}", configurationFileName);
         return configurationFileName;
     }
 

@@ -100,10 +100,10 @@ public class IdentifierESDT {
     @Override
     public String toString() {
         return "IdentifierESDT{" +
-                "type='" + type + '\'' +
+                "type=" + type +
                 ", use=" + use +
-                ", value='" + value + '\'' +
-                ", valueWithoutContext='" + leafValue + '\'' +
+                ", value=" + value +
+                ", valueWithoutContext=" + leafValue +
                 '}';
     }
 

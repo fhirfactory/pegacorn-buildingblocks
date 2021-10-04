@@ -10,21 +10,25 @@ import org.slf4j.LoggerFactory;
 public class PetasosITOpsService {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosITOpsService.class);
 
+    protected Logger getLogger(){
+        return(LOG);
+    }
+	
     CamelContext camelContext;
     APIServicesFacade servicesFacade;
 
     public PetasosITOpsService(JGroupsGossipRouterNode node){
-        LOG.debug(".PetasosITOpsService(): Entry, node->{}", node);
+        getLogger().debug(".PetasosITOpsService(): Entry, node->{}", node);
         CamelContext context = new DefaultCamelContext();
         setCamelContext(context);
-        LOG.trace(".PetasosITOpsService(): context->{}", context);
+        getLogger().trace(".PetasosITOpsService(): context->{}", context);
         APIServicesFacade apiService = new APIServicesFacade(node);
         setServicesFacade(apiService);
-        LOG.trace(".PetasosITOpsService(): servicesFacade->{}", apiService);
+        getLogger().trace(".PetasosITOpsService(): servicesFacade->{}", apiService);
         try {
-            LOG.trace(".PetasosITOpsService(): Adding Routes");
+            getLogger().trace(".PetasosITOpsService(): Adding Routes");
             getCamelContext().addRoutes(getServicesFacade());
-            LOG.trace(".PetasosITOpsService(): Routes Added");
+            getLogger().trace(".PetasosITOpsService(): Routes Added");
         } catch (Exception e) {
             e.printStackTrace();
         }

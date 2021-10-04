@@ -63,9 +63,9 @@ public class CacheIDMetadata {
     public String toString() {
         return "PrimaryKeyMetadata{" +
                 "identifierBased=" + identifierBased +
-                ", identifierType='" + identifierType + '\'' +
-                ", identifierUse='" + identifierUse + '\'' +
-                ", derivationSource='" + derivationSource + '\'' +
+                ", identifierType=" + identifierType +
+                ", identifierUse=" + identifierUse +
+                ", derivationSource=" + derivationSource +
                 '}';
     }
 }

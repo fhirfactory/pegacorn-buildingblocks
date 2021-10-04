@@ -74,8 +74,8 @@ public class CapabilityUtilisationRequest implements Serializable {
     @Override
     public String toString() {
         return "CapabilityUtilisationRequest{" +
-                "requestID='" + requestID + '\'' +
-                ", requiredCapabilityName='" + requiredCapabilityName + '\'' +
+                "requestID=" + requestID +
+                ", requiredCapabilityName=" + requiredCapabilityName +
                 ", requestDate=" + requestDate +
                 ", requestContent='" + requestContent + '\'' +
                 ", requestSourceComponentID='" + requestSourceComponentID + '\'' +

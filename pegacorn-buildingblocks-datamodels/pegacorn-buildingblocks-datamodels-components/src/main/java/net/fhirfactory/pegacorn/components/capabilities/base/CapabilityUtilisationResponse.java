@@ -74,7 +74,7 @@ public class CapabilityUtilisationResponse implements Serializable {
     @Override
     public String toString() {
         return "CapabilityUtilisationResponseBase{" +
-                "associatedRequestID='" + associatedRequestID + '\'' +
+                "associatedRequestID=" + associatedRequestID +
                 ", inScope=" + inScope +
                 ", successful=" + successful +
                 ", dateCompleted=" + dateCompleted +

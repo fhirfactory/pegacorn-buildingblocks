@@ -37,8 +37,8 @@ public class A19QueryTaskOutcome extends CapabilityUtilisationResponse {
     @Override
     public String toString() {
         return "A19QueryTaskOutcome{" +
-                "a19QueryResponse='" + a19QueryResponse + '\'' +
-                ", associatedRequestID='" + getAssociatedRequestID() + '\'' +
+                "a19QueryResponse=" + a19QueryResponse +
+                ", associatedRequestID=" + getAssociatedRequestID() +
                 ", inScope=" + isInScope() +
                 ", successful=" + isSuccessful() +
                 ", dateCompleted=" + getDateCompleted() +

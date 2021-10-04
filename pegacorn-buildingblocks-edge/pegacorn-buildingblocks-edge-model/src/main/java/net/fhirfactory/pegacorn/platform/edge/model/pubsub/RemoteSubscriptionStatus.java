@@ -52,7 +52,7 @@ public class RemoteSubscriptionStatus implements Serializable {
     public String toString() {
         return "RemoteSubscriptionStatus{" +
                 "subscriptionSuccessful=" + subscriptionSuccessful +
-                ", subscriptionCommentary='" + subscriptionCommentary + '\'' +
+                ", subscriptionCommentary=" + subscriptionCommentary +
                 '}';
     }
 }

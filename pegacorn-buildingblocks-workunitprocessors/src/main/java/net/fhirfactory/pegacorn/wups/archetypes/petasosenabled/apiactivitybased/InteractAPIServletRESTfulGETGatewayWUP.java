@@ -34,23 +34,22 @@ import org.slf4j.LoggerFactory;
 public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAServerWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractAPIServletRESTfulGETGatewayWUP.class);
 
+    protected Logger getLogger(){
+        return(LOG);
+    }
+   
     public InteractAPIServletRESTfulGETGatewayWUP(){
         super();
     }
 
-
-
-     public void registerActivityStart(UoW unitOfWork, WUPClusterModeEnum clusterMode, WUPSystemModeEnum systemMode){
-        LOG.debug(".registerActivityStart(): Entry, unitOfWork --> {}", unitOfWork);
+    public void registerActivityStart(UoW unitOfWork, WUPClusterModeEnum clusterMode, WUPSystemModeEnum systemMode){
+        getLogger().debug(".registerActivityStart(): Entry, unitOfWork --> {}", unitOfWork);
         ActivityID newActivityID = new ActivityID();
         newActivityID.setPresentWUPFunctionToken(this.getWUP().getNodeFunctionFDN().getFunctionToken());
         newActivityID.setPresentWUPIdentifier(this.getWUPIdentifier());
-     }
-
-    public void registerActivityFinish(UoW unitOfWork){
-        LOG.debug(".registerActivityFinish(): Entry, unitOfWork --> {}", unitOfWork);
-
     }
 
-
+    public void registerActivityFinish(UoW unitOfWork){
+        getLogger().debug(".registerActivityFinish(): Entry, unitOfWork --> {}", unitOfWork);
+    }
 }

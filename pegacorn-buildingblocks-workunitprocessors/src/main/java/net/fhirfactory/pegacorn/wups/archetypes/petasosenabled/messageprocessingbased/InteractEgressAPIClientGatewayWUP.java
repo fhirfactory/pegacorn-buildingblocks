@@ -31,10 +31,13 @@ import org.slf4j.LoggerFactory;
 public abstract class InteractEgressAPIClientGatewayWUP extends GenericMessageBasedWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractEgressAPIClientGatewayWUP.class);
 
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public InteractEgressAPIClientGatewayWUP() {
         super();
-//        LOG.debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
+//        getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
 
     protected abstract String specifyEgressTopologyEndpointName();

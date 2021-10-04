@@ -16,7 +16,7 @@ public class CommunicateSessionID {
     @Override
     public String toString() {
         return "CommunicateSessionID{" +
-                "value='" + value + '\'' +
+                "value=" + value +
                 '}';
     }
 

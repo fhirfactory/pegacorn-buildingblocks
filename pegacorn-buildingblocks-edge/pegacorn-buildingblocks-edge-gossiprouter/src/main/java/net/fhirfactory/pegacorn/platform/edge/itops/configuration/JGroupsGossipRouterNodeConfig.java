@@ -21,10 +21,19 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.itops.configuration;
 
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.DeploymentModeSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.DeploymentSiteSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.DeploymentZoneSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.JavaDeploymentSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.LoadBalancerSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.SecurityCredentialSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.SubsystemImageSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.SubsystemInstanceSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.VolumeMountSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.base.StandardClusterServiceServerPortSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.interact.ClusteredInteractServerPortSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.standard.HTTPProcessingPlantServerPortSegment;
 
-import net.fhirfactory.pegacorn.platform.edge.itops.configuration.segments.*;
-import net.fhirfactory.pegacorn.platform.edge.itops.configuration.segments.ports.base.StandardClusterServiceServerPortSegment;
-import net.fhirfactory.pegacorn.platform.edge.itops.configuration.segments.ports.standard.HTTPProcessingPlantServerPortSegment;
 
 public class JGroupsGossipRouterNodeConfig {
 
@@ -36,7 +45,7 @@ public class JGroupsGossipRouterNodeConfig {
     private HTTPProcessingPlantServerPortSegment kubeLivelinessProbe;
     private HTTPProcessingPlantServerPortSegment prometheusPort;
     private HTTPProcessingPlantServerPortSegment jolokiaPort;
-    private StandardClusterServiceServerPortSegment gossipRouterPort;
+    private ClusteredInteractServerPortSegment gossipRouterPort;
     private LoadBalancerSegment loadBalancer;
     private SubsystemImageSegment subsystemImageProperties;
     private SecurityCredentialSegment trustStorePassword;
@@ -57,7 +66,7 @@ public class JGroupsGossipRouterNodeConfig {
         jolokiaPort = new HTTPProcessingPlantServerPortSegment();
         prometheusPort = new HTTPProcessingPlantServerPortSegment();
         deploymentZone = new DeploymentZoneSegment();
-        gossipRouterPort = new StandardClusterServiceServerPortSegment();
+        gossipRouterPort = new ClusteredInteractServerPortSegment();
         loadBalancer = new LoadBalancerSegment();
         volumeMounts = new VolumeMountSegment();
         hapiAPIKey = new SecurityCredentialSegment();
@@ -176,11 +185,11 @@ public class JGroupsGossipRouterNodeConfig {
         this.deploymentZone = deploymentZone;
     }
 
-    public StandardClusterServiceServerPortSegment getGossipRouterPort() {
+    public ClusteredInteractServerPortSegment getGossipRouterPort() {
         return gossipRouterPort;
     }
 
-    public void setGossipRouterPort(StandardClusterServiceServerPortSegment gossipRouterPort) {
+    public void setGossipRouterPort(ClusteredInteractServerPortSegment gossipRouterPort) {
         this.gossipRouterPort = gossipRouterPort;
     }
 

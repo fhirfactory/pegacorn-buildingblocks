@@ -40,27 +40,27 @@ public class MatrixRoomServiceHandler extends HandlerBase {
 
     public String update(String inputBody,  Exchange camelExchange)
             throws ResourceUpdateException, ResourceInvalidSearchException {
-        LOG.debug(".update(): Entry, inputBody --> {}", inputBody);
+        getLogger().debug(".update(): Entry, inputBody --> {}", inputBody);
         GroupESR entry = null;
         try{
-            LOG.debug(".update(): Attempting to parse Resource");
+            getLogger().debug(".update(): Attempting to parse Resource");
             JsonMapper jsonMapper = new JsonMapper();
             entry = jsonMapper.readValue(inputBody, GroupESR.class);
-            LOG.debug(".update(): Resource parsing successful");
+            getLogger().debug(".update(): Resource parsing successful");
         } catch (JsonMappingException mappingException) {
             throw(new ResourceUpdateException("Unable to parse (map) message, error --> " + mappingException.getMessage()));
         } catch (JsonProcessingException processingException) {
             throw(new ResourceUpdateException("Unable to process message, error --> " + processingException.getMessage()));
         }
-        LOG.debug(".update(): Requesting update from the Directory Resource Broker");
+        getLogger().debug(".update(): Requesting update from the Directory Resource Broker");
         ESRMethodOutcome outcome = matrixRoomDirectoryResourceBroker.updateDirectoryEntry(entry);
-        LOG.debug(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
+        getLogger().debug(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             String result = convertToJSONString(outcome.getEntry());
-            LOG.debug(".update(): Exit, returning updated resource");
+            getLogger().debug(".update(): Exit, returning updated resource");
             return(result);
         }
-        LOG.debug(".update(): Exit, something has gone wrong.....");
+        getLogger().debug(".update(): Exit, something has gone wrong.....");
         return("Hmmm... not good!");
     }
 }

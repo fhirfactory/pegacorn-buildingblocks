@@ -246,7 +246,7 @@ public class CommunicateRoom extends CommunicateRoomESR {
                 ", roomType=" + roomType +
                 ", joinRuleType=" + joinRuleType +
                 ", powerLevels=" + powerLevels +
-                ", topic='" + topic + '\'' +
+                ", topic=" + topic + 
                 ", members=" + members +
                 ", eventQueue=" + eventQueue +
                 ", receiveMessageQueue=" + receiveMessageQueue +

@@ -93,7 +93,7 @@ public class SimpleTransactionOutcome {
                 ", transactionStatus=" + transactionStatus +
                 ", transactionType=" + transactionType +
                 ", transactionSuccessful=" + transactionSuccessful +
-                ", reason='" + reason + '\'' +
+                ", reason=" + reason +
                 '}';
     }
 }

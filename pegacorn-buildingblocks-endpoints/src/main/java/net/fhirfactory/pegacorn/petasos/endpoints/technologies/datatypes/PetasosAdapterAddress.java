@@ -84,7 +84,7 @@ public class PetasosAdapterAddress {
                 "jGroupsAddress=" + jGroupsAddress +
                 ", hTTPAddress=" + hTTPAddress +
                 ", addressType=" + addressType +
-                ", addressName='" + addressName + '\'' +
+                ", addressName=" + addressName +
                 '}';
     }
 

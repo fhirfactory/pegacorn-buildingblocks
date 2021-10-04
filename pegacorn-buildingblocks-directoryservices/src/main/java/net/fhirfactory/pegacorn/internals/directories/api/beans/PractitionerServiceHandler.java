@@ -46,34 +46,34 @@ public class PractitionerServiceHandler extends HandlerBase {
 
     public String updatePractitioner(String inputBody,  Exchange camelExchange)
             throws ResourceUpdateException, ResourceInvalidSearchException {
-        LOG.debug(".update(): Entry, inputBody --> {}", inputBody);
+        getLogger().debug(".update(): Entry, inputBody --> {}", inputBody);
         PractitionerESR entry = null;
         try{
-            LOG.debug(".update(): Attempting to parse Resource");
+            getLogger().debug(".update(): Attempting to parse Resource");
             JsonMapper jsonMapper = new JsonMapper();
             entry = jsonMapper.readValue(inputBody, PractitionerESR.class);
-            LOG.debug(".update(): Resource parsing successful");
+            getLogger().debug(".update(): Resource parsing successful");
         } catch (JsonMappingException mappingException) {
             throw(new ResourceUpdateException("Unable to parse (map) message, error --> " + mappingException.getMessage()));
         } catch (JsonProcessingException processingException) {
             throw(new ResourceUpdateException("Unable to process message, error --> " + processingException.getMessage()));
         }
-        LOG.debug(".update(): Requesting update from the Directory Resource Broker");
+        getLogger().debug(".update(): Requesting update from the Directory Resource Broker");
         ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitioner(entry);
-        LOG.debug(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
+        getLogger().debug(".update(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             String result = convertToJSONString(outcome.getEntry());
             camelExchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
-            LOG.debug(".update(): Exit, returning updated resource");
+            getLogger().debug(".update(): Exit, returning updated resource");
             return(result);
         }
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL_CREATE)){
             String result = convertToJSONString(outcome.getEntry());
             camelExchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, constant(201));
-            LOG.debug(".update(): Exit, returning updated resource (after creating it)");
+            getLogger().debug(".update(): Exit, returning updated resource (after creating it)");
             return(result);
         }
-        LOG.debug(".update(): Exit, something has gone wrong.....");
+        getLogger().debug(".update(): Exit, something has gone wrong.....");
         return("Hmmm... not good!");
     }
 
@@ -95,14 +95,14 @@ public class PractitionerServiceHandler extends HandlerBase {
     public PractitionerESR updatePractitionerRoles(@Header("simplifiedID") String id, PractitionerRoleListESDT practitionerRoles) throws ResourceInvalidSearchException, ResourceUpdateException {
         getLogger().debug(".updatePractitionerRoles(): Entry, simplifiedID->{}, practitionerRoles->{}", id, practitionerRoles);
         ESRMethodOutcome outcome = practitionerDirectoryResourceBroker.updatePractitionerRoles(id, practitionerRoles);
-        LOG.trace(".updatePractitionerRoles(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
+        getLogger().trace(".updatePractitionerRoles(): Directory Resource Broker has finished update, outcome --> {}", outcome.getStatus());
         if(outcome.getStatus().equals(ESRMethodOutcomeEnum.UPDATE_ENTRY_SUCCESSFUL)){
             ESRMethodOutcome updatedOutcome = getResourceBroker().getResource(id.toLowerCase());
             PractitionerESR practitioner = (PractitionerESR) outcome.getEntry();
-            LOG.debug(".updatePractitionerRoles(): Exit, returning updated resource");
+            getLogger().debug(".updatePractitionerRoles(): Exit, returning updated resource");
             return(practitioner);
         } else {
-            LOG.error(".updatePractitionerRoles(): Could not update Resource");
+            getLogger().error(".updatePractitionerRoles(): Could not update Resource");
             throw(new ResourceUpdateException(outcome.getStatusReason()) );
         }
     }

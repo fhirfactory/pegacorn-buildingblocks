@@ -21,7 +21,7 @@ public class APIServicesFacade extends APIServicesFacadeBase{
 
     public APIServicesFacade(JGroupsGossipRouterNode node){
         super(node);
-        LOG.debug(".APIServicesFacade(): Entry, node->{}", node);
+        getLogger().debug(".APIServicesFacade(): Entry, node->{}", node);
         lastUpdateDate = Date.from(Instant.now());
     }
 
@@ -81,9 +81,9 @@ public class APIServicesFacade extends APIServicesFacadeBase{
         return "APIServicesFacade{" +
                 "lastUpdateDate=" + lastUpdateDate +
                 ", topologyNode=" + topologyNode +
-                ", serverPort='" + getServerPort() + '\'' +
-                ", serverHost='" + getServerHost() + '\'' +
-                ", webContext='" + getWebContext() + '\'' +
+                ", serverPort=" + getServerPort() +
+                ", serverHost=" + getServerHost() +
+                ", webContext=" + getWebContext() +
                 ", order=" + getOrder() +
                 ", restConfiguration=" + restConfiguration() +
                 ", rest=" + rest() +

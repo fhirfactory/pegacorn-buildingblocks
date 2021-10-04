@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 import java.sql.Date;
 import java.time.Instant;
 
-public class IPCGossipRouter{
-    private static final Logger LOG = LoggerFactory.getLogger(IPCGossipRouter.class);
+public class InterZoneRepeater{
+    private static final Logger LOG = LoggerFactory.getLogger(InterZoneRepeater.class);
 
     GossipRouter gossipRouter;
     PetasosITOpsService petasosServices;
@@ -42,15 +42,15 @@ public class IPCGossipRouter{
     }
 
     public void run(){
-        getLogger().debug("IPCGossipRouter::main(): Gossip Router");
+        getLogger().debug("InterZoneRepeater::run(): Entry");
         gossipRouterNode = new JGroupsGossipRouterNode();
         petasosServices = new PetasosITOpsService(gossipRouterNode);
         petasosServices.start();
-        initialiseGossipRouter();
+        initialiseRepeater();
         eventLoop();
     }
 
-    private void initialiseGossipRouter(){
+    private void initialiseRepeater(){
 
         String ipAddress = gossipRouterNode.getPropertyFile().getGossipRouterPort().getHostDNSEntry();
         int portNumber = gossipRouterNode.getPropertyFile().getGossipRouterPort().getPortValue();
@@ -60,7 +60,7 @@ public class IPCGossipRouter{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        getLogger().info("initialiseGossipRouter(): Bound To = Address->{}, Port->{}",gossipRouter.bindAddress(), gossipRouter.port());
+        getLogger().info("initialiseRepeater(): Bound To = Address->{}, Port->{}",gossipRouter.bindAddress(), gossipRouter.port());
     }
 
     private void eventLoop(){

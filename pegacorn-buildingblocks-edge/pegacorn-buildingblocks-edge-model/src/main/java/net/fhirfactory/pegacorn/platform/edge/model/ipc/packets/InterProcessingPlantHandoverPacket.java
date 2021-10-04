@@ -105,13 +105,13 @@ public class InterProcessingPlantHandoverPacket implements Serializable {
     public String toString() {
         return "InterProcessingPlantHandoverPacket{" +
                 "payloadPacket=" + payloadPacket +
-                ", payloadType='" + payloadType + '\'' +
+                ", payloadType=" + payloadType +
                 ", activityID=" + activityID +
-                ", messageIdentifier='" + messageIdentifier + '\'' +
+                ", messageIdentifier=" + messageIdentifier +
                 ", messageSize=" + messageSize +
                 ", sendDate=" + sendDate +
-                ", source='" + source + '\'' +
-                ", target='" + target + '\'' +
+                ", source=" + source +
+                ", target=" + target +
                 '}';
     }
 }

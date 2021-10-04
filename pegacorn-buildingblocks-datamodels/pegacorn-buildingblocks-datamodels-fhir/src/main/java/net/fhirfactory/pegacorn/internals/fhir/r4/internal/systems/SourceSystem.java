@@ -42,6 +42,10 @@ import java.util.Date;
  */
 public abstract class SourceSystem {
     private static final Logger LOG = LoggerFactory.getLogger(SourceSystem.class);
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
         
     protected String organizationName;
     protected String systemOwnerContactName;
@@ -153,17 +157,17 @@ public abstract class SourceSystem {
     }
     
     protected Reference createSystemEndpointReference() {
-        LOG.debug(".createSystemEndpointReference(): Entry");
+        getLogger().debug(".createSystemEndpointReference(): Entry");
         Reference systemEndpointRef = new Reference();
         systemEndpointRef.setIdentifier(getIdentifierSystemEndpoint());
         systemEndpointRef.setDisplay(this.getOrganizationName() + " - " + this.getSystemEndpointName());
         systemEndpointRef.setType("Endpoint");
-        LOG.debug(".createSystemEndpointReference(): Exit, created Reference --> {}", systemEndpointRef);    	
+        getLogger().debug(".createSystemEndpointReference(): Exit, created Reference --> {}", systemEndpointRef);    	
         return(systemEndpointRef);
     }
     
     protected Identifier createSystemEndpointIdentifier() {
-        LOG.debug(".createSystemEndpointIdentifier(): Entry");
+        getLogger().debug(".createSystemEndpointIdentifier(): Entry");
         Identifier systemSystemEndpointIdentifier = new Identifier();
         systemSystemEndpointIdentifier.setUse(Identifier.IdentifierUse.SECONDARY);
         CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM);
@@ -174,7 +178,7 @@ public abstract class SourceSystem {
         validPeriod.setStart(Date.from(Instant.now()));
         systemSystemEndpointIdentifier.setPeriod(validPeriod);
         systemSystemEndpointIdentifier.setAssigner(buildDefaultEndpointReference());
-        LOG.debug(".createSystemEndpointIdentifier(): Exit, created Identifier --> {}", systemSystemEndpointIdentifier);
+        getLogger().debug(".createSystemEndpointIdentifier(): Exit, created Identifier --> {}", systemSystemEndpointIdentifier);
         return(systemSystemEndpointIdentifier);
     }
 
@@ -199,7 +203,7 @@ public abstract class SourceSystem {
     // System Administrator Resource (Practitioner) Set (and Attributes)
 
     protected Practitioner createSystemAdministratorPractitioner(){
-        LOG.debug(".createSystemAdministrator(): Entry");
+        getLogger().debug(".createSystemAdministrator(): Entry");
         Practitioner systemSAPractitioner = new Practitioner();
         systemSAPractitioner.getIdentifier().add(getIdentifierSystemAdministratorPractitioner());
         systemSAPractitioner.setActive(true);
@@ -209,22 +213,22 @@ public abstract class SourceSystem {
         nameEffectivePeriod.setStart(Date.from(Instant.now()));
         simpleName.setPeriod(nameEffectivePeriod);
         systemSAPractitioner.getName().add(simpleName);
-        LOG.debug(".createSystemAdministrator(): Exit, created Practitioner --> {}", systemSAPractitioner);
+        getLogger().debug(".createSystemAdministrator(): Exit, created Practitioner --> {}", systemSAPractitioner);
         return(systemSAPractitioner);
     }
 
     protected Reference createSystemAdministratorPractitionerReference(){
-        LOG.debug(".createSystemAdministratorPractitionerReference(): Entry");
+        getLogger().debug(".createSystemAdministratorPractitionerReference(): Entry");
         Reference systemSysAdminRef = new Reference();
         systemSysAdminRef.setIdentifier(getIdentifierSystemOwnerPractitioner());
         systemSysAdminRef.setDisplay(this.getOrganizationName() + " - " + this.systemAdministratorContactName);
         systemSysAdminRef.setType("Practitioner");
-        LOG.debug(".createSystemAdministratorPractitionerReference(): Exit, created Reference --> {}", systemSysAdminRef);
+        getLogger().debug(".createSystemAdministratorPractitionerReference(): Exit, created Reference --> {}", systemSysAdminRef);
         return (systemSysAdminRef);
     }
     
     protected Identifier createSystemAdministratorPractitionerIdentifier(){
-        LOG.debug(".createSystemAdministratorIdentifier(): Entry");
+        getLogger().debug(".createSystemAdministratorIdentifier(): Entry");
         // Create an empty FHIR::Identifier element
         Identifier systemSystemAdministrationPractitioner = new Identifier();
         // Set the FHIR::Identifier.Use to "SECONDARY" (this id is not their ABN or anything)
@@ -247,14 +251,14 @@ public abstract class SourceSystem {
         systemSystemAdministrationPractitioner.setPeriod(validPeriod);
         // Set the FHIR::Identifier.Assigner (to us, for this one)
         systemSystemAdministrationPractitioner.setAssigner(new Reference("Organization/FHIRFactory"));
-        LOG.debug(".createSystemAdministratorIdentifier(): Exit, created Identifier --> {}", systemSystemAdministrationPractitioner);
+        getLogger().debug(".createSystemAdministratorIdentifier(): Exit, created Identifier --> {}", systemSystemAdministrationPractitioner);
         return(systemSystemAdministrationPractitioner);
     }
 
     // System Administrator Resource (PractitionerRole) Set (and Attributes)
 
     protected Identifier createSystemAdministratorPractitionerRoleIdentifier(){
-        LOG.debug(".createSystemAdministratorPractitionerRoleIdentifier(): Entry");
+        getLogger().debug(".createSystemAdministratorPractitionerRoleIdentifier(): Entry");
         // Create an empty FHIR::Identifier element
         Identifier systemSystemAdministrationPractitionerRole = new Identifier();
         // Set the FHIR::Identifier.Use to "SECONDARY" (this id is not their ABN or anything)
@@ -277,34 +281,34 @@ public abstract class SourceSystem {
         systemSystemAdministrationPractitionerRole.setPeriod(validPeriod);
         // Set the FHIR::Identifier.Assigner (to us, for this one)
         systemSystemAdministrationPractitionerRole.setAssigner(new Reference("Organization/FHIRFactory"));
-        LOG.debug(".createSystemAdministratorPractitionerRoleIdentifier(): Exit, created Identifier --> {}", systemSystemAdministrationPractitionerRole);
+        getLogger().debug(".createSystemAdministratorPractitionerRoleIdentifier(): Exit, created Identifier --> {}", systemSystemAdministrationPractitionerRole);
         return(systemSystemAdministrationPractitionerRole);
     }
 
     protected Reference createSystemAdministratorRoleReference() {
-        LOG.debug(".createSystemAdministratorRoleReference(): Entry");
+        getLogger().debug(".createSystemAdministratorRoleReference(): Entry");
         Reference systemSysAdminRef = new Reference();
         systemSysAdminRef.setIdentifier(createSystemAdministratorPractitionerRoleIdentifier());
         systemSysAdminRef.setDisplay(this.getOrganizationName() + ": System Administrator");
         systemSysAdminRef.setType("PractitionerRole");
-        LOG.debug(".createSystemAdministratorRoleReference(): Exit, created Reference --> {}", systemSysAdminRef);
+        getLogger().debug(".createSystemAdministratorRoleReference(): Exit, created Reference --> {}", systemSysAdminRef);
         return (systemSysAdminRef);
     }
 
     protected PractitionerRole createSystemAdministratorPractitionerRole(){
-        LOG.debug(".createSystemAdministratorPractitionerRole(): Entry");
+        getLogger().debug(".createSystemAdministratorPractitionerRole(): Entry");
         PractitionerRole systemAdministratorPractitionerRole = new PractitionerRole();
         systemAdministratorPractitionerRole.getIdentifier().add(getIdentifierSystemAdministratorPractitionerRole());
         systemAdministratorPractitionerRole.setActive(true);
         systemAdministratorPractitionerRole.setOrganization(this.getReferenceOrganization());
-        LOG.debug(".createSystemAdministratorPractitionerRole(): Exit, created Practitioner --> {}", systemAdministratorPractitionerRole);
+        getLogger().debug(".createSystemAdministratorPractitionerRole(): Exit, created Practitioner --> {}", systemAdministratorPractitionerRole);
         return(systemAdministratorPractitionerRole);
     }
 
     // System Owner Resource (Practitioner) Set (and Attributes)
 
     protected Practitioner createSystemOwnerPractitioner(){
-        LOG.debug(".createSystemOwner(): Entry");
+        getLogger().debug(".createSystemOwner(): Entry");
         Practitioner systemSOPractitioner = new Practitioner();
         systemSOPractitioner.getIdentifier().add(getIdentifierSystemOwnerPractitioner());
         systemSOPractitioner.setActive(true);
@@ -314,12 +318,12 @@ public abstract class SourceSystem {
         nameEffectivePeriod.setStart(Date.from(Instant.now()));
         simpleName.setPeriod(nameEffectivePeriod);
         systemSOPractitioner.getName().add(simpleName);
-        LOG.debug(".createSystemOwner(): Exit, created Practitioner --> {}", systemSOPractitioner);
+        getLogger().debug(".createSystemOwner(): Exit, created Practitioner --> {}", systemSOPractitioner);
         return(systemSOPractitioner);
     }
 
     protected Identifier createSystemOwnerPractitionerIdentifier(){
-        LOG.debug(".createOwningPractitionerIdentifier(): Entry");
+        getLogger().debug(".createOwningPractitionerIdentifier(): Entry");
         // Create an empty FHIR::Identifier element
         Identifier systemOwningPractitionerIdentifier = new Identifier();
         // Set the FHIR::Identifier.Use to "SECONDARY" (this id is not their ABN or anything)
@@ -342,34 +346,34 @@ public abstract class SourceSystem {
         systemOwningPractitionerIdentifier.setPeriod(validPeriod);
         // Set the FHIR::Identifier.Assigner (to us, for this one)
         systemOwningPractitionerIdentifier.setAssigner(new Reference("Organization/FHIRFactory"));
-        LOG.debug(".createSystemOwnerIdentifier(): Exit, created Identifier --> {}", systemOwningPractitionerIdentifier);
+        getLogger().debug(".createSystemOwnerIdentifier(): Exit, created Identifier --> {}", systemOwningPractitionerIdentifier);
         return(systemOwningPractitionerIdentifier);
     }
 
     protected Reference createSystemOwnerPractitionerReference(){
-        LOG.debug(".createSystemOwnerPractitionerReference(): Entry");
+        getLogger().debug(".createSystemOwnerPractitionerReference(): Entry");
         Reference systemSysOwnerRef = new Reference();
         systemSysOwnerRef.setIdentifier(getIdentifierSystemOwnerPractitioner());
         systemSysOwnerRef.setDisplay(this.getOrganizationName() + ": " + this.getSystemOwnerContactName());
         systemSysOwnerRef.setType("Practitioner");
-        LOG.debug(".createSystemOwnerPractitionerReference(): Exit, created Reference --> {}", systemSysOwnerRef);
+        getLogger().debug(".createSystemOwnerPractitionerReference(): Exit, created Reference --> {}", systemSysOwnerRef);
         return (systemSysOwnerRef);
     }
 
     // System Owner Resource (PractitionerRole) Set (and Attributes)
 
     protected Reference createSystemOwnerPractitionerRoleReference() {
-        LOG.debug(".createOwningPractitionerReference(): Entry");
+        getLogger().debug(".createOwningPractitionerReference(): Entry");
         Reference systemOwningPractitionerRef = new Reference();
         systemOwningPractitionerRef.setIdentifier(getIdentifierSystemOwnerPractitionerRole());
         systemOwningPractitionerRef.setDisplay(this.getOrganizationName() + ": System Owner");
         systemOwningPractitionerRef.setType("PractitionerRole");
-        LOG.debug(".createOwningPractitionerReference(): Exit, created Reference --> {}", systemOwningPractitionerRef);
+        getLogger().debug(".createOwningPractitionerReference(): Exit, created Reference --> {}", systemOwningPractitionerRef);
         return (systemOwningPractitionerRef);
     }
 
     protected Identifier createSystemOwnerPractitionerRoleIdentifier(){
-        LOG.debug(".createSystemOwnerIdentifier(): Entry");
+        getLogger().debug(".createSystemOwnerIdentifier(): Entry");
         // Create an empty FHIR::Identifier element
         Identifier systemOwningPractitionerIdentifier = new Identifier();
         // Set the FHIR::Identifier.Use to "SECONDARY" (this id is not their ABN or anything)
@@ -392,24 +396,24 @@ public abstract class SourceSystem {
         systemOwningPractitionerIdentifier.setPeriod(validPeriod);
         // Set the FHIR::Identifier.Assigner (to us, for this one)
         systemOwningPractitionerIdentifier.setAssigner(new Reference("Organization/FHIRFactory"));
-        LOG.debug(".createSystemOwnerIdentifier(): Exit, created Identifier --> {}", systemOwningPractitionerIdentifier);
+        getLogger().debug(".createSystemOwnerIdentifier(): Exit, created Identifier --> {}", systemOwningPractitionerIdentifier);
         return(systemOwningPractitionerIdentifier);
     }
 
     protected PractitionerRole createSystemOwnerPractitionerRole(){
-        LOG.debug(".createSystemOwner(): Entry");
+        getLogger().debug(".createSystemOwner(): Entry");
         PractitionerRole systemOwnerPractitionerRole = new PractitionerRole();
         systemOwnerPractitionerRole.getIdentifier().add(getIdentifierSystemOwnerPractitionerRole());
         systemOwnerPractitionerRole.setActive(true);
         systemOwnerPractitionerRole.setOrganization(this.getReferenceOrganization());
-        LOG.debug(".createSystemOwner(): Exit, created Practitioner --> {}", systemOwnerPractitionerRole);
+        getLogger().debug(".createSystemOwner(): Exit, created Practitioner --> {}", systemOwnerPractitionerRole);
         return(systemOwnerPractitionerRole);
     }
     
     // System Owner Resource (Oranization) Set (and Attributes)
     
     protected Identifier createOrganizationIdentifier(){
-        LOG.debug(".createOrganizationIdentifier(): Entry");
+        getLogger().debug(".createOrganizationIdentifier(): Entry");
         // Create an empty FHIR::Identifier element
         Identifier systemIdentifier = new Identifier();
         // Set the FHIR::Identifier.Use to "SECONDARY" (this id is not their ABN or anything)
@@ -432,28 +436,28 @@ public abstract class SourceSystem {
         systemIdentifier.setPeriod(validPeriod);
         // Set the FHIR::Identifier.Assigner (to us, for this one)
         systemIdentifier.setAssigner(new Reference("Organization/FHIRFactory"));
-        LOG.debug("createOrganizationIdentifier(): Exit, created Identifier --> {}", systemIdentifier);
+        getLogger().debug("createOrganizationIdentifier(): Exit, created Identifier --> {}", systemIdentifier);
         return (systemIdentifier);
     }
 
     protected Reference createOwningOrganizationReference() {
-        LOG.debug(".createOwningOrganizationReference(): Entry");
+        getLogger().debug(".createOwningOrganizationReference(): Entry");
         Reference systemReference = new Reference();
         systemReference.setIdentifier(getIdentifierSystemOwnerPractitioner());
         systemReference.setDisplay(this.getOrganizationName());
         systemReference.setType("Oranization");
-        LOG.debug(".createOwningOrganizationReference(): Exit, created Reference --> {}", systemReference);
+        getLogger().debug(".createOwningOrganizationReference(): Exit, created Reference --> {}", systemReference);
         return(systemReference);
     }
 
     protected Organization createOrganization(){
-        LOG.debug(".createOrganization(): Entry");
+        getLogger().debug(".createOrganization(): Entry");
         Organization systemOrganization = new Organization();
         systemOrganization.getIdentifier().add(getIdentifierSystemAdministratorPractitioner());
         systemOrganization.setActive(true);
         systemOrganization.getType().add(this.specifyOrganizationType());
         systemOrganization.setName(this.getOrganizationName());
-        LOG.debug(".createOrganization(): Exit, created Organization --> {}", systemOrganization);
+        getLogger().debug(".createOrganization(): Exit, created Organization --> {}", systemOrganization);
         return(systemOrganization);
     }
     
