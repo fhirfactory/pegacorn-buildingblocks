@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.itops.forwarders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.deployment.names.capabilities.CapabilityProviderNameServiceInterface;
@@ -31,7 +30,8 @@ import net.fhirfactory.pegacorn.petasos.endpoints.itops.forwarders.common.ITOpsR
 import net.fhirfactory.pegacorn.petasos.itops.caches.ITOpsMetricsLocalDM;
 import net.fhirfactory.pegacorn.petasos.itops.caches.common.ITOpsLocalDMRefreshBase;
 import net.fhirfactory.pegacorn.petasos.itops.valuesets.ITOpsCapabilityNamesEnum;
-import net.fhirfactory.pegacorn.petasos.model.itops.metrics.ITOpsMetricsSet;
+import net.fhirfactory.pegacorn.petasos.model.itops.metrics.WorkUnitProcessorNodeMetrics;
+import net.fhirfactory.pegacorn.petasos.model.itops.metrics.common.NodeMetricsBase;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,9 +92,9 @@ public class ITOpsMetricsReportForwarder extends ITOpsReportForwarderCommon {
     
     protected void forwardMetricsReports(){
         LOG.debug(".forwardMetricsReports(): Entry");
-        List<ITOpsMetricsSet> allMetricsSets = metricsDM.getAllMetricsSets();
+        List<NodeMetricsBase> allMetricsSets = metricsDM.getAllMetricsSets();
         boolean metricsUpdateFailed = false;
-        for(ITOpsMetricsSet currentMetricsSet: allMetricsSets){
+        for(NodeMetricsBase currentMetricsSet: allMetricsSets){
             boolean metricsUpdateSent = sendMetricsUpdate(currentMetricsSet);
             if(!metricsUpdateSent){
                 metricsUpdateFailed = true;
@@ -112,14 +112,14 @@ public class ITOpsMetricsReportForwarder extends ITOpsReportForwarderCommon {
         }
     }
 
-    protected boolean sendMetricsUpdate(ITOpsMetricsSet metricsSet) {
-        LOG.debug(".sendMetricsUpdate(): Entry");
+    protected boolean sendMetricsUpdate(NodeMetricsBase metrics) {
+        LOG.debug(".sendMetricsUpdate(): Entry, metrics->{}", metrics);
         //
         // Build Query
         //
         CapabilityUtilisationRequest task = new CapabilityUtilisationRequest();
         task.setRequestID(UUID.randomUUID().toString());
-        String metricsSetString = convertToJSONString(metricsSet);
+        String metricsSetString = convertToJSONString(metrics);
         if(StringUtils.isEmpty(metricsSetString)){
             return(false);
         }
@@ -147,9 +147,9 @@ public class ITOpsMetricsReportForwarder extends ITOpsReportForwarderCommon {
         }
     }
 
-    private String convertToJSONString(ITOpsMetricsSet metricsSet){
+    private String convertToJSONString(NodeMetricsBase metrics){
         try {
-            String metricsSetString = getJsonMapper().writeValueAsString(metricsSet);
+            String metricsSetString = getJsonMapper().writeValueAsString(metrics);
             return(metricsSetString);
         } catch (JsonProcessingException e) {
             LOG.error(".convertToJSONString(): Unable to convert ->{}",e);

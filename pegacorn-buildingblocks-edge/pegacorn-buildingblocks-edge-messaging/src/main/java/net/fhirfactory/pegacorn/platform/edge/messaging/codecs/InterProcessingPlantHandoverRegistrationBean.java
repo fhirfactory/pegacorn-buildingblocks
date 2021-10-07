@@ -46,7 +46,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
@@ -68,12 +68,15 @@ import java.util.Date;
 @ApplicationScoped
 public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanCommon {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverRegistrationBean.class);
+
     @Inject
     TopologyIM topologyIM;
+
     @Inject
     PetasosMOAServicesBroker servicesBroker;
+
     @Inject
-    PetasosPathwayExchangePropertyNames exchangePropertyNames;
+    WorkUnitProcessorMetricsCollectionAgent metricsAgent;
 
     public InterProcessingPlantHandoverRegistrationBean() {
     }
@@ -90,8 +93,13 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         ActivityID newActivityID = new ActivityID();
         newActivityID.setPresentWUPFunctionToken(wupFunctionToken);
         newActivityID.setPresentWUPIdentifier(wupNodeID);
+        newActivityID.setPresentEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
         newActivityID.setPreviousEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
         newActivityID.setPreviousParcelIdentifier(thePacket.getActivityID().getPresentParcelIdentifier());
+        metricsAgent.incrementIngresMessageCount(node.getComponentID());
+        metricsAgent.incrementRegisteredTasks(node.getComponentID());
+        metricsAgent.incrementStartedTasks(node.getComponentID());
+        metricsAgent.getNodeMetrics(node.getComponentID()).setEventProcessingStartInstant(thePacket.getEventProcessingStartTime());
         LOG.trace(".ipcReceiverActivityStart(): newActivityID (ActivityID) --> {}", newActivityID);
         UoW theUoW = thePacket.getPayloadPacket();
         LOG.trace(".ipcReceiverActivityStart(): Creating new JobCard");

@@ -67,9 +67,6 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     @Inject
     private PegacornEnvironmentProperties environmentProperties;
 
-    @Inject
-    private ITOpsTopologyCollectionAgent itopsCollectionAgent;
-
     abstract protected ClusterServiceDeliverySubsystemPropertyFile specifyPropertyFile();
     abstract protected Logger specifyLogger();
     abstract protected PegacornTopologyFactoryInterface specifyTopologyFactory();
@@ -117,7 +114,6 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             getLogger().info("ProcessingPlant::initialise(): [Executing other PostConstruct Activities] Start");
             executePostConstructActivities();
             getLogger().info("ProcessingPlant::initialise(): [Executing other PostConstruct Activities] Finish");
-//            itopsCollectionAgent.refreshLocalTopologyGraph();
             isInitialised = true;
             getLogger().info("StandardProcessingPlatform::initialise(): Done...");
         } else {
