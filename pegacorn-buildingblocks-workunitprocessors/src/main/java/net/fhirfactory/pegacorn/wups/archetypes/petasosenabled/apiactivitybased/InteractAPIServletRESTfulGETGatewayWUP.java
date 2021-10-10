@@ -23,10 +23,10 @@
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.apiactivitybased;
 
 import net.fhirfactory.pegacorn.petasos.core.sta.wup.GenericSTAServerWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPClusterModeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPSystemModeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPClusterModeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPSystemModeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +44,9 @@ public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAS
 
     public void registerActivityStart(UoW unitOfWork, WUPClusterModeEnum clusterMode, WUPSystemModeEnum systemMode){
         getLogger().debug(".registerActivityStart(): Entry, unitOfWork --> {}", unitOfWork);
-        ActivityID newActivityID = new ActivityID();
-        newActivityID.setPresentWUPFunctionToken(this.getWUP().getNodeFunctionFDN().getFunctionToken());
-        newActivityID.setPresentWUPIdentifier(this.getWUPIdentifier());
+        TaskFulfillmentType newPetasosTaskFulfillment = new TaskFulfillmentType();
+        newPetasosTaskFulfillment.setPresentWUPFunctionToken(this.getWUP().getNodeFunctionFDN().getFunctionToken());
+        newPetasosTaskFulfillment.setImplementingWorkUnitProcessID(this.getWUPIdentifier());
     }
 
     public void registerActivityFinish(UoW unitOfWork){

@@ -33,7 +33,7 @@ import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.Tran
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWProcessingOutcomeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.hl7.fhir.r4.model.Resource;
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class TransactionalWUPAuditEntryManager {
     }
 
 
-    public TransactionStatusElement beginTransaction(WUPJobCard jobCard, String auditCommentary, String resourceType, Resource fhirResource, TransactionTypeEnum action) {
+    public TransactionStatusElement beginTransaction(PetasosTaskJobCard jobCard, String auditCommentary, String resourceType, Resource fhirResource, TransactionTypeEnum action) {
         LOG.debug(".beginTransaction(): Entry, jobCard->{}, auditCommentary->{}, fhriResource->{}, action->{}", jobCard, auditCommentary, fhirResource, action);
         LOG.trace(".beginTransaction(): Create the UoW for accessor utilisation");
         UoWPayload payload = new UoWPayload();
@@ -151,7 +151,7 @@ public class TransactionalWUPAuditEntryManager {
         return (currentTransaction);
     }
 
-    public TransactionStatusElement beginTransaction(WUPJobCard jobCard, UoW uow, TransactionTypeEnum action) {
+    public TransactionStatusElement beginTransaction(PetasosTaskJobCard jobCard, UoW uow, TransactionTypeEnum action) {
         TransactionStatusElement currentTransaction = servicesBroker.logAPIActivity(jobCard, uow, action);
         return(currentTransaction);
     }

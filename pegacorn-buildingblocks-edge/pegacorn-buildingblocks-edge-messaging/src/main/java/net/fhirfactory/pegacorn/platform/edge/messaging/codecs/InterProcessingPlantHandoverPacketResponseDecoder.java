@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverContextualResponse;
@@ -75,8 +76,8 @@ public class InterProcessingPlantHandoverPacketResponseDecoder extends IPCPacket
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Convert incoming message string to an InterProcessingPlantHandoverResponsePacket");
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Attempting to retrieve UoW from the Exchange");
-        String uowPropertyKey = exchangePropertyNames.getExchangeUoWPropertyName(node.getComponentID());
-        UoW theUoW = camelExchange.getProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, UoW.class);
+        PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, PetasosTaskOld.class);
+        UoW theUoW = wupTransportPacket.getPayload();
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Retrieved UoW --> {}", theUoW);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Creating the Response message");
         metricsAgent.getNodeMetrics(node.getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());

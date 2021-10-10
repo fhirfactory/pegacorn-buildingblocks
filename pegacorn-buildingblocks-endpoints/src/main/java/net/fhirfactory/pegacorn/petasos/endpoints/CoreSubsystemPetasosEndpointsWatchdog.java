@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.metrics.ProcessingPlantLocalCacheMetricsReportingInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetaosPubSubEndpointChangeCallbackRegistrationInterface;
@@ -82,6 +84,12 @@ public class CoreSubsystemPetasosEndpointsWatchdog
 
     @Inject
     PetasosEndpointMap endpointMap;
+
+    @Inject
+    private ProcessingPlantLocalCacheMetricsReportingInterface metricsAgent;
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
 
     //
     // Constructor
@@ -274,6 +282,7 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         Instant timeRightNow = Instant.now();
         setLastCheckTime(timeRightNow);
         PetasosEndpointStatusEnum currentStatus = deriveAggregateStatus(this.getAggregateStatus());
+        metricsAgent.updatedLocalCacheStatus(processingPlant.getProcessingPlantNode().getComponentID(), endpointMap.getCacheName(), endpointMap.getMetrics());
         switch(currentStatus){
             case PETASOS_ENDPOINT_STATUS_STARTED: {
                 // Shouldn't be here....

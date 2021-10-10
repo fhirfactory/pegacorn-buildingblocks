@@ -21,13 +21,13 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
@@ -60,8 +60,9 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", node);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Extracting Job Card and Status Element from Exchange");
-        WUPJobCard jobCard = (WUPJobCard)camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class);
-        ParcelStatusElement statusElement = (ParcelStatusElement)camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ParcelStatusElement.class);
+        PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, PetasosTaskOld.class);
+        PetasosTaskJobCard jobCard = wupTransportPacket.getCurrentJobCard();
+        TaskStatusType statusElement = wupTransportPacket.getCurrentParcelStatus();
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message");
         InterProcessingPlantHandoverResponsePacket response = new InterProcessingPlantHandoverResponsePacket();
         response.setActivityID(jobCard.getActivityID());

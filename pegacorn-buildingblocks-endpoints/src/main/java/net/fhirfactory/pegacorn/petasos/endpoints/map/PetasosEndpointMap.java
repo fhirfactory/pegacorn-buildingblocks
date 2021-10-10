@@ -85,6 +85,21 @@ public class PetasosEndpointMap {
     }
 
     //
+    // Metrics Reporting
+    //
+
+    public String getCacheName(){
+        return("PetasosEndpointMap");
+    }
+
+    public String getMetrics(){
+        String metrics = "Endpoints["+endpoints.size()+"]"
+                + ", EndpointCheckSchedule["+endpointCheckSchedule.size()+"]"
+                + ", EndpointServiceMap["+endpointServiceMap.size()+"]";
+        return(metrics);
+    }
+
+    //
     // Abstract Methods
     //
 

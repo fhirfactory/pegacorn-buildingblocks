@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.interact.Sta
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 

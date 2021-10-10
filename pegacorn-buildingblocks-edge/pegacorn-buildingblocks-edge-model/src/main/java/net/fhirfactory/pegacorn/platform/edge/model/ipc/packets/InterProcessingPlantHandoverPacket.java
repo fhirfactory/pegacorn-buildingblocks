@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
-import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
 import java.io.Serializable;
@@ -30,7 +30,7 @@ import java.time.Instant;
 public class InterProcessingPlantHandoverPacket implements Serializable {
     private UoW payloadPacket;
     private String payloadType;
-    private ActivityID activityID;
+    private TaskFulfillmentType petasosTaskFulfillment;
     private String messageIdentifier;
     private Integer messageSize;
     private Instant eventProcessingStartTime;
@@ -39,12 +39,12 @@ public class InterProcessingPlantHandoverPacket implements Serializable {
     private String source;
     private String target;
 
-    public ActivityID getActivityID() {
-        return activityID;
+    public TaskFulfillmentType getActivityID() {
+        return petasosTaskFulfillment;
     }
 
-    public void setActivityID(ActivityID activity) {
-        this.activityID = activity;
+    public void setActivityID(TaskFulfillmentType activity) {
+        this.petasosTaskFulfillment = activity;
     }
 
     public UoW getPayloadPacket() {
@@ -124,7 +124,7 @@ public class InterProcessingPlantHandoverPacket implements Serializable {
         return "net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket{" +
                 "payloadPacket=" + payloadPacket +
                 ", payloadType='" + payloadType + '\'' +
-                ", activityID=" + activityID +
+                ", activityID=" + petasosTaskFulfillment +
                 ", messageIdentifier='" + messageIdentifier + '\'' +
                 ", messageSize=" + messageSize +
                 ", eventProcessingStartTime=" + eventProcessingStartTime +
