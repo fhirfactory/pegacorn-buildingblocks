@@ -72,9 +72,9 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
 
     public InterProcessingPlantHandoverResponsePacket receiveIPCMessage(InterProcessingPlantHandoverPacket handoverPacket){
         getLogger().debug(".receiveIPCMessage(): Entry, handoverPacket->{}",handoverPacket);
-        getLogger().warn(".sendIPCMessage(): Message.RECEIVED: handoverPacker->{}", handoverPacket);
+        getLogger().trace(".sendIPCMessage(): Message.RECEIVED: handoverPacker->{}", handoverPacket);
         InterProcessingPlantHandoverResponsePacket response = injectMessageIntoRoute(handoverPacket);
-        getLogger().warn(".sendIPCMessage(): Message.RECEIVED.RESPONSE: response->{}", response);
+        getLogger().trace(".sendIPCMessage(): Message.RECEIVED.RESPONSE: response->{}", response);
         getLogger().debug(".receiveIPCMessage(): Exit, response->{}",response);
         return(response);
     }
@@ -103,9 +103,9 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
             objectSet[0] = handoverPacket;
             classSet[0] = InterProcessingPlantHandoverPacket.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            getLogger().warn(".sendIPCMessage(): Message.SEND: targetAddress->{}, handoverPacket->{}", targetAddress, handoverPacket);
+            getLogger().trace(".sendIPCMessage(): Message.SEND: targetAddress->{}, handoverPacket->{}", targetAddress, handoverPacket);
             InterProcessingPlantHandoverResponsePacket response = getRPCDispatcher().callRemoteMethod(targetAddress, "receiveIPCMessage", objectSet, classSet, requestOptions);
-            getLogger().warn(".sendIPCMessage(): Message.SEND.RESPONSE: response->{}", response);
+            getLogger().trace(".sendIPCMessage(): Message.SEND.RESPONSE: response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
             getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());
@@ -165,7 +165,7 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     //
 
     public CapabilityUtilisationResponse executeTask(String capabilityProviderName, CapabilityUtilisationRequest task){
-        getLogger().warn(".executeTask(): Entry, capabilityProviderName->{}, task->{}", capabilityProviderName, task);
+        getLogger().trace(".executeTask(): Entry, capabilityProviderName->{}, task->{}", capabilityProviderName, task);
         Address targetAddress = getCandidateIPCTargetAddress(capabilityProviderName);
         try {
             Object objectSet[] = new Object[1];
