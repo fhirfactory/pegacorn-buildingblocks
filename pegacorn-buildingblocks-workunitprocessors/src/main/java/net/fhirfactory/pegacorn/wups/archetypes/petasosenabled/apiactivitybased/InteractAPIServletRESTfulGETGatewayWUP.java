@@ -46,7 +46,7 @@ public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAS
         getLogger().debug(".registerActivityStart(): Entry, unitOfWork --> {}", unitOfWork);
         TaskFulfillmentType newPetasosTaskFulfillment = new TaskFulfillmentType();
         newPetasosTaskFulfillment.setPresentWUPFunctionToken(this.getWUP().getNodeFunctionFDN().getFunctionToken());
-        newPetasosTaskFulfillment.setImplementingWorkUnitProcessID(this.getWUPIdentifier());
+        newPetasosTaskFulfillment.setFulfillerComponentId(this.getWUPIdentifier());
     }
 
     public void registerActivityFinish(UoW unitOfWork){

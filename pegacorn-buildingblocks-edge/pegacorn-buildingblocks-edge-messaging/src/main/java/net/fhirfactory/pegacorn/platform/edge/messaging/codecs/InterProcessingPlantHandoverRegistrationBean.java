@@ -93,7 +93,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         WUPIdentifier wupNodeID = new WUPIdentifier(node.getNodeFDN().getToken());
         TaskFulfillmentType newPetasosTaskFulfillment = new TaskFulfillmentType();
         newPetasosTaskFulfillment.setPresentWUPFunctionToken(wupFunctionToken);
-        newPetasosTaskFulfillment.setImplementingWorkUnitProcessID(wupNodeID);
+        newPetasosTaskFulfillment.setFulfillerComponentId(wupNodeID);
         newPetasosTaskFulfillment.setPresentEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
         newPetasosTaskFulfillment.setPreviousEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
         newPetasosTaskFulfillment.setPreviousParcelIdentifier(thePacket.getActivityID().getPresentParcelIdentifier());

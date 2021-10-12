@@ -191,7 +191,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         TaskFulfillmentType petasosTaskFulfillment = new TaskFulfillmentType();
         petasosTaskFulfillment.setResilientActivity(resilientActivity);
         petasosTaskFulfillment.setPresentWUPFunctionToken(getNodeFunctionFDN().getFunctionToken());
-        petasosTaskFulfillment.setImplementingWorkUnitProcessID(getNodeInstanceID());
+        petasosTaskFulfillment.setFulfillerComponentId(getNodeInstanceID());
         ConcurrencyModeEnum concurrencyMode = this.topologyNode.getConcurrencyMode();
         ResilienceModeEnum resilienceMode = this.topologyNode.getResilienceMode();
         Date nowDate = Date.from(Instant.now());
