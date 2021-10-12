@@ -79,12 +79,21 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
             getLogger().debug(".logAuditEventAsynchronously(): Exit, auditEvent is null");
             return(null);
         }
+        //
+        // TODO Remove this, it is a temporary fix to Reduce AuditTrail Load
+        //
+        /*
         MethodOutcome outcome = utiliseAuditEventPersistenceCapability(auditEvent);
+
         IIdType id = outcome.getId();
         if(id != null){
             auditEvent.setId(id);
         }
-        getLogger().debug(".logAuditEventAsynchronously(): Exit, outcome->{}", outcome);
+         */
+        UUID uuid = UUID.randomUUID();
+        String id = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
+        auditEvent.setId(id);
+//        getLogger().debug(".logAuditEventAsynchronously(): Exit, outcome->{}", outcome);
         return(auditEvent);
     }
 
