@@ -76,11 +76,11 @@ public class InterProcessingPlantHandoverPacketResponseDecoder extends IPCPacket
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Convert incoming message string to an InterProcessingPlantHandoverResponsePacket");
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Attempting to retrieve UoW from the Exchange");
-        PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, PetasosTaskOld.class);
+        PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_PROPERTY_NAME, PetasosTaskOld.class);
         UoW theUoW = wupTransportPacket.getPayload();
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Retrieved UoW --> {}", theUoW);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Creating the Response message");
-        metricsAgent.getNodeMetrics(node.getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
+        metricsAgent.getNodeMetrics(node.getComponentType()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
         InterProcessingPlantHandoverContextualResponse contextualisedResponsePacket = new InterProcessingPlantHandoverContextualResponse();
         contextualisedResponsePacket.setResponsePacket(responsePacket);
         contextualisedResponsePacket.setTheUoW(theUoW);

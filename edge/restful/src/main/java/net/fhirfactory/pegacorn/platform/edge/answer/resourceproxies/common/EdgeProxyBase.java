@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.platform.edge.answer.resourceproxies.common;
 
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle.BundleContentHelper;
 import net.fhirfactory.pegacorn.components.transaction.model.TransactionMethodOutcome;
 import net.fhirfactory.pegacorn.platform.edge.model.common.ResourceAccessorInterfaceBase;

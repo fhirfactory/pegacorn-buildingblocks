@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcess
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.itops.metrics.WorkUnitProcessorNodeMetrics;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskStatusType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
@@ -66,7 +66,7 @@ import java.time.Instant;
             WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Node Element retrieved --> {}", node);
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Extracting Job Card and Status Element from Exchange");
-            PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, PetasosTaskOld.class);
+            PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_PROPERTY_NAME, PetasosTaskOld.class);
             PetasosTaskJobCard jobCard = wupTransportPacket.getCurrentJobCard();
             TaskStatusType statusElement = wupTransportPacket.getCurrentParcelStatus();
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Creating the Response message");
@@ -75,7 +75,7 @@ import java.time.Instant;
             String processingPlantName = node.getNodeFDN().toTag();
             forwardingPacket.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
             forwardingPacket.setMessageSendStartInstant(Instant.now());
-            WorkUnitProcessorNodeMetrics nodeMetrics = metricsAgent.getNodeMetrics(node.getComponentID());
+            WorkUnitProcessorNodeMetrics nodeMetrics = metricsAgent.getNodeMetrics(node.getComponentType());
             if(nodeMetrics != null){
                 int messageProcessingCount = nodeMetrics.getIngresMessageCount();
                 Instant messageProcessingStartInstant = nodeMetrics.getEventProcessingStartInstant();
@@ -87,7 +87,7 @@ import java.time.Instant;
             theUoW.getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.SUBSYSTEM_IPC_DATA_PARCEL);
             forwardingPacket.setPayloadPacket(theUoW);
             forwardingPacket.setTarget(theUoW.getPayloadTopicID().getIntendedTargetSystem());
-            forwardingPacket.setSource(processingPlant.getIPCServiceName());
+            forwardingPacket.setSource(processingPlant.getIPCServiceRoutingName());
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): not push the UoW into Exchange as a property for extraction after IPC activity");
             wupTransportPacket.setPayload(theUoW);
             LOG.debug(".constructInterProcessingPlantHandoverPacket(): Exit, forwardingPacket (InterProcessingPlantHandoverPacket) --> {}", forwardingPacket);

@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.itops.ITOpsAgent;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;

@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.apiactivitybased;
 
 import net.fhirfactory.pegacorn.petasos.core.sta.wup.GenericSTAServerWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPClusterModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPSystemModeEnum;

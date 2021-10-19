@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelDirectionEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWProcessingOutcomeEnum;
@@ -66,7 +66,7 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
         parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE);
         parcelManifest.setInterSubsystemDistributable(false);
         if(parcelManifest.hasIntendedTargetSystem()){
-            if(parcelManifest.getIntendedTargetSystem().contentEquals(processingPlant.getIPCServiceName())){
+            if(parcelManifest.getIntendedTargetSystem().contentEquals(processingPlant.getIPCServiceRoutingName())){
                 parcelManifest.setIntendedTargetSystem(null);
             }
         }

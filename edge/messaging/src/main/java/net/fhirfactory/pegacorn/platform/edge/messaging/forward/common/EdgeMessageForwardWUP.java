@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.forward.common;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
@@ -144,7 +144,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
         IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
         IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(getAssociatedTopologyNode().getNodeFDN().getToken());
         localSubscriber.setIdentifier(identifier);
-        localSubscriber.setComponentID(getAssociatedTopologyNode().getComponentID());
+        localSubscriber.setComponentID(getAssociatedTopologyNode().getComponentType());
         subscriber.setIntraSubsystemParticipant(localSubscriber);
         // Now Register within the (Internal) PubSub Service
         for(DataParcelManifest currentDataParcel: contentSubscriptionList) {

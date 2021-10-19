@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.receive.common;
 
-import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.*;

@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskStatusType;
 import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -60,7 +60,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", node);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Extracting Job Card and Status Element from Exchange");
-        PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, PetasosTaskOld.class);
+        PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_PROPERTY_NAME, PetasosTaskOld.class);
         PetasosTaskJobCard jobCard = wupTransportPacket.getCurrentJobCard();
         TaskStatusType statusElement = wupTransportPacket.getCurrentParcelStatus();
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message");

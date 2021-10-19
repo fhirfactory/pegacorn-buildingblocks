@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 
 import java.io.Serializable;
 import java.time.Instant;

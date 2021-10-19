@@ -48,9 +48,9 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskStatusType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
@@ -97,10 +97,10 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         newPetasosTaskFulfillment.setPresentEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
         newPetasosTaskFulfillment.setPreviousEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
         newPetasosTaskFulfillment.setPreviousParcelIdentifier(thePacket.getActivityID().getPresentParcelIdentifier());
-        metricsAgent.incrementIngresMessageCount(node.getComponentID());
-        metricsAgent.incrementRegisteredTasks(node.getComponentID());
-        metricsAgent.incrementStartedTasks(node.getComponentID());
-        metricsAgent.getNodeMetrics(node.getComponentID()).setEventProcessingStartInstant(thePacket.getEventProcessingStartTime());
+        metricsAgent.incrementIngresMessageCount(node.getComponentType());
+        metricsAgent.incrementRegisteredTasks(node.getComponentType());
+        metricsAgent.incrementStartedTasks(node.getComponentType());
+        metricsAgent.getNodeMetrics(node.getComponentType()).setEventProcessingStartInstant(thePacket.getEventProcessingStartTime());
         LOG.trace(".ipcReceiverActivityStart(): newActivityID (ActivityID) --> {}", newPetasosTaskFulfillment);
         UoW theUoW = thePacket.getPayloadPacket();
         LOG.trace(".ipcReceiverActivityStart(): Creating new JobCard");
@@ -112,7 +112,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         PetasosTaskOld wupTransportPacket = new PetasosTaskOld(newPetasosTaskFulfillment, Date.from(Instant.now()), theUoW);
         wupTransportPacket.setCurrentParcelStatus(statusElement);
         wupTransportPacket.setCurrentJobCard(activityJobCard);
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, wupTransportPacket);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_PROPERTY_NAME, wupTransportPacket);
         LOG.debug(".ipcReceiverActivityStart(): exit, my work is done!");
         return thePacket;
     }

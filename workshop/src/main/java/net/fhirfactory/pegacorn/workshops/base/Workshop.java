@@ -23,10 +23,10 @@ package net.fhirfactory.pegacorn.workshops.base;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.components.topology.interfaces.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
@@ -66,7 +66,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     abstract protected String specifyWorkshopName();
     abstract protected String specifyWorkshopVersion();
-    abstract protected TopologyNodeTypeEnum specifyWorkshopType();
+    abstract protected ComponentTypeTypeEnum specifyWorkshopType();
     abstract protected void invokePostConstructInitialisation();
 
     protected PegacornTopologyFactoryInterface getTopologyFactory(){
@@ -131,7 +131,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
         WorkUnitProcessorTopologyNode foundWorkshop = null;
         for (TopologyNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
             WorkUnitProcessorTopologyNode containedWorkshop = (WorkUnitProcessorTopologyNode)topologyIM.getNode(containedWorkshopFDN);
-            TopologyNodeRDN testRDN = new TopologyNodeRDN(TopologyNodeTypeEnum.WORKSHOP, wupName, wupVersion);
+            TopologyNodeRDN testRDN = new TopologyNodeRDN(ComponentTypeTypeEnum.WORKSHOP, wupName, wupVersion);
             if (testRDN.equals(containedWorkshop.getNodeRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;

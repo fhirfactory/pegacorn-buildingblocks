@@ -19,36 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.workshops;
+package net.fhirfactory.pegacorn.components.topology.interfaces;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.valuesets.DefaultWorkshopSetEnum;
-import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fhirfactory.pegacorn.deployment.properties.codebased.DeploymentSystemIdentificationInterface;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SolutionTopologyNode;
 
-import javax.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
-public class EdgeWorkshop extends PetasosEnabledWorkshop {
-    private static final Logger LOG = LoggerFactory.getLogger(EdgeWorkshop.class);
-
-    @Override
-    protected Logger specifyLogger() {
-        return (LOG);
-    }
-
-    @Override
-    protected String specifyWorkshopName() {
-        return (DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop());
-    }
-
-    @Override
-    protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
-    }
-
-    @Override
-    protected void invokePostConstructInitialisation() {
-
-    }
+public interface SolutionInterface extends DeploymentSystemIdentificationInterface {
+    public void initialiseSolutionTopology();
+    public SolutionTopologyNode getSolutionNode();
 }

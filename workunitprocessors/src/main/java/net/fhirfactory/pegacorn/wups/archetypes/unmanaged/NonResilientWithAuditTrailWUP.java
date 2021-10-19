@@ -24,12 +24,12 @@ package net.fhirfactory.pegacorn.wups.archetypes.unmanaged;
 import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
@@ -38,7 +38,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
@@ -118,7 +118,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     private void buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
         WorkUnitProcessorTopologyNode wupNode = getTopologyFactory()
-                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), TopologyNodeTypeEnum.WUP);
+                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), ComponentTypeTypeEnum.WUP);
         getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getNodeFDN(), wupNode);
         wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());

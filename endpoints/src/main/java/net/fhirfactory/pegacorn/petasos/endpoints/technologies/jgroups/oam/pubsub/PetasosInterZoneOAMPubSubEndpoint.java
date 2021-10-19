@@ -56,7 +56,7 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
         String endpointScopeName = specifyPetasosEndpointScope().getEndpointScopeName();
         String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
         String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
-        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSiteName();
         String endpointZone = getProcessingPlantInterface().getNetworkZone().getNetworkSecurityZoneCamelCase();
         // Build EndpointName
         String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointScopeName, endpointUUID);
@@ -66,10 +66,10 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
         endpointID.setEndpointChannelName(endpointChannelName);
         endpointID.setEndpointName(endpointName);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
-        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
+        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSiteName());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
-        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
-        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentType());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentType());
         String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
         endpointID.setEndpointDetailedAddressName(endpointAddress);
         return(endpointID);
@@ -77,7 +77,7 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
 
     @Override
     protected String specifyEndpointServiceName() {
-        return (getProcessingPlantInterface().getIPCServiceName());
+        return (getProcessingPlantInterface().getIPCServiceRoutingName());
     }
 
     @Override

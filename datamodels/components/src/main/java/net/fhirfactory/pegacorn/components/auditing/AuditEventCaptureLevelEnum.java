@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,36 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.workshops;
+package net.fhirfactory.pegacorn.components.auditing;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.valuesets.DefaultWorkshopSetEnum;
-import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public enum AuditEventCaptureLevelEnum {
+    LEVEL_1_BLACK_BOX(1, "Level-1.AETHER-As-BlackBox"),
+    LEVEL_2_SUBSYSTEM(2, "Level-2.Subsystem-Ingres-and-Egress"),
+    LEVEL_3_WUP_FINALISATION(3, "Level-3.WorkUnitProcessor-Finalisation"),
+    LEVEL_4_WUP_ALL(4, "Level-4.WorkUnitProcessor-Start-Finish-and-Finalisation"),
+    LEVEL_5_COMPONENT_ALL(5, "Level-5.All-Components");
 
-import javax.enterprise.context.ApplicationScoped;
+    private String displayName;
+    private int auditLevel;
 
-@ApplicationScoped
-public class EdgeWorkshop extends PetasosEnabledWorkshop {
-    private static final Logger LOG = LoggerFactory.getLogger(EdgeWorkshop.class);
-
-    @Override
-    protected Logger specifyLogger() {
-        return (LOG);
+    private AuditEventCaptureLevelEnum(int level, String name){
+        this.displayName = name;
+        this.auditLevel = level;
     }
 
-    @Override
-    protected String specifyWorkshopName() {
-        return (DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop());
+    public String getDisplayName(){
+        return(displayName);
     }
 
-    @Override
-    protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
-    }
-
-    @Override
-    protected void invokePostConstructInitialisation() {
-
+    public int getAuditLevel() {
+        return auditLevel;
     }
 }

@@ -1,9 +1,8 @@
 package net.fhirfactory.pegacorn.services.audit;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.metrics.ProcessingPlantAuditActivityMetricsReportingInterface;
-import net.fhirfactory.pegacorn.components.metrics.ProcessingPlantLocalCacheMetricsReportingInterface;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.services.audit.cache.AsynchronousWriterAuditEventCache;
 import net.fhirfactory.pegacorn.services.audit.forwarder.beans.AuditEventPersistenceAccessor;
@@ -112,7 +111,7 @@ public class LocalAuditEventManager implements PetasosAuditWriterInterface {
             return(null);
         }
         MethodOutcome outcome = persistenceAccessor.utiliseAuditEventPersistenceCapability(auditEvent);
-        metricsAgent.incrementSynchronousAuditEventWritten(processingPlant.getProcessingPlantNode().getComponentID());
+        metricsAgent.incrementSynchronousAuditEventWritten(processingPlant.getProcessingPlantNode().getComponentType());
         IIdType id = outcome.getId();
         if(id != null){
             auditEvent.setId(id);
@@ -154,8 +153,8 @@ public class LocalAuditEventManager implements PetasosAuditWriterInterface {
             // TODO This next bit makes a wild assumption about the success of the writing action!
             //
             eventCache.pollAuditEvent();
-            metricsAgent.incrementAsynchronousAuditEventWritten(processingPlant.getProcessingPlantNode().getComponentID());
+            metricsAgent.incrementAsynchronousAuditEventWritten(processingPlant.getProcessingPlantNode().getComponentType());
         }
-        metricsAgent.touchAsynchronousAuditEventWrite(processingPlant.getProcessingPlantNode().getComponentID());
+        metricsAgent.touchAsynchronousAuditEventWrite(processingPlant.getProcessingPlantNode().getComponentType());
     }
 }

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.itops;
 
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.itops.forwarders.ITOpsMetricsReportForwarder;
 import net.fhirfactory.pegacorn.petasos.endpoints.itops.forwarders.ITOpsPubSubReportForwarder;
 import net.fhirfactory.pegacorn.petasos.endpoints.itops.forwarders.ITOpsTopologyReportForwarder;

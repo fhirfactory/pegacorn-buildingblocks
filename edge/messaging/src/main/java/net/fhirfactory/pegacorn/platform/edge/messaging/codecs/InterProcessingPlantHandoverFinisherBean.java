@@ -33,8 +33,8 @@ import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroke
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskStatusType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWProcessingOutcomeEnum;
@@ -79,7 +79,7 @@ public class InterProcessingPlantHandoverFinisherBean extends IPCPacketBeanCommo
         LOG.debug(".ipcSenderNotifyActivityFinished(): Entry, handoverPacket (InterProcessingPlantHandoverContextualResponse) --> {}", handoverPacket);
         LOG.trace(".ipcSenderNotifyActivityFinished(): Get Job Card and Status Element from Exchange for extraction by the WUP Egress Conduit");
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
-        PetasosTaskOld wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, PetasosTaskOld.class);
+        PetasosFulfillmentTask wupTransportPacket = camelExchange.getProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_PROPERTY_NAME, PetasosFulfillmentTask.class);
         PetasosTaskJobCard activityJobCard = wupTransportPacket.getCurrentJobCard();
         TaskStatusType statusElement = wupTransportPacket.getCurrentParcelStatus();
         LOG.trace(".ipcSenderNotifyActivityFinished(): Extract the UoW");
@@ -95,7 +95,7 @@ public class InterProcessingPlantHandoverFinisherBean extends IPCPacketBeanCommo
                 LOG.trace(".ipcSenderNotifyActivityFinished(): PACKET_RECEIVED_BUT_FAILED_DECODING");
                 theUoW.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_FAILED);
                 theUoW.setFailureDescription("Message encoding/decoding failure!");
-                metricsAgent.incrementFailedTasks(node.getComponentID());
+                metricsAgent.incrementFailedTasks(node.getComponentType());
                 break;
             case PACKET_RECEIVE_TIMED_OUT:
                 LOG.trace(".ipcSenderNotifyActivityFinished(): PACKET_RECEIVE_TIMED_OUT");
@@ -121,16 +121,16 @@ public class InterProcessingPlantHandoverFinisherBean extends IPCPacketBeanCommo
         switch (theUoW.getProcessingOutcome()) {
             case UOW_OUTCOME_SUCCESS:
                 servicesBroker.notifyFinishOfWorkUnitActivity(activityJobCard, theUoW);
-                metricsAgent.incrementFinishedTasks(node.getComponentID());
+                metricsAgent.incrementFinishedTasks(node.getComponentType());
                 break;
             case UOW_OUTCOME_NOTSTARTED:
             case UOW_OUTCOME_INCOMPLETE:
             case UOW_OUTCOME_FAILED:
                 servicesBroker.notifyFailureOfWorkUnitActivity(activityJobCard, theUoW);
-                metricsAgent.incrementFailedTasks(node.getComponentID());
+                metricsAgent.incrementFailedTasks(node.getComponentType());
         }
-        metricsAgent.touchLastActivityInstant(node.getComponentID());
-        metricsAgent.touchActivityFinishInstant(node.getComponentID());
+        metricsAgent.touchLastActivityInstant(node.getComponentType());
+        metricsAgent.touchActivityFinishInstant(node.getComponentType());
         LOG.debug(".ipcSenderNotifyActivityFinished(): exit, theUoW (UoW) --> {}", theUoW);
         return (theUoW);
     }

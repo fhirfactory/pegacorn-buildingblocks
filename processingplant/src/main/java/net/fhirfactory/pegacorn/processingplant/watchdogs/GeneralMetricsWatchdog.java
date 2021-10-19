@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.processingplant.watchdogs;
 
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.metrics.ProcessingPlantLocalCacheMetricsReportingInterface;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.DataParcelSubscriptionMapDM;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.DistributedPubSubSubscriptionMapDM;
@@ -138,8 +138,8 @@ public class GeneralMetricsWatchdog extends RouteBuilder {
 
 
     protected void metricsWatchdog(){
-        metricsAgent.updatedLocalCacheStatus(processingPlant.getProcessingPlantNode().getComponentID(), subscriptionMapDM.getCacheName(), subscriptionMapDM.getMetrics());
-        metricsAgent.updatedLocalCacheStatus(processingPlant.getProcessingPlantNode().getComponentID(), registrationMapDM.getCacheName(), registrationMapDM.getMetrics());
+        metricsAgent.updatedLocalCacheStatus(processingPlant.getProcessingPlantNode().getComponentType(), subscriptionMapDM.getCacheName(), subscriptionMapDM.getMetrics());
+        metricsAgent.updatedLocalCacheStatus(processingPlant.getProcessingPlantNode().getComponentType(), registrationMapDM.getCacheName(), registrationMapDM.getMetrics());
     }
 
 

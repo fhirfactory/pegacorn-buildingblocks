@@ -1,7 +1,7 @@
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

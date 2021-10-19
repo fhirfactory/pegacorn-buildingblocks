@@ -99,7 +99,7 @@ public class ITOpsPubSubReportForwarder extends ITOpsReportForwarderCommon {
         //
         LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Report] Start");
         ITOpsPubSubReport pubSubReport = pubsubMapDM.getPubSubReport();
-        pubSubReport.setProcessingPlantComponentID(getProcessingPlant().getProcessingPlantNode().getComponentID());
+        pubSubReport.setProcessingPlantComponentID(getProcessingPlant().getProcessingPlantNode().getComponentType());
         LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Report] Start");
         //
         // Build Task

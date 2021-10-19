@@ -24,13 +24,12 @@ package net.fhirfactory.pegacorn.processingplant;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.components.capabilities.CapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.components.capabilities.CapabilityFulfillmentManagementInterface;
 import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfaces.SolutionNodeFactoryInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -38,7 +37,6 @@ import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
-import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsTopologyCollectionAgent;
 import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -47,7 +45,6 @@ import org.slf4j.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -128,7 +125,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     }
 
     @Override
-    public String getHostName() {
+    public String getDeploymentPlatformName() {
         return hostName;
     }
 
@@ -150,7 +147,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         String processingPlantVersion = getPropertyFile().getSubsystemInstant().getProcessingPlantVersion();
         getLogger().debug(".resolveProcessingPlant(): Getting ProcessingPlant->{}, version->{}", processingPlantName, processingPlantVersion);
         getLogger().trace(".resolveProcessingPlant(): Resolving list of available ProcessingPlants");
-        List<TopologyNode> topologyNodes = topologyIM.nodeSearch(TopologyNodeTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
+        List<TopologyNode> topologyNodes = topologyIM.nodeSearch(ComponentTypeTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
         if(getLogger().isTraceEnabled()){
             if(topologyNodes == null){
                 getLogger().trace(".resolveProcessingPlant(): nodeSearch return a null list");
@@ -203,7 +200,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         WorkshopTopologyNode foundWorkshop = null;
         for (TopologyNodeFDN containedWorkshopFDN : this.processingPlantNode.getWorkshops()) {
             WorkshopTopologyNode containedWorkshop = (WorkshopTopologyNode)topologyIM.getNode(containedWorkshopFDN);
-            TopologyNodeRDN testRDN = new TopologyNodeRDN(TopologyNodeTypeEnum.WORKSHOP, workshopName, version);
+            TopologyNodeRDN testRDN = new TopologyNodeRDN(ComponentTypeTypeEnum.WORKSHOP, workshopName, version);
             if (testRDN.equals(containedWorkshop.getNodeRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;
@@ -228,7 +225,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public String getSimpleFunctionName() {
-        TopologyNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
+        TopologyNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(ComponentTypeTypeEnum.PROCESSING_PLANT);
         String functionName = functionRDN.getNodeName();
         return (functionName);
     }
@@ -246,13 +243,13 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     }
 
     @Override
-    public String getIPCServiceName() {
+    public String getIPCServiceRoutingName() {
         return (getProcessingPlantNode().getSubsystemName());
     }
 
     @Override
-    public String getDeploymentSite() {
-        TopologyNodeRDN siteRDN = getProcessingPlantNode().getNodeFDN().extractRDNForNodeType(TopologyNodeTypeEnum.SITE);
+    public String getDeploymentSiteName() {
+        TopologyNodeRDN siteRDN = getProcessingPlantNode().getNodeFDN().extractRDNForNodeType(ComponentTypeTypeEnum.SITE);
         String siteName = siteRDN.getNodeName();
         return (siteName);
     }
