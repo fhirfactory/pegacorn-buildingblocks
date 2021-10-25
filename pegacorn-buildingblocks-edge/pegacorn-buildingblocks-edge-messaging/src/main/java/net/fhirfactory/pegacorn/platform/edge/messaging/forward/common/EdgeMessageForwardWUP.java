@@ -144,6 +144,7 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
         IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
         IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(getAssociatedTopologyNode().getNodeFDN().getToken());
         localSubscriber.setIdentifier(identifier);
+        localSubscriber.setComponentID(getAssociatedTopologyNode().getComponentID());
         subscriber.setIntraSubsystemParticipant(localSubscriber);
         // Now Register within the (Internal) PubSub Service
         for(DataParcelManifest currentDataParcel: contentSubscriptionList) {

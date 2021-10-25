@@ -1,6 +1,7 @@
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.petasos.endpoints.itops.ITOpsAgent;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosInterZoneOAMDiscoveryEndpoint;
@@ -17,8 +18,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class CoreSubsystemPetasosEndpointsMetricsService extends RouteBuilder {
-    private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosEndpointsMetricsService.class);
+public class CoreSubsystemPetasosITOpsService extends RouteBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosITOpsService.class);
+    private boolean initialised;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -41,19 +43,33 @@ public class CoreSubsystemPetasosEndpointsMetricsService extends RouteBuilder {
     @Inject
     private PetasosInterZoneOAMPubSubEndpoint interZoneOAMPubSubEndpoint;
 
-    public CoreSubsystemPetasosEndpointsMetricsService(){
+    @Inject
+    private ITOpsAgent itopsAgent;
+
+    public CoreSubsystemPetasosITOpsService(){
         super();
+        this.initialised = false;
     }
 
     @PostConstruct
     public void initialise(){
-        LOG.info(".initialise(): Entry");
-        LOG.info(".initialise(): interZoneIPCEndpoint ==> {}", interZoneIPCEndpoint.getEndpointID());
-        LOG.info(".initialise(): intraZoneIPCEndpoint ==> {}", intraZoneIPCEndpoint.getEndpointID());
-        LOG.info(".initialise(): intraZoneOAMPubSubEndpoint ==> {}", intraZoneOAMPubSubEndpoint.getEndpointID());
-        LOG.info(".initialise(): interZoneOAMPubSubEndpoint ==> {}", interZoneOAMPubSubEndpoint.getEndpointID());
-        LOG.info(".initialise(): intraZoneOAMDiscoveryEndpoint ==> {}", intraZoneOAMDiscoveryEndpoint.getEndpointID());
-        LOG.info(".initialise(): interZoneOAMDiscoveryEndpoint ==> {}", interZoneOAMDiscoveryEndpoint.getEndpointID());
+        LOG.debug(".initailse(): Entry");
+        if(!this.initialised) {
+            LOG.info(".initialise(): Initialising...");
+            LOG.info(".initialise(): [ITOpsAgent Initialisation] Start");
+            itopsAgent.initialise();
+            LOG.info(".initialise(): [ITOpsAgent Initialisation] Finish");
+            LOG.info(".initialise(): interZoneIPCEndpoint ==> {}", interZoneIPCEndpoint.getEndpointID());
+            LOG.info(".initialise(): intraZoneIPCEndpoint ==> {}", intraZoneIPCEndpoint.getEndpointID());
+            LOG.info(".initialise(): intraZoneOAMPubSubEndpoint ==> {}", intraZoneOAMPubSubEndpoint.getEndpointID());
+            LOG.info(".initialise(): interZoneOAMPubSubEndpoint ==> {}", interZoneOAMPubSubEndpoint.getEndpointID());
+            LOG.info(".initialise(): intraZoneOAMDiscoveryEndpoint ==> {}", intraZoneOAMDiscoveryEndpoint.getEndpointID());
+            LOG.info(".initialise(): interZoneOAMDiscoveryEndpoint ==> {}", interZoneOAMDiscoveryEndpoint.getEndpointID());
+            LOG.info(".initialise(): Done.");
+        } else {
+            LOG.debug(".initialise(): Already initialised, nothing to do!");
+        }
+        LOG.debug(".initialise(): Exit");
     }
 
     @Override

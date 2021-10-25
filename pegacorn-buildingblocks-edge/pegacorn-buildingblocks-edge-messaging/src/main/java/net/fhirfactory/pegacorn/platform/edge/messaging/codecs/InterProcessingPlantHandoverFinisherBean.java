@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
@@ -30,6 +31,7 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
@@ -61,9 +63,14 @@ public class InterProcessingPlantHandoverFinisherBean extends IPCPacketBeanCommo
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
+    @Inject
+    private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
+
     @PostConstruct
     public void initialise() {
         this.jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
     }
 
 
@@ -86,6 +93,7 @@ public class InterProcessingPlantHandoverFinisherBean extends IPCPacketBeanCommo
                 LOG.trace(".ipcSenderNotifyActivityFinished(): PACKET_RECEIVED_BUT_FAILED_DECODING");
                 theUoW.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_FAILED);
                 theUoW.setFailureDescription("Message encoding/decoding failure!");
+                metricsAgent.incrementFailedTasks(node.getComponentID());
                 break;
             case PACKET_RECEIVE_TIMED_OUT:
                 LOG.trace(".ipcSenderNotifyActivityFinished(): PACKET_RECEIVE_TIMED_OUT");
@@ -111,12 +119,16 @@ public class InterProcessingPlantHandoverFinisherBean extends IPCPacketBeanCommo
         switch (theUoW.getProcessingOutcome()) {
             case UOW_OUTCOME_SUCCESS:
                 servicesBroker.notifyFinishOfWorkUnitActivity(activityJobCard, theUoW);
+                metricsAgent.incrementFinishedTasks(node.getComponentID());
                 break;
             case UOW_OUTCOME_NOTSTARTED:
             case UOW_OUTCOME_INCOMPLETE:
             case UOW_OUTCOME_FAILED:
                 servicesBroker.notifyFailureOfWorkUnitActivity(activityJobCard, theUoW);
+                metricsAgent.incrementFailedTasks(node.getComponentID());
         }
+        metricsAgent.touchLastActivityInstant(node.getComponentID());
+        metricsAgent.touchActivityFinishInstant(node.getComponentID());
         LOG.debug(".ipcSenderNotifyActivityFinished(): exit, theUoW (UoW) --> {}", theUoW);
         return (theUoW);
     }

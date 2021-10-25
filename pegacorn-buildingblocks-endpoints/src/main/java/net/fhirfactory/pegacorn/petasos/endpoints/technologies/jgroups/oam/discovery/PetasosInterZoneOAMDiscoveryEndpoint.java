@@ -64,6 +64,8 @@ public class PetasosInterZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneOAMGroupName());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
         String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getInterZoneOAMGroupName();
         endpointID.setEndpointDetailedAddressName(endpointAddress);
         return(endpointID);

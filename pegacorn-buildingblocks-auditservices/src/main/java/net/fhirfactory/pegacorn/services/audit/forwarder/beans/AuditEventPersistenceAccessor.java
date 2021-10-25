@@ -25,6 +25,7 @@ import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.components.transaction.model.SimpleResourceID;
@@ -46,7 +47,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @ApplicationScoped
-public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterface {
+public class AuditEventPersistenceAccessor {
     private static final Logger LOG = LoggerFactory.getLogger(AuditEventPersistenceAccessor.class);
 
     private ObjectMapper jsonMapper;
@@ -66,10 +67,14 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
     @Inject
     private CapabilityUtilisationBroker capabilityUtilisationBroker;
 
-    @PostConstruct
-    public void initialise(){
+    //
+    // Constructor
+    //
+
+    public AuditEventPersistenceAccessor() {
         jsonMapper = new ObjectMapper();
-        fhirParser = fhirContextUtility.getJsonParser();
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
     }
 
     @Override
@@ -97,23 +102,12 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
         return(auditEvent);
     }
 
-    @Override
-    public AuditEvent logAuditEventSynchronously(AuditEvent auditEvent) {
-        getLogger().debug(".logAuditEventSynchronously(): Entry, auditEvent->{}", auditEvent);
-        if(auditEvent == null){
-            getLogger().debug(".logAuditEventSynchronously(): Exit, auditEvent is null");
-            return(null);
-        }
-        MethodOutcome outcome = utiliseAuditEventPersistenceCapability(auditEvent);
-        IIdType id = outcome.getId();
-        if(id != null){
-            auditEvent.setId(id);
-        }
-        getLogger().debug(".logAuditEventSynchronously(): Exit, outcome->{}", outcome);
-        return(auditEvent);
+    @PostConstruct
+    public void initialise() {
+        fhirParser = fhirContextUtility.getJsonParser();
     }
 
-    public  MethodOutcome utiliseAuditEventPersistenceCapability(AuditEvent auditEvent){
+    public synchronized MethodOutcome utiliseAuditEventPersistenceCapability(AuditEvent auditEvent) {
         getLogger().debug(".utiliseAuditEventPersistenceCapability(): Entry, auditEvent --> {}", auditEvent);
         //
         // Build Write
@@ -134,24 +128,24 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
         String resultString = auditEventWriteOutcome.getResponseContent();
         MethodOutcome methodOutcome = convertToMethodOutcome(resultString);
         getLogger().debug(".utiliseAuditEventPersistenceCapability(): Entry, methodOutcome --> {}", methodOutcome);
-        return(methodOutcome);
+        return (methodOutcome);
     }
 
-    private String convertToJSONString(AuditEvent auditEvent){
+    private String convertToJSONString(AuditEvent auditEvent) {
         String auditEventString = fhirParser.encodeResourceToString(auditEvent);
-        return(auditEventString);
+        return (auditEventString);
     }
 
-    private AuditEvent convertToAuditEvent(String auditEventString){
+    private AuditEvent convertToAuditEvent(String auditEventString) {
         AuditEvent auditEvent = fhirParser.parseResource(AuditEvent.class, auditEventString);
-        return(auditEvent);
+        return (auditEvent);
     }
 
-    private MethodOutcome convertToMethodOutcome(String methodOutcomeString){
-        if(StringUtils.isEmpty(methodOutcomeString)){
+    private MethodOutcome convertToMethodOutcome(String methodOutcomeString) {
+        if (StringUtils.isEmpty(methodOutcomeString)) {
             MethodOutcome outcome = new MethodOutcome();
             outcome.setCreated(false);
-            return(outcome);
+            return (outcome);
         }
         SimpleTransactionOutcome transactionOutcome = null;
         try {
@@ -160,13 +154,13 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
             getLogger().error(".convertToMethodOutcome(): Cannot parse MethodOutcome object! ", e);
         }
         MethodOutcome methodOutcome = null;
-        if(transactionOutcome != null){
+        if (transactionOutcome != null) {
             String resourceURL = null;
             String resourceType = "AuditEvent";
-            if(transactionOutcome.isTransactionSuccessful()) {
+            if (transactionOutcome.isTransactionSuccessful()) {
                 String resourceValue = transactionOutcome.getResourceID().getValue();
                 String resourceVersion = SimpleResourceID.DEFAULT_VERSION;
-                if(transactionOutcome.getResourceID() != null) {
+                if (transactionOutcome.getResourceID() != null) {
                     if (transactionOutcome.getResourceID().getResourceType() != null) {
                         resourceType = transactionOutcome.getResourceID().getResourceType();
                     }
@@ -184,18 +178,22 @@ public class AuditEventPersistenceAccessor implements PetasosAuditWriterInterfac
                 }
             }
         }
-        if(methodOutcome == null) {
+        if (methodOutcome == null) {
             methodOutcome = new MethodOutcome();
             methodOutcome.setCreated(false);
         }
-        return(methodOutcome);
+        return (methodOutcome);
     }
 
-    protected ObjectMapper getJSONMapper(){
-        return(jsonMapper);
+    //
+    // Getters (and Setters)
+    //
+
+    protected ObjectMapper getJSONMapper() {
+        return (jsonMapper);
     }
 
-    protected Logger getLogger(){
-        return(LOG);
+    protected Logger getLogger() {
+        return (LOG);
     }
 }

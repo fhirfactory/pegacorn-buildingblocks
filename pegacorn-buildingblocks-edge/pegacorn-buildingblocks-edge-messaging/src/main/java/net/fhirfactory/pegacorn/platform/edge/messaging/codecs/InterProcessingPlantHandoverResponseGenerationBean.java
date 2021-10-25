@@ -44,8 +44,10 @@ import java.time.Instant;
 @ApplicationScoped
 public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPacketBeanCommon {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverResponseGenerationBean.class);
+
     @Inject
     TopologyIM topologyIM;
+
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
@@ -65,7 +67,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
         response.setActivityID(jobCard.getActivityID());
         String processingPlantName = node.getNodeFDN().toTag();
         response.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
-        response.setSendDate(Date.from(Instant.now()));
+        response.setMessageSendFinishInstant(Instant.now());
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): We are at this point, so it is all good - so assign appropriate status");
         response.setStatus(InterProcessingPlantHandoverPacketStatusEnum.PACKET_RECEIVED_AND_DECODED);
         LOG.debug(".generateInterProcessingPlantHandoverResponse(): Exit, response (InterProcessingPlantHandoverResponsePacket) --> {}", response);

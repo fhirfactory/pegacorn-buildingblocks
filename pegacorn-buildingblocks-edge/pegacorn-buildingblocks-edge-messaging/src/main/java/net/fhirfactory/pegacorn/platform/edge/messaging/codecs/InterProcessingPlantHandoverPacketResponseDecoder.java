@@ -21,11 +21,12 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
@@ -55,9 +56,14 @@ public class InterProcessingPlantHandoverPacketResponseDecoder extends IPCPacket
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
+    @Inject
+    WorkUnitProcessorMetricsCollectionAgent metricsAgent;
+
     @PostConstruct
     public void initiate(){
         jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
     }
 
     public ObjectMapper getJSONMapper() {
@@ -73,6 +79,7 @@ public class InterProcessingPlantHandoverPacketResponseDecoder extends IPCPacket
         UoW theUoW = camelExchange.getProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, UoW.class);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Retrieved UoW --> {}", theUoW);
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): Creating the Response message");
+        metricsAgent.getNodeMetrics(node.getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
         InterProcessingPlantHandoverContextualResponse contextualisedResponsePacket = new InterProcessingPlantHandoverContextualResponse();
         contextualisedResponsePacket.setResponsePacket(responsePacket);
         contextualisedResponsePacket.setTheUoW(theUoW);

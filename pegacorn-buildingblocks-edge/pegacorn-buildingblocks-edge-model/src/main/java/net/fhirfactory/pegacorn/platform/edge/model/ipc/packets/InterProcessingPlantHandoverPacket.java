@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 public class InterProcessingPlantHandoverPacket implements Serializable {
     private UoW payloadPacket;
@@ -33,7 +33,9 @@ public class InterProcessingPlantHandoverPacket implements Serializable {
     private ActivityID activityID;
     private String messageIdentifier;
     private Integer messageSize;
-    private Date sendDate;
+    private Instant eventProcessingStartTime;
+    private int messageTransferCount;
+    private Instant messageSendStartInstant;
     private String source;
     private String target;
 
@@ -59,14 +61,6 @@ public class InterProcessingPlantHandoverPacket implements Serializable {
 
     public void setMessageIdentifier(String messageIdentifier) {
         this.messageIdentifier = messageIdentifier;
-    }
-
-    public Date getSendDate() {
-        return (sendDate);
-    }
-
-    public void setSendDate(Date sendDate) {
-        this.sendDate = sendDate;
     }
 
     public Integer getMessageSize() {
@@ -101,17 +95,43 @@ public class InterProcessingPlantHandoverPacket implements Serializable {
         this.source = source;
     }
 
+    public Instant getEventProcessingStartTime() {
+        return eventProcessingStartTime;
+    }
+
+    public void setEventProcessingStartTime(Instant eventProcessingStartTime) {
+        this.eventProcessingStartTime = eventProcessingStartTime;
+    }
+
+    public int getMessageTransferCount() {
+        return messageTransferCount;
+    }
+
+    public void setMessageTransferCount(int messageTransferCount) {
+        this.messageTransferCount = messageTransferCount;
+    }
+
+    public Instant getMessageSendStartInstant() {
+        return messageSendStartInstant;
+    }
+
+    public void setMessageSendStartInstant(Instant messageSendStartInstant) {
+        this.messageSendStartInstant = messageSendStartInstant;
+    }
+
     @Override
     public String toString() {
-        return "InterProcessingPlantHandoverPacket{" +
+        return "net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket{" +
                 "payloadPacket=" + payloadPacket +
-                ", payloadType=" + payloadType +
+                ", payloadType='" + payloadType + '\'' +
                 ", activityID=" + activityID +
-                ", messageIdentifier=" + messageIdentifier +
+                ", messageIdentifier='" + messageIdentifier + '\'' +
                 ", messageSize=" + messageSize +
-                ", sendDate=" + sendDate +
-                ", source=" + source +
-                ", target=" + target +
+                ", eventProcessingStartTime=" + eventProcessingStartTime +
+                ", messageTransferCount=" + messageTransferCount +
+                ", messageSendStartInstant=" + messageSendStartInstant +
+                ", source='" + source + '\'' +
+                ", target='" + target + '\'' +
                 '}';
     }
 }

@@ -132,12 +132,21 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>${version-com.fasterxml.jackson.core-jackson-core}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${version-com.fasterxml.jackson.datatype-jackson-datatype-jsr310}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${version-com.fasterxml.jackson.core-jackson-databind}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!--                  -->

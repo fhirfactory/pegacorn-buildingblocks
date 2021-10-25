@@ -24,13 +24,14 @@ package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
 public class InterProcessingPlantHandoverResponsePacket implements Serializable {
     private ActivityID activityID;
     private String messageIdentifier;
     private Integer messageSize;
-    private Date sendDate;
+    private Instant messageSendFinishInstant;
     private InterProcessingPlantHandoverPacketStatusEnum status;
     private String statusReason;
 
@@ -66,12 +67,12 @@ public class InterProcessingPlantHandoverResponsePacket implements Serializable 
         this.messageSize = messageSize;
     }
 
-    public Date getSendDate() {
-        return sendDate;
+    public Instant getMessageSendFinishInstant() {
+        return messageSendFinishInstant;
     }
 
-    public void setSendDate(Date sendDate) {
-        this.sendDate = sendDate;
+    public void setMessageSendFinishInstant(Instant messageSendFinishInstant) {
+        this.messageSendFinishInstant = messageSendFinishInstant;
     }
 
     public String getStatusReason() {
@@ -84,13 +85,13 @@ public class InterProcessingPlantHandoverResponsePacket implements Serializable 
 
     @Override
     public String toString() {
-        return "InterProcessingPlantHandoverResponsePacket{" +
+        return "net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket{" +
                 "activityID=" + activityID +
-                ", messageIdentifier=" + messageIdentifier +
+                ", messageIdentifier='" + messageIdentifier + '\'' +
                 ", messageSize=" + messageSize +
-                ", sendDate=" + sendDate +
+                ", messageSendFinishInstant=" + messageSendFinishInstant +
                 ", status=" + status +
-                ", statusReason=" + statusReason +
+                ", statusReason='" + statusReason + '\'' +
                 '}';
     }
 }

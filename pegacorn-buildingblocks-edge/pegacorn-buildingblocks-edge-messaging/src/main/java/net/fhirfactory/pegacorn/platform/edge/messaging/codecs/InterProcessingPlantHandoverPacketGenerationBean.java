@@ -26,7 +26,9 @@ import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantIn
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.model.itops.metrics.WorkUnitProcessorNodeMetrics;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
@@ -52,6 +54,9 @@ import java.time.Instant;
         PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
         @Inject
+        private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
+
+        @Inject
         private ProcessingPlantInterface processingPlant;
 
         public InterProcessingPlantHandoverPacket constructInterProcessingPlantHandoverPacket(UoW theUoW, Exchange camelExchange){
@@ -67,7 +72,16 @@ import java.time.Instant;
             forwardingPacket.setActivityID(jobCard.getActivityID());
             String processingPlantName = node.getNodeFDN().toTag();
             forwardingPacket.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
-            forwardingPacket.setSendDate(Date.from(Instant.now()));
+            forwardingPacket.setMessageSendStartInstant(Instant.now());
+            WorkUnitProcessorNodeMetrics nodeMetrics = metricsAgent.getNodeMetrics(node.getComponentID());
+            if(nodeMetrics != null){
+                int messageProcessingCount = nodeMetrics.getIngresMessageCount();
+                Instant messageProcessingStartInstant = nodeMetrics.getEventProcessingStartInstant();
+                forwardingPacket.setMessageTransferCount(messageProcessingCount);
+                if(messageProcessingStartInstant != null){
+                    forwardingPacket.setEventProcessingStartTime(messageProcessingStartInstant);
+                }
+            }
             theUoW.getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.SUBSYSTEM_IPC_DATA_PARCEL);
             forwardingPacket.setPayloadPacket(theUoW);
             forwardingPacket.setTarget(theUoW.getPayloadTopicID().getIntendedTargetSystem());

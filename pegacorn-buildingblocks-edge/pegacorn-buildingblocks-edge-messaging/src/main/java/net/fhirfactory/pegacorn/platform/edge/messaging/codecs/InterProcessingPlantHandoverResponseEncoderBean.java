@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,8 @@ public class InterProcessingPlantHandoverResponseEncoderBean {
 
     public InterProcessingPlantHandoverResponseEncoderBean() {
         jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
     }
 
     public InterProcessingPlantHandoverResponsePacket responseEncoder(InterProcessingPlantHandoverResponsePacket incomingResponsePacket) throws JsonProcessingException {

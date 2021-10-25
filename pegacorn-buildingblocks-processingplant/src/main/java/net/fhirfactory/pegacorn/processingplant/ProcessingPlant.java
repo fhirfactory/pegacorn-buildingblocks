@@ -37,6 +37,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsTopologyCollectionAgent;
 import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -80,7 +81,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     public ProcessingPlant() {
         super();
-
+        this.capabilityDeliveryServices = new ConcurrentHashMap<>();
         this.isInitialised = false;
         this.instanceQualifier = UUID.randomUUID().toString();
 
@@ -88,27 +89,35 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @PostConstruct
     public void initialise() {
+        getLogger().debug(".initalise(): Entry");
         if (!isInitialised) {
-            getLogger().debug("StandardProcessingPlatform::initialise(): Invoked!");
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising TopologyIM --> Start");
+            getLogger().info("ProcessingPlant::initialise(): Initialising....");
+            getLogger().info("ProcessingPlant::initialise(): [TopologyIM Initialisation] Start");
             getTopologyIM().initialise();
+            getLogger().info("ProcessingPlant::initialise(): [TopologyIM Initialisation] Finish");
+            getLogger().info("ProcessingPlant::initialise(): [Topology Factory Initialisation] Start");
             getTopologyFactory().initialise();
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising TopologyIM --> Finish");
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising Building Subsystem Topology --> Start");
+            getLogger().info("ProcessingPlant::initialise(): [Topology Factory Initialisation] Finish");
+            getLogger().info("ProcessingPlant::initialise(): [Solution Node Factory Initialisation] Start");
             specifySolutionNodeFactory().initialise();
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising Building Subsystem Topology --> Finish");
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Start");
+            getLogger().info("ProcessingPlant::initialise(): [Solution Node Factory Initialisation] Finish");
+            getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Resolution] Start");
             resolveProcessingPlant();
-            getLogger().debug("StandardProcessingPlatform::initialise(): Initialising ProcessingPlant Resolution --> Finish");
-
-            capabilityDeliveryServices = new ConcurrentHashMap<>();
-
+            getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Resolution] Finish");
+            getLogger().info("ProcessingPlant::initialise(): [Capaility Delivery Services Map Initialisation] Start");
+            getLogger().info("ProcessingPlant::initialise(): [POD Name Resolution and Assignment] Start");
             String myPodName = environmentProperties.getMandatoryProperty("MY_POD_NAME");
             setHostName(myPodName);
-
+            getLogger().info("ProcessingPlant::initialise(): [POD Name Resolution and Assignment] Finish");
+            getLogger().info("ProcessingPlant::initialise(): [Executing other PostConstruct Activities] Start");
             executePostConstructActivities();
+            getLogger().info("ProcessingPlant::initialise(): [Executing other PostConstruct Activities] Finish");
             isInitialised = true;
+            getLogger().info("StandardProcessingPlatform::initialise(): Done...");
+        } else {
+            getLogger().debug(".initialise(): Already initialised, nothing to do!");
         }
+        getLogger().debug(".initialise(): Exit");
     }
 
     @Override
@@ -249,10 +258,13 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public void registerCapabilityFulfillmentService(String capabilityName, CapabilityFulfillmentInterface fulfillmentInterface) {
+        getLogger().debug(".registerCapabilityFulfillmentService(): Entry, capabilityName->{}", capabilityName);
         if(fulfillmentInterface == null){
+            getLogger().debug(".registerCapabilityFulfillmentService(): Exit, Capability Fulfillment Interface is NULL");
             return;
         }
         this.capabilityDeliveryServices.put(capabilityName, fulfillmentInterface);
+        getLogger().debug(".registerCapabilityFulfillmentService(): Exit, Capability Fulillment Interface registered");
     }
 
     @Override

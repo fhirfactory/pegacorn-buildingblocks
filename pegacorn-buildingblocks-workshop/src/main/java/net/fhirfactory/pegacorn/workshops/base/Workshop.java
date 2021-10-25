@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsTopologyCollectionAgent;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -47,6 +48,9 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     @Inject
     private ProcessingPlantInterface processingPlant;
+
+    @Inject
+    private ITOpsTopologyCollectionAgent itopsCollectionAgent;
 
     public Workshop() {
         super();

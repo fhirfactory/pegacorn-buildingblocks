@@ -84,6 +84,8 @@ public class PetasosInterZoneIPCEndpoint extends PetasosIPCEndpoint {
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
         endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneIPCGroupName());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
         String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getInterZoneIPCGroupName();
         endpointID.setEndpointDetailedAddressName(endpointAddress);
         return (endpointID);
