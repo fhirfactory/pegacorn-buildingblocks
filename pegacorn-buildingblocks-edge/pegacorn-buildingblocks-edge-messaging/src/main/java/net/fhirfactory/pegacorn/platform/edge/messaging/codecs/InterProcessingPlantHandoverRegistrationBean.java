@@ -51,8 +51,8 @@ import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConst
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -95,7 +95,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         LOG.trace(".ipcReceiverActivityStart(): newActivityID (ActivityID) --> {}", newActivityID);
         UoW theUoW = thePacket.getPayloadPacket();
         LOG.trace(".ipcReceiverActivityStart(): Creating new JobCard");
-        WUPJobCard activityJobCard = new WUPJobCard(newActivityID, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, node.getConcurrencyMode(), node.getResilienceMode(), Date.from(Instant.now()));
+        WUPJobCard activityJobCard = new WUPJobCard(newActivityID, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, node.getConcurrencyMode(), node.getResilienceMode(), Date.from(Instant.now()));
         LOG.trace(".ipcReceiverActivityStart(): Registering the Work Unit Activity using the activityJobCard --> {} and UoW --> {}", activityJobCard, theUoW);
         ParcelStatusElement statusElement = this.servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
         LOG.trace(".ipcReceiverActivityStart(): Registration aftermath: statusElement --> {}", statusElement);

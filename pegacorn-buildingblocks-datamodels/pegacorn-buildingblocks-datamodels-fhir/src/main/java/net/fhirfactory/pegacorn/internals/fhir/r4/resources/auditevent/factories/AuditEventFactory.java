@@ -26,9 +26,7 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r4.model.AuditEvent;
-import org.hl7.fhir.r4.model.Period;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +34,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @ApplicationScoped
 public class AuditEventFactory {
@@ -57,6 +56,42 @@ public class AuditEventFactory {
                                     String eventOutcomeCommentary,
                                     Period eventPeriod,
                                     AuditEvent.AuditEventEntityComponent auditEntity){
+
+        AuditEvent auditEvent = newAuditEvent(
+                petasosNodeReference,
+                sourceSystem,
+                sourceHost,
+                sourceComponentName,
+                eventLocation,
+                sourceType,
+                eventType,
+                eventSubType,
+                eventAction,
+                eventOutcome,
+                eventOutcomeCommentary,
+                eventPeriod,
+                auditEntity,
+                null,
+                null);
+
+        return(auditEvent);
+    }
+
+    public AuditEvent newAuditEvent(Reference petasosNodeReference,
+                                    String sourceSystem,
+                                    String sourceHost,
+                                    String sourceComponentName,
+                                    Reference eventLocation,
+                                    AuditEventSourceTypeEnum sourceType,
+                                    AuditEventTypeEnum eventType,
+                                    AuditEventSubTypeEnum eventSubType,
+                                    AuditEvent.AuditEventAction eventAction,
+                                    AuditEvent.AuditEventOutcome eventOutcome,
+                                    String eventOutcomeCommentary,
+                                    Period eventPeriod,
+                                    AuditEvent.AuditEventEntityComponent auditEntity,
+                                    String activitySource,
+                                    List<Extension> transactionHistory){
 
         AuditEvent auditEvent = new AuditEvent();
 
@@ -98,6 +133,21 @@ public class AuditEventFactory {
         auditEvent.setSource(sourceComponent);
 
         auditEvent.addEntity(auditEntity);
+
+        if(StringUtils.isNotEmpty(activitySource)){
+            Extension messageSourceExtension = new Extension();
+            messageSourceExtension.setUrl("System.Ingres.Point");
+            messageSourceExtension.setValue(new StringType(activitySource));
+            auditEvent.addExtension(messageSourceExtension);
+        }
+
+        if(transactionHistory != null){
+            if(transactionHistory.isEmpty()){
+                // do nothing
+            } else {
+                auditEvent.getExtension().addAll(transactionHistory);
+            }
+        }
 
         return(auditEvent);
     }

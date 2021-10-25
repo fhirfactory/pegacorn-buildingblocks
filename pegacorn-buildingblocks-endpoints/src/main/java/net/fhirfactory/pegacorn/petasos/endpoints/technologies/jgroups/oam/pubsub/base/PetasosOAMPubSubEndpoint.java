@@ -1,7 +1,9 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.base;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosPubSubEndpointChangeInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.roles.common.MultiPublisherResponseSet;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;

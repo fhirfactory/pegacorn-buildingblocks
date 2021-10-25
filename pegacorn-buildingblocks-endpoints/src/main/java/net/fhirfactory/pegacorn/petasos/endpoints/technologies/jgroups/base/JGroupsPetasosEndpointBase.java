@@ -24,8 +24,7 @@ package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base;
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.*;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;
@@ -44,7 +43,6 @@ import org.jgroups.blocks.ResponseMode;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.List;
 
 public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBase implements PetasosAdapterTechnologyInterface {
 

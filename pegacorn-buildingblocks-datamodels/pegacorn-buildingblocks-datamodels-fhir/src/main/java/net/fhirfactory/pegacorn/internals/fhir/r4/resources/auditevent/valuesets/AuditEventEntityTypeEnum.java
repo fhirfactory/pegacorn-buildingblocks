@@ -34,7 +34,8 @@ public enum AuditEventEntityTypeEnum {
     FHIR_ENDPOINT("http://hl7.org/fhir/resource-types", "4.0.1", "Endpoint", "Endpoint", false),
     FHIR_TASK("http://hl7.org/fhir/resource-types", "4.0.1", "Task", "Task", false),
     // TODO Add more from https://www.hl7.org/fhir/valueset-audit-entity-type.html
-    PEGACORN_MLLP_MSG("http://net.fhirfactory.pegacorn/fhir/audit-resource-types", "1.0.0", "MLLP-MSG", "MLLP Message", true);
+    PEGACORN_MLLP_MSG("http://net.fhirfactory.pegacorn/fhir/audit-resource-types", "1.0.0", "MLLP-MSG", "MLLP Message", true),
+    PEGACORN_PROCESSING_EXCEPTION("http://net.fhirfactory.pegacorn/fhir/audit-resource-types", "1.0.0", "Processing.Exception", "Processing Exception", true);
 
 
     private String system;

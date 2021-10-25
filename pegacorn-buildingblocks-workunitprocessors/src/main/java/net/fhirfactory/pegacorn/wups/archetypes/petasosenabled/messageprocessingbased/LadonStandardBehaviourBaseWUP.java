@@ -23,11 +23,11 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
 
-public abstract class LadonStandardMessageBaseWUP extends GenericMessageBasedWUPTemplate {
+public abstract class LadonStandardBehaviourBaseWUP extends GenericMessageBasedWUPTemplate {
 
-    public LadonStandardMessageBaseWUP() {
+    public LadonStandardBehaviourBaseWUP() {
         super();
     }
     

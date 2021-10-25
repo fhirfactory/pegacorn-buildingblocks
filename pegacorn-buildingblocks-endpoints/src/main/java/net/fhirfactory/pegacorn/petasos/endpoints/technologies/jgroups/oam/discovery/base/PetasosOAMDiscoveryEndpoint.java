@@ -3,7 +3,9 @@ package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.disc
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.petasos.endpoints.oam.itops.ITOpsDiscoveredNodesDM;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;

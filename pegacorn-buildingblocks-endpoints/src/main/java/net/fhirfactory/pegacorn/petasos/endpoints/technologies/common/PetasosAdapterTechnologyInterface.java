@@ -22,8 +22,8 @@
 
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.common;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointStatusEnum;
 
 public interface PetasosAdapterTechnologyInterface {
 

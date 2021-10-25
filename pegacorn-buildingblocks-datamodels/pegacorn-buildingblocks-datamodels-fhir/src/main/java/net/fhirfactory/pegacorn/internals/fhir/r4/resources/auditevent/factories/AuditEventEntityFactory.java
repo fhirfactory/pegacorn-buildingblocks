@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories;
 
+import ca.uhn.fhir.model.api.Tag;
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityLifecycleEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityRoleEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityTypeEnum;
@@ -28,10 +30,14 @@ import org.hl7.fhir.r4.model.AuditEvent;
 import org.hl7.fhir.r4.model.StringType;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.List;
 
 @ApplicationScoped
 public class AuditEventEntityFactory {
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
 
     public AuditEvent.AuditEventEntityComponent newAuditEventEntity(AuditEventEntityTypeEnum entityType,
                                                                     AuditEventEntityRoleEnum entityRole,
@@ -82,4 +88,5 @@ public class AuditEventEntityFactory {
         detail.setValue(detailValueStringType);
         return(detail);
     }
+
 }

@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.forward;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCInterfaceDefinition;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;

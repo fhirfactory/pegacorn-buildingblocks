@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.unmanaged;
 import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
@@ -42,8 +42,8 @@ import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.workshops.base.Workshop;
 import net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit.TransactionalWUPAuditEntryManager;
@@ -118,7 +118,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     private void buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
         WorkUnitProcessorTopologyNode wupNode = getTopologyFactory()
-                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), TopologyNodeTypeEnum.WUP);
+                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), ComponentTypeTypeEnum.WUP);
         getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getNodeFDN(), wupNode);
         wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());
@@ -195,7 +195,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         ConcurrencyModeEnum concurrencyMode = this.topologyNode.getConcurrencyMode();
         ResilienceModeEnum resilienceMode = this.topologyNode.getResilienceMode();
         Date nowDate = Date.from(Instant.now());
-        WUPJobCard jobCard = new WUPJobCard(activityID, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING,WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING,concurrencyMode,resilienceMode,nowDate);
+        WUPJobCard jobCard = new WUPJobCard(activityID, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING,concurrencyMode,resilienceMode,nowDate);
         this.currentJobCard = jobCard;
     }
 

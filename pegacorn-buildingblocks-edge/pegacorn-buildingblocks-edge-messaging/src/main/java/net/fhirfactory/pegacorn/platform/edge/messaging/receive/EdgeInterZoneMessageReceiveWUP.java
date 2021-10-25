@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.receive;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCInterfaceDefinition;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.messaging.receive.common.EdgeMessageReceiveWUP;
 import org.slf4j.Logger;

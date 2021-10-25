@@ -24,13 +24,16 @@ package net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.*;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.StandardEdgeIPCEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.answer.StandardEdgeIPCEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointChannelScopeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
@@ -346,7 +349,7 @@ public class JGroupsBasedParticipantInformationService {
         }
         TopologyNodeFDN workshopNodeFDN = deriveWorkshopFDN();
         TopologyNodeFDN wupNodeFDN = SerializationUtils.clone(workshopNodeFDN);
-        wupNodeFDN.appendTopologyNodeRDN(new TopologyNodeRDN(TopologyNodeTypeEnum.WUP, forwarderName, EDGE_FORWARDER_WUP_VERSION));
+        wupNodeFDN.appendTopologyNodeRDN(new TopologyNodeRDN(ComponentTypeTypeEnum.WUP, forwarderName, EDGE_FORWARDER_WUP_VERSION));
         TopologyNodeFDNToken associatedForwarderWUPToken = wupNodeFDN.getToken();
         return(associatedForwarderWUPToken);
     }
@@ -480,7 +483,7 @@ public class JGroupsBasedParticipantInformationService {
     private TopologyNodeFDN deriveWorkshopFDN() {
         TopologyNodeFDN processingPlantFDN = getProcessingPlant().getProcessingPlantNode().getNodeFDN();
         TopologyNodeFDN futureWorkshopFDN = SerializationUtils.clone(processingPlantFDN);
-        TopologyNodeRDN newRDN = new TopologyNodeRDN(TopologyNodeTypeEnum.WORKSHOP, DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop(), getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
+        TopologyNodeRDN newRDN = new TopologyNodeRDN(ComponentTypeTypeEnum.WORKSHOP, DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop(), getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
         futureWorkshopFDN.appendTopologyNodeRDN(newRDN);
         return(futureWorkshopFDN);
     }

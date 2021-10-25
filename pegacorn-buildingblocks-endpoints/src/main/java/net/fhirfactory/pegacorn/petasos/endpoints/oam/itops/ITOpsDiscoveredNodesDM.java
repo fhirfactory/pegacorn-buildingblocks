@@ -22,10 +22,9 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.oam.itops;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
@@ -85,7 +84,7 @@ public class ITOpsDiscoveredNodesDM {
                 break;
             }
         }
-        String simpleName = newElement.getComponentID();
+        String simpleName = newElement.getComponentID().getId();
         if (elementFound) {
             this.nodeSet.remove(currentNodeID);
             this.nodeSet.put(currentNodeID, newElement);
@@ -157,7 +156,7 @@ public class ITOpsDiscoveredNodesDM {
         return (null);
     }
 
-    public List<TopologyNode> nodeSearch(TopologyNodeTypeEnum nodeType, String nodeName, String nodeVersion){
+    public List<TopologyNode> nodeSearch(ComponentTypeTypeEnum nodeType, String nodeName, String nodeVersion){
         LOG.debug(".nodeSearch(): Entry, nodeType->{}, nodeName->{}, nodeVersion->{}", nodeType, nodeName, nodeVersion);
         ArrayList<TopologyNode> nodeList = new ArrayList<>();
         for(TopologyNode currentNode: nodeSet.values()){

@@ -25,5 +25,6 @@
         <module>../pegacorn-buildingblocks-workunitprocessors</module>
 	<module>../pegacorn-buildingblocks-endpoints</module>
         <module>../pegacorn-buildingblocks-auditservices</module>
+        <module>../pegacorn-buildingblocks-interception</module>
     </modules>
 </project>

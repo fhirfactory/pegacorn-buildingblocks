@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.oamwup.base;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -92,7 +92,7 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
 
     private void buildOAMWorkUnitProcessor() {
         getLogger().debug(".buildOAMWorkUnitProcessor(): Entry, adding Workshop --> {}, version --> {}", specifyOAMWUPName(), specifyOAMWUPVersion());
-        WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifyOAMWUPName(), specifyOAMWUPVersion(), specifyOAMWorkshop().getWorkshopNode(), TopologyNodeTypeEnum.OAM_WORK_UNIT_PROCESSOR);
+        WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifyOAMWUPName(), specifyOAMWUPVersion(), specifyOAMWorkshop().getWorkshopNode(), ComponentTypeTypeEnum.OAM_WORK_UNIT_PROCESSOR);
         topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getNodeFDN(), wup);
         this.wupTopologyNode = wup;
         getLogger().debug(".buildOAMWorkUnitProcessor(): Exit");
