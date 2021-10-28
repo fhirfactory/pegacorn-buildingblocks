@@ -45,7 +45,7 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
@@ -73,7 +73,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
     TopologyIM topologyIM;
 
     @Inject
-    PetasosMOAServicesBroker servicesBroker;
+    LocalTaskActivityController servicesBroker;
 
     @Inject
     WorkUnitProcessorMetricsCollectionAgent metricsAgent;
@@ -109,7 +109,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         LOG.trace(".ipcReceiverActivityStart(): Registration aftermath: statusElement --> {}", statusElement);
         LOG.trace(".ipcReceiverActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
         camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, activityJobCard);
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, statusElement);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_EXCHANGE_PROPERTY_NAME, statusElement);
         LOG.debug(".ipcReceiverActivityStart(): exit, my work is done!");
         return thePacket;
     }
