@@ -23,20 +23,14 @@ package net.fhirfactory.pegacorn.services.audit.forwarder.beans;
 
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.components.transaction.model.SimpleResourceID;
-import net.fhirfactory.pegacorn.components.transaction.model.SimpleTransactionOutcome;
+import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.model.capabilities.base.factories.MethodOutcomeFactory;
 import net.fhirfactory.pegacorn.petasos.endpoints.CapabilityUtilisationBroker;
-import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
-import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.AuditEvent;
-import org.hl7.fhir.r4.model.IdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +61,9 @@ public class AuditEventPersistenceAccessor {
     @Inject
     private CapabilityUtilisationBroker capabilityUtilisationBroker;
 
+    @Inject
+    private MethodOutcomeFactory outcomeFactory;
+
     //
     // Constructor
     //
@@ -77,7 +74,8 @@ public class AuditEventPersistenceAccessor {
         jsonMapper.registerModule(module);
     }
 
-    @Override
+
+
     public AuditEvent logAuditEventAsynchronously(AuditEvent auditEvent) {
         getLogger().debug(".logAuditEventAsynchronously(): Entry, auditEvent->{}", auditEvent);
         if(auditEvent == null){
@@ -117,7 +115,7 @@ public class AuditEventPersistenceAccessor {
         task.setRequestID(UUID.randomUUID().toString());
         task.setRequestContent(auditEventString);
         task.setRequiredCapabilityName("FHIR-AuditEvent-Persistence");
-        task.setRequestDate(Instant.now());
+        task.setRequestInstant(Instant.now());
         //
         // Do Write
         //
@@ -125,8 +123,8 @@ public class AuditEventPersistenceAccessor {
         //
         // Extract the response
         //
-        String resultString = auditEventWriteOutcome.getResponseContent();
-        MethodOutcome methodOutcome = convertToMethodOutcome(resultString);
+        String resultString = auditEventWriteOutcome.getResponseStringContent();
+        MethodOutcome methodOutcome = outcomeFactory.convertToMethodOutcome(resultString);
         getLogger().debug(".utiliseAuditEventPersistenceCapability(): Entry, methodOutcome --> {}", methodOutcome);
         return (methodOutcome);
     }
@@ -141,49 +139,7 @@ public class AuditEventPersistenceAccessor {
         return (auditEvent);
     }
 
-    private MethodOutcome convertToMethodOutcome(String methodOutcomeString) {
-        if (StringUtils.isEmpty(methodOutcomeString)) {
-            MethodOutcome outcome = new MethodOutcome();
-            outcome.setCreated(false);
-            return (outcome);
-        }
-        SimpleTransactionOutcome transactionOutcome = null;
-        try {
-            transactionOutcome = getJSONMapper().readValue(methodOutcomeString, SimpleTransactionOutcome.class);
-        } catch (JsonProcessingException e) {
-            getLogger().error(".convertToMethodOutcome(): Cannot parse MethodOutcome object! ", e);
-        }
-        MethodOutcome methodOutcome = null;
-        if (transactionOutcome != null) {
-            String resourceURL = null;
-            String resourceType = "AuditEvent";
-            if (transactionOutcome.isTransactionSuccessful()) {
-                String resourceValue = transactionOutcome.getResourceID().getValue();
-                String resourceVersion = SimpleResourceID.DEFAULT_VERSION;
-                if (transactionOutcome.getResourceID() != null) {
-                    if (transactionOutcome.getResourceID().getResourceType() != null) {
-                        resourceType = transactionOutcome.getResourceID().getResourceType();
-                    }
-                    if (transactionOutcome.getResourceID().getVersion() != null) {
-                        resourceVersion = transactionOutcome.getResourceID().getVersion();
-                    }
-                    if (transactionOutcome.getResourceID().getUrl() != null) {
-                        resourceURL = transactionOutcome.getResourceID().getUrl();
-                    }
-                    IdType id = new IdType();
-                    id.setParts(resourceURL, resourceType, resourceValue, resourceVersion);
-                    methodOutcome = new MethodOutcome();
-                    methodOutcome.setId(id);
-                    methodOutcome.setCreated(transactionOutcome.isTransactionSuccessful());
-                }
-            }
-        }
-        if (methodOutcome == null) {
-            methodOutcome = new MethodOutcome();
-            methodOutcome.setCreated(false);
-        }
-        return (methodOutcome);
-    }
+
 
     //
     // Getters (and Setters)

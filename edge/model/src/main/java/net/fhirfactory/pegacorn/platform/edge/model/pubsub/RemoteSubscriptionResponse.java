@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.model.pubsub;
 
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipantUtilisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipantUtilisationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 
 import java.io.Serializable;
 import java.time.Instant;

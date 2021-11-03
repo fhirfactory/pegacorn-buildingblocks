@@ -21,24 +21,24 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.answer.resourceproxies.common;
 
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionMethodOutcome;
+import net.fhirfactory.pegacorn.components.transaction.model.PegacornTransactionMethodOutcome;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Resource;
 
 abstract public class EdgeAsynchronousCRUDResourceBase extends EdgeGetResourceBase {
 
     @Override
-    protected TransactionMethodOutcome createResource(Resource resource) {
+    protected PegacornTransactionMethodOutcome createResource(Resource resource) {
         return null;
     }
 
     @Override
-    protected TransactionMethodOutcome updateResource(Resource resource) {
+    protected PegacornTransactionMethodOutcome updateResource(Resource resource) {
         return null;
     }
 
     @Override
-    protected TransactionMethodOutcome deleteResource(IdType id) {
+    protected PegacornTransactionMethodOutcome deleteResource(IdType id) {
         return null;
     }
 }

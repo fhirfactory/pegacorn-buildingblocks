@@ -22,29 +22,29 @@
 package net.fhirfactory.pegacorn.wups.archetypes.unmanaged;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
+import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.pathway.ActivityID;
+import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta.TransactionStatusElement;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.datatypes.WUPIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
-import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
-import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.workshops.base.Workshop;
 import net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit.TransactionalWUPAuditEntryManager;
 import org.apache.camel.builder.RouteBuilder;
@@ -119,7 +119,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         getLogger().debug(".buildWUPNodeElement(): Entry");
         WorkUnitProcessorTopologyNode wupNode = getTopologyFactory()
                 .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), ComponentTypeTypeEnum.WUP);
-        getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getNodeFDN(), wupNode);
+        getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getComponentFDN(), wupNode);
         wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());
         this.topologyNode = wupNode;
@@ -138,7 +138,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     }
 
     public WUPIdentifier getNodeInstanceID(){
-        WUPIdentifier wupID = new WUPIdentifier(topologyNode.getNodeFDN().getToken());
+        WUPIdentifier wupID = new WUPIdentifier(topologyNode.getComponentFDN().getToken());
         return(wupID);
     }
 
@@ -212,7 +212,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
      * @param action
      * @return
      */
-    protected TransactionStatusElement beginRESTfulTransaction(IdType resourceID, String resourceType, Identifier resourceIdentifier, Resource fhirResource, TransactionTypeEnum action){
+    protected TransactionStatusElement beginRESTfulTransaction(IdType resourceID, String resourceType, Identifier resourceIdentifier, Resource fhirResource, PegacornTransactionTypeEnum action){
         getLogger().debug(".beginRESTfulTransaction(): Entry, resourceID->{}, resourceType->{}, resourceIdentifier->{}, fhirResource->{}, actopm->{}", resourceID, resourceType, resourceIdentifier, fhirResource, action);
         String resourceKey = identifierHelpers.generatePrintableInformationFromIdentifier(resourceIdentifier);
         initialiseWUPActivity(false);
@@ -226,7 +226,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
      * @param action
      * @return
      */
-    protected TransactionStatusElement beginAPITransaction(UoW uow, TransactionTypeEnum action){
+    protected TransactionStatusElement beginAPITransaction(UoW uow, PegacornTransactionTypeEnum action){
         initialiseWUPActivity(false);
         TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(this.getCurrentJobCard(),uow, action);
         return(transactionStatus);
@@ -272,7 +272,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         parcelManifest.setDataParcelType(DataParcelTypeEnum.SEARCH_QUERY_DATA_PARCEL_TYPE);
         newPayload.setPayloadManifest(parcelManifest);
         UoW uow = new UoW(newPayload);
-        TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(this.getCurrentJobCard(),uow, TransactionTypeEnum.SEARCH);
+        TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(this.getCurrentJobCard(),uow, PegacornTransactionTypeEnum.SEARCH);
         return(transactionStatus);
     }
 

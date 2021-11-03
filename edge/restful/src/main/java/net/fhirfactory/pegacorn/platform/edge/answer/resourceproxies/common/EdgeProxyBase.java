@@ -2,7 +2,7 @@ package net.fhirfactory.pegacorn.platform.edge.answer.resourceproxies.common;
 
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle.BundleContentHelper;
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionMethodOutcome;
+import net.fhirfactory.pegacorn.components.transaction.model.PegacornTransactionMethodOutcome;
 import net.fhirfactory.pegacorn.platform.edge.model.common.ResourceAccessorInterfaceBase;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;
@@ -57,10 +57,10 @@ public abstract class EdgeProxyBase {
 
     abstract protected Logger getLogger();
     abstract protected ResourceAccessorInterfaceBase specifyActualResourceAccessor();
-    abstract protected TransactionMethodOutcome getResource(IdType id);
-    abstract protected TransactionMethodOutcome createResource(Resource resource);
-    abstract protected TransactionMethodOutcome updateResource(Resource resource);
-    abstract protected TransactionMethodOutcome deleteResource(IdType id);
+    abstract protected PegacornTransactionMethodOutcome getResource(IdType id);
+    abstract protected PegacornTransactionMethodOutcome createResource(Resource resource);
+    abstract protected PegacornTransactionMethodOutcome updateResource(Resource resource);
+    abstract protected PegacornTransactionMethodOutcome deleteResource(IdType id);
 
     protected ResourceAccessorInterfaceBase getActualResourceAccessor(){
         return(specifyActualResourceAccessor());

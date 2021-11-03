@@ -21,20 +21,20 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base;
 
-import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
-import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
+import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
+import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.*;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.*;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterTechnologyInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.EndpointNameUtilities;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers.JGroupsBasedParticipantInformationService;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.topology.EndpointNodeList;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;

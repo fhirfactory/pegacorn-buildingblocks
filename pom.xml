@@ -17,6 +17,8 @@
     <description>The core subset of subsystem building blocks and services</description>
 
     <modules>
+	    <module>commoncode</module>
+	    <module>petasos</module>
         <module>datamodels</module>
         <module>directoryservices</module>
         <module>workshop</module>
@@ -28,5 +30,6 @@
         <module>auditservices</module>
         <module>taskservices</module>
         <module>interception</module>
+	<module>oam</module>
     </modules>
 </project>

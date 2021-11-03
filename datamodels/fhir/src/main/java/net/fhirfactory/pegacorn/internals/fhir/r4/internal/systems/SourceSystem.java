@@ -23,10 +23,10 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems;
 
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SubsystemTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.SubsystemTopologyNode;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

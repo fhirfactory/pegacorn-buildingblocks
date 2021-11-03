@@ -30,4 +30,6 @@ import javax.enterprise.context.ApplicationScoped;
 public class TaskFactory {
     private static final Logger LOG = LoggerFactory.getLogger(TaskFactory.class);
 
+
+
 }

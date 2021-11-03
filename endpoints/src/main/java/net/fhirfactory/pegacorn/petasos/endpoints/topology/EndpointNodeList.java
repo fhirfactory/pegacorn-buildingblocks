@@ -21,24 +21,24 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.topology;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
+import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EndpointNodeList implements Serializable {
-    List<TopologyNode> nodeList;
+    List<SoftwareComponent> nodeList;
 
     public EndpointNodeList(){
         nodeList = new ArrayList<>();
     }
 
-    public List<TopologyNode> getNodeList() {
+    public List<SoftwareComponent> getNodeList() {
         return nodeList;
     }
 
-    public void setNodeList(List<TopologyNode> nodeList) {
+    public void setNodeList(List<SoftwareComponent> nodeList) {
         this.nodeList = nodeList;
     }
 }

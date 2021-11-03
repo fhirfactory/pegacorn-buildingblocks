@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.internals.directories.api.common;
 
 import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
-import net.fhirfactory.pegacorn.internals.esr.resources.PractitionerRoleESR;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceNotFoundException;
 import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
 import org.apache.camel.Exchange;
@@ -33,7 +32,6 @@ import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestConfigurationDefinition;
 import org.apache.camel.model.rest.RestDefinition;
 import org.apache.camel.model.rest.RestParamType;
-import org.apache.camel.spi.RestConfiguration;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;

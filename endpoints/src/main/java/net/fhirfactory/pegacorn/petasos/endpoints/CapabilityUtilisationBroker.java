@@ -21,13 +21,11 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTask;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTaskOutcome;
-import net.fhirfactory.pegacorn.components.capabilities.CapabilityUtilisationBrokerInterface;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
+import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityUtilisationBrokerInterface;
+import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks.PetasosInterZoneTaskEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks.PetasosIntraZoneTaskEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,24 +38,24 @@ public class CapabilityUtilisationBroker implements CapabilityUtilisationBrokerI
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityUtilisationBroker.class);
 
     @Inject
-    private PetasosInterZoneIPCEndpoint interZoneIPCEndpoint;
+    private PetasosIntraZoneTaskEndpoint intraZoneTaskingEndpoint;
 
     @Inject
-    private PetasosIntraZoneIPCEndpoint intraZoneIPCEndpoint;
+    private PetasosInterZoneTaskEndpoint interZoneTaskingEndpoint;
 
     @Override
     public CapabilityUtilisationResponse executeTask(String preferredCapabilityProvider, CapabilityUtilisationRequest task) {
         LOG.debug(".executeTask(): Entry, preferredCapabilityProvider->{}, task->{}", preferredCapabilityProvider, task);
 
-        if(intraZoneIPCEndpoint.capabilityProviderIsInScope(preferredCapabilityProvider)){
-            LOG.trace(".executeTask(): Using intra-zone communication framework");
-            CapabilityUtilisationResponse taskOutcome = intraZoneIPCEndpoint.executeTask(preferredCapabilityProvider, task);
+        if(interZoneTaskingEndpoint.taskFulfillerIsInScope(preferredCapabilityProvider)){
+            LOG.trace(".executeTask(): Using inter-zone communication framework");
+            CapabilityUtilisationResponse taskOutcome = interZoneTaskingEndpoint.executeTask(preferredCapabilityProvider, task);
             LOG.debug(".executeTask(): Exit, outcome->{}", taskOutcome);
             return(taskOutcome);
         }
-        if(interZoneIPCEndpoint.capabilityProviderIsInScope(preferredCapabilityProvider)){
-            LOG.trace(".executeTask(): Using inter-zone communication framework");
-            CapabilityUtilisationResponse taskOutcome = interZoneIPCEndpoint.executeTask(preferredCapabilityProvider, task);
+        if(intraZoneTaskingEndpoint.taskFulfillerIsInScope(preferredCapabilityProvider)){
+            LOG.trace(".executeTask(): Using intra-zone communication framework");
+            CapabilityUtilisationResponse taskOutcome = intraZoneTaskingEndpoint.executeTask(preferredCapabilityProvider, task);
             LOG.debug(".executeTask(): Exit, outcome->{}", taskOutcome);
             return(taskOutcome);
         }
@@ -66,7 +64,7 @@ public class CapabilityUtilisationBroker implements CapabilityUtilisationBrokerI
         CapabilityUtilisationResponse outcome = new CapabilityUtilisationResponse();
         outcome.setSuccessful(false);
         outcome.setInScope(false);
-        outcome.setDateCompleted(Instant.now());
+        outcome.setInstantCompleted(Instant.now());
         outcome.setAssociatedRequestID(task.getRequestID());
         LOG.debug(".executeTask(): Exit, failed to find capability provider, outcome->{}", outcome);
         return(outcome);

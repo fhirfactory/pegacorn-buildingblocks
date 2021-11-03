@@ -21,13 +21,13 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpointStatusEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.base.PetaosPubSubEndpointChangeCallbackRegistrationInterface;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosPubSubEndpointChangeCallbackRegistrationInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosHealthCheckCallBackInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.base.PetasosPubSubEndpointChangeInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubParticipant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,18 +44,30 @@ import java.util.TimerTask;
 public class CoreSubsystemPetasosEndpointsWatchdog
         implements PetasosHealthCheckCallBackInterface,
         PetasosPubSubEndpointChangeInterface,
-        PetaosPubSubEndpointChangeCallbackRegistrationInterface {
+        PetasosPubSubEndpointChangeCallbackRegistrationInterface {
     private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosEndpointsWatchdog.class);
 
     private PetasosEndpoint intrazoneIPC;
     private PetasosEndpoint intrazoneOAMPubSub;
     private PetasosEndpoint intrazoneOAMDiscovery;
+    private PetasosEndpoint intraZoneAudit;
+    private PetasosEndpoint intraZoneTask;
+    private PetasosEndpoint intraZoneInterception;
+
     private PetasosEndpoint interzoneIPC;
     private PetasosEndpoint interzoneOAMPubSub;
     private PetasosEndpoint interzoneOAMDiscovery;
+    private PetasosEndpoint interZoneAudit;
+    private PetasosEndpoint interZoneTask;
+    private PetasosEndpoint interZoneInterception;
+
     private PetasosEndpoint intersiteIPC;
     private PetasosEndpoint intersiteOAMPubSub;
     private PetasosEndpoint intersiteOAMDiscovery;
+    private PetasosEndpoint interSiteAudit;
+    private PetasosEndpoint interSiteTask;
+    private PetasosEndpoint interSiteInterception;
+
     private PetasosEndpointStatusEnum aggregateStatus;
     private PetasosEndpoint edgeAnswerHTTP;
     private PetasosEndpoint edgeAnswerRPC;
@@ -91,12 +103,24 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         this.intrazoneIPC = null;
         this.intrazoneOAMDiscovery = null;
         this.intrazoneOAMPubSub = null;
+        this.intraZoneAudit = null;
+        this.intraZoneTask = null;
+        this.intraZoneInterception = null;
+
         this.interzoneIPC = null;
         this.interzoneOAMDiscovery = null;
         this.interzoneOAMPubSub = null;
+        this.interZoneAudit = null;
+        this.interZoneTask = null;
+        this.interZoneInterception = null;
+
         this.intersiteIPC = null;
         this.intersiteOAMDiscovery = null;
         this.intersiteOAMPubSub = null;
+        this.interSiteAudit = null;
+        this.interSiteTask = null;
+        this.interSiteInterception = null;
+
         this.edgeAnswerHTTP = null;
         this.edgeAnswerRPC = null;
         this.aggregateStatus = PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED;
@@ -117,10 +141,11 @@ public class CoreSubsystemPetasosEndpointsWatchdog
 
     @PostConstruct
     public void initialise(){
-        if(initialised){
+        if(this.initialised){
             return;
         }
         scheduleStartupWatchdog();
+        initialised = true;
     }
 
     //
@@ -321,6 +346,15 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         if (existsIntraZoneOAMPubSub()) {
             statusList.add(resolveStatusValue(startingStatus, getIntrazoneOAMPubSub().getEndpointStatus()));
         }
+        if (existsIntraZoneAudit()){
+            statusList.add(resolveStatusValue(startingStatus, getIntraZoneAudit().getEndpointStatus()));
+        }
+        if (existsIntraZoneTask()){
+            statusList.add(resolveStatusValue(startingStatus, getIntraZoneTask().getEndpointStatus()));
+        }
+        if (existsIntraZoneInterception()){
+            statusList.add(resolveStatusValue(startingStatus, getIntraZoneInterception().getEndpointStatus()));
+        }
         if (existsInterZoneIPC()) {
             statusList.add(resolveStatusValue(startingStatus, getInterzoneIPC().getEndpointStatus()));
         }
@@ -329,6 +363,15 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         }
         if (existsInterZoneOAMPubSub()) {
             statusList.add(resolveStatusValue(startingStatus, getInterzoneOAMPubSub().getEndpointStatus()));
+        }
+        if (existsInterZoneAudit()){
+            statusList.add(resolveStatusValue(startingStatus, getInterZoneAudit().getEndpointStatus()));
+        }
+        if (existsInterZoneTask()){
+            statusList.add(resolveStatusValue(startingStatus, getInterZoneTask().getEndpointStatus()));
+        }
+        if (existsInterZoneInterception()){
+            statusList.add(resolveStatusValue(startingStatus, getInterZoneInterception().getEndpointStatus()));
         }
         if (existsInterSiteIPC()) {
             statusList.add(resolveStatusValue(startingStatus, getIntersiteIPC().getEndpointStatus()));
@@ -339,6 +382,16 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         if (existsInterSiteOAMPubSub()) {
             statusList.add(resolveStatusValue(startingStatus, getIntersiteOAMPubSub().getEndpointStatus()));
         }
+        if (existsInterSiteAudit()){
+            statusList.add(resolveStatusValue(startingStatus, getInterSiteAudit().getEndpointStatus()));
+        }
+        if (existsInterSiteTask()){
+            statusList.add(resolveStatusValue(startingStatus, getInterSiteTask().getEndpointStatus()));
+        }
+        if (existsInterSiteInterception()){
+            statusList.add(resolveStatusValue(startingStatus, getInterSiteInterception().getEndpointStatus()));
+        }
+
         if (existsEdgeAnswerHTTP()) {
             statusList.add(resolveStatusValue(startingStatus, getEdgeAnswerHTTP().getEndpointStatus()));
         }
@@ -443,9 +496,126 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         this.publisherChangeCallbacks.add(publisherChangeCallback);
     }
 
-//
+    //
     // Getters (and Setters)
     //
+
+    public boolean existsIntraZoneInterception(){
+        boolean hasValue = this.intraZoneInterception != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getIntraZoneInterception() {
+        return intraZoneInterception;
+    }
+
+    public void setIntraZoneInterception(PetasosEndpoint intraZoneInterception) {
+        this.intraZoneInterception = intraZoneInterception;
+    }
+
+    public boolean existsInterZoneInterception(){
+        boolean hasValue = this.interZoneInterception != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getInterZoneInterception() {
+        return interZoneInterception;
+    }
+
+    public void setInterZoneInterception(PetasosEndpoint interZoneInterception) {
+        this.interZoneInterception = interZoneInterception;
+    }
+
+    public boolean existsInterSiteInterception(){
+        boolean hasValue = this.interSiteInterception != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getInterSiteInterception() {
+        return interSiteInterception;
+    }
+
+    public void setInterSiteInterception(PetasosEndpoint interSiteInterception) {
+        this.interSiteInterception = interSiteInterception;
+    }
+
+    public boolean existsIntraZoneAudit(){
+        boolean hasValue = this.intraZoneAudit != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getIntraZoneAudit() {
+        return intraZoneAudit;
+    }
+
+    public void setIntraZoneAudit(PetasosEndpoint intraZoneAudit) {
+        this.intraZoneAudit = intraZoneAudit;
+    }
+
+    public boolean existsIntraZoneTask(){
+        boolean hasValue = this.intraZoneTask != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getIntraZoneTask() {
+        return intraZoneTask;
+    }
+
+    public void setIntraZoneTask(PetasosEndpoint intraZoneTask) {
+        this.intraZoneTask = intraZoneTask;
+    }
+
+    public boolean existsInterZoneAudit(){
+        boolean hasValue = this.interZoneAudit != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getInterZoneAudit() {
+        return interZoneAudit;
+    }
+
+    public void setInterZoneAudit(PetasosEndpoint interZoneAudit) {
+        this.interZoneAudit = interZoneAudit;
+    }
+
+    public boolean existsInterZoneTask(){
+        boolean hasValue = this.interZoneTask != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getInterZoneTask() {
+        return interZoneTask;
+    }
+
+    public void setInterZoneTask(PetasosEndpoint interZoneTask) {
+        this.interZoneTask = interZoneTask;
+    }
+
+    public boolean existsInterSiteAudit(){
+        boolean hasValue = this.interSiteAudit != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getInterSiteAudit() {
+        return interSiteAudit;
+    }
+
+    public void setInterSiteAudit(PetasosEndpoint interSiteAudit) {
+        this.interSiteAudit = interSiteAudit;
+    }
+
+    public boolean existsInterSiteTask(){
+        boolean hasValue = this.interSiteTask != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpoint getInterSiteTask() {
+        return interSiteTask;
+    }
+
+    public void setInterSiteTask(PetasosEndpoint interSiteTask) {
+        this.interSiteTask = interSiteTask;
+    }
 
     public boolean existsIntrazoneIPC(){
         boolean exists = this.intrazoneIPC != null;

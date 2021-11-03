@@ -21,11 +21,11 @@
  */
 package net.fhirfactory.pegacorn.oamwup.base;
 
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.workshops.base.OAMWorkshop;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -93,7 +93,7 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
     private void buildOAMWorkUnitProcessor() {
         getLogger().debug(".buildOAMWorkUnitProcessor(): Entry, adding Workshop --> {}, version --> {}", specifyOAMWUPName(), specifyOAMWUPVersion());
         WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifyOAMWUPName(), specifyOAMWUPVersion(), specifyOAMWorkshop().getWorkshopNode(), ComponentTypeTypeEnum.OAM_WORK_UNIT_PROCESSOR);
-        topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getNodeFDN(), wup);
+        topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getComponentFDN(), wup);
         this.wupTopologyNode = wup;
         getLogger().debug(".buildOAMWorkUnitProcessor(): Exit");
     }
@@ -107,7 +107,7 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
     }
 
     private String getFriendlyName(){
-        String nodeName = getWUPTopologyNode().getNodeRDN().getNodeName() + "(" + getWUPTopologyNode().getNodeRDN().getNodeVersion() + ")";
+        String nodeName = getWUPTopologyNode().getComponentRDN().getNodeName() + "(" + getWUPTopologyNode().getComponentRDN().getNodeVersion() + ")";
         return(nodeName);
     }
 }

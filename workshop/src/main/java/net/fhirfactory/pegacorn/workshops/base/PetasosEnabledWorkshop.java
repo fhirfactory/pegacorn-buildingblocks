@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 
 public abstract class PetasosEnabledWorkshop extends Workshop{
 

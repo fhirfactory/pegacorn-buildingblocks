@@ -21,8 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.codesystems;
 
-
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.StringType;

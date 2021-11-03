@@ -23,10 +23,10 @@
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.apiactivitybased;
 
 import net.fhirfactory.pegacorn.petasos.core.sta.wup.GenericSTAServerWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPClusterModeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPSystemModeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.pathway.ActivityID;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPClusterModeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPSystemModeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

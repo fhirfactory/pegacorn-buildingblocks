@@ -15,9 +15,9 @@
     <description>The key data models used within a Pegacorn solution</description>
 
     <modules>
-        <module>components</module>
-        <module>datamodels-fhir</module>
+        <module>core</module>
+        <module>fhir</module>
         <module>esr</module>
-        <!--module>communicate</module-->
+        <module>communicate</module>
     </modules>
 </project>

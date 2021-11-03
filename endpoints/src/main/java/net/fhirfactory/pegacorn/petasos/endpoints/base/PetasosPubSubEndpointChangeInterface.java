@@ -20,7 +20,7 @@
  * SOFTWARE.
  */package net.fhirfactory.pegacorn.petasos.endpoints.base;
 
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubParticipant;
 
 public interface PetasosPubSubEndpointChangeInterface {
     public void notifyNewPublisher(InterSubsystemPubSubParticipant newPublisher);

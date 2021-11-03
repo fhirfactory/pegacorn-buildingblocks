@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.model.pubsub;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
 
 import java.util.List;
 

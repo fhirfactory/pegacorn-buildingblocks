@@ -22,18 +22,18 @@
 package net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
-import net.fhirfactory.pegacorn.deployment.properties.codebased.DeploymentSystemIdentificationInterface;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DeploymentSystemIdentificationInterface;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta.TransactionStatusElement;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoWProcessingOutcomeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.hl7.fhir.r4.model.Resource;
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class TransactionalWUPAuditEntryManager {
     }
 
 
-    public TransactionStatusElement beginTransaction(WUPJobCard jobCard, String auditCommentary, String resourceType, Resource fhirResource, TransactionTypeEnum action) {
+    public TransactionStatusElement beginTransaction(WUPJobCard jobCard, String auditCommentary, String resourceType, Resource fhirResource, PegacornTransactionTypeEnum action) {
         LOG.debug(".beginTransaction(): Entry, jobCard->{}, auditCommentary->{}, fhriResource->{}, action->{}", jobCard, auditCommentary, fhirResource, action);
         LOG.trace(".beginTransaction(): Create the UoW for accessor utilisation");
         UoWPayload payload = new UoWPayload();
@@ -151,7 +151,7 @@ public class TransactionalWUPAuditEntryManager {
         return (currentTransaction);
     }
 
-    public TransactionStatusElement beginTransaction(WUPJobCard jobCard, UoW uow, TransactionTypeEnum action) {
+    public TransactionStatusElement beginTransaction(WUPJobCard jobCard, UoW uow, PegacornTransactionTypeEnum action) {
         TransactionStatusElement currentTransaction = servicesBroker.logAPIActivity(jobCard, uow, action);
         return(currentTransaction);
     }

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.workshops;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class EdgeWorkshop extends PetasosEnabledWorkshop {
 
     @Override
     protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
+        return (getProcessingPlant().getProcessingPlantNode().getComponentRDN().getNodeVersion());
     }
 
     @Override

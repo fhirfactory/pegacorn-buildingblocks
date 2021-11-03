@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
-import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.pathway.ActivityID;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 
 import java.io.Serializable;
 import java.time.Instant;

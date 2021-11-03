@@ -23,8 +23,8 @@ package net.fhirfactory.pegacorn.platform.edge.answer.resourceproxies.common;
 
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
-import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionStatusEnum;
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionMethodOutcome;
+import net.fhirfactory.pegacorn.components.transaction.valuesets.PegacornTransactionStatusEnum;
+import net.fhirfactory.pegacorn.components.transaction.model.PegacornTransactionMethodOutcome;
 import org.hl7.fhir.r4.model.*;
 
 public abstract class EdgeGetResourceBase extends EdgeProxyBase {
@@ -41,9 +41,9 @@ public abstract class EdgeGetResourceBase extends EdgeProxyBase {
     protected Resource findResourceViaIdentifier(Identifier identifier) {
         getLogger().debug(".findByIdentifier(): Entry, identifier --> {}", identifier);
 
-        TransactionMethodOutcome outcome = getActualResourceAccessor().searchUsingIdentifier(identifier);
+        PegacornTransactionMethodOutcome outcome = getActualResourceAccessor().searchUsingIdentifier(identifier);
 
-        if (outcome.getStatusEnum().equals(TransactionStatusEnum.REVIEW_FINISH) || outcome.getStatusEnum().equals(TransactionStatusEnum.SEARCH_FINISHED)) {
+        if (outcome.getStatusEnum().equals(PegacornTransactionStatusEnum.REVIEW_FINISH) || outcome.getStatusEnum().equals(PegacornTransactionStatusEnum.SEARCH_FINISHED)) {
             getLogger().trace("findByIdentifier(): search is finished, extracting result Resource");
             Resource searchOutcome = (Resource) outcome.getResource();
             getLogger().debug("findByIdentifier(): Exit, resulting Resource is {}", searchOutcome);
@@ -57,7 +57,7 @@ public abstract class EdgeGetResourceBase extends EdgeProxyBase {
 
 
     @Override
-    protected TransactionMethodOutcome getResource(IdType id) {
+    protected PegacornTransactionMethodOutcome getResource(IdType id) {
         return null;
     }
 

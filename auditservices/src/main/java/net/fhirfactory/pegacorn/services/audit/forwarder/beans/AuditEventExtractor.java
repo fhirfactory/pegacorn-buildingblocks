@@ -22,8 +22,8 @@
 package net.fhirfactory.pegacorn.services.audit.forwarder.beans;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.AuditEvent;

@@ -22,20 +22,20 @@
 package net.fhirfactory.pegacorn.platform.edge.model.common;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import net.fhirfactory.pegacorn.components.transaction.model.TransactionMethodOutcome;
+import net.fhirfactory.pegacorn.components.transaction.model.PegacornTransactionMethodOutcome;
 import org.hl7.fhir.r4.model.*;
 
 import java.io.Serializable;
 import java.util.Map;
 
 public interface ResourceAccessorInterfaceBase {
-    public TransactionMethodOutcome getResource(IdType id);
-    public TransactionMethodOutcome createResource(Resource newResource);
-    public TransactionMethodOutcome updateResource(Resource resourceToUpdate);
-    public TransactionMethodOutcome deleteResource(Resource resourceToRemove);
+    public PegacornTransactionMethodOutcome getResource(IdType id);
+    public PegacornTransactionMethodOutcome createResource(Resource newResource);
+    public PegacornTransactionMethodOutcome updateResource(Resource resourceToUpdate);
+    public PegacornTransactionMethodOutcome deleteResource(Resource resourceToRemove);
     public boolean supportsSearch(String searchName, Map<Property, Serializable> parameterSet);
-    public TransactionMethodOutcome searchUsingCriteria(ResourceType resourceType, String searchName, Map<Property, Serializable> parameterSet);
-    public TransactionMethodOutcome searchUsingIdentifier(Identifier identifier);
+    public PegacornTransactionMethodOutcome searchUsingCriteria(ResourceType resourceType, String searchName, Map<Property, Serializable> parameterSet);
+    public PegacornTransactionMethodOutcome searchUsingIdentifier(Identifier identifier);
     public Identifier getBestIdentifier(MethodOutcome outcome);
     public void initialiseServices();
 }

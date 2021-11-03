@@ -1,7 +1,6 @@
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.petasos.endpoints.itops.ITOpsAgent;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosInterZoneOAMDiscoveryEndpoint;
@@ -43,8 +42,6 @@ public class CoreSubsystemPetasosITOpsService extends RouteBuilder {
     @Inject
     private PetasosInterZoneOAMPubSubEndpoint interZoneOAMPubSubEndpoint;
 
-    @Inject
-    private ITOpsAgent itopsAgent;
 
     public CoreSubsystemPetasosITOpsService(){
         super();
@@ -57,7 +54,7 @@ public class CoreSubsystemPetasosITOpsService extends RouteBuilder {
         if(!this.initialised) {
             LOG.info(".initialise(): Initialising...");
             LOG.info(".initialise(): [ITOpsAgent Initialisation] Start");
-            itopsAgent.initialise();
+
             LOG.info(".initialise(): [ITOpsAgent Initialisation] Finish");
             LOG.info(".initialise(): interZoneIPCEndpoint ==> {}", interZoneIPCEndpoint.getEndpointID());
             LOG.info(".initialise(): intraZoneIPCEndpoint ==> {}", intraZoneIPCEndpoint.getEndpointID());
@@ -74,8 +71,8 @@ public class CoreSubsystemPetasosITOpsService extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        String nodeName = processingPlant.getProcessingPlantNode().getNodeRDN().getNodeName();
-        String nodeVersion = processingPlant.getProcessingPlantNode().getNodeRDN().getNodeVersion();
+        String nodeName = processingPlant.getProcessingPlantNode().getComponentRDN().getNodeName();
+        String nodeVersion = processingPlant.getProcessingPlantNode().getComponentRDN().getNodeVersion();
         String friendlyName = nodeName + "(" + nodeVersion + ").CoreSubsystemEndpoints";
 
         LOG.info(".configure(): Entry, friendlyName->{}", friendlyName);

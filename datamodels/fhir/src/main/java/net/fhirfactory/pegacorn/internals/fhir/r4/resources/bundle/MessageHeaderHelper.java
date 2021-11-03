@@ -21,10 +21,10 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle;
 
+import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointIdentifierHelper;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornMessageHeaderCodeSystemFactory;
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.UrlType;

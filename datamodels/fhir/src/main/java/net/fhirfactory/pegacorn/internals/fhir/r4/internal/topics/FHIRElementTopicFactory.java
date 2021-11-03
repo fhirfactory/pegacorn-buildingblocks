@@ -21,8 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

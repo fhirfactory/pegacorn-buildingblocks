@@ -22,11 +22,10 @@
 package net.fhirfactory.pegacorn.internals.communicate.entities.rooms;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.common.model.dates.EffectivePeriod;
+import net.fhirfactory.pegacorn.core.model.dates.EffectivePeriod;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.*;
 import net.fhirfactory.pegacorn.internals.communicate.entities.message.CommunicateMessage;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.valuesets.CommunicateRoomJoinRuleEnum;
-import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.valuesets.CommunicateRoomStatusEnum;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.valuesets.CommunicateRoomTypeEnum;
 import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateRoomESR;
 import org.slf4j.Logger;

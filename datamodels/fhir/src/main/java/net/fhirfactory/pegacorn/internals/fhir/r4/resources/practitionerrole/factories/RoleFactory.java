@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitionerrole.factories;
 
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
-import net.fhirfactory.pegacorn.deployment.properties.codebased.ContainmentBasedValueSeparators;
+import net.fhirfactory.pegacorn.core.constants.ContainmentBasedValueSeparators;
+import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.StringType;

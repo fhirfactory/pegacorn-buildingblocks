@@ -21,16 +21,16 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
-import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsTopologyCollectionAgent;
+import net.fhirfactory.pegacorn.petasos.oam.topology.OAMTopologyCollectionAgent;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     private ProcessingPlantInterface processingPlant;
 
     @Inject
-    private ITOpsTopologyCollectionAgent itopsCollectionAgent;
+    private OAMTopologyCollectionAgent itopsCollectionAgent;
 
     public Workshop() {
         super();
@@ -98,7 +98,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     private void buildWorkshop() {
         getLogger().debug(".buildWorkshop(): Entry, adding Workshop --> {}, version --> {}", specifyWorkshopName(), specifyWorkshopVersion());
         WorkshopTopologyNode workshop = getTopologyFactory().createWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getProcessingPlantNode(),specifyWorkshopType());
-        topologyIM.addTopologyNode(getProcessingPlant().getProcessingPlantNode().getNodeFDN(), workshop);
+        topologyIM.addTopologyNode(getProcessingPlant().getProcessingPlantNode().getComponentFDN(), workshop);
         this.workshopNode = workshop;
         getLogger().debug(".buildWorkshop(): Exit");
     }
@@ -120,7 +120,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     }
 
     private String getFriendlyName(){
-        String nodeName = getWorkshopNode().getNodeRDN().getNodeName() + "(" + getWorkshopNode().getNodeRDN().getNodeVersion() + ")";
+        String nodeName = getWorkshopNode().getComponentRDN().getNodeName() + "(" + getWorkshopNode().getComponentRDN().getNodeVersion() + ")";
         return(nodeName);
     }
 
@@ -132,7 +132,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
         for (TopologyNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
             WorkUnitProcessorTopologyNode containedWorkshop = (WorkUnitProcessorTopologyNode)topologyIM.getNode(containedWorkshopFDN);
             TopologyNodeRDN testRDN = new TopologyNodeRDN(ComponentTypeTypeEnum.WORKSHOP, wupName, wupVersion);
-            if (testRDN.equals(containedWorkshop.getNodeRDN())) {
+            if (testRDN.equals(containedWorkshop.getComponentRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;
                 break;
@@ -146,7 +146,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     public WorkUnitProcessorTopologyNode getWUP(String workshopName){
         getLogger().debug(".getWorkshop(): Entry, workshopName --> {}", workshopName);
-        String version = this.workshopNode.getNodeRDN().getNodeVersion();
+        String version = this.workshopNode.getComponentRDN().getNodeVersion();
         WorkUnitProcessorTopologyNode workshop = getWUP(workshopName, version);
         return(workshop);
     }

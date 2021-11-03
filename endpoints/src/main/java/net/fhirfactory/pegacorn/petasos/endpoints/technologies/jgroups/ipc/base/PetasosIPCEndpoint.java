@@ -21,11 +21,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base;
 
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryCapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTask;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTaskOutcome;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -38,7 +33,6 @@ import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,58 +153,6 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
         return(endpointJGroupsAddress);
     }
 
-    //
-    // ****Tactical****
-    // Task Execution / Capability Utilisation Services
-    //
-
-    public CapabilityUtilisationResponse executeTask(String capabilityProviderName, CapabilityUtilisationRequest task){
-        getLogger().trace(".executeTask(): Entry, capabilityProviderName->{}, task->{}", capabilityProviderName, task);
-        Address targetAddress = getCandidateIPCTargetAddress(capabilityProviderName);
-        try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = task;
-            classSet[0] = CapabilityUtilisationRequest.class;
-            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            CapabilityUtilisationResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "executeTaskHandler", objectSet, classSet, requestOptions);
-            getLogger().debug(".executeTask(): Exit, response->{}", response);
-            return(response);
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".executeTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
-            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setAssociatedRequestID(task.getRequestID());
-            response.setSuccessful(false);
-            return(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getLogger().error(".executeTask: Error (GeneralException) ->{}", e.getMessage());
-            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setAssociatedRequestID(task.getRequestID());
-            response.setSuccessful(false);
-            return(response);
-        }
-    }
-
-    public CapabilityUtilisationResponse executeTaskHandler(CapabilityUtilisationRequest task){
-        getLogger().debug(".executeTaskHandler(): Entry, task->{}", task);
-        CapabilityUtilisationResponse response = getProcessingPlantInterface().executeTask(task);
-        getLogger().debug(".executeTaskHandler(): Exit, response->{}", response);
-        return(response);
-    }
-
-    public boolean capabilityProviderIsInScope(String capabilityProviderServiceName){
-        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
-        if(memberSetBasedOnService.isEmpty()){
-            return(false);
-        }
-        for(String currentName: memberSetBasedOnService){
-            if(isWithinScopeBasedOnChannelName(currentName)){
-                return(true);
-            }
-        }
-        return(false);
-    }
 
     //
     // Getters (and Setters)
