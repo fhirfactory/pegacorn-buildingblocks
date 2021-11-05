@@ -90,18 +90,18 @@ public abstract class PetasosOAMMetricsEndpoint extends JGroupsPetasosEndpointBa
     }
 
     public Address getCandidateMetricsServerTargetAddress(String endpointServiceName){
-        getLogger().debug(".getCandidateAuditServerTargetAddress(): Entry, endpointServiceName->{}", endpointServiceName);
+        getLogger().debug(".getCandidateMetricsServerTargetAddress(): Entry, endpointServiceName->{}", endpointServiceName);
         if(StringUtils.isEmpty(endpointServiceName)){
-            getLogger().debug(".getCandidateAuditServerTargetAddress(): Exit, endpointServiceName is empty");
+            getLogger().debug(".getCandidateMetricsServerTargetAddress(): Exit, endpointServiceName is empty");
             return(null);
         }
         List<Address> endpointAddressSet = getMetricsServerTargetAddressSet(endpointServiceName);
         if(endpointAddressSet.isEmpty()){
-            getLogger().debug(".getCandidateAuditServerTargetAddress(): Exit, endpointAddressSet is empty");
+            getLogger().debug(".getCandidateMetricsServerTargetAddress(): Exit, endpointAddressSet is empty");
             return(null);
         }
         Address endpointJGroupsAddress = endpointAddressSet.get(0);
-        getLogger().debug(".getCandidateAuditServerTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
+        getLogger().debug(".getCandidateMetricsServerTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
         return(endpointJGroupsAddress);
     }
 

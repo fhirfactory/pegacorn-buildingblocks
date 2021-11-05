@@ -21,24 +21,39 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.pubsub;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 public class PubSubSubscription implements Serializable {
     private DataParcelManifest parcelManifest;
     private PubSubParticipant subscriber;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant registrationInstant;
+
+    //
+    // Constructor(s)
+    //
 
     public PubSubSubscription(){
         this.subscriber = null;
         this.parcelManifest = null;
+        this.registrationInstant = Instant.now();
     }
 
     public PubSubSubscription(DataParcelManifest parcelManifest, PubSubParticipant subscriber){
         this.subscriber = subscriber;
         this.parcelManifest = parcelManifest;
+        this.registrationInstant = Instant.now();
     }
+
+    //
+    // Getters and Setters
+    //
 
     public DataParcelManifest getParcelManifest() {
         return parcelManifest;
@@ -56,24 +71,41 @@ public class PubSubSubscription implements Serializable {
         this.subscriber = subscriber;
     }
 
+    public Instant getRegistrationInstant() {
+        return registrationInstant;
+    }
+
+    public void setRegistrationInstant(Instant registrationInstant) {
+        this.registrationInstant = registrationInstant;
+    }
+
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
         return "PubSubSubscription{" +
                 "parcelManifest=" + parcelManifest +
                 ", subscriber=" + subscriber +
+                ", registrationInstant=" + registrationInstant +
                 '}';
     }
+
+    //
+    // Equals and Hashcode
+    //
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PubSubSubscription)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         PubSubSubscription that = (PubSubSubscription) o;
-        return Objects.equals(getParcelManifest(), that.getParcelManifest()) && Objects.equals(getSubscriber(), that.getSubscriber());
+        return Objects.equals(parcelManifest, that.parcelManifest) && Objects.equals(subscriber, that.subscriber) && Objects.equals(registrationInstant, that.registrationInstant);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getParcelManifest(), getSubscriber());
+        return Objects.hash(parcelManifest, subscriber, registrationInstant);
     }
 }

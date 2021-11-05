@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.distribution;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

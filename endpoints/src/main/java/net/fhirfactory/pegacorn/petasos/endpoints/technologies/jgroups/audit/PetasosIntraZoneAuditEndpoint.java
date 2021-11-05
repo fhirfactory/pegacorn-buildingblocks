@@ -61,7 +61,7 @@ public class PetasosIntraZoneAuditEndpoint extends PetasosAuditEndpoint {
 
     @Override
     protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlantInterface().getProcessingPlantNode().getIntraZoneIPCStackConfigFile());
+        return (getProcessingPlantInterface().getProcessingPlantNode().getIntraZoneAuditStackConfigFile());
     }
 
     @Override

@@ -49,7 +49,7 @@ public class PetasosIntraZoneOAMMetricsEndpoint extends PetasosOAMMetricsEndpoin
 
     @Override
     protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getFunctionNameIntraZoneJGroupsAudit());
+        return (getInterfaceNames().getFunctionNameIntraZoneJGroupsMetrics());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class PetasosIntraZoneOAMMetricsEndpoint extends PetasosOAMMetricsEndpoin
 
     @Override
     protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlantInterface().getProcessingPlantNode().getIntraZoneIPCStackConfigFile());
+        return (getProcessingPlantInterface().getProcessingPlantNode().getIntraZoneMetricsStackConfigFile());
     }
 
     @Override

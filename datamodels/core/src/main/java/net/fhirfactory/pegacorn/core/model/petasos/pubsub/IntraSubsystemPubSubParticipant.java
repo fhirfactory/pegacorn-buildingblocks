@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.pubsub;
 
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -40,12 +40,12 @@ public class IntraSubsystemPubSubParticipant implements Serializable {
         this.identifier = identifier;
     }
 
-    public IntraSubsystemPubSubParticipant(TopologyNodeFDNToken wupToken){
-        this.identifier = new IntraSubsystemPubSubParticipantIdentifier(wupToken);
-    }
-
     public IntraSubsystemPubSubParticipant(IntraSubsystemPubSubParticipant ori){
         this.identifier = ori.getIdentifier();
+    }
+
+    public IntraSubsystemPubSubParticipant(ComponentIdType componentId){
+        identifier = new IntraSubsystemPubSubParticipantIdentifier(componentId);
     }
 
     //

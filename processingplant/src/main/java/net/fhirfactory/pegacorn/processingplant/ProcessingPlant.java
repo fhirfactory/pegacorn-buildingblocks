@@ -271,7 +271,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         getLogger().debug(".executeTask(): Entry, request->{}", request);
         if(request == null){
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setDateCompleted(Instant.now());
+            response.setInstantCompleted(Instant.now());
             response.setSuccessful(false);
             getLogger().debug(".executeTask(): Exit, request is null, response->{}", response);
             return(response);
@@ -280,7 +280,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         CapabilityFulfillmentInterface interfaceToUse = this.capabilityDeliveryServices.get(capabilityName);
         if(interfaceToUse == null){
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setDateCompleted(Instant.now());
+            response.setInstantCompleted(Instant.now());
             response.setSuccessful(false);
             response.setInScope(false);
             getLogger().debug(".executeTask(): Exit, not registered capability, response->{}", response);

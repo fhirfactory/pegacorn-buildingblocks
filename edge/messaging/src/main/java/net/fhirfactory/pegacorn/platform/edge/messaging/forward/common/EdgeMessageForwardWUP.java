@@ -35,7 +35,7 @@ import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPl
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketResponseDecoder;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
-import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionStatus;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.RemoteSubscriptionStatus;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.Exchange;

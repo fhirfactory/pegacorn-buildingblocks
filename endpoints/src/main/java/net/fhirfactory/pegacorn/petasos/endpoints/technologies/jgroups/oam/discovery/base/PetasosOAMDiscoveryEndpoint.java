@@ -1,6 +1,9 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.base;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetric;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubPublisherRegistration;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpoint;
@@ -13,8 +16,12 @@ import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAda
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import org.apache.commons.lang3.StringUtils;
+import org.jgroups.Address;
+import org.jgroups.blocks.RequestOptions;
+import org.jgroups.blocks.ResponseMode;
 
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -31,6 +38,9 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
 
     @Inject
     private ProcessingPlantInterface processingPlant;
+
+    @Inject
+    private PetasosTopologyHandlerInterface topologyHandler;
 
     //
     // Constructor
@@ -143,6 +153,23 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             }
         }
         getLogger().debug(".scheduleEndpointScan(): Exit");
+    }
+
+    //
+    // Simple Helper
+    //
+
+    public boolean discoveryServiceProviderIsInScope(String capabilityProviderServiceName){
+        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
+        if(memberSetBasedOnService.isEmpty()){
+            return(false);
+        }
+        for(String currentName: memberSetBasedOnService){
+            if(isWithinScopeBasedOnChannelName(currentName)){
+                return(true);
+            }
+        }
+        return(false);
     }
 
     //
@@ -409,5 +436,44 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             return (true);
         }
         return (false);
+    }
+
+    //
+    // OAM Services
+    //
+
+    public Instant shareLocalTopologyGraph(String serviceProviderName, PetasosMonitoredTopologyGraph topologyGraph){
+        getLogger().trace(".updateMetric(): Entry, serviceProviderName->{}, topologyGraph->{}", serviceProviderName, topologyGraph);
+        PetasosEndpointIdentifier endpointIdentifier = getEndpointID();
+        Address targetAddress = getCandidateTargetServiceAddress(serviceProviderName);
+        try {
+            Object objectSet[] = new Object[2];
+            Class classSet[] = new Class[2];
+            objectSet[0] = topologyGraph;
+            classSet[0] = PetasosMonitoredTopologyGraph.class;
+            objectSet[1] = endpointIdentifier;
+            classSet[1] = PetasosEndpointIdentifier.class;
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "topologyGraphHandler", objectSet, classSet, requestOptions);
+            getLogger().debug(".updateMetric(): Exit, responseInstant->{}", responseInstant);
+            return(responseInstant);
+        } catch (NoSuchMethodException e) {
+            getLogger().error(".updateMetric(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            getLogger().error(".updateMetric: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    public Instant topologyGraphHandler(PetasosMonitoredTopologyGraph topologyGraph, PetasosEndpointIdentifier endpointIdentifier){
+        getLogger().trace(".logAuditEventHandler(): Entry, topologyGraph->{}, endpointIdentifier->{}", topologyGraph, endpointIdentifier);
+        Instant outcomeInstant = null;
+        if((topologyGraph != null) && (endpointIdentifier != null)) {
+            outcomeInstant = topologyHandler.mergeRemoteTopologyGraph(topologyGraph, endpointIdentifier);
+        }
+        getLogger().debug(".logAuditEventHandler(): Exit, outcomeInstant->{}", outcomeInstant);
+        return(outcomeInstant);
     }
 }

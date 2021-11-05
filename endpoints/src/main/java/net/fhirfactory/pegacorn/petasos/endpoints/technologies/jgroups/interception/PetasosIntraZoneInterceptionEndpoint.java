@@ -61,7 +61,7 @@ public class PetasosIntraZoneInterceptionEndpoint extends PetasosInterceptionEnd
 
     @Override
     protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlantInterface().getProcessingPlantNode().getIntraZoneIPCStackConfigFile());
+        return (getProcessingPlantInterface().getProcessingPlantNode().getIntraZoneInterceptionStackConfigFile());
     }
 
     @Override

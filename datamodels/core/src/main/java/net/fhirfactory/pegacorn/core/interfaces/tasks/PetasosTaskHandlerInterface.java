@@ -24,8 +24,11 @@ package net.fhirfactory.pegacorn.core.interfaces.tasks;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
 
+import java.util.List;
+
 public interface PetasosTaskHandlerInterface {
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier);
     public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier);
+    public List<PetasosActionableTask> retrievePendingActionableTasks(PetasosEndpointIdentifier requestorEndpointIdentifier);
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier);
 }

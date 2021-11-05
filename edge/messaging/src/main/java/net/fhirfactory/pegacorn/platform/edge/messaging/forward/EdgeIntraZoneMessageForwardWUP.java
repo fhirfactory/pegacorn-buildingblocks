@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.messaging.forward.common.EdgeMessageForwardWUP;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.IntraZoneEdgeForwarderService;
-import net.fhirfactory.pegacorn.platform.edge.model.pubsub.RemoteSubscriptionStatus;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.RemoteSubscriptionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

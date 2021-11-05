@@ -61,7 +61,7 @@ public class PetasosInterZoneTaskEndpoint extends PetasosTaskEndpoint {
 
     @Override
     protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlantInterface().getProcessingPlantNode().getInterZoneIPCStackConfigFile());
+        return (getProcessingPlantInterface().getProcessingPlantNode().getInterZoneTaskStackConfigFile());
     }
 
     @Override

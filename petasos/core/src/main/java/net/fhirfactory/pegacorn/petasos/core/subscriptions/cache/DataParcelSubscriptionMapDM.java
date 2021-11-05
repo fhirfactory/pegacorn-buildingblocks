@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.subscriptions.cache;
 
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
@@ -182,7 +183,7 @@ public class DataParcelSubscriptionMapDM {
 		}
 	}
 
-    public void addSubscriber(DataParcelTypeDescriptor contentDescriptor, TopologyNodeFDNToken localSubscriberWUP){
+    public void addSubscriber(DataParcelTypeDescriptor contentDescriptor, ComponentIdType localSubscriberWUP){
 		LOG.debug(".addSubscriber(): Entry, contentDescriptor->{}, localSubscriberWUP->{}", contentDescriptor, localSubscriberWUP);
 		if((contentDescriptor==null) || (localSubscriberWUP==null)) {
 			throw(new IllegalArgumentException(".addSubscriber(): payloadTopic or localSubscriberWUP is null"));
@@ -434,7 +435,7 @@ public class DataParcelSubscriptionMapDM {
 			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 			if(goodEnoughMatch || containerBasedOKMatch){
 				if(LOG.isWarnEnabled()) {
-					String subscriber = currentRegisteredSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier().toVersionBasedFDNToken().toTag();
+					ComponentIdType subscriber = currentRegisteredSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier();
 					LOG.trace(".deriveSubscriberList(): subscriber->{}", subscriber);
 				}
 				derivedSubscriberList.add(currentRegisteredSubscription.getSubscriber());
@@ -686,5 +687,17 @@ public class DataParcelSubscriptionMapDM {
 		}
     	boolean directionMatches = testManifest.getDataParcelFlowDirection() == subscribedManifest.getDataParcelFlowDirection();
     	return(directionMatches);
+	}
+
+	public List<PubSubSubscription> getAllSubscriptions(){
+		List<PubSubSubscription> subscriptionList = new ArrayList<>();
+		synchronized (this.distributionListUpdateLock){
+			for(List<PubSubSubscription> currentSubscriptionSet: this.distributionList.values()) {
+				for (PubSubSubscription currenSubscription : currentSubscriptionSet) {
+					subscriptionList.add(currenSubscription);
+				}
+			}
+		}
+		return(subscriptionList);
 	}
 }

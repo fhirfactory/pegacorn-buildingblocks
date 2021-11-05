@@ -226,6 +226,18 @@
         </dependency>
 
         <!--*******************************************************************************-->
+        <!-- Pegacorn (Petasos Core) Libraries                                            -->
+        <!--*******************************************************************************-->
+
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-buildingblocks-petasos-core</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+
+        <!--*******************************************************************************-->
         <!-- Inifnispan Libraries                                                          -->
         <!--*******************************************************************************-->
 

@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.subscriptions.manager;
 
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubSubscription;
 import net.fhirfactory.pegacorn.petasos.core.subscriptions.cache.DataParcelSubscriptionMapDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,5 +83,13 @@ public class DataParcelSubscriptionMapIM {
         LOG.debug(".removeSubscriber(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
         subscriptionCache.removeSubscriber(contentTopicID, interestedNode);
         LOG.debug(".removeSubscriber(): Exit");
+    }
+
+    @Transactional
+    public List<PubSubSubscription> getAllSubscriptions(){
+        LOG.debug(".getAllSubscriptions(): Entry");
+        List<PubSubSubscription> subscriptions = subscriptionCache.getAllSubscriptions();
+        LOG.debug(".getAllSubscriptions(): Exit");
+        return(subscriptions);
     }
 }

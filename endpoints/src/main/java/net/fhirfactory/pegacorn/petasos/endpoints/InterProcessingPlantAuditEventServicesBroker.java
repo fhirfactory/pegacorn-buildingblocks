@@ -45,41 +45,41 @@ public class InterProcessingPlantAuditEventServicesBroker implements PetasosAudi
 
     @Override
     public PegacornTransactionMethodOutcome logAuditEvent(String taskFulfiller, AuditEvent task) {
-        LOG.debug(".registerActionableTask(): Entry, taskFulfiller->{}, task->{}", taskFulfiller, task);
+        LOG.debug(".logAuditEvent(): Entry, taskFulfiller->{}, task->{}", taskFulfiller, task);
 
         PegacornTransactionMethodOutcome outcome = null;
         if(interZoneAuditEndpoint.auditServiceProviderIsInScope(taskFulfiller)){
-            LOG.trace(".registerActionableTask(): Using inter-zone communication framework");
+            LOG.trace(".logAuditEvent(): Using inter-zone communication framework");
             outcome = interZoneAuditEndpoint.logAuditEvent(taskFulfiller, task);
         }
         if(intraZoneAuditEndpoint.auditServiceProviderIsInScope(taskFulfiller)){
-            LOG.trace(".registerActionableTask(): Using intra-zone communication framework");
+            LOG.trace(".logAuditEvent(): Using intra-zone communication framework");
             outcome = intraZoneAuditEndpoint.logAuditEvent(taskFulfiller, task);
         }
         if(outcome == null) {
-            LOG.trace(".executeTask(): Can't find suitable capability provider");
+            LOG.trace(".logAuditEvent(): Can't find suitable capability provider");
         }
-        LOG.debug(".executeTask(): Exit, outcome->{}", outcome);
+        LOG.debug(".logAuditEvent(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     @Override
     public PegacornTransactionMethodOutcome logAuditEvent(String serviceProviderName, List<AuditEvent> auditEventList) {
-        LOG.debug(".fulfillActionableTask(): Entry, taskFulfiller->{}, auditEventList->{}", serviceProviderName, auditEventList);
+        LOG.debug(".logAuditEvent(): Entry, taskFulfiller->{}, auditEventList->{}", serviceProviderName, auditEventList);
 
         PegacornTransactionMethodOutcome outcome = null;
         if(interZoneAuditEndpoint.auditServiceProviderIsInScope(serviceProviderName)){
-            LOG.trace(".fulfillActionableTask(): Using inter-zone communication framework");
+            LOG.trace(".logAuditEvent(): Using inter-zone communication framework");
             outcome = interZoneAuditEndpoint.logAuditEvent(serviceProviderName, auditEventList);
         }
         if(intraZoneAuditEndpoint.auditServiceProviderIsInScope(serviceProviderName)){
-            LOG.trace(".fulfillActionableTask(): Using intra-zone communication framework");
+            LOG.trace(".logAuditEvent(): Using intra-zone communication framework");
             outcome = intraZoneAuditEndpoint.logAuditEvent(serviceProviderName, auditEventList);
         }
         if(outcome == null) {
-            LOG.trace(".fulfillActionableTask(): Can't find suitable capability provider");
+            LOG.trace(".logAuditEvent(): Can't find suitable capability provider");
         }
-        LOG.debug(".fulfillActionableTask(): Exit, outcome->{}", outcome);
+        LOG.debug(".logAuditEvent(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 

@@ -41,8 +41,16 @@ public class ProcessingPlantTopologyNode extends SoftwareComponent implements En
     private String nameSpace;
     private String interZoneIPCStackConfigFile;
     private String interZoneOAMStackConfigFile;
+    private String interZoneMetricsStackConfigFile;
+    private String interZoneInterceptionStackConfigFile;
+    private String interZoneTaskStackConfigFile;
+    private String interZoneAuditStackConfigFile;
     private String intraZoneIPCStackConfigFile;
     private String intraZoneOAMStackConfigFile;
+    private String intraZoneMetricsStackConfigFile;
+    private String intraZoneInterceptionStackConfigFile;
+    private String intraZoneTaskStackConfigFile;
+    private String intraZoneAuditStackConfigFile;
 
     private String defaultDNSName;
     private boolean internalTrafficEncrypted;
@@ -66,6 +74,70 @@ public class ProcessingPlantTopologyNode extends SoftwareComponent implements En
         this.interZoneOAMStackConfigFile = null;
         this.intraZoneIPCStackConfigFile = null;
         this.intraZoneOAMStackConfigFile = null;
+    }
+
+    public String getInterZoneMetricsStackConfigFile() {
+        return interZoneMetricsStackConfigFile;
+    }
+
+    public void setInterZoneMetricsStackConfigFile(String interZoneMetricsStackConfigFile) {
+        this.interZoneMetricsStackConfigFile = interZoneMetricsStackConfigFile;
+    }
+
+    public String getInterZoneInterceptionStackConfigFile() {
+        return interZoneInterceptionStackConfigFile;
+    }
+
+    public void setInterZoneInterceptionStackConfigFile(String interZoneInterceptionStackConfigFile) {
+        this.interZoneInterceptionStackConfigFile = interZoneInterceptionStackConfigFile;
+    }
+
+    public String getInterZoneTaskStackConfigFile() {
+        return interZoneTaskStackConfigFile;
+    }
+
+    public void setInterZoneTaskStackConfigFile(String interZoneTaskStackConfigFile) {
+        this.interZoneTaskStackConfigFile = interZoneTaskStackConfigFile;
+    }
+
+    public String getInterZoneAuditStackConfigFile() {
+        return interZoneAuditStackConfigFile;
+    }
+
+    public void setInterZoneAuditStackConfigFile(String interZoneAuditStackConfigFile) {
+        this.interZoneAuditStackConfigFile = interZoneAuditStackConfigFile;
+    }
+
+    public String getIntraZoneMetricsStackConfigFile() {
+        return intraZoneMetricsStackConfigFile;
+    }
+
+    public void setIntraZoneMetricsStackConfigFile(String intraZoneMetricsStackConfigFile) {
+        this.intraZoneMetricsStackConfigFile = intraZoneMetricsStackConfigFile;
+    }
+
+    public String getIntraZoneInterceptionStackConfigFile() {
+        return intraZoneInterceptionStackConfigFile;
+    }
+
+    public void setIntraZoneInterceptionStackConfigFile(String intraZoneInterceptionStackConfigFile) {
+        this.intraZoneInterceptionStackConfigFile = intraZoneInterceptionStackConfigFile;
+    }
+
+    public String getIntraZoneTaskStackConfigFile() {
+        return intraZoneTaskStackConfigFile;
+    }
+
+    public void setIntraZoneTaskStackConfigFile(String intraZoneTaskStackConfigFile) {
+        this.intraZoneTaskStackConfigFile = intraZoneTaskStackConfigFile;
+    }
+
+    public String getIntraZoneAuditStackConfigFile() {
+        return intraZoneAuditStackConfigFile;
+    }
+
+    public void setIntraZoneAuditStackConfigFile(String intraZoneAuditStackConfigFile) {
+        this.intraZoneAuditStackConfigFile = intraZoneAuditStackConfigFile;
     }
 
     public String getInterZoneIPCStackConfigFile() {
@@ -198,6 +270,14 @@ public class ProcessingPlantTopologyNode extends SoftwareComponent implements En
                 ", interZoneOAMStackConfigFile=" + interZoneOAMStackConfigFile +
                 ", intraZoneIPCStackConfigFile=" + intraZoneIPCStackConfigFile +
                 ", intraZoneOAMStackConfigFile=" + intraZoneOAMStackConfigFile +
+                ", interZoneMetricsStackConfigFile=" + interZoneMetricsStackConfigFile +
+                ", interZoneInterceptionStackConfigFile=" + interZoneInterceptionStackConfigFile +
+                ", interZoneTaskStackConfigFile=" + interZoneTaskStackConfigFile +
+                ", interZoneAuditStackConfigFile=" + interZoneAuditStackConfigFile +
+                ", intraZoneMetricsStackConfigFile=" + intraZoneMetricsStackConfigFile +
+                ", intraZoneInterceptionStackConfigFile=" + intraZoneInterceptionStackConfigFile +
+                ", intraZoneTaskStackConfigFile=" + intraZoneTaskStackConfigFile +
+                ", intraZoneAuditStackConfigFile=" + intraZoneAuditStackConfigFile +
                 ", defaultDNSName=" + defaultDNSName +
                 ", internalTrafficEncrypted=" + internalTrafficEncrypted +
                 ", instanceCount=" + instanceCount +
