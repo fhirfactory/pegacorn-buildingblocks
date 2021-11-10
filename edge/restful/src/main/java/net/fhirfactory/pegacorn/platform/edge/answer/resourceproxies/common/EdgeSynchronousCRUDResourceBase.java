@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.answer.resourceproxies.common;
 
-import net.fhirfactory.pegacorn.components.transaction.model.PegacornTransactionMethodOutcome;
+import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Resource;
 

@@ -22,20 +22,17 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.pathway.WorkUnitTransportPacket;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.Dependent;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +41,7 @@ import java.util.List;
  * @author Mark A. Hunter
  * @since 2020-07-01
  */
-@Dependent
+@ApplicationScoped
 public class WUPContainerEgressGatekeeper {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerEgressGatekeeper.class);
     private static final String EGRESS_GATEKEEPER_PROCESSED_PROPERTY = "EgressGatekeeperSemaphore";
@@ -68,34 +65,21 @@ public class WUPContainerEgressGatekeeper {
      * within another WUP). At the moment, it reaches the "discard" decisions purely by checking the
      * WUPJobCard.isToBeDiscarded boolean.
      *
-     * @param transportPacket The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * @param fulfillmentTask The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange   The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
      * @return Should either return the ingres point into the associated Interchange Payload Transformer or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> egressGatekeeper(WorkUnitTransportPacket transportPacket, Exchange camelExchange) {
-        getLogger().debug(".egressGatekeeper(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", transportPacket );
-        // Get my Petasos Context
-        getLogger().trace(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
-        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        getLogger().trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
-        TopologyNodeFDNToken wupFunctionToken = node.getComponentFDN().getToken();
-        getLogger().trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
-        // Now, continue with business logic
-        RouteElementNames nameSet = new RouteElementNames( wupFunctionToken);
-        getLogger().trace(".egressGatekeeper(): Created the nameSet (RouteElementNames) for the activity --> {}", nameSet);
+    public List<String> egressGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+        getLogger().debug(".egressGatekeeper(): Enter, fulfillmentTask ->{}", fulfillmentTask );
         ArrayList<String> targetList = new ArrayList<String>();
-        if(!transportPacket.hasCurrentJobCard()) {
-            getLogger().warn(".egressGatekeeper(): CurrentJobCard is null!");
-        }
-        if (transportPacket.getCurrentJobCard().getIsToBeDiscarded()) {
+        if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
             getLogger().trace(".egressGatekeeper(): The isToBeDiscarded attribute is true, so we return null (and discard the packet");
             getLogger().debug(".egressGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             return (targetList);
         } else {
-            getLogger().trace(".egressGatekeeper(): the isToBeDiscarded attribute is false, so we need to set the Semaphore (so we know we've processed this packet)");
-            getLogger().trace(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
-            String targetEndpoint = nameSet.getEndpointTaskOutcomeCollection();
+            getLogger().trace(".egressGatekeeper(): the isToBeDiscarded attribute is false, so routing the message to the outcomes collector");
+            String targetEndpoint = PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE;
             targetList.add(targetEndpoint);
             getLogger().debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
             return (targetList);

@@ -40,7 +40,7 @@ public class A19QueryTask extends CapabilityUtilisationRequest {
         return "A19QueryTask{" +
                 "a19QueryString=" + a19QueryString +
                 ", requestID=" + getRequestID() +
-                ", requestDate=" + getRequestDate() +
+                ", requestDate=" + getRequestInstant() +
                 '}';
     }
 }

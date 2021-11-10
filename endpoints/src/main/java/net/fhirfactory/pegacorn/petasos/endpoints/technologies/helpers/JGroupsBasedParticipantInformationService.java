@@ -21,17 +21,16 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipantUtilisationStatusEnum;
-import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer.StandardEdgeIPCEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpoint;
@@ -39,9 +38,9 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.Petas
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.CoreSubsystemPetasosEndpointsWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.PetasosEndpointMap;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -370,7 +369,7 @@ public class JGroupsBasedParticipantInformationService {
             PetasosEndpointTopologyTypeEnum endpointType = currentEndpoint.getEndpointType();
             boolean endpointTypeMatches = endpointType.equals(requiredEndpointType);
             if(endpointTypeMatches){
-                if(currentEndpoint.getName().contentEquals(interfaceName)) {
+                if(currentEndpoint.getEndpointConfigurationName().contentEquals(interfaceName)) {
                     StandardEdgeIPCEndpoint resolvedEndpoint = (StandardEdgeIPCEndpoint)currentEndpoint;
                     getLogger().info(".deriveIPCTopologyEndpoint(): Exit, found IPCTopologyEndpoint and assigned it, resolvedEndpoint->{}", resolvedEndpoint);
                     return(resolvedEndpoint);
@@ -399,7 +398,7 @@ public class JGroupsBasedParticipantInformationService {
             return(null);
         }
         getLogger().info(".initialise(): localPublisher TopologyNodeFDNToken is ->{}", topologyNodeFDNToken);
-        IntraSubsystemPubSubParticipant intraSubsystemParticipant = new IntraSubsystemPubSubParticipant(topologyNodeFDNToken);
+        IntraSubsystemPubSubParticipant intraSubsystemParticipant = new IntraSubsystemPubSubParticipant(petasosEndpoint.getEndpointID().getEndpointComponentID());
         getLogger().info(".initialise(): intraSubsystemParticipant created -->{}", intraSubsystemParticipant);
         getLogger().info(".initialise(): Now create my PubSubParticipant");
         PubSubParticipant participant = new PubSubParticipant();

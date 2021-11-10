@@ -25,6 +25,7 @@ import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.factories.MethodOutcomeFactory;
@@ -47,13 +48,8 @@ public class AuditEventPersistenceAccessor {
     private ObjectMapper jsonMapper;
     private IParser fhirParser;
 
-    // ***********************************************************************************
-    //
-    // W A R N I N G: Tactical Solution for Short-Term Integration Support
-    //
-    private static String AUDIT_EVENT_PERSISTENCE_CAPABILITY_PROVIDER = "aether-hestia-audit-im";
-    //
-    // ***********************************************************************************
+   @Inject
+   private PetasosAuditEventServiceProviderNameInterface auditEventServiceProvider;
 
     @Inject
     private FHIRContextUtility fhirContextUtility;
@@ -119,7 +115,7 @@ public class AuditEventPersistenceAccessor {
         //
         // Do Write
         //
-        CapabilityUtilisationResponse auditEventWriteOutcome = capabilityUtilisationBroker.executeTask(AUDIT_EVENT_PERSISTENCE_CAPABILITY_PROVIDER, task);
+        CapabilityUtilisationResponse auditEventWriteOutcome = capabilityUtilisationBroker.executeTask(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), task);
         //
         // Extract the response
         //

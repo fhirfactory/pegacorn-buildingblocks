@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.model.common;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import net.fhirfactory.pegacorn.components.transaction.model.PegacornTransactionMethodOutcome;
+import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import org.hl7.fhir.r4.model.*;
 
 import java.io.Serializable;

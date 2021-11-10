@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.component;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.*;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
@@ -49,6 +50,7 @@ public abstract class SoftwareComponent implements Serializable {
     private String actualHostIP;
     private String actualPodIP;
     private PetasosComponentMetricSet metrics;
+    private SoftwareComponentSystemRoleEnum componentSystemRole;
 
     //
     // Constructor
@@ -63,6 +65,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.componentID = null;
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
+        this.componentSystemRole = null;
     }
 
     //
@@ -287,6 +290,22 @@ public abstract class SoftwareComponent implements Serializable {
 
     public TopologyNodeRDN getComponentRDN() {
         return componentRDN;
+    }
+
+    public PetasosComponentMetricSet getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(PetasosComponentMetricSet metrics) {
+        this.metrics = metrics;
+    }
+
+    public SoftwareComponentSystemRoleEnum getComponentSystemRole() {
+        return componentSystemRole;
+    }
+
+    public void setComponentSystemRole(SoftwareComponentSystemRoleEnum componentSystemRole) {
+        this.componentSystemRole = componentSystemRole;
     }
 
     //

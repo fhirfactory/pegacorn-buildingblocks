@@ -21,10 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalIngresWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.StandardWUPContainerRoute;
@@ -59,7 +59,7 @@ public class WorkUnitProcessorFrameworkManager {
     private ProcessingPlantInterface processingPlant;
 
     @Inject
-    private MOAServicesAuditBroker auditBroker;
+    private PetasosFulfillmentTaskAuditServicesBroker auditBroker;
 
     public void buildWUPFramework(WorkUnitProcessorTopologyNode wupNode, List<DataParcelManifest> subscribedTopics, WUPArchetypeEnum wupArchetype) {
         LOG.debug(".buildWUPFramework(): Entry, wupNode --> {}, subscribedTopics --> {}, wupArchetype --> {}", wupNode, subscribedTopics, wupArchetype);
@@ -155,7 +155,7 @@ public class WorkUnitProcessorFrameworkManager {
     private PubSubParticipant constructPubSubSubscriber(WorkUnitProcessorTopologyNode wupNode){
         PubSubParticipant subscriber = new PubSubParticipant();
         IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
-        IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getComponentFDN().getToken());
+        IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getComponentID());
         localSubscriber.setIdentifier(identifier);
         subscriber.setIntraSubsystemParticipant(localSubscriber);
         return(subscriber);

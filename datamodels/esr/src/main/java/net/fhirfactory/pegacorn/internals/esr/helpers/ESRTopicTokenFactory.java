@@ -21,13 +21,16 @@
  */
 package net.fhirfactory.pegacorn.internals.esr.helpers;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
 public class ESRTopicTokenFactory {
 
-    public DataParcelToken newTopicFactory(ExtremelySimplifiedResourceTypeEnum resourceType){
-        DataParcelToken token = new DataParcelToken();
+    public DataParcelTypeDescriptor newTopicFactory(ExtremelySimplifiedResourceTypeEnum resourceType){
+        DataParcelTypeDescriptor token = new DataParcelTypeDescriptor();
         token.setDataParcelDefiner("FHIRFactory");
         token.setDataParcelCategory("DirectoryServices");
         token.setDataParcelSubCategory("ExtremelySimplifiedResources");

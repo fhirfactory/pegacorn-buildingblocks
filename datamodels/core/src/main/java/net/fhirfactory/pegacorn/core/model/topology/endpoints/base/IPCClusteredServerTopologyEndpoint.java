@@ -96,15 +96,6 @@ public class IPCClusteredServerTopologyEndpoint extends IPCServerTopologyEndpoin
                 ", serviceDNSName=" + serviceDNSName +
                 ", toStringString=" + toStringString +
                 ", endpointType=" + getEndpointType() +
-                ", supportedInterfaceSet=" + getSupportedInterfaceSet() +
-                ", encrypted=" + isEncrypted() +
-                ", portValue=" + getPortValue() +
-                ", portType=" + getPortType() +
-                ", aServer=" + getaServer() +
-                ", encrypted=" + isEncrypted() +
-                ", interfaceDNSName=" + getHostDNSName() +
-                ", name=" + getName() +
-                ", additionalParameters=" + getAdditionalParameters() +
                 '}';
     }
 }

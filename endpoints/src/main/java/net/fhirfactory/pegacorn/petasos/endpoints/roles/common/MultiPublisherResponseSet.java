@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.roles.common;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubPublisherRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.RemoteSubscriptionResponse;

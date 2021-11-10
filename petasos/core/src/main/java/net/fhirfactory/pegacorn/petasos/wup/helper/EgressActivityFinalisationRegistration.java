@@ -22,15 +22,14 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.moa.ParcelStatusElement;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,29 +55,40 @@ public class EgressActivityFinalisationRegistration {
     TopologyIM topologyProxy;
 
     @Inject
-    LocalTaskActivityController servicesBroker;
-
-    @Inject
-    PetasosPathwayExchangePropertyNames exchangePropertyNames;
+    private LocalPetasosFulfilmentTaskActivityController fulfillmentTaskActivityController;
 
     public UoW registerActivityFinishAndFinalisation(UoW theUoW, Exchange camelExchange, String wupInstanceKey){
         LOG.debug(".registerActivityFinishAndFinalisation(): Entry, payload --> {}, wupInstanceKey --> {}", theUoW, wupInstanceKey);
-        LOG.trace(".registerActivityFinishAndFinalisation(): Get Job Card and Status Element from Exchange for extraction by the WUP Egress Conduit");
-        WUPJobCard jobCard = camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class);
-        ParcelStatusElement statusElement = camelExchange.getProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_EXCHANGE_PROPERTY_NAME, ParcelStatusElement.class);
-        LOG.trace(".registerActivityFinishAndFinalisation(): Extract the UoW");
+        LOG.trace(".registerActivityFinishAndFinalisation(): Retrieve the Fulfillment Task from the Camel Exchange object");
+        PetasosFulfillmentTask fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTask.class);
+        LOG.trace(".registerActivityFinishAndFinalisation(): Merge the UoW Egress Content into the PetasosFulfillmentTask object & process");
+        if(theUoW.hasEgressContent()){
+            synchronized (fulfillmentTask.getTaskWorkItemLock()) {
+                fulfillmentTask.getTaskWorkItem().getEgressContent().getPayloadElements().addAll(theUoW.getEgressContent().getPayloadElements());
+            }
+        }
+        synchronized (fulfillmentTask.getTaskWorkItemLock()){
+            fulfillmentTask.getTaskWorkItem().setProcessingOutcome(theUoW.getProcessingOutcome());
+            if(StringUtils.isNotEmpty(theUoW.getFailureDescription())){
+                fulfillmentTask.getTaskWorkItem().setFailureDescription(theUoW.getFailureDescription());
+            }
+        }
+        LOG.trace(".registerActivityFinishAndFinalisation(): Process the status");
         switch(theUoW.getProcessingOutcome()){
             case UOW_OUTCOME_SUCCESS:{
-                jobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
-                servicesBroker.notifyFinishOfWorkUnitActivity(jobCard, theUoW);
-                servicesBroker.notifyFinalisationOfWorkUnitActivity(jobCard);
+                synchronized (fulfillmentTask.getTaskJobCardLock()) {
+                    fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
+                }
+                fulfillmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskId());
                 break;
             }
             case UOW_OUTCOME_INCOMPLETE:
             case UOW_OUTCOME_NOTSTARTED:
             case UOW_OUTCOME_FAILED:{
-                jobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
-                servicesBroker.notifyFailureOfWorkUnitActivity(jobCard, theUoW);
+                synchronized (fulfillmentTask.getTaskJobCardLock()){
+                    fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
+                }
+                fulfillmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskId());
             }
         }
         LOG.debug(".registerActivityFinishAndFinalisation(): exit, my work is done!");

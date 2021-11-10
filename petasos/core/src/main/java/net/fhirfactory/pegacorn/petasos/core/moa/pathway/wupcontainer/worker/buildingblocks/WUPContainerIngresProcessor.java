@@ -22,50 +22,28 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.pathway.ActivityID;
-import net.fhirfactory.pegacorn.core.model.petasos.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.datatypes.WUPIdentifier;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import org.apache.camel.Exchange;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.Dependent;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.Instant;
-import java.util.Date;
 
-/**
- * @author Mark A. Hunter
- * @since 2020-06-01
- */
-@Dependent
+@ApplicationScoped
 public class WUPContainerIngresProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerIngresProcessor.class);
     protected Logger getLogger(){
         return(LOG);
     }
 
-    private RouteElementNames elementNames;
-
     @Inject
-    LocalTaskActivityController localTaskActivityController;
+    private LocalPetasosFulfilmentTaskActivityController fulfillmentActivityController;
 
     @Inject
     TopologyIM topologyProxy;
@@ -89,41 +67,33 @@ public class WUPContainerIngresProcessor {
      * Finally, if all is going OK, but this WUP-Thread does not have the Cluster Focus (or SystemWide Focus), it waits in a sleep/loop until a condition
      * changes.
      *
-     * @param transportPacket The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * @param fulfillmentTask The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange The Apache Camel Exchange object, used to store a Semaphors and Attributes
      * @return Should return a WorkUnitTransportPacket that is forwarding onto the WUP Ingres Gatekeeper.
      */
-    public WorkUnitTransportPacket ingresContentProcessor(WorkUnitTransportPacket transportPacket, Exchange camelExchange) {
-        getLogger().debug(".ingresContentProcessor(): Enter, transportPacket (WorkUnitTransportPacket)->{}", transportPacket );
-        // Get my Petasos Context
-        getLogger().trace(".ingresContentProcessor(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
-        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
-        getLogger().trace(".ingresContentProcessor(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
-        // Now, continue with business logic
-        elementNames = new RouteElementNames(node.getComponentFDN().getToken());
-        getLogger().trace(".ingresContentProcessor(): Now, check if this the 1st time the associated UoW has been (attempted to be) processed");
-        WorkUnitTransportPacket newTransportPacket;
-        if (transportPacket.getIsARetry()) {
-            getLogger().trace(".ingresContentProcessor(): This is a recovery or retry iteration of processing this UoW, so send to .alternativeIngresContentProcessor()");
-            newTransportPacket = alternativeIngresContentProcessor(transportPacket, camelExchange, wupFunctionToken, node.getComponentFDN().getToken());
-        } else {
-            getLogger().trace(".ingresContentProcessor(): This is the 1st time this UoW is being processed, so send to .standardIngresContentProcessor()");
-            newTransportPacket = standardIngresContentProcessor(transportPacket, camelExchange, wupFunctionToken, node.getComponentFDN().getToken());
-        }
+    public PetasosFulfillmentTask ingresContentProcessor(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+        getLogger().debug(".ingresContentProcessor(): Enter, fulfillmentTask->{}", fulfillmentTask );
+        //
+        // Now, set out wait-loop sleep period
         long waitTime = PetasosPropertyConstants.WUP_SLEEP_INTERVAL_MILLISECONDS;
+        //
+        // Set our wait-loop check state
         boolean waitState = true;
-        WUPJobCard jobCard = newTransportPacket.getCurrentJobCard();
-        ParcelStatusElement statusElement = newTransportPacket.getCurrentParcelStatus();
+        //
+        // Now check status
         while (waitState) {
-            switch (jobCard.getCurrentStatus()) {
+            switch (fulfillmentTask.getTaskJobCard().getCurrentStatus()) {
                 case WUP_ACTIVITY_STATUS_WAITING:
                     getLogger().trace(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}", PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING );
-                    jobCard.setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
-                    localTaskActivityController.synchroniseJobCard(jobCard);
-                    if (jobCard.getGrantedStatus() == PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) {
-                        jobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
-                        localTaskActivityController.notifyStartOfWorkUnitActivity(jobCard);
+                    synchronized (fulfillmentTask.getTaskJobCardLock()) {
+                        fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
+                    }
+                    fulfillmentActivityController.requestFulfillmentTaskExecutionPrivelege(fulfillmentTask.getTaskId());
+                    if (fulfillmentTask.getTaskJobCard().getGrantedStatus() == PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) {
+                        synchronized (fulfillmentTask.getTaskJobCardLock()) {
+                            fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
+                        }
+                        fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskId());
                         getLogger().trace(".ingresContentProcessor(): We've been granted execution privileges!");
                         waitState = false;
                         break;
@@ -135,10 +105,12 @@ public class WUPContainerIngresProcessor {
                 case WUP_ACTIVITY_STATUS_CANCELED:
                 default:
                     getLogger().trace(".ingresContentProcessor(): jobCard.getCurrentStatus --> Default");
-                    jobCard.setIsToBeDiscarded(true);
+                    synchronized(fulfillmentTask.getTaskJobCardLock()) {
+                        fulfillmentTask.getTaskJobCard().setToBeDiscarded(true);
+                        fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
+                        fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
+                    }
                     waitState = false;
-                    jobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
-                    jobCard.setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
             }
             if (waitState) {
                 try {
@@ -148,67 +120,7 @@ public class WUPContainerIngresProcessor {
                 }
             }
         }
-        if (jobCard.getIsToBeDiscarded()) {
-            ParcelStatusElement currentParcelStatus = newTransportPacket.getCurrentParcelStatus();
-            currentParcelStatus.setRequiresRetry(true);
-            currentParcelStatus.setParcelStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
-        }
-        getLogger().debug(".ingresContentProcessor(): Exit, newTransportPacket --> {}", newTransportPacket);
-        return (newTransportPacket);
-    }
-
-    public WorkUnitTransportPacket standardIngresContentProcessor(WorkUnitTransportPacket transportPacket, Exchange camelExchange, TopologyNodeFunctionFDNToken wupFunctionToken, TopologyNodeFDNToken nodeToken) {
-        getLogger().debug(".standardIngresContentProcessor(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, nodeIdentifier (NodeElementIdentifier) --> {}", transportPacket,nodeToken );
-        UoW theUoW = transportPacket.getPayload();
-        getLogger().trace(".standardIngresContentProcessor(): Creating a new ActivityID/ActivityID");
-        WUPIdentifier localWUPInstanceID = new WUPIdentifier(nodeToken);
-        TopologyNodeFunctionFDNToken localWUPTypeID = new TopologyNodeFunctionFDNToken(wupFunctionToken);
-        ActivityID oldActivityID = transportPacket.getPacketID();
-        ActivityID newActivityID = new ActivityID();
-        ResilienceParcelIdentifier previousPresentParcelInstanceID = SerializationUtils.clone(oldActivityID.getPresentParcelIdentifier());
-        PetasosEpisodeIdentifier previousPresentEpisodeID =  SerializationUtils.clone(oldActivityID.getPresentEpisodeIdentifier());
-        WUPIdentifier previousPresentWUPInstanceID =  SerializationUtils.clone(oldActivityID.getPresentWUPIdentifier());
-        TopologyNodeFunctionFDNToken previousPresentWUPTypeID =  SerializationUtils.clone(oldActivityID.getPresentWUPFunctionToken());
-        newActivityID.setPreviousParcelIdentifier(previousPresentParcelInstanceID);
-        newActivityID.setPreviousEpisodeIdentifier(previousPresentEpisodeID);
-        newActivityID.setPreviousWUPIdentifier(previousPresentWUPInstanceID);
-        newActivityID.setPreviousWUPFunctionToken(previousPresentWUPTypeID);
-        newActivityID.setPresentWUPFunctionToken(localWUPTypeID);
-        newActivityID.setPresentWUPIdentifier(localWUPInstanceID);
-        getLogger().trace(".standardIngresContentProcessor(): Creating new JobCard");
-        WUPJobCard activityJobCard = new WUPJobCard(newActivityID, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, ConcurrencyModeEnum.CONCURRENCY_MODE_STANDALONE, ResilienceModeEnum.RESILIENCE_MODE_STANDALONE, Date.from(Instant.now()));
-        getLogger().trace(".standardIngresContentProcessor(): Registering the Work Unit Activity using the ActivityID --> {} and UoW --> {}", newActivityID, theUoW);
-        ParcelStatusElement statusElement = localTaskActivityController.registerTaskJobCard(activityJobCard, theUoW);
-        getLogger().trace(".standardIngresContentProcessor(): Let's check the status of everything");
-        switch (statusElement.getParcelStatus()) {
-            case PARCEL_STATUS_REGISTERED:
-            case PARCEL_STATUS_ACTIVE_ELSEWHERE:
-                getLogger().trace(".standardIngresContentProcessor(): The Parcel is either Registered or Active_Elsewhere - both are acceptable at this point");
-                break;
-            case PARCEL_STATUS_FAILED:
-            case PARCEL_STATUS_ACTIVE:
-            case PARCEL_STATUS_FINALISED_ELSEWHERE:
-            case PARCEL_STATUS_FINALISED:
-            case PARCEL_STATUS_FINISHED_ELSEWHERE:
-            case PARCEL_STATUS_FINISHED:
-            case PARCEL_STATUS_INITIATED:
-            default:
-                getLogger().trace(".standardIngresContentProcessor(): The Parcel is doing something odd, none of the above states should be in-play, so cancel");
-                statusElement.setParcelStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
-                statusElement.setRequiresRetry(true);
-                activityJobCard.setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
-                activityJobCard.setIsToBeDiscarded(true);
-        }
-        WorkUnitTransportPacket newTransportPacket = new WorkUnitTransportPacket(newActivityID, Date.from(Instant.now()),transportPacket.getPayload());
-        newTransportPacket.setCurrentJobCard(activityJobCard);
-        newTransportPacket.setCurrentParcelStatus(statusElement);
-        getLogger().debug(".ingresContentProcessor(): Exit, newTransportPacket --> {}", newTransportPacket);
-        return (newTransportPacket);
-    }
-
-    public WorkUnitTransportPacket alternativeIngresContentProcessor(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, TopologyNodeFunctionFDNToken wupFunctionToken, TopologyNodeFDNToken wupInstanceID) {
-        getLogger().debug(".alternativeIngresContentProcessor(): Enter, ingresPacket --> {}, wupFunctionToken --> {}, wupInstanceID --> {}", ingresPacket, wupFunctionToken, wupInstanceID);
-        // TODO Implement alternate flow for ingressContentProcessor functionality (retry functionality).
-        return (ingresPacket);
+        getLogger().debug(".ingresContentProcessor(): Exit, newTransportPacket --> {}", fulfillmentTask);
+        return (fulfillmentTask);
     }
 }

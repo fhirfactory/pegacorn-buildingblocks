@@ -81,7 +81,7 @@ public class AuditEventCaptureAndRouteWUP extends MOAStandardWUP  {
         manifest.setSourceSystem(DataParcelManifest.WILDCARD_CHARACTER);
         manifest.setIntendedTargetSystem(DataParcelManifest.WILDCARD_CHARACTER);
         manifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_ANY);
-        manifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INBOUND_DATA_PARCEL);
+        manifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_INBOUND_DATA_PARCEL);
 
         subscribedTopics.add(manifest);
 

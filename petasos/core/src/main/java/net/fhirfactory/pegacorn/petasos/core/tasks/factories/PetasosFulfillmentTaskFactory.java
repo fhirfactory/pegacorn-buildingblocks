@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
+import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
@@ -51,6 +52,9 @@ public class PetasosFulfillmentTaskFactory {
 
     @Inject
     private TaskIdTypeFactory taskIdFactory;
+
+    @Inject
+    private PetasosTaskJobCardFactory jobCardFactory;
 
     //
     // Constructor(s)
@@ -125,6 +129,10 @@ public class PetasosFulfillmentTaskFactory {
         fulfillment.setTrackingID(trackingId);
         fulfillment.setLastCheckedInstant(Instant.now());
         fulfillmentTask.setTaskFulfillment(fulfillment);
+        //
+        // Now create and add the PetasosTaskJobCard
+        PetasosTaskJobCard jobCard = jobCardFactory.newPetasosTaskJobCard(fulfillmentTask);
+        fulfillmentTask.setTaskJobCard(jobCard);
         //
         // Done! :)
         getLogger().debug(".newFulfillmentTask(): Exit, fulfillmentTask->{}", fulfillmentTask);

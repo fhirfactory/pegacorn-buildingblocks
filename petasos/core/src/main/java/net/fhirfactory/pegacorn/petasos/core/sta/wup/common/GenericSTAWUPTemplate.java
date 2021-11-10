@@ -1,18 +1,17 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.wup.common;
 
 import ca.uhn.fhir.parser.IParser;
+import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.datatypes.WUPIdentifier;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.slf4j.Logger;
 
@@ -21,7 +20,7 @@ import javax.inject.Inject;
 
 public abstract class GenericSTAWUPTemplate {
     private WorkUnitProcessorTopologyNode wup;
-    private WUPJobCard wupJobCard;
+    private PetasosTaskJobCard wupJobCard;
     private boolean isInitialised;
 
     private IParser parserR4;
@@ -100,7 +99,7 @@ public abstract class GenericSTAWUPTemplate {
         return (getWUP().getComponentRDN().getNodeName());
     }
 
-    public WUPJobCard getWUPJobCard() {
+    public PetasosTaskJobCard getWUPJobCard() {
         return (wupJobCard);
     }
 
@@ -112,8 +111,4 @@ public abstract class GenericSTAWUPTemplate {
         return topologyIM;
     }
 
-    public WUPIdentifier getWUPIdentifier(){
-        WUPIdentifier wupIdentifier = new WUPIdentifier(getWUP().getComponentFDN().getToken());
-        return(wupIdentifier);
-    }
 }

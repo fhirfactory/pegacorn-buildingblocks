@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,87 +31,50 @@ import java.util.ArrayList;
 public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(IPCServerTopologyEndpoint.class);
 
-    private int portValue;
-    private String portType;
-    private Boolean aServer;
-    private String hostDNSName;
 
-    private ArrayList<IPCInterface> supportedInterfaceSet;
+    //
+    // Constructor(s)
+    //
 
+    public IPCServerTopologyEndpoint(){
+        super();
+    }
+
+    //
+    // Getters and Setters
+    //
+
+    @JsonIgnore
     @Override
     protected Logger getLogger() {
         return (LOG);
     }
 
-    public IPCServerTopologyEndpoint(){
-        super();
-        this.supportedInterfaceSet = new ArrayList<>();
-    }
-
-    public ArrayList<IPCInterface> getSupportedInterfaceSet() {
-        return supportedInterfaceSet;
-    }
-
-    public void setSupportedInterfaceSet(ArrayList<IPCInterface> supportedInterfaceSet) {
-        ArrayList<IPCInterface> newSet = new ArrayList<>();
-        newSet.addAll(supportedInterfaceSet);
-        this.supportedInterfaceSet = newSet;
-    }
-
-    public int getPortValue() {
-        return portValue;
-    }
-
-    public void setPortValue(int portValue) {
-        this.portValue = portValue;
-    }
-
-    public String getPortType() {
-        return portType;
-    }
-
-    public void setPortType(String portType) {
-        this.portType = portType;
-    }
-
-    public Boolean getaServer() {
-        return aServer;
-    }
-
-    public void setaServer(Boolean aServer) {
-        this.aServer = aServer;
-    }
-
-    public String getHostDNSName() {
-        return hostDNSName;
-    }
-
-    public void setHostDNSName(String interfaceDNSName) {
-        this.hostDNSName = interfaceDNSName;
-    }
+    //
+    // To String
+    //
 
     @Override
     public String toString() {
         return "IPCServerTopologyEndpoint{" +
-                "nodeRDN=" + getComponentRDN() +
-                ", nodeFDN=" + getComponentFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", nodeKey=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                "componentFDN=" + getComponentFDN() +
+                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
                 ", securityZone=" + getSecurityZone() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", portValue=" + portValue +
-                ", portType=" + portType +
-                ", aServer=" + aServer +
-                ", encrypted=" + isEncrypted() +
-                ", interfaceDNSName=" + hostDNSName +
-                ", supportedInterfaceSet=" + supportedInterfaceSet +
-                ", additionalParameters=" + getAdditionalParameters() +
-                ", connectedSystemName=" + getConnectedSystemName() +
-                ", name=" + getName() +
+                ", componentID=" + getComponentID() +
+                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                ", componentType=" + getComponentType() +
+                ", containingNodeFDN=" + getContainingNodeFDN() +
+                ", actualHostIP='" + getActualHostIP() + '\'' +
+                ", actualPodIP='" + getActualPodIP() + '\'' +
+                ", componentRDN=" + getComponentRDN() +
+                ", metrics=" + getMetrics() +
+                ", componentSystemRole=" + getComponentSystemRole() +
+                ", server=" + isServer() +
+                ", implementingWUP=" + getImplementingWUP() +
+                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
                 ", endpointType=" + getEndpointType() +
                 '}';
     }

@@ -26,12 +26,11 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSubTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.datatypes.WUPIdentifier;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.hl7.fhir.r4.model.Period;
 
@@ -45,51 +44,58 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         return(outgoingString1);
     }
 
-    protected Period extractProcessingPeriod(ResilienceParcel parcel){
-        if(parcel == null){
+    protected Period extractProcessingPeriod(PetasosFulfillmentTask fulfillmentTask){
+        if(fulfillmentTask == null){
             return(null);
         }
         Date startDate = null;
         Date endDate = null;
-        if(parcel.hasStartDate()){
-            startDate = parcel.getStartDate();
-        }
-        if(parcel.hasFinishedDate()){
-            endDate = parcel.getFinishedDate();
-        }
-        if(parcel.hasFinalisationDate()){
-            endDate = parcel.getFinalisationDate();
-        }
-        if(parcel.hasCancellationDate()){
-            if(endDate == null){
-                endDate = parcel.getCancellationDate();
+        if(fulfillmentTask.hasTaskFulfillment()) {
+            if (fulfillmentTask.getTaskFulfillment().hasStartDate()) {
+                startDate = fulfillmentTask.getTaskFulfillment().getStartDate();
+            }
+            if (fulfillmentTask.getTaskFulfillment().hasFinishedDate()) {
+                endDate = fulfillmentTask.getTaskFulfillment().getFinishedDate();
+            }
+            if (fulfillmentTask.getTaskFulfillment().hasFinalisationDate()) {
+                endDate = fulfillmentTask.getTaskFulfillment().getFinalisationDate();
+            }
+            if (fulfillmentTask.getTaskFulfillment().hasCancellationDate()) {
+                if (endDate == null) {
+                    endDate = fulfillmentTask.getTaskFulfillment().getCancellationDate();
+                }
             }
         }
         if(startDate == null){
             startDate = endDate;
         }
         Period period = new Period();
-        period.setStart(startDate);
-        period.setEnd(endDate);
+        if(startDate != null) {
+            period.setStart(startDate);
+        }
+        if(endDate != null) {
+            period.setEnd(endDate);
+        }
         return(period);
     }
 
-    protected AuditEvent.AuditEventOutcome extractAuditEventOutcome(ResilienceParcel parcel, UoW uow){
-        if(parcel == null){
+    protected AuditEvent.AuditEventOutcome extractAuditEventOutcome(PetasosFulfillmentTask fulfillmentTask, UoW uow){
+        if(fulfillmentTask == null){
             return(AuditEvent.AuditEventOutcome._8);
         }
         if(uow == null) {
-            switch (parcel.getProcessingStatus()) {
-                case PARCEL_STATUS_REGISTERED:
-                case PARCEL_STATUS_ACTIVE:
-                case PARCEL_STATUS_INITIATED:
+            switch (fulfillmentTask.getTaskFulfillment().getStatus()) {
+                case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
+                case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
+                case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
+                case FULFILLMENT_EXECUTION_STATUS_INITIATED:
                     return (null);
-                case PARCEL_STATUS_FINISHED:
-                case PARCEL_STATUS_FINALISED:
+                case FULFILLMENT_EXECUTION_STATUS_FINALISED:
+                case FULFILLMENT_EXECUTION_STATUS_FINISHED:
                     return (AuditEvent.AuditEventOutcome._0);
-                case PARCEL_STATUS_CANCELLED:
+                case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
                     return (AuditEvent.AuditEventOutcome._4);
-                case PARCEL_STATUS_FAILED:
+                case FULFILLMENT_EXECUTION_STATUS_FAILED:
                 default:
                     return (AuditEvent.AuditEventOutcome._8);
             }
@@ -112,17 +118,16 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         }
     }
 
-    protected AuditEvent.AuditEventOutcome extractAuditEventOutcome(ResilienceParcel parcel){
-        AuditEvent.AuditEventOutcome outcome = extractAuditEventOutcome(parcel, null);
+    protected AuditEvent.AuditEventOutcome extractAuditEventOutcome(PetasosFulfillmentTask fulfillmentTask){
+        AuditEvent.AuditEventOutcome outcome = extractAuditEventOutcome(fulfillmentTask, null);
         return(outcome);
     }
 
-    protected AuditEventTypeEnum extractAuditEventType(ResilienceParcel parcel){
-        if(parcel == null){
+    protected AuditEventTypeEnum extractAuditEventType(PetasosFulfillmentTask fulfillmentTask){
+        if(fulfillmentTask == null){
             return(AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY);
         }
-        WUPIdentifier wupIdentifier = parcel.getAssociatedWUPIdentifier();
-        TopologyNodeFDN nodeFDN = new TopologyNodeFDN(wupIdentifier);
+        TopologyNodeFDN nodeFDN = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentFDN();
         TopologyNodeRDN topologyNodeRDN = nodeFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
         if(topologyNodeRDN == null){
             return(AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY);
@@ -134,55 +139,61 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         }
     }
 
-    protected AuditEventSubTypeEnum extractAuditEventSubType(ResilienceParcel parcel){
-        AuditEventSubTypeEnum outcomeAuditEventSubType = extractAuditEventSubType(parcel, false);
+    protected AuditEventSubTypeEnum extractAuditEventSubType(PetasosFulfillmentTask fulfillmentTask){
+        AuditEventSubTypeEnum outcomeAuditEventSubType = extractAuditEventSubType(fulfillmentTask, false);
         return(outcomeAuditEventSubType);
     }
 
-    protected AuditEventSubTypeEnum extractAuditEventSubType(ResilienceParcel parcel, boolean isInteractDone){
-        if(parcel == null){
+    protected AuditEventSubTypeEnum extractAuditEventSubType(PetasosFulfillmentTask fulfillmentTask, boolean isInteractDone){
+        if(fulfillmentTask == null){
             return(AuditEventSubTypeEnum.DICOM_APPLICATION_LOCAL_SERVICE_OPERATION_STOPPED) ;
         }
         if(isInteractDone){
             return(AuditEventSubTypeEnum.DICOM_APPLICATION_LOCAL_SERVICE_OPERATION_STOPPED);
         }
-        switch(parcel.getProcessingStatus()) {
-            case PARCEL_STATUS_REGISTERED:
-            case PARCEL_STATUS_ACTIVE:
-            case PARCEL_STATUS_INITIATED:
+        switch(fulfillmentTask.getTaskFulfillment().getStatus()) {
+            case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
+            case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
+            case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
                 return(AuditEventSubTypeEnum.DICOM_APPLICATION_LOCAL_SERVICE_OPERATION_STARTED);
-            case PARCEL_STATUS_FINISHED:
-            case PARCEL_STATUS_FINALISED:
+            case FULFILLMENT_EXECUTION_STATUS_FINISHED:
+            case FULFILLMENT_EXECUTION_STATUS_FINALISED:
             default:
                 return(AuditEventSubTypeEnum.DICOM_APPLICATION_LOCAL_SERVICE_OPERATION_STOPPED);
         }
     }
 
-    protected String extractAuditEventEntityNameFromParcel(ResilienceParcel parcel){
-        if(parcel == null){
+    protected String extractAuditEventEntityNameFromTask(PetasosFulfillmentTask fulfillmentTask){
+        if(fulfillmentTask == null){
             return(null);
         }
-        UoW uow = parcel.getActualUoW();
+        UoW uow = fulfillmentTask.getTaskWorkItem();
         if(uow == null){
             return(null);
         }
         DataParcelManifest dataParcelManifest = null;
-        switch(parcel.getProcessingStatus()) {
-            case PARCEL_STATUS_REGISTERED:
-            case PARCEL_STATUS_ACTIVE:
-            case PARCEL_STATUS_INITIATED:
+        switch(fulfillmentTask.getTaskFulfillment().getStatus()) {
+            case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
+            case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
+            case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
+            case FULFILLMENT_EXECUTION_STATUS_INITIATED:
+            case FULFILLMENT_EXECUTION_STATUS_FAILED:
+            case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
+            case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:{
                 if (uow.hasIngresContent()) {
                     dataParcelManifest = uow.getIngresContent().getPayloadManifest();
                 }
                 break;
-            case PARCEL_STATUS_FINISHED:
-            case PARCEL_STATUS_FINALISED:
+            }
+            case FULFILLMENT_EXECUTION_STATUS_FINISHED:
+            case FULFILLMENT_EXECUTION_STATUS_FINALISED:{
                 if (uow.hasEgressContent()) {
                     if (!uow.getEgressContent().getPayloadElements().isEmpty()) {
                         dataParcelManifest = uow.getEgressContent().getPayloadElements().iterator().next().getPayloadManifest();
                     }
                 }
                 break;
+            }
             default:
         }
         if(dataParcelManifest == null){
@@ -223,12 +234,11 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         return(value);
     }
 
-    protected String extractNiceNodeName(ResilienceParcel parcel){
-        if(parcel == null){
+    protected String extractNiceNodeName(PetasosFulfillmentTask fulfillmentTask){
+        if(fulfillmentTask == null){
             return(null);
         }
-        WUPIdentifier associatedWUPIdentifier = parcel.getAssociatedWUPIdentifier();
-        TopologyNodeFDN wupFDN = new TopologyNodeFDN(associatedWUPIdentifier);
+        TopologyNodeFDN wupFDN = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentFDN();
         TopologyNodeRDN processingPlantRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.PROCESSING_PLANT);
         TopologyNodeRDN workshopRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
         TopologyNodeRDN wupRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WUP);

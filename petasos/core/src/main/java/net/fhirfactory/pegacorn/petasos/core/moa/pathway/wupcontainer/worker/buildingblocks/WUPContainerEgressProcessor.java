@@ -22,106 +22,42 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.Dependent;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-/**
- * @author Mark A. Hunter
- * @since 2020-07-01
- */
-@Dependent
+@ApplicationScoped
 public class WUPContainerEgressProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerEgressProcessor.class);
     protected Logger getLogger(){
         return(LOG);
     }
 
-    RouteElementNames elementNames = null;
-
     @Inject
-    LocalTaskActivityController localTaskActivityController;
-
-    @Inject
-    TopologyIM topologyProxy;
+    LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
 
 
-    public WorkUnitTransportPacket egressContentProcessor(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
-      	getLogger().debug(".egressContentProcessor(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupNodeFDNTokenValue (String) --> {}", ingresPacket);
-        // Get my Petasos Context
-        getLogger().trace(".egressContentProcessor(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
-        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        getLogger().trace(".egressContentProcessor(): Retrieved the WUPTopologyNode, value->{}", node);
-        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
-        getLogger().trace(".egressContentProcessor(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
-        // Now, continue with business logic
-        WorkUnitTransportPacket egressPacket = null;
-        switch (node.getResilienceMode()) {
-            case RESILIENCE_MODE_MULTISITE:
-            case RESILIENCE_MODE_KUBERNETES_MULTISITE:
-                getLogger().trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_MULTISITE");
-            case RESILIENCE_MODE_CLUSTERED:
-            case RESILIENCE_MODE_KUBERNETES_CLUSTERED:
-                getLogger().trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_CLUSTERED");
-            case RESILIENCE_MODE_STANDALONE:
-            case RESILIENCE_MODE_KUBERNETES_STANDALONE:
-                getLogger().trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_STANDALONE");
-                egressPacket = standaloneDeploymentModeECP(ingresPacket, camelExchange,node);
-        }
-		getLogger().debug(".egressContentProcessor(): Exit, egressPacket (WorkUnitTransportPacket) --> {}", egressPacket);
-        return (egressPacket);
-    }
+    public PetasosFulfillmentTask egressContentProcessor(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+      	getLogger().debug(".egressContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask);
 
-    private WorkUnitTransportPacket standaloneDeploymentModeECP(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, WorkUnitProcessorTopologyNode wupNode) {
-       	getLogger().debug(".standaloneDeploymentModeECP(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupNode (NodeElement) --> {}", ingresPacket, wupNode);
-        elementNames = new RouteElementNames(wupNode.getComponentFDN().getToken());
-        getLogger().trace(".standaloneDeploymentModeECP(): Now, extract WUPJobCard from ingresPacket (WorkUnitTransportPacket)");
-        WUPJobCard jobCard = ingresPacket.getCurrentJobCard();
-        getLogger().trace(".standaloneDeploymentModeECP(): Now, extract ParcelStatusElement from ingresPacket (WorkUnitTransportPacket)");
-        ParcelStatusElement statusElement = ingresPacket.getCurrentParcelStatus();
-        getLogger().trace(".standaloneDeploymentModeECP(): Now, extract UoW from ingresPacket (WorkUnitTransportPacket)");
-        UoW uow = ingresPacket.getPayload();
-		getLogger().debug(".standaloneDeploymentModeECP(): uow (UoW) --> {}", uow);
-		getLogger().trace(".standaloneDeploymentModeECP(): Now, continue processing based on the ParcelStatusElement.getParcelStatus() (ResilienceParcelProcessingStatusEnum)");
-        ResilienceParcelProcessingStatusEnum parcelProcessingStatusEnum = statusElement.getParcelStatus();
-        switch (parcelProcessingStatusEnum) {
-            case PARCEL_STATUS_FINISHED:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
-                localTaskActivityController.notifyFinishOfWorkUnitActivity(jobCard, uow);
+        switch (fulfillmentTask.getTaskFulfillment().getStatus()) {
+            case FULFILLMENT_EXECUTION_STATUS_FINISHED:
+                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskId());
                 break;
-            case PARCEL_STATUS_ACTIVE_ELSEWHERE:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE_ELSEWHERE);
-            case PARCEL_STATUS_FINISHED_ELSEWHERE:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED_ELSEWHERE);
-            case PARCEL_STATUS_FINALISED_ELSEWHERE:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED_ELSEWHERE);
-            case PARCEL_STATUS_REGISTERED:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
-            case PARCEL_STATUS_INITIATED:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_INITIATED);
-            case PARCEL_STATUS_ACTIVE:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE);
-            case PARCEL_STATUS_FINALISED:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
-            case PARCEL_STATUS_FAILED:
-            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
+            case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
+                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask.getTaskId());
+                break;
+            case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
+                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionNoActionRequired(fulfillmentTask.getTaskId());
+                break;
             default:
-                localTaskActivityController.notifyFailureOfWorkUnitActivity(jobCard, uow);
+                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskId());
         }
-        return (ingresPacket);
+        return (fulfillmentTask);
     }
 }

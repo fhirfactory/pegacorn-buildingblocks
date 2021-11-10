@@ -22,27 +22,22 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.pathway.WorkUnitTransportPacket;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.Dependent;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Mark A. Hunter
- * @since 2020-06-01
- */
-@Dependent
+
+@ApplicationScoped
 public class WUPContainerIngresGatekeeper {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerIngresGatekeeper.class);
     private static final String INGRES_GATEKEEPER_PROCESSED_PROPERTY = "IngresGatekeeperSemaphore";
@@ -59,26 +54,23 @@ public class WUPContainerIngresGatekeeper {
      * within another WUP). At the moment, it reaches the "discard" decisions purely by checking the
      * WUPJobCard.isToBeDiscarded boolean.
      *
-     * @param ingresPacket     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * @param fulfillmentTask     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange    The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
      * @return Should either return the ingres point into the associated WUP Ingres Conduit or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> ingresGatekeeper(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
-        getLogger().debug(".ingresGatekeeper(): Enter, ingresPacket->{}", ingresPacket);
-        // Get my Petasos Context
-        getLogger().trace(".ingresGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
-        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        getLogger().trace(".ingresGatekeeper(): Node Element retrieved --> {}", node);
-        TopologyNodeFDNToken wupToken = node.getComponentFDN().getToken();
+    public List<String> ingresGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+        getLogger().debug(".ingresGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask);
+        // Get Route Names
+        TopologyNodeFunctionFDNToken wupToken = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames(wupToken);
         ArrayList<String> targetList = new ArrayList<String>();
         getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
-        if (ingresPacket.getCurrentJobCard().getIsToBeDiscarded()) {
+        if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
             getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
-            return (null);
+            return (targetList);
         } else {
             getLogger().trace(".ingresGatekeeper(): And we return the ingres point to the associated WUP Ingres Conduit");
             String targetEndpoint = nameSet.getEndPointWUPIngresConduitIngres();

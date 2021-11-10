@@ -21,24 +21,36 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.InitialHostSpecification;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.datatypes.JGroupsAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StandardEdgeIPCEndpoint extends IPCServerTopologyEndpoint {
+public class StandardEdgeIPCEndpoint extends IPCTopologyEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(StandardEdgeIPCEndpoint.class);
 
     private List<InitialHostSpecification> initialHosts;
     private String nameSpace;
 
+    //
+    // Constructor(s)
+    //
+
     public StandardEdgeIPCEndpoint(){
         super();
-        initialHosts = new ArrayList<>();
+        this.initialHosts = new ArrayList<>();
+        this.nameSpace = null;
     }
+
+    //
+    // Getters and Setters
+    //
 
     public List<InitialHostSpecification> getInitialHosts() {
         return initialHosts;
@@ -56,36 +68,57 @@ public class StandardEdgeIPCEndpoint extends IPCServerTopologyEndpoint {
         this.nameSpace = nameSpace;
     }
 
+    @JsonIgnore
     @Override
     protected Logger getLogger() {
         return (LOG);
     }
 
+    @JsonIgnore
+    public JGroupsAdapter getJGroupsAdapter(){
+        if(getAdapterList().isEmpty()){
+            return(null);
+        }
+        JGroupsAdapter jgroupsAdapter = (JGroupsAdapter) getAdapterList().get(0);
+        return(jgroupsAdapter);
+    }
+
+    @JsonIgnore
+    public void setJGroupsAdapter(JGroupsAdapter jgroupsAdapter){
+        if(jgroupsAdapter != null){
+            getAdapterList().add(jgroupsAdapter);
+        }
+    }
+
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
         return "StandardEdgeIPCEndpoint{" +
-                "nodeRDN=" + getComponentRDN() +
-                ", nodeFDN=" + getComponentFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", nodeKey=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                "componentFDN=" + getComponentFDN() +
+                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
                 ", securityZone=" + getSecurityZone() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", supportedInterfaceSet=" + getSupportedInterfaceSet() +
-                ", encrypted=" + isEncrypted() +
-                ", portValue=" + getPortValue() +
-                ", portType=" + getPortType() +
-                ", aServer=" + getaServer() +
-                ", encrypted=" + isEncrypted() +
-                ", interfaceDNSName=" + getHostDNSName() +
-                ", additionalParameters=" + getAdditionalParameters() +
-                ", name=" + getName() +
+                ", componentID=" + getComponentID() +
+                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                ", componentType=" + getComponentType() +
+                ", containingNodeFDN=" + getContainingNodeFDN() +
+                ", actualHostIP='" + getActualHostIP() + '\'' +
+                ", actualPodIP='" + getActualPodIP() + '\'' +
+                ", componentRDN=" + getComponentRDN() +
+                ", metrics=" + getMetrics() +
+                ", componentSystemRole=" + getComponentSystemRole() +
+                ", server=" + isServer() +
+                ", implementingWUP=" + getImplementingWUP() +
+                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
                 ", endpointType=" + getEndpointType() +
+                ", adapterList=" + getAdapterList() +
                 ", initialHosts=" + initialHosts +
-                ", nameSpace=" + nameSpace +
+                ", nameSpace='" + nameSpace + '\'' +
                 '}';
     }
 }

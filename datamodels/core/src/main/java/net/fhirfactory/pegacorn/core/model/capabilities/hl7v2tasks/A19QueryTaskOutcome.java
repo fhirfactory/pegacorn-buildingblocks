@@ -41,7 +41,7 @@ public class A19QueryTaskOutcome extends CapabilityUtilisationResponse {
                 ", associatedRequestID=" + getAssociatedRequestID() +
                 ", inScope=" + isInScope() +
                 ", successful=" + isSuccessful() +
-                ", dateCompleted=" + getDateCompleted() +
+                ", dateCompleted=" + getInstantCompleted() +
                 '}';
     }
 }

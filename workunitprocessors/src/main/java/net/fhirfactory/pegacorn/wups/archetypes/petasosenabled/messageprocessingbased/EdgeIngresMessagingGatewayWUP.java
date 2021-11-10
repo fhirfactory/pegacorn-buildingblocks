@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
@@ -43,7 +43,7 @@ public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedW
     }
 
     protected abstract String specifyIngresInterfaceName();
-    protected abstract IPCInterfaceDefinition specifyIngresInterfaceDefinition();
+    protected abstract IPCAdapterDefinition specifyIngresInterfaceDefinition();
 
     @Inject
     private PegacornCommonInterfaceNames interfaceNames;

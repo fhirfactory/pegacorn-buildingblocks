@@ -22,14 +22,14 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressGatekeeper;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressProcessor;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPEgressConduit;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
@@ -46,11 +46,11 @@ public class ExternalIngresWUPContainerRoute extends BasePetasosContainerRoute {
     private WorkUnitProcessorTopologyNode wupTopologyNode;
     private RouteElementNames nameSet;
 
-    public ExternalIngresWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode, MOAServicesAuditBroker auditTrailBroker) {
+    public ExternalIngresWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker) {
         super(camelCTX, auditTrailBroker);
         getLogger().debug(".ExternalIngresWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode );
         this.wupTopologyNode = wupNode;
-        nameSet = new RouteElementNames(wupTopologyNode.getComponentFDN().getToken());
+        nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken());
     }
 
     @Override

@@ -21,7 +21,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredWorkUnitProcessor;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -39,9 +38,6 @@ public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredCo
     @Inject
     private PetasosMonitoredEndpointFactory endpointFactory;
 
-    @Inject
-    private TopologyIM topologyIM;
-
     @Override
     protected Logger getLogger() {
         return (LOG);
@@ -51,14 +47,16 @@ public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredCo
         getLogger().debug(".newWorkUnitProcessor(): wupTopologyNode->{}", wupTopologyNode);
         PetasosMonitoredWorkUnitProcessor wup = new PetasosMonitoredWorkUnitProcessor();
         wup = (PetasosMonitoredWorkUnitProcessor) newPetasosMonitoredComponent(wup, wupTopologyNode);
-        for(TopologyNodeFDN currentEndpointFDN: wupTopologyNode.getEndpoints()){
-            getLogger().trace(".newWorkUnitProcessor(): currentEndpointFDN->{}", currentEndpointFDN);
-            IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint) topologyIM.getNode(currentEndpointFDN);
-            getLogger().trace(".newWorkUnitProcessor(): endpointTopologyNode->{}", endpointTopologyNode);
-            PetasosMonitoredEndpoint currentEndpoint = endpointFactory.newEndpoint(endpointTopologyNode);
-            if(currentEndpoint != null) {
-                wup.addEndpoint(currentEndpoint);
-            }
+        if(wupTopologyNode.getEgressEndpoint() != null){
+            IPCTopologyEndpoint egressEndpoint = wupTopologyNode.getEgressEndpoint();
+            PetasosMonitoredEndpoint egressMonitoredEndpoint = endpointFactory.newEndpoint(egressEndpoint);
+            wup.addEndpoint(egressMonitoredEndpoint);
+
+        }
+        if(wupTopologyNode.getIngresEndpoint() != null){
+            IPCTopologyEndpoint ingresEndpoint = wupTopologyNode.getIngresEndpoint();
+            PetasosMonitoredEndpoint ingresMonitoredEndpoint = endpointFactory.newEndpoint(ingresEndpoint);
+            wup.addEndpoint(ingresMonitoredEndpoint);
         }
         getLogger().debug(".newWorkUnitProcessor(): wup->{}", wup);
         return(wup);

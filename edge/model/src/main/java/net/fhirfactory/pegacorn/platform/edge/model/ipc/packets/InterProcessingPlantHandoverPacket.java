@@ -21,38 +21,62 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
-import net.fhirfactory.pegacorn.core.model.petasos.pathway.ActivityID;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 
 import java.io.Serializable;
 import java.time.Instant;
 
 public class InterProcessingPlantHandoverPacket implements Serializable {
-    private UoW payloadPacket;
-    private String payloadType;
-    private ActivityID activityID;
+    private PetasosActionableTask actionableTask;
+    private TaskTraceabilityElementType upstreamFulfillmentTaskDetails;
     private String messageIdentifier;
     private Integer messageSize;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant eventProcessingStartTime;
     private int messageTransferCount;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant messageSendStartInstant;
     private String source;
     private String target;
 
-    public ActivityID getActivityID() {
-        return activityID;
+    //
+    // Constructor(s)
+    //
+
+    public InterProcessingPlantHandoverPacket(){
+        this.actionableTask = null;
+        this.messageIdentifier = null;
+        this.messageSize = null;
+        this.eventProcessingStartTime = null;
+        this.messageTransferCount = 0;
+        this.messageSendStartInstant = null;
+        this.upstreamFulfillmentTaskDetails = null;
+        this.source = null;
+        this.target = null;
     }
 
-    public void setActivityID(ActivityID activity) {
-        this.activityID = activity;
+    //
+    // Getters and Setters
+    //
+
+    public TaskTraceabilityElementType getUpstreamFulfillmentTaskDetails() {
+        return upstreamFulfillmentTaskDetails;
     }
 
-    public UoW getPayloadPacket() {
-        return (payloadPacket);
+    public void setUpstreamFulfillmentTaskDetails(TaskTraceabilityElementType upstreamFulfillmentTaskDetails) {
+        this.upstreamFulfillmentTaskDetails = upstreamFulfillmentTaskDetails;
     }
 
-    public void setPayloadPacket(UoW payloadPacket) {
-        this.payloadPacket = payloadPacket;
+    public PetasosActionableTask getActionableTask() {
+        return actionableTask;
+    }
+
+    public void setActionableTask(PetasosActionableTask actionableTask) {
+        this.actionableTask = actionableTask;
     }
 
     public String getMessageIdentifier() {
@@ -69,14 +93,6 @@ public class InterProcessingPlantHandoverPacket implements Serializable {
 
     public void setMessageSize(Integer messageSize) {
         this.messageSize = messageSize;
-    }
-
-    public String getPayloadType() {
-        return payloadType;
-    }
-
-    public void setPayloadType(String payloadType) {
-        this.payloadType = payloadType;
     }
 
     public String getTarget() {
@@ -119,12 +135,15 @@ public class InterProcessingPlantHandoverPacket implements Serializable {
         this.messageSendStartInstant = messageSendStartInstant;
     }
 
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
-        return "net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket{" +
-                "payloadPacket=" + payloadPacket +
-                ", payloadType='" + payloadType + '\'' +
-                ", activityID=" + activityID +
+        return "InterProcessingPlantHandoverPacket{" +
+                "actionableTask=" + actionableTask +
+                ", upstreamFulfillmentTaskDetails=" + upstreamFulfillmentTaskDetails +
                 ", messageIdentifier='" + messageIdentifier + '\'' +
                 ", messageSize=" + messageSize +
                 ", eventProcessingStartTime=" + eventProcessingStartTime +

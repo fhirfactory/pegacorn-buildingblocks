@@ -22,14 +22,14 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerIngresGatekeeper;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerIngresProcessor;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPIngresConduit;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -50,11 +50,11 @@ public class ExternalEgressWUPContainerRoute extends BasePetasosContainerRoute {
 	private WorkUnitProcessorTopologyNode wupTopologyNode;
 	private RouteElementNames nameSet;
 
-	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode, MOAServicesAuditBroker auditTrailBroker) {
+	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupTopologyNode = wupNode;
-		nameSet = new RouteElementNames(wupNode.getComponentFDN().getToken());
+		nameSet = new RouteElementNames(wupNode.getNodeFunctionFDN().getFunctionToken());
 	}
 
 	@Override

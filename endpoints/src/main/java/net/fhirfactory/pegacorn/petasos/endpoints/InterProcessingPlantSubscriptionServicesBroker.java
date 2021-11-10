@@ -22,11 +22,9 @@
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
 import net.fhirfactory.pegacorn.core.interfaces.pubsub.PetasosSubscriptionBrokerInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyBrokerInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosInterZoneOAMDiscoveryEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosIntraZoneOAMDiscoveryEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.PetasosInterZoneOAMPubSubEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.PetasosIntraZoneOAMPubSubEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,23 +37,23 @@ public class InterProcessingPlantSubscriptionServicesBroker implements PetasosSu
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantSubscriptionServicesBroker.class);
 
     @Inject
-    private PetasosInterZoneOAMDiscoveryEndpoint interZoneDiscoveryEndpoint;
+    private PetasosInterZoneOAMPubSubEndpoint interZonePubSubEndpoint;
 
     @Inject
-    private PetasosIntraZoneOAMDiscoveryEndpoint intraZoneDiscoveryEndpoint;
+    private PetasosIntraZoneOAMPubSubEndpoint intraZonePubSubEndpoint;
 
     @Override
     public Instant shareSubscriptionSummaryReport(String serviceProviderName, PetasosSubscriptionSummaryReport summaryReport) {
         LOG.debug(".shareSubscriptionSummaryReport(): Entry, serviceProviderName->{}, summaryReport->{}", serviceProviderName, summaryReport);
 
         Instant captureInstant = null;
-        if(interZoneDiscoveryEndpoint.discoveryServiceProviderIsInScope(serviceProviderName)){
+        if(interZonePubSubEndpoint.subscriptionServiceProviderIsInScope(serviceProviderName)){
             LOG.trace(".shareSubscriptionSummaryReport(): Using inter-zone communication framework");
-            captureInstant = interZoneDiscoveryEndpoint.shareLocalTopologyGraph(serviceProviderName, summaryReport);
+            captureInstant = interZonePubSubEndpoint.shareLocalSubscriptionSummaries(serviceProviderName, summaryReport);
         }
-        if(intraZoneDiscoveryEndpoint.discoveryServiceProviderIsInScope(serviceProviderName)){
+        if(intraZonePubSubEndpoint.subscriptionServiceProviderIsInScope(serviceProviderName)){
             LOG.trace(".shareSubscriptionSummaryReport(): Using intra-zone communication framework");
-            captureInstant = intraZoneDiscoveryEndpoint.shareLocalTopologyGraph(serviceProviderName, summaryReport);
+            captureInstant = intraZonePubSubEndpoint.shareLocalSubscriptionSummaries(serviceProviderName, summaryReport);
         }
         if(captureInstant == null) {
             LOG.trace(".shareSubscriptionSummaryReport(): Can't find suitable capability provider");

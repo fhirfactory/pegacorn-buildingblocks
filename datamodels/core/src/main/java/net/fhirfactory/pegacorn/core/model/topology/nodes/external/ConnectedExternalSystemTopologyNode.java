@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.core.model.topology.nodes.external;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterface;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ public class ConnectedExternalSystemTopologyNode implements Serializable {
     private String subsystemVersion;
     private String externalisedServiceName;
     private String externalisedServiceEndpointName;
-    private List<IPCInterface> targetPorts;
+    private List<IPCAdapter> targetPorts;
 
     public ConnectedExternalSystemTopologyNode(){
         this.targetPorts = new ArrayList<>();
@@ -71,11 +71,11 @@ public class ConnectedExternalSystemTopologyNode implements Serializable {
         this.externalisedServiceEndpointName = externalisedServiceEndpointName;
     }
 
-    public List<IPCInterface> getTargetPorts() {
+    public List<IPCAdapter> getTargetPorts() {
         return targetPorts;
     }
 
-    public void setTargetPorts(List<IPCInterface> targetPorts) {
+    public void setTargetPorts(List<IPCAdapter> targetPorts) {
         this.targetPorts.clear();
         this.targetPorts.addAll(targetPorts);
     }

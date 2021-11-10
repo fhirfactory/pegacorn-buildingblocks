@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.common;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
-import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.LoggingLevel;
@@ -30,13 +30,13 @@ import org.apache.camel.model.OnExceptionDefinition;
 
 public abstract class BasePetasosContainerRoute extends BaseRouteBuilder {
 
-    private MOAServicesAuditBroker auditTrailBroker;
+    private PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker;
 
     //
     // Constructor(s)
     //
 
-    public BasePetasosContainerRoute(CamelContext camelContext, MOAServicesAuditBroker auditTrailBroker){
+    public BasePetasosContainerRoute(CamelContext camelContext, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker){
         super(camelContext);
         this.auditTrailBroker = auditTrailBroker;
     }
@@ -57,7 +57,7 @@ public abstract class BasePetasosContainerRoute extends BaseRouteBuilder {
     // Getters (and Setters)
     //
 
-    protected MOAServicesAuditBroker getAuditTrailBroker() {
+    protected PetasosFulfillmentTaskAuditServicesBroker getAuditTrailBroker() {
         return auditTrailBroker;
     }
 }

@@ -21,11 +21,11 @@
  */
 package net.fhirfactory.pegacorn.oamwup.base;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.workshops.base.OAMWorkshop;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -44,25 +44,28 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
     @Inject
     private ProcessingPlantInterface processingPlant;
 
+    //
+    // Constructor(s)
+    //
+
     public OAMWorkUnitProcessor() {
         super();
         this.isInitialised = false;
     }
 
+    //
+    // Getters and Setters
+    //
+
     public WorkUnitProcessorTopologyNode getWUPTopologyNode(){
         return(this.wupTopologyNode);
     }
 
-    protected abstract Logger specifyLogger();
     protected Logger getLogger() {return(specifyLogger());}
 
     protected ProcessingPlantInterface getProcessingPlant(){
         return(processingPlant);
     }
-
-    abstract protected String specifyOAMWUPName();
-    abstract protected String specifyOAMWUPVersion();
-    abstract protected OAMWorkshop specifyOAMWorkshop();
 
     public PegacornTopologyFactoryInterface getTopologyFactory(){
         return(processingPlant.getTopologyFactory());
@@ -72,7 +75,19 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
         return(specifyOAMWorkshop());
     }
 
+    //
+    // Abstract Methods
+    //
+
+    abstract protected String specifyOAMWUPName();
+    abstract protected String specifyOAMWUPVersion();
+    abstract protected OAMWorkshop specifyOAMWorkshop();
     abstract protected void invokePostConstructInitialisation();
+    abstract protected Logger specifyLogger();
+
+    //
+    // Post Construct
+    //
 
     @PostConstruct
     private void initialise() {
@@ -85,6 +100,10 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
             isInitialised = true;
         }
     }
+
+    //
+    // Business Methods
+    //
 
     public void initialiseOAMWorkUnitProcessor(){
         initialise();

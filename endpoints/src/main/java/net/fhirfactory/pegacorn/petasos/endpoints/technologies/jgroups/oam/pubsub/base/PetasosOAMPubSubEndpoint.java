@@ -21,7 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.base;
 
+import net.fhirfactory.pegacorn.core.interfaces.pubsub.PetasosSubscriptionHandlerInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.*;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
@@ -66,6 +69,9 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
     @Inject
     DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
 
+    @Inject
+    private PetasosSubscriptionHandlerInterface subscriptionHandlerInterface;
+
     //
     // Constructor
     //
@@ -100,6 +106,25 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
     protected DistributedPubSubSubscriptionMapIM getDistributedPubSubSubscriptionMapIM(){
         return(distributedPubSubSubscriptionMapIM);
     }
+
+    //
+    // Simple Helper
+    //
+
+    public boolean subscriptionServiceProviderIsInScope(String capabilityProviderServiceName){
+        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
+        if(memberSetBasedOnService.isEmpty()){
+            return(false);
+        }
+        for(String currentName: memberSetBasedOnService){
+            if(isWithinScopeBasedOnChannelName(currentName)){
+                return(true);
+            }
+        }
+        return(false);
+    }
+
+
     //
     // Endpoint Discovery
     //
@@ -629,6 +654,45 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
             }
         }
         return(candidateSet);
+    }
+
+    //
+    // OAM Services
+    //
+
+    public Instant shareLocalSubscriptionSummaries(String serviceProviderName, PetasosSubscriptionSummaryReport subscriptionSummaries){
+        getLogger().trace(".shareLocalSubscriptionSummaries(): Entry, serviceProviderName->{}, subscriptionSummaries->{}", serviceProviderName, subscriptionSummaries);
+        PetasosEndpointIdentifier endpointIdentifier = getEndpointID();
+        Address targetAddress = getCandidateTargetServiceAddress(serviceProviderName);
+        try {
+            Object objectSet[] = new Object[2];
+            Class classSet[] = new Class[2];
+            objectSet[0] = subscriptionSummaries;
+            classSet[0] = PetasosSubscriptionSummaryReport.class;
+            objectSet[1] = endpointIdentifier;
+            classSet[1] = PetasosEndpointIdentifier.class;
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "subscriptionSummaryHandler", objectSet, classSet, requestOptions);
+            getLogger().debug(".shareLocalSubscriptionSummaries(): Exit, responseInstant->{}", responseInstant);
+            return(responseInstant);
+        } catch (NoSuchMethodException e) {
+            getLogger().error(".shareLocalSubscriptionSummaries(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            getLogger().error(".shareLocalSubscriptionSummaries: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    public Instant subscriptionSummaryHandler(PetasosSubscriptionSummaryReport subscriptionSummary, PetasosEndpointIdentifier endpointIdentifier){
+        getLogger().trace(".subscriptionSummaryHandler(): Entry, subscriptionSummary->{}, endpointIdentifier->{}", subscriptionSummary, endpointIdentifier);
+        Instant outcomeInstant = null;
+        if((subscriptionSummary != null) && (endpointIdentifier != null)) {
+            outcomeInstant = subscriptionHandlerInterface.shareSubscriptionSummaryReport(subscriptionSummary, endpointIdentifier);
+        }
+        getLogger().debug(".subscriptionSummaryHandler(): Exit, outcomeInstant->{}", outcomeInstant);
+        return(outcomeInstant);
     }
 
 }

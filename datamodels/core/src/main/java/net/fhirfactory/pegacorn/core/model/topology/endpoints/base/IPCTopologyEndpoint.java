@@ -22,54 +22,67 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.AdditionalParametersListEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IPCTopologyEndpoint extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(IPCTopologyEndpoint.class);
 
-    private String name;
     private PetasosEndpointTopologyTypeEnum endpointType;
-    private Map<AdditionalParametersListEnum, String> additionalParameters;
     private String connectedSystemName;
-    private Boolean encrypted;
-    private TopologyNodeFDN implementingWUP;
+    private boolean server;
+    private ComponentIdType implementingWUP;
+    private List<IPCAdapter> adapterList;
+    private String endpointConfigurationName;
+
+    //
+    // Constructor(s)
+    //
 
     public IPCTopologyEndpoint(){
         super();
-        encrypted = false;
-        this.additionalParameters = new HashMap<>();
+        this.endpointType = null;
+        this.connectedSystemName = null;
+        this.server = true;
+        this.implementingWUP = null;
+        this.adapterList = new ArrayList<>();
+        this.endpointConfigurationName = null;
     }
 
-    public TopologyNodeFDN getImplementingWUP() {
+    //
+    // Getters and Setters
+    //
+
+
+    public String getEndpointConfigurationName() {
+        return endpointConfigurationName;
+    }
+
+    public void setEndpointConfigurationName(String endpointConfigurationName) {
+        this.endpointConfigurationName = endpointConfigurationName;
+    }
+
+    public boolean isServer() {
+        return server;
+    }
+
+    public void setServer(boolean server) {
+        this.server = server;
+    }
+
+    public ComponentIdType getImplementingWUP() {
         return implementingWUP;
     }
 
-    public void setImplementingWUP(TopologyNodeFDN implementingWUP) {
+    public void setImplementingWUP(ComponentIdType implementingWUP) {
         this.implementingWUP = implementingWUP;
-    }
-
-    public boolean isEncrypted() {
-        return encrypted;
-    }
-
-    public void setEncrypted(boolean encrypted) {
-        this.encrypted = encrypted;
-    }
-
-    public Map<AdditionalParametersListEnum, String> getAdditionalParameters() {
-        return additionalParameters;
-    }
-
-    public void setAdditionalParameters(Map<AdditionalParametersListEnum, String> additionalParameters) {
-        this.additionalParameters = additionalParameters;
     }
 
     public String getConnectedSystemName() {
@@ -80,14 +93,6 @@ public class IPCTopologyEndpoint extends SoftwareComponent {
         this.connectedSystemName = connectedSystemName;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public PetasosEndpointTopologyTypeEnum getEndpointType() {
         return endpointType;
     }
@@ -96,41 +101,48 @@ public class IPCTopologyEndpoint extends SoftwareComponent {
         this.endpointType = endpointType;
     }
 
+    public List<IPCAdapter> getAdapterList() {
+        return adapterList;
+    }
+
+    public void setAdapterList(List<IPCAdapter> adapterList) {
+        this.adapterList = adapterList;
+    }
+
+    @JsonIgnore
     @Override
     protected Logger getLogger() {
         return (LOG);
     }
 
-    @JsonIgnore
-    public String getAdditionalParameter(AdditionalParametersListEnum parameterName){
-        if(this.additionalParameters.isEmpty()){
-            return(null);
-        }
-        String value = additionalParameters.get(parameterName);
-        return(value);
-    }
+    //
+    // to String
+    //
 
     @Override
     public String toString() {
         return "IPCTopologyEndpoint{" +
-                "nodeRDN=" + getComponentRDN() +
-                ", nodeFDN=" + getComponentFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", nodeKey=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                "componentFDN=" + getComponentFDN() +
+                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
                 ", securityZone=" + getSecurityZone() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", name=" + name +
-                ", endpointType=" + endpointType +
-                ", additionalParameters=" + additionalParameters +
-                ", connectedSystemName=" + connectedSystemName +
-                ", encrypted=" + encrypted +
-                ", implementingWUP=" + implementingWUP +
+                ", componentID=" + getComponentID() +
+                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                ", componentType=" + getComponentType() +
+                ", containingNodeFDN=" + getContainingNodeFDN() +
                 ", actualHostIP=" + getActualHostIP() +
+                ", actualPodIP=" + getActualPodIP() +
+                ", componentRDN=" + getComponentRDN() +
+                ", metrics=" + getMetrics() +
+                ", componentSystemRole=" + getComponentSystemRole() +
+                ", endpointType=" + endpointType +
+                ", connectedSystemName=" + connectedSystemName +
+                ", implementingWUP=" + implementingWUP +
+                ", server=" + isServer() +
+                ", adapterList=" + adapterList +
+                ", endpointConfigurationName=" + endpointConfigurationName +
                 '}';
     }
 }

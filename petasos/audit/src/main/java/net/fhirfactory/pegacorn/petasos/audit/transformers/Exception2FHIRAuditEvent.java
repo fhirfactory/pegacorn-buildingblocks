@@ -24,11 +24,11 @@ package net.fhirfactory.pegacorn.petasos.audit.transformers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import org.apache.camel.CamelExecutionException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -71,7 +71,7 @@ public class Exception2FHIRAuditEvent  extends Pegacorn2FHIRAuditEventBase {
     // Business Methods
     //
 
-    public AuditEvent transformCamelExecutionException(CamelExecutionException camelExecutionException, ResilienceParcel parcel, UoW uow){
+    public AuditEvent transformCamelExecutionException(CamelExecutionException camelExecutionException, PetasosFulfillmentTask fulfillmentTask, UoW uow){
         AuditEvent event = transformCamelExecutionException(camelExecutionException);
         return(event);
     }

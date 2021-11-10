@@ -21,8 +21,10 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,14 +35,25 @@ public class WorkUnitProcessorTopologyNode extends SoftwareComponent {
 
     private ArrayList<TopologyNodeFDN> wupComponents;
     private ArrayList<TopologyNodeFDN> wupInterchangeComponents;
-    private ArrayList<TopologyNodeFDN> endpoints;
+    private IPCTopologyEndpoint ingresEndpoint;
+    private IPCTopologyEndpoint egressEndpoint;
+
+    //
+    // Constructor(s)
+    //
 
     public WorkUnitProcessorTopologyNode(){
         this.wupComponents = new ArrayList<>();
         this.wupInterchangeComponents = new ArrayList<>();
-        this.endpoints = new ArrayList<>();
+        this.ingresEndpoint = null;
+        this.egressEndpoint = null;
     }
 
+    //
+    // Getters and Setters
+    //
+
+    @JsonIgnore
     @Override
     protected Logger getLogger() {
         return (LOG);
@@ -62,11 +75,48 @@ public class WorkUnitProcessorTopologyNode extends SoftwareComponent {
         this.wupInterchangeComponents = wupInterchangeComponents;
     }
 
-    public ArrayList<TopologyNodeFDN> getEndpoints() {
-        return endpoints;
+    public IPCTopologyEndpoint getIngresEndpoint() {
+        return ingresEndpoint;
     }
 
-    public void setEndpoints(ArrayList<TopologyNodeFDN> endpoints) {
-        this.endpoints = endpoints;
+    public void setIngresEndpoint(IPCTopologyEndpoint ingresEndpoint) {
+        this.ingresEndpoint = ingresEndpoint;
+    }
+
+    public IPCTopologyEndpoint getEgressEndpoint() {
+        return egressEndpoint;
+    }
+
+    public void setEgressEndpoint(IPCTopologyEndpoint egressEndpoint) {
+        this.egressEndpoint = egressEndpoint;
+    }
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "WorkUnitProcessorTopologyNode{" +
+                "componentFDN=" + getComponentFDN() +
+                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
+                ", concurrencyMode=" + getConcurrencyMode() +
+                ", resilienceMode=" + getResilienceMode() +
+                ", securityZone=" + getSecurityZone() +
+                ", componentID=" + getComponentID() +
+                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                ", componentType=" + getComponentType() +
+                ", containingNodeFDN=" + getContainingNodeFDN() +
+                ", actualHostIP='" + getActualHostIP() + '\'' +
+                ", actualPodIP='" + getActualPodIP() + '\'' +
+                ", componentRDN=" + getComponentRDN() +
+                ", metrics=" + getMetrics() +
+                ", componentSystemRole=" + getComponentSystemRole() +
+                ", wupComponents=" + wupComponents +
+                ", wupInterchangeComponents=" + wupInterchangeComponents +
+                ", ingresEndpoint=" + ingresEndpoint +
+                ", egressEndpoint=" + egressEndpoint +
+                '}';
     }
 }

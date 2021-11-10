@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnu
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import org.apache.camel.Exchange;
@@ -38,8 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
-
-    private MessageBasedWUPEndpoint ingresEndpoint;
 
     public InteractIngresMessagingGatewayWUP() {
         super();
@@ -133,9 +132,9 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
             if (!alreadyInPlace) {
                 switch(getIngresEndpoint().getEndpointTopologyNode().getEndpointType()) {
                     case MLLP_SERVER: {
-                        IPCServerTopologyEndpoint serverTopologyEndpoint = (IPCServerTopologyEndpoint) getIngresEndpoint().getEndpointTopologyNode();
+                        InteractMLLPServerEndpoint serverTopologyEndpoint = (InteractMLLPServerEndpoint) getIngresEndpoint().getEndpointTopologyNode();
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, serverTopologyEndpoint.getEndpointType().getEndpointType());
-                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, serverTopologyEndpoint.getPortValue());
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, serverTopologyEndpoint.getMLLPServerAdapter().getPortNumber());
                         break;
                     }
                     case MLLP_CLIENT:{

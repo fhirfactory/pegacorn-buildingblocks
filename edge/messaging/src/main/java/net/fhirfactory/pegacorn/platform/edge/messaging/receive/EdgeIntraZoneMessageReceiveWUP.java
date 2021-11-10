@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.receive;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.messaging.receive.common.EdgeMessageReceiveWUP;
 import org.slf4j.Logger;
@@ -69,8 +69,8 @@ public class EdgeIntraZoneMessageReceiveWUP extends EdgeMessageReceiveWUP {
     }
 
     @Override
-    protected IPCInterfaceDefinition specifyIngresInterfaceDefinition() {
-        IPCInterfaceDefinition interfaceDefinition = new IPCInterfaceDefinition();
+    protected IPCAdapterDefinition specifyIngresInterfaceDefinition() {
+        IPCAdapterDefinition interfaceDefinition = new IPCAdapterDefinition();
         interfaceDefinition.setInterfaceFormalName("JGroups-Kube");
         interfaceDefinition.setInterfaceFormalVersion("1.0.0");
         return (interfaceDefinition);

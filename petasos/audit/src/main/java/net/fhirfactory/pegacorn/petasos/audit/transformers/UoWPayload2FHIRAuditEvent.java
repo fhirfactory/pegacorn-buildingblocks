@@ -25,12 +25,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
-import net.fhirfactory.pegacorn.core.model.petasos.audit.PetasosParcelAuditTrailEntry;
-import net.fhirfactory.pegacorn.core.model.petasos.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import org.apache.commons.lang3.StringUtils;
@@ -63,31 +65,31 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
 //        jsonMapper = new ObjectMapper();
     }
 
-    public AuditEvent transform(ResilienceParcel parcel, UoW uow){
-        AuditEvent outcomeAuditEvent = transform(parcel, uow, false);
+    public AuditEvent transform(PetasosFulfillmentTask fulfillmentTask){
+        AuditEvent outcomeAuditEvent = transform(fulfillmentTask, false);
         return(outcomeAuditEvent);
     }
 
-    public AuditEvent transform(ResilienceParcel parcel, UoW uow, boolean isInteractDone){
-        AuditEvent outcomeAuditEvent = transform(parcel, uow, null, "false", false);
+    public AuditEvent transform(PetasosFulfillmentTask fulfillmentTask, boolean isInteractDone){
+        AuditEvent outcomeAuditEvent = transform(fulfillmentTask, "false", false);
         return(outcomeAuditEvent);
     }
 
-    public AuditEvent transform(ResilienceParcel parcel, UoW uow, String activity, String filteredState, boolean isInteractDone){
-        if(parcel == null){
+    public AuditEvent transform(PetasosFulfillmentTask fulfillmentTask, String filteredState, boolean isInteractDone){
+        if(fulfillmentTask == null){
             return(null);
         }
 
-        String auditEventEntityName = extractAuditEventEntityNameFromParcel(parcel);
+        String auditEventEntityName = extractAuditEventEntityNameFromTask(fulfillmentTask);
 
         List<AuditEvent.AuditEventEntityDetailComponent> detailList = new ArrayList<>();
-        AuditEvent.AuditEventEntityDetailComponent ingresDetailComponent = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Ingress.Payload", uow.getIngresContent().getPayload());
+        AuditEvent.AuditEventEntityDetailComponent ingresDetailComponent = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Ingress.Payload", fulfillmentTask.getTaskWorkItem().getIngresContent().getPayload());
         detailList.add(ingresDetailComponent);
         if(StringUtils.isNotEmpty(filteredState)){
             if(filteredState.equalsIgnoreCase("false")) {
-                if (uow.hasEgressContent()) {
+                if (fulfillmentTask.getTaskWorkItem().hasEgressContent()) {
                     int counter = 0;
-                    for (UoWPayload currentPayload : uow.getEgressContent().getPayloadElements()) {
+                    for (UoWPayload currentPayload : fulfillmentTask.getTaskWorkItem().getEgressContent().getPayloadElements()) {
                         AuditEvent.AuditEventEntityDetailComponent currentEgressDetail = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Egress.Payload[" + counter + "]", currentPayload.getPayload());
                         detailList.add(currentEgressDetail);
                         counter += 1;
@@ -99,14 +101,8 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
             detailList.add(currentEgressDetail);
         }
 
-        String descriptionText = null;
-        if(StringUtils.isNotEmpty(activity)) {
-            if (activity.equalsIgnoreCase("MLLPEgress")) {
-                descriptionText = "Interact.Egress: MLLP Message Forwarding";
-            } else if (activity.equalsIgnoreCase("MLLPIngres")) {
-                descriptionText = "Interact.Ingres: MLLP Message Reception";
-            }
-        }
+        String descriptionText = getDescription(fulfillmentTask);
+
         if(StringUtils.isEmpty(descriptionText)){
             descriptionText = "Ingres and Egress content fromm UoW (Unit of Work) Processors";
         }
@@ -119,17 +115,10 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 descriptionText,
                 detailList);
 
-        String portValue = parcel.getAssociatedPortValue();
-        String portType = parcel.getAssociatedPortType();
-        String sourceSite;
-        if(portValue != null && portType != null) {
-            sourceSite = processingPlant.getIPCServiceName() + ":" + portValue;
-        } else {
-            sourceSite = processingPlant.getIPCServiceName();
-        }
+        String sourceSite = getSourceSite(fulfillmentTask);
 
-        AuditEvent.AuditEventOutcome auditEventOutcome = extractAuditEventOutcome(parcel, uow);
-        String outcomeString = getOutcomeDescription(auditEventOutcome, uow);
+        AuditEvent.AuditEventOutcome auditEventOutcome = extractAuditEventOutcome(fulfillmentTask);
+        String outcomeString = getOutcomeDescription(auditEventOutcome, fulfillmentTask.getTaskWorkItem());
 
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
@@ -138,15 +127,96 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 sourceSite,
                 null,
                 AuditEventSourceTypeEnum.HL7_APPLICATION_SERVER,
-                extractAuditEventType(parcel),
-                extractAuditEventSubType(parcel, isInteractDone),
+                extractAuditEventType(fulfillmentTask),
+                extractAuditEventSubType(fulfillmentTask, isInteractDone),
                 AuditEvent.AuditEventAction.C,
                 auditEventOutcome,
                 outcomeString,
-                extractProcessingPeriod(parcel),
+                extractProcessingPeriod(fulfillmentTask),
                 auditEventEntityComponent);
 
         return(auditEvent);
+    }
+
+    protected String getDescription(PetasosFulfillmentTask fulfillmentTask){
+        if(fulfillmentTask == null){
+            return(null);
+        }
+        if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(ComponentTypeTypeEnum.WUP)) {
+            WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
+            switch (wup.getComponentSystemRole()) {
+                case COMPONENT_ROLE_INTERACT_INGRES: {
+                    if (wup.getIngresEndpoint() != null) {
+                        switch (wup.getIngresEndpoint().getEndpointType()) {
+                            case MLLP_SERVER: {
+                                String descriptionText = "Interact.Ingres: MLLP Message Reception";
+                                return (descriptionText);
+                            }
+                            default: {
+                                return (null);
+                            }
+                        }
+                    }
+                }
+                case COMPONENT_ROLE_INTERACT_EGRESS: {
+                    if (wup.getEgressEndpoint() != null) {
+                        switch (wup.getEgressEndpoint().getEndpointType()) {
+                            case MLLP_CLIENT: {
+                                String descriptionText = "Interact.Egress: MLLP Message Forwarding";
+                                return (descriptionText);
+                            }
+                            default: {
+                                return (null);
+                            }
+                        }
+                    }
+                }
+                case COMPONENT_ROLE_SUBSYSTEM_TASK_DISTRIBUTION:
+                case COMPONENT_ROLE_SUBSYSTEM_INTERNAL:
+                case COMPONENT_ROLE_SUBSYSTEM_EDGE:
+                default: {
+                    return (null);
+                }
+            }
+        } else {
+            return(null);
+        }
+    }
+
+    protected String getSourceSite(PetasosFulfillmentTask fulfillmentTask){
+        if(fulfillmentTask == null){
+            return(null);
+        }
+        if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(ComponentTypeTypeEnum.WUP)) {
+            WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
+            switch (wup.getComponentSystemRole()) {
+                case COMPONENT_ROLE_INTERACT_INGRES: {
+                    if (wup.getIngresEndpoint() != null) {
+                        switch (wup.getIngresEndpoint().getEndpointType()) {
+                            case MLLP_SERVER: {
+                                InteractMLLPServerEndpoint mllpServerEndpoint = (InteractMLLPServerEndpoint) wup.getIngresEndpoint();
+                                String source = processingPlant.getIPCServiceName();
+                                String port = mllpServerEndpoint.getMLLPServerAdapter().getPortNumber().toString();
+                                String sourceSite = source + ":" + port;
+                                return(sourceSite);
+                            }
+                            default: {
+                                return (null);
+                            }
+                        }
+                    }
+                }
+                case COMPONENT_ROLE_INTERACT_EGRESS:
+                case COMPONENT_ROLE_SUBSYSTEM_TASK_DISTRIBUTION:
+                case COMPONENT_ROLE_SUBSYSTEM_INTERNAL:
+                case COMPONENT_ROLE_SUBSYSTEM_EDGE:
+                default: {
+                    return (null);
+                }
+            }
+        } else {
+            return(null);
+        }
     }
 
     protected String getOutcomeDescription(AuditEvent.AuditEventOutcome outcome, UoW uow){
@@ -164,16 +234,5 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
             outcomeString = outcomeString + " (" + addedText + ")";
         }
         return(outcomeString);
-    }
-
-
-
-    //
-    //  To Do
-    //
-
-    public AuditEvent transform(PetasosParcelAuditTrailEntry parcel){
-        AuditEvent auditEvent = new AuditEvent();
-        return(auditEvent);
     }
 }

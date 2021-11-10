@@ -21,26 +21,26 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.interact;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterface;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class ExternalSystemIPCEndpoint extends IPCInterface implements Serializable {
+public class ExternalSystemIPCEndpoint extends IPCAdapter implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalSystemIPCEndpoint.class);
 
-    private IPCInterfaceDefinition supportedInterfaceDefinition;
+    private IPCAdapterDefinition supportedInterfaceDefinition;
     private Integer targetPortValue;
     private String targetPortDNSName;
     private String targetPath;
 
-    public IPCInterfaceDefinition getSupportedInterfaceDefinition() {
+    public IPCAdapterDefinition getSupportedInterfaceDefinition() {
         return supportedInterfaceDefinition;
     }
 
-    public void setSupportedInterfaceDefinition(IPCInterfaceDefinition supportedInterfaceDefinition) {
+    public void setSupportedInterfaceDefinition(IPCAdapterDefinition supportedInterfaceDefinition) {
         this.supportedInterfaceDefinition = supportedInterfaceDefinition;
     }
 

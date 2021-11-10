@@ -48,6 +48,7 @@ public abstract class PegacornCommonInterfaceNamesBase {
     public String getFunctionNameInterZoneJGroupsInterception(){return("inter-snoop");}
     public String getFunctionNameIntraZoneJGroupsMetrics(){return("intra-metrics");}
     public String getFunctionNameInterZoneJGroupsMetrics(){return("inter-metrics");}
+    public String getFunctionNameMultiZoneInfinispan(){return("multi-infini");}
     public String getFunctionNameEdgeReceive(){return("EdgeReceive");}
     public String getFunctionNameEdgeForward(){return("EdgeForward");}
     public String getFunctionNameEdgeAnswer(){return("EdgeAnswer");}

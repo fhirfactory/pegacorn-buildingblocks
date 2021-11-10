@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
-import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
-import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParcel2FHIRAuditEvent;
-import net.fhirfactory.pegacorn.core.model.petasos.audit.PetasosAuditWriterInterface;
+import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceClientWriterInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
+import net.fhirfactory.pegacorn.petasos.audit.transformers.PetasosFulfillmentTask2FHIRAuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +39,10 @@ public class STAServicesAuditBroker {
     private static final Logger LOG = LoggerFactory.getLogger(STAServicesAuditBroker.class);
 
     @Inject
-    PetasosAuditWriterInterface auditWriter;
+    PetasosAuditEventServiceClientWriterInterface auditWriter;
 
     @Inject
-    DefaultResilienceParcel2FHIRAuditEvent parcel2auditevent;
+    PetasosFulfillmentTask2FHIRAuditEvent parcel2auditevent;
 
     public void logAPIActivity(TransactionStatusElement transactionStatus) {
         LOG.debug(".logAPIActivity(): Entry, transactionStatus->{}", transactionStatus);
@@ -51,7 +51,7 @@ public class STAServicesAuditBroker {
         }
     }
 
-    public TransactionStatusElement logAPIActivity(WUPJobCard jobCard, UoW uow, PegacornTransactionTypeEnum transactionType){
+    public TransactionStatusElement logAPIActivity(PetasosTaskJobCard jobCard, UoW uow, PegacornTransactionTypeEnum transactionType){
         LOG.debug(".logAPIActivity(): Entry, jobCard->{}, uow->{}, transactionType->{}", jobCard, uow, transactionType);
         TransactionStatusElement statusElement = new TransactionStatusElement();
         return(statusElement);

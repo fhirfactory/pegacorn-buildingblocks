@@ -23,11 +23,13 @@ package net.fhirfactory.pegacorn.petasos.oam.metrics.cache;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.petasos.oam.common.LocalOAMCacheBase;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -82,14 +84,19 @@ public class PetasosLocalMetricsDM extends LocalOAMCacheBase {
         return(metricsSetList);
     }
 
-    public Object getNodeMetricsLock(String componentID){
+    public Object getNodeMetricsLock(ComponentIdType componentID){
         Object lock = getNodeMetricsLockMap().get(componentID);
         return(lock);
     }
 
-    public ComponentMetricsAgentBase getNodeMetrics(String componentID){
+    public ComponentMetricsAgentBase getNodeMetrics(ComponentIdType componentID){
         ComponentMetricsAgentBase metrics = getNodeMetricsMap().get(componentID);
         return(metrics);
+    }
+
+    public WorkUnitProcessorMetricsAgent getWorkUnitProcessorMetricsAgent(ComponentIdType componetId){
+        WorkUnitProcessorMetricsAgent nodeMetrics = (WorkUnitProcessorMetricsAgent)getNodeMetrics(componetId);
+        return(nodeMetrics);
     }
 
 }

@@ -23,10 +23,13 @@
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPClientAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.datatypes.JGroupsAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPClientEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPClientAdapter;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.oam.topology.factories.common.PetasosMonitoredComponentFactory;
 import org.slf4j.Logger;
@@ -55,7 +58,14 @@ public class PetasosMonitoredEndpointFactory extends PetasosMonitoredComponentFa
         PetasosMonitoredEndpoint endpoint = new PetasosMonitoredEndpoint();
         endpoint = (PetasosMonitoredEndpoint) newPetasosMonitoredComponent(endpoint, endpointTopologyNode);
         endpoint.setEndpointType(endpointTopologyNode.getEndpointType());
-        endpoint.setEncrypted(endpointTopologyNode.isEncrypted());
+        boolean isEncrypted = false;
+        for(IPCAdapter currentAdapter: endpointTopologyNode.getAdapterList()){
+            if(currentAdapter.isEncrypted()){
+                isEncrypted = true;
+                break;
+            }
+        }
+        endpoint.setEncrypted(isEncrypted);
         endpoint.setActualHostIP(endpointTopologyNode.getActualHostIP());
         endpoint.setActualPodIP(endpointTopologyNode.getActualPodIP());
         switch(endpointTopologyNode.getEndpointType()){
@@ -63,24 +73,30 @@ public class PetasosMonitoredEndpointFactory extends PetasosMonitoredComponentFa
             case JGROUPS_INTERZONE_SERVICE:
             case JGROUPS_INTERSITE_SERVICE:{
                 IPCServerTopologyEndpoint jgroupsEndpoint = (IPCServerTopologyEndpoint)endpointTopologyNode;
-                endpoint.setLocalPort(Integer.toString(jgroupsEndpoint.getPortValue()));
-                endpoint.setLocalDNSEntry(jgroupsEndpoint.getHostDNSName());
+                JGroupsAdapter currentAdapter = (JGroupsAdapter) jgroupsEndpoint.getAdapterList().get(0);
+                endpoint.setLocalPort(Integer.toString(currentAdapter.getPortNumber()));
+                endpoint.setLocalDNSEntry(currentAdapter.getHostName());
                 break;
             }
             case MLLP_SERVER: {
-                InteractMLLPServerAdapter mllpServerEndpoint = (InteractMLLPServerAdapter)endpointTopologyNode;
-                endpoint.setLocalPort(Integer.toString(mllpServerEndpoint.getPortValue()));
-                endpoint.setLocalDNSEntry(mllpServerEndpoint.getServerMLLPPort().getHostName());
-                endpoint.setRemoteSystemName(mllpServerEndpoint.getConnectedSystemName());
-                endpoint.setLocalServicePort(mllpServerEndpoint.getServerMLLPPort().getPort());
-                endpoint.setLocalServiceDNSEntry(mllpServerEndpoint.getServiceDNSName());
+                InteractMLLPServerEndpoint mllpServerEndpoint = (InteractMLLPServerEndpoint)endpointTopologyNode;
+                if(mllpServerEndpoint.getMLLPServerAdapter() != null) {
+                    endpoint.setLocalPort(Integer.toString(mllpServerEndpoint.getMLLPServerAdapter().getPortNumber()));
+                    endpoint.setLocalDNSEntry(mllpServerEndpoint.getMLLPServerAdapter().getHostName());
+                    endpoint.setRemoteSystemName(mllpServerEndpoint.getConnectedSystemName());
+                    endpoint.setLocalServicePort(Integer.toString(mllpServerEndpoint.getMLLPServerAdapter().getServicePortValue()));
+                    endpoint.setLocalServiceDNSEntry(mllpServerEndpoint.getMLLPServerAdapter().getServiceDNSName());
+                }
                 break;
             }
             case MLLP_CLIENT: {
-                InteractMLLPClientAdapter mllpClientEndpoint = (InteractMLLPClientAdapter)endpointTopologyNode;
-                endpoint.setRemoteSystemName(mllpClientEndpoint.getConnectedSystemName());
-                endpoint.setRemoteDNSEntry(mllpClientEndpoint.getTargetMLLPPorts().get(0).getTargetName());
-                endpoint.setRemotePort(mllpClientEndpoint.getTargetMLLPPorts().get(0).getPort());
+                InteractMLLPClientEndpoint mllpClientEndpoint = (InteractMLLPClientEndpoint)endpointTopologyNode;
+                if(mllpClientEndpoint.getMLLPClientAdapters().get(0) != null) {
+                    MLLPClientAdapter clientAdapter = mllpClientEndpoint.getMLLPClientAdapters().get(0);
+                    endpoint.setRemoteSystemName(mllpClientEndpoint.getConnectedSystemName());
+                    endpoint.setRemoteDNSEntry(clientAdapter.getHostName());
+                    endpoint.setRemotePort(Integer.toString(clientAdapter.getPortNumber()));
+                }
                 break;
             }
             case HTTP_API_SERVER:

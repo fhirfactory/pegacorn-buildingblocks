@@ -29,13 +29,15 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.pathway.ActivityID;
 import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta.TransactionStatusElement;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.datatypes.WUPIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
@@ -44,10 +46,15 @@ import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransac
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.workshops.base.Workshop;
 import net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit.TransactionalWUPAuditEntryManager;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 
@@ -62,7 +69,7 @@ import java.util.Set;
 public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
 
     private WorkUnitProcessorTopologyNode topologyNode;
-    private WUPJobCard currentJobCard;
+    private PetasosFulfillmentTask currentFulfillmentTask;
     private boolean isInitialised;
     private IParser parserR4;
 
@@ -82,15 +89,35 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     private net.fhirfactory.pegacorn.util.FHIRContextUtility FHIRContextUtility;
 
     @Inject
-    private PegacornIdentifierFactory pegacornIdentifierFactory;
+    private PetasosTaskJobCardFactory jobCardFactory;
 
     @Inject
     private PegacornIdentifierDataTypeHelpers identifierHelpers;
+
+    @Inject
+    private PetasosActionableTaskFactory actionableTaskFactory;
+
+    @Inject
+    private PetasosFulfillmentTaskFactory fulfillmentTaskFactory;
+
+    @Inject
+    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+
+    @Inject
+    private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
+
+    //
+    // Constructor(s)
+    //
 
     public NonResilientWithAuditTrailWUP(){
         super();
         this.isInitialised = false;
     }
+
+    //
+    // Abstract Methods
+    //
 
     abstract protected Logger getLogger();
     abstract protected String specifyWUPInstanceName();
@@ -98,9 +125,9 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     abstract protected Workshop specifyWorkshop();
     abstract protected void executePostConstructActivities();
 
-//    abstract protected InternalFHIRClientServices getFHIRClientServices();
-
-//    abstract public VirtualDBMethodOutcome synchroniseResource(ResourceType resourceType, Resource resource);
+    //
+    // Post Construct
+    //
 
     @PostConstruct
     protected void initialise() {
@@ -129,17 +156,21 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     // Getters and Setters
     //
 
+
+    public PetasosFulfillmentTask getCurrentFulfillmentTask() {
+        return currentFulfillmentTask;
+    }
+
+    public void setCurrentFulfillmentTask(PetasosFulfillmentTask currentFulfillmentTask) {
+        this.currentFulfillmentTask = currentFulfillmentTask;
+    }
+
     public TopologyNodeFunctionFDN getNodeFunctionFDN(){
         return(topologyNode.getNodeFunctionFDN());
     }
 
     public TopologyNodeFunctionFDNToken getNodeFunctionFDNToken(){
         return(topologyNode.getNodeFunctionFDN().getFunctionToken());
-    }
-
-    public WUPIdentifier getNodeInstanceID(){
-        WUPIdentifier wupID = new WUPIdentifier(topologyNode.getComponentFDN().getToken());
-        return(wupID);
     }
 
     public WorkUnitProcessorTopologyNode getTopologyNode() {
@@ -186,21 +217,80 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         return(specifyWUPInstanceVersion());
     }
 
+    protected PetasosTaskJobCardFactory getJobCardFactory() {
+        return jobCardFactory;
+    }
 
-    protected void initialiseWUPActivity(boolean resilientActivity){
-        ActivityID activityID = new ActivityID();
-        activityID.setResilientActivity(resilientActivity);
-        activityID.setPresentWUPFunctionToken(getNodeFunctionFDN().getFunctionToken());
-        activityID.setPresentWUPIdentifier(getNodeInstanceID());
-        ConcurrencyModeEnum concurrencyMode = this.topologyNode.getConcurrencyMode();
-        ResilienceModeEnum resilienceMode = this.topologyNode.getResilienceMode();
-        Date nowDate = Date.from(Instant.now());
-        WUPJobCard jobCard = new WUPJobCard(activityID, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING,concurrencyMode,resilienceMode,nowDate);
-        this.currentJobCard = jobCard;
+    protected PegacornIdentifierDataTypeHelpers getIdentifierHelpers() {
+        return identifierHelpers;
+    }
+
+    protected PetasosActionableTaskFactory getActionableTaskFactory() {
+        return actionableTaskFactory;
+    }
+
+    protected PetasosFulfillmentTaskFactory getFulfillmentTaskFactory() {
+        return fulfillmentTaskFactory;
+    }
+
+    protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController() {
+        return actionableTaskActivityController;
+    }
+
+    protected LocalPetasosFulfilmentTaskActivityController getFulfilmentTaskActivityController() {
+        return fulfilmentTaskActivityController;
+    }
+
+    //
+    // Business Methods
+    //
+
+
+    protected void initialiseActivity(String resourceType, boolean resilientActivity){
+        getLogger().debug(".initialiseActivity(): Entry, resourceType->{}, resilientActivity->{}", resourceType, resilientActivity);
+        //
+        // Build a UoW for the activity
+        DataParcelTypeDescriptor dataParcelTypeDescriptor = topicIDBuilder.newTopicToken(resourceType);
+        UoWPayload payload = new UoWPayload();
+        DataParcelManifest payloadManifest = new DataParcelManifest();
+        payloadManifest.setContentDescriptor(dataParcelTypeDescriptor);
+        payloadManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_API_ACTIVITY_REQUEST);
+        payload.setPayload("Query");
+        payload.setPayloadManifest(payloadManifest);
+        TaskWorkItemType workItem = new TaskWorkItemType(payload);
+        //
+        // Build and register a Petasos Actionable Task
+        PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
+        getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
+        //
+        // Build and register a Petasos Fulfillment Task
+        PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, getTopologyNode());
+        getFulfilmentTaskActivityController().registerFulfillmentTask(fulfillmentTask, false);
+        //
+        // Now assign our "current fulfillment task"
+        setCurrentFulfillmentTask(fulfillmentTask);
+    }
+
+    protected void initialiseActivity(UoW uow, boolean resilientActivity){
+        getLogger().debug(".initialiseActivity(): Entry, uow->{}, resilientActivity->{}", uow, resilientActivity);
+        //
+        // Build a UoW for the activity
+        TaskWorkItemType workItem = new TaskWorkItemType(uow.getIngresContent());
+        //
+        // Build and register a Petasos Actionable Task
+        PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
+        getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
+        //
+        // Build and register a Petasos Fulfillment Task
+        PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, getTopologyNode());
+        getFulfilmentTaskActivityController().registerFulfillmentTask(fulfillmentTask, false);
+        //
+        // Now assign our "current fulfillment task"
+        setCurrentFulfillmentTask(fulfillmentTask);
     }
 
     protected void finaliseWUPActivity(){
-        this.currentJobCard = null;
+        setCurrentFulfillmentTask(null);
     }
 
     /**
@@ -215,8 +305,8 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     protected TransactionStatusElement beginRESTfulTransaction(IdType resourceID, String resourceType, Identifier resourceIdentifier, Resource fhirResource, PegacornTransactionTypeEnum action){
         getLogger().debug(".beginRESTfulTransaction(): Entry, resourceID->{}, resourceType->{}, resourceIdentifier->{}, fhirResource->{}, actopm->{}", resourceID, resourceType, resourceIdentifier, fhirResource, action);
         String resourceKey = identifierHelpers.generatePrintableInformationFromIdentifier(resourceIdentifier);
-        initialiseWUPActivity(false);
-        TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(this.getCurrentJobCard(), resourceKey, fhirResource.fhirType(), fhirResource, action );
+        initialiseActivity(resourceType, false);
+        TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(getCurrentFulfillmentTask().getTaskJobCard(), resourceKey, fhirResource.fhirType(), fhirResource, action );
         return(transactionStatus);
     }
 
@@ -227,9 +317,14 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
      * @return
      */
     protected TransactionStatusElement beginAPITransaction(UoW uow, PegacornTransactionTypeEnum action){
-        initialiseWUPActivity(false);
-        TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(this.getCurrentJobCard(),uow, action);
-        return(transactionStatus);
+        if(uow != null) {
+            if(StringUtils.isNotEmpty(uow.getIngresContent().getPayload())) {
+                initialiseActivity(uow, false);
+                TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(getCurrentFulfillmentTask().getTaskJobCard(), uow, action);
+                return (transactionStatus);
+            }
+        }
+        return(null);
     }
 
     /**
@@ -252,7 +347,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
 
 
     protected TransactionStatusElement beginSearchTransaction(String resourceType, String resourceVersion, Map<Property, Serializable> parameterSet){
-        initialiseWUPActivity(false);
+        initialiseActivity(resourceType, false);
         Set<Property> parameterKeys = parameterSet.keySet();
         String searchParameters = new String();
         int totalCount = parameterKeys.size();
@@ -272,7 +367,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         parcelManifest.setDataParcelType(DataParcelTypeEnum.SEARCH_QUERY_DATA_PARCEL_TYPE);
         newPayload.setPayloadManifest(parcelManifest);
         UoW uow = new UoW(newPayload);
-        TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(this.getCurrentJobCard(),uow, PegacornTransactionTypeEnum.SEARCH);
+        TransactionStatusElement transactionStatus = auditEntryManager.beginTransaction(getCurrentFulfillmentTask().getTaskJobCard(),uow, PegacornTransactionTypeEnum.SEARCH);
         return(transactionStatus);
     }
 
@@ -313,14 +408,6 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
             resultCount -= 1;
         }
         return(resultString);
-    }
-
-    public WUPJobCard getCurrentJobCard() {
-        return currentJobCard;
-    }
-
-    public void setCurrentJobCard(WUPJobCard currentJobCard) {
-        this.currentJobCard = currentJobCard;
     }
 
     public void setTopologyNode(WorkUnitProcessorTopologyNode topologyNode) {

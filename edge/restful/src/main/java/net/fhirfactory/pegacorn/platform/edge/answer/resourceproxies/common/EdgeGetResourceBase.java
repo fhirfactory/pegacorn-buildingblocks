@@ -23,8 +23,8 @@ package net.fhirfactory.pegacorn.platform.edge.answer.resourceproxies.common;
 
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
-import net.fhirfactory.pegacorn.components.transaction.valuesets.PegacornTransactionStatusEnum;
-import net.fhirfactory.pegacorn.components.transaction.model.PegacornTransactionMethodOutcome;
+import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
+import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionStatusEnum;
 import org.hl7.fhir.r4.model.*;
 
 public abstract class EdgeGetResourceBase extends EdgeProxyBase {

@@ -29,10 +29,9 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterface;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopologyNode;
@@ -41,7 +40,7 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopol
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -73,7 +72,6 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     private WorkUnitProcessorTopologyNode associatedTopologyNode;
-    private WUPJobCard wupJobCard;
     private RouteElementNames nameSet;
     private WUPArchetypeEnum wupArchetype;
     private List<DataParcelManifest> topicSubscriptionSet;
@@ -81,7 +79,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     private MessageBasedWUPEndpoint ingresEndpoint;
 
     @Inject
-    private LocalTaskActivityController servicesBroker;
+    private WorkUnitProcessorFrameworkManager wupFrameworkManager;
 
     @Inject
     private TopologyIM topologyIM;
@@ -118,7 +116,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().trace(".initialise(): Setting up the wupTopologyElement (NodeElement) instance, which is the Topology Server's representation of this WUP ");
         this.associatedTopologyNode = buildWUPNodeElement();
         getLogger().trace(".initialise(): Setting the WUP nameSet, which is the set of Route EndPoints that the WUP Framework will use to link various enablers");
-        this.nameSet = new RouteElementNames(getAssociatedTopologyNode().getComponentFDN().getToken());
+        this.nameSet = new RouteElementNames(getAssociatedTopologyNode().getNodeFunctionFDN().getFunctionToken());
         getLogger().trace(".initialise(): Setting the WUP EgressEndpoint");
         this.egressEndpoint = specifyEgressEndpoint();
         getLogger().trace(".initialise(): Setting the WUP IngresEndpoint");
@@ -185,7 +183,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     public void buildWUPFramework(CamelContext routeContext) {
         getLogger().debug(".buildWUPFramework(): Entry");
-        servicesBroker.registerWorkUnitProcessor(this.associatedTopologyNode, this.getTopicSubscriptionSet(), this.getWupArchetype());
+        wupFrameworkManager.buildWUPFramework(this.associatedTopologyNode, this.getTopicSubscriptionSet(), this.getWupArchetype());
         getLogger().debug(".buildWUPFramework(): Exit");
     }
     
@@ -194,9 +192,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(dnsName);
     }
     
-    public LocalTaskActivityController getServicesBroker(){
-        return(this.servicesBroker);
-    }
+//    public LocalTaskActivityController getServicesBroker(){
+//        return(this.servicesBroker);
+//    }
     
     public TopologyIM getTopologyIM(){
         return(topologyIM);
@@ -310,18 +308,18 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
      * @param interfaceDefinition
      * @return
      */
-    protected IPCServerTopologyEndpoint deriveAssociatedTopologyEndpoint(String interfaceName, IPCInterfaceDefinition interfaceDefinition){
+    protected IPCServerTopologyEndpoint deriveAssociatedTopologyEndpoint(String interfaceName, IPCAdapterDefinition interfaceDefinition){
         getLogger().debug(".deriveServerTopologyEndpoint(): Entry, interfaceName->{}, interfaceDefinition->{}", interfaceName, interfaceDefinition);
         ProcessingPlantTopologyNode processingPlantTopologyNode = processingPlantServices.getProcessingPlantNode();
         getLogger().trace(".deriveServerTopologyEndpoint(): Parse through all endpoints and their IPC Definitions");
         for(TopologyNodeFDN endpointFDN: processingPlantTopologyNode.getEndpoints()){
             IPCServerTopologyEndpoint endpoint = (IPCServerTopologyEndpoint)topologyIM.getNode(endpointFDN);
             getLogger().trace(".deriveServerTopologyEndpoint(): endpoint->{}", endpoint);
-            if(endpoint.getName().equalsIgnoreCase(interfaceName)) {
+            if(endpoint.getEndpointConfigurationName().equalsIgnoreCase(interfaceName)) {
                 getLogger().trace(".deriveServerTopologyEndpoint(): names ({}) match, now confirming supported InterfaceDefinition", interfaceName);
-                for (IPCInterface currentInterface : endpoint.getSupportedInterfaceSet()) {
+                for (IPCAdapter currentInterface : endpoint.getAdapterList()) {
                     getLogger().trace(".deriveServerTopologyEndpoint(): currentInterface->{}", currentInterface);
-                    for (IPCInterfaceDefinition currentInterfaceDef : currentInterface.getSupportedInterfaceDefinitions()) {
+                    for (IPCAdapterDefinition currentInterfaceDef : currentInterface.getSupportedInterfaceDefinitions()) {
                         getLogger().trace(".deriveServerTopologyEndpoint(): currentInterfaceDef->{}", currentInterfaceDef);
                         if (currentInterfaceDef.equals(interfaceDefinition)) {
                             getLogger().debug(".deriveServerTopologyEndpoint(): Exit, match found, currentInterfaceDef->{}, endpoint->{}", currentInterfaceDef, endpoint);
@@ -340,7 +338,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         ArrayList<TopologyNodeFDN> endpointFDNs = getProcessingPlant().getProcessingPlantNode().getEndpoints();
         for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
-            if(endpointTopologyNode.getName().contentEquals(topologyEndpointName)){
+            if(endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)){
                 getLogger().debug(".getTopologyEndpoint(): Exit, node found -->{}", endpointTopologyNode);
                 return(endpointTopologyNode);
             }

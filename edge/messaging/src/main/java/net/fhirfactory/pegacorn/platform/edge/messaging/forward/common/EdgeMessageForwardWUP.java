@@ -21,21 +21,20 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.forward.common;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
-import net.fhirfactory.pegacorn.deployment.properties.codebased.PegacornIPCCommonValues;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
+import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
+import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
-import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverFinisherBean;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.RemoteSubscriptionStatus;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.subscriptions.manager.DataParcelSubscriptionMapIM;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
+import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverResponseProcessingBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
-import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketResponseDecoder;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.RemoteSubscriptionStatus;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.Exchange;
@@ -83,15 +82,13 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
                 .process(new NodeDetailInjector())
                 .bean(InterProcessingPlantHandoverPacketGenerationBean.class, "constructInterProcessingPlantHandoverPacket(*,  Exchange)")
                 .to(egressFeed())
-                .bean(InterProcessingPlantHandoverPacketResponseDecoder.class, "contextualiseInterProcessingPlantHandoverResponsePacket(*,  Exchange)")
-                .bean(InterProcessingPlantHandoverFinisherBean.class, "ipcSenderNotifyActivityFinished(*, Exchange)");
+                .bean(InterProcessingPlantHandoverResponseProcessingBean.class, "processResponse(*, Exchange)");
 
         from(egressFeed())
                 .process(new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         InterProcessingPlantHandoverPacket packet = exchange.getIn().getBody(InterProcessingPlantHandoverPacket.class);
-//                        getLogger().info(".configure().process(): packet->{}", packet);
                         InterProcessingPlantHandoverResponsePacket response = getIPCEndpoint().sendIPCMessage(packet.getTarget(), packet);
                         exchange.getIn().setBody(response);
                     }
@@ -142,9 +139,8 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
         }
         // Add LocalSubscriber Details (i.e. the local WUP)
         IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
-        IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(getAssociatedTopologyNode().getComponentFDN().getToken());
-        localSubscriber.setIdentifier(identifier);
-        localSubscriber.setComponentID(getAssociatedTopologyNode().getComponentID());
+        IntraSubsystemPubSubParticipantIdentifier localSubscriberIdentifier = new IntraSubsystemPubSubParticipantIdentifier(getAssociatedTopologyNode().getComponentID());
+        localSubscriber.setIdentifier(localSubscriberIdentifier);
         subscriber.setIntraSubsystemParticipant(localSubscriber);
         // Now Register within the (Internal) PubSub Service
         for(DataParcelManifest currentDataParcel: contentSubscriptionList) {
