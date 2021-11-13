@@ -21,11 +21,11 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes;
 
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.OutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 
 public class TaskOutcomeStatusType extends TaskStatusType {
 
-    private OutcomeStatusEnum outcomeStatus;
+    private ActionableTaskOutcomeStatusEnum outcomeStatus;
 
     //
     // Constructor(s)
@@ -33,7 +33,7 @@ public class TaskOutcomeStatusType extends TaskStatusType {
 
     public TaskOutcomeStatusType(){
         super();
-        this.outcomeStatus = OutcomeStatusEnum.OUTCOME_STATUS_UNKNOWN;
+        this.outcomeStatus = ActionableTaskOutcomeStatusEnum.OUTCOME_STATUS_UNKNOWN;
     }
 
     //
@@ -41,11 +41,11 @@ public class TaskOutcomeStatusType extends TaskStatusType {
     //
 
 
-    public OutcomeStatusEnum getOutcomeStatus() {
+    public ActionableTaskOutcomeStatusEnum getOutcomeStatus() {
         return outcomeStatus;
     }
 
-    public void setOutcomeStatus(OutcomeStatusEnum outcomeStatus) {
+    public void setOutcomeStatus(ActionableTaskOutcomeStatusEnum outcomeStatus) {
         this.outcomeStatus = outcomeStatus;
     }
 

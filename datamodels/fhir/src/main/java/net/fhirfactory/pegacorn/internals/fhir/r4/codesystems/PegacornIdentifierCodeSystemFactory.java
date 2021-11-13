@@ -45,11 +45,11 @@ public class PegacornIdentifierCodeSystemFactory {
     public CodeableConcept buildIdentifierType(PegacornIdentifierCodeEnum identifierCode){
         CodeableConcept idType = new CodeableConcept();
         Coding idTypeCoding = new Coding();
-        idTypeCoding.setCode(identifierCode.getIdentifierCode());
+        idTypeCoding.setCode(identifierCode.getToken());
         idTypeCoding.setSystem(getPegacornIdentifierCodeSystem());
         idTypeCoding.setDisplayElement(codeDisplayText(identifierCode));
         idType.getCoding().add(idTypeCoding);
-        idType.setText(identifierCode.getIdentifierCode() + " --> " + codeDisplayText(identifierCode));
+        idType.setText(identifierCode.getToken() + " --> " + codeDisplayText(identifierCode));
         return(idType);
     }
 

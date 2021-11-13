@@ -75,7 +75,7 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): check the response");
         boolean responseOK = false;
         String responseReason = null;
-        if(responsePacket.getFulfillmentTaskId().equals(fulfillmentTask.getTaskId())){
+        if(responsePacket.getActionableTaskId().equals(fulfillmentTask.getActionableTaskId())){
             switch(responsePacket.getStatus()) {
                 case PACKET_RECEIVE_TIMED_OUT: {
                     responseOK = false;

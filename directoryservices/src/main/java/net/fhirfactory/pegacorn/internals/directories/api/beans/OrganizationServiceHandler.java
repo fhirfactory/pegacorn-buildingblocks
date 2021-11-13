@@ -1,9 +1,9 @@
 package net.fhirfactory.pegacorn.internals.directories.api.beans;
 
 import net.fhirfactory.pegacorn.internals.directories.api.beans.common.HandlerBase;
-import net.fhirfactory.pegacorn.internals.esr.brokers.OrganizationESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.internals.esr.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.model.ui.brokers.OrganizationESRBroker;
+import net.fhirfactory.pegacorn.model.ui.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.model.ui.transactions.ESRMethodOutcome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -55,7 +55,7 @@ public class PetasosFulfillmentTask extends PetasosTask{
         this.taskJobCard = null;
         this.taskJobCardLock = new SerializableObject();
         this.aRetry = false;
-        setTaskType(new TaskTypeType(TaskTypeTypeEnum.FULFILLMENT_TASK_TYPE));
+        setTaskType(new TaskTypeType(TaskTypeTypeEnum.PETASOS_FULFILLMENT_TASK_TYPE));
     }
 
     //
@@ -155,6 +155,7 @@ public class PetasosFulfillmentTask extends PetasosTask{
                 ", registered=" + isRegistered() +
                 ", taskPerformerTypes=" + getTaskPerformerTypes() +
                 ", isARetry=" + isaRetry() +
+                ", taskMetadata=" + getTaskMetadata() +
                 '}';
     }
 }

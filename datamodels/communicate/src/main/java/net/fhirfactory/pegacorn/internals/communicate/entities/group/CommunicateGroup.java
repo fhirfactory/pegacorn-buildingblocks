@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.internals.communicate.entities.group;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.CommunicateUser;
-import net.fhirfactory.pegacorn.internals.esr.resources.GroupESR;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.GroupESR;
 
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.common.valuesets;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 
 public enum CommunicateResourceTypeEnum {
     COMMUNICATE_CARETEAM("communicate.resource.careteam", "CommunicateCareTeam"),

@@ -22,10 +22,10 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets;
 
 public enum TaskTypeTypeEnum {
-    BASE_TASK_TYPE("Task", "petasos.task_type.base_task"),
-    ACTIONABLE_TASK_TYPE("ActionableTask", "petasos.task_type.actionable_task"),
-    FULFILLMENT_TASK_TYPE("FulfillmentTask", "petasos.task_type.fulfillment_task"),
-    OVERSIGHT_TASK_TYPE("OversightTask", "petasos.task_type.oversight_task");
+    PETASOS_BASE_TASK_TYPE("Task", "petasos.task_type.base_task"),
+    PETASOS_ACTIONABLE_TASK_TYPE("ActionableTask", "petasos.task_type.actionable_task"),
+    PETASOS_FULFILLMENT_TASK_TYPE("FulfillmentTask", "petasos.task_type.fulfillment_task"),
+    PETASOS_AGGREGATE_TASK_TYPE("OversightTask", "petasos.task_type.oversight_task");
 
     private String displayName;
     private String token;

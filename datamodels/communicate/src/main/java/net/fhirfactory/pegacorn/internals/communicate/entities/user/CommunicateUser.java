@@ -26,11 +26,11 @@ import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.Co
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserID;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.valuesets.CommunicateUserTypeEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.CommunicateUserESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.IdentifierESDTTypesEnum;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.CommunicateUserESR;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.valuesets.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.valuesets.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.valuesets.IdentifierESDTTypesEnum;
 
 public class CommunicateUser extends CommunicateUserESR {
     private CommunicateSurrogateResourceReference representedResource;

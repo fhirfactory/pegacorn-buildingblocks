@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes;
 
-import net.fhirfactory.pegacorn.internals.esr.resources.datatypes.ReferenceESDT;
-import net.fhirfactory.pegacorn.internals.esr.resources.valuesets.ExtremelySimplifiedResourceTypeEnum;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.ReferenceESDT;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 public class CommunicateSurrogateResourceReference {
     private ReferenceESDT realResourceID;

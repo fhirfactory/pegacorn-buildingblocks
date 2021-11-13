@@ -21,25 +21,15 @@
  */
 package net.fhirfactory.pegacorn.services.oam.topology.agent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityProviderNameServiceInterface;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
-import net.fhirfactory.pegacorn.deployment.names.capabilities.CapabilityProviderNameServiceInterface;
-import net.fhirfactory.pegacorn.deployment.names.capabilities.CapabilityProviderTitlesEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.InterProcessingPlantTopologyServicesBroker;
 import net.fhirfactory.pegacorn.petasos.oam.topology.PetasosMonitoredTopologyReportingAgent;
 import net.fhirfactory.pegacorn.petasos.oam.topology.cache.PetasosLocalTopologyReportingDM;
-import net.fhirfactory.pegacorn.services.oam.metrics.agent.PetasosMetricsAgentWorker;
-import net.fhirfactory.pegacorn.services.oam.monitoring.metrics.management.common.ITOpsReportForwarderCommon;
-import net.fhirfactory.pegacorn.petasos.itops.caches.ITOpsTopologyLocalDM;
-import net.fhirfactory.pegacorn.petasos.itops.caches.common.ITOpsLocalDMRefreshBase;
-import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsTopologyCollectionAgent;
-import net.fhirfactory.pegacorn.petasos.itops.valuesets.ITOpsCapabilityNamesEnum;
-import net.fhirfactory.pegacorn.petasos.model.itops.topology.ITOpsTopologyGraph;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +39,15 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 
 @ApplicationScoped
 public class PetasosTopologyReportWorker {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosTopologyReportWorker.class);
     private boolean initialised;
+    private static long SYNCHRONIZATION_CHECK_PERIOD = 30000;
+    private static long INITIAL_CHECK_DELAY_PERIOD=60000;
+    private boolean backgroundCheckInitiated;
+    private ObjectMapper jsonMapper;
 
     @Inject
     private PetasosLocalTopologyReportingDM itOpsTopologyDM;
@@ -66,18 +59,26 @@ public class PetasosTopologyReportWorker {
     private InterProcessingPlantTopologyServicesBroker topologyServicesBroker;
 
     @Inject
+    private PetasosTopologyReportingServiceProviderNameInterface topologyReportingServiceProviderName;
+
+    @Inject
     private ProcessingPlantInterface processingPlant;
 
     public PetasosTopologyReportWorker(){
         super();
         this.initialised = false;
+        this.backgroundCheckInitiated = false;
+        this.jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        this.jsonMapper.registerModule(module);
+        this.jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
     @PostConstruct
     public void initialise(){
         if(!initialised){
             if(!getProcessingPlant().isITOpsNode()) {
-                scheduleMetricsForwarding();
+                scheduleTopologyGraphForwarding();
             }
             this.initialised = true;
         }
@@ -109,71 +110,31 @@ public class PetasosTopologyReportWorker {
         currentState.setDeploymentName(getProcessingPlant().getSolutionNode().getComponentRDN().getNodeName());
         LOG.trace(".forwardTopologyDetails(): [Grab Current Topology Graph] Finish");
         //
-        // Build Query
+        // Send Update
         //
-        LOG.trace(".forwardTopologyDetails(): [Create Task] Start");
-        CapabilityUtilisationRequest task = new CapabilityUtilisationRequest();
-        task.setRequestID(UUID.randomUUID().toString());
-        String topologyGraphAsJSONString = convertToJSONString(currentState);
-        if(StringUtils.isEmpty(topologyGraphAsJSONString)){
-            LOG.debug(".forwardTopologyDetails(): Exit");
-            return;
-        }
-        task.setRequestContent(topologyGraphAsJSONString);
-        task.setRequiredCapabilityName(ITOpsCapabilityNamesEnum.IT_OPS_TOPOLOGY_REPORT_COLLATOR.getCapabilityName());
-        task.setRequestDate(Instant.now());
-        LOG.trace(".forwardTopologyDetails(): [Create Task] Finish");
+        String topologyReportingServer = topologyReportingServiceProviderName.getPetasosTopologyReportingServiceProviderName();
+        Instant updateInstant = topologyServicesBroker.shareLocalTopologyGraph(topologyReportingServer, currentState);
         //
-        // Do Query
+        // All Done!
         //
-        LOG.trace(".forwardTopologyDetails(): [Execute RPC Call] Start");
-        String serviceProvider = capabilityProviderNameResolver.resolveCapabilityServiceProvider(CapabilityProviderTitlesEnum.CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS);
-        CapabilityUtilisationResponse response = getCapabilityUtilisationBroker().executeTask(serviceProvider, task);
-        LOG.trace(".forwardTopologyDetails(): [Execute RPC Call] Finish");
-        //
-        // Extract the response
-        //
-        if(response == null){
-            LOG.error(".forwardTopologyDetails(): Problem updating Topology details with the Information Manager");
-            return;
-        }
-        if(response.isSuccessful()){
-            LOG.debug(".forwardTopologyDetails(): Exit, Topology details updated with the Information Manager");
-            itOpsTopologyDM.stateReported();
-            return;
-        } else {
-            LOG.error(".forwardTopologyDetails(): Exit, Unsuccesful attemt at updating Topology details with the Information Manager");
-            return;
-        }
-    }
-
-
-    private String convertToJSONString(ITOpsTopologyGraph graph){
-        try {
-            String reportString = getJsonMapper().writeValueAsString(graph);
-            return(reportString);
-        } catch (JsonProcessingException e) {
-            LOG.error(".convertToJSONString(): Unable to convert ->{}",e);
-            return(null);
-        }
+        LOG.debug(".forwardTopologyDetails(): Exit, updateInstant->{}", updateInstant);
     }
 
     //
     // Schedule Period Synchronisation Check/Update Activity
     //
 
-    @Override
-    public void scheduleMetricsForwarding() {
+    public void scheduleTopologyGraphForwarding() {
 
-        getLogger().debug(".scheduleITOpsBackgroundSynchronisationTask(): Entry");
+        getLogger().debug(".scheduleTopologyGraphForwarding(): Entry");
         if(isBackgroundCheckInitiated()){
             // do nothing
         } else {
             TimerTask ITOpsTopologyCacheSynchronisationCheck = new TimerTask() {
                 public void run() {
-                    getLogger().debug(".ITOpsCacheSynchronisationCheck(): Entry");
+                    getLogger().debug(".ITOpsTopologyCacheSynchronisationCheck(): Entry");
                     forwardTopologyDetails();
-                    getLogger().debug(".ITOpsCacheSynchronisationCheck(): Exit");
+                    getLogger().debug(".ITOpsTopologyCacheSynchronisationCheck(): Exit");
                 }
             };
             String timerName = "ITOpsTopologyCacheSynchronisationCheck";
@@ -181,6 +142,29 @@ public class PetasosTopologyReportWorker {
             timer.schedule(ITOpsTopologyCacheSynchronisationCheck, getInitialCheckDelayPeriod(), getSynchronizationCheckPeriod());
             setBackgroundCheckInitiated(true);
         }
-        getLogger().debug(".scheduleITOpsBackgroundSynchronisationTask(): Exit");
+        getLogger().debug(".scheduleTopologyGraphForwarding(): Exit");
+    }
+
+    //
+    // Getters (and Setters)
+    //
+    public static long getSynchronizationCheckPeriod() {
+        return SYNCHRONIZATION_CHECK_PERIOD;
+    }
+
+    public static long getInitialCheckDelayPeriod() {
+        return INITIAL_CHECK_DELAY_PERIOD;
+    }
+
+    public boolean isBackgroundCheckInitiated() {
+        return backgroundCheckInitiated;
+    }
+
+    public void setBackgroundCheckInitiated(boolean value){
+        this.backgroundCheckInitiated = value;
+    }
+
+    public ObjectMapper getJsonMapper() {
+        return jsonMapper;
     }
 }

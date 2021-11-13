@@ -25,7 +25,49 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCS
 
 public class HTTPClientAdapter extends IPCSocketBasedAdapter {
 
+    private String contextPath;
+
+    //
+    // Constructor(s)
+    //
+
     public HTTPClientAdapter(){
         super();
+        this.contextPath = null;
+    }
+
+    //
+    // Getters and Setters
+    //
+
+    public String getContextPath() {
+        return contextPath;
+    }
+
+    public void setContextPath(String contextPath) {
+        this.contextPath = contextPath;
+    }
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "HTTPClientAdapter{" +
+                "contextPath='" + contextPath + '\'' +
+                ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
+                ", targetNameInstant='" + getTargetNameInstant() + '\'' +
+                ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
+                ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
+                ", supportInterfaceTags=" + getSupportInterfaceTags() +
+                ", encrypted=" + isEncrypted() +
+                ", groupName='" + getGroupName() + '\'' +
+                ", active=" + isActive() +
+                ", additionalParameters=" + getAdditionalParameters() +
+                ", lastActivity=" + getLastActivity() +
+                ", portNumber=" + getPortNumber() +
+                ", hostName='" + getHostName() + '\'' +
+                '}';
     }
 }

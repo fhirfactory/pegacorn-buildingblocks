@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.internals.communicate.entities.careteam.valueset
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.CommunicateSession;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
-import net.fhirfactory.pegacorn.internals.esr.resources.CareTeamESR;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.CareTeamESR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -23,8 +23,8 @@ package net.fhirfactory.pegacorn.internals.directories.api;
 
 import net.fhirfactory.pegacorn.internals.directories.api.beans.CareTeamServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
-import net.fhirfactory.pegacorn.internals.esr.resources.CareTeamESR;
-import net.fhirfactory.pegacorn.internals.esr.resources.RoleESR;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.CareTeamESR;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.RoleESR;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.rest.RestParamType;

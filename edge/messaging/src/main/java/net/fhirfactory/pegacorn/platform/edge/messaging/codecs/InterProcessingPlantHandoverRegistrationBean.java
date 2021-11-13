@@ -42,24 +42,31 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.datatypes.WUPIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.Date;
 
 @ApplicationScoped
 public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanCommon {
@@ -69,44 +76,72 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
     TopologyIM topologyIM;
 
     @Inject
-    LocalTaskActivityController servicesBroker;
+    PetasosLocalMetricsDM metricsAgent;
 
     @Inject
-    WorkUnitProcessorMetricsCollectionAgent metricsAgent;
+    private PetasosActionableTaskFactory actionableTaskFactory;
+
+    @Inject
+    private PetasosFulfillmentTaskFactory fulfillmentTaskFactory;
+
+    @Inject
+    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+
+    @Inject
+    private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
 
     public InterProcessingPlantHandoverRegistrationBean() {
     }
 
-    public InterProcessingPlantHandoverPacket ipcReceiverActivityStart(InterProcessingPlantHandoverPacket thePacket, Exchange camelExchange, String wupInstanceKey) {
-        LOG.debug(".ipcReceiverActivityStart(): Entry, thePacket --> {}, wupInstanceKey --> {}", thePacket, wupInstanceKey);
+    public InterProcessingPlantHandoverPacket ipcReceiverActivityStart(InterProcessingPlantHandoverPacket handoverPacket, Exchange camelExchange, String wupInstanceKey) {
+        LOG.debug(".ipcReceiverActivityStart(): Entry, handoverPacket->{}, wupInstanceKey->{}", handoverPacket, wupInstanceKey);
         LOG.trace(".ipcReceiverActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".ipcReceiverActivityStart(): Node Element retrieved --> {}", node);
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".ipcReceiverActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
-        LOG.trace(".ipcReceiverActivityStart(): Building the ActivityID for this activity");
-        WUPIdentifier wupNodeID = new WUPIdentifier(node.getComponentFDN().getToken());
-        ActivityID newActivityID = new ActivityID();
-        newActivityID.setPresentWUPFunctionToken(wupFunctionToken);
-        newActivityID.setPresentWUPIdentifier(wupNodeID);
-        newActivityID.setPresentEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
-        newActivityID.setPreviousEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
-        newActivityID.setPreviousParcelIdentifier(thePacket.getActivityID().getPresentParcelIdentifier());
-        metricsAgent.incrementIngresMessageCount(node.getComponentID());
-        metricsAgent.incrementRegisteredTasks(node.getComponentID());
-        metricsAgent.incrementStartedTasks(node.getComponentID());
-        metricsAgent.getNodeMetrics(node.getComponentID()).setEventProcessingStartInstant(thePacket.getEventProcessingStartTime());
-        LOG.trace(".ipcReceiverActivityStart(): newActivityID (ActivityID) --> {}", newActivityID);
-        UoW theUoW = thePacket.getPayloadPacket();
-        LOG.trace(".ipcReceiverActivityStart(): Creating new JobCard");
-        WUPJobCard activityJobCard = new WUPJobCard(newActivityID, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, node.getConcurrencyMode(), node.getResilienceMode(), Date.from(Instant.now()));
-        LOG.trace(".ipcReceiverActivityStart(): Registering the Work Unit Activity using the activityJobCard --> {} and UoW --> {}", activityJobCard, theUoW);
-        ParcelStatusElement statusElement = this.servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
-        LOG.trace(".ipcReceiverActivityStart(): Registration aftermath: statusElement --> {}", statusElement);
-        LOG.trace(".ipcReceiverActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, activityJobCard);
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_EXCHANGE_PROPERTY_NAME, statusElement);
+
+        LOG.trace(".ipcReceiverActivityStart(): Create and register a new ActionableTask: Start");
+        TaskWorkItemType taskWorkItem = SerializationUtils.clone(handoverPacket.getActionableTask().getTaskWorkItem());
+        PetasosActionableTask incomingActionableTask = handoverPacket.getActionableTask();
+        TaskTraceabilityElementType upstreamTaskTraceability = handoverPacket.getUpstreamFulfillmentTaskDetails();
+        PetasosActionableTask newActionableTask = actionableTaskFactory.newMessageBasedActionableTask(incomingActionableTask, upstreamTaskTraceability, taskWorkItem);
+        actionableTaskActivityController.registerActionableTask(newActionableTask);
+        LOG.trace(".ipcReceiverActivityStart(): Create and register a new ActionableTask: Finish");
+
+        LOG.trace(".ipcReceiverActivityStart(): Create and register a new FulfillmentTask: Start");
+        PetasosFulfillmentTask newFulfillmentTask = fulfillmentTaskFactory.newFulfillmentTask(newActionableTask, node);
+        fulfilmentTaskActivityController.registerFulfillmentTask(newFulfillmentTask, false);
+        LOG.trace(".ipcReceiverActivityStart(): Create and register a new FulfillmentTask: Finish");
+
+        //
+        // Given that this WUP/Node is the "only" one receiving the handover packet, we can assume it should also
+        // have execution priveleges.
+        LOG.trace(".ipcReceiverActivityStart(): Update Fulfillment Task Status: Start");
+        synchronized (newFulfillmentTask.getTaskFulfillmentLock()){
+            newFulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+        }
+        synchronized (newFulfillmentTask.getTaskJobCardLock()){
+            newFulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
+            newFulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
+            newFulfillmentTask.getTaskJobCard().setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
+            newFulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+            newFulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
+        }
+        fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionStart(newFulfillmentTask.getTaskId());
+        LOG.trace(".ipcReceiverActivityStart(): Update Fulfillment Task Status: Finish");
+
+
+        LOG.trace(".ipcReceiverActivityStart(): Capture some metrics: Start");
+        metricsAgent.getWorkUnitProcessorMetricsAgent(node.getComponentID()).incrementIngresMessageCount();
+        metricsAgent.getWorkUnitProcessorMetricsAgent(node.getComponentID()).incrementRegisteredTasks();
+        metricsAgent.getWorkUnitProcessorMetricsAgent(node.getComponentID()).incrementStartedTasks();
+        metricsAgent.getWorkUnitProcessorMetricsAgent(node.getComponentID()).setEventProcessingStartInstant(handoverPacket.getEventProcessingStartTime());
+        LOG.trace(".ipcReceiverActivityStart(): Capture some metrics: Finish");
+
+        LOG.trace(".ipcReceiverActivityStart(): Injecting Fulfillment Task into Exchange for extraction by the WUP Egress Conduit");
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, newFulfillmentTask);
         LOG.debug(".ipcReceiverActivityStart(): exit, my work is done!");
-        return thePacket;
+        return handoverPacket;
     }
 }

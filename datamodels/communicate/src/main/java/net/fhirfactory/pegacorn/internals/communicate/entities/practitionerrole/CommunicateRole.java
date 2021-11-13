@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.communicate.entities.practitionerrole;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.internals.esr.resources.RoleESR;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.RoleESR;
 import net.fhirfactory.pegacorn.communicate.synapse.model.SynapseUser;
 
 public class CommunicateRole extends RoleESR{

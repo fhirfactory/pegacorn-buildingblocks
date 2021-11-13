@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.task;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.metadata.TaskMetadataType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
@@ -34,9 +35,14 @@ import net.fhirfactory.pegacorn.internals.SerializableObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PetasosTask implements Serializable {
+
+    private TaskMetadataType taskMetadata;
+    private SerializableObject taskMetadataLock;
 
     private TaskIdType taskId;
     private SerializableObject taskIdLock;
@@ -62,6 +68,9 @@ public class PetasosTask implements Serializable {
     private ComponentIdType taskNodeAffinity;
     private SerializableObject taskNodeAffinityLock;
 
+    private Map<TaskIdType, PetasosTask> subTasks;
+    private SerializableObject subTasksLock;
+
     private boolean registered;
 
     //
@@ -75,6 +84,8 @@ public class PetasosTask implements Serializable {
         this.taskWorkItemLock = new SerializableObject();
         this.taskTraceability = new TaskTraceabilityType();
         this.taskTraceabilityLock = new SerializableObject();
+        this.subTasks = new HashMap<>();
+        this.subTasksLock = new SerializableObject();
         this.taskOutcomeStatus = null;
         this.taskOutcomeStatusLock = new SerializableObject();
         this.registered = false;
@@ -86,6 +97,8 @@ public class PetasosTask implements Serializable {
         this.taskReasonLock = new SerializableObject();
         this.taskNodeAffinity = null;
         this.taskNodeAffinityLock = new SerializableObject();
+        this.taskMetadata = null;
+        this.taskMetadataLock = new SerializableObject();
     }
 
     //
@@ -276,6 +289,56 @@ public class PetasosTask implements Serializable {
         this.taskNodeAffinityLock = taskNodeAffinityLock;
     }
 
+    @JsonIgnore
+    public boolean hasSubTasks(){
+        boolean hasValue = this.subTasks != null;
+        return(hasValue);
+    }
+
+    public Map<TaskIdType, PetasosTask> getSubTasks() {
+        return (this.subTasks);
+    }
+
+    public void setSubTasks(Map<TaskIdType, PetasosTask> tasks) {
+        if(this.subTasks == null){
+            this.subTasks = new HashMap<>();
+        }
+        this.subTasks.clear();
+        for(TaskIdType currentTaskId: tasks.keySet()){
+            this.subTasks.put(currentTaskId, tasks.get(currentTaskId));
+        }
+    }
+
+    public SerializableObject getSubTasksLock() {
+        return subTasksLock;
+    }
+
+    public void setSubTasksLock(SerializableObject subTasksLock) {
+        this.subTasksLock = subTasksLock;
+    }
+
+    @JsonIgnore
+    public boolean hasTaskMetadata(){
+        boolean hasValue = this.taskMetadata != null;
+        return(hasValue);
+    }
+
+    public TaskMetadataType getTaskMetadata() {
+        return taskMetadata;
+    }
+
+    public void setTaskMetadata(TaskMetadataType taskMetadata) {
+        this.taskMetadata = taskMetadata;
+    }
+
+    public SerializableObject getTaskMetadataLock() {
+        return taskMetadataLock;
+    }
+
+    public void setTaskMetadataLock(SerializableObject taskMetadataLock) {
+        this.taskMetadataLock = taskMetadataLock;
+    }
+
     //
     // To String
     //
@@ -291,6 +354,8 @@ public class PetasosTask implements Serializable {
                 ", registered=" + registered +
                 ", taskPerformers=" + taskPerformerTypes +
                 ", taskReason=" + taskReason +
+                ", subTasks=" + getSubTasks() +
+                ", taskMetadata=" + getTaskMetadata() +
                 '}';
     }
 }

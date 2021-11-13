@@ -131,6 +131,11 @@ public class PetasosActionableTaskFactory {
         newTask.setTaskNodeAffinity(processingPlant.getProcessingPlantNode().getComponentID());
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Node Affinity] Finish");
         //
+        // add the task work item
+        getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Item] Start");
+        newTask.setTaskWorkItem(payload);
+        getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Item] Finish");
+        //
         // return the object
         getLogger().debug(".newMessageBasedActionableTask(): Exit, petasosActionableTask->{}", newTask);
         return(newTask);

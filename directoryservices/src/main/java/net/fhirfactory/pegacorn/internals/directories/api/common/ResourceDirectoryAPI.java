@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.directories.api.common;
 
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceNotFoundException;
-import net.fhirfactory.pegacorn.internals.esr.transactions.exceptions.ResourceUpdateException;
+import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.model.ui.transactions.exceptions.ResourceNotFoundException;
+import net.fhirfactory.pegacorn.model.ui.transactions.exceptions.ResourceUpdateException;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;

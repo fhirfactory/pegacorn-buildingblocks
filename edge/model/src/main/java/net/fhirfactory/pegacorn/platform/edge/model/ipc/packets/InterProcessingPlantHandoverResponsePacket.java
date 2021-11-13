@@ -29,7 +29,8 @@ import java.io.Serializable;
 import java.time.Instant;
 
 public class InterProcessingPlantHandoverResponsePacket implements Serializable {
-    private TaskIdType fulfillmentTaskId;
+    private TaskIdType downstreamActionableTaskId;
+    private TaskIdType actionableTaskId;
     private String messageIdentifier;
     private Integer messageSize;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
@@ -42,7 +43,8 @@ public class InterProcessingPlantHandoverResponsePacket implements Serializable 
     //
 
     public InterProcessingPlantHandoverResponsePacket(){
-        this.fulfillmentTaskId = null;
+        this.downstreamActionableTaskId = null;
+        this.actionableTaskId = null;
         this.messageIdentifier = null;
         this.messageSize = null;
         this.messageSendFinishInstant = null;
@@ -58,16 +60,24 @@ public class InterProcessingPlantHandoverResponsePacket implements Serializable 
         return status;
     }
 
+    public TaskIdType getActionableTaskId() {
+        return actionableTaskId;
+    }
+
+    public void setActionableTaskId(TaskIdType actionableTaskId) {
+        this.actionableTaskId = actionableTaskId;
+    }
+
     public void setStatus(InterProcessingPlantHandoverPacketStatusEnum status) {
         this.status = status;
     }
 
-    public TaskIdType getFulfillmentTaskId() {
-        return fulfillmentTaskId;
+    public TaskIdType getDownstreamActionableTaskId() {
+        return downstreamActionableTaskId;
     }
 
-    public void setFulfillmentTaskId(TaskIdType fulfillmentTaskId) {
-        this.fulfillmentTaskId = fulfillmentTaskId;
+    public void setDownstreamActionableTaskId(TaskIdType downstreamActionableTaskId) {
+        this.downstreamActionableTaskId = downstreamActionableTaskId;
     }
 
     public String getMessageIdentifier() {
@@ -109,7 +119,8 @@ public class InterProcessingPlantHandoverResponsePacket implements Serializable 
     @Override
     public String toString() {
         return "InterProcessingPlantHandoverResponsePacket{" +
-                "fulfillmentTaskId=" + fulfillmentTaskId +
+                "downstreamActionableTaskId=" + downstreamActionableTaskId +
+                ", actionableTaskId=" + actionableTaskId +
                 ", messageIdentifier='" + messageIdentifier + '\'' +
                 ", messageSize=" + messageSize +
                 ", messageSendFinishInstant=" + messageSendFinishInstant +

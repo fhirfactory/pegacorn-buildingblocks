@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.oversight.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosOversightTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosAggregateTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.factories.TaskIdTypeFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
@@ -58,7 +58,7 @@ public class PetasosOversightTaskFactory {
     // Business Methods
     //
 
-    public PetasosOversightTask newOversightTask(PetasosActionableTask actionableTask, WorkUnitProcessorTopologyNode wupNode) {
+    public PetasosAggregateTask newOversightTask(PetasosActionableTask actionableTask, WorkUnitProcessorTopologyNode wupNode) {
         getLogger().debug(".newFulfillmentTask(): Enter, actionableTask->{}, wupNode->{}", actionableTask, wupNode );
 
         // Get the core Items from the actionableTask (PetasosActionableTask)
@@ -69,7 +69,7 @@ public class PetasosOversightTaskFactory {
 
         // Construct the PetasosOversightTask using the ActionableTask details
 
-        PetasosOversightTask oversightTask = new PetasosOversightTask();
+        PetasosAggregateTask oversightTask = new PetasosAggregateTask();
         oversightTask.setTaskId(taskIdFactory.newTaskId());
 
         oversightTask.setTaskWorkItem(taskWorkItem);

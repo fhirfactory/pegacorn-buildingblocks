@@ -24,8 +24,10 @@ package net.fhirfactory.pegacorn.services.tasks.agent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.services.tasks.distribution.PetasosTasksDistributionHandler;
+import org.slf4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
 public class PetasosTasksAgentHandler extends PetasosTasksDistributionHandler {
@@ -41,6 +43,16 @@ public class PetasosTasksAgentHandler extends PetasosTasksDistributionHandler {
 
     @Override
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
+        return null;
+    }
+
+    @Override
+    public List<PetasosActionableTask> retrievePendingActionableTasks(PetasosEndpointIdentifier requestorEndpointIdentifier) {
+        return null;
+    }
+
+    @Override
+    protected Logger specifyLogger() {
         return null;
     }
 }

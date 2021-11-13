@@ -21,25 +21,15 @@
  */
 package net.fhirfactory.pegacorn.services.oam.subscriptions.agent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityProviderNameServiceInterface;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.fhirfactory.pegacorn.core.interfaces.pubsub.PetasosSubscriptionReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
-import net.fhirfactory.pegacorn.deployment.names.capabilities.CapabilityProviderNameServiceInterface;
-import net.fhirfactory.pegacorn.deployment.names.capabilities.CapabilityProviderTitlesEnum;
-import net.fhirfactory.pegacorn.petasos.oam.common.LocalOAMCacheBase;
+import net.fhirfactory.pegacorn.petasos.endpoints.InterProcessingPlantSubscriptionServicesBroker;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.PetasosSubscriptionReportingAgent;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
-import net.fhirfactory.pegacorn.services.oam.metrics.agent.PetasosMetricsAgentWorker;
-import net.fhirfactory.pegacorn.services.oam.monitoring.metrics.management.common.ITOpsReportForwarderCommon;
-import net.fhirfactory.pegacorn.petasos.itops.caches.ITOpsPubSubMapLocalDM;
-import net.fhirfactory.pegacorn.petasos.itops.caches.common.ITOpsLocalDMRefreshBase;
-import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsPubSubCollectionAgent;
-import net.fhirfactory.pegacorn.petasos.itops.valuesets.ITOpsCapabilityNamesEnum;
-import net.fhirfactory.pegacorn.petasos.model.itops.subscriptions.ITOpsPubSubReport;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +39,15 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 
 @ApplicationScoped
 public class PetasosSubscriptionReportWorker {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosSubscriptionReportWorker.class);
     private boolean initialised;
+    private static long SYNCHRONIZATION_CHECK_PERIOD = 30000;
+    private static long INITIAL_CHECK_DELAY_PERIOD=60000;
+    private boolean backgroundCheckInitiated;
+    private ObjectMapper jsonMapper;
 
     @Inject
     private PetasosLocalSubscriptionReportingDM pubsubMapDM;
@@ -63,7 +56,10 @@ public class PetasosSubscriptionReportWorker {
     private PetasosSubscriptionReportingAgent pubSubCollectionAgent;
 
     @Inject
-    private InterProcessingPlant
+    private InterProcessingPlantSubscriptionServicesBroker subscriptionServicesBroker;
+
+    @Inject
+    private PetasosSubscriptionReportingServiceProviderNameInterface serviceProviderName;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -71,13 +67,18 @@ public class PetasosSubscriptionReportWorker {
     public PetasosSubscriptionReportWorker() {
         super();
         this.initialised = false;
+        this.backgroundCheckInitiated = false;
+        this.jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        this.jsonMapper.registerModule(module);
+        this.jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
     @PostConstruct
     public void initialise(){
         if(!initialised){
             if(!getProcessingPlant().isITOpsNode()) {
-                scheduleMetricsForwarding();
+                scheduleSubscriptionMapForwarding();
             }
             this.initialised = true;
         }
@@ -102,70 +103,29 @@ public class PetasosSubscriptionReportWorker {
         pubSubReport.setProcessingPlantComponentID(getProcessingPlant().getProcessingPlantNode().getComponentID());
         LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Report] Start");
         //
-        // Build Task
+        // Send via Broker
         //
-        LOG.trace(".forwardPubSubReports(): [Build Report Submission Task] Start");
-        CapabilityUtilisationRequest task = new CapabilityUtilisationRequest();
-        task.setRequestID(UUID.randomUUID().toString());
-        String pubsubReportString = convertToJSONString(pubSubReport);
-        if(StringUtils.isEmpty(pubsubReportString)){
-            LOG.trace(".forwardPubSubReports(): [Build Report Submission Task] Terminate Activity, Nothing To Report");
-            return;
-        }
-        task.setRequestContent(pubsubReportString);
-        task.setRequiredCapabilityName(ITOpsCapabilityNamesEnum.IT_OPS_PUBSUB_REPORT_COLLATOR.getCapabilityName());
-        task.setRequestDate(Instant.now());
-        LOG.trace(".forwardPubSubReports(): [Build Report Submission Task] Finish");
-        //
-        // Execute Task
-        //
-        LOG.trace(".forwardPubSubReports(): [Execute Report Submission Task] Start");
-        String serviceProvider = capabilityProviderNameResolver.resolveCapabilityServiceProvider(CapabilityProviderTitlesEnum.CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS);
-        CapabilityUtilisationResponse response = getCapabilityUtilisationBroker().executeTask(serviceProvider, task);
-        LOG.trace(".forwardPubSubReports(): [Execute Report Submission Task] Finish");
-        //
-        // Extract the response
-        //
-        if(response == null){
-            LOG.error(".forwardPubSubReports(): Problem updating PubSub details with the Information Manager");
-            return;
-        }
-        if(response.isSuccessful()){
-            LOG.debug(".forwardPubSubReports(): Exit, PubSub details updated with the Information Manager");
-            pubsubMapDM.refreshReportedStateUpdateInstant();
-            return;
-        } else {
-            LOG.error(".forwardPubSubReports(): Exit, Unsuccesful attemt at updating PubSub details with the Information Manager");
-            return;
-        }
-    }
+        String subscriptionReportingServerName = serviceProviderName.getPetasosSubscriptionReportingServiceProviderName();
+        Instant submissionInstant = subscriptionServicesBroker.shareSubscriptionSummaryReport(subscriptionReportingServerName, pubSubReport);
 
-    private String convertToJSONString(ITOpsPubSubReport pubSubReport){
-        try {
-            String reportString = getJsonMapper().writeValueAsString(pubSubReport);
-            return(reportString);
-        } catch (JsonProcessingException e) {
-            LOG.error(".convertToJSONString(): Unable to convert ->{}",e);
-            return(null);
-        }
+        LOG.debug(".forwardPubSubReports(): Finished, sent time->{}", submissionInstant);
     }
 
     //
     // Schedule Period Synchronisation Check/Update Activity
     //
 
-    @Override
-    public void scheduleMetricsForwarding() {
+    public void scheduleSubscriptionMapForwarding() {
 
-        getLogger().debug(".scheduleITOpsBackgroundSynchronisationTask(): Entry");
+        getLogger().debug(".scheduleSubscriptionMapForwarding(): Entry");
         if(isBackgroundCheckInitiated()){
             // do nothing
         } else {
             TimerTask ITOpsPubSubCacheSynchronisationCheck = new TimerTask() {
                 public void run() {
-                    getLogger().debug(".ITOpsCacheSynchronisationCheck(): Entry");
+                    getLogger().debug(".ITOpsPubSubCacheSynchronisationCheck(): Entry");
                     forwardPubSubReports();
-                    getLogger().debug(".ITOpsCacheSynchronisationCheck(): Exit");
+                    getLogger().debug(".ITOpsPubSubCacheSynchronisationCheck(): Exit");
                 }
             };
             String timerName = "ITOpsPubSubCacheSynchronisationCheck";
@@ -173,7 +133,7 @@ public class PetasosSubscriptionReportWorker {
             timer.schedule(ITOpsPubSubCacheSynchronisationCheck, getInitialCheckDelayPeriod(), getSynchronizationCheckPeriod());
             setBackgroundCheckInitiated(true);
         }
-        getLogger().debug(".scheduleITOpsBackgroundSynchronisationTask(): Exit");
+        getLogger().debug(".scheduleSubscriptionMapForwarding(): Exit");
     }
 
     //
@@ -186,5 +146,29 @@ public class PetasosSubscriptionReportWorker {
 
     protected Logger getLogger() {
         return (LOG);
+    }
+
+    public boolean isInitialised() {
+        return initialised;
+    }
+
+    public static long getSynchronizationCheckPeriod() {
+        return SYNCHRONIZATION_CHECK_PERIOD;
+    }
+
+    public static long getInitialCheckDelayPeriod() {
+        return INITIAL_CHECK_DELAY_PERIOD;
+    }
+
+    public boolean isBackgroundCheckInitiated() {
+        return backgroundCheckInitiated;
+    }
+
+    public void setBackgroundCheckInitiated(boolean value){
+        this.backgroundCheckInitiated = value;
+    }
+
+    public ObjectMapper getJsonMapper() {
+        return jsonMapper;
     }
 }

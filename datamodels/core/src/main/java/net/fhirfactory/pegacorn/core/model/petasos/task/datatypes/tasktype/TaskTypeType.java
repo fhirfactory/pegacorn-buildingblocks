@@ -35,7 +35,7 @@ public class TaskTypeType implements Serializable {
     //
 
     public TaskTypeType(){
-        this.taskType = TaskTypeTypeEnum.BASE_TASK_TYPE;
+        this.taskType = TaskTypeTypeEnum.PETASOS_BASE_TASK_TYPE;
         this.taskSubType = null;
     }
 

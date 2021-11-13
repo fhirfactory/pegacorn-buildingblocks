@@ -104,7 +104,8 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
         } catch (NoSuchMethodException e) {
             getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());
             InterProcessingPlantHandoverResponsePacket response = new InterProcessingPlantHandoverResponsePacket();
-            response.setFulfillmentTaskId(handoverPacket.getActionableTask().getActionableTaskId());
+            response.setFulfillmentTaskId(handoverPacket.getUpstreamFulfillmentTaskDetails().getFulfillerTaskId());
+            response.setActionableTaskId(handoverPacket.getActionableTask().getTaskId());
             response.setStatus(InterProcessingPlantHandoverPacketStatusEnum.PACKET_SEND_FAILURE);
             response.setStatusReason("Error (NoSuchMethodException)" + e.getMessage());
             return(response);
@@ -112,7 +113,8 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
             e.printStackTrace();
             getLogger().error(".sendIPCMessage: Error (GeneralException) ->{}", e.getMessage());
             InterProcessingPlantHandoverResponsePacket response = new InterProcessingPlantHandoverResponsePacket();
-            response.setFulfillmentTaskId(handoverPacket.getActionableTask().getTaskId());
+            response.setActionableTaskId(handoverPacket.getActionableTask().getTaskId());
+            response.setFulfillmentTaskId(handoverPacket.getUpstreamFulfillmentTaskDetails().getFulfillerTaskId());
             response.setStatus(InterProcessingPlantHandoverPacketStatusEnum.PACKET_SEND_FAILURE);
             response.setStatusReason("Error (GeneralException)" + e.getMessage());
             return(response);
