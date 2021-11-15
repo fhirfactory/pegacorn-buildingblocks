@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterfac
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;
@@ -143,7 +143,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
             return(null);
         }
         if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(ComponentTypeTypeEnum.WUP)) {
-            WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
+            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
             switch (wup.getComponentSystemRole()) {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {
@@ -188,7 +188,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
             return(null);
         }
         if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(ComponentTypeTypeEnum.WUP)) {
-            WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
+            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
             switch (wup.getComponentSystemRole()) {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {

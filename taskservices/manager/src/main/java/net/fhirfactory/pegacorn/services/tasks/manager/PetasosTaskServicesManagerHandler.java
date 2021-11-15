@@ -34,22 +34,35 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApplicationScoped
-public class PetasosTaskServicesManagerHandler extends PetasosTasksDistributionHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosTaskServicesManagerHandler.class);
+public abstract class PetasosTaskServicesManagerHandler extends PetasosTasksDistributionHandler {
 
-    @Inject
-    private PetasosActionableTaskDM actionableTaskDM;
+    //
+    // Constructor(s)
+    //
 
-    @Override
-    protected Logger specifyLogger() {
-        return (LOG);
-    }
+
+    //
+    // Abstract Methods
+    //
+
+    abstract protected PetasosActionableTaskDM specifyActionableTaskDM();
+
+    //
+    // Getters and Setters
+    //
+
+   protected PetasosActionableTaskDM getActionableTaskDM(){
+       return(specifyActionableTaskDM());
+   }
+
+    //
+    // Business Methods
+    //
 
     @Override
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
         getLogger().debug(".retrievePendingActionableTasks(): Entry, actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
-        PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = actionableTaskDM.registerPetasosActionableTask(actionableTask, requesterEndpointIdentifier);
+        PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().registerPetasosActionableTask(actionableTask, requesterEndpointIdentifier);
         PetasosActionableTask registeredActionableTask = petasosActionableTaskRegistration.getActionableTask();
         getLogger().debug(".retrievePendingActionableTasks(): Exit, registeredActionableTask->{}", registeredActionableTask);
         return(registeredActionableTask);
@@ -58,7 +71,7 @@ public class PetasosTaskServicesManagerHandler extends PetasosTasksDistributionH
     @Override
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
         getLogger().debug(".retrievePendingActionableTasks(): Entry, actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
-        PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = actionableTaskDM.updatePetasosActionableTask(actionableTask, requesterEndpointIdentifier);
+        PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().updatePetasosActionableTask(actionableTask, requesterEndpointIdentifier);
         PetasosActionableTask updatedActionableTask = petasosActionableTaskRegistration.getActionableTask();
         getLogger().debug(".retrievePendingActionableTasks(): Exit, updatedActionableTask->{}", updatedActionableTask);
         return(updatedActionableTask);
@@ -72,7 +85,7 @@ public class PetasosTaskServicesManagerHandler extends PetasosTasksDistributionH
             getLogger().debug(".retrievePendingActionableTasks(): Exit, requestorEndpointIdentifier is null, returning empty list");
             return (taskList);
         }
-        List<PetasosActionableTask> waitingActionableTasksForComponent = actionableTaskDM.getWaitingActionableTasksForComponent(requestorEndpointIdentifier.getProcessingPlantComponentID());
+        List<PetasosActionableTask> waitingActionableTasksForComponent = getActionableTaskDM().getWaitingActionableTasksForComponent(requestorEndpointIdentifier.getProcessingPlantComponentID());
         taskList.addAll(waitingActionableTasksForComponent);
         getLogger().debug(".retrievePendingActionableTasks(): Exit");
         return(taskList);

@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
@@ -59,7 +59,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
     public InterProcessingPlantHandoverResponsePacket generateInterProcessingPlantHandoverResponse(InterProcessingPlantHandoverPacket incomingPacket, Exchange camelExchange, String wupInstanceKey) {
         LOG.debug(".generateInterProcessingPlantHandoverResponse(): Entry, incomingPacket (InterProcessingPlantHandoverPacket) --> {}, wupInstanceKey (String) --> {}", incomingPacket, wupInstanceKey);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): reconstituted token, now attempting to retrieve NodeElement");
-        WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
+        WorkUnitProcessorSoftwareComponent node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", node);
 
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Retrieve new PetasosFulfillmentTask from Camel exchange: Start");

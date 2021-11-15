@@ -9,13 +9,13 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.*;
 public interface PegacornTopologyFactoryInterface {
     public TopologyNodeRDN createNodeRDN(String nodeName, String nodeVersion, ComponentTypeTypeEnum nodeType);
 
-    public WorkshopTopologyNode createWorkshop(String name, String version, ProcessingPlantTopologyNode processingPlant, ComponentTypeTypeEnum nodeType);
+    public WorkshopSoftwareComponent createWorkshop(String name, String version, ProcessingPlantSoftwareComponent processingPlant, ComponentTypeTypeEnum nodeType);
 
-    public WorkUnitProcessorTopologyNode createWorkUnitProcessor(String name, String version, WorkshopTopologyNode workshop, ComponentTypeTypeEnum nodeType);
+    public WorkUnitProcessorSoftwareComponent createWorkUnitProcessor(String name, String version, WorkshopSoftwareComponent workshop, ComponentTypeTypeEnum nodeType);
 
-    public WorkUnitProcessorComponentTopologyNode createWorkUnitProcessorComponent(String name, ComponentTypeTypeEnum topologyType, WorkUnitProcessorTopologyNode wup);
+    public WorkUnitProcessorComponentTopologyNode createWorkUnitProcessorComponent(String name, ComponentTypeTypeEnum topologyType, WorkUnitProcessorSoftwareComponent wup);
 
-    public WorkUnitProcessorInterchangeComponentTopologyNode createWorkUnitProcessingInterchangeComponent(String name, ComponentTypeTypeEnum topologyNodeType, WorkUnitProcessorTopologyNode wup);
+    public WorkUnitProcessorInterchangeComponentTopologyNode createWorkUnitProcessingInterchangeComponent(String name, ComponentTypeTypeEnum topologyNodeType, WorkUnitProcessorSoftwareComponent wup);
 
     public Boolean getSubsystemInternalTrafficEncrypt();
 

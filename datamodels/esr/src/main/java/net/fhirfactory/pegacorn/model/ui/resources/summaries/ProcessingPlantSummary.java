@@ -19,23 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.oam.topology;
+package net.fhirfactory.pegacorn.model.ui.resources.summaries;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.common.PetasosMonitoredComponent;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PetasosMonitoredProcessingPlant extends PetasosMonitoredComponent{
+public class ProcessingPlantSummary extends SoftwareComponentSummary {
     private String platformID;
     private String securityZone;
     private String site;
-    private Map<ComponentIdType, PetasosMonitoredWorkshop> workshops;
+    private Map<ComponentIdType, WorkshopSummary> workshops;
     private String actualHostIP;
     private String actualPodIP;
 
-    public PetasosMonitoredProcessingPlant(){
+    public ProcessingPlantSummary(){
         workshops = new ConcurrentHashMap<>();
     }
 
@@ -47,15 +46,15 @@ public class PetasosMonitoredProcessingPlant extends PetasosMonitoredComponent{
         this.platformID = platformID;
     }
 
-    public Map<ComponentIdType, PetasosMonitoredWorkshop> getWorkshops() {
+    public Map<ComponentIdType, WorkshopSummary> getWorkshops() {
         return workshops;
     }
 
-    public void setWorkshops(Map<ComponentIdType, PetasosMonitoredWorkshop> workshops) {
+    public void setWorkshops(Map<ComponentIdType, WorkshopSummary> workshops) {
         this.workshops = workshops;
     }
 
-    public void addWorkshop(PetasosMonitoredWorkshop workshop){
+    public void addWorkshop(WorkshopSummary workshop){
         removeWorkshop(workshop.getComponentID());
         workshops.put(workshop.getComponentID(), workshop);
     }

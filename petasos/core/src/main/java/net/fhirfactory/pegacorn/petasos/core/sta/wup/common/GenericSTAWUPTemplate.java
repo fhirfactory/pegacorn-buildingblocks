@@ -8,8 +8,8 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
@@ -19,7 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 public abstract class GenericSTAWUPTemplate {
-    private WorkUnitProcessorTopologyNode wup;
+    private WorkUnitProcessorSoftwareComponent wup;
     private PetasosTaskJobCard wupJobCard;
     private boolean isInitialised;
 
@@ -42,7 +42,7 @@ public abstract class GenericSTAWUPTemplate {
     abstract protected String specifySTAClientVersion();
     abstract protected WUPArchetypeEnum specifyWUPArchetype();
     abstract protected Logger getLogger();
-    abstract protected WorkshopTopologyNode specifyWorkshop();
+    abstract protected WorkshopSoftwareComponent specifyWorkshop();
     abstract protected ProcessingPlantInterface specifyProcessingPlant();
     abstract protected PegacornTopologyFactoryInterface specifyTopologyFactory();
 
@@ -58,7 +58,7 @@ public abstract class GenericSTAWUPTemplate {
     }
 
     protected ProcessingPlantInterface getProcessingPlant(){return(specifyProcessingPlant());}
-    protected WorkshopTopologyNode getWorkshop(){return(specifyWorkshop());}
+    protected WorkshopSoftwareComponent getWorkshop(){return(specifyWorkshop());}
     protected PegacornTopologyFactoryInterface getTopologyFactory(){return(specifyTopologyFactory());}
     protected WUPArchetypeEnum getWUPArchetype(){return(specifyWUPArchetype());}
 
@@ -72,11 +72,11 @@ public abstract class GenericSTAWUPTemplate {
      * @return The NodeElement representing the WUP which this code-set is
      * fulfilling.
      */
-    private WorkUnitProcessorTopologyNode buildSTAClientNode() {
+    private WorkUnitProcessorSoftwareComponent buildSTAClientNode() {
         getLogger().debug(".buildSTAClientNode(): Entry");
         TopologyNodeFDN staClientTypeFDN = new TopologyNodeFDN(getWorkshop().getComponentFDN());
         getLogger().trace(".buildSTAClientNode(): Now construct the Work Unit Processing Node");
-        WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), ComponentTypeTypeEnum.WUP);
+        WorkUnitProcessorSoftwareComponent wup = getTopologyFactory().createWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), ComponentTypeTypeEnum.WUP);
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Concurrency Mode");
         wup.setConcurrencyMode(getWorkshop().getConcurrencyMode());
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Resillience Mode");
@@ -91,7 +91,7 @@ public abstract class GenericSTAWUPTemplate {
         return getWUP().getNodeFunctionFDN().getFunctionToken();
     }
 
-    public WorkUnitProcessorTopologyNode getWUP() {
+    public WorkUnitProcessorSoftwareComponent getWUP() {
         return wup;
     }
 

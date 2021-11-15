@@ -55,4 +55,5 @@ public class PetasosTasksAgentHandler extends PetasosTasksDistributionHandler {
     protected Logger specifyLogger() {
         return null;
     }
+
 }

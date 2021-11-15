@@ -19,52 +19,64 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.oam.topology;
+package net.fhirfactory.pegacorn.model.ui.resources.summaries;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.common.PetasosMonitoredComponent;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PetasosMonitoredWorkUnitProcessor extends PetasosMonitoredComponent {
-    Map<ComponentIdType, PetasosMonitoredEndpoint> endpoints;
+public class WorkshopSummary extends SoftwareComponentSummary {
 
-    public PetasosMonitoredWorkUnitProcessor(){
-        this.endpoints = new ConcurrentHashMap<>();
+    private Map<ComponentIdType, WorkUnitProcessorSummary> workUnitProcessors;
+
+    //
+    // Constructor(s)
+    //
+
+    public WorkshopSummary(){
+        this.workUnitProcessors = new ConcurrentHashMap<>();
     }
 
-    public Map<ComponentIdType, PetasosMonitoredEndpoint> getEndpoints() {
-        return endpoints;
+    //
+    // Getters and Setters
+    //
+
+    public Map<ComponentIdType, WorkUnitProcessorSummary> getWorkUnitProcessors() {
+        return workUnitProcessors;
     }
 
-    public void setEndpoints(Map<ComponentIdType, PetasosMonitoredEndpoint> endpoints) {
-        this.endpoints = endpoints;
+    public void setWorkUnitProcessors(Map<ComponentIdType, WorkUnitProcessorSummary> workUnitProcessors) {
+        this.workUnitProcessors = workUnitProcessors;
     }
 
-    public void removeEndpoint(ComponentIdType componentID){
-        if(endpoints.containsKey(componentID)){
-            endpoints.remove(componentID);
+    public void removeWorkUnitProcessor(ComponentIdType componentID){
+        if(workUnitProcessors.containsKey(componentID)){
+            workUnitProcessors.remove(componentID);
         }
     }
 
-    public void addEndpoint(PetasosMonitoredEndpoint endpoint){
-        removeEndpoint(endpoint.getComponentID());
-        endpoints.put(endpoint.getComponentID(), endpoint);
+    public void addWorkUnitProcessor(WorkUnitProcessorSummary wup){
+        removeWorkUnitProcessor(wup.getComponentID());
+        workUnitProcessors.put(wup.getComponentID(), wup);
     }
+
+    //
+    // To String
+    //
 
     @Override
     public String toString() {
-        return "PetasosMonitoredWorkUnitProcessor{" +
-                "endpoints=" + endpoints +
+        return "PetasosMonitoredWorkshop{" +
+                "workUnitProcessors=" + workUnitProcessors +
                 ", routing=" + getRouting() +
                 ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +
-                ", nodeVersion=" + getNodeVersion() +
+                ", nodeVersion='" + getNodeVersion() + '\'' +
                 ", nodeType=" + getNodeType() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", componentName=" + getComponentName() +
+                ", concurrencyMode='" + getConcurrencyMode() + '\'' +
+                ", resilienceMode='" + getResilienceMode() + '\'' +
+                ", componentName='" + getComponentName() + '\'' +
                 '}';
     }
 }

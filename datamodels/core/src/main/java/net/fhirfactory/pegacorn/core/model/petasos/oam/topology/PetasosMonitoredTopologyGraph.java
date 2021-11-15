@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PetasosMonitoredTopologyGraph implements Serializable {
     private String deploymentName;
-    private Map<ComponentIdType, PetasosMonitoredProcessingPlant> processingPlants;
+    private Map<ComponentIdType, ProcessingPlantSummary> processingPlants;
 
     //
     // Constructor(s)
@@ -44,11 +44,11 @@ public class PetasosMonitoredTopologyGraph implements Serializable {
     // Getters and Setters
     //
 
-    public Map<ComponentIdType, PetasosMonitoredProcessingPlant> getProcessingPlants() {
+    public Map<ComponentIdType, ProcessingPlantSummary> getProcessingPlants() {
         return processingPlants;
     }
 
-    public void setProcessingPlants(Map<ComponentIdType, PetasosMonitoredProcessingPlant> processingPlants) {
+    public void setProcessingPlants(Map<ComponentIdType, ProcessingPlantSummary> processingPlants) {
         this.processingPlants = processingPlants;
     }
 
@@ -60,7 +60,7 @@ public class PetasosMonitoredTopologyGraph implements Serializable {
         this.deploymentName = deploymentName;
     }
 
-    public void addProcessingPlant(PetasosMonitoredProcessingPlant processingPlant){
+    public void addProcessingPlant(ProcessingPlantSummary processingPlant){
         removeProcessingPlant(processingPlant.getComponentID());
         processingPlants.put(processingPlant.getComponentID(), processingPlant);
     }

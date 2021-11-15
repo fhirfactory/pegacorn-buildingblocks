@@ -24,10 +24,10 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredProcessingPlant;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredWorkshop;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopologyNode;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.ProcessingPlantSummary;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.WorkshopSummary;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.oam.topology.factories.common.PetasosMonitoredComponentFactory;
 import org.slf4j.Logger;
@@ -51,10 +51,10 @@ public class PetasosMonitoredProcessingPlantFactory extends PetasosMonitoredComp
         return (LOG);
     }
 
-    public PetasosMonitoredProcessingPlant newProcessingPlant(ProcessingPlantTopologyNode topologyNode){
+    public ProcessingPlantSummary newProcessingPlant(ProcessingPlantSoftwareComponent topologyNode){
         LOG.debug(".newProcessingPlant(): Entry, topologyNode->{}", topologyNode);
-        PetasosMonitoredProcessingPlant processingPlant = new PetasosMonitoredProcessingPlant();
-        processingPlant = (PetasosMonitoredProcessingPlant) newPetasosMonitoredComponent(processingPlant, topologyNode);
+        ProcessingPlantSummary processingPlant = new ProcessingPlantSummary();
+        processingPlant = (ProcessingPlantSummary) newPetasosMonitoredComponent(processingPlant, topologyNode);
         processingPlant.setSecurityZone(topologyNode.getSecurityZone().getNetworkSecurityZone());
         processingPlant.setActualHostIP(topologyNode.getActualHostIP());
         processingPlant.setActualPodIP(topologyNode.getActualPodIP());
@@ -77,8 +77,8 @@ public class PetasosMonitoredProcessingPlantFactory extends PetasosMonitoredComp
         processingPlant.setSite(siteName);
         processingPlant.setPlatformID(platformNodeName);
         for(TopologyNodeFDN currentWorkshopFDN: topologyNode.getWorkshops()){
-            WorkshopTopologyNode workshopTopologyNode = (WorkshopTopologyNode) topologyIM.getNode(currentWorkshopFDN);
-            PetasosMonitoredWorkshop currentWorkshop = workshopFactory.newWorkshop(workshopTopologyNode);
+            WorkshopSoftwareComponent workshopSoftwareComponent = (WorkshopSoftwareComponent) topologyIM.getNode(currentWorkshopFDN);
+            WorkshopSummary currentWorkshop = workshopFactory.newWorkshop(workshopSoftwareComponent);
             processingPlant.addWorkshop(currentWorkshop);
         }
         LOG.debug(".newProcessingPlant(): Exit, processingPlant->{}", processingPlant);

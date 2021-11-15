@@ -21,5 +21,50 @@
  */
 package net.fhirfactory.pegacorn.model.ui.resources.summaries;
 
+import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.IdentifierESDT;
+
 public class LocationSummary {
+    private IdentifierESDT locationId;
+    private String locationDescription;
+
+    //
+    // Constructor(s)
+    //
+
+    public LocationSummary(){
+        this.locationDescription = null;
+        this.locationId = null;
+    }
+
+    //
+    // Getters and Setters
+    //
+
+    public IdentifierESDT getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(IdentifierESDT locationId) {
+        this.locationId = locationId;
+    }
+
+    public String getLocationDescription() {
+        return locationDescription;
+    }
+
+    public void setLocationDescription(String locationDescription) {
+        this.locationDescription = locationDescription;
+    }
+
+    //
+    // toString
+    //
+
+    @Override
+    public String toString() {
+        return "LocationSummary{" +
+                "locationId=" + locationId +
+                ", locationDescription='" + locationDescription + '\'' +
+                '}';
+    }
 }

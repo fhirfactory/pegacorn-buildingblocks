@@ -50,7 +50,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.va
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
@@ -96,7 +96,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
     public InterProcessingPlantHandoverPacket ipcReceiverActivityStart(InterProcessingPlantHandoverPacket handoverPacket, Exchange camelExchange, String wupInstanceKey) {
         LOG.debug(".ipcReceiverActivityStart(): Entry, handoverPacket->{}, wupInstanceKey->{}", handoverPacket, wupInstanceKey);
         LOG.trace(".ipcReceiverActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
-        WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
+        WorkUnitProcessorSoftwareComponent node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".ipcReceiverActivityStart(): Node Element retrieved --> {}", node);
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".ipcReceiverActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);

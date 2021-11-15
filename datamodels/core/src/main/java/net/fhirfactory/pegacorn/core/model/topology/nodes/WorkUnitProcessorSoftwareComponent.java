@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-public class WorkUnitProcessorTopologyNode extends SoftwareComponent {
-    private static final Logger LOG = LoggerFactory.getLogger(WorkUnitProcessorTopologyNode.class);
+public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
+    private static final Logger LOG = LoggerFactory.getLogger(WorkUnitProcessorSoftwareComponent.class);
 
     private ArrayList<TopologyNodeFDN> wupComponents;
     private ArrayList<TopologyNodeFDN> wupInterchangeComponents;
@@ -42,7 +42,7 @@ public class WorkUnitProcessorTopologyNode extends SoftwareComponent {
     // Constructor(s)
     //
 
-    public WorkUnitProcessorTopologyNode(){
+    public WorkUnitProcessorSoftwareComponent(){
         this.wupComponents = new ArrayList<>();
         this.wupInterchangeComponents = new ArrayList<>();
         this.ingresEndpoint = null;

@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
 import org.apache.camel.CamelContext;
+import org.hl7.fhir.r4.model.SearchParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +71,9 @@ public class LocalPetasosActionableTaskActivityController {
         getSharedActionableTaskDM().registerActionableTask(actionableTask);
         getTaskRepositoryService().registerActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), actionableTask);
 
+
+        SearchParameter searchParameter = new SearchParameter();
+        searchParameter.set
         return(actionableTask);
     }
 

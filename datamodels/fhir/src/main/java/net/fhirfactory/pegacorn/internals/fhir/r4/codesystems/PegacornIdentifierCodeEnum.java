@@ -22,28 +22,39 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.codesystems;
 
 public enum PegacornIdentifierCodeEnum {
-    IDENTIFIER_CODE_AUDIT_EVENT("AuditEvent Identifier", "petasos.fhir.identifier.audit-event"),
-    IDENTIFIER_CODE_COMMUNICATE_ROOM_ID("Communicate RoomID", "petasos.fhir.identifier.communicate_room_id"),
-    IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM("Endpoint Common Name Identifier", "petasos.fhir.identifier.endpoint.common-name"),
-    IDENTIFIER_CODE_SOURCE_OF_TRUTH_RECORD_ID("Endoint Source of Truth Identifier", "petasos.fhir.identifier.endpoint.sot_rid"),
-    IDENTIFIER_CODE_PRACTITIONER_ROLE_SHORT_NAME("PractitionerRole Short Name", "petasos.fhir.identifier.practitioner_role.role-short-name"),
-    IDENTIFIER_CODE_PRACTITIONER_ROLE_LONG_NAME("PractitionerRole Long Name", "petasos.fhir.identifier.practitioner_role.role-long-name"),
-    IDENTIFIER_CODE_PRACTITIONER_EMAIL("Practitioner Email", "petasos.fhir.identifier.practitioner_role.email"),
-    IDENTIFIER_CODE_BUSINESS_UNIT("Business Unit", "petasos.fhir.identifier.organization.business-unit"),
-    IDENTIFIER_CODE_CONTAINMENT_BASED_LOCATION("Containment Based Location Id", "petasos.fhir.identifier.location.containment-based-location-id"),
-    IDENTIFIER_CODE_PRACTITIONER_ROLE_GROUP("Practitioner Role Group Name", "petasos.fhir.identifier.group.containing-practitioner-roles"),
-    IDENTIFIER_CODE_PRACTITIONER_GROUP("Practitioner Group Name", "petasos.fhir.identifier.group.containing-practitioners"),
-    IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER("Communication HL7v2x Message Id", "petasos.fhir.identifier.communication.HL7v2-container"),
-    IDENTIFIER_CODE_ACTIONABLE_TASK("Actionable Task Id", "petasos.fhir.identifier.task.actionable_task"),
-    IDENTIFIER_CODE_FULFILLMENT_TASK("Fulfillment Task Id", "petasos.fhir.identifier.task.fulfillment_task");
+    IDENTIFIER_CODE_AUDIT_EVENT("AuditEvent Identifier", "pegacorn.fhir.identifier.audit-event", "FHIR::AuditEvent (Generated Content from Pegacorn Internal Systems)"),
+    IDENTIFIER_CODE_COMMUNICATE_ROOM_ID("Communicate RoomID", "pegacorn.fhir.identifier.group.communicate_room_id", "FHIR::Group (Group Identifier representing a Room within Communicate/Matrix Server)"),
+    IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM("Endpoint Common Name Identifier", "pegacorn.fhir.identifier.endpoint.common-name", "FHIR::Endpoint (Common, but Unique, Name for the Endpoint)"),
+    IDENTIFIER_CODE_SOURCE_OF_TRUTH_RECORD_ID("Endoint Source of Truth Identifier", "pegacorn.fhir.identifier.endpoint.sot_rid", "FHIR::Endpoint (Source-of-Truth Endpoint for FHIR Data)"),
+    IDENTIFIER_CODE_PRACTITIONER_ROLE_SHORT_NAME("PractitionerRole Short Name", "pegacorn.fhir.identifier.practitioner_role.role-short-name", "FHIR::PractitionerRole (Short, but Unique, Name for a PractitionerRole)"),
+    IDENTIFIER_CODE_PRACTITIONER_ROLE_LONG_NAME("PractitionerRole Long Name", "pegacorn.fhir.identifier.practitioner_role.role-long-name", "FHIR::PractitionerRole (Long, and Unique, Name for a PractitionerRole"),
+    IDENTIFIER_CODE_PRACTITIONER_EMAIL("Practitioner Email", "pegacorn.fhir.identifier.practitioner_role.email", "FHIR::PractitionerRole (FHIR::PractitionerRole (Unique Internal Email Address for the PractitionerRole)"),
+    IDENTIFIER_CODE_BUSINESS_UNIT("Business Unit", "pegacorn.fhir.identifier.organization.business-unit", "FHIR::Organization (A unique identifier for a Business Unit within the Organization)"),
+    IDENTIFIER_CODE_CONTAINMENT_BASED_LOCATION("Containment Based Location Id", "pegacorn.fhir.identifier.location.containment-based-location-id", "FHIR::Location (A containment based identifier for a Location)"),
+    IDENTIFIER_CODE_PRACTITIONER_ROLE_GROUP("Practitioner Role Group Name", "pegacorn.fhir.identifier.group.containing-practitioner-roles", "FHIR::Group (A Unique Identifier for a Grouping of PractitionerRoles used for Collaboration/Messaging Services)"),
+    IDENTIFIER_CODE_PRACTITIONER_GROUP("Practitioner Group Name", "pegacorn.fhir.identifier.group.containing-practitioners", "FHIR::Group (A Unique Identifier for a Grouping of Practitioners used for Collaboration/Messaging Services)"),
+    IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER("Communication HL7v2x Message Id", "pegacorn.fhir.identifier.communication.HL7v2-container", "FHIR::Communication (A Unique Identifier for Communication Resources used to Transport HL7 version 2.x Messages)"),
+    IDENTIFIER_CODE_ACTIONABLE_TASK("Actionable Task Id", "pegacorn.fhir.identifier.task.actionable_task", "FHIR::Task (A Unique Identifier for a Task representing a piece of work for the Pegacorn System)"),
+    IDENTIFIER_CODE_FULFILLMENT_TASK("Fulfillment Task Id", "pegacorn.fhir.identifier.task.fulfillment_task", "FHIR::Task (A Unique Identifier for a Task representing the execution of a piece of work within the Pegacorn System)"),
+    IDENTIFIER_CODE_SOFTWARE_COMPONENT("Software Component Id", "pegacorn.fhir.identifier.device.software_component", "FHIR:Device (A Unique Identifier for a Software Component within the Pegacorn System");
 
     private String token;
     private String displayName;
+    private String displayText;
 
-    private PegacornIdentifierCodeEnum(String name, String code){
+    private PegacornIdentifierCodeEnum(String name, String code, String text){
         this.displayName = name;
         this.token = code;
+        this.displayText = text;
     }
 
     public String getToken(){return(this.token);}
+
+    public String getDisplayName(){
+        return(this.displayName);
+    }
+
+    public String getDisplayText(){
+        return(this.displayText);
+    }
 }

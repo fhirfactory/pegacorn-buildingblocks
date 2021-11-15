@@ -22,10 +22,10 @@
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredWorkUnitProcessor;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredWorkshop;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.WorkUnitProcessorSummary;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.WorkshopSummary;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.oam.topology.factories.common.PetasosMonitoredComponentFactory;
 import org.slf4j.Logger;
@@ -49,13 +49,13 @@ public class PetasosMonitoredWorkshopFactory extends PetasosMonitoredComponentFa
         return (LOG);
     }
 
-    public PetasosMonitoredWorkshop newWorkshop(WorkshopTopologyNode workshopNode){
+    public WorkshopSummary newWorkshop(WorkshopSoftwareComponent workshopNode){
         getLogger().debug(".newWorkshop(): Entry, workshopNode->{}", workshopNode);
-        PetasosMonitoredWorkshop workshop = new PetasosMonitoredWorkshop();
-        workshop = (PetasosMonitoredWorkshop) newPetasosMonitoredComponent(workshop, workshopNode);
+        WorkshopSummary workshop = new WorkshopSummary();
+        workshop = (WorkshopSummary) newPetasosMonitoredComponent(workshop, workshopNode);
         for(TopologyNodeFDN currentWUPFDN: workshopNode.getWupSet()){
-            WorkUnitProcessorTopologyNode wupTopologyNode = (WorkUnitProcessorTopologyNode) topologyIM.getNode(currentWUPFDN);
-            PetasosMonitoredWorkUnitProcessor currentWUP = wupFactory.newWorkUnitProcessor(wupTopologyNode);
+            WorkUnitProcessorSoftwareComponent wupTopologyNode = (WorkUnitProcessorSoftwareComponent) topologyIM.getNode(currentWUPFDN);
+            WorkUnitProcessorSummary currentWUP = wupFactory.newWorkUnitProcessor(wupTopologyNode);
             workshop.addWorkUnitProcessor(currentWUP);
         }
         getLogger().debug(".newWorkshop(): Exit, workshop->{}", workshop);

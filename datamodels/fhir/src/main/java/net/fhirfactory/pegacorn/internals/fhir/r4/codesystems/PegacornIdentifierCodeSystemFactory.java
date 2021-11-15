@@ -47,41 +47,9 @@ public class PegacornIdentifierCodeSystemFactory {
         Coding idTypeCoding = new Coding();
         idTypeCoding.setCode(identifierCode.getToken());
         idTypeCoding.setSystem(getPegacornIdentifierCodeSystem());
-        idTypeCoding.setDisplayElement(codeDisplayText(identifierCode));
+        idTypeCoding.setDisplay(identifierCode.getDisplayName());
         idType.getCoding().add(idTypeCoding);
-        idType.setText(identifierCode.getToken() + " --> " + codeDisplayText(identifierCode));
+        idType.setText(identifierCode.getDisplayText());
         return(idType);
     }
-
-    private StringType codeDisplayText(PegacornIdentifierCodeEnum identifierCodeEnum){
-        String displayText = "";
-        switch(identifierCodeEnum){
-            case IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM:
-                displayText = "FHIR::Endpoint Identifier";
-                break;
-            case IDENTIFIER_CODE_SOURCE_OF_TRUTH_RECORD_ID:
-                displayText = "Manufactured Identifier for Source-of-Truth Internal/Local Record Id (RID) for Resource";
-                break;
-            case IDENTIFIER_CODE_PRACTITIONER_ROLE_SHORT_NAME:
-                displayText = "FHIR::PractitionerRole Identifier (The Short Name given to the PractitionerRole instance)";
-                break;
-            case IDENTIFIER_CODE_PRACTITIONER_ROLE_LONG_NAME:
-                displayText = "FHIR::PractitionerRole Identifier (The Long Name given to the PractitionerRole instance)";
-                break;
-            case IDENTIFIER_CODE_BUSINESS_UNIT:
-                displayText = "FHIR::Organization Identifier (A Business Unit within an Organization)";
-                break;
-            case IDENTIFIER_CODE_CONTAINMENT_BASED_LOCATION:
-                displayText = "FHIR::Location Identifier (Containment Based Location Identifier)";
-                break;
-            case IDENTIFIER_CODE_PRACTITIONER_EMAIL:
-                displayText = "FHIR::Practitioner Identifier (Corporate Email Address)";
-                break;
-            case IDENTIFIER_CODE_COMMUNICATE_ROOM_ID:
-                displayText = "FHIR::Group Identifier (CommunicateRoom Id)";
-                break;
-        }
-        return(new StringType(displayText));
-    }
-
 }

@@ -22,12 +22,12 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import org.apache.camel.Exchange;
 
 public class IPCPacketBeanCommon {
-    protected WorkUnitProcessorTopologyNode getWUPNodeFromExchange(Exchange exchange){
-        WorkUnitProcessorTopologyNode wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+    protected WorkUnitProcessorSoftwareComponent getWUPNodeFromExchange(Exchange exchange){
+        WorkUnitProcessorSoftwareComponent wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorSoftwareComponent.class);
         return(wupTN);
     }
 }

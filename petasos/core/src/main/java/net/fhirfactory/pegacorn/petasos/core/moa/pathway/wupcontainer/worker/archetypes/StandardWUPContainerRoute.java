@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
@@ -45,21 +45,21 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
         return(LOG);
     }
 
-	private WorkUnitProcessorTopologyNode wupTopologyNode;
+	private WorkUnitProcessorSoftwareComponent wupTopologyNode;
 	private RouteElementNames nameSet;
 
 	//
 	// Constructor(s)
 	//
 
-	public StandardWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker) {
+	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
 		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken());
 	}
 
-	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker, boolean requiresDirect) {
+	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker, boolean requiresDirect) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
@@ -146,7 +146,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 			getLogger().debug("NodeDetailInjector.process(): Entry");
 			boolean alreadyInPlace = false;
 			if(exchange.hasProperties()) {
-				WorkUnitProcessorTopologyNode wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+				WorkUnitProcessorSoftwareComponent wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorSoftwareComponent.class);
 				if (wupTN != null) {
 					alreadyInPlace = true;
 				}
@@ -161,7 +161,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 	// Getters (and Setters)
 	//
 
-	public WorkUnitProcessorTopologyNode getWupTopologyNode() {
+	public WorkUnitProcessorSoftwareComponent getWupTopologyNode() {
 		return wupTopologyNode;
 	}
 

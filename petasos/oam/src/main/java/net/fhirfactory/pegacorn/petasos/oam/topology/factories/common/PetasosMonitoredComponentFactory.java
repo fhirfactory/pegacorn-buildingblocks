@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories.common;
 
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.common.PetasosMonitoredComponent;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.common.SoftwareComponentSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import org.slf4j.Logger;
 
@@ -30,7 +30,7 @@ public abstract class PetasosMonitoredComponentFactory {
 
     abstract protected Logger getLogger();
 
-    protected PetasosMonitoredComponent newPetasosMonitoredComponent(PetasosMonitoredComponent monitoredNode, SoftwareComponent topologyNode){
+    protected SoftwareComponentSummary newPetasosMonitoredComponent(SoftwareComponentSummary monitoredNode, SoftwareComponent topologyNode){
         getLogger().debug(".newITOpsMonitoredNode(): Entry, monitoredNode->{}, topologyNode->{}", monitoredNode, topologyNode);
         monitoredNode.setComponentID(topologyNode.getComponentID());
         monitoredNode.setComponentName(topologyNode.getComponentRDN().getNodeName());

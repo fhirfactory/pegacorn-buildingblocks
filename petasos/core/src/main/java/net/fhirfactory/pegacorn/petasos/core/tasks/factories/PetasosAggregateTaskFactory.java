@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oversight.tasks.factories;
 
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosAggregateTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-public class PetasosOversightTaskFactory {
+public class PetasosAggregateTaskFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosOversightTaskFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(net.fhirfactory.pegacorn.petasos.oversight.tasks.factories.PetasosAggregateTaskFactory.class);
 
     @Inject
     private TaskIdTypeFactory taskIdFactory;
@@ -58,7 +58,7 @@ public class PetasosOversightTaskFactory {
     // Business Methods
     //
 
-    public PetasosAggregateTask newOversightTask(PetasosActionableTask actionableTask, WorkUnitProcessorTopologyNode wupNode) {
+    public PetasosAggregateTask newAggregateTask(PetasosActionableTask actionableTask, WorkUnitProcessorSoftwareComponent wupNode) {
         getLogger().debug(".newFulfillmentTask(): Enter, actionableTask->{}, wupNode->{}", actionableTask, wupNode );
 
         // Get the core Items from the actionableTask (PetasosActionableTask)

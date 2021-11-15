@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.oam.topology.common;
+package net.fhirfactory.pegacorn.model.ui.resources.summaries;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.Petas
 
 import java.io.Serializable;
 
-public class PetasosMonitoredComponent implements Serializable {
+public class SoftwareComponentSummary implements Serializable {
     private ComponentIdType componentID;
     private String componentName;
     private String nodeVersion;

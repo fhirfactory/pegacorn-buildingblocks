@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubPa
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.subscriptions.manager.DataParcelSubscriptionMapIM;
@@ -197,7 +197,7 @@ public class LocalTaskDistributionBean {
         getLogger().debug(".forwardUoW2WUPs(): Subscriber --> {}", subscriber);
         IntraSubsystemPubSubParticipantIdentifier localSubscriberIdentifier = subscriber.getIntraSubsystemParticipant().getIdentifier();
         getLogger().trace(".forwardUoW2WUPs(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
-        WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(localSubscriberIdentifier);
+        WorkUnitProcessorSoftwareComponent currentNodeElement = (WorkUnitProcessorSoftwareComponent)topologyProxy.getNode(localSubscriberIdentifier);
         getLogger().trace(".forwardUoW2WUPs(): The TopologyNode for the target subscriber->{}", currentNodeElement);
         TopologyNodeFunctionFDNToken currentNodeToken = currentNodeElement.getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".forwardUoW2WUPs(): The WUPToken for the target subscriber->{}", currentNodeElement);
@@ -226,9 +226,9 @@ public class LocalTaskDistributionBean {
         template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, petasosFulfillmentTask);
     }
 
-    private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorTopologyNode> wupSet) {
+    private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorSoftwareComponent> wupSet) {
         getLogger().trace(".tracePrintSubscribedWUPSet(): Subscribed WUP Set --> {}", wupSet.size());
-        Iterator<WorkUnitProcessorTopologyNode> tokenIterator = wupSet.iterator();
+        Iterator<WorkUnitProcessorSoftwareComponent> tokenIterator = wupSet.iterator();
         while (tokenIterator.hasNext()) {
             getLogger().trace(".forwardUoW2WUPs(): Subscribed WUP Ingres Point --> {}", tokenIterator.next());
         }

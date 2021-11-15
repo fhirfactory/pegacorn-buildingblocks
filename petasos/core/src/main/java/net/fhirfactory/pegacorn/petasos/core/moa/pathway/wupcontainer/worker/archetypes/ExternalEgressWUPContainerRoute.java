@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
@@ -47,10 +47,10 @@ public class ExternalEgressWUPContainerRoute extends BasePetasosContainerRoute {
         return(LOG);
     }
 
-	private WorkUnitProcessorTopologyNode wupTopologyNode;
+	private WorkUnitProcessorSoftwareComponent wupTopologyNode;
 	private RouteElementNames nameSet;
 
-	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker) {
+	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupTopologyNode = wupNode;
@@ -99,7 +99,7 @@ public class ExternalEgressWUPContainerRoute extends BasePetasosContainerRoute {
 			getLogger().debug("NodeDetailInjector.process(): Entry");
 			boolean alreadyInPlace = false;
 			if(exchange.hasProperties()) {
-				WorkUnitProcessorTopologyNode wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+				WorkUnitProcessorSoftwareComponent wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorSoftwareComponent.class);
 				if (wupTN != null) {
 					alreadyInPlace = true;
 				}
@@ -110,7 +110,7 @@ public class ExternalEgressWUPContainerRoute extends BasePetasosContainerRoute {
 		}
 	}
 
-	public WorkUnitProcessorTopologyNode getWupTopologyNode() {
+	public WorkUnitProcessorSoftwareComponent getWupTopologyNode() {
 		return wupTopologyNode;
 	}
 }

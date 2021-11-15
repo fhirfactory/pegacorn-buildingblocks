@@ -28,12 +28,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-public class WorkshopTopologyNode extends SoftwareComponent {
-    private static final Logger LOG = LoggerFactory.getLogger(WorkshopTopologyNode.class);
+public class WorkshopSoftwareComponent extends SoftwareComponent {
+    private static final Logger LOG = LoggerFactory.getLogger(WorkshopSoftwareComponent.class);
 
     private ArrayList<TopologyNodeFDN> wupSet;
 
-    public WorkshopTopologyNode(){
+    public WorkshopSoftwareComponent(){
         this.wupSet = new ArrayList<>();
     }
 

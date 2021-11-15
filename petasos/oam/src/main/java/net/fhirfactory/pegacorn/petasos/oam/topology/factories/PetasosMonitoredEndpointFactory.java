@@ -22,7 +22,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredEndpoint;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.SoftwareComponentEndpointSummary;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -50,13 +50,13 @@ public class PetasosMonitoredEndpointFactory extends PetasosMonitoredComponentFa
         return (LOG);
     }
 
-    public PetasosMonitoredEndpoint newEndpoint(IPCTopologyEndpoint endpointTopologyNode){
+    public SoftwareComponentEndpointSummary newEndpoint(IPCTopologyEndpoint endpointTopologyNode){
         getLogger().debug(".newEndpoint(): Entry, endpointTopologyNode->{}", endpointTopologyNode);
         if(endpointTopologyNode == null){
             return(null);
         }
-        PetasosMonitoredEndpoint endpoint = new PetasosMonitoredEndpoint();
-        endpoint = (PetasosMonitoredEndpoint) newPetasosMonitoredComponent(endpoint, endpointTopologyNode);
+        SoftwareComponentEndpointSummary endpoint = new SoftwareComponentEndpointSummary();
+        endpoint = (SoftwareComponentEndpointSummary) newPetasosMonitoredComponent(endpoint, endpointTopologyNode);
         endpoint.setEndpointType(endpointTopologyNode.getEndpointType());
         boolean isEncrypted = false;
         for(IPCAdapter currentAdapter: endpointTopologyNode.getAdapterList()){

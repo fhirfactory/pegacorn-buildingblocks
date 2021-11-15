@@ -24,9 +24,9 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredProcessingPlant;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.ProcessingPlantSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,8 +61,8 @@ public class PetasosMonitoredTopologyGraphFactory {
         LOG.debug(".newTopologyGraph(): Iterating Through nodeList");
         for(SoftwareComponent currentNode: nodeList){
             if(currentNode.getComponentType().equals(ComponentTypeTypeEnum.PROCESSING_PLANT)){
-                ProcessingPlantTopologyNode currentProcessingPlantTopologyNode = (ProcessingPlantTopologyNode)currentNode;
-                PetasosMonitoredProcessingPlant processingPlant = processingPlantFactory.newProcessingPlant(currentProcessingPlantTopologyNode);
+                ProcessingPlantSoftwareComponent currentProcessingPlantSoftwareComponent = (ProcessingPlantSoftwareComponent)currentNode;
+                ProcessingPlantSummary processingPlant = processingPlantFactory.newProcessingPlant(currentProcessingPlantSoftwareComponent);
                 graph.addProcessingPlant(processingPlant);
             }
         }

@@ -32,15 +32,15 @@ import javax.enterprise.context.ApplicationScoped;
 public class PetasosActionableTaskToFHIRTaskTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosActionableTaskToFHIRTaskTransformer.class);
 
-    public Task createFHIRTaskFromPetasosActionableTask(PetasosActionableTask actionableTask){
-        getLogger().debug(".createFHIRTaskFromPetasosActionableTask(): Entry, actionableTask->{}", actionableTask);
+    public Task newTask(PetasosActionableTask actionableTask){
+        getLogger().debug(".newTask(): Entry, actionableTask->{}", actionableTask);
         Task fhirTask = new Task();
 
 
 
         //
         // And done...
-        getLogger().debug(".createFHIRTaskFromPetasosActionableTask(): Exit, fhirTask->{}", fhirTask);
+        getLogger().debug(".newTask(): Exit, fhirTask->{}", fhirTask);
         return(fhirTask);
     }
 

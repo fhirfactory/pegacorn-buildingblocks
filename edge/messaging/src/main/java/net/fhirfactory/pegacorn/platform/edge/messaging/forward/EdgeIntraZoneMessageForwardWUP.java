@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.RemoteSubscriptionStatus;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
@@ -103,7 +103,7 @@ public class EdgeIntraZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     }
 
     @Override
-    public WorkUnitProcessorTopologyNode getWUPTopologyNode() {
+    public WorkUnitProcessorSoftwareComponent getWUPTopologyNode() {
         return (getAssociatedTopologyNode());
     }
 

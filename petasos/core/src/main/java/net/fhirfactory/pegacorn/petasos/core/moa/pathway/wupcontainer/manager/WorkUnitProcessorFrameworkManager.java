@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalIngresWUPContainerRoute;
@@ -61,7 +61,7 @@ public class WorkUnitProcessorFrameworkManager {
     @Inject
     private PetasosFulfillmentTaskAuditServicesBroker auditBroker;
 
-    public void buildWUPFramework(WorkUnitProcessorTopologyNode wupNode, List<DataParcelManifest> subscribedTopics, WUPArchetypeEnum wupArchetype) {
+    public void buildWUPFramework(WorkUnitProcessorSoftwareComponent wupNode, List<DataParcelManifest> subscribedTopics, WUPArchetypeEnum wupArchetype) {
         LOG.debug(".buildWUPFramework(): Entry, wupNode --> {}, subscribedTopics --> {}, wupArchetype --> {}", wupNode, subscribedTopics, wupArchetype);
         try {
             switch (wupArchetype) {
@@ -138,7 +138,7 @@ public class WorkUnitProcessorFrameworkManager {
         }
     }
 
-    public void uowTopicSubscribe(List<DataParcelManifest> subscribedTopics, WorkUnitProcessorTopologyNode wupNode) {
+    public void uowTopicSubscribe(List<DataParcelManifest> subscribedTopics, WorkUnitProcessorSoftwareComponent wupNode) {
         LOG.debug(".uowTopicSubscribe(): Entry, subscribedTopics --> {}, wupNode --> {}", subscribedTopics, wupNode);
         if (subscribedTopics.isEmpty()) {
             LOG.debug(".uowTopicSubscribe(): Something's wrong, no Topics are subscribed for this WUP");
@@ -152,7 +152,7 @@ public class WorkUnitProcessorFrameworkManager {
         LOG.debug(".uowTopicSubscribe(): Exit");
     }
 
-    private PubSubParticipant constructPubSubSubscriber(WorkUnitProcessorTopologyNode wupNode){
+    private PubSubParticipant constructPubSubSubscriber(WorkUnitProcessorSoftwareComponent wupNode){
         PubSubParticipant subscriber = new PubSubParticipant();
         IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
         IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getComponentID());

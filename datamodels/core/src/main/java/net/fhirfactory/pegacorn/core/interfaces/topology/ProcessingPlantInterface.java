@@ -3,9 +3,9 @@ package net.fhirfactory.pegacorn.core.interfaces.topology;
 import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityFulfillmentManagementInterface;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 
 public interface ProcessingPlantInterface extends CapabilityFulfillmentManagementInterface, CapabilityFulfillmentInterface {
     public void initialisePlant();
@@ -16,9 +16,9 @@ public interface ProcessingPlantInterface extends CapabilityFulfillmentManagemen
     public String getHostName();
     public String getDeploymentSite();
     public PegacornTopologyFactoryInterface getTopologyFactory();
-    public ProcessingPlantTopologyNode getProcessingPlantNode();
-    public WorkshopTopologyNode getWorkshop(String workshopName, String version);
-    public WorkshopTopologyNode getWorkshop(String workshopName);
+    public ProcessingPlantSoftwareComponent getProcessingPlantNode();
+    public WorkshopSoftwareComponent getWorkshop(String workshopName, String version);
+    public WorkshopSoftwareComponent getWorkshop(String workshopName);
     public String getIPCServiceName();
     public boolean isITOpsNode();
 }

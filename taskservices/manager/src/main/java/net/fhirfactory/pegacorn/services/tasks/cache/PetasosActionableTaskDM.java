@@ -33,9 +33,7 @@ import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-@ApplicationScoped
-public class PetasosActionableTaskDM {
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosActionableTaskDM.class);
+public abstract class PetasosActionableTaskDM {
 
     private ConcurrentHashMap<TaskIdType, PetasosActionableTaskRegistrationType> taskRegistrationMap;
     private ConcurrentHashMap<ComponentIdType, List<TaskIdType>> componentToTaskMap;
@@ -50,11 +48,17 @@ public class PetasosActionableTaskDM {
     }
 
     //
+    // Abstract Methods
+    //
+
+    abstract protected Logger specifyLogger();
+
+    //
     // Getters (and Setters)
     //
 
     protected Logger getLogger(){
-        return(LOG);
+        return(specifyLogger());
     }
 
     public ConcurrentHashMap<TaskIdType, PetasosActionableTaskRegistrationType> getTaskRegistrationMap() {

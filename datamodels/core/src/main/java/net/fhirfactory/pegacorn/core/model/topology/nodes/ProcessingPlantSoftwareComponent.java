@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-public class ProcessingPlantTopologyNode extends SoftwareComponent implements EndpointProviderInterface {
-    private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantTopologyNode.class);
+public class ProcessingPlantSoftwareComponent extends SoftwareComponent implements EndpointProviderInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantSoftwareComponent.class);
 
     private ArrayList<TopologyNodeFDN> workshops;
     private ArrayList<TopologyNodeFDN> endpoints;
@@ -61,7 +61,7 @@ public class ProcessingPlantTopologyNode extends SoftwareComponent implements En
         return (LOG);
     }
 
-    public ProcessingPlantTopologyNode(){
+    public ProcessingPlantSoftwareComponent(){
         this.workshops = new ArrayList<>();
         this.endpoints = new ArrayList<>();
         this.connections = new ArrayList<>();

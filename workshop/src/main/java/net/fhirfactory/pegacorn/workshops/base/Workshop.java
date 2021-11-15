@@ -27,8 +27,8 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.oam.topology.PetasosMonitoredTopologyReportingAgent;
 import org.apache.camel.LoggingLevel;
@@ -40,7 +40,7 @@ import javax.inject.Inject;
 
 public abstract class Workshop extends RouteBuilder implements WorkshopInterface {
 
-    private WorkshopTopologyNode workshopNode;
+    private WorkshopSoftwareComponent workshopNode;
     private boolean isInitialised;
 
     @Inject
@@ -74,7 +74,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     }
 
     @Override
-    public WorkshopTopologyNode getWorkshopNode(){
+    public WorkshopSoftwareComponent getWorkshopNode(){
         return(workshopNode);
     }
 
@@ -97,7 +97,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     private void buildWorkshop() {
         getLogger().debug(".buildWorkshop(): Entry, adding Workshop --> {}, version --> {}", specifyWorkshopName(), specifyWorkshopVersion());
-        WorkshopTopologyNode workshop = getTopologyFactory().createWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getProcessingPlantNode(),specifyWorkshopType());
+        WorkshopSoftwareComponent workshop = getTopologyFactory().createWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getProcessingPlantNode(),specifyWorkshopType());
         topologyIM.addTopologyNode(getProcessingPlant().getProcessingPlantNode().getComponentFDN(), workshop);
         this.workshopNode = workshop;
         getLogger().debug(".buildWorkshop(): Exit");
@@ -125,12 +125,12 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     }
 
     @Override
-    public WorkUnitProcessorTopologyNode getWUP(String wupName, String wupVersion) {
+    public WorkUnitProcessorSoftwareComponent getWUP(String wupName, String wupVersion) {
         getLogger().debug(".getWUP(): Entry, wupName --> {}, wupVersion --> {}", wupName, wupVersion);
         boolean found = false;
-        WorkUnitProcessorTopologyNode foundWorkshop = null;
+        WorkUnitProcessorSoftwareComponent foundWorkshop = null;
         for (TopologyNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
-            WorkUnitProcessorTopologyNode containedWorkshop = (WorkUnitProcessorTopologyNode)topologyIM.getNode(containedWorkshopFDN);
+            WorkUnitProcessorSoftwareComponent containedWorkshop = (WorkUnitProcessorSoftwareComponent)topologyIM.getNode(containedWorkshopFDN);
             TopologyNodeRDN testRDN = new TopologyNodeRDN(ComponentTypeTypeEnum.WORKSHOP, wupName, wupVersion);
             if (testRDN.equals(containedWorkshop.getComponentRDN())) {
                 found = true;
@@ -144,10 +144,10 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
         return (null);
     }
 
-    public WorkUnitProcessorTopologyNode getWUP(String workshopName){
+    public WorkUnitProcessorSoftwareComponent getWUP(String workshopName){
         getLogger().debug(".getWorkshop(): Entry, workshopName --> {}", workshopName);
         String version = this.workshopNode.getComponentRDN().getNodeVersion();
-        WorkUnitProcessorTopologyNode workshop = getWUP(workshopName, version);
+        WorkUnitProcessorSoftwareComponent workshop = getWUP(workshopName, version);
         return(workshop);
     }
 }

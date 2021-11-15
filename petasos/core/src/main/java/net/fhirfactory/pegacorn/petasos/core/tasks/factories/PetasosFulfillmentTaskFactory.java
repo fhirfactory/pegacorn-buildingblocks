@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
@@ -72,7 +72,7 @@ public class PetasosFulfillmentTaskFactory {
     // Business Methods
     //
 
-    public PetasosFulfillmentTask newFulfillmentTask(PetasosActionableTask actionableTask, WorkUnitProcessorTopologyNode wupNode) {
+    public PetasosFulfillmentTask newFulfillmentTask(PetasosActionableTask actionableTask, WorkUnitProcessorSoftwareComponent wupNode) {
         getLogger().debug(".newFulfillmentTask(): Enter, actionableTask->{}, wupNode->{}", actionableTask, wupNode );
 
         //

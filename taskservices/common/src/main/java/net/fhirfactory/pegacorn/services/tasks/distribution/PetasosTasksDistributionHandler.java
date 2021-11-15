@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.Petas
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
 
 public abstract class PetasosTasksDistributionHandler implements PetasosTaskHandlerInterface {

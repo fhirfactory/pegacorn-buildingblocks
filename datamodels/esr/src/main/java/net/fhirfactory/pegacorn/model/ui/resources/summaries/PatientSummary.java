@@ -21,5 +21,65 @@
  */
 package net.fhirfactory.pegacorn.model.ui.resources.summaries;
 
+import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.HumanNameESDT;
+import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.IdentifierESDT;
+import org.hl7.fhir.r4.model.HumanName;
+
+import java.util.Date;
+
 public class PatientSummary {
+    private HumanNameESDT patientName;
+    private IdentifierESDT patientMRN;
+    private Date patientDateOfBirth;
+
+    //
+    // Constructor(s)
+    //
+
+    public PatientSummary(){
+        this.patientMRN = null;
+        this.patientName = null;
+        this.patientDateOfBirth = null;
+    }
+
+    //
+    // Getters and Setters
+    //
+
+    public HumanNameESDT getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(HumanNameESDT patientName) {
+        this.patientName = patientName;
+    }
+
+    public IdentifierESDT getPatientMRN() {
+        return patientMRN;
+    }
+
+    public void setPatientMRN(IdentifierESDT patientMRN) {
+        this.patientMRN = patientMRN;
+    }
+
+    public Date getPatientDateOfBirth() {
+        return patientDateOfBirth;
+    }
+
+    public void setPatientDateOfBirth(Date patientDateOfBirth) {
+        this.patientDateOfBirth = patientDateOfBirth;
+    }
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "PatientSummary{" +
+                "patientName=" + patientName +
+                ", patientMRN=" + patientMRN +
+                ", patientDateOfBirth=" + patientDateOfBirth +
+                '}';
+    }
 }

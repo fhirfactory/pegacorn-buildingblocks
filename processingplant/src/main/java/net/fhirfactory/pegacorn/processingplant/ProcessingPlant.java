@@ -32,8 +32,8 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopologyNode;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfaces.SolutionNodeFactoryInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantInterface {
 
-    private ProcessingPlantTopologyNode processingPlantNode;
+    private ProcessingPlantSoftwareComponent processingPlantNode;
     private String hostName;
     private String instanceQualifier;
     private boolean isInitialised;
@@ -163,7 +163,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         if(topologyNodes.isEmpty() || topologyNodes.size() > 1){
             throw new RuntimeException("Unable to resolve ProcessingPlant");
         }
-        this.processingPlantNode = (ProcessingPlantTopologyNode) topologyNodes.get(0);
+        this.processingPlantNode = (ProcessingPlantSoftwareComponent) topologyNodes.get(0);
         getLogger().debug(".resolveProcessingPlant(): Exit, Resolved ProcessingPlant, processingPlant->{}", processingPlantNode);
     }
 
@@ -185,7 +185,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     }
 
     @Override
-    public ProcessingPlantTopologyNode getProcessingPlantNode() {
+    public ProcessingPlantSoftwareComponent getProcessingPlantNode() {
         return (this.processingPlantNode);
     }
 
@@ -194,12 +194,12 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     }
 
     @Override
-    public WorkshopTopologyNode getWorkshop(String workshopName, String version) {
+    public WorkshopSoftwareComponent getWorkshop(String workshopName, String version) {
         getLogger().debug(".getWorkshop(): Entry, workshopName --> {}, version --> {}", workshopName, version);
         boolean found = false;
-        WorkshopTopologyNode foundWorkshop = null;
+        WorkshopSoftwareComponent foundWorkshop = null;
         for (TopologyNodeFDN containedWorkshopFDN : this.processingPlantNode.getWorkshops()) {
-            WorkshopTopologyNode containedWorkshop = (WorkshopTopologyNode)topologyIM.getNode(containedWorkshopFDN);
+            WorkshopSoftwareComponent containedWorkshop = (WorkshopSoftwareComponent)topologyIM.getNode(containedWorkshopFDN);
             TopologyNodeRDN testRDN = new TopologyNodeRDN(ComponentTypeTypeEnum.WORKSHOP, workshopName, version);
             if (testRDN.equals(containedWorkshop.getComponentRDN())) {
                 found = true;
@@ -215,10 +215,10 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return (null);
     }
 
-    public WorkshopTopologyNode getWorkshop(String workshopName){
+    public WorkshopSoftwareComponent getWorkshop(String workshopName){
         getLogger().debug(".getWorkshop(): Entry, workshopName --> {}", workshopName);
         String version = this.processingPlantNode.getComponentRDN().getNodeVersion();
-        WorkshopTopologyNode workshop = getWorkshop(workshopName, version);
+        WorkshopSoftwareComponent workshop = getWorkshop(workshopName, version);
         getLogger().debug(".getWorkshop(): Exit");
         return(workshop);
     }
