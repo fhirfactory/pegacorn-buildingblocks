@@ -67,9 +67,9 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
             }
             if (!alreadyInPlace) {
                 switch(getEgressEndpoint().getEndpointTopologyNode().getEndpointType()) {
-                    case MLLP_CLIENT:{
+                    case INTERACT_MLLP_CLIENT:{
                         StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getEgressEndpoint().getEndpointTopologyNode();
-                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getEndpointType());
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getToken());
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, getEgressEndpoint().getEndpointSpecification());
                     }
                     default:{

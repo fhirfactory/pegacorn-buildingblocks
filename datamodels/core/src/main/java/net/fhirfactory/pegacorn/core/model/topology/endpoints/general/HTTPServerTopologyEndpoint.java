@@ -38,7 +38,7 @@ public class HTTPServerTopologyEndpoint extends IPCClusteredServerTopologyEndpoi
 
     public HTTPServerTopologyEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.HTTP_API_SERVER);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_HTTP_API_SERVER);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_INGRES);
     }
 

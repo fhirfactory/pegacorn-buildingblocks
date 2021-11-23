@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
+import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,10 @@ import javax.enterprise.context.ApplicationScoped;
 public class TaskFactory {
     private static final Logger LOG = LoggerFactory.getLogger(TaskFactory.class);
 
+    public Task newTask(){
+        Task task = new Task();
 
+        return(task);
+    }
 
 }

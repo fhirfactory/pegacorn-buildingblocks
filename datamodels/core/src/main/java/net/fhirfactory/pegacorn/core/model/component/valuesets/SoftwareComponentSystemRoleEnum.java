@@ -22,18 +22,20 @@
 package net.fhirfactory.pegacorn.core.model.component.valuesets;
 
 public enum SoftwareComponentSystemRoleEnum {
-    COMPONENT_ROLE_INTERACT_INGRES("InteractIngresRole", "pegacorn.component.componet_role.interact_ingres"),
-    COMPONENT_ROLE_INTERACT_EGRESS("InteractEgressRole", "pegacorn.component.component_role.interact_egress"),
-    COMPONENT_ROLE_SUBSYSTEM_EDGE("SubsystemEdgeRole", "pegacorn.component.component_role.subsystem_edge"),
-    COMPONENT_ROLE_SUBSYSTEM_INTERNAL("SubsystemInternal", "pegacorn.component.component_role.subsystem_internal"),
-    COMPONENT_ROLE_SUBSYSTEM_TASK_DISTRIBUTION("SubsystemTaskDistribution", "pegacorn.component_role.susbsystem_task_distribution");
+    COMPONENT_ROLE_INTERACT_INGRES("InteractIngresRole", "pegacorn.fhir.device.specialisation.component_role.interact_ingres", "Interact Ingres Role (Inbound Content Handling)"),
+    COMPONENT_ROLE_INTERACT_EGRESS("InteractEgressRole", "pegacorn.fhir.device.specialisation.component_role.interact_egress", "Interact Egress Role (Output Content Handling)"),
+    COMPONENT_ROLE_SUBSYSTEM_EDGE("SubsystemEdgeRole", "pegacorn.fhir.device.specialisation.component_role.subsystem_edge", "Subsystem Edge (Inter-Process Communication Services for Pegacorn subsystems)"),
+    COMPONENT_ROLE_SUBSYSTEM_INTERNAL("SubsystemInternal", "pegacorn.fhir.device.specialisation.component_role.subsystem_internal", "Subsystem Internal Functional Block"),
+    COMPONENT_ROLE_SUBSYSTEM_TASK_DISTRIBUTION("SubsystemTaskDistribution", "pegacorn.fhir.device.specialisation.component_role.subsystem_task_distribution", "Inter-Process/Intra-Process Task Management and Distribution Service");
 
     private String displayName;
     private String token;
+    private String displayText;
 
-    private SoftwareComponentSystemRoleEnum(String displayName, String token){
+    private SoftwareComponentSystemRoleEnum(String displayName, String token, String displayText){
         this.displayName = displayName;
         this.token = token;
+        this.displayText = displayText;
     }
 
     public String getDisplayName(){
@@ -42,5 +44,9 @@ public enum SoftwareComponentSystemRoleEnum {
 
     public String getToken() {
         return (this.token);
+    }
+
+    public String getDisplayText(){
+        return(this.displayText);
     }
 }

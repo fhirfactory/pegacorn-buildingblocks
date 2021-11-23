@@ -60,7 +60,7 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
         String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
         String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
         String endpointSite = getProcessingPlantInterface().getDeploymentSite();
-        String endpointZone = getProcessingPlantInterface().getNetworkZone().getNetworkSecurityZoneCamelCase();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
         // Build EndpointName
         String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointScopeName, endpointUUID);
         // Build EndpointChannelName
@@ -90,7 +90,7 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTERZONE_SERVICE);
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTERZONE_SERVICE);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
 
     @Override
     protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
-        return (EndpointPayloadTypeEnum.ENPOINT_PAYLOAD_PEGACORN_OAM);
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_SUBSCRIPTION);
     }
 
     @Override

@@ -45,10 +45,10 @@ public class EndpointPayloadTypeFactory {
         Coding newCoding = new Coding();
         String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ENDPOINT_CODE_SYSTEM;
         newCoding.setSystem(codeSystem);
-        newCoding.setCode(codeValue.getPayloadType());
-        newCoding.setDisplay(codeValue.getPayloadType());
+        newCoding.setCode(codeValue.getDisplayName());
+        newCoding.setDisplay(codeValue.getDisplayName());
         newCC.addCoding(newCoding);
-        newCC.setText(codeValue.getPayloadType());
+        newCC.setText(codeValue.getDisplayName());
         LOG.debug(".newPayloadType(): Exit, newCC->{}", newCC);
         return(newCC);
     }

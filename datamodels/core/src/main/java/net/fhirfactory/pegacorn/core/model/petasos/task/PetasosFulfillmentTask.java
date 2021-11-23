@@ -155,7 +155,7 @@ public class PetasosFulfillmentTask extends PetasosTask{
                 ", registered=" + isRegistered() +
                 ", taskPerformerTypes=" + getTaskPerformerTypes() +
                 ", isARetry=" + isaRetry() +
-                ", taskMetadata=" + getTaskMetadata() +
+                ", taskMetadata=" + getTaskContext() +
                 '}';
     }
 }

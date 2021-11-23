@@ -25,7 +25,6 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
@@ -131,15 +130,15 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
             }
             if (!alreadyInPlace) {
                 switch(getIngresEndpoint().getEndpointTopologyNode().getEndpointType()) {
-                    case MLLP_SERVER: {
+                    case INTERACT_MLLP_SERVER: {
                         InteractMLLPServerEndpoint serverTopologyEndpoint = (InteractMLLPServerEndpoint) getIngresEndpoint().getEndpointTopologyNode();
-                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, serverTopologyEndpoint.getEndpointType().getEndpointType());
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, serverTopologyEndpoint.getEndpointType().getToken());
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, serverTopologyEndpoint.getMLLPServerAdapter().getPortNumber());
                         break;
                     }
-                    case MLLP_CLIENT:{
+                    case INTERACT_MLLP_CLIENT:{
                         StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getEgressEndpoint().getEndpointTopologyNode();
-                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getEndpointType());
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getToken());
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, getEgressEndpoint().getEndpointSpecification());
                     }
                     default:{

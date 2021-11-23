@@ -41,7 +41,7 @@ public class InteractMLLPClientEndpoint extends StandardInteractClientTopologyEn
 
     public InteractMLLPClientEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.MLLP_CLIENT);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_MLLP_CLIENT);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_EGRESS);
     }
 

@@ -21,15 +21,21 @@
  */
 package net.fhirfactory.pegacorn.core.model.componentid;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 public class ComponentIdType implements Serializable {
     private String id;
     private String displayName;
-    private String version;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant idValidityStartInstant;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant idValidityEndInstant;
 
     //
     // Constructor(s)
@@ -37,19 +43,24 @@ public class ComponentIdType implements Serializable {
 
     public ComponentIdType(){
         this.id = null;
-        this.version = null;
+        this.idValidityStartInstant = null;
+        this.idValidityEndInstant = null;
         this.displayName = null;
     }
 
     public ComponentIdType(ComponentIdType ori){
         this.id = null;
-        this.version = null;
+        this.idValidityStartInstant = null;
+        this.idValidityEndInstant = null;
         this.displayName = null;
         if(ori.hasId()){
             setId(SerializationUtils.clone(ori.getId()));
         }
-        if(ori.hasVersion()){
-            setVersion(SerializationUtils.clone(ori.getVersion()));
+        if(ori.hasIdValidityStartInstant()){
+            setIdValidityStartInstant(SerializationUtils.clone(ori.getIdValidityStartInstant()));
+        }
+        if(ori.hasIdValidityEndInstant()){
+            setIdValidityEndInstant(SerializationUtils.clone(ori.getIdValidityEndInstant()));
         }
         if(ori.hasDisplayName()){
             setDisplayName(SerializationUtils.clone(ori.getDisplayName()));
@@ -89,20 +100,34 @@ public class ComponentIdType implements Serializable {
     }
 
     @JsonIgnore
-    public boolean hasVersion(){
-        boolean hasValue = this.version != null;
+    public boolean hasIdValidityStartInstant(){
+        boolean hasValue = this.idValidityStartInstant != null;
         return(hasValue);
     }
 
-    public String getVersion() {
-        return version;
+    public Instant getIdValidityStartInstant() {
+        return idValidityStartInstant;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    public void setIdValidityStartInstant(Instant idValidityStartInstant) {
+        this.idValidityStartInstant = idValidityStartInstant;
     }
 
-    //
+    @JsonIgnore
+    public boolean hasIdValidityEndInstant(){
+        boolean hasValue = this.idValidityEndInstant != null;
+        return(hasValue);
+    }
+
+    public Instant getIdValidityEndInstant() {
+        return idValidityEndInstant;
+    }
+
+    public void setIdValidityEndInstant(Instant idValidityEndInstant) {
+        this.idValidityEndInstant = idValidityEndInstant;
+    }
+
+//
     // To String
     //
 
@@ -111,7 +136,8 @@ public class ComponentIdType implements Serializable {
         return "ComponentIdType{" +
                 "id='" + id + '\'' +
                 ", displayName='" + displayName + '\'' +
-                ", version='" + version + '\'' +
+                ", idValidityStartInstant=" + idValidityStartInstant +
+                ", idValidityEndInstant=" + idValidityEndInstant +
                 '}';
     }
 }

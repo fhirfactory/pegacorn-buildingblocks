@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.internals.communicate.entities.media;
 
 import net.fhirfactory.pegacorn.internals.communicate.entities.media.datatypes.CommunicateMediaContent;
 import net.fhirfactory.pegacorn.internals.communicate.entities.media.datatypes.CommunicateMediaDetail;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.MediaESR;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.MediaESR;
 
 public class CommunicateMedia extends MediaESR {
     private CommunicateMediaDetail mediaDetails;

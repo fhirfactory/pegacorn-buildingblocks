@@ -36,6 +36,7 @@ public enum PegacornIdentifierCodeEnum {
     IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER("Communication HL7v2x Message Id", "pegacorn.fhir.identifier.communication.HL7v2-container", "FHIR::Communication (A Unique Identifier for Communication Resources used to Transport HL7 version 2.x Messages)"),
     IDENTIFIER_CODE_ACTIONABLE_TASK("Actionable Task Id", "pegacorn.fhir.identifier.task.actionable_task", "FHIR::Task (A Unique Identifier for a Task representing a piece of work for the Pegacorn System)"),
     IDENTIFIER_CODE_FULFILLMENT_TASK("Fulfillment Task Id", "pegacorn.fhir.identifier.task.fulfillment_task", "FHIR::Task (A Unique Identifier for a Task representing the execution of a piece of work within the Pegacorn System)"),
+    IDENTIFIER_CODE_AGGREGATE_TASK("Aggregate Task Id", "pegacorn.fhir.identifier.task.aggregate_task", "FHIR::Task (A Unique Identifier for a Task representing the execution of a set of one or more pieces of work within the Pegacorn System)"),
     IDENTIFIER_CODE_SOFTWARE_COMPONENT("Software Component Id", "pegacorn.fhir.identifier.device.software_component", "FHIR:Device (A Unique Identifier for a Software Component within the Pegacorn System");
 
     private String token;

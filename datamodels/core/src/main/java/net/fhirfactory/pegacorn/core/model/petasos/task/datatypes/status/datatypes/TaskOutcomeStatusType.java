@@ -33,7 +33,7 @@ public class TaskOutcomeStatusType extends TaskStatusType {
 
     public TaskOutcomeStatusType(){
         super();
-        this.outcomeStatus = ActionableTaskOutcomeStatusEnum.OUTCOME_STATUS_UNKNOWN;
+        this.outcomeStatus = ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN;
     }
 
     //

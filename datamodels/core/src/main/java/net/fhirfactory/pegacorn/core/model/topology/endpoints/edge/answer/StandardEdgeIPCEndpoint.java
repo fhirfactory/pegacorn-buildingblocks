@@ -37,6 +37,7 @@ public class StandardEdgeIPCEndpoint extends IPCTopologyEndpoint {
 
     private List<InitialHostSpecification> initialHosts;
     private String nameSpace;
+    private String configurationFileName;
 
     //
     // Constructor(s)
@@ -46,11 +47,21 @@ public class StandardEdgeIPCEndpoint extends IPCTopologyEndpoint {
         super();
         this.initialHosts = new ArrayList<>();
         this.nameSpace = null;
+        this.configurationFileName = null;
     }
 
     //
     // Getters and Setters
     //
+
+
+    public String getConfigurationFileName() {
+        return configurationFileName;
+    }
+
+    public void setConfigurationFileName(String configurationFileName) {
+        this.configurationFileName = configurationFileName;
+    }
 
     public List<InitialHostSpecification> getInitialHosts() {
         return initialHosts;
@@ -119,6 +130,7 @@ public class StandardEdgeIPCEndpoint extends IPCTopologyEndpoint {
                 ", adapterList=" + getAdapterList() +
                 ", initialHosts=" + initialHosts +
                 ", nameSpace='" + nameSpace + '\'' +
+                ", configurationFileName=" + configurationFileName +
                 '}';
     }
 }

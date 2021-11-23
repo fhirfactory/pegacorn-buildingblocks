@@ -21,10 +21,12 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.metadata.TaskMetadataType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
@@ -34,15 +36,19 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
 
 public class PetasosTask implements Serializable {
 
-    private TaskMetadataType taskMetadata;
-    private SerializableObject taskMetadataLock;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant creationInstant;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant updateInstant;
+
+    private TaskContextType taskContext;
+    private SerializableObject taskContextLock;
 
     private TaskIdType taskId;
     private SerializableObject taskIdLock;
@@ -68,8 +74,8 @@ public class PetasosTask implements Serializable {
     private ComponentIdType taskNodeAffinity;
     private SerializableObject taskNodeAffinityLock;
 
-    private Map<TaskIdType, PetasosTask> subTasks;
-    private SerializableObject subTasksLock;
+    private Set<TaskIdType> aggregateTaskMembership;
+    private SerializableObject aggregateTaskMembershipLock;
 
     private boolean registered;
 
@@ -79,13 +85,15 @@ public class PetasosTask implements Serializable {
 
     public PetasosTask(){
         this.taskId = null;
+        this.creationInstant = Instant.now();
+        this.updateInstant = Instant.now();
         this.taskIdLock = new SerializableObject();
         this.taskWorkItem = new TaskWorkItemType();
         this.taskWorkItemLock = new SerializableObject();
         this.taskTraceability = new TaskTraceabilityType();
         this.taskTraceabilityLock = new SerializableObject();
-        this.subTasks = new HashMap<>();
-        this.subTasksLock = new SerializableObject();
+        this.aggregateTaskMembership = new HashSet<>();
+        this.aggregateTaskMembershipLock = new SerializableObject();
         this.taskOutcomeStatus = null;
         this.taskOutcomeStatusLock = new SerializableObject();
         this.registered = false;
@@ -97,13 +105,30 @@ public class PetasosTask implements Serializable {
         this.taskReasonLock = new SerializableObject();
         this.taskNodeAffinity = null;
         this.taskNodeAffinityLock = new SerializableObject();
-        this.taskMetadata = null;
-        this.taskMetadataLock = new SerializableObject();
+        this.taskContext = null;
+        this.taskContextLock = new SerializableObject();
     }
 
     //
     // Getters and Setters (Bean Methods)
     //
+
+
+    public Instant getCreationInstant() {
+        return creationInstant;
+    }
+
+    public void setCreationInstant(Instant creationInstant) {
+        this.creationInstant = creationInstant;
+    }
+
+    public Instant getUpdateInstant() {
+        return updateInstant;
+    }
+
+    public void setUpdateInstant(Instant updateInstant) {
+        this.updateInstant = updateInstant;
+    }
 
     @JsonIgnore
     public boolean hasTaskId(){
@@ -290,72 +315,70 @@ public class PetasosTask implements Serializable {
     }
 
     @JsonIgnore
-    public boolean hasSubTasks(){
-        boolean hasValue = this.subTasks != null;
+    public boolean hasAggregateTaskMembership(){
+        boolean hasValue = this.aggregateTaskMembership != null;
         return(hasValue);
     }
 
-    public Map<TaskIdType, PetasosTask> getSubTasks() {
-        return (this.subTasks);
+    public Set<TaskIdType> getAggregateTaskMembership() {
+        return aggregateTaskMembership;
     }
 
-    public void setSubTasks(Map<TaskIdType, PetasosTask> tasks) {
-        if(this.subTasks == null){
-            this.subTasks = new HashMap<>();
-        }
-        this.subTasks.clear();
-        for(TaskIdType currentTaskId: tasks.keySet()){
-            this.subTasks.put(currentTaskId, tasks.get(currentTaskId));
-        }
+    public void setAggregateTaskMembership(Set<TaskIdType> aggregateTaskMembership) {
+        this.aggregateTaskMembership = aggregateTaskMembership;
     }
 
-    public SerializableObject getSubTasksLock() {
-        return subTasksLock;
+    public SerializableObject getAggregateTaskMembershipLock() {
+        return aggregateTaskMembershipLock;
     }
 
-    public void setSubTasksLock(SerializableObject subTasksLock) {
-        this.subTasksLock = subTasksLock;
+    public void setAggregateTaskMembershipLock(SerializableObject aggregateTaskMembershipLock) {
+        this.aggregateTaskMembershipLock = aggregateTaskMembershipLock;
     }
 
     @JsonIgnore
-    public boolean hasTaskMetadata(){
-        boolean hasValue = this.taskMetadata != null;
+    public boolean hasTaskContext(){
+        boolean hasValue = this.taskContext != null;
         return(hasValue);
     }
 
-    public TaskMetadataType getTaskMetadata() {
-        return taskMetadata;
+    public TaskContextType getTaskContext() {
+        return taskContext;
     }
 
-    public void setTaskMetadata(TaskMetadataType taskMetadata) {
-        this.taskMetadata = taskMetadata;
+    public void setTaskContext(TaskContextType taskContext) {
+        this.taskContext = taskContext;
     }
 
-    public SerializableObject getTaskMetadataLock() {
-        return taskMetadataLock;
+    public SerializableObject getTaskContextLock() {
+        return taskContextLock;
     }
 
-    public void setTaskMetadataLock(SerializableObject taskMetadataLock) {
-        this.taskMetadataLock = taskMetadataLock;
+    public void setTaskContextLock(SerializableObject taskContextLock) {
+        this.taskContextLock = taskContextLock;
     }
 
     //
     // To String
     //
 
+
     @Override
     public String toString() {
         return "PetasosTask{" +
-                "taskId=" + taskId +
+                "creationInstant=" + creationInstant +
+                ", updateInstant=" + updateInstant +
+                ", taskContext=" + taskContext +
+                ", taskId=" + taskId +
                 ", taskType=" + taskType +
                 ", taskWorkItem=" + taskWorkItem +
                 ", taskTraceability=" + taskTraceability +
                 ", taskOutcomeStatus=" + taskOutcomeStatus +
-                ", registered=" + registered +
-                ", taskPerformers=" + taskPerformerTypes +
+                ", taskPerformerTypes=" + taskPerformerTypes +
                 ", taskReason=" + taskReason +
-                ", subTasks=" + getSubTasks() +
-                ", taskMetadata=" + getTaskMetadata() +
+                ", taskNodeAffinity=" + taskNodeAffinity +
+                ", aggregateTaskMembership=" + aggregateTaskMembership +
+                ", registered=" + registered +
                 '}';
     }
 }

@@ -24,9 +24,9 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.ProcessingPlantSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.ProcessingPlantSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,7 @@ public class PetasosMonitoredTopologyGraphFactory {
     private ProcessingPlantInterface processingPlant;
 
     @Inject
-    private PetasosMonitoredProcessingPlantFactory processingPlantFactory;
+    private PetasosProcessingPlantSummaryFactory processingPlantFactory;
 
     public PetasosMonitoredTopologyGraph newTopologyGraph(List<SoftwareComponent> nodeList){
         LOG.debug(".newTopologyGraph(): Entry");

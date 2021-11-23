@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.internals.communicate.entities.patient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.PatientESR;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.PatientESR;
 
 import java.util.concurrent.ConcurrentHashMap;
 

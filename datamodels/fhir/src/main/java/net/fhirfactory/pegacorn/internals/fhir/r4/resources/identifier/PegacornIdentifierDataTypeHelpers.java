@@ -125,4 +125,23 @@ public class PegacornIdentifierDataTypeHelpers {
         }
         return(printableInfo);
     }
+
+    public Identifier findIdentifierWithSystemAndCode(List<Identifier> identifierList, String identifierSystem, String identifierCode){
+        if(identifierList == null){
+            return(null);
+        }
+        if(identifierList.isEmpty()){
+            return(null);
+        }
+        for(Identifier currentIdentifier: identifierList){
+            for(Coding currentCoding: currentIdentifier.getType().getCoding()){
+                boolean isRequiredIdentifierCode = currentCoding.getCode().contentEquals(identifierCode);
+                boolean isRequiredIdentifierSystem = currentCoding.getSystem().contentEquals(identifierSystem);
+                if(isRequiredIdentifierCode && isRequiredIdentifierSystem){
+                    return(currentIdentifier);
+                }
+            }
+        }
+        return(null);
+    }
 }

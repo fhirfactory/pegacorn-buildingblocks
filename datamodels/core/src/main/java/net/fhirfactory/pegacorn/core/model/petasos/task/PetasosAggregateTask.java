@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reporting.datatypes.TaskReportingType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.AggregateTaskStatusType;
@@ -30,8 +29,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskT
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PetasosAggregateTask extends PetasosTask{
 
@@ -43,6 +42,9 @@ public class PetasosAggregateTask extends PetasosTask{
 
     private TaskIdType actionableTaskId;
     private SerializableObject actionableTaskIdLock;
+
+    private Set<TaskIdType> subTasks;
+    private SerializableObject subTasksLock;
 
     //
     // Constructor(s)
@@ -56,6 +58,8 @@ public class PetasosAggregateTask extends PetasosTask{
         this.aggregateTaskStatusLock =  new SerializableObject();
         this.actionableTaskId = null;
         this.actionableTaskIdLock = new SerializableObject();
+        this.subTasks = new HashSet<>();
+        this.subTasksLock = new SerializableObject();
         setTaskType(new TaskTypeType(TaskTypeTypeEnum.PETASOS_AGGREGATE_TASK_TYPE));
     }
 
@@ -78,7 +82,7 @@ public class PetasosAggregateTask extends PetasosTask{
     }
 
     @JsonIgnore
-    boolean hasTaskReporting(){
+    public boolean hasTaskReporting(){
         boolean hasValue = this.taskReporting != null;
         return(hasValue);
     }
@@ -92,7 +96,7 @@ public class PetasosAggregateTask extends PetasosTask{
     }
 
     @JsonIgnore
-    public boolean hasTaskOversightStatus(){
+    public boolean hasTaskAggregateStatus(){
         boolean hasValue = this.aggregateTaskStatus != null;
         return(hasValue);
     }
@@ -129,6 +133,28 @@ public class PetasosAggregateTask extends PetasosTask{
         this.actionableTaskIdLock = actionableTaskIdLock;
     }
 
+    @JsonIgnore
+    public boolean hasSubTasks(){
+        boolean hasValue = this.subTasks != null;
+        return(hasValue);
+    }
+
+    public Set<TaskIdType> getSubTasks() {
+        return subTasks;
+    }
+
+    public void setSubTasks(Set<TaskIdType> subTasks) {
+        this.subTasks = subTasks;
+    }
+
+    public SerializableObject getSubTasksLock() {
+        return subTasksLock;
+    }
+
+    public void setSubTasksLock(SerializableObject subTasksLock) {
+        this.subTasksLock = subTasksLock;
+    }
+
     //
     // To String
     //
@@ -149,7 +175,8 @@ public class PetasosAggregateTask extends PetasosTask{
                 ", taskPerformerTypes=" + getTaskPerformerTypes() +
                 ", taskReason=" + getTaskReason() +
                 ", taskNodeAffinity=" + getTaskNodeAffinity() +
-                ", taskMetadata=" + getTaskMetadata() +
+                ", taskMetadata=" + getTaskContext() +
+                ", subTasks=" + getSubTasks() +
                 '}';
     }
 }

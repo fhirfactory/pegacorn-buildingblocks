@@ -21,11 +21,10 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets;
 
-import net.fhirfactory.pegacorn.referencevalues.PegacornSystemReference;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-
 public enum DevicePropertyTypeEnum {
+    DEVICE_PROPERTY_KUBERNETES_POD_ID("Pod Id", "pegacorn.fhir.device.software_component.kubernetes_pod_id", "Software Component Kubernetes Execution Pod ID"),
+    DEVICE_PROPERTY_KUBERNETES_POD_IP("Pod IP Address", "pegacorn.fhir.device.software_component.kubernetes_pod_ip_address", "Software Component Kubernetes Execution Pod IP Address"),
+    DEVICE_PROPERTY_PLATFORM_IP("Host IP Address", "pegacorn.fhir.device.software_component.host_ip_address", "Software Component Host IP Address (or Kubernetes Worker Node IP Address)"),
     DEVICE_PROPERTY_RESILIENCE_MODE("Resilience Mode", "pegacorn.fhir.device.software_component.resilience_mode", "Software Component Resilience Mode"),
     DEVICE_PROPERTY_CONCURRENCY_MODE("Concurency Mode", "pegacorn.fhir.device.software_component.concurrency_mode", "Software Component Concurrency Mode"),
     DEVICE_PROPERTY_SECURITY_ZONE("Security Zone", "pegacorn.fhir.device.software_component.security_zone", "Software Component Security Zone");

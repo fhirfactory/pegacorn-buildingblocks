@@ -79,6 +79,11 @@ public class EdgeInterZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
     }
 
     @Override
+    protected List<DataParcelManifest> declarePublishedTopics() {
+        return (new ArrayList<>());
+    }
+
+    @Override
     protected String specifyWUPInstanceName() {
         return (this.getClass().getSimpleName());
     }

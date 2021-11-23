@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.internals.communicate.entities.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.OrganizationESR;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.OrganizationESR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

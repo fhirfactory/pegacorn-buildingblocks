@@ -28,9 +28,6 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.Petas
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.audit.base.PetasosAuditEndpoint;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
-import org.apache.camel.ExchangePattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +53,7 @@ public class PetasosIntraZoneAuditEndpoint extends PetasosAuditEndpoint {
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTRAZONE_SERVICE);
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTRAZONE_SERVICE);
     }
 
     @Override
@@ -73,7 +70,7 @@ public class PetasosIntraZoneAuditEndpoint extends PetasosAuditEndpoint {
         String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
         String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
         String endpointSite = getProcessingPlantInterface().getDeploymentSite();
-        String endpointZone = getProcessingPlantInterface().getNetworkZone().getNetworkSecurityZoneCamelCase();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
         // Build EndpointName
         String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointScopeName, endpointUUID);
         // Build EndpointChannelName
@@ -103,7 +100,7 @@ public class PetasosIntraZoneAuditEndpoint extends PetasosAuditEndpoint {
 
     @Override
     protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
-        return (EndpointPayloadTypeEnum.ENPOINT_PAYLOAD_PEGACORN_IPC);
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_AUDITEVENTS);
     }
 
     @Override

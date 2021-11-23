@@ -37,7 +37,7 @@ public class InteractMLLPServerEndpoint extends ClusteredInteractServerTopologyE
     //
     public InteractMLLPServerEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.MLLP_SERVER);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_MLLP_SERVER);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_INGRES);
     }
 

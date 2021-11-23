@@ -23,7 +23,6 @@
 package net.fhirfactory.pegacorn.petasos.core.subscriptions.cache;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
@@ -56,9 +55,9 @@ public class DataParcelSubscriptionMapDM {
     }
 
     /**
-     * This function retrieves the list (FDNTokenSet) of WUPs that are interested in 
+     * This function retrieves the list (FDNTokenSet) of WUPs that are interested in
      * receiving the identified uowPayloadTopicID (FDNToken).
-     * 
+     *
      * @param parcelDescriptor The FDNToken representing the UoW (Ingres) Payload Topic that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
@@ -83,11 +82,11 @@ public class DataParcelSubscriptionMapDM {
 		return (subscriptionList);
 
 	}
-    
+
     /**
      * This function establishes a link between a Payload Type and a WUP that is interested in
      * processing/using it.
-     * 
+     *
      * @param parcelManifest The contentTopicID (FDNToken) of the payload we have received from a WUP
      * @param subscriber The NodeElement of the WUP that is interested in the payload type.
      */
@@ -193,10 +192,10 @@ public class DataParcelSubscriptionMapDM {
 		PubSubParticipant subscriber = new PubSubParticipant(intraSubsystemParticipant);
 		addSubscriber(descriptor, subscriber);
 	}
-    
+
     /**
      * Remove a Subscriber from the Topic Subscription list
-     * 
+     *
      * @param parcelManifest The DataParcelManifest of the Topic we want to unsubscribe from.
      * @param subscriberInstanceID  The subscriber we are removing from the subscription list.
      */

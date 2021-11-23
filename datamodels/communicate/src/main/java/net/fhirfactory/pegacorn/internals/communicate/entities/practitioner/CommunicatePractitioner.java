@@ -25,10 +25,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionID;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.PractitionerESR;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.valuesets.IdentifierESDTUseEnum;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.valuesets.IdentifierESDTTypesEnum;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.PractitionerESR;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.valuesets.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.valuesets.IdentifierESDTTypesEnum;
 
 import java.util.ArrayList;
 import java.util.List;

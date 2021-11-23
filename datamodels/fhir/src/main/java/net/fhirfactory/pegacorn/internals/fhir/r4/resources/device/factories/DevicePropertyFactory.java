@@ -24,6 +24,8 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DeviceConfigurationFilePropertyTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DevicePropertyQuantityTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DevicePropertyTypeEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -45,6 +47,7 @@ public class DevicePropertyFactory {
     private static final String PEGACORN_DEVICE_PROPERTY_CODE_SYSTEM = "/device-property-type";
     private static final String PEGACORN_DEVICE_RESILIENCE_MODE_CODE_SYSTEM = "/device-resilience-mode-type";
     private static final String PEGACORN_DEVICE_CONCURRENCY_MODE_CODE_SYSTEM = "/device-concurrency-mode-type";
+    private static final String PEGACORN_DEVICE_CONFIGURATION_FILE_CODE_SYSTEM = "/device-configuration-file-type";
 
     //
     // Business Methods
@@ -62,6 +65,11 @@ public class DevicePropertyFactory {
 
     public String getPegacornDeviceConcurrencyModeCodeSystem(){
         String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_CONCURRENCY_MODE_CODE_SYSTEM;
+        return (codeSystem);
+    }
+
+    public String getPegacornDeviceConfigurationFileCodeSystem(){
+        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_CONFIGURATION_FILE_CODE_SYSTEM;
         return (codeSystem);
     }
 
@@ -115,6 +123,25 @@ public class DevicePropertyFactory {
         return(propertyComponent);
     }
 
+    public Device.DevicePropertyComponent newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum configFileType, String value){
+        Device.DevicePropertyComponent propertyComponent = new Device.DevicePropertyComponent();
+        CodeableConcept codeableConcept = new CodeableConcept();
+        Coding coding = new Coding();
+        coding.setSystem(getPegacornDevicePropertyCodeSystem());
+        coding.setCode(configFileType.getToken());
+        coding.setDisplay(configFileType.getDisplayName());
+        codeableConcept.setText(configFileType.getDisplayText());
+        codeableConcept.addCoding(coding);
+
+        propertyComponent.setType(codeableConcept);
+
+        CodeableConcept fileNameCC = new CodeableConcept();
+        fileNameCC.setText(value);
+
+        propertyComponent.addValueCode(fileNameCC);
+
+        return(propertyComponent);
+    }
 
     //
     // Getters (and Setters)

@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
 
 import net.fhirfactory.pegacorn.internals.communicate.workflow.model.CDTIdentifier;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.common.ExtremelySimplifiedResource;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWIdentifier;
 
 import java.util.Date;

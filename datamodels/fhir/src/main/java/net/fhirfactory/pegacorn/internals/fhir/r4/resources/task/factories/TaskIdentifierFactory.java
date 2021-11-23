@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
 import org.hl7.fhir.r4.model.Identifier;
@@ -49,26 +50,54 @@ public class TaskIdentifierFactory {
     // Business Methods
     //
 
-    public Identifier newTaskIdentifier(TaskIdType taskId){
-        getLogger().debug(".newTaskIdentifier(): Entry, taskId->{}", taskId);
+    public Identifier newTaskIdentifier(TaskTypeTypeEnum taskType, TaskIdType taskId, Instant startInstant, Instant endInstant){
+        getLogger().debug(".newActionableTaskIdentifier(): Entry, taskId->{}", taskId);
         Identifier fhirIdentifier = new Identifier();
         Period identifierPeriod = new Period();
-        identifierPeriod.setStart(Date.from(taskId.getCreationInstant()));
-        fhirIdentifier = generalIdentifierFactory.newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_ACTIONABLE_TASK, taskId.getId(), identifierPeriod);
-        getLogger().debug(".newTaskIdentifier(): Exit, fhirIdentifier->{}", fhirIdentifier);
+        if(startInstant != null){
+            identifierPeriod.setStart(Date.from(startInstant));
+        } else {
+            if(taskId.getCreationInstant() != null) {
+                identifierPeriod.setStart(Date.from(taskId.getCreationInstant()));
+            } else {
+                identifierPeriod.setStart(Date.from(Instant.now()));
+            }
+        }
+        if(endInstant != null){
+            identifierPeriod.setEnd(Date.from(endInstant));
+        }
+        PegacornIdentifierCodeEnum identifierCode = null;
+        switch(taskType){
+            case PETASOS_BASE_TASK_TYPE:
+            case PETASOS_ACTIONABLE_TASK_TYPE:
+                identifierCode = PegacornIdentifierCodeEnum.IDENTIFIER_CODE_ACTIONABLE_TASK;
+                break;
+            case PETASOS_FULFILLMENT_TASK_TYPE:
+                identifierCode = PegacornIdentifierCodeEnum.IDENTIFIER_CODE_FULFILLMENT_TASK;
+                break;
+            case PETASOS_AGGREGATE_TASK_TYPE:
+                identifierCode = PegacornIdentifierCodeEnum.IDENTIFIER_CODE_AGGREGATE_TASK;
+                break;
+        }
+        fhirIdentifier = generalIdentifierFactory.newIdentifier(identifierCode, taskId.getId(), identifierPeriod);
+        getLogger().debug(".newActionableTaskIdentifier(): Exit, fhirIdentifier->{}", fhirIdentifier);
         return(fhirIdentifier);
     }
 
-    public Identifier newTaskIdentifier(TaskIdType taskId, Instant endInstant){
-        getLogger().debug(".newTaskIdentifier(): Entry, taskId->{}", taskId);
-        Identifier fhirIdentifier = new Identifier();
-        Period identifierPeriod = new Period();
-        identifierPeriod.setStart(Date.from(taskId.getCreationInstant()));
-        identifierPeriod.setEnd(Date.from(endInstant));
-        fhirIdentifier = generalIdentifierFactory.newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_ACTIONABLE_TASK, taskId.getId(), identifierPeriod);
-        getLogger().debug(".newTaskIdentifier(): Exit, fhirIdentifier->{}", fhirIdentifier);
+    public Identifier newTaskIdentifier(TaskTypeTypeEnum taskType, TaskIdType taskId, Instant endInstant){
+        getLogger().debug(".newActionableTaskIdentifier(): Entry, taskId->{}", taskId);
+        Identifier fhirIdentifier = fhirIdentifier = newTaskIdentifier(taskType, taskId, null, endInstant);
+        getLogger().debug(".newActionableTaskIdentifier(): Exit, fhirIdentifier->{}", fhirIdentifier);
         return(fhirIdentifier);
     }
+
+    public Identifier newTaskIdentifier(TaskTypeTypeEnum taskType, TaskIdType taskId){
+        getLogger().debug(".newActionableTaskIdentifier(): Entry, taskId->{}", taskId);
+        Identifier fhirIdentifier = fhirIdentifier = newTaskIdentifier(taskType, taskId, null, null);
+        getLogger().debug(".newActionableTaskIdentifier(): Exit, fhirIdentifier->{}", fhirIdentifier);
+        return(fhirIdentifier);
+    }
+
 
     //
     // Getters (and Setters)

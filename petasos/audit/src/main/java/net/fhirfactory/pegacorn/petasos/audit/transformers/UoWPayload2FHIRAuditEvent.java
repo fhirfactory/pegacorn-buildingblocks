@@ -148,7 +148,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {
                         switch (wup.getIngresEndpoint().getEndpointType()) {
-                            case MLLP_SERVER: {
+                            case INTERACT_MLLP_SERVER: {
                                 String descriptionText = "Interact.Ingres: MLLP Message Reception";
                                 return (descriptionText);
                             }
@@ -161,7 +161,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 case COMPONENT_ROLE_INTERACT_EGRESS: {
                     if (wup.getEgressEndpoint() != null) {
                         switch (wup.getEgressEndpoint().getEndpointType()) {
-                            case MLLP_CLIENT: {
+                            case INTERACT_MLLP_CLIENT: {
                                 String descriptionText = "Interact.Egress: MLLP Message Forwarding";
                                 return (descriptionText);
                             }
@@ -193,7 +193,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {
                         switch (wup.getIngresEndpoint().getEndpointType()) {
-                            case MLLP_SERVER: {
+                            case INTERACT_MLLP_SERVER: {
                                 InteractMLLPServerEndpoint mllpServerEndpoint = (InteractMLLPServerEndpoint) wup.getIngresEndpoint();
                                 String source = processingPlant.getIPCServiceName();
                                 String port = mllpServerEndpoint.getMLLPServerAdapter().getPortNumber().toString();

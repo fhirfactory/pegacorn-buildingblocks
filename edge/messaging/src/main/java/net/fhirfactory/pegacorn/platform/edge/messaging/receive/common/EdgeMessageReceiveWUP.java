@@ -2,6 +2,7 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.receive.common;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.*;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
@@ -9,6 +10,8 @@ import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessing
 import org.apache.camel.ExchangePattern;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class EdgeMessageReceiveWUP extends EdgeIngresMessagingGatewayWUP {
 
@@ -56,7 +59,12 @@ public abstract class EdgeMessageReceiveWUP extends EdgeIngresMessagingGatewayWU
     //
 
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTRAZONE_SERVICE);
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTRAZONE_SERVICE);
+    }
+
+    @Override
+    protected List<DataParcelManifest> declarePublishedTopics() {
+        return (new ArrayList<>());
     }
 
     //

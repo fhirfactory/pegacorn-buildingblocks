@@ -98,7 +98,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     protected String specifyJGroupsClusterName() {
         getLogger().debug(".specifyJGroupsClusterName(): Entry");
         if(specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE)) {
-            String clusterName = specifyEndpointID().getEndpointZone().getNetworkSecurityZoneCamelCase()+"-"+specifyEndpointID().getEndpointGroup();
+            String clusterName = specifyEndpointID().getEndpointZone().getDisplayName()+"-"+specifyEndpointID().getEndpointGroup();
             getLogger().debug(".specifyJGroupsClusterName(): IntraZone Scope, returning->{}", clusterName);
             return (clusterName);
         }

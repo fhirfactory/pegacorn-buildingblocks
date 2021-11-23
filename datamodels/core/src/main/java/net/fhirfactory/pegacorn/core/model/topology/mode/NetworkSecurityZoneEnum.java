@@ -22,30 +22,39 @@
 package net.fhirfactory.pegacorn.core.model.topology.mode;
 
 public enum NetworkSecurityZoneEnum {
-    ZONE_PRIVATE_NETWORK("private-network", "PrivateNetwork"),
-    ZONE_PRIVATE_DMZ("private-dmz", "PrivateDMZ"),
-    ZONE_PUBLIC_DMZ("public-dmz", "PublicDMZ"),
-    ZONE_PUBLIC_INTERNET("public-internet", "Internet");
+    DATA_CENTRE_PRIVATE_NETWORK("PrivateNetwork","pegacorn.fhir.device.metadata.network-security-zone.private-network","Data Centre Private Network"),
+    DATA_CENTRE_PRIVATE_DMZ("PrivateDMZ","pegacorn.fhir.device.metadata.network-security-zone.private-dmz","Data Centre Private DMZ"),
+    DATA_CENTRE_PUBLIC_DMZ("PublicDMZ","pegacorn.fhir.device.metadata.network-security-zone.public-dmz","Data Centre Public DMZ"),
+    ENTERPRISE_GUEST_NETWORK("EnterpriseGuest","pegacorn.fhir.device.metadata.network-security-zone.enterprise-guest","Enterprise Guest Network"),
+    ENTERPRISE_RESTRICTED_NETWORK("EnterpriseRestricted","pegacorn.fhir.device.metadata.network-security-zone.enterprise-restricted","Enterprise Restricted (or Authenticated) Network"),
+    INTERNET("Internet","pegacorn.fhir.device.metadata.network-security-zone.internet","Internet (unrestricted, hostile)");
 
-    private String networkSecurityZone;
-    private String networkSecurityZoneCamelCase;
 
-    private NetworkSecurityZoneEnum(String zone, String camelCase) {
-        this.networkSecurityZone = zone;
-        this.networkSecurityZoneCamelCase = camelCase;
+    private String token;
+    private String displayName;
+    private String displayText;
+
+    private NetworkSecurityZoneEnum(String name, String token, String text) {
+        this.token = token;
+        this.displayName = name;
+        this.displayText = text;
     }
 
-    public String getNetworkSecurityZone(){
-        return(this.networkSecurityZone);
+    public String getToken(){
+        return(this.token);
     }
 
-    public String getNetworkSecurityZoneCamelCase(){
-        return(networkSecurityZoneCamelCase);
+    public String getDisplayName(){
+        return(displayName);
     }
 
-    public static NetworkSecurityZoneEnum fromSecurityZoneString(String zoneString){
+    public String getDisplayText(){
+        return(displayText);
+    }
+
+    public static NetworkSecurityZoneEnum fromDisplayName(String zoneString){
         for (NetworkSecurityZoneEnum b : NetworkSecurityZoneEnum.values()) {
-            if (b.getNetworkSecurityZone().equalsIgnoreCase(zoneString)) {
+            if (b.getDisplayName().equalsIgnoreCase(zoneString)) {
                 return b;
             }
         }
@@ -54,7 +63,7 @@ public enum NetworkSecurityZoneEnum {
 
     public static NetworkSecurityZoneEnum fromSecurityZoneCamelCaseString(String zoneCamelCaseString){
         for (NetworkSecurityZoneEnum b : NetworkSecurityZoneEnum.values()) {
-            if (b.getNetworkSecurityZoneCamelCase().equalsIgnoreCase(zoneCamelCaseString)) {
+            if (b.getDisplayName().equalsIgnoreCase(zoneCamelCaseString)) {
                 return b;
             }
         }

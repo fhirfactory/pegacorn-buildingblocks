@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.valuesets.CommunicateUserTypeEnum;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.ReferenceESDT;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.ReferenceESDT;
 
 public class CommunicateUserReference extends ReferenceESDT {
     private CommunicateUserTypeEnum userType;

@@ -360,7 +360,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         getLogger().debug(".isWithinScopeBasedOnChannelName(): Entry, endpointChannelName->{}", endpointChannelName);
         boolean sameSite = getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
         getLogger().trace(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Site.... result->{}", sameSite);
-        boolean sameZone = getEndpointNameUtilities().getEndpointZoneFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointZone().getNetworkSecurityZoneCamelCase());
+        boolean sameZone = getEndpointNameUtilities().getEndpointZoneFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointZone().getDisplayName());
         getLogger().trace(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Zone.... result->{}", sameZone);
         String otherChannelScope = getEndpointNameUtilities().getEndpointScopeFromChannelName(endpointChannelName);
         getLogger().trace(".isWithinScopeBasedOnChannelName(): Checking endpoint channel scope->{}", otherChannelScope);

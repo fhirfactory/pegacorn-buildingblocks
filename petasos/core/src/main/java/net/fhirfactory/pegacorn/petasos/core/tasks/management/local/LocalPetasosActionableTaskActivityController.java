@@ -64,16 +64,12 @@ public class LocalPetasosActionableTaskActivityController {
 
 
     //
-    // Task Registration/deregistration
+    // Task Registration/Deregistration
     //
 
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask){
         getSharedActionableTaskDM().registerActionableTask(actionableTask);
         getTaskRepositoryService().registerActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), actionableTask);
-
-
-        SearchParameter searchParameter = new SearchParameter();
-        searchParameter.set
         return(actionableTask);
     }
 

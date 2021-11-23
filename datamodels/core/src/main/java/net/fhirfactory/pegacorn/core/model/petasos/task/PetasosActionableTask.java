@@ -34,8 +34,6 @@ public class PetasosActionableTask extends PetasosTask{
     private SerializableObject taskFulfillmentLock;
     private TaskCompletionSummaryType taskCompletionSummary;
     private SerializableObject taskCompletionLock;
-    private PetasosTask taskTrigger;
-    private SerializableObject taskTriggerLock;
 
     //
     // Constructor(s)
@@ -47,8 +45,6 @@ public class PetasosActionableTask extends PetasosTask{
         this.taskFulfillmentLock = new SerializableObject();
         this.taskCompletionSummary = null;
         this.taskCompletionLock = new SerializableObject();
-        this.taskTrigger = null;
-        this.taskTriggerLock = new SerializableObject();
         setTaskType(new TaskTypeType(TaskTypeTypeEnum.PETASOS_ACTIONABLE_TASK_TYPE));
     }
 
@@ -79,7 +75,7 @@ public class PetasosActionableTask extends PetasosTask{
     }
 
     @JsonIgnore
-    public boolean hasTaskFinalisation(){
+    public boolean hasTaskCompletionSummary(){
         boolean hasValue = this.taskCompletionSummary != null;
         return(hasValue);
     }
@@ -100,28 +96,6 @@ public class PetasosActionableTask extends PetasosTask{
         this.taskCompletionLock = taskCompletionLock;
     }
 
-    @JsonIgnore
-    public boolean hasTaskTrigger(){
-        boolean hasValue = this.taskTrigger != null;
-        return(hasValue);
-    }
-
-    public PetasosTask getTaskTrigger() {
-        return taskTrigger;
-    }
-
-    public void setTaskTrigger(PetasosTask taskTrigger) {
-        this.taskTrigger = taskTrigger;
-    }
-
-    public SerializableObject getTaskTriggerLock() {
-        return taskTriggerLock;
-    }
-
-    public void setTaskTriggerLock(SerializableObject taskTriggerLock) {
-        this.taskTriggerLock = taskTriggerLock;
-    }
-
     //
     // To String
     //
@@ -140,8 +114,7 @@ public class PetasosActionableTask extends PetasosTask{
                 ", taskPerformerTypes=" + getTaskPerformerTypes() +
                 ", taskReason=" + getTaskReason() +
                 ", taskNodeAffinity=" + getTaskNodeAffinity() +
-                ", taskTrigger=" + getTaskTrigger() +
-                ", taskMetadata=" + getTaskMetadata() +
+                ", taskMetadata=" + getTaskContext() +
                 '}';
     }
 }

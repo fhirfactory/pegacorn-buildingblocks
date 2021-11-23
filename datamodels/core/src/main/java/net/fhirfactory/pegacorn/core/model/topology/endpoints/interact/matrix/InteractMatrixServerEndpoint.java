@@ -26,29 +26,11 @@ import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponent
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ClusteredInteractServerTopologyEndpointPort;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPServerAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPServerTopologyEndpoint;
 
-public class InteractMatrixServerEndpoint extends ClusteredInteractServerTopologyEndpointPort {
+public class InteractMatrixServerEndpoint extends InteractHTTPServerTopologyEndpoint {
 
     public InteractMatrixServerEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.HTTP_API_SERVER);
-        setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_INGRES);
-    }
-
-    @JsonIgnore
-    public HTTPServerAdapter getHTTPServerAdapter(){
-        if(getAdapterList().isEmpty()){
-            return(null);
-        }
-        HTTPServerAdapter mllpServer = (HTTPServerAdapter) getAdapterList().get(0);
-        return(mllpServer);
-    }
-
-    @JsonIgnore
-    public void setHTTPServerAdapter(HTTPServerAdapter httpServer){
-        if(httpServer != null){
-            getAdapterList().add(httpServer);
-        }
     }
 }

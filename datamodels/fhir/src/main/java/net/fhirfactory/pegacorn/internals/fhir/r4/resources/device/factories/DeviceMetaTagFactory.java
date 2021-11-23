@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DeviceSecurityZoneEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import org.hl7.fhir.r4.model.Coding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +38,10 @@ public class DeviceMetaTagFactory {
     @Inject
     private PegacornReferenceProperties systemWideProperties;
 
-    private static final String PEGACORN_DEVICE_SECURITY_ZONE_META_TAG_SYSTEM = "/device-security-zone";
-
+    private static final String PEGACORN_DEVICE_SECURITY_ZONE_META_TAG_SYSTEM = "/device-meta-tag-security-zone";
+    private static final String PEGACORN_DEVICE_DEPLOYMENT_POD_ID = "/device-meta-tag-pod-id";
+    private static final String PEGACORN_DEVICE_DEPLOYMENT_POD_IP_ADDRESS = "/device-meta-tag-pod-ip";
+    private static final String PEGACORN_DEVICE_DEPLOYMENT_HOST_IP_ADDRESS = "/device-meta-tag-host-ip";
 
     //
     // Business Methods
@@ -50,11 +52,47 @@ public class DeviceMetaTagFactory {
         return (codeSystem);
     }
 
-    public Coding newSecurityTag(DeviceSecurityZoneEnum securityZone){
+    public String getPegacornDeviceDeploymentPodId() {
+        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_POD_ID;
+        return(codeSystem);
+    }
+
+    public String getPegacornDeviceDeploymentPodIpAddress() {
+        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_POD_IP_ADDRESS;
+        return(codeSystem);
+    }
+
+    public String getPegacornDeviceDeploymentHostIpAddress() {
+        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_HOST_IP_ADDRESS;
+        return(codeSystem);
+    }
+
+    public Coding newSecurityTag(NetworkSecurityZoneEnum securityZone){
         Coding securityZoneCoding = new Coding();
         securityZoneCoding.setSystem(getPegacornDeviceSecurityZoneMetaTagSystem());
         securityZoneCoding.setCode(securityZone.getToken());
         securityZoneCoding.setDisplay(securityZone.getDisplayName());
         return(securityZoneCoding);
+    }
+
+    public Coding newPodIdTag(String podId){
+        Coding podIdCoding = new Coding();
+        podIdCoding.setSystem(getPegacornDeviceDeploymentPodId());
+        podIdCoding.setCode(podId);
+        return(podIdCoding);
+    }
+
+    public Coding newPodIPAddressTag(String ipAddress){
+        Coding podIPAddressCoding = new Coding();
+        podIPAddressCoding.setSystem(getPegacornDeviceDeploymentPodIpAddress());
+        podIPAddressCoding.setCode(ipAddress);
+        return(podIPAddressCoding);
+    }
+
+    public Coding newHostIPAddressTag(String ipAddress){
+        Coding hostIPAddressCoding = new Coding();
+        hostIPAddressCoding.setSystem(getPegacornDeviceDeploymentHostIpAddress());
+        hostIPAddressCoding.setCode(ipAddress);
+        return(hostIPAddressCoding);
     }
 }

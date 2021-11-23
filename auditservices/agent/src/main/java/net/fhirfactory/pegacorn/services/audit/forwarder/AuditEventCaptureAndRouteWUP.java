@@ -115,5 +115,8 @@ public class AuditEventCaptureAndRouteWUP extends MOAStandardWUP  {
                 .to(egressFeed());
     }
 
-
+    @Override
+    protected List<DataParcelManifest> declarePublishedTopics() {
+        return (new ArrayList<>());
+    }
 }

@@ -167,10 +167,10 @@ public class JGroupsBasedParticipantInformationService {
 
         // Derive the IPCEndpoints
         getLogger().info(".initialise(): [resolving interzone topology endpoint] Start");
-        this.myInterZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosEndpointTopologyTypeEnum.JGROUPS_INTERZONE_SERVICE, getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
+        this.myInterZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTERZONE_SERVICE, getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
         getLogger().info(".initialise(): [resolving interzone topology endpoint] finish, myInterZoneTopologyEndpoint->{}", this.myInterZoneTopologyEndpoint);
         getLogger().info(".initialise(): [resolving intrazone topology endpoint] Start");
-        this.myIntraZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosEndpointTopologyTypeEnum.JGROUPS_INTRAZONE_SERVICE, getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
+        this.myIntraZoneTopologyEndpoint = deriveTopologyEndpoint(PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTRAZONE_SERVICE, getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
         getLogger().info(".initialise(): [resolving intrazone topology endpoint] finish, myIntraZoneTopologyEndpoint->{}", this.myIntraZoneTopologyEndpoint);
 
         // Create the Participants

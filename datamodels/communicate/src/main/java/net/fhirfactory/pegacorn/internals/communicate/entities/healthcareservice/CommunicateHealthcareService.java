@@ -26,10 +26,10 @@ import net.fhirfactory.pegacorn.internals.communicate.entities.session.Communica
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserID;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.HealthcareServiceESR;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.valuesets.IdentifierESDTTypesEnum;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.valuesets.IdentifierESDTUseEnum;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.HealthcareServiceESR;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.valuesets.IdentifierESDTTypesEnum;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.valuesets.IdentifierESDTUseEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

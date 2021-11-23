@@ -245,17 +245,6 @@
         </dependency>
 
         <!--*******************************************************************************-->
-        <!-- Pegacorn ESR Libraries                                                        -->
-        <!--*******************************************************************************-->
-
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-datamodels-esr</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!--*******************************************************************************-->
         <!-- HAPI FHIR Libraries                                                           -->
         <!--*******************************************************************************-->
 

@@ -23,15 +23,15 @@ package net.fhirfactory.pegacorn.internals.directories.api.beans.common;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import net.fhirfactory.pegacorn.model.ui.brokers.common.ESRBroker;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.common.ExtremelySimplifiedResource;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.search.exceptions.ESRPaginationException;
-import net.fhirfactory.pegacorn.model.ui.resources.simple.search.exceptions.ESRSortingException;
-import net.fhirfactory.pegacorn.model.ui.transactions.ESRMethodOutcome;
-import net.fhirfactory.pegacorn.model.ui.transactions.exceptions.ResourceInvalidSearchException;
-import net.fhirfactory.pegacorn.model.ui.transactions.exceptions.ResourceInvalidSortException;
-import net.fhirfactory.pegacorn.model.ui.transactions.exceptions.ResourceNotFoundException;
+import net.fhirfactory.pegacorn.core.model.ui.brokers.common.ESRBroker;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.search.exceptions.ESRPaginationException;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.search.exceptions.ESRSortingException;
+import net.fhirfactory.pegacorn.core.model.ui.transactions.ESRMethodOutcome;
+import net.fhirfactory.pegacorn.core.model.ui.transactions.exceptions.ResourceInvalidSearchException;
+import net.fhirfactory.pegacorn.core.model.ui.transactions.exceptions.ResourceInvalidSortException;
+import net.fhirfactory.pegacorn.core.model.ui.transactions.exceptions.ResourceNotFoundException;
 import org.apache.camel.Header;
 import org.slf4j.Logger;
 

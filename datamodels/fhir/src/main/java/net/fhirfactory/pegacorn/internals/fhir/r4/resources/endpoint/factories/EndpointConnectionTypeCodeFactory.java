@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
 import org.hl7.fhir.r4.model.Coding;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -29,18 +30,35 @@ import javax.inject.Inject;
 
 @ApplicationScoped
 public class EndpointConnectionTypeCodeFactory {
-    private String PEGACORN_ENDPOINT_CODE_SYSTEM = "/endpoint/connection_type";
+
+    private static final String PEGACORN_ENDPOINT_CONNECTION_TYPE_SYSTEM = "/endpoint-connection_type";
 
     @Inject
     private PegacornReferenceProperties systemWideProperties;
 
+    //
+    // Business Methods
+    //
+
+    public String getPegacornEndpointConnectionTypeSystem(){
+        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ENDPOINT_CONNECTION_TYPE_SYSTEM;
+        return (codeSystem);
+    }
+
     public Coding newPegacornEndpointJGroupsConnectionCodeSystem(String technologyType, String endpointType) {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ENDPOINT_CODE_SYSTEM;
         Coding coding = new Coding();
         coding.setCode(technologyType);
-        coding.setSystem(codeSystem);
+        coding.setSystem(getPegacornEndpointConnectionTypeSystem());
         String codeDisplay = technologyType + "(" + endpointType +" )";
         coding.setDisplay(codeDisplay);
+        return (coding);
+    }
+
+    public Coding newPegacornEndpointJGroupsConnectionCodeSystem(PetasosEndpointTopologyTypeEnum endpointType) {
+        Coding coding = new Coding();
+        coding.setCode(endpointType.getToken());
+        coding.setSystem(getPegacornEndpointConnectionTypeSystem());
+        coding.setDisplay(endpointType.getDisplayName());
         return (coding);
     }
 }

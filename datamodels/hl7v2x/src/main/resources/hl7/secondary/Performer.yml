@@ -1,0 +1,29 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+function_v1:
+   condition: $orderingProvider NOT_NULL
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   constants:
+    system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
+    code: 'OP'
+    text: 'Ordering Provider'
+
+function_v2:
+   condition: $administeringProvider NOT_NULL
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   constants:
+    system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
+    code: AP
+    text: Administering Provider
+actor:
+   condition: $orderingProvider NOT_NULL || $administeringProvider NOT_NULL
+   valueOf: resource/Practitioner
+   expressionType: reference
+   generateList: true
+   specs: $orderingProvider | $administeringProvider
+   required: true

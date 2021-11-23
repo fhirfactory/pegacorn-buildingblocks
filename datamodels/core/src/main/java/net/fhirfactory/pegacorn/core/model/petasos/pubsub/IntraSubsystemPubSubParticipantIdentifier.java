@@ -53,7 +53,6 @@ public class IntraSubsystemPubSubParticipantIdentifier extends ComponentIdType i
         return "IntraSubsystemPubSubParticipantIdentifier{" +
                 "id='" + getId() + '\'' +
                 ", displayName='" + getDisplayName() + '\'' +
-                ", version='" + getVersion() + '\'' +
                 '}';
     }
 }

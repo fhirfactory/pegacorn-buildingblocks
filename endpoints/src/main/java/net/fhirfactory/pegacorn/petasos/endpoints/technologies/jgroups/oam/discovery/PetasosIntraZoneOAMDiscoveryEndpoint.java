@@ -53,7 +53,7 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
         String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
         String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
         String endpointSite = getProcessingPlantInterface().getDeploymentSite();
-        String endpointZone = getProcessingPlantInterface().getNetworkZone().getNetworkSecurityZoneCamelCase();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
         // Build EndpointName
         String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointScopeName, endpointUUID);
         // Build EndpointChannelName
@@ -83,7 +83,7 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTRAZONE_SERVICE);
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTRAZONE_SERVICE);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class PetasosIntraZoneOAMDiscoveryEndpoint extends PetasosOAMDiscoveryEnd
 
     @Override
     protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
-        return (EndpointPayloadTypeEnum.ENPOINT_PAYLOAD_PEGACORN_OAM);
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_TOPOLOGY);
     }
 
     @Override

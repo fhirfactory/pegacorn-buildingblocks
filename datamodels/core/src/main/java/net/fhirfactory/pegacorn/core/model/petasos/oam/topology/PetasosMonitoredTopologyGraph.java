@@ -23,6 +23,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.oam.topology;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.ProcessingPlantSummary;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PetasosMonitoredTopologyGraph implements Serializable {
     private String deploymentName;
-    private Map<ComponentIdType, ProcessingPlantSummary> processingPlants;
+    private Map<String, ProcessingPlantSummary> processingPlants;
 
     //
     // Constructor(s)
@@ -44,11 +45,11 @@ public class PetasosMonitoredTopologyGraph implements Serializable {
     // Getters and Setters
     //
 
-    public Map<ComponentIdType, ProcessingPlantSummary> getProcessingPlants() {
+    public Map<String, ProcessingPlantSummary> getProcessingPlants() {
         return processingPlants;
     }
 
-    public void setProcessingPlants(Map<ComponentIdType, ProcessingPlantSummary> processingPlants) {
+    public void setProcessingPlants(Map<String, ProcessingPlantSummary> processingPlants) {
         this.processingPlants = processingPlants;
     }
 
@@ -62,12 +63,18 @@ public class PetasosMonitoredTopologyGraph implements Serializable {
 
     public void addProcessingPlant(ProcessingPlantSummary processingPlant){
         removeProcessingPlant(processingPlant.getComponentID());
-        processingPlants.put(processingPlant.getComponentID(), processingPlant);
+        processingPlants.put(processingPlant.getComponentID().getId(), processingPlant);
     }
 
     public void removeProcessingPlant(ComponentIdType componentID){
         if(processingPlants.containsKey(componentID)){
-            processingPlants.remove(componentID);
+            removeProcessingPlant(componentID.getId());
+        }
+    }
+
+    public void removeProcessingPlant(String id){
+        if(processingPlants.containsKey(id)){
+            processingPlants.remove(id);
         }
     }
 

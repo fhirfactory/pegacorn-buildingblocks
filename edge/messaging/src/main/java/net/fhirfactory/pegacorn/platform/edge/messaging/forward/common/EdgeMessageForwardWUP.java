@@ -41,6 +41,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWUP {
@@ -100,12 +101,17 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
     //
 
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTRAZONE_SERVICE);
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTRAZONE_SERVICE);
     }
 
     @Override
     public void executePostInitialisationActivities(){
         this.getIPCEndpoint().initialise();
+    }
+
+    @Override
+    protected List<DataParcelManifest> declarePublishedTopics() {
+        return (new ArrayList<>());
     }
 
     //

@@ -39,7 +39,7 @@ public class StandardEdgeAskHTTPEndpoint extends StandardInteractClientTopologyE
 
     public StandardEdgeAskHTTPEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.HTTP_API_CLIENT);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_HTTP_API_CLIENT);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_SUBSYSTEM_EDGE);
     }
 
