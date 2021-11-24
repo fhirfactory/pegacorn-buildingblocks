@@ -21,5 +21,63 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
-public class EncounterSummary {
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PeriodESDT;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
+
+public class EncounterSummary extends ResourceSummaryBase {
+    private String encounterId;
+    private PeriodESDT encounterPeriod;
+    private String patientId;
+
+    //
+    // Constructor(s)
+    //
+
+    public EncounterSummary(){
+        this.encounterId = null;
+        this.encounterPeriod = null;
+        this.patientId = null;
+    }
+
+    //
+    // Getters and Setters
+    //
+
+    public String getEncounterId() {
+        return encounterId;
+    }
+
+    public void setEncounterId(String encounterId) {
+        this.encounterId = encounterId;
+    }
+
+    public PeriodESDT getEncounterPeriod() {
+        return encounterPeriod;
+    }
+
+    public void setEncounterPeriod(PeriodESDT encounterPeriod) {
+        this.encounterPeriod = encounterPeriod;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "EncounterSummary{" +
+                "encounterId=" + encounterId +
+                ", encounterPeriod=" + encounterPeriod +
+                ", patientId=" + patientId +
+                ", resourceId=" + getResourceId() +
+                '}';
+    }
 }

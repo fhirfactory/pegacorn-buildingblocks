@@ -25,10 +25,11 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 
 import java.io.Serializable;
 
-public class SoftwareComponentSummary implements Serializable {
+public class SoftwareComponentSummary extends ResourceSummaryBase {
     private ComponentIdType componentID;
     private String componentName;
     private String nodeVersion;
@@ -115,6 +116,7 @@ public class SoftwareComponentSummary implements Serializable {
                 ", routing=" + routing +
                 ", topologyNodeFDN=" + topologyNodeFDN +
                 ", nodeType=" + nodeType +
+                ", resourceId=" + getResourceId() +
                 '}';
     }
 }

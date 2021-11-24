@@ -93,7 +93,7 @@ public class SoftwareComponentEndpointSummary extends SoftwareComponentSummary {
     @Override
     public String toString() {
         return "SoftwareComponentEndpointSummary{" +
-                "connectedSystemName='" + connectedSystemName + '\'' +
+                "connectedSystemName='" + connectedSystemName + 
                 ", endpointType=" + endpointType +
                 ", server=" + server +
                 ", serverPorts=" + serverPorts +
@@ -101,11 +101,12 @@ public class SoftwareComponentEndpointSummary extends SoftwareComponentSummary {
                 ", routing=" + getRouting() +
                 ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +
-                ", nodeVersion='" + getNodeVersion() + '\'' +
+                ", nodeVersion='" + getNodeVersion() +
                 ", nodeType=" + getNodeType() +
-                ", concurrencyMode='" + getConcurrencyMode() + '\'' +
-                ", resilienceMode='" + getResilienceMode() + '\'' +
-                ", componentName='" + getComponentName() + '\'' +
+                ", concurrencyMode=" + getConcurrencyMode() +
+                ", resilienceMode=" + getResilienceMode() +
+                ", componentName=" + getComponentName() +
+                ", resourceId=" + getResourceId() +
                 '}';
     }
 }

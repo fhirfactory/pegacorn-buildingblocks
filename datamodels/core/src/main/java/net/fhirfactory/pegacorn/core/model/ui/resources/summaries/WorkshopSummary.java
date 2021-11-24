@@ -72,11 +72,12 @@ public class WorkshopSummary extends SoftwareComponentSummary {
                 ", routing=" + getRouting() +
                 ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +
-                ", nodeVersion='" + getNodeVersion() + '\'' +
+                ", nodeVersion=" + getNodeVersion() +
                 ", nodeType=" + getNodeType() +
-                ", concurrencyMode='" + getConcurrencyMode() + '\'' +
-                ", resilienceMode='" + getResilienceMode() + '\'' +
-                ", componentName='" + getComponentName() + '\'' +
+                ", concurrencyMode=" + getConcurrencyMode() +
+                ", resilienceMode=" + getResilienceMode() +
+                ", componentName=" + getComponentName() +
+                ", resourceId=" + getResourceId() +
                 '}';
     }
 }

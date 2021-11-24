@@ -23,11 +23,12 @@ package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PeriodESDT;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class TaskSummary {
+public class TaskSummary extends ResourceSummaryBase {
     private String taskId;
     private String taskFocus;
     private String taskBeneficiary;
@@ -168,6 +169,7 @@ public class TaskSummary {
                 ", taskStatus=" + taskStatus +
                 ", taskTriggerType=" + taskTriggerType +
                 ", taskTriggerId=" + taskTriggerId +
+                ", resourceId=" + getResourceId() +
                 '}';
     }
 }

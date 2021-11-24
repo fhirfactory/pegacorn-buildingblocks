@@ -19,54 +19,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
+package net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common;
 
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.IdentifierESDT;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
+import java.io.Serializable;
 
-public class LocationSummary extends ResourceSummaryBase {
-    private IdentifierESDT locationId;
-    private String locationDescription;
+public class ResourceSummaryBase implements Serializable {
+    private String resourceId;
 
     //
     // Constructor(s)
     //
 
-    public LocationSummary(){
-        this.locationDescription = null;
-        this.locationId = null;
+    public ResourceSummaryBase(){
+        this.resourceId = null;
     }
 
     //
-    // Getters and Setters
+    // Getters And Setters
     //
 
-    public IdentifierESDT getLocationId() {
-        return locationId;
+    public String getResourceId() {
+        return resourceId;
     }
 
-    public void setLocationId(IdentifierESDT locationId) {
-        this.locationId = locationId;
-    }
-
-    public String getLocationDescription() {
-        return locationDescription;
-    }
-
-    public void setLocationDescription(String locationDescription) {
-        this.locationDescription = locationDescription;
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
     }
 
     //
-    // toString
+    // To String
     //
 
     @Override
     public String toString() {
-        return "LocationSummary{" +
-                "locationId=" + locationId +
-                ", locationDescription=" + locationDescription +
-                ", resourceId=" + getResourceId() +
+        return "ResourceSummaryBase{" +
+                "resourceId=" + resourceId +
                 '}';
     }
 }

@@ -64,6 +64,7 @@ public class WorkUnitProcessorSummary extends SoftwareComponentSummary {
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
                 ", componentName=" + getComponentName() +
+                ", resourceId=" + getResourceId() +
                 '}';
     }
 }

@@ -114,6 +114,7 @@ public class ProcessingPlantSummary extends SoftwareComponentSummary {
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
                 ", componentName=" + getComponentName() +
+                ", resourceId=" + getResourceId() +
                 '}';
     }
 }

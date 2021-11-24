@@ -23,10 +23,11 @@ package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.HumanNameESDT;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.IdentifierESDT;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 
 import java.util.Date;
 
-public class PatientSummary {
+public class PatientSummary extends ResourceSummaryBase {
     private HumanNameESDT patientName;
     private IdentifierESDT patientMRN;
     private Date patientDateOfBirth;
@@ -79,6 +80,7 @@ public class PatientSummary {
                 "patientName=" + patientName +
                 ", patientMRN=" + patientMRN +
                 ", patientDateOfBirth=" + patientDateOfBirth +
+                ", resourceId=" + getResourceId() +
                 '}';
     }
 }

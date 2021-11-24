@@ -128,6 +128,7 @@ public class SoftwareComponentPortSummary extends SoftwareComponentSummary {
                 ", resilienceMode=" + getResilienceMode() +
                 ", componentName=" + getComponentName() +
                 ", encrypted=" + isEncrypted() +
+                ", resourceId=" + getResourceId() +
                 '}';
     }
 }
