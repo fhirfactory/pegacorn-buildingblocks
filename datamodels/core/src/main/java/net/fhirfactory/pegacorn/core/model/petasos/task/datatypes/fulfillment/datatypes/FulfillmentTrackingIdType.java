@@ -57,9 +57,7 @@ public class FulfillmentTrackingIdType extends TaskIdType implements Serializabl
 	@Override
 	public String toString() {
 		return "FulfillmentTrackingIdType{" +
-				"id='" + getId() + '\'' +
-				", version='" + getVersion() + '\'' +
-				", creationInstant=" + getCreationInstant() +
+				"id='" + getLocalId() +
 				'}';
 	}
 }

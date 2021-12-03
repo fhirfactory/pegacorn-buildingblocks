@@ -26,6 +26,8 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskTriggerSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
@@ -84,6 +86,12 @@ public class IngresActivityBeginRegistration {
         getLogger().trace(".registerActivityStart(): Create and register a PetasosActionableTask for the incoming message (processing activity): Start");
         TaskWorkItemType workItem = new TaskWorkItemType(theUoW.getIngresContent());
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
+        TaskContextType taskContext = new TaskContextType();
+        TaskTriggerSummaryType taskTriggerSummary = new TaskTriggerSummaryType();
+        taskTriggerSummary.setTriggerTaskId(petasosActionableTask.getTaskId());
+        taskTriggerSummary.setTriggerLocation(wup.getComponentFDN().getToken().getTokenValue());
+        taskContext.setTaskTriggerSummary(taskTriggerSummary);
+        petasosActionableTask.setTaskContext(taskContext);
         getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
         getLogger().trace(".registerActivityStart(): Create and register a PetasosActionableTask for the incoming message (processing activity): Finish");
 

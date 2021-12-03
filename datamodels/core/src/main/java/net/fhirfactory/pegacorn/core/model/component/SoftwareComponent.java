@@ -41,7 +41,7 @@ public abstract class SoftwareComponent implements Serializable {
     private TopologyNodeFDN componentFDN;
     private ComponentIdType componentID;
     private TopologyNodeFunctionFDN nodeFunctionFDN;
-    private ComponentTypeTypeEnum componentType;
+    private PegacornSystemComponentTypeTypeEnum componentType;
     private TopologyNodeFDN containingNodeFDN;
     private ConcurrencyModeEnum concurrencyMode;
     private ResilienceModeEnum resilienceMode;
@@ -85,7 +85,7 @@ public abstract class SoftwareComponent implements Serializable {
     @JsonIgnore
     public void constructFDN(TopologyNodeFDN parentNodeFDN, TopologyNodeRDN nodeRDN){
         getLogger().debug(".constructFDN(): Entry, parentNodeFDN->{}, nodeRDN->{}", parentNodeFDN, nodeRDN);
-        if(parentNodeFDN == null || nodeRDN.getNodeType().equals(ComponentTypeTypeEnum.SOLUTION)){
+        if(parentNodeFDN == null || nodeRDN.getNodeType().equals(PegacornSystemComponentTypeTypeEnum.SOLUTION)){
             getLogger().trace(".constructFDN(): Is a Solution Node");
             TopologyNodeFDN solutionFDN = new TopologyNodeFDN();
             solutionFDN.appendTopologyNodeRDN(nodeRDN);
@@ -167,6 +167,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.otherConfigurationParameters.put(key,value);
     }
 
+    @JsonIgnore
     public String getOtherConfigurationParameter(String key){
         if(this.otherConfigurationParameters.containsKey(key)){
             String value = this.otherConfigurationParameters.get(key);
@@ -239,11 +240,11 @@ public abstract class SoftwareComponent implements Serializable {
         this.nodeFunctionFDN = nodeFunctionFDN;
     }
 
-    public ComponentTypeTypeEnum getComponentType() {
+    public PegacornSystemComponentTypeTypeEnum getComponentType() {
         return componentType;
     }
 
-    public void setComponentType(ComponentTypeTypeEnum componentType) {
+    public void setComponentType(PegacornSystemComponentTypeTypeEnum componentType) {
         this.componentType = componentType;
     }
 

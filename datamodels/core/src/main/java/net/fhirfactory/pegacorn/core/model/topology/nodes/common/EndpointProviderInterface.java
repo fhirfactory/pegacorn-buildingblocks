@@ -10,7 +10,7 @@ public interface EndpointProviderInterface {
     public TopologyNodeFDN getComponentFDN();
     public ComponentIdType getComponentID();
     public TopologyNodeFunctionFDN getNodeFunctionFDN();
-    public ComponentTypeTypeEnum getComponentType();
+    public PegacornSystemComponentTypeTypeEnum getComponentType();
     public ResilienceModeEnum getResilienceMode();
     public ConcurrencyModeEnum getConcurrencyMode();
 }

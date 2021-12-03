@@ -91,13 +91,13 @@ public class EdgeIntraZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
 
     @Override
     protected String specifyEgressInterfaceName() {
-        return (getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
+        return (getInterfaceNames().getIntraZoneJGroupsIPCEndpointName());
     }
 
     @Override
     protected IPCAdapterDefinition specifyEgressInterfaceDefinition() {
         IPCAdapterDefinition interfaceDefinition = new IPCAdapterDefinition();
-        interfaceDefinition.setInterfaceFormalName("JGroups-Kube");
+        interfaceDefinition.setInterfaceFormalName(getIPCComponentNames().getJGroupsKubernetesServerInterfaceType());
         interfaceDefinition.setInterfaceFormalVersion("1.0.0");
         return (interfaceDefinition);
     }

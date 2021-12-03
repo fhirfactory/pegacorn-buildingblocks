@@ -355,6 +355,45 @@
         </dependency>
 
         <!--*******************************************************************************-->
+        <!-- HAPI HL7 v2 Libraries                                                         -->
+        <!--*******************************************************************************-->
+
+        <dependency>
+            <groupId>ca.uhn.hapi</groupId>
+            <artifactId>hapi-structures-v24</artifactId>
+            <version>${version-ca.uhn.hapi-hl7structures}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ca.uhn.hapi</groupId>
+            <artifactId>hapi-structures-v231</artifactId>
+            <version>${version-ca.uhn.hapi-hl7structures}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ca.uhn.hapi</groupId>
+            <artifactId>hapi-structures-v25</artifactId>
+            <version>${version-ca.uhn.hapi-hl7structures}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ca.uhn.hapi</groupId>
+            <artifactId>hapi-structures-v251</artifactId>
+            <version>${version-ca.uhn.hapi-hl7structures}</version>
+        </dependency>
+
+        <!--*******************************************************************************-->
+        <!-- IBM HL7 to FHIR Converter Libraries                                           -->
+        <!--*******************************************************************************-->
+
+        <dependency>
+            <groupId>io.github.linuxforhealth</groupId>
+            <artifactId>hl7v2-fhir-converter</artifactId>
+            <version>1.0.13</version>
+        </dependency>
+
+
+        <!--*******************************************************************************-->
         <!-- Test (JUnit Jupiter) Libraries                                                -->
         <!--*******************************************************************************-->
 

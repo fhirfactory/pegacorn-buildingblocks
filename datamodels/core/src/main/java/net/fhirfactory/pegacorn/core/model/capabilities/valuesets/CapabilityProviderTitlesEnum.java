@@ -22,8 +22,24 @@
 package net.fhirfactory.pegacorn.core.model.capabilities.valuesets;
 
 public enum CapabilityProviderTitlesEnum {
-    CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS,
-    CAPABILITY_INFORMATION_MANAGEMENT_AUDIT_EVENTS,
-    CAPABILITY_DATA_MANAGEMENT_AUDIT_EVENTS,
-    CAPABILITY_SERVICE_PROVIDER_A19QRY,
+    CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS("IT-Ops-IM", "pegacorn.capability.im.itops"),
+    CAPABILITY_INFORMATION_MANAGEMENT_AUDIT_EVENTS("AuditEvent-IM", "pegacorn.capability.im.audit-event"),
+    CAPABILITY_DATA_MANAGEMENT_AUDIT_EVENTS("AuditEvent-DM","pegacorn.capability.dm.audit-event"),
+    CAPABILITY_SERVICE_PROVIDER_A19QRY("A19Query-Task", "pegacorn.capability.task.a19query");
+
+    private String displayName;
+    private String token;
+
+    private CapabilityProviderTitlesEnum(String name, String token){
+        this.displayName = name;
+        this.token = token;
+    }
+
+    public String getDisplayName(){
+        return(this.displayName);
+    }
+
+    public String getToken(){
+        return(this.token);
+    }
 }

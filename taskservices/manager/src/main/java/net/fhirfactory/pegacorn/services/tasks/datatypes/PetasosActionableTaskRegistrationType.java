@@ -24,47 +24,60 @@ package net.fhirfactory.pegacorn.services.tasks.datatypes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.datagrid.valuesets.DatagridPersistenceResourceStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class PetasosActionableTaskRegistrationType implements Serializable {
-    private PetasosActionableTask actionableTask;
+    private TaskIdType actionableTaskId;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant registrationInstant;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant checkInstant;
-    private List<ComponentIdType> fulfillmentProcessingPlants;
-    private List<String> fulfillmentServiceNames;
-    private List<TaskPerformerTypeType> performerType;
+    private DatagridPersistenceResourceStatusEnum resourceStatus;
+    private Set<ComponentIdType> fulfillmentProcessingPlants;
+    private Set<String> fulfillmentServiceNames;
+    private Set<TaskPerformerTypeType> performerType;
 
     //
     // Constructor(s)
     //
 
     public PetasosActionableTaskRegistrationType(){
-        this.actionableTask = null;
+        this.actionableTaskId = null;
         this.registrationInstant = null;
         this.checkInstant = null;
-        this.fulfillmentProcessingPlants = new ArrayList<>();
-        this.performerType = new ArrayList<>();
-        this.fulfillmentServiceNames = new ArrayList<>();
+        this.fulfillmentProcessingPlants = new HashSet<>();
+        this.performerType = new HashSet<>();
+        this.fulfillmentServiceNames = new HashSet<>();
+        this.resourceStatus = null;
     }
 
     //
     // Getters and Setters
     //
 
-    public PetasosActionableTask getActionableTask() {
-        return actionableTask;
+
+    public DatagridPersistenceResourceStatusEnum getResourceStatus() {
+        return resourceStatus;
     }
 
-    public void setActionableTask(PetasosActionableTask actionableTask) {
-        this.actionableTask = actionableTask;
+    public void setResourceStatus(DatagridPersistenceResourceStatusEnum resourceStatus) {
+        this.resourceStatus = resourceStatus;
+    }
+
+    public TaskIdType getActionableTaskId() {
+        return actionableTaskId;
+    }
+
+    public void setActionableTaskId(TaskIdType actionableTask) {
+        this.actionableTaskId = actionableTask;
     }
 
     public Instant getRegistrationInstant() {
@@ -83,28 +96,98 @@ public class PetasosActionableTaskRegistrationType implements Serializable {
         this.checkInstant = checkInstant;
     }
 
-    public List<ComponentIdType> getFulfillmentProcessingPlants() {
+    public Set<ComponentIdType> getFulfillmentProcessingPlants() {
         return fulfillmentProcessingPlants;
     }
 
-    public void setFulfillmentProcessingPlants(List<ComponentIdType> fulfillmentProcessingPlants) {
-        this.fulfillmentProcessingPlants = fulfillmentProcessingPlants;
+    public void setFulfillmentProcessingPlants(Set<ComponentIdType> fulfillmentProcessingPlants) {
+        this.fulfillmentProcessingPlants.clear();
+        this.fulfillmentProcessingPlants.addAll(fulfillmentProcessingPlants);
     }
 
-    public List<String> getFulfillmentServiceNames() {
+    public Set<String> getFulfillmentServiceNames() {
         return fulfillmentServiceNames;
     }
 
-    public void setFulfillmentServiceNames(List<String> fulfillmentServiceNames) {
-        this.fulfillmentServiceNames = fulfillmentServiceNames;
+    public void setFulfillmentServiceNames(Set<String> fulfillmentServiceNames) {
+        this.fulfillmentServiceNames.clear();
+        this.fulfillmentServiceNames.addAll(fulfillmentServiceNames);
     }
 
-    public List<TaskPerformerTypeType> getPerformerType() {
+    public Set<TaskPerformerTypeType> getPerformerType() {
         return performerType;
     }
 
-    public void setPerformerType(List<TaskPerformerTypeType> performerType) {
-        this.performerType = performerType;
+    public void setPerformerType(Set<TaskPerformerTypeType> performerType) {
+        this.performerType.clear();
+        this.performerType.addAll(performerType);
+    }
+
+    //
+    // Business Methods
+    //
+
+    public void addPerformerType(TaskPerformerTypeType performerType){
+        if(performerType == null){
+            return;
+        }
+        if(!getPerformerType().contains(performerType)){
+            getPerformerType().add(performerType);
+        }
+    }
+
+    public void addPerformerTypes(Collection<TaskPerformerTypeType> taskPerformers){
+        if(taskPerformers == null){
+            return;
+        }
+        if(taskPerformers.isEmpty()){
+            return;
+        }
+        for(TaskPerformerTypeType currentPerformerType: taskPerformers){
+            addPerformerType(currentPerformerType);
+        }
+    }
+
+    public void addFulfillmentServiceName(String serviceName){
+        if(StringUtils.isEmpty(serviceName)){
+            return;
+        }
+        if(!getFulfillmentServiceNames().contains(serviceName)){
+            getFulfillmentServiceNames().add(serviceName);
+        }
+    }
+
+    public void addServiceFulfillmentNames(Collection<String> serviceNames){
+        if(serviceNames == null){
+            return;
+        }
+        if(serviceNames.isEmpty()){
+            return;
+        }
+        for(String currentServiceName: serviceNames){
+            addFulfillmentServiceName(currentServiceName);
+        }
+    }
+
+    public void addFulfillmentProcessingPlant(ComponentIdType processingPlantId){
+        if(processingPlantId == null){
+            return;
+        }
+        if(!getFulfillmentProcessingPlants().contains(processingPlantId)){
+            getFulfillmentProcessingPlants().add(processingPlantId);
+        }
+    }
+
+    public void addFulfillmentProcessingPlants(Collection<ComponentIdType> processingPlants){
+        if(processingPlants == null){
+            return;
+        }
+        if(processingPlants.isEmpty()){
+            return;
+        }
+        for(ComponentIdType currentProcessingPlant: processingPlants){
+            addFulfillmentProcessingPlant(currentProcessingPlant);
+        }
     }
 
     //
@@ -114,12 +197,13 @@ public class PetasosActionableTaskRegistrationType implements Serializable {
     @Override
     public String toString() {
         return "PetasosActionableTaskRegistrationType{" +
-                "actionableTask=" + actionableTask +
+                "actionableTaskId=" + actionableTaskId +
                 ", registrationInstant=" + registrationInstant +
                 ", checkInstant=" + checkInstant +
                 ", fulfillmentProcessingPlants=" + fulfillmentProcessingPlants +
                 ", fulfillmentServiceNames=" + fulfillmentServiceNames +
                 ", performerType=" + performerType +
+                ", resourceStatus=" + resourceStatus +
                 '}';
     }
 }

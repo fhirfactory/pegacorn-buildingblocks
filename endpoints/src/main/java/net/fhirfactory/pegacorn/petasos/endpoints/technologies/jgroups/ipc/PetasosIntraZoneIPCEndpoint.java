@@ -51,7 +51,7 @@ public class PetasosIntraZoneIPCEndpoint extends PetasosIPCEndpoint {
 
     @Override
     protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
+        return (getInterfaceNames().getIntraZoneJGroupsIPCEndpointName());
     }
 
     @Override
@@ -70,7 +70,7 @@ public class PetasosIntraZoneIPCEndpoint extends PetasosIPCEndpoint {
         // Get Core Values
         String endpointServiceName = specifyEndpointServiceName();
         String endpointScopeName = specifyPetasosEndpointScope().getEndpointScopeName();
-        String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
         String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
         String endpointSite = getProcessingPlantInterface().getDeploymentSite();
         String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();

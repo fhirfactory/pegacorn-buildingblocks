@@ -29,7 +29,7 @@ import java.io.Serializable;
 public class ComponentTypeType implements Serializable {
     private String typeName;
     private String displayTypeName;
-    private ComponentTypeTypeEnum componentArchetype;
+    private PegacornSystemComponentTypeTypeEnum componentArchetype;
     private String version;
 
     //
@@ -100,11 +100,11 @@ public class ComponentTypeType implements Serializable {
         return(hasValue);
     }
 
-    public ComponentTypeTypeEnum getComponentArchetype() {
+    public PegacornSystemComponentTypeTypeEnum getComponentArchetype() {
         return componentArchetype;
     }
 
-    public void setComponentArchetype(ComponentTypeTypeEnum componentArchetype) {
+    public void setComponentArchetype(PegacornSystemComponentTypeTypeEnum componentArchetype) {
         this.componentArchetype = componentArchetype;
     }
 

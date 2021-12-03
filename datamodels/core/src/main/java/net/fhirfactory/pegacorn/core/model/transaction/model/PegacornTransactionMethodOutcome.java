@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.core.model.transaction.model;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.keyring.PegacornResourceKeyring;
 import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionStatusEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;

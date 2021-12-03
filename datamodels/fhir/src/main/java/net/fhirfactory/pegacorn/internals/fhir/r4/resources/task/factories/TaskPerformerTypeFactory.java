@@ -54,4 +54,19 @@ public class TaskPerformerTypeFactory {
         performerTypeCC.setText(wupDescription);
         return(performerTypeCC);
     }
+
+    public String extractCodeFromCodeableConceptForTaskPerformerType(CodeableConcept performerType){
+        if(performerType == null){
+            return(null);
+        }
+        if (performerType.getCoding() == null) {
+            return(null);
+        }
+        for(Coding code: performerType.getCoding()){
+            if(code.getSystem().contentEquals(getPegacornTaskPerformerType())){
+                return(code.getCode());
+            }
+        }
+        return(null);
+    }
 }

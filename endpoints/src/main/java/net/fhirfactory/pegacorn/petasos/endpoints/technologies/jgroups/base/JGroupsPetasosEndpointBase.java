@@ -266,14 +266,14 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             return(null);
         }
         String newName = null;
-        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionName())){
-            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionName(), "");
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getDisplayName())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getDisplayName(), "");
         }
-        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName())){
-            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName(), "");
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName(), "");
         }
-        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionName())){
-            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionName(), "");
+        if(endpointKey.contains(PetasosEndpointFunctionTypeEnum.PETASOS_SUBSCRIPTIONS_ENDPOINT.getDisplayName())){
+            newName = endpointKey.replace(PetasosEndpointFunctionTypeEnum.PETASOS_SUBSCRIPTIONS_ENDPOINT.getDisplayName(), "");
         }
         if(newName == null){
             newName = endpointKey;
@@ -282,7 +282,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     }
 
     protected String addFunctionNameSuffixToEndpointName(String endpointName, PetasosEndpointFunctionTypeEnum functionType){
-        String functionInclusiveName = endpointName.replace("(", functionType.getFunctionName()+"(");
+        String functionInclusiveName = endpointName.replace("(", functionType.getDisplayName()+"(");
         return(functionInclusiveName);
     }
 

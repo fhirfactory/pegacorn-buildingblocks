@@ -21,10 +21,10 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 
 public abstract class OAMWorkshop extends Workshop{
-    protected ComponentTypeTypeEnum specifyWorkshopType(){
-        return(ComponentTypeTypeEnum.OAM_WORKSHOP);
+    protected PegacornSystemComponentTypeTypeEnum specifyWorkshopType(){
+        return(PegacornSystemComponentTypeTypeEnum.OAM_WORKSHOP);
     }
 }

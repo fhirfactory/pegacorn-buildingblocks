@@ -24,9 +24,12 @@ package net.fhirfactory.pegacorn.services.oam.metrics.agent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.fhirfactory.pegacorn.core.interfaces.oam.metrics.PetasosMetricsHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityUtilisationBrokerInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetric;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetricSet;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.endpoints.InterProcessingPlantMetricsServicesBroker;
@@ -34,11 +37,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.*;
 
-public class PetasosMetricsAgentWorker {
+@ApplicationScoped
+public class PetasosMetricsAgentWorker implements PetasosMetricsHandlerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosMetricsAgentWorker.class);
 
     private ArrayList<PetasosComponentMetric> metricsQueue;
@@ -143,6 +148,16 @@ public class PetasosMetricsAgentWorker {
             setBackgroundCheckInitiated(true);
         }
         getLogger().debug(".scheduleMetricsSynchronisation(): Exit");
+    }
+
+    @Override
+    public Instant captureMetric(PetasosComponentMetric metric, PetasosEndpointIdentifier endpointIdentifier) {
+        return null;
+    }
+
+    @Override
+    public Instant captureMetrics(PetasosComponentMetricSet metricSet, PetasosEndpointIdentifier endpointIdentifier) {
+        return null;
     }
 
     //

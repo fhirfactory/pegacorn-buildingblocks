@@ -28,6 +28,7 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 
 public class ComponentIdType implements Serializable {
     private String id;
@@ -127,7 +128,24 @@ public class ComponentIdType implements Serializable {
         this.idValidityEndInstant = idValidityEndInstant;
     }
 
-//
+    //
+    // Equals and Hashcodes
+    //
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ComponentIdType)) return false;
+        ComponentIdType that = (ComponentIdType) o;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    //
     // To String
     //
 

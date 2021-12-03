@@ -103,7 +103,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
             return (clusterName);
         }
         if(specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE)){
-            String clusterName = specifyEndpointID().getEndpointSite()+"-"+specifyEndpointID().getEndpointGroup();
+            String clusterName = specifyEndpointID().getEndpointGroup();
             getLogger().debug(".specifyJGroupsClusterName(): InterZone Scope, returning->{}", clusterName);
             return(clusterName);
         }

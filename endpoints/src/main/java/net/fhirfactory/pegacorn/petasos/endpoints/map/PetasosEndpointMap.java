@@ -246,7 +246,7 @@ public class PetasosEndpointMap {
         newEndpoint.setPeriod(period);
         Identifier identifier = identifierFactory.newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM, petasosEndpointID.getEndpointName(), period );
         newEndpoint.addIdentifier(identifier);
-        newEndpoint.setConnectionType(connectionTypeCodeFactory.newPegacornEndpointJGroupsConnectionCodeSystem("JGroups", endpointType.getFunctionType()));
+        newEndpoint.setConnectionType(connectionTypeCodeFactory.newPegacornEndpointJGroupsConnectionCodeSystem("JGroups", endpointType.getToken()));
         UrlType urlType = new UrlType();
         urlType.setId(petasosEndpointID.getEndpointDetailedAddressName());
         newEndpoint.setAddressElement(urlType);

@@ -35,6 +35,18 @@ public class TaskBeneficiaryType extends Reference {
         super();
     }
 
+    public TaskBeneficiaryType(Reference reference){
+        setIdentifier(reference.getIdentifier());
+        setType(reference.getType());
+        setBeneficiaryType(TaskBeneficiaryTypeTypeEnum.TASK_BENEFICIARY_PATIENT);
+    }
+
+    public TaskBeneficiaryType(TaskBeneficiaryType ori){
+        setIdentifier(ori.getIdentifier());
+        setType(ori.getType());
+        setBeneficiaryType(ori.getBeneficiaryType());
+    }
+
     //
     // Getters and Setters
     //

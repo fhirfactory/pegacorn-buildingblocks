@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.workshops.base;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
@@ -66,7 +66,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     abstract protected String specifyWorkshopName();
     abstract protected String specifyWorkshopVersion();
-    abstract protected ComponentTypeTypeEnum specifyWorkshopType();
+    abstract protected PegacornSystemComponentTypeTypeEnum specifyWorkshopType();
     abstract protected void invokePostConstructInitialisation();
 
     protected PegacornTopologyFactoryInterface getTopologyFactory(){
@@ -131,7 +131,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
         WorkUnitProcessorSoftwareComponent foundWorkshop = null;
         for (TopologyNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
             WorkUnitProcessorSoftwareComponent containedWorkshop = (WorkUnitProcessorSoftwareComponent)topologyIM.getNode(containedWorkshopFDN);
-            TopologyNodeRDN testRDN = new TopologyNodeRDN(ComponentTypeTypeEnum.WORKSHOP, wupName, wupVersion);
+            TopologyNodeRDN testRDN = new TopologyNodeRDN(PegacornSystemComponentTypeTypeEnum.WORKSHOP, wupName, wupVersion);
             if (testRDN.equals(containedWorkshop.getComponentRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;

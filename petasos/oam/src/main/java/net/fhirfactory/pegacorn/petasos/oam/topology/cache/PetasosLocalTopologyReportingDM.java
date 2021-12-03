@@ -26,6 +26,9 @@ import net.fhirfactory.pegacorn.petasos.oam.common.LocalOAMCacheBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
 public class PetasosLocalTopologyReportingDM extends LocalOAMCacheBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(PetasosLocalTopologyReportingDM.class);

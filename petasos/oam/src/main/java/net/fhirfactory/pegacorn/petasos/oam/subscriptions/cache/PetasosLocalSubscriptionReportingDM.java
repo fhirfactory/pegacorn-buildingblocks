@@ -29,8 +29,10 @@ import net.fhirfactory.pegacorn.petasos.oam.common.LocalOAMCacheBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ApplicationScoped
 public class PetasosLocalSubscriptionReportingDM extends LocalOAMCacheBase {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosLocalSubscriptionReportingDM.class);
 

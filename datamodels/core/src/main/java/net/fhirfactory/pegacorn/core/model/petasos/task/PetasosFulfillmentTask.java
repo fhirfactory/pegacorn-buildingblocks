@@ -29,6 +29,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.value
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 
+import java.util.Objects;
+
 public class PetasosFulfillmentTask extends PetasosTask{
 
     private TaskFulfillmentType taskFulfillment;
@@ -137,6 +139,24 @@ public class PetasosFulfillmentTask extends PetasosTask{
     }
 
     //
+    // Hash and Equals
+    //
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        PetasosFulfillmentTask that = (PetasosFulfillmentTask) o;
+        return isaRetry() == that.isaRetry() && Objects.equals(getTaskFulfillment(), that.getTaskFulfillment()) && Objects.equals(getTaskJobCard(), that.getTaskJobCard()) && Objects.equals(getActionableTaskId(), that.getActionableTaskId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getTaskFulfillment(), getTaskJobCard(), getActionableTaskId(), isaRetry());
+    }
+
+    //
     // ToString
     //
 
@@ -146,6 +166,7 @@ public class PetasosFulfillmentTask extends PetasosTask{
                 "taskFulfillment=" + taskFulfillment +
                 ", taskJobCard=" + taskJobCard +
                 ", actionableTaskId=" + actionableTaskId +
+                ", sourceResourceId=" + getSourceResourceId() +
                 ", taskId=" + getTaskId() +
                 ", hasTaskType=" + hasTaskType() +
                 ", taskType=" + getTaskType() +

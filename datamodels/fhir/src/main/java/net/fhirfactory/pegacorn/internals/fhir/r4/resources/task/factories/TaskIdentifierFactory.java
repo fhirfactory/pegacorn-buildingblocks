@@ -57,11 +57,7 @@ public class TaskIdentifierFactory {
         if(startInstant != null){
             identifierPeriod.setStart(Date.from(startInstant));
         } else {
-            if(taskId.getCreationInstant() != null) {
-                identifierPeriod.setStart(Date.from(taskId.getCreationInstant()));
-            } else {
-                identifierPeriod.setStart(Date.from(Instant.now()));
-            }
+            identifierPeriod.setStart(Date.from(Instant.now()));
         }
         if(endInstant != null){
             identifierPeriod.setEnd(Date.from(endInstant));
@@ -79,7 +75,7 @@ public class TaskIdentifierFactory {
                 identifierCode = PegacornIdentifierCodeEnum.IDENTIFIER_CODE_AGGREGATE_TASK;
                 break;
         }
-        fhirIdentifier = generalIdentifierFactory.newIdentifier(identifierCode, taskId.getId(), identifierPeriod);
+        fhirIdentifier = generalIdentifierFactory.newIdentifier(identifierCode, taskId.getLocalId(), identifierPeriod);
         getLogger().debug(".newActionableTaskIdentifier(): Exit, fhirIdentifier->{}", fhirIdentifier);
         return(fhirIdentifier);
     }

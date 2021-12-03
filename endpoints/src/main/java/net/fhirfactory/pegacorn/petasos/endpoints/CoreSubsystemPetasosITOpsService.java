@@ -1,12 +1,20 @@
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.audit.PetasosInterZoneAuditEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.audit.PetasosIntraZoneAuditEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.interception.PetasosInterZoneInterceptionEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.interception.PetasosIntraZoneInterceptionEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosInterZoneOAMDiscoveryEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosIntraZoneOAMDiscoveryEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.metrics.PetasosInterZoneOAMMetricsEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.metrics.PetasosIntraZoneOAMMetricsEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.PetasosInterZoneOAMPubSubEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.PetasosIntraZoneOAMPubSubEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks.PetasosInterZoneTaskEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks.PetasosIntraZoneTaskEndpoint;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -42,6 +50,30 @@ public class CoreSubsystemPetasosITOpsService extends RouteBuilder {
     @Inject
     private PetasosInterZoneOAMPubSubEndpoint interZoneOAMPubSubEndpoint;
 
+    @Inject
+    private PetasosInterZoneAuditEndpoint interZoneAuditEndpoint;
+
+    @Inject
+    private PetasosIntraZoneAuditEndpoint intraZoneAuditEndpoint;
+
+    @Inject
+    private PetasosInterZoneInterceptionEndpoint interZoneInterceptionEndpoint;
+
+    @Inject
+    private PetasosIntraZoneInterceptionEndpoint intraZoneInterceptionEndpoint;
+
+    @Inject
+    private PetasosInterZoneOAMMetricsEndpoint interZoneOAMMetricsEndpoint;
+
+    @Inject
+    private PetasosIntraZoneOAMMetricsEndpoint intraZoneOAMMetricsEndpoint;
+
+    @Inject
+    private PetasosInterZoneTaskEndpoint interZoneTaskEndpoint;
+
+    @Inject
+    private PetasosIntraZoneTaskEndpoint intraZoneTaskEndpoint;
+
 
     public CoreSubsystemPetasosITOpsService(){
         super();
@@ -62,6 +94,14 @@ public class CoreSubsystemPetasosITOpsService extends RouteBuilder {
             LOG.info(".initialise(): interZoneOAMPubSubEndpoint ==> {}", interZoneOAMPubSubEndpoint.getEndpointID());
             LOG.info(".initialise(): intraZoneOAMDiscoveryEndpoint ==> {}", intraZoneOAMDiscoveryEndpoint.getEndpointID());
             LOG.info(".initialise(): interZoneOAMDiscoveryEndpoint ==> {}", interZoneOAMDiscoveryEndpoint.getEndpointID());
+            LOG.info(".initialise(): interZoneAuditEndpoint ==>{}", interZoneAuditEndpoint.getEndpointID());
+            LOG.info(".initialise(): intraZoneAuditEndpoint ==>{}", intraZoneAuditEndpoint.getEndpointID());
+            LOG.info(".initialise(): interZoneOAMMetricsEndpoint ==>{}", interZoneOAMMetricsEndpoint.getEndpointID());
+            LOG.info(".initialise(): intraZoneOAMMetricsEndpoint ==>{}", intraZoneOAMMetricsEndpoint.getEndpointID());
+            LOG.info(".initialise(): interZoneInterceptionEndpoint ==>{}", interZoneInterceptionEndpoint.getEndpointID());
+            LOG.info(".initialise(): intraZoneInterceptionEndpoint ==>{}", intraZoneInterceptionEndpoint.getEndpointID());
+            LOG.info(".initialise(): interZoneTaskEndpoint ==>{}", interZoneTaskEndpoint.getEndpointID());
+            LOG.info(".initialise(): intraZoneTaskEndpoint ==>{}", intraZoneTaskEndpoint.getEndpointID());
             LOG.info(".initialise(): Done.");
         } else {
             LOG.debug(".initialise(): Already initialised, nothing to do!");

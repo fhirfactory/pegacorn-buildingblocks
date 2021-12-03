@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.transformers.common;
 
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
@@ -128,7 +128,7 @@ public abstract class Pegacorn2FHIRAuditEventBase {
             return(AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY);
         }
         TopologyNodeFDN nodeFDN = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentFDN();
-        TopologyNodeRDN topologyNodeRDN = nodeFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
+        TopologyNodeRDN topologyNodeRDN = nodeFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WORKSHOP);
         if(topologyNodeRDN == null){
             return(AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY);
         }
@@ -239,9 +239,9 @@ public abstract class Pegacorn2FHIRAuditEventBase {
             return(null);
         }
         TopologyNodeFDN wupFDN = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentFDN();
-        TopologyNodeRDN processingPlantRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.PROCESSING_PLANT);
-        TopologyNodeRDN workshopRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
-        TopologyNodeRDN wupRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WUP);
+        TopologyNodeRDN processingPlantRDN = wupFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT);
+        TopologyNodeRDN workshopRDN = wupFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WORKSHOP);
+        TopologyNodeRDN wupRDN = wupFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WUP);
 
         String name = new String();
         if(processingPlantRDN != null){

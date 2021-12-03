@@ -82,9 +82,7 @@ public class PetasosFulfillmentTaskFactory {
         //
         // Create a TaskId (is local, so simple UUID is ok) and add to our Task
         TaskIdType fulfillmentTaskId = new TaskIdType();
-        fulfillmentTaskId.setId(UUID.randomUUID().toString());
-        fulfillmentTaskId.setVersion(actionableTask.getTaskId().getVersion());
-        fulfillmentTaskId.setCreationInstant(Instant.now());
+        fulfillmentTaskId.setLocalId(UUID.randomUUID().toString());
         fulfillmentTask.setTaskId(fulfillmentTaskId);
         //
         // Get the Task Type, clone it and add it to our Task

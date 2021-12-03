@@ -22,24 +22,28 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos;
 
 public enum PetasosEndpointFunctionTypeEnum {
-    PETASOS_INTERACT_ENDPOINT("petasos_endpoint_function.interact", "Interact"),
-    PETASOS_IPC_ENDPOINT("petasos_endpoint_function.IPC","IPC"),
-    PETASOS_OAM_PUBSUB_ENDPOINT("petasos_endpoint_function.OAM_PUBSUB", "OAM.PubSub"),
-    PETASOS_OAM_DISCOVERY_ENDPOINT("petasos_endpoint_function.OAM_DISCOVERY", "OAM.Discovery");
+    PETASOS_INTERACT_ENDPOINT("petasos.endpoint_function.interact", "Interact"),
+    PETASOS_IPC_ENDPOINT("petasos.endpoint_function.IPC","IPC"),
+    PETASOS_SUBSCRIPTIONS_ENDPOINT("petasos.endpoint_function.subscriptions", "Subscriptions"),
+    PETASOS_INTERCEPTION_ENDPOINT("petasos.endpoint_function.interception", "Interception"),
+    PETASOS_TASKING_ENDPOINT("petasos.endpoint_function.tasking", "Tasking"),
+    PETASOS_AUDIT_ENDPOINT("petasos.endpoint_function.audit", "Audit"),
+    PETASOS_METRICS_ENDPOINT("petasos.endpoint_function.metrics", "Metrics"),
+    PETASOS_TOPOLOGY_ENDPOINT("petasos.endpoint_function.topology", "Topology");
 
-    private String functionType;
-    private String functionName;
+    private String token;
+    private String displayName;
 
     private PetasosEndpointFunctionTypeEnum(String functionType, String functionName ){
-        this.functionType = functionType;
-        this.functionName = functionName;
+        this.token = functionType;
+        this.displayName = functionName;
     }
 
-    public String getFunctionType(){
-        return(this.functionType);
+    public String getToken(){
+        return(this.token);
     }
 
-    public String getFunctionName(){
-        return(this.functionName);
+    public String getDisplayName(){
+        return(this.displayName);
     }
 }

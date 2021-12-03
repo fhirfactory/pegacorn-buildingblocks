@@ -6,9 +6,11 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.util.HashMap;
 
+@ApplicationScoped
 public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     public static final String PROCESSING_PLANT_METRICS_TYPE = "ProcessingPlantBasedMetrics";
 

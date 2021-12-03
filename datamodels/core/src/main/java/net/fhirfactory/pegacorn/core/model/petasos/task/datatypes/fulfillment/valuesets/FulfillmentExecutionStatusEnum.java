@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets;
 
+import org.thymeleaf.util.StringUtils;
+
 /**
  *
  * @author ACT Health (Mark A. Hunter)
@@ -53,5 +55,14 @@ public enum FulfillmentExecutionStatusEnum {
 
     public String getDisplayName(){
         return(this.displayName);
+    }
+
+    public static FulfillmentExecutionStatusEnum fromToken(String token){
+        for(FulfillmentExecutionStatusEnum currentStatus: FulfillmentExecutionStatusEnum.values()){
+            if(StringUtils.equalsIgnoreCase(token, currentStatus.getToken())){
+                return(currentStatus);
+            }
+        }
+        return(null);
     }
 }

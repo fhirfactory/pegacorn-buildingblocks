@@ -38,9 +38,9 @@ public class EndpointMetaTagFactory {
     @Inject
     private PegacornReferenceProperties systemWideProperties;
 
-    private static final String PEGACORN_ENDPOINT_DEFAULT_HOSTNAME = "/endpoint-meta-tag-default_hostname";
-    private static final String PEGACORN_ENDPOINT_DEFAULT_PORT = "/endpoint-meta-tag-default_port";
-    private static final String PEGACORN_ENDPOINT_CONNECTION_BEHAVIOUR = "/endpoint-meta-tag-connection_behaviour";
+    private static final String PEGACORN_ENDPOINT_DEFAULT_HOSTNAME = "/Endpoint/meta-tag-default_hostname";
+    private static final String PEGACORN_ENDPOINT_DEFAULT_PORT = "/Endpoint/meta-tag-default_port";
+    private static final String PEGACORN_ENDPOINT_CONNECTION_BEHAVIOUR = "/Endpoint/meta-tag-connection_behaviour";
 
     private static final String PEGACORN_ENDPOINT_IS_SERVER = "isServer";
     private static final String PEGACORN_ENDPOINT_IS_CLIENT = "isClient";

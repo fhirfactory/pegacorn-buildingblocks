@@ -26,11 +26,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.Petas
 import net.fhirfactory.pegacorn.services.tasks.cache.PetasosActionableTaskDM;
 import net.fhirfactory.pegacorn.services.tasks.datatypes.PetasosActionableTaskRegistrationType;
 import net.fhirfactory.pegacorn.services.tasks.distribution.PetasosTasksDistributionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,16 +59,16 @@ public abstract class PetasosTaskServicesManagerHandler extends PetasosTasksDist
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
         getLogger().debug(".retrievePendingActionableTasks(): Entry, actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
         PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().registerPetasosActionableTask(actionableTask, requesterEndpointIdentifier);
-        PetasosActionableTask registeredActionableTask = petasosActionableTaskRegistration.getActionableTask();
-        getLogger().debug(".retrievePendingActionableTasks(): Exit, registeredActionableTask->{}", registeredActionableTask);
-        return(registeredActionableTask);
+        actionableTask.setRegistered(petasosActionableTaskRegistration.getRegistrationInstant()!= null);
+        getLogger().debug(".retrievePendingActionableTasks(): Exit, actionableTask->{}", actionableTask);
+        return(actionableTask);
     }
 
     @Override
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
         getLogger().debug(".retrievePendingActionableTasks(): Entry, actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
         PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().updatePetasosActionableTask(actionableTask, requesterEndpointIdentifier);
-        PetasosActionableTask updatedActionableTask = petasosActionableTaskRegistration.getActionableTask();
+        PetasosActionableTask updatedActionableTask = getActionableTaskDM().getPetasosActionableTask(actionableTask.getTaskId());
         getLogger().debug(".retrievePendingActionableTasks(): Exit, updatedActionableTask->{}", updatedActionableTask);
         return(updatedActionableTask);
     }

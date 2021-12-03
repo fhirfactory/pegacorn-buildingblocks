@@ -22,7 +22,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
-import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -30,8 +29,8 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.datatypes.JGr
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPClientEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPClientAdapter;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentEndpointSummary;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentPortSummary;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.EndpointSummary;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.PortSoftwareComponentSummary;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentSummary;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.oam.topology.factories.common.PetasosMonitoredComponentFactory;
@@ -58,8 +57,8 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
         if(endpointTopologyNode == null){
             return(null);
         }
-        SoftwareComponentEndpointSummary endpoint = new SoftwareComponentEndpointSummary();
-        endpoint = (SoftwareComponentEndpointSummary) newPetasosMonitoredComponent(endpoint, endpointTopologyNode);
+        EndpointSummary endpoint = new EndpointSummary();
+        endpoint = (EndpointSummary) newPetasosMonitoredComponent(endpoint, endpointTopologyNode);
         endpoint.setEndpointType(endpointTopologyNode.getEndpointType());
         boolean isEncrypted = false;
         for(IPCAdapter currentAdapter: endpointTopologyNode.getAdapterList()){
@@ -74,7 +73,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
             case EDGE_JGROUPS_INTERSITE_SERVICE:{
                 IPCServerTopologyEndpoint jgroupsEndpoint = (IPCServerTopologyEndpoint)endpointTopologyNode;
                 JGroupsAdapter currentAdapter = (JGroupsAdapter) jgroupsEndpoint.getAdapterList().get(0);
-                SoftwareComponentPortSummary portSummary = new SoftwareComponentPortSummary();
+                PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
                 portSummary.setEncrypted(isEncrypted);
                 portSummary.setHostPort(Integer.toString(currentAdapter.getPortNumber()));
                 portSummary.setHostDNSName(currentAdapter.getHostName());
@@ -84,7 +83,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
             case INTERACT_MLLP_SERVER: {
                 InteractMLLPServerEndpoint mllpServerEndpoint = (InteractMLLPServerEndpoint)endpointTopologyNode;
                 if(mllpServerEndpoint.getMLLPServerAdapter() != null) {
-                    SoftwareComponentPortSummary portSummary = new SoftwareComponentPortSummary();
+                    PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
                     portSummary.setHostPort(Integer.toString(mllpServerEndpoint.getMLLPServerAdapter().getPortNumber()));
                     portSummary.setHostDNSName(mllpServerEndpoint.getMLLPServerAdapter().getHostName());
                     endpoint.setConnectedSystemName(mllpServerEndpoint.getConnectedSystemName());
@@ -98,7 +97,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 InteractMLLPClientEndpoint mllpClientEndpoint = (InteractMLLPClientEndpoint)endpointTopologyNode;
                 if(mllpClientEndpoint.getMLLPClientAdapters().get(0) != null) {
                     MLLPClientAdapter clientAdapter = mllpClientEndpoint.getMLLPClientAdapters().get(0);
-                    SoftwareComponentPortSummary portSummary = new SoftwareComponentPortSummary();
+                    PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
                     endpoint.setConnectedSystemName(mllpClientEndpoint.getConnectedSystemName());
                     portSummary.setHostDNSName(clientAdapter.getHostName());
                     portSummary.setHostPort(Integer.toString(clientAdapter.getPortNumber()));

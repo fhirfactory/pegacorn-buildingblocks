@@ -48,7 +48,7 @@ public class PetasosInterZoneAuditEndpoint extends PetasosAuditEndpoint {
 
     @Override
     protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getFunctionNameInterZoneJGroupsAudit());
+        return (getInterfaceNames().getInterZoneJGroupsAuditEndpointName());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class PetasosInterZoneAuditEndpoint extends PetasosAuditEndpoint {
         // Get Core Values
         String endpointServiceName = specifyEndpointServiceName();
         String endpointScopeName = specifyPetasosEndpointScope().getEndpointScopeName();
-        String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
         String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
         String endpointSite = getProcessingPlantInterface().getDeploymentSite();
         String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
@@ -80,7 +80,7 @@ public class PetasosInterZoneAuditEndpoint extends PetasosAuditEndpoint {
         endpointID.setEndpointName(endpointName);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
-        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneIPCGroupName());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterzoneAuditGroupName());
         endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
         endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
         String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getInterZoneIPCGroupName();
@@ -95,7 +95,7 @@ public class PetasosInterZoneAuditEndpoint extends PetasosAuditEndpoint {
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
-        return (PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT);
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_INTERCEPTION_ENDPOINT);
     }
 
     @Override

@@ -65,11 +65,11 @@ public class RouteElementNames {
         getLogger().debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.nodeFunctionFDNToken);
         TopologyNodeFunctionFDN wupFunctionFDN = new TopologyNodeFunctionFDN(this.nodeFunctionFDNToken);
         getLogger().trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
-        TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(ComponentTypeTypeEnum.PROCESSING_PLANT);
+        TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT);
         getLogger().trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);
-        TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
+        TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WORKSHOP);
         getLogger().trace(".simplifyName(): workshopRDN (RDN) --> {} ", workshopRDN);
-        TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WUP);
+        TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WUP);
         getLogger().trace(".simplifyName(): wupFunctionRDN (RDN) --> {}", wupFunctionRDN);
         String nodeVersion = wupFunctionRDN.getNodeVersion();
         String nodeVersionSimplified = nodeVersion.replace(".","");

@@ -24,9 +24,10 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.fact
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.valuesets.TaskReasonTypeEnum;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Identifier;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.time.Instant;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -75,23 +76,30 @@ public class TaskIdTypeFactory {
         idBuilder.append("::");
         idBuilder.append(hexString);
         TaskIdType id = new TaskIdType();
-        id.setId(idBuilder.toString());
-        id.setCreationInstant(Instant.now());
+        id.setLocalId(idBuilder.toString());
         return(id);
     }
 
     public TaskIdType newTaskId(){
-        TaskIdType taskId = newTaskId("1.0");
+        TaskIdType taskId = newTaskId();
         return(taskId);
     }
 
-    public TaskIdType newTaskId(String version){
+    public TaskIdType newTaskId(IdType id){
         TaskIdType taskId = new TaskIdType();
-        taskId.setCreationInstant(Instant.now());
+        taskId.setResourceId(id);
+        UUID uuid = UUID.randomUUID();
+        String localId = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
+        taskId.setLocalId(localId);
+        return(taskId);
+    }
+
+    public TaskIdType newTaskId(Identifier identifier){
+        TaskIdType taskId = new TaskIdType();
+        taskId.setPrimaryBusinessIdentifier(identifier);
         UUID uuid = UUID.randomUUID();
         String id = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
-        taskId.setId(id);
-        taskId.setVersion(version);
+        taskId.setLocalId(id);
         return(taskId);
     }
 }

@@ -27,17 +27,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WorkUnitProcessorSummary extends SoftwareComponentSummary {
-    Map<ComponentIdType, SoftwareComponentEndpointSummary> endpoints;
+    Map<ComponentIdType, EndpointSummary> endpoints;
 
     public WorkUnitProcessorSummary(){
         this.endpoints = new ConcurrentHashMap<>();
     }
 
-    public Map<ComponentIdType, SoftwareComponentEndpointSummary> getEndpoints() {
+    public Map<ComponentIdType, EndpointSummary> getEndpoints() {
         return endpoints;
     }
 
-    public void setEndpoints(Map<ComponentIdType, SoftwareComponentEndpointSummary> endpoints) {
+    public void setEndpoints(Map<ComponentIdType, EndpointSummary> endpoints) {
         this.endpoints = endpoints;
     }
 
@@ -47,7 +47,7 @@ public class WorkUnitProcessorSummary extends SoftwareComponentSummary {
         }
     }
 
-    public void addEndpoint(SoftwareComponentEndpointSummary endpoint){
+    public void addEndpoint(EndpointSummary endpoint){
         removeEndpoint(endpoint.getComponentID());
         endpoints.put(endpoint.getComponentID(), endpoint);
     }

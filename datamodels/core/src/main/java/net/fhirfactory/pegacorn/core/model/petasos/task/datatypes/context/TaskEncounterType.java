@@ -39,6 +39,11 @@ public class TaskEncounterType extends Reference {
         this.encounterPeriod = null;
     }
 
+    public TaskEncounterType(Reference reference){
+        setIdentifier(reference.getIdentifier());
+        setType(reference.getType());
+    }
+
     //
     // Getters and Setters
     //

@@ -24,9 +24,11 @@ package net.fhirfactory.pegacorn.services.oam.subscriptions.agent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.fhirfactory.pegacorn.core.interfaces.pubsub.PetasosSubscriptionReportHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.pubsub.PetasosSubscriptionReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.petasos.endpoints.InterProcessingPlantSubscriptionServicesBroker;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.PetasosSubscriptionReportingAgent;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
@@ -41,7 +43,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class PetasosSubscriptionReportWorker {
+public class PetasosSubscriptionReportWorker implements PetasosSubscriptionReportHandlerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosSubscriptionReportWorker.class);
     private boolean initialised;
     private static long SYNCHRONIZATION_CHECK_PERIOD = 30000;
@@ -134,6 +136,15 @@ public class PetasosSubscriptionReportWorker {
             setBackgroundCheckInitiated(true);
         }
         getLogger().debug(".scheduleSubscriptionMapForwarding(): Exit");
+    }
+
+    //
+    //
+    //
+
+    @Override
+    public Instant shareSubscriptionSummaryReport(PetasosSubscriptionSummaryReport summaryReport, PetasosEndpointIdentifier endpointIdentifier) {
+        return null;
     }
 
     //

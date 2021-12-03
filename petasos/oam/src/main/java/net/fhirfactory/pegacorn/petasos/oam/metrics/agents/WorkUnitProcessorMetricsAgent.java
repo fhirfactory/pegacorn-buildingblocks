@@ -28,9 +28,11 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.util.HashMap;
 
+@ApplicationScoped
 public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
     public static final String WORK_UNIT_PROCESSOR_METRICS_TYPE = "WorkUnitProcessorBasedMetrics";
 

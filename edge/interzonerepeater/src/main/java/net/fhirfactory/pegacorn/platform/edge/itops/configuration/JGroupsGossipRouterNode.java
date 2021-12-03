@@ -40,9 +40,17 @@ public class JGroupsGossipRouterNode {
 
     JGroupsGossipRouterNodeConfig propertyFile;
 
+    //
+    // Constructor(s)
+    //
+
     public JGroupsGossipRouterNode(){
         this.propertyFile = readPropertyFile();
     }
+
+    //
+    // Getters and Setters
+    //
 
     public void setPropertyFile(JGroupsGossipRouterNodeConfig propertyFile) {
         this.propertyFile = propertyFile;
@@ -55,6 +63,10 @@ public class JGroupsGossipRouterNode {
     protected Logger getLogger(){
         return(LOG);
     }
+
+    //
+    // Business Logic
+    //
 
     protected JGroupsGossipRouterNodeConfig readPropertyFile(){
         String propertyFileName = specifyPropertyFileName();

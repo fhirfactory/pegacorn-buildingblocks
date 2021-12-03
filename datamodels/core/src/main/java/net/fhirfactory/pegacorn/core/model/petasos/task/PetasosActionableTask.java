@@ -28,6 +28,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskT
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 
+import java.util.Objects;
+
 public class PetasosActionableTask extends PetasosTask{
 
     private TaskFulfillmentType taskFulfillment;
@@ -97,6 +99,55 @@ public class PetasosActionableTask extends PetasosTask{
     }
 
     //
+    // HashCode and Equals
+    //
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PetasosActionableTask that = (PetasosActionableTask) o;
+        boolean theyAreEqual = isRegistered() == that.isRegistered()
+                && Objects.equals(getCreationInstant(), that.getCreationInstant())
+                && Objects.equals(getUpdateInstant(), that.getUpdateInstant())
+                && Objects.equals(getTaskContext(), that.getTaskContext())
+                && Objects.equals(getSourceResourceId(), that.getSourceResourceId())
+                && Objects.equals(getTaskId(), that.getTaskId())
+                && Objects.equals(getTaskType(), that.getTaskType())
+                && Objects.equals(getTaskWorkItem(), that.getTaskWorkItem())
+                && Objects.equals(getTaskTraceability(), that.getTaskTraceability())
+                && Objects.equals(getTaskOutcomeStatus(), that.getTaskOutcomeStatus())
+                && Objects.equals(getTaskPerformerTypes(), that.getTaskPerformerTypes())
+                && Objects.equals(getTaskReason(), that.getTaskReason())
+                && Objects.equals(getTaskNodeAffinity(), that.getTaskNodeAffinity())
+                && Objects.equals(getAggregateTaskMembership(), that.getAggregateTaskMembership())
+                && Objects.equals(getTaskFulfillment(), that.getTaskFulfillment())
+                && Objects.equals(getTaskCompletionSummary(), that.getTaskCompletionSummary());
+        return (theyAreEqual);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                getTaskFulfillment(),
+                getTaskCompletionSummary(),
+                getCreationInstant(),
+                getUpdateInstant(),
+                getTaskContext(),
+                getTaskId(),
+                getTaskType(),
+                getTaskWorkItem(),
+                getTaskTraceability(),
+                getTaskOutcomeStatus(),
+                getTaskPerformerTypes(),
+                getTaskReason(),
+                getTaskNodeAffinity(),
+                getAggregateTaskMembership(),
+                getSourceResourceId(),
+                isRegistered());
+    }
+
+    //
     // To String
     //
 
@@ -104,6 +155,7 @@ public class PetasosActionableTask extends PetasosTask{
     public String toString() {
         return "PetasosActionableTask{" +
                 "taskFulfillment=" + taskFulfillment +
+                ", sourceResourceId=" + getSourceResourceId() +
                 ", taskCompletionSummary=" + taskCompletionSummary +
                 ", taskId=" + getTaskId() +
                 ", taskType=" + getTaskType() +

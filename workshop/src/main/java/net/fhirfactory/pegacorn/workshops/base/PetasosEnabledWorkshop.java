@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 
 public abstract class PetasosEnabledWorkshop extends Workshop{
 
     @Override
-    protected ComponentTypeTypeEnum specifyWorkshopType(){
-        return(ComponentTypeTypeEnum.WORKSHOP);
+    protected PegacornSystemComponentTypeTypeEnum specifyWorkshopType(){
+        return(PegacornSystemComponentTypeTypeEnum.WORKSHOP);
     }
 }

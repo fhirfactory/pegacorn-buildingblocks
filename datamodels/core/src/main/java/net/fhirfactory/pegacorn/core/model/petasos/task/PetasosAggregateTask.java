@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.value
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class PetasosAggregateTask extends PetasosTask{
@@ -156,6 +157,25 @@ public class PetasosAggregateTask extends PetasosTask{
     }
 
     //
+    // Equals and Hash
+    //
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        PetasosAggregateTask that = (PetasosAggregateTask) o;
+        return Objects.equals(getTaskReporting(), that.getTaskReporting()) && Objects.equals(getAggregateTaskStatus(), that.getAggregateTaskStatus()) && Objects.equals(getActionableTaskId(), that.getActionableTaskId()) && Objects.equals(getSubTasks(), that.getSubTasks());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getTaskReporting(), getAggregateTaskStatus(), getActionableTaskId(), getSubTasks());
+    }
+
+
+    //
     // To String
     //
 
@@ -163,6 +183,7 @@ public class PetasosAggregateTask extends PetasosTask{
     public String toString() {
         return "PetasosAggregateTask{" +
                 "taskReporting=" + taskReporting +
+                ", sourceResourceId=" + getSourceResourceId() +
                 ", subTasks=" + getSubTasks() +
                 ", aggregateTaskStatus=" + aggregateTaskStatus +
                 ", actionableTaskId=" + actionableTaskId +

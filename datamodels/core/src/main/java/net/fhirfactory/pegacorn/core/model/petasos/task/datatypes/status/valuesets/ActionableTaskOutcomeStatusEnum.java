@@ -27,6 +27,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.values
  */
 public enum ActionableTaskOutcomeStatusEnum {
     ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN("Outcome Unknown","petasos.task.outcome_status.unknown"),
+    ACTIONABLE_TASK_OUTCOME_STATUS_WAITING("Waiting","petasos.task.outcome_status.waiting"),
     ACTIONABLE_TASK_OUTCOME_STATUS_CANCELLED("Cancelled", "petasos.task.outcome_status.cancelled"),
     ACTIONABLE_TASK_OUTCOME_STATUS_ACTIVE("Active", "petasos.task.outcome_status.active"),
     ACTIONABLE_TASK_OUTCOME_STATUS_FINISHED("Finished", "petasos.task.outcome_status.finished"),

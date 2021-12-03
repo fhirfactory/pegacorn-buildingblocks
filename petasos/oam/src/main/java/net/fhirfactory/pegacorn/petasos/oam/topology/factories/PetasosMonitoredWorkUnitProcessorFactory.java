@@ -23,14 +23,16 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentEndpointSummary;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.EndpointSummary;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.WorkUnitProcessorSummary;
 import net.fhirfactory.pegacorn.petasos.oam.topology.factories.common.PetasosMonitoredComponentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+@ApplicationScoped
 public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredComponentFactory {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosMonitoredWorkUnitProcessorFactory.class);
 
@@ -48,13 +50,13 @@ public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredCo
         wup = (WorkUnitProcessorSummary) newPetasosMonitoredComponent(wup, wupTopologyNode);
         if(wupTopologyNode.getEgressEndpoint() != null){
             IPCTopologyEndpoint egressEndpoint = wupTopologyNode.getEgressEndpoint();
-            SoftwareComponentEndpointSummary egressMonitoredEndpoint = (SoftwareComponentEndpointSummary)endpointFactory.newEndpoint(egressEndpoint);
+            EndpointSummary egressMonitoredEndpoint = (EndpointSummary)endpointFactory.newEndpoint(egressEndpoint);
             wup.addEndpoint(egressMonitoredEndpoint);
 
         }
         if(wupTopologyNode.getIngresEndpoint() != null){
             IPCTopologyEndpoint ingresEndpoint = wupTopologyNode.getIngresEndpoint();
-            SoftwareComponentEndpointSummary ingresMonitoredEndpoint = (SoftwareComponentEndpointSummary)endpointFactory.newEndpoint(ingresEndpoint);
+            EndpointSummary ingresMonitoredEndpoint = (EndpointSummary)endpointFactory.newEndpoint(ingresEndpoint);
             wup.addEndpoint(ingresMonitoredEndpoint);
         }
         getLogger().debug(".newWorkUnitProcessor(): wup->{}", wup);

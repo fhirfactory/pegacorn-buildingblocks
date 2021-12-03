@@ -96,7 +96,7 @@ public class EndpointNameUtilities {
         if(StringUtils.isEmpty(channelName)){
             return(null);
         }
-        String oamPubSubName = remapFuncitonTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT);
+        String oamPubSubName = remapFuncitonTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_SUBSCRIPTIONS_ENDPOINT);
         return(oamPubSubName);
     }
 
@@ -104,7 +104,7 @@ public class EndpointNameUtilities {
         if(StringUtils.isEmpty(channelName)){
             return(null);
         }
-        String oamDiscoveryName = remapFuncitonTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT);
+        String oamDiscoveryName = remapFuncitonTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT);
         return(oamDiscoveryName);
     }
 
@@ -125,7 +125,7 @@ public class EndpointNameUtilities {
         String endpointSiteName = nameSplit[ENDPOINT_SITE_POSITION_IN_CHANNEL_NAME];
         String endpointZoneName = nameSplit[ENDPOINT_ZONE_POSITION_IN_CHANNEL_NAME];
         String endpointScopeName = nameSplit[ENDPOINT_SCOPE_POSITION_IN_CHANNEL_NAME];
-        String endpointFunctionName = functionType.getFunctionName();
+        String endpointFunctionName = functionType.getDisplayName();
         String endpointUUID = nameSplit[ENDPOINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME];
         String oamPubSubName = buildChannelName(endpointSiteName,endpointZoneName,endpointServiceName,endpointScopeName,endpointFunctionName,endpointUUID);
         return(oamPubSubName);
@@ -340,14 +340,14 @@ public class EndpointNameUtilities {
     }
 
     public  String getOAMPubSubFunctionName(){
-        return(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionName());
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_SUBSCRIPTIONS_ENDPOINT.getDisplayName());
     }
 
     public String getOAMDiscoveryFunctionName(){
-        return(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName());
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
     }
 
     public String getIPCFunctionName(){
-        return(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getFunctionName());
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getDisplayName());
     }
 }

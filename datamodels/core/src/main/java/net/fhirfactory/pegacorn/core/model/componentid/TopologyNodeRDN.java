@@ -28,7 +28,7 @@ import java.io.Serializable;
 public class TopologyNodeRDN implements Serializable {
     private String nodeName;
     private String nodeVersion;
-    private ComponentTypeTypeEnum nodeType;
+    private PegacornSystemComponentTypeTypeEnum nodeType;
 
     public TopologyNodeRDN(){
         this.nodeVersion = null;
@@ -36,7 +36,7 @@ public class TopologyNodeRDN implements Serializable {
         this.nodeType = null;
     }
 
-    public TopologyNodeRDN(ComponentTypeTypeEnum newNodeType, String newNodeName, String newNodeVersion){
+    public TopologyNodeRDN(PegacornSystemComponentTypeTypeEnum newNodeType, String newNodeName, String newNodeVersion){
         this.nodeName = newNodeName;
         this.nodeType = newNodeType;
         this.nodeVersion = newNodeVersion;
@@ -58,11 +58,11 @@ public class TopologyNodeRDN implements Serializable {
         this.nodeVersion = nodeVersion;
     }
 
-    public ComponentTypeTypeEnum getNodeType() {
+    public PegacornSystemComponentTypeTypeEnum getNodeType() {
         return nodeType;
     }
 
-    public void setNodeType(ComponentTypeTypeEnum nodeType) {
+    public void setNodeType(PegacornSystemComponentTypeTypeEnum nodeType) {
         this.nodeType = nodeType;
     }
 

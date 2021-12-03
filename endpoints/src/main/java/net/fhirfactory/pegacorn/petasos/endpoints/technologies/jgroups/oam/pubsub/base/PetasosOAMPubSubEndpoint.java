@@ -21,10 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.base;
 
-import net.fhirfactory.pegacorn.core.interfaces.pubsub.PetasosSubscriptionHandlerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.pubsub.PetasosSubscriptionReportHandlerInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.*;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
@@ -70,7 +69,7 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
     DistributedPubSubSubscriptionMapIM distributedPubSubSubscriptionMapIM;
 
     @Inject
-    private PetasosSubscriptionHandlerInterface subscriptionHandlerInterface;
+    private PetasosSubscriptionReportHandlerInterface subscriptionHandlerInterface;
 
     //
     // Constructor
@@ -649,7 +648,7 @@ public abstract class PetasosOAMPubSubEndpoint extends JGroupsPetasosEndpointBas
             return(candidateSet);
         }
         for(String currentMember: serviceNameMembership){
-            if(currentMember.contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_PUBSUB_ENDPOINT.getFunctionName())){
+            if(currentMember.contains(PetasosEndpointFunctionTypeEnum.PETASOS_SUBSCRIPTIONS_ENDPOINT.getDisplayName())){
                 candidateSet.add(currentMember);
             }
         }

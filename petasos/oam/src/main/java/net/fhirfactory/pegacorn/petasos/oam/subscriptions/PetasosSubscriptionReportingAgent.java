@@ -39,12 +39,14 @@ import net.fhirfactory.pegacorn.petasos.oam.subscriptions.factories.PetasosTopic
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ApplicationScoped
 public class PetasosSubscriptionReportingAgent {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosSubscriptionReportingAgent.class);
 

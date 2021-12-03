@@ -28,11 +28,6 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.Petas
 import java.time.Instant;
 
 public interface PetasosMetricsHandlerInterface {
-    public default Instant captureMetric(PetasosComponentMetric metric, PetasosEndpointIdentifier endpointIdentifier) {
-        return null;
-    }
-
-    public default Instant captureMetrics(PetasosComponentMetricSet metricSet, PetasosEndpointIdentifier endpointIdentifier) {
-        return null;
-    }
+    public Instant captureMetric(PetasosComponentMetric metric, PetasosEndpointIdentifier endpointIdentifier);
+    public Instant captureMetrics(PetasosComponentMetricSet metricSet, PetasosEndpointIdentifier endpointIdentifier);
 }

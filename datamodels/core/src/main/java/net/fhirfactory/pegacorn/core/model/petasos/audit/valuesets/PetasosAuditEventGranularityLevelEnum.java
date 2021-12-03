@@ -43,4 +43,13 @@ public enum PetasosAuditEventGranularityLevelEnum {
     public String getDisplayName(){
         return(this.displayName);
     }
+
+    public static PetasosAuditEventGranularityLevelEnum fromDisplayName(String displayName){
+        for(PetasosAuditEventGranularityLevelEnum currentEnumValue: PetasosAuditEventGranularityLevelEnum.values()){
+            if(currentEnumValue.getDisplayName().equalsIgnoreCase(displayName)){
+                return(currentEnumValue);
+            }
+        }
+        return(AUDIT_LEVEL_FINE);
+    }
 }

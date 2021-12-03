@@ -38,6 +38,16 @@ public class HL7V2XTopicFactory {
 
     private static String HL7_MESSAGE_UNKNOWN = "Unknown";
 
+
+
+    public String getHl7MessageDefiner(){
+        return(HL7_MESSAGE_DEFINER);
+    }
+
+    public String getHl7MessageCategory(){
+        return(HL7_MESSAGE_CATEGORY);
+    }
+
     /**
      *
      * @param triggerName

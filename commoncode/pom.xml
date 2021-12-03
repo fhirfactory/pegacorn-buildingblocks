@@ -121,6 +121,32 @@
         </dependency>
 
         <!--*******************************************************************************-->
+        <!-- HAPI FHIR Libraries                                                           -->
+        <!--*******************************************************************************-->
+
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-base</artifactId>
+            <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-structures-r4</artifactId>
+            <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+
+        <!--*******************************************************************************-->
+        <!-- HAPI FHIR Narrative (Thymeleaf) Libraries                                     -->
+        <!--*******************************************************************************-->
+
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>${version-org.thymeleaf}</version>
+        </dependency>
+
+        <!--*******************************************************************************-->
         <!-- JGroups Manipulation Libraries                                                -->
         <!--*******************************************************************************-->
 

@@ -24,7 +24,10 @@ package net.fhirfactory.pegacorn.services.audit;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceClientWriterInterface;
+import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceProviderNameInterface;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import net.fhirfactory.pegacorn.services.audit.cache.AsynchronousWriterAuditEventCache;
 import net.fhirfactory.pegacorn.services.audit.forwarder.beans.AuditEventPersistenceAccessor;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -35,11 +38,12 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class LocalAuditEventServiceClientEventManager implements PetasosAuditEventServiceClientWriterInterface {
+public class LocalAuditEventServiceClientEventManager implements PetasosAuditEventServiceClientWriterInterface, PetasosAuditEventServiceHandlerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(LocalAuditEventServiceClientEventManager.class);
 
     private boolean initialised;
@@ -171,5 +175,15 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
             //
             eventCache.pollAuditEvent();
         }
+    }
+
+    @Override
+    public PegacornTransactionMethodOutcome logAuditEvent(AuditEvent event, PetasosEndpointIdentifier endpointIdentifier) {
+        return(null);
+    }
+
+    @Override
+    public PegacornTransactionMethodOutcome logAuditEvent(List<AuditEvent> eventList, PetasosEndpointIdentifier endpointIdentifier) {
+        return null;
     }
 }

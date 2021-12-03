@@ -32,6 +32,7 @@ import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.com
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.VolumeMountSegment;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.base.StandardClusterServiceServerPortSegment;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.interact.ClusteredInteractServerPortSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.ipc.JGroupsInterZoneRepeaterServerPortSegment;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.standard.HTTPProcessingPlantServerPortSegment;
 
 
@@ -45,7 +46,15 @@ public class JGroupsGossipRouterNodeConfig {
     private HTTPProcessingPlantServerPortSegment kubeLivelinessProbe;
     private HTTPProcessingPlantServerPortSegment prometheusPort;
     private HTTPProcessingPlantServerPortSegment jolokiaPort;
-    private ClusteredInteractServerPortSegment gossipRouterPort;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterIPC;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterTasking;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterTopology;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterSubscriptions;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterInterception;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterMetrics;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterInfinspan;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterDatagrid;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterAudit;
     private LoadBalancerSegment loadBalancer;
     private SubsystemImageSegment subsystemImageProperties;
     private SecurityCredentialSegment trustStorePassword;
@@ -54,23 +63,39 @@ public class JGroupsGossipRouterNodeConfig {
     private VolumeMountSegment volumeMounts;
     private SecurityCredentialSegment hapiAPIKey;
 
+    //
+    // Constructor(s)
+    //
+
     public JGroupsGossipRouterNodeConfig() {
-        subsystemInstant = new SubsystemInstanceSegment();
-        deploymentMode = new DeploymentModeSegment();
-        deploymentSites = new DeploymentSiteSegment();
-        kubeLivelinessProbe = new HTTPProcessingPlantServerPortSegment();
-        kubeReadinessProbe = new HTTPProcessingPlantServerPortSegment();
-        subsystemImageProperties = new SubsystemImageSegment();
-        trustStorePassword = new SecurityCredentialSegment();
-        keyPassword = new SecurityCredentialSegment();
-        jolokiaPort = new HTTPProcessingPlantServerPortSegment();
-        prometheusPort = new HTTPProcessingPlantServerPortSegment();
-        deploymentZone = new DeploymentZoneSegment();
-        gossipRouterPort = new ClusteredInteractServerPortSegment();
-        loadBalancer = new LoadBalancerSegment();
-        volumeMounts = new VolumeMountSegment();
-        hapiAPIKey = new SecurityCredentialSegment();
+        this.subsystemInstant = new SubsystemInstanceSegment();
+        this.deploymentMode = new DeploymentModeSegment();
+        this.deploymentSites = new DeploymentSiteSegment();
+        this.kubeLivelinessProbe = new HTTPProcessingPlantServerPortSegment();
+        this.kubeReadinessProbe = new HTTPProcessingPlantServerPortSegment();
+        this.subsystemImageProperties = new SubsystemImageSegment();
+        this.trustStorePassword = new SecurityCredentialSegment();
+        this.keyPassword = new SecurityCredentialSegment();
+        this.jolokiaPort = new HTTPProcessingPlantServerPortSegment();
+        this.prometheusPort = new HTTPProcessingPlantServerPortSegment();
+        this.deploymentZone = new DeploymentZoneSegment();
+        this.multizoneRepeaterAudit = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.multizoneRepeaterDatagrid = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.multizoneRepeaterInfinspan = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.multizoneRepeaterInterception = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.multizoneRepeaterIPC = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.multizoneRepeaterMetrics = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.multizoneRepeaterSubscriptions = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.multizoneRepeaterTasking = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.multizoneRepeaterTopology = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.loadBalancer = new LoadBalancerSegment();
+        this.volumeMounts = new VolumeMountSegment();
+        this.hapiAPIKey = new SecurityCredentialSegment();
     }
+
+    //
+    // Getters and Setters
+    //
 
     public SecurityCredentialSegment getHapiAPIKey() {
         return hapiAPIKey;
@@ -185,12 +210,76 @@ public class JGroupsGossipRouterNodeConfig {
         this.deploymentZone = deploymentZone;
     }
 
-    public ClusteredInteractServerPortSegment getGossipRouterPort() {
-        return gossipRouterPort;
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterIPC() {
+        return multizoneRepeaterIPC;
     }
 
-    public void setGossipRouterPort(ClusteredInteractServerPortSegment gossipRouterPort) {
-        this.gossipRouterPort = gossipRouterPort;
+    public void setMultizoneRepeaterIPC(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterIPC) {
+        this.multizoneRepeaterIPC = multizoneRepeaterIPC;
+    }
+
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterTasking() {
+        return multizoneRepeaterTasking;
+    }
+
+    public void setMultizoneRepeaterTasking(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterTasking) {
+        this.multizoneRepeaterTasking = multizoneRepeaterTasking;
+    }
+
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterTopology() {
+        return multizoneRepeaterTopology;
+    }
+
+    public void setMultizoneRepeaterTopology(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterTopology) {
+        this.multizoneRepeaterTopology = multizoneRepeaterTopology;
+    }
+
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterSubscriptions() {
+        return multizoneRepeaterSubscriptions;
+    }
+
+    public void setMultizoneRepeaterSubscriptions(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterSubscriptions) {
+        this.multizoneRepeaterSubscriptions = multizoneRepeaterSubscriptions;
+    }
+
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterInterception() {
+        return multizoneRepeaterInterception;
+    }
+
+    public void setMultizoneRepeaterInterception(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterInterception) {
+        this.multizoneRepeaterInterception = multizoneRepeaterInterception;
+    }
+
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterMetrics() {
+        return multizoneRepeaterMetrics;
+    }
+
+    public void setMultizoneRepeaterMetrics(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterMetrics) {
+        this.multizoneRepeaterMetrics = multizoneRepeaterMetrics;
+    }
+
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterInfinspan() {
+        return multizoneRepeaterInfinspan;
+    }
+
+    public void setMultizoneRepeaterInfinspan(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterInfinspan) {
+        this.multizoneRepeaterInfinspan = multizoneRepeaterInfinspan;
+    }
+
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterDatagrid() {
+        return multizoneRepeaterDatagrid;
+    }
+
+    public void setMultizoneRepeaterDatagrid(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterDatagrid) {
+        this.multizoneRepeaterDatagrid = multizoneRepeaterDatagrid;
+    }
+
+    public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterAudit() {
+        return multizoneRepeaterAudit;
+    }
+
+    public void setMultizoneRepeaterAudit(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterAudit) {
+        this.multizoneRepeaterAudit = multizoneRepeaterAudit;
     }
 
     public JavaDeploymentSegment getJavaDeploymentParameters() {
@@ -200,6 +289,10 @@ public class JGroupsGossipRouterNodeConfig {
     public void setJavaDeploymentParameters(JavaDeploymentSegment javaDeploymentParameters) {
         this.javaDeploymentParameters = javaDeploymentParameters;
     }
+
+    //
+    // To String
+    //
 
     @Override
     public String toString() {
@@ -212,11 +305,22 @@ public class JGroupsGossipRouterNodeConfig {
                 ", kubeLivelinessProbe=" + kubeLivelinessProbe +
                 ", prometheusPort=" + prometheusPort +
                 ", jolokiaPort=" + jolokiaPort +
-                ", gossipRouterPort=" + gossipRouterPort +
+                ", multizoneRepeaterIPC=" + multizoneRepeaterIPC +
+                ", multizoneRepeaterTasking=" + multizoneRepeaterTasking +
+                ", multizoneRepeaterTopology=" + multizoneRepeaterTopology +
+                ", multizoneRepeaterSubscriptions=" + multizoneRepeaterSubscriptions +
+                ", multizoneRepeaterInterception=" + multizoneRepeaterInterception +
+                ", multizoneRepeaterMetrics=" + multizoneRepeaterMetrics +
+                ", multizoneRepeaterInfinspan=" + multizoneRepeaterInfinspan +
+                ", multizoneRepeaterDatagrid=" + multizoneRepeaterDatagrid +
+                ", multizoneRepeaterAudit=" + multizoneRepeaterAudit +
+                ", loadBalancer=" + loadBalancer +
                 ", subsystemImageProperties=" + subsystemImageProperties +
                 ", trustStorePassword=" + trustStorePassword +
                 ", keyPassword=" + keyPassword +
                 ", javaDeploymentParameters=" + javaDeploymentParameters +
+                ", volumeMounts=" + volumeMounts +
+                ", hapiAPIKey=" + hapiAPIKey +
                 '}';
     }
 }

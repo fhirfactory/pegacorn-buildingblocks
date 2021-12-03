@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
@@ -142,7 +142,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         if(fulfillmentTask == null){
             return(null);
         }
-        if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(ComponentTypeTypeEnum.WUP)) {
+        if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(PegacornSystemComponentTypeTypeEnum.WUP)) {
             WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
             switch (wup.getComponentSystemRole()) {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
@@ -187,7 +187,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         if(fulfillmentTask == null){
             return(null);
         }
-        if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(ComponentTypeTypeEnum.WUP)) {
+        if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(PegacornSystemComponentTypeTypeEnum.WUP)) {
             WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
             switch (wup.getComponentSystemRole()) {
                 case COMPONENT_ROLE_INTERACT_INGRES: {

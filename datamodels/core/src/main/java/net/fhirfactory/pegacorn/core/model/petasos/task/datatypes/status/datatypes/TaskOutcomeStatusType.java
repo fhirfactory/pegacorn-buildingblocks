@@ -21,11 +21,17 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 
-public class TaskOutcomeStatusType extends TaskStatusType {
+import java.time.Instant;
+
+public class TaskOutcomeStatusType  {
 
     private ActionableTaskOutcomeStatusEnum outcomeStatus;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant entryInstant;
 
     //
     // Constructor(s)
@@ -33,6 +39,7 @@ public class TaskOutcomeStatusType extends TaskStatusType {
 
     public TaskOutcomeStatusType(){
         super();
+        entryInstant = Instant.now();
         this.outcomeStatus = ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN;
     }
 
@@ -40,6 +47,14 @@ public class TaskOutcomeStatusType extends TaskStatusType {
     // Getters and Setters (Bean Methods)
     //
 
+
+    public Instant getEntryInstant() {
+        return entryInstant;
+    }
+
+    public void setEntryInstant(Instant entryInstant) {
+        this.entryInstant = entryInstant;
+    }
 
     public ActionableTaskOutcomeStatusEnum getOutcomeStatus() {
         return outcomeStatus;
@@ -58,9 +73,6 @@ public class TaskOutcomeStatusType extends TaskStatusType {
     public String toString() {
         return "OutcomeStatusSegment{" +
                 "outcomeStatus=" + outcomeStatus +
-                ", fulfillmentExecutionStatus=" + getFulfillmentExecutionStatus() +
-                ", beingFulfilled=" + isBeingFulfilled() +
-                ", retryCount=" + getRetryCount() +
                 ", entryInstant=" + getEntryInstant() +
                 '}';
     }

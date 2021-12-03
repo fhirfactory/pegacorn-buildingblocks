@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.ProcessingPlantSummary;
@@ -60,7 +60,7 @@ public class PetasosMonitoredTopologyGraphFactory {
         graph.setDeploymentName(solutionName);
         LOG.debug(".newTopologyGraph(): Iterating Through nodeList");
         for(SoftwareComponent currentNode: nodeList){
-            if(currentNode.getComponentType().equals(ComponentTypeTypeEnum.PROCESSING_PLANT)){
+            if(currentNode.getComponentType().equals(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT)){
                 ProcessingPlantSoftwareComponent currentProcessingPlantSoftwareComponent = (ProcessingPlantSoftwareComponent)currentNode;
                 ProcessingPlantSummary processingPlant = processingPlantFactory.newProcessingPlant(currentProcessingPlantSoftwareComponent);
                 graph.addProcessingPlant(processingPlant);

@@ -2,7 +2,6 @@ package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.disc
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetric;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubPublisherRegistration;
@@ -93,7 +92,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
     @Override
     public void interfaceAdded(PetasosAdapterAddress addedInterface){
         boolean itIsAnotherInstanceOfMe = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(addedInterface.getAddressName()).contentEquals(getEndpointServiceName());
-        boolean itIsSameType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(addedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName());
+        boolean itIsSameType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(addedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
         boolean isWithinScope = isWithinScopeBasedOnChannelName(addedInterface.getAddressName());
         if(isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType) {
             PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
@@ -113,7 +112,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
     @Override
     public void interfaceRemoved(PetasosAdapterAddress removedInterface){
         boolean itIsAnotherInstanceOfMe = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(removedInterface.getAddressName()).contentEquals(getEndpointServiceName());
-        boolean itIsSameType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(removedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName());
+        boolean itIsSameType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(removedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
         boolean isWithinScope = isWithinScopeBasedOnChannelName(removedInterface.getAddressName());
         if(isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType) {
             PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
@@ -138,7 +137,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         getLogger().debug(".scheduleEndpointScan(): Entry");
         List<PetasosAdapterAddress> groupMembers = getAllGroupMembers();
         for(PetasosAdapterAddress currentGroupMember: groupMembers){
-            if(currentGroupMember.getAddressName().contains(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName())) {
+            if(currentGroupMember.getAddressName().contains(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName())) {
                 PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
                 String endpointChannelName = currentGroupMember.getAddressName();
                 endpointID.setEndpointName(getEndpointNameUtilities().buildEndpointNameFromChannelName(endpointChannelName));
@@ -258,7 +257,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             return(false);
         }
         String endpointFunctionType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(endpointChannelName);
-        boolean isOAMDiscoveryEndpoint = endpointFunctionType.contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_OAM_DISCOVERY_ENDPOINT.getFunctionName());
+        boolean isOAMDiscoveryEndpoint = endpointFunctionType.contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
         return(isOAMDiscoveryEndpoint);
     }
 
@@ -395,7 +394,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
     protected void checkEndpointRemoval(PetasosEndpointCheckScheduleElement currentScheduleElement){
         getLogger().debug(".checkEndpointRemoval(): Entry, currentScheduleElement->{}", currentScheduleElement);
         boolean sameGroup = currentScheduleElement.getPetasosEndpointID().getEndpointGroup().equals(specifyJGroupsClusterName());
-        boolean sameEndpointType = currentScheduleElement.getPetasosEndpointID().getEndpointChannelName().contains(getPetasosEndpointFunctionType().getFunctionName());
+        boolean sameEndpointType = currentScheduleElement.getPetasosEndpointID().getEndpointChannelName().contains(getPetasosEndpointFunctionType().getDisplayName());
         if( sameGroup && sameEndpointType ){
             boolean wasRemoved = removePublisher(currentScheduleElement.getPetasosEndpointID().getEndpointName());
             getEndpointMap().deleteEndpoint(currentScheduleElement.getPetasosEndpointID().getEndpointName());

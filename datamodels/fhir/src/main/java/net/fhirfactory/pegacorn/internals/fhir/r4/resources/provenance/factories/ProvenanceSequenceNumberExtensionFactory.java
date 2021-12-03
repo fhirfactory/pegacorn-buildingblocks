@@ -28,8 +28,10 @@ import org.hl7.fhir.r4.model.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+@ApplicationScoped
 public class ProvenanceSequenceNumberExtensionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ProvenanceSequenceNumberExtensionFactory.class);
 

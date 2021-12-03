@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
@@ -62,14 +62,14 @@ public class PetasosProcessingPlantSummaryFactory extends PetasosMonitoredCompon
         processingPlant.setTopologyNodeFDN(nodeFDN);
         String platformNodeName = "Unknown";
         for(TopologyNodeRDN currentRDN: nodeFDN.getHierarchicalNameSet()){
-            if(currentRDN.getNodeType().equals(ComponentTypeTypeEnum.PLATFORM)){
+            if(currentRDN.getNodeType().equals(PegacornSystemComponentTypeTypeEnum.PLATFORM)){
                 platformNodeName = currentRDN.getNodeName();
                 break;
             }
         }
         String siteName = "Unknown";
         for(TopologyNodeRDN currentRDN: nodeFDN.getHierarchicalNameSet()){
-            if(currentRDN.getNodeType().equals(ComponentTypeTypeEnum.SITE)){
+            if(currentRDN.getNodeType().equals(PegacornSystemComponentTypeTypeEnum.SITE)){
                 siteName = currentRDN.getNodeName();
                 break;
             }

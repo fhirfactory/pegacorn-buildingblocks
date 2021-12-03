@@ -24,9 +24,11 @@ package net.fhirfactory.pegacorn.services.oam.topology.agent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.petasos.endpoints.InterProcessingPlantTopologyServicesBroker;
 import net.fhirfactory.pegacorn.petasos.oam.topology.PetasosMonitoredTopologyReportingAgent;
 import net.fhirfactory.pegacorn.petasos.oam.topology.cache.PetasosLocalTopologyReportingDM;
@@ -41,7 +43,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class PetasosTopologyReportWorker {
+public class PetasosTopologyReportWorker implements PetasosTopologyHandlerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosTopologyReportWorker.class);
     private boolean initialised;
     private static long SYNCHRONIZATION_CHECK_PERIOD = 30000;
@@ -143,6 +145,15 @@ public class PetasosTopologyReportWorker {
             setBackgroundCheckInitiated(true);
         }
         getLogger().debug(".scheduleTopologyGraphForwarding(): Exit");
+    }
+
+    //
+    //
+    //
+
+    @Override
+    public Instant mergeRemoteTopologyGraph(PetasosMonitoredTopologyGraph topologyGraph, PetasosEndpointIdentifier requesterEndpointIdentifier) {
+        return null;
     }
 
     //

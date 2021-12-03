@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -44,7 +44,6 @@ import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.interact.ClusteredInteractHTTPServerPortSegment;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DeviceConfigurationFilePropertyTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointFactory;
@@ -394,9 +393,9 @@ public class DeviceFactory {
         device.addProperty(interZoneMetricsConfigFileProperty);
         Device.DevicePropertyComponent intraZoneMetricsConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTRAZONE_METRICS, processingPlant.getIntraZoneMetricsStackConfigFile());
         device.addProperty(intraZoneMetricsConfigFileProperty);
-        Device.DevicePropertyComponent interZoneTasksConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTERZONE_TASKS, processingPlant.getInterZoneTaskStackConfigFile());
+        Device.DevicePropertyComponent interZoneTasksConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTERZONE_TASKS, processingPlant.getInterZoneTaskingStackConfigFile());
         device.addProperty(interZoneTasksConfigFileProperty);
-        Device.DevicePropertyComponent intraZoneTasksConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTRAZONE_TASKS, processingPlant.getIntraZoneTaskStackConfigFile());
+        Device.DevicePropertyComponent intraZoneTasksConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTRAZONE_TASKS, processingPlant.getIntraZoneTaskingStackConfigFile());
         device.addProperty(intraZoneTasksConfigFileProperty);
 
         //
@@ -440,7 +439,7 @@ public class DeviceFactory {
         return(softwareComponentCC);
     }
 
-    public CodeableConcept newPegacornSoftwareComponentDeviceType(ComponentTypeTypeEnum componentType){
+    public CodeableConcept newPegacornSoftwareComponentDeviceType(PegacornSystemComponentTypeTypeEnum componentType){
         CodeableConcept softwareComponentCC = new CodeableConcept();
         Coding softwareComponentCoding = new Coding();
         softwareComponentCoding.setCode(componentType.getToken());

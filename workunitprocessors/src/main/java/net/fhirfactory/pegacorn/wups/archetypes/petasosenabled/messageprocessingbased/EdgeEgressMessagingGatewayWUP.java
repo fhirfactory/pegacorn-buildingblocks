@@ -26,13 +26,14 @@ import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNa
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 
 import javax.inject.Inject;
 
 public abstract class EdgeEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
-    private IPCServerTopologyEndpoint associatedEgressTopologyEndpoint;
+    private IPCTopologyEndpoint associatedEgressTopologyEndpoint;
 
     public EdgeEgressMessagingGatewayWUP() {
         super();
@@ -73,7 +74,7 @@ public abstract class EdgeEgressMessagingGatewayWUP extends GenericMessageBasedW
      */
     protected void assignEgressTopologyEndpoint(){
         getLogger().debug(".assignIngresTopologyEndpoint(): Entry");
-        IPCServerTopologyEndpoint endpoint = deriveAssociatedTopologyEndpoint(specifyEgressInterfaceName(), specifyEgressInterfaceDefinition());
+        IPCTopologyEndpoint endpoint = deriveAssociatedTopologyEndpoint(specifyEgressInterfaceName(), specifyEgressInterfaceDefinition());
         if(endpoint != null){
             this.associatedEgressTopologyEndpoint = endpoint;
         } else {
@@ -82,7 +83,7 @@ public abstract class EdgeEgressMessagingGatewayWUP extends GenericMessageBasedW
         getLogger().debug(".assignIngresTopologyEndpoint(): Exit, endpoint->{}", endpoint);
     }
 
-    public IPCServerTopologyEndpoint getAssociatedEgressTopologyEndpoint() {
+    public IPCTopologyEndpoint getAssociatedEgressTopologyEndpoint() {
         return associatedEgressTopologyEndpoint;
     }
 

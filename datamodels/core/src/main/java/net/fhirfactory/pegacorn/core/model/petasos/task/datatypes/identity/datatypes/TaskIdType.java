@@ -21,45 +21,31 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import org.apache.commons.lang3.SerializationUtils;
+import net.fhirfactory.pegacorn.core.model.keyring.PegacornResourceKeyring;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Identifier;
 
-import java.io.Serializable;
-import java.time.Instant;
-
-public class TaskIdType implements Serializable {
-    private String id;
-    private String version;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant creationInstant;
-
-    private static final String DEFAULT_VERSION="1.0";
+public class TaskIdType extends PegacornResourceKeyring {
 
     //
     // Constructors
     //
 
     public TaskIdType(){
-        this.id = null;
-        this.version = DEFAULT_VERSION;
-        this.creationInstant = Instant.now();
+        super();
+    }
+
+    public TaskIdType(IdType id, String keyContext){
+        super(id, keyContext);
+    }
+
+    public TaskIdType(Identifier identifier){
+        super(identifier);
     }
 
     public TaskIdType(TaskIdType ori){
-        this.id = null;
-        this.version = DEFAULT_VERSION;
-        this.creationInstant = Instant.now();
-        if(ori.hasId()) {
-            setId(SerializationUtils.clone(ori.getId()));
-        }
-        if(ori.hasVersion()) {
-            setVersion(SerializationUtils.clone(ori.getVersion()));
-        }
-        if(ori.hasCreationInstant()){
-            setCreationInstant(SerializationUtils.clone(ori.getCreationInstant()));
-        }
+        super(ori);
     }
 
     //
@@ -67,57 +53,30 @@ public class TaskIdType implements Serializable {
     //
 
     @JsonIgnore
-    public boolean hasId(){
-        boolean hasValue = this.id != null;
-        return(hasValue);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public String getId(){
+        return(getLocalId());
     }
 
     @JsonIgnore
-    public boolean hasVersion(){
-        boolean hasValue = this.version != null;
-        return(hasValue);
+    public void setId(String id){
+        setLocalId(id);
     }
 
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    @JsonIgnore
-    public boolean hasCreationInstant(){
-        boolean hasValue = this.creationInstant != null;
-        return(hasValue);
-    }
-
-    public Instant getCreationInstant() {
-        return creationInstant;
-    }
-
-    public void setCreationInstant(Instant creationInstant) {
-        this.creationInstant = creationInstant;
-    }
+    //
+    // Hashcode && Equals
+    //
 
     //
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "IdentitySegment{" +
-                "id=" + id +
-                ", version=" + version +
-                ", creationInstant=" + creationInstant +
+        return "TaskIdType{" +
+                "businessIdentifier=" + getPrimaryBusinessIdentifier() +
+                ", localId=" + getLocalId() +
+                ", sourceSystemKeyMap=" + getSourceSystemKeyMap() +
                 '}';
     }
 }

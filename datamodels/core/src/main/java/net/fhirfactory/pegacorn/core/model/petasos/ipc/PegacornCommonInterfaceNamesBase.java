@@ -25,34 +25,36 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.Petas
 
 public abstract class PegacornCommonInterfaceNamesBase {
 
-    public String getFunctionNamePetasosReplication(){return("PetasosReplication");}
-    public String getFunctionNamePetasosStatus(){return("PetasosStatus");}
-    public String getFunctionNamePetasosFinalisation(){return("PetasosFinalisation");}
-    public String getFunctionNamePetasosTopology(){return("PetasosTopology");}
+    public String getPetasosReplication(){return("PetasosReplication");}
+    public String getPetasosStatus(){return("PetasosStatus");}
+    public String getPetasosFinalisation(){return("PetasosFinalisation");}
+    public String getPetasosTopology(){return("PetasosTopology");}
     //
     // Property Names
     //
-    public String getFunctionNamePrometheus(){return("KubernetesSystemPrometheus");}
-    public String getFunctionNameJolokia(){return("KubernetesSystemJolokia");}
-    public String getFunctionNameKubeReadiness(){return("KubernetesSystemReadiness");}
-    public String getFunctionNameKubeLiveliness(){return("KubernetesSystemLiveliness");}
-    public String getFunctionNameIntraZoneJGroupsIPC(){return("intra-ipc");}
-    public String getFunctionNameInterZoneJGroupsIPC(){return("inter-ipc");}
-    public String getFunctionNameIntraZoneJGroupsOAM(){return("intra-oam");}
-    public String getFunctionNameInterZoneJGroupsOAM(){return("intra-oam");}
-    public String getFunctionNameIntraZoneJGroupsTask(){return("intra-task");}
-    public String getFunctionNameInterZoneJGroupsTask(){return("inter-task");}
-    public String getFunctionNameIntraZoneJGroupsAudit(){return("intra-audit");}
-    public String getFunctionNameInterZoneJGroupsAudit(){return("inter-audit");}
-    public String getFunctionNameIntraZoneJGroupsInterception(){return("intra-snoop");}
-    public String getFunctionNameInterZoneJGroupsInterception(){return("inter-snoop");}
-    public String getFunctionNameIntraZoneJGroupsMetrics(){return("intra-metrics");}
-    public String getFunctionNameInterZoneJGroupsMetrics(){return("inter-metrics");}
-    public String getFunctionNameMultiZoneInfinispan(){return("multi-infini");}
-    public String getFunctionNameEdgeReceive(){return("EdgeReceive");}
-    public String getFunctionNameEdgeForward(){return("EdgeForward");}
-    public String getFunctionNameEdgeAnswer(){return("EdgeAnswer");}
-    public String getFunctionNameEdgeAsk(){return("EdgeAsk");}
+    public String getPrometheusEndpointName(){return("KubernetesSystemPrometheus");}
+    public String getJolokiaEndpointName(){return("KubernetesSystemJolokia");}
+    public String getKubeReadinessEndpointName(){return("KubernetesSystemReadiness");}
+    public String getKubeLivelinessEndpointName(){return("KubernetesSystemLiveliness");}
+    public String getIntraZoneJGroupsIPCEndpointName(){return("intra-ipc");}
+    public String getInterZoneJGroupsIPCEndpointName(){return("inter-ipc");}
+    public String getIntraZoneJGroupsTopologyEndpointName(){return("intra-top");}
+    public String getInterZoneJGroupsTopologyEndpointName(){return("inter-top");}
+    public String getIntraZoneJGroupsSubscriptionsEndpointName(){return("intra-sub");}
+    public String getInterZoneJGroupsSubscriptionsEndpointName(){return("inter-sub");}
+    public String getIntraZoneJGroupsTaskingEndpointName(){return("intra-task");}
+    public String getInterZoneJGroupsTaskingEndpointName(){return("inter-task");}
+    public String getIntraZoneJGroupsAuditEndpointName(){return("intra-audit");}
+    public String getInterZoneJGroupsAuditEndpointName(){return("inter-audit");}
+    public String getIntraZoneJGroupsInterceptionEndpointName(){return("intra-snoop");}
+    public String getInterZoneJGroupsInterceptionEndpointName(){return("inter-snoop");}
+    public String getIntraZoneJGroupsMetricsEndpointName(){return("intra-metrics");}
+    public String getInterZoneJGroupsMetricsEndpointName(){return("inter-metrics");}
+    public String getMultiZoneInfinispaEndpointName(){return("multi-infini");}
+    public String getEdgeReceiveEndpointName(){return("edge-rec");}
+    public String getEdgeForwardEndpointName(){return("edge-snd");}
+    public String getEdgeAnswerEndpointName(){return("edge-answer");}
+    public String getEdgeAskEndpointName(){return("edge-ask");}
     //
     // Default ProcessorPlant Interface Binding
     //

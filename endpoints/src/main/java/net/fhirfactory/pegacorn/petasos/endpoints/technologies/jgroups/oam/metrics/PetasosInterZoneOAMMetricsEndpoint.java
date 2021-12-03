@@ -48,7 +48,7 @@ public class PetasosInterZoneOAMMetricsEndpoint extends PetasosOAMMetricsEndpoin
 
     @Override
     protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getFunctionNameInterZoneJGroupsMetrics());
+        return (getInterfaceNames().getInterZoneJGroupsMetricsEndpointName());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class PetasosInterZoneOAMMetricsEndpoint extends PetasosOAMMetricsEndpoin
         // Get Core Values
         String endpointServiceName = specifyEndpointServiceName();
         String endpointScopeName = specifyPetasosEndpointScope().getEndpointScopeName();
-        String endpointFunctionName = specifyPetasosEndpointFunctionType().getFunctionName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
         String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
         String endpointSite = getProcessingPlantInterface().getDeploymentSite();
         String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
@@ -80,7 +80,7 @@ public class PetasosInterZoneOAMMetricsEndpoint extends PetasosOAMMetricsEndpoin
         endpointID.setEndpointName(endpointName);
         endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
         endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
-        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterZoneIPCGroupName());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getInterzoneMetricsGroupName());
         endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
         endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
         String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getInterZoneIPCGroupName();
@@ -95,7 +95,7 @@ public class PetasosInterZoneOAMMetricsEndpoint extends PetasosOAMMetricsEndpoin
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
-        return (PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT);
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_METRICS_ENDPOINT);
     }
 
     @Override

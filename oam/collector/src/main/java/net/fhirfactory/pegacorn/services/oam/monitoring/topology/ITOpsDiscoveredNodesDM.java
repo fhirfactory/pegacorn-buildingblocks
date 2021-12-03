@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.services.oam.monitoring.topology;
 
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import org.slf4j.Logger;
@@ -156,7 +156,7 @@ public class ITOpsDiscoveredNodesDM {
         return (null);
     }
 
-    public List<SoftwareComponent> nodeSearch(ComponentTypeTypeEnum nodeType, String nodeName, String nodeVersion){
+    public List<SoftwareComponent> nodeSearch(PegacornSystemComponentTypeTypeEnum nodeType, String nodeName, String nodeVersion){
         LOG.debug(".nodeSearch(): Entry, nodeType->{}, nodeName->{}, nodeVersion->{}", nodeType, nodeName, nodeVersion);
         ArrayList<SoftwareComponent> nodeList = new ArrayList<>();
         for(SoftwareComponent currentNode: nodeSet.values()){

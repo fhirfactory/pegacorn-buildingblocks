@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.datagrid.datatypes.DatagridElementSourceResourceIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
@@ -46,6 +47,9 @@ public class PetasosTask implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant updateInstant;
+
+    private DatagridElementSourceResourceIdType sourceResourceId;
+    private SerializableObject sourceResourceIdLock;
 
     private TaskContextType taskContext;
     private SerializableObject taskContextLock;
@@ -85,9 +89,11 @@ public class PetasosTask implements Serializable {
 
     public PetasosTask(){
         this.taskId = null;
+        this.taskIdLock = new SerializableObject();
+        this.sourceResourceId = null;
+        this.sourceResourceIdLock = new SerializableObject();
         this.creationInstant = Instant.now();
         this.updateInstant = Instant.now();
-        this.taskIdLock = new SerializableObject();
         this.taskWorkItem = new TaskWorkItemType();
         this.taskWorkItemLock = new SerializableObject();
         this.taskTraceability = new TaskTraceabilityType();
@@ -113,6 +119,21 @@ public class PetasosTask implements Serializable {
     // Getters and Setters (Bean Methods)
     //
 
+    public DatagridElementSourceResourceIdType getSourceResourceId() {
+        return sourceResourceId;
+    }
+
+    public void setSourceResourceId(DatagridElementSourceResourceIdType sourceResourceId) {
+        this.sourceResourceId = sourceResourceId;
+    }
+
+    public SerializableObject getSourceResourceIdLock() {
+        return sourceResourceIdLock;
+    }
+
+    public void setSourceResourceIdLock(SerializableObject sourceResourceIdLock) {
+        this.sourceResourceIdLock = sourceResourceIdLock;
+    }
 
     public Instant getCreationInstant() {
         return creationInstant;
@@ -359,14 +380,59 @@ public class PetasosTask implements Serializable {
     }
 
     //
-    // To String
+    // Hashcode and Equals
     //
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PetasosTask that = (PetasosTask) o;
+        boolean theyAreEqual = isRegistered() == that.isRegistered()
+                && Objects.equals(getSourceResourceId(), that.getSourceResourceId())
+                && Objects.equals(getCreationInstant(), that.getCreationInstant())
+                && Objects.equals(getUpdateInstant(), that.getUpdateInstant())
+                && Objects.equals(getTaskContext(), that.getTaskContext())
+                && Objects.equals(getTaskId(), that.getTaskId())
+                && Objects.equals(getTaskType(), that.getTaskType())
+                && Objects.equals(getTaskWorkItem(), that.getTaskWorkItem())
+                && Objects.equals(getTaskTraceability(), that.getTaskTraceability())
+                && Objects.equals(getTaskOutcomeStatus(), that.getTaskOutcomeStatus())
+                && Objects.equals(getTaskPerformerTypes(), that.getTaskPerformerTypes())
+                && Objects.equals(getTaskReason(), that.getTaskReason())
+                && Objects.equals(getTaskNodeAffinity(), that.getTaskNodeAffinity())
+                && Objects.equals(getAggregateTaskMembership(), that.getAggregateTaskMembership());
+        return(theyAreEqual);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCreationInstant(),
+                getSourceResourceId(),
+                getUpdateInstant(),
+                getTaskContext(),
+                getTaskId(),
+                getTaskType(),
+                getTaskWorkItem(),
+                getTaskTraceability(),
+                getTaskOutcomeStatus(),
+                getTaskPerformerTypes(),
+                getTaskReason(),
+                getTaskNodeAffinity(),
+                getAggregateTaskMembership(),
+                isRegistered());
+    }
+
+
+    //
+    // To String
+    //
 
     @Override
     public String toString() {
         return "PetasosTask{" +
                 "creationInstant=" + creationInstant +
+                ", sourceResourceId=" + getSourceResourceId() +
                 ", updateInstant=" + updateInstant +
                 ", taskContext=" + taskContext +
                 ", taskId=" + taskId +

@@ -65,13 +65,13 @@ public class EdgeIntraZoneMessageReceiveWUP extends EdgeMessageReceiveWUP {
 
     @Override
     protected String specifyIngresInterfaceName() {
-        return (getInterfaceNames().getFunctionNameIntraZoneJGroupsIPC());
+        return (getInterfaceNames().getIntraZoneJGroupsIPCEndpointName());
     }
 
     @Override
     protected IPCAdapterDefinition specifyIngresInterfaceDefinition() {
         IPCAdapterDefinition interfaceDefinition = new IPCAdapterDefinition();
-        interfaceDefinition.setInterfaceFormalName("JGroups-Kube");
+        interfaceDefinition.setInterfaceFormalName(getIPCComponentNames().getJGroupsKubernetesServerInterfaceType());
         interfaceDefinition.setInterfaceFormalVersion("1.0.0");
         return (interfaceDefinition);
     }

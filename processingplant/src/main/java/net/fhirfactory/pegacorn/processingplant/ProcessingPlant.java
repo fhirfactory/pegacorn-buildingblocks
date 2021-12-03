@@ -21,20 +21,24 @@
  */
 package net.fhirfactory.pegacorn.processingplant;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditEventGranularityLevelEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.datatypes.ParameterNameValuePairType;
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfaces.SolutionNodeFactoryInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
@@ -49,12 +53,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantInterface {
+public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface {
 
     private ProcessingPlantSoftwareComponent processingPlantNode;
     private String hostName;
     private String instanceQualifier;
     private boolean isInitialised;
+    private PetasosAuditEventGranularityLevelEnum processingPlantAuditLevel;
 
     ConcurrentHashMap<String, CapabilityFulfillmentInterface> capabilityDeliveryServices;
 
@@ -111,6 +116,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             getLogger().info("ProcessingPlant::initialise(): [Executing other PostConstruct Activities] Start");
             executePostConstructActivities();
             getLogger().info("ProcessingPlant::initialise(): [Executing other PostConstruct Activities] Finish");
+            getLogger().info("ProcessingPlant::initialise(): [Audit Event Level Derivation] Start");
+            this.processingPlantAuditLevel = deriveAuditEventGranularityLevel();
+            getLogger().info("ProcessingPlant::initialise(): [Audit Event Level Derivation] Finish");
             isInitialised = true;
             getLogger().info("StandardProcessingPlatform::initialise(): Done...");
         } else {
@@ -147,7 +155,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         String processingPlantVersion = getPropertyFile().getSubsystemInstant().getProcessingPlantVersion();
         getLogger().debug(".resolveProcessingPlant(): Getting ProcessingPlant->{}, version->{}", processingPlantName, processingPlantVersion);
         getLogger().trace(".resolveProcessingPlant(): Resolving list of available ProcessingPlants");
-        List<SoftwareComponent> topologyNodes = topologyIM.nodeSearch(ComponentTypeTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
+        List<SoftwareComponent> topologyNodes = topologyIM.nodeSearch(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
         if(getLogger().isTraceEnabled()){
             if(topologyNodes == null){
                 getLogger().trace(".resolveProcessingPlant(): nodeSearch return a null list");
@@ -200,7 +208,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         WorkshopSoftwareComponent foundWorkshop = null;
         for (TopologyNodeFDN containedWorkshopFDN : this.processingPlantNode.getWorkshops()) {
             WorkshopSoftwareComponent containedWorkshop = (WorkshopSoftwareComponent)topologyIM.getNode(containedWorkshopFDN);
-            TopologyNodeRDN testRDN = new TopologyNodeRDN(ComponentTypeTypeEnum.WORKSHOP, workshopName, version);
+            TopologyNodeRDN testRDN = new TopologyNodeRDN(PegacornSystemComponentTypeTypeEnum.WORKSHOP, workshopName, version);
             if (testRDN.equals(containedWorkshop.getComponentRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;
@@ -225,7 +233,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public String getSimpleFunctionName() {
-        TopologyNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(ComponentTypeTypeEnum.PROCESSING_PLANT);
+        TopologyNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT);
         String functionName = functionRDN.getNodeName();
         return (functionName);
     }
@@ -249,7 +257,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public String getDeploymentSite() {
-        TopologyNodeRDN siteRDN = getProcessingPlantNode().getComponentFDN().extractRDNForNodeType(ComponentTypeTypeEnum.SITE);
+        TopologyNodeRDN siteRDN = getProcessingPlantNode().getComponentFDN().extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.SITE);
         String siteName = siteRDN.getNodeName();
         return (siteName);
     }
@@ -294,5 +302,24 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     @Override
     public boolean isITOpsNode() {
         return (false);
+    }
+
+    @Override
+    public PetasosAuditEventGranularityLevelEnum getAuditEventGranularityLevel() {
+        return(this.processingPlantAuditLevel);
+    }
+
+    protected PetasosAuditEventGranularityLevelEnum deriveAuditEventGranularityLevel(){
+        List<ParameterNameValuePairType> otherDeploymentParameters = getPropertyFile().getDeploymentMode().getOtherDeploymentParameters();
+        if(otherDeploymentParameters != null){
+            for(ParameterNameValuePairType currentNameValuePair: otherDeploymentParameters){
+                if(currentNameValuePair.getParameterName().equalsIgnoreCase(PetasosPropertyConstants.AUDIT_LEVEL_PARAMETER_NAME)){
+                    String parameterValue = currentNameValuePair.getParameterValue();
+                    PetasosAuditEventGranularityLevelEnum petasosAuditEventGranularityLevelEnum = PetasosAuditEventGranularityLevelEnum.fromDisplayName(parameterValue);
+                    return(petasosAuditEventGranularityLevelEnum);
+                }
+            }
+        }
+        return (PetasosAuditEventGranularityLevelEnum.AUDIT_LEVEL_COARSE);
     }
 }

@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
@@ -297,7 +297,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
                 specifyWUPInstanceName(),
                 specifyWUPInstanceVersion(),
                 getWorkshop().getWorkshopNode(),
-                ComponentTypeTypeEnum.WUP);
+                PegacornSystemComponentTypeTypeEnum.WUP);
         getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getComponentFDN(), wupNode);
         wupNode.setResilienceMode(getWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(getWorkshop().getWorkshopNode().getConcurrencyMode());
@@ -309,12 +309,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
      * @param interfaceDefinition
      * @return
      */
-    protected IPCServerTopologyEndpoint deriveAssociatedTopologyEndpoint(String interfaceName, IPCAdapterDefinition interfaceDefinition){
+    protected IPCTopologyEndpoint deriveAssociatedTopologyEndpoint(String interfaceName, IPCAdapterDefinition interfaceDefinition){
         getLogger().debug(".deriveServerTopologyEndpoint(): Entry, interfaceName->{}, interfaceDefinition->{}", interfaceName, interfaceDefinition);
         ProcessingPlantSoftwareComponent processingPlantSoftwareComponent = processingPlantServices.getProcessingPlantNode();
         getLogger().trace(".deriveServerTopologyEndpoint(): Parse through all endpoints and their IPC Definitions");
         for(TopologyNodeFDN endpointFDN: processingPlantSoftwareComponent.getEndpoints()){
-            IPCServerTopologyEndpoint endpoint = (IPCServerTopologyEndpoint)topologyIM.getNode(endpointFDN);
+            IPCTopologyEndpoint endpoint = (IPCTopologyEndpoint)topologyIM.getNode(endpointFDN);
             getLogger().trace(".deriveServerTopologyEndpoint(): endpoint->{}", endpoint);
             if(endpoint.getEndpointConfigurationName().equalsIgnoreCase(interfaceName)) {
                 getLogger().trace(".deriveServerTopologyEndpoint(): names ({}) match, now confirming supported InterfaceDefinition", interfaceName);

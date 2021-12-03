@@ -95,13 +95,13 @@ public class EdgeInterZoneMessageForwardWUP extends EdgeMessageForwardWUP implem
 
     @Override
     protected String specifyEgressInterfaceName() {
-        return (getInterfaceNames().getFunctionNameInterZoneJGroupsIPC());
+        return (getInterfaceNames().getInterZoneJGroupsIPCEndpointName());
     }
 
     @Override
     protected IPCAdapterDefinition specifyEgressInterfaceDefinition() {
         IPCAdapterDefinition interfaceDefinition = new IPCAdapterDefinition();
-        interfaceDefinition.setInterfaceFormalName("JGroups-Gossip");
+        interfaceDefinition.setInterfaceFormalName(getIPCComponentNames().getJGroupsInterzoneRepeaterClientInterfaceType());
         interfaceDefinition.setInterfaceFormalVersion("1.0.0");
         return (interfaceDefinition);
     }

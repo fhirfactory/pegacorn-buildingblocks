@@ -27,24 +27,16 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.services.tasks.datatypes.PetasosActionableTaskRegistrationType;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class PetasosActionableTaskDM {
-
-    private ConcurrentHashMap<TaskIdType, PetasosActionableTaskRegistrationType> taskRegistrationMap;
-    private ConcurrentHashMap<ComponentIdType, List<TaskIdType>> componentToTaskMap;
 
     //
     // Constructor(s)
     //
 
-    public PetasosActionableTaskDM(){
-        this.taskRegistrationMap = new ConcurrentHashMap<>();
-        this.componentToTaskMap = new ConcurrentHashMap<>();
+    public PetasosActionableTaskDM() {
     }
 
     //
@@ -53,63 +45,32 @@ public abstract class PetasosActionableTaskDM {
 
     abstract protected Logger specifyLogger();
 
+    abstract public PetasosActionableTaskRegistrationType registerPetasosActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier endpointIdentifier);
+
+    abstract public PetasosActionableTaskRegistrationType updatePetasosActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier endpointIdentifier);
+
+    abstract public PetasosActionableTask getPetasosActionableTask(TaskIdType taskId);
+
+    abstract public List<PetasosActionableTask> getPetasosActionableTasksForComponent(ComponentIdType componentId);
+
+    abstract public List<PetasosActionableTask> getWaitingActionableTasksForComponent(ComponentIdType componentId);
+
+    abstract public boolean archivePetasosActionableTask(PetasosActionableTask actionableTask);
+
+    abstract public boolean archivePetasosActionableTask(TaskIdType taskId);
+
     //
     // Getters (and Setters)
     //
 
-    protected Logger getLogger(){
-        return(specifyLogger());
-    }
-
-    public ConcurrentHashMap<TaskIdType, PetasosActionableTaskRegistrationType> getTaskRegistrationMap() {
-        return taskRegistrationMap;
-    }
-
-    public ConcurrentHashMap<ComponentIdType, List<TaskIdType>> getComponentToTaskMap() {
-        return componentToTaskMap;
+    protected Logger getLogger() {
+        return (specifyLogger());
     }
 
     //
     // Business Methods
     //
 
-    public PetasosActionableTaskRegistrationType registerPetasosActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier endpointIdentifier){
-
-
-        return(null);
-    }
-
-    public PetasosActionableTaskRegistrationType updatePetasosActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier endpointIdentifier){
-
-
-        return(null);
-    }
-
-    public PetasosActionableTask getPetasosActionableTask(TaskIdType taskId){
-
-
-        return(null);
-    }
-
-    public List<PetasosActionableTask> getPetasosActionableTasksForComponent(ComponentIdType componentId){
-
-
-        return(null);
-    }
-
-    public List<PetasosActionableTask> getWaitingActionableTasksForComponent(ComponentIdType componentId){
-
-
-        return(null);
-    }
-
-    public boolean deletePetasosActionableTask(PetasosActionableTask actionableTask){
-
-        return(false);
-    }
-
-    public boolean deletePetasosActionableTask(TaskIdType taskId){
-
-        return(false);
-    }
 }
+
+

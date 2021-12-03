@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries.factories;
 
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentEndpointSummary;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.EndpointSummary;
 import org.hl7.fhir.r4.model.Device;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +36,9 @@ public class SoftwareComponentEndpointSummaryFactory extends SoftwareComponentSu
     // Business Methods
     //
 
-    public SoftwareComponentEndpointSummary newEndpointSummary(Device fhriDevice){
+    public EndpointSummary newEndpointSummary(Device fhriDevice){
 
-        SoftwareComponentEndpointSummary endpointSummary = new SoftwareComponentEndpointSummary();
+        EndpointSummary endpointSummary = new EndpointSummary();
         return(endpointSummary);
     }
 

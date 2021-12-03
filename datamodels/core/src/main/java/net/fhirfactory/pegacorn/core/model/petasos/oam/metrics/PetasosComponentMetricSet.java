@@ -21,10 +21,12 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.oam.metrics;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class PetasosComponentMetricSet {
-    HashMap<String, PetasosComponentMetric> metrics;
+public class PetasosComponentMetricSet implements Serializable {
+    private HashMap<String, PetasosComponentMetric> metrics;
+    private String metricSourceComponentId;
 
     //
     // Contructor(s)
@@ -32,6 +34,12 @@ public class PetasosComponentMetricSet {
 
     public PetasosComponentMetricSet(){
         metrics = new HashMap<>();
+        metricSourceComponentId = null;
+    }
+
+    public PetasosComponentMetricSet(String sourceId){
+        metrics = new HashMap<>();
+        metricSourceComponentId = sourceId;
     }
 
     //
@@ -44,6 +52,14 @@ public class PetasosComponentMetricSet {
 
     public void setMetrics(HashMap<String, PetasosComponentMetric> metrics) {
         this.metrics = metrics;
+    }
+
+    public String getMetricSourceComponentId() {
+        return metricSourceComponentId;
+    }
+
+    public void setMetricSourceComponentId(String metricSourceComponentId) {
+        this.metricSourceComponentId = metricSourceComponentId;
     }
 
     //
