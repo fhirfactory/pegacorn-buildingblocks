@@ -23,10 +23,20 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelValidationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
@@ -44,20 +54,13 @@ import java.util.List;
 @ApplicationScoped
 public class WUPContainerEgressGatekeeper {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerEgressGatekeeper.class);
-    private static final String EGRESS_GATEKEEPER_PROCESSED_PROPERTY = "EgressGatekeeperSemaphore";
+
     protected Logger getLogger(){
         return(LOG);
     }
 
     @Inject
-    TopologyIM topologyProxy;
-
-    private String getGatekeeperProperty(FDNToken wupIdentifier) {
-        FDN workingFDN = new FDN(wupIdentifier);
-        String workingInstanceID = workingFDN.getUnqualifiedRDN().getValue();
-        String stringToUse = EGRESS_GATEKEEPER_PROCESSED_PROPERTY + "-" + workingInstanceID;
-        return (stringToUse);
-    }
+    private PetasosFulfillmentTaskAuditServicesBroker auditServicesBroker;
 
     /**
      * This class/method checks the status of the WUPJobCard for the parcel, and ascertains if it is to be
@@ -67,22 +70,52 @@ public class WUPContainerEgressGatekeeper {
      *
      * @param fulfillmentTask The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange   The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
-     * @return Should either return the ingres point into the associated Interchange Payload Transformer or null (if the packet is to be discarded)
+     * @return Returns a PetasosFulfillmentTask with the egress payload containing the DiscardedTask value set
      */
-    @RecipientList
-    public List<String> egressGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+
+    public PetasosFulfillmentTask egressGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
         getLogger().debug(".egressGatekeeper(): Enter, fulfillmentTask ->{}", fulfillmentTask );
         ArrayList<String> targetList = new ArrayList<String>();
         if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
-            getLogger().trace(".egressGatekeeper(): The isToBeDiscarded attribute is true, so we return null (and discard the packet");
-            getLogger().debug(".egressGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
-            return (targetList);
-        } else {
-            getLogger().trace(".egressGatekeeper(): the isToBeDiscarded attribute is false, so routing the message to the outcomes collector");
-            String targetEndpoint = PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE;
-            targetList.add(targetEndpoint);
-            getLogger().debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
-            return (targetList);
+            DataParcelManifest discardedParcelManifest = new DataParcelManifest();
+            DataParcelTypeDescriptor discardedParcelDescriptor = new DataParcelTypeDescriptor();
+            discardedParcelDescriptor.setDataParcelDefiner("FHIRFactory");
+            discardedParcelDescriptor.setDataParcelCategory("Petasos");
+            discardedParcelDescriptor.setDataParcelSubCategory("Tasking");
+            discardedParcelManifest.setContentDescriptor(discardedParcelDescriptor);
+            discardedParcelManifest.setDataParcelFlowDirection(fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().getDataParcelFlowDirection());
+            discardedParcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
+            discardedParcelManifest.setInterSubsystemDistributable(false);
+            discardedParcelManifest.setNormalisationStatus(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_TRUE);
+            discardedParcelManifest.setValidationStatus(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_TRUE);
+            if (fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().getSourceSystem() != null){
+                discardedParcelManifest.setSourceSystem(fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().getSourceSystem());
+            }
+            UoWPayload discardedItemPayload = new UoWPayload();
+
+            switch(fulfillmentTask.getTaskWorkItem().getProcessingOutcome()){
+                case UOW_OUTCOME_NO_PROCESSING_REQUIRED:
+                    discardedParcelDescriptor.setDataParcelResource("OAM-NoProcessingRequired");
+                    discardedItemPayload.setPayload("Task was a No-Operation");
+                    break;
+                case UOW_OUTCOME_FILTERED:
+                    discardedParcelDescriptor.setDataParcelResource("OAM-Filtered");
+                    discardedItemPayload.setPayload("Task was filtered");
+                    break;
+                case UOW_OUTCOME_DISCARD:
+                    discardedParcelDescriptor.setDataParcelResource("OAM-Discard");
+                    discardedItemPayload.setPayload("Task is to be discarded");
+                    break;
+                default:
+                    discardedParcelDescriptor.setDataParcelResource("OAM-Failure");
+                    discardedItemPayload.setPayload("Failed");
+            }
+            discardedItemPayload.setPayloadManifest(discardedParcelManifest);
+            fulfillmentTask.getTaskWorkItem().getEgressContent().getPayloadElements().clear();
+            fulfillmentTask.getTaskWorkItem().getEgressContent().addPayloadElement(discardedItemPayload);
         }
+        auditServicesBroker.logActivity(fulfillmentTask);
+        getLogger().debug(".egressGatekeeper(): Exit, fulfillmentTask ->{}", fulfillmentTask );
+        return(fulfillmentTask);
     }
 }

@@ -135,7 +135,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
 
     public void scheduleEndpointScan(){
         getLogger().debug(".scheduleEndpointScan(): Entry");
-        List<PetasosAdapterAddress> groupMembers = getAllGroupMembers();
+        List<PetasosAdapterAddress> groupMembers = getAllClusterMemberAdapterAddresses();
         for(PetasosAdapterAddress currentGroupMember: groupMembers){
             if(currentGroupMember.getAddressName().contains(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName())) {
                 PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();

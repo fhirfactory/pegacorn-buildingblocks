@@ -321,58 +321,88 @@ public class CoreSubsystemPetasosEndpointsWatchdog
     }
 
     private PetasosEndpointStatusEnum deriveAggregateStatus(PetasosEndpointStatusEnum startingStatus){
-        getLogger().trace(".deriveAggregateStatus(): Entry, startingStatus->{}", startingStatus);
+        getLogger().debug(".deriveAggregateStatus(): Entry, startingStatus->{}", startingStatus);
         List<PetasosEndpointStatusEnum> statusList = new ArrayList<>();
         getLogger().trace(".deriveAggregateStatus(): Assembling the list of status'es");
         if (existsIntrazoneIPC()) {
-            statusList.add(resolveStatusValue(startingStatus, getIntrazoneIPC().getEndpointStatus()));
+            PetasosEndpointStatusEnum intrazoneIPCStatus = getIntrazoneIPC().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getIntrazoneIPC().getEndpointStatus()->{}", intrazoneIPCStatus);
+            statusList.add(resolveStatusValue(startingStatus, intrazoneIPCStatus));
         }
         if (existsIntraZoneOAMDiscovery()){
-            statusList.add(resolveStatusValue(startingStatus, getIntrazoneOAMDiscovery().getEndpointStatus()));
+            PetasosEndpointStatusEnum intrazoneTopologyStatus = getIntrazoneOAMDiscovery().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getIntrazoneOAMDiscovery().getEndpointStatus()->{}", intrazoneTopologyStatus);
+            statusList.add(resolveStatusValue(startingStatus, intrazoneTopologyStatus));
         }
         if (existsIntraZoneOAMPubSub()) {
-            statusList.add(resolveStatusValue(startingStatus, getIntrazoneOAMPubSub().getEndpointStatus()));
+            PetasosEndpointStatusEnum intrazoneSubscriptionStatus = getIntrazoneOAMPubSub().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getIntrazoneOAMPubSub().getEndpointStatus()->{}", intrazoneSubscriptionStatus);
+            statusList.add(resolveStatusValue(startingStatus, intrazoneSubscriptionStatus));
         }
         if (existsIntraZoneAudit()){
-            statusList.add(resolveStatusValue(startingStatus, getIntraZoneAudit().getEndpointStatus()));
+            PetasosEndpointStatusEnum intrazoneAuditStatus = getIntraZoneAudit().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getIntraZoneAudit().getEndpointStatus()->{}", intrazoneAuditStatus);
+            statusList.add(resolveStatusValue(startingStatus, intrazoneAuditStatus));
         }
         if (existsIntraZoneTask()){
-            statusList.add(resolveStatusValue(startingStatus, getIntraZoneTask().getEndpointStatus()));
+            PetasosEndpointStatusEnum intrazoneTaskingStatus = getIntraZoneTask().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getIntraZoneTask().getEndpointStatus()->{}", intrazoneTaskingStatus);
+            statusList.add(resolveStatusValue(startingStatus, intrazoneTaskingStatus));
         }
         if (existsIntraZoneInterception()){
-            statusList.add(resolveStatusValue(startingStatus, getIntraZoneInterception().getEndpointStatus()));
+            PetasosEndpointStatusEnum intrazoneInterceptionStatus = getIntraZoneInterception().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getIntraZoneInterception().getEndpointStatus()->{}", intrazoneInterceptionStatus);
+            statusList.add(resolveStatusValue(startingStatus, intrazoneInterceptionStatus));
         }
         if (existsIntraZoneMetrics()){
-            statusList.add(resolveStatusValue(startingStatus, getIntraZoneMetrics().getEndpointStatus()));
+            PetasosEndpointStatusEnum intrazoneMetricsStatus = getIntraZoneMetrics().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getIntraZoneMetrics().getEndpointStatus()->{}", intrazoneMetricsStatus);
+            statusList.add(resolveStatusValue(startingStatus, intrazoneMetricsStatus));
         }
         if (existsInterZoneIPC()) {
-            statusList.add(resolveStatusValue(startingStatus, getInterzoneIPC().getEndpointStatus()));
+            PetasosEndpointStatusEnum interzoneIPCStatus = getInterzoneIPC().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getInterzoneIPC().getEndpointStatus()->{}", interzoneIPCStatus);
+            statusList.add(resolveStatusValue(startingStatus, interzoneIPCStatus));
         }
         if (existsInterZoneOAMDiscovery()) {
-            statusList.add(resolveStatusValue(startingStatus, getInterzoneOAMDiscovery().getEndpointStatus()));
+            PetasosEndpointStatusEnum interzoneTopologyStatus = getInterzoneOAMDiscovery().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneOAMDiscovery().getEndpointStatus()->{}", interzoneTopologyStatus);
+            statusList.add(resolveStatusValue(startingStatus, interzoneTopologyStatus));
         }
         if (existsInterZoneOAMPubSub()) {
-            statusList.add(resolveStatusValue(startingStatus, getInterzoneOAMPubSub().getEndpointStatus()));
+            PetasosEndpointStatusEnum interzoneSubscriptionStatus = getInterzoneOAMPubSub().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getInterzoneOAMPubSub().getEndpointStatus()->{}", interzoneSubscriptionStatus);
+            statusList.add(resolveStatusValue(startingStatus, interzoneSubscriptionStatus));
         }
         if (existsInterZoneAudit()){
-            statusList.add(resolveStatusValue(startingStatus, getInterZoneAudit().getEndpointStatus()));
+            PetasosEndpointStatusEnum interzoneAuditStatus = getInterZoneAudit().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneAudit().getEndpointStatus()->{}", interzoneAuditStatus);
+            statusList.add(resolveStatusValue(startingStatus, interzoneAuditStatus));
         }
         if (existsInterZoneTask()){
-            statusList.add(resolveStatusValue(startingStatus, getInterZoneTask().getEndpointStatus()));
+            PetasosEndpointStatusEnum interzoneTaskingStatus = getInterZoneTask().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneTask().getEndpointStatus()->{}", interzoneTaskingStatus);
+            statusList.add(resolveStatusValue(startingStatus, interzoneTaskingStatus));
         }
         if (existsInterZoneInterception()){
-            statusList.add(resolveStatusValue(startingStatus, getInterZoneInterception().getEndpointStatus()));
+            PetasosEndpointStatusEnum interzoneInterceptionStatus = getInterZoneInterception().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneInterception().getEndpointStatus()->{}", interzoneInterceptionStatus);
+            statusList.add(resolveStatusValue(startingStatus,interzoneInterceptionStatus));
         }
         if(existsInterZoneMetrics()){
-            statusList.add(resolveStatusValue(startingStatus, getInterZoneMetrics().getEndpointStatus()));
+            PetasosEndpointStatusEnum interzoneMetricsStatus = getInterZoneMetrics().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneMetrics().getEndpointStatus()->{}", interzoneMetricsStatus);
+            statusList.add(resolveStatusValue(startingStatus, interzoneMetricsStatus));
         }
-
+/*
         if (existsEdgeAnswerHTTP()) {
             statusList.add(resolveStatusValue(startingStatus, getEdgeAnswerHTTP().getEndpointStatus()));
         }
         if (existsEdgeAnswerRPC()) {
             statusList.add(resolveStatusValue(startingStatus, getEdgeAnswerRPC().getEndpointStatus()));
         }
+
+ */
         getLogger().trace(".deriveAggregateStatus(): If any of the PetasosEndpoints are FAILED, then they have ALL FAILED");
         for(PetasosEndpointStatusEnum currentStatus: statusList){
             if(currentStatus.equals(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_FAILED)){

@@ -109,7 +109,7 @@ public class IngresActivityBeginRegistration {
             fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
             fulfillmentTask.getTaskJobCard().setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
         }
-        getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskId());
+        getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
         getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
         //
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice

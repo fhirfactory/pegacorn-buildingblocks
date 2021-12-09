@@ -68,14 +68,14 @@ public class TaskOutcome2NewTasksBean {
      * 3. It then returns a List<> of these new WorkUnitTransportPackets for distribution.
      * 
      * It generates the 
-     * @param fulfillmentTask
+     * @param actionableTask
      * @param camelExchange
      * @return A List<> of WorkUnitTransportPackets - one for each egress UoWPayload element within the incoming UoW.
      */
 
-    public List<PetasosActionableTask> collectOutcomesAndCreateNewTasks(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
-        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, fulfillmentTask (WorkUnitTransportPacket)->{}", fulfillmentTask);
-        TaskWorkItemType incomingUoW = fulfillmentTask.getTaskWorkItem();
+    public List<PetasosActionableTask> collectOutcomesAndCreateNewTasks(PetasosActionableTask actionableTask, Exchange camelExchange) {
+        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, actionableTask (WorkUnitTransportPacket)->{}", actionableTask);
+        TaskWorkItemType incomingUoW = actionableTask.getTaskWorkItem();
         UoWPayloadSet egressContent = incomingUoW.getEgressContent();
         Set<UoWPayload> egressPayloadList = egressContent.getPayloadElements();
         if (getLogger().isDebugEnabled()) {
@@ -90,7 +90,7 @@ public class TaskOutcome2NewTasksBean {
         for(UoWPayload currentPayload: egressPayloadList) {
             TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
             getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): newWorkItem->{}", newWorkItem);
-            PetasosActionableTask transportPacket = newActionableTask(fulfillmentTask.getActionableTaskId(), fulfillmentTask.getTaskFulfillment(), newWorkItem);
+            PetasosActionableTask transportPacket = newActionableTask(actionableTask, newWorkItem);
             newActionableTaskList.add(transportPacket);
         }
         getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newActionableTaskList.size());
@@ -98,27 +98,18 @@ public class TaskOutcome2NewTasksBean {
         return (newActionableTaskList);
     }
 
-    private PetasosActionableTask newActionableTask(TaskIdType previousActionableTaskId, TaskFulfillmentType previousTaskFulfillmentDetail, TaskWorkItemType work){
-        getLogger().debug(".newActionableTask(): Entry, previousActionableTaskId->{}, previousTaskFulfillmentDetail->{}, work->{}", previousActionableTaskId, previousTaskFulfillmentDetail, work);
+    private PetasosActionableTask newActionableTask(PetasosActionableTask previousActionableTask, TaskWorkItemType work){
+        getLogger().debug(".newActionableTask(): Entry, previousActionableTask->{}, work->{}", previousActionableTask,  work);
 
-        if(previousTaskFulfillmentDetail == null){
+        if(previousActionableTask == null){
             getLogger().debug(".newActionableTask(): Exit, previousTaskFulfillmentDetail is null, returning null");
-            return(null);
-        }
-        if(previousActionableTaskId == null){
-            getLogger().debug(".newActionableTask(): Exit, No associated Actionable Task (previousActionableTaskId == null), returning null");
             return(null);
         }
         if(work == null){
             getLogger().debug(".newActionableTask(): Exit, No new work to be done, returning null");
             return(null);
         }
-        PetasosActionableTask actionableTask = actionableTaskCache.getActionableTask(previousActionableTaskId);
-        if(actionableTask == null){
-            getLogger().debug(".newActionableTask(): Exit, cannot resolve previousActionableTaskId, returning null");
-            return(null);
-        }
-        PetasosActionableTask petasosActionableTask = actionableTaskFactory.newMessageBasedActionableTask(actionableTask, previousTaskFulfillmentDetail, work);
+        PetasosActionableTask petasosActionableTask = actionableTaskFactory.newMessageBasedActionableTask(previousActionableTask, work);
         return(petasosActionableTask);
     }
 }

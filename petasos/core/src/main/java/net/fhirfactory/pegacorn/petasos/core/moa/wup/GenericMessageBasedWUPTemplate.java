@@ -339,9 +339,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         ArrayList<TopologyNodeFDN> endpointFDNs = getProcessingPlant().getProcessingPlantNode().getEndpoints();
         for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
-            if(endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)){
-                getLogger().debug(".getTopologyEndpoint(): Exit, node found -->{}", endpointTopologyNode);
-                return(endpointTopologyNode);
+            getLogger().trace(".getTopologyEndpoint(): Iterating Through Endpoints, current->{}", endpointTopologyNode);
+            if(endpointTopologyNode.getEndpointConfigurationName() != null) {
+                if (endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)) {
+                    getLogger().debug(".getTopologyEndpoint(): Exit, node found->{}", endpointTopologyNode);
+                    return (endpointTopologyNode);
+                }
             }
         }
         getLogger().debug(".getTopologyEndpoint(): Exit, Could not find node!");

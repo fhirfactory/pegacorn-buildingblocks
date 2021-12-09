@@ -65,7 +65,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.componentID = null;
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
-        this.componentSystemRole = null;
+        this.componentSystemRole = SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
     }
 
     //
@@ -179,6 +179,8 @@ public abstract class SoftwareComponent implements Serializable {
     //
     // Getters (and Setters)
     //
+
+
 
     public ConcurrentHashMap<String, String> getOtherConfigurationParameters() {
         return otherConfigurationParameters;

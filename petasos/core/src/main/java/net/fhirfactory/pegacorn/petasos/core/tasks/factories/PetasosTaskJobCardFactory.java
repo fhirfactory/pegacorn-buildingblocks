@@ -41,6 +41,7 @@ public class PetasosTaskJobCardFactory {
     private ProcessingPlantInterface processingPlant;
 
     public PetasosTaskJobCard newPetasosTaskJobCard(PetasosFulfillmentTask fulfillmentTask){
+        getLogger().debug(".newPetasosTaskJobCard(): Entry, fulfillmentTask->{}", fulfillmentTask);
         PetasosTaskJobCard jobCard = new PetasosTaskJobCard();
         jobCard.setActionableTaskIdentifier(fulfillmentTask.getActionableTaskId());
         jobCard.setClusterMode(processingPlant.getProcessingPlantNode().getConcurrencyMode());
@@ -52,7 +53,18 @@ public class PetasosTaskJobCardFactory {
         jobCard.setLocalUpdateInstant(Instant.EPOCH);
         jobCard.setSystemMode(processingPlant.getProcessingPlantNode().getResilienceMode());
         jobCard.setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING);
+        jobCard.setProcessingPlant(processingPlant.getProcessingPlantNode().getComponentID());
+        jobCard.setWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID());
+        getLogger().debug(".newPetasosTaskJobCard(): Exit, jobCard->{}", jobCard);
         return(jobCard);
     }
 
+
+    //
+    // Getters (and Setters)
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
 }

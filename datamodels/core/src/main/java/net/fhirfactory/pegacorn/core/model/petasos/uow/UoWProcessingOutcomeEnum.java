@@ -30,6 +30,8 @@ public enum UoWProcessingOutcomeEnum {
     UOW_OUTCOME_FAILED("pegacorn.uow.processingoutcome.failed"),
     UOW_OUTCOME_INCOMPLETE("pegacorn.uow.processingoutcome.incomplete"),
     UOW_OUTCOME_NO_PROCESSING_REQUIRED("pegacorn.uow.processingoutcome.nonerequired"),
+    UOW_OUTCOME_FILTERED("pegacorn.uow.processingoutcome.filtered"),
+    UOW_OUTCOME_DISCARD("pegacorn.uow.processingoutcome.discard"),
     UOW_OUTCOME_NOTSTARTED("pegacorn.uow.processingoutcome.not_started");
     
     private String uowProcessingOutcome;

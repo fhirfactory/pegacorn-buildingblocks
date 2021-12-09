@@ -109,6 +109,20 @@ public class WUPEgressConduit {
                     fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
                 }
                 break;
+            case UOW_OUTCOME_DISCARD:
+            case UOW_OUTCOME_FILTERED:
+                getLogger().trace(".receiveFromWUP(): UoW was processed with task to be discarded/filtered!");
+                synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
+                    fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
+                    fulfillmentTask.getTaskFulfillment().setFinishedDate(Date.from(Instant.now()));
+                }
+                synchronized (fulfillmentTask.getTaskJobCardLock()) {
+                    fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
+                    fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
+                    fulfillmentTask.getTaskJobCard().setToBeDiscarded(true);
+                    fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
+                }
+                break;
             case UOW_OUTCOME_NOTSTARTED:
             case UOW_OUTCOME_INCOMPLETE:
             case UOW_OUTCOME_FAILED:

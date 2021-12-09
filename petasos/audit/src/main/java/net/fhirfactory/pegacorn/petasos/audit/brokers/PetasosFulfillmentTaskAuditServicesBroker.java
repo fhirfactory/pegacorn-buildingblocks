@@ -95,9 +95,11 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
         boolean isInteractEgressActivity = false;
         boolean isInteractIngresActivity = false;
         if(fulfillmentTask.hasTaskFulfillment()){
-            if(fulfillmentTask.getTaskFulfillment().hasFulfillerComponent()){
-                isInteractEgressActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_EGRESS);
-                isInteractIngresActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_INGRES);
+            if(fulfillmentTask.getTaskFulfillment().hasFulfillerComponent()) {
+                if (fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole() != null) {
+                    isInteractEgressActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_EGRESS);
+                    isInteractIngresActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_INGRES);
+                }
             }
         }
         if(!(isInteractEgressActivity || isInteractIngresActivity)){

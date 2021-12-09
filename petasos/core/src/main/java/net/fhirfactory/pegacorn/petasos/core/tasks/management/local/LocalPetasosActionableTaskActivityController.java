@@ -25,9 +25,20 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.local;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityElementTypeFactory;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
 import org.apache.camel.CamelContext;
+import org.apache.commons.lang3.SerializationUtils;
 import org.hl7.fhir.r4.model.SearchParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +63,9 @@ public class LocalPetasosActionableTaskActivityController {
     @Inject
     private PetasosTaskRepositoryServiceProviderNameInterface taskRepositoryServiceProviderNameInterface;
 
+    @Inject
+    private TaskTraceabilityElementTypeFactory traceabilityElementTypeFactory;
+
 
     //
     // Constructor(s)
@@ -74,7 +88,7 @@ public class LocalPetasosActionableTaskActivityController {
     }
 
     public PetasosActionableTask deregisterActionableTask(PetasosActionableTask actionableTask){
-
+        getSharedActionableTaskDM().unregisterActionableTask(actionableTask);
         return(actionableTask);
     }
 
@@ -88,22 +102,103 @@ public class LocalPetasosActionableTaskActivityController {
         return(updateInstant);
     }
 
-    public Instant notifyActionableTaskExecutionFinish(TaskIdType taskId){
+    public PetasosActionableTask notifyActionableTaskExecutionFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
+        getLogger().info(".notifyActionableTaskExecutionFinish(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        if(fulfillmentTask == null){
+            getLogger().debug(".notifyActionableTaskExecutionFinish(): Exit, fulfillmentTask is null");
+            return(null);
+        }
+        PetasosActionableTask actionableTask = getSharedActionableTaskDM().getActionableTask(taskId);
+        //
+        // Update Fulfillment Status
+        if(actionableTask.getTaskFulfillment() == null){
+            TaskFulfillmentType taskFulfillment = SerializationUtils.clone(fulfillmentTask.getTaskFulfillment());
+            actionableTask.setTaskFulfillment(taskFulfillment);
+        }
+        actionableTask.getTaskFulfillment().setFinishInstant(Instant.now());
+        actionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
+        actionableTask.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
+        //
+        // Update Outcome Status
+        if(actionableTask.getTaskOutcomeStatus() == null){
+            TaskOutcomeStatusType outcomeStatus = new TaskOutcomeStatusType();
+            actionableTask.setTaskOutcomeStatus(outcomeStatus);
+        }
+        actionableTask.getTaskOutcomeStatus().setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FINISHED);
+        actionableTask.getTaskOutcomeStatus().setEntryInstant(Instant.now());
 
-        Instant updateInstant = Instant.now();
-        return(updateInstant);
+        UoWPayloadSet taskWorkItemEgressContent = SerializationUtils.clone(fulfillmentTask.getTaskWorkItem().getEgressContent());
+        actionableTask.getTaskWorkItem().setEgressContent(taskWorkItemEgressContent);
+        TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(taskId,fulfillmentTask.getTaskFulfillment());
+        actionableTask.getTaskTraceability().addToTaskJourney(traceabilityElementType);
+        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), actionableTask);
+        PetasosActionableTask clonedTask = SerializationUtils.clone(petasosActionableTask);
+        getLogger().info(".notifyActionableTaskExecutionFinish(): Exit, clonedTask->{}", clonedTask);
+        return(clonedTask);
     }
 
-    public Instant notifyActionableTaskExecutionFailure(TaskIdType taskId){
-
-        Instant updateInstant = Instant.now();
-        return(updateInstant);
+    public PetasosActionableTask notifyActionableTaskExecutionFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
+        getLogger().debug(".notifyActionableTaskExecutionFailure(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        if(fulfillmentTask == null){
+            getLogger().debug(".notifyActionableTaskExecutionFailure(): Exit, fulfillmentTask is null");
+            return(null);
+        }
+        PetasosActionableTask actionableTask = getSharedActionableTaskDM().getActionableTask(taskId);
+        //
+        // Update Fulfillment Status
+        if(actionableTask.getTaskFulfillment() == null){
+            TaskFulfillmentType taskFulfillment = SerializationUtils.clone(fulfillmentTask.getTaskFulfillment());
+            actionableTask.setTaskFulfillment(taskFulfillment);
+        }
+        actionableTask.getTaskFulfillment().setFinishInstant(Instant.now());
+        actionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
+        actionableTask.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
+        //
+        // Update Outcome Status
+        if(actionableTask.getTaskOutcomeStatus() == null){
+            TaskOutcomeStatusType outcomeStatus = new TaskOutcomeStatusType();
+            actionableTask.setTaskOutcomeStatus(outcomeStatus);
+        }
+        actionableTask.getTaskOutcomeStatus().setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FAILED);
+        actionableTask.getTaskOutcomeStatus().setEntryInstant(Instant.now());
+        TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(taskId,fulfillmentTask.getTaskFulfillment());
+        actionableTask.getTaskTraceability().addToTaskJourney(traceabilityElementType);
+        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), actionableTask);
+        PetasosActionableTask clonedTask = SerializationUtils.clone(petasosActionableTask);
+        getLogger().debug(".notifyActionableTaskExecutionFailure(): Exit");
+        return(clonedTask);
     }
 
-    public Instant notifyActionableTaskExecutionCancellation(TaskIdType taskId){
-
-        Instant updateInstant = Instant.now();
-        return(updateInstant);
+    public PetasosActionableTask notifyActionableTaskExecutionCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
+        getLogger().debug(".notifyActionableTaskExecutionCancellation(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        if(fulfillmentTask == null){
+            getLogger().debug(".notifyActionableTaskExecutionCancellation(): Exit, fulfillmentTask is null");
+            return(null);
+        }
+        PetasosActionableTask actionableTask = getSharedActionableTaskDM().getActionableTask(taskId);
+        //
+        // Update Fulfillment Status
+        if(actionableTask.getTaskFulfillment() == null){
+            TaskFulfillmentType taskFulfillment = SerializationUtils.clone(fulfillmentTask.getTaskFulfillment());
+            actionableTask.setTaskFulfillment(taskFulfillment);
+        }
+        actionableTask.getTaskFulfillment().setFinishInstant(Instant.now());
+        actionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
+        actionableTask.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
+        //
+        // Update Outcome Status
+        if(actionableTask.getTaskOutcomeStatus() == null){
+            TaskOutcomeStatusType outcomeStatus = new TaskOutcomeStatusType();
+            actionableTask.setTaskOutcomeStatus(outcomeStatus);
+        }
+        actionableTask.getTaskOutcomeStatus().setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_CANCELLED);
+        actionableTask.getTaskOutcomeStatus().setEntryInstant(Instant.now());
+        TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(taskId,fulfillmentTask.getTaskFulfillment());
+        actionableTask.getTaskTraceability().addToTaskJourney(traceabilityElementType);
+        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), actionableTask);
+        PetasosActionableTask clonedTask = SerializationUtils.clone(petasosActionableTask);
+        getLogger().debug(".notifyActionableTaskExecutionCancellation(): Exit");
+        return(clonedTask);
     }
 
     //

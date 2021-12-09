@@ -23,6 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalPetasosFulfillmentTaskDM;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
@@ -31,7 +32,9 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedTaskJobCardDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.global.GlobalPetasosTaskExecutionController;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,28 +64,25 @@ public class LocalPetasosFulfilmentTaskActivityController {
     @Inject
     private GlobalPetasosTaskExecutionController taskExecutionController;
 
+    @Inject
+    private PetasosTaskJobCardFactory jobCardFactory;
+
     //
     // PetasosFulfillmentTask Registration
     //
 
     public PetasosFulfillmentTask registerFulfillmentTask(PetasosFulfillmentTask task, boolean synchronousWriteToAudit){
-
+        getLogger().debug(".registerFulfillmentTask(): Entry, fulfillmentTask->{}", task);
         PetasosTaskJobCard petasosTaskJobCard = null;
         if(task.hasTaskJobCard()) {
             petasosTaskJobCard = task.getTaskJobCard();
         } else {
-            petasosTaskJobCard = new PetasosTaskJobCard();
-            petasosTaskJobCard.setActionableTaskIdentifier(task.getActionableTaskId());
-            petasosTaskJobCard.setClusterMode(task.getTaskFulfillment().getFulfillerComponent().getConcurrencyMode());
-            petasosTaskJobCard.setFulfillmentTaskIdentifier(task.getTaskId());
+            petasosTaskJobCard = jobCardFactory.newPetasosTaskJobCard(task);
             petasosTaskJobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING);
             petasosTaskJobCard.setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING);
             petasosTaskJobCard.setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
             petasosTaskJobCard.setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING);
-            petasosTaskJobCard.setProcessingPlant(processingPlant.getProcessingPlantNode().getComponentID());
-            petasosTaskJobCard.setSystemMode(task.getTaskFulfillment().getFulfillerComponent().getResilienceMode());
             petasosTaskJobCard.setToBeDiscarded(false);
-            petasosTaskJobCard.setWorkUnitProcessor(task.getTaskFulfillment().getFulfillerComponent().getComponentID());
             petasosTaskJobCard.setLocalUpdateInstant(Instant.now());
             synchronized (task.getTaskJobCardLock()) {
                 task.setTaskJobCard(petasosTaskJobCard);
@@ -93,7 +93,8 @@ public class LocalPetasosFulfilmentTaskActivityController {
         fulfillmentTaskDM.registerFulfillmentTask(task);
         //
         // Register the Task Job Card
-        sharedTaskJobCardDM.registerJobCard(petasosTaskJobCard);
+        PetasosTaskJobCard sharedJobCard = SerializationUtils.clone(petasosTaskJobCard);
+        sharedTaskJobCardDM.registerJobCard(sharedJobCard);
         //
         // Request Execution Privileges
         taskExecutionController.requestTaskExecutionPrivilege(task.getTaskJobCard());
@@ -112,8 +113,9 @@ public class LocalPetasosFulfilmentTaskActivityController {
     // Requests
     //
 
-    public Instant requestFulfillmentTaskExecutionPrivelege(TaskIdType taskId){
-
+    public Instant requestFulfillmentTaskExecutionPrivilege(PetasosTaskJobCard localJobCard){
+        getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Entry, localJobCard->{}", localJobCard);
+        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.requestTaskExecutionPrivilege(localJobCard);
         Instant updateInstant = Instant.now();
         return(updateInstant);
     }
@@ -122,31 +124,39 @@ public class LocalPetasosFulfilmentTaskActivityController {
     // Notifications
     //
 
-    public Instant notifyFulfillmentTaskExecutionStart(TaskIdType taskId){
-
+    public Instant notifyFulfillmentTaskExecutionStart(PetasosTaskJobCard localJobCard){
+        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Entry, localJobCard->{}", localJobCard);
+        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskExecutionStart(localJobCard);
         Instant updateInstant = Instant.now();
+        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Exit, localJobCard->{}", localJobCard);
         return(updateInstant);
     }
 
-    public Instant notifyFulfillmentTaskExecutionFinish(TaskIdType taskId){
-
+    public Instant notifyFulfillmentTaskExecutionFinish(PetasosTaskJobCard localJobCard){
+        getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Entry, localJobCard->{}", localJobCard);
+        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskExecutionFinish(localJobCard);
         Instant updateInstant = Instant.now();
+        getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Exit, localJobCard->{}", localJobCard);
         return(updateInstant);
     }
 
-    public Instant notifyFulfillmentTaskExecutionFailure(TaskIdType taskId){
-
+    public Instant notifyFulfillmentTaskExecutionFailure(PetasosTaskJobCard localJobCard){
+        getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Entry, localJobCard->{}", localJobCard);
+        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskExecutionFailure(localJobCard);
         Instant updateInstant = Instant.now();
+        getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Exit, localJobCard->{}", localJobCard);
         return(updateInstant);
     }
 
-    public Instant notifyFulfillmentTaskExecutionCancellation(TaskIdType taskId){
-
+    public Instant notifyFulfillmentTaskExecutionCancellation(PetasosTaskJobCard localJobCard){
+        getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Entry, localJobCard->{}", localJobCard);
+        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskCancellation(localJobCard);
         Instant updateInstant = Instant.now();
+        getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Exit, localJobCard->{}", localJobCard);
         return(updateInstant);
     }
 
-    public Instant notifyFulfillmentTaskExecutionNoActionRequired(TaskIdType taskId){
+    public Instant notifyFulfillmentTaskExecutionNoActionRequired(PetasosTaskJobCard localJobCard){
 
         Instant updateInstant = Instant.now();
         return(updateInstant);

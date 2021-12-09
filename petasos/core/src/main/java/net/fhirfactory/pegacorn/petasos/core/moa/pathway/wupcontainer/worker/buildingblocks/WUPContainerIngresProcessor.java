@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import org.apache.camel.Exchange;
@@ -46,7 +47,7 @@ public class WUPContainerIngresProcessor {
     private LocalPetasosFulfilmentTaskActivityController fulfillmentActivityController;
 
     @Inject
-    TopologyIM topologyProxy;
+    private PetasosFulfillmentTaskAuditServicesBroker auditServicesBroker;
     
     /**
      * This class/method is used as the injection point into the WUP Processing Framework for the specific WUP Type/Instance in question.
@@ -80,6 +81,9 @@ public class WUPContainerIngresProcessor {
         // Set our wait-loop check state
         boolean waitState = true;
         //
+        // Write an AuditEvent
+        auditServicesBroker.logActivity(fulfillmentTask);
+        //
         // Now check status
         while (waitState) {
             switch (fulfillmentTask.getTaskJobCard().getCurrentStatus()) {
@@ -88,12 +92,12 @@ public class WUPContainerIngresProcessor {
                     synchronized (fulfillmentTask.getTaskJobCardLock()) {
                         fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
                     }
-                    fulfillmentActivityController.requestFulfillmentTaskExecutionPrivelege(fulfillmentTask.getTaskId());
+                    fulfillmentActivityController.requestFulfillmentTaskExecutionPrivilege(fulfillmentTask.getTaskJobCard());
                     if (fulfillmentTask.getTaskJobCard().getGrantedStatus() == PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) {
                         synchronized (fulfillmentTask.getTaskJobCardLock()) {
                             fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
                         }
-                        fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskId());
+                        fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
                         getLogger().trace(".ingresContentProcessor(): We've been granted execution privileges!");
                         waitState = false;
                         break;

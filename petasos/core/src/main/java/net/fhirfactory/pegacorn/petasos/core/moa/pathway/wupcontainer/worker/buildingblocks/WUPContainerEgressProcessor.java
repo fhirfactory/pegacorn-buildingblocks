@@ -47,16 +47,16 @@ public class WUPContainerEgressProcessor {
 
         switch (fulfillmentTask.getTaskFulfillment().getStatus()) {
             case FULFILLMENT_EXECUTION_STATUS_FINISHED:
-                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskId());
+                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskJobCard());
                 break;
             case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
-                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask.getTaskId());
+                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask.getTaskJobCard());
                 break;
             case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
-                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionNoActionRequired(fulfillmentTask.getTaskId());
+                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionNoActionRequired(fulfillmentTask.getTaskJobCard());
                 break;
             default:
-                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskId());
+                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskJobCard());
         }
         return (fulfillmentTask);
     }

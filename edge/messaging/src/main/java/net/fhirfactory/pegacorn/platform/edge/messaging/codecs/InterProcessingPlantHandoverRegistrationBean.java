@@ -128,7 +128,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
             newFulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
             newFulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
         }
-        fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionStart(newFulfillmentTask.getTaskId());
+        fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionStart(newFulfillmentTask.getTaskJobCard());
         LOG.trace(".ipcReceiverActivityStart(): Update Fulfillment Task Status: Finish");
 
 

@@ -145,6 +145,8 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         getLogger().debug(".getTargetMemberAdapterSetForService(): Exit, addressSet->{}", addressSet);
         return (addressSet);
     }
+
+
     public PetasosAdapterAddress getTargetMemberAdapterAddress(String targetMemberKey){
         getLogger().debug(".getTargetMemberAdapterAddress(): Entry, targetMemberKey->{}", targetMemberKey);
         Address targetAddress = getTargetMemberAddress(targetMemberKey);
@@ -183,8 +185,8 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         }
     }
 
-    public List<PetasosAdapterAddress> getAllGroupMembers(){
-        getLogger().info(".getAllGroupMembers(): Entry");
+    public List<PetasosAdapterAddress> getAllClusterMemberAdapterAddresses(){
+        getLogger().info(".getAllClusterMemberAdapterAddresses(): Entry");
         List<PetasosAdapterAddress> groupMembers = getAllClusterTargets();
         List<PetasosAdapterAddress> sameServiceSet = new ArrayList<>();
         for(PetasosAdapterAddress currentAdapterAddress: groupMembers){
@@ -195,7 +197,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         for(PetasosAdapterAddress sameServiceAddress: sameServiceSet){
             groupMembers.remove(sameServiceAddress);
         }
-        getLogger().info(".getAllGroupMembers(): Exit, size->{}", groupMembers.size());
+        getLogger().info(".getAllClusterMemberAdapterAddresses(): Exit, size->{}", groupMembers.size());
         return(groupMembers);
     }
 
@@ -209,16 +211,14 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
      * @return A List of Strings containing the names of all the members of the JGroups Cluster this interface is connected to.
      */
     public List<String> getAllClusterMembers(){
-        getLogger().debug(".getAllClusterMembers(): Entry");
+        getLogger().info(".getAllClusterMembers(): Entry");
         List<String> memberNameList = new ArrayList<>();
-        synchronized (getCurrentScannedMembershipLock()) {
-            List<Address> memberAddressList = getCurrentScannedMembership();
-            for (Address currentAddress : memberAddressList) {
-                String currentMemberName = currentAddress.toString();
-                memberNameList.add(currentMemberName);
-            }
+        List<PetasosAdapterAddress> allGroupMembers = getAllClusterMemberAdapterAddresses();
+        for (PetasosAdapterAddress currentAddress : allGroupMembers) {
+            String currentMemberName = currentAddress.toString();
+            memberNameList.add(currentMemberName);
         }
-        getLogger().debug(".getAllClusterMembers(): Exit");
+        getLogger().info(".getAllClusterMembers(): Exit");
         return(memberNameList);
     }
 
@@ -327,27 +327,27 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
      * @return a list of String's representing all members whose name begins with the given prefix
      */
     public List<String> getClusterMemberSetBasedOnService(String serviceName){
-        getLogger().debug(".getClusterMemberSetBasedOnPrefix(): Entry, serviceName->{}", serviceName);
+        getLogger().info(".getClusterMemberSetBasedOnService(): Entry, serviceName->{}", serviceName);
         List<String> memberListForService = new ArrayList<>();
         if(getIPCChannel() == null){
-            getLogger().debug(".getClusterMemberSetBasedOnService(): Exit, IPCChannel is null, returning empty set");
+            getLogger().info(".getClusterMemberSetBasedOnService(): Exit, IPCChannel is null, returning empty set");
             return(memberListForService);
         }
         if(StringUtils.isEmpty(serviceName)){
-            getLogger().debug(".getClusterMemberSetBasedOnService(): Exit, namePrefix is null, returning empty set");
+            getLogger().info(".getClusterMemberSetBasedOnService(): Exit, namePrefix is null, returning empty set");
             return(memberListForService);
         }
-        getLogger().trace(".getClusterMemberSetBasedOnService(): IPCChannel is NOT null & serviceName is not empty, let's get updated Address set via view");
+        getLogger().info(".getClusterMemberSetBasedOnService(): IPCChannel is NOT null & serviceName is not empty, let's get updated Address set via view");
         List<String> memberList = getAllClusterMembers();
-        getLogger().trace(".getClusterMemberSetBasedOnService(): Got the Address set via view, now iterate through and see if one is suitable");
+        getLogger().info(".getClusterMemberSetBasedOnService(): Got the Address set via view, now iterate through and see if one is suitable");
         for(String currentMemberName: memberList){
-            getLogger().trace(".getClusterMemberSetBasedOnService(): Iterating through Address list, current element->{}", currentMemberName);
+            getLogger().info(".getClusterMemberSetBasedOnService(): Iterating through Address list, current element->{}", currentMemberName);
             if(currentMemberName.toString().contains(serviceName)){
-                getLogger().debug(".getClusterMemberSetBasedOnService(): currentMemberName is a match for given serviceName, so adding it to list");
+                getLogger().info(".getClusterMemberSetBasedOnService(): currentMemberName is a match for given serviceName, so adding it to list");
                 memberListForService.add(currentMemberName);
             }
         }
-        getLogger().debug(".getClusterMemberSetBasedOnService(): Exit, memberListBasedOnPrefix->{}",memberListForService);
+        getLogger().info(".getClusterMemberSetBasedOnService(): Exit, memberListBasedOnPrefix->{}",memberListForService);
         return(memberListForService);
     }
 

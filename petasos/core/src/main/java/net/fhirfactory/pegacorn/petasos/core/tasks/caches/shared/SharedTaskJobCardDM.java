@@ -238,11 +238,13 @@ public class SharedTaskJobCardDM {
             PetasosTaskJobCardSet petasosTaskJobCardSet = getActionableTaskJobCardMap().get(actionableTaskId);
             if(petasosTaskJobCardSet != null){
                 if(!petasosTaskJobCardSet.getAllPetasosTaskJobCard().isEmpty()){
-                    for(PetasosTaskJobCard currentCard: petasosTaskJobCardSet.getAllPetasosTaskJobCard()){
-                        if(currentCard.getCurrentStatus().equals(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) ||
-                                currentCard.getGrantedStatus().equals(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING)){
-                            activeFulfillmentTaskJobCard = currentCard;
-                            break;
+                    for(PetasosTaskJobCard currentCard: petasosTaskJobCardSet.getAllPetasosTaskJobCard()) {
+                        if (currentCard.getGrantedStatus() != null && currentCard.getCurrentStatus() != null) {
+                            if (currentCard.getCurrentStatus().equals(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) ||
+                                    currentCard.getGrantedStatus().equals(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING)) {
+                                activeFulfillmentTaskJobCard = currentCard;
+                                break;
+                            }
                         }
                     }
                 }

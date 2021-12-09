@@ -288,7 +288,7 @@
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-deployment-properties</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -307,6 +307,7 @@
             </plugin>
             <!--Build configuration for the WAR plugin: -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${version-org.apache.maven-war-plugin}</version>
                 <configuration>
@@ -321,6 +322,7 @@
                 <version>${version-org.apache.maven-surefire-plugin}</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${version-org.apache.maven-failsafe-plugin}</version>
             </plugin>
@@ -332,7 +334,7 @@
             <!-- An optional Arquillian testing profile -->
             <id>arquillian-managed-wildfly</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <dependencies>
                 <dependency>

@@ -119,7 +119,7 @@ public class PetasosIntraZoneOAMMetricsEndpoint extends PetasosOAMMetricsEndpoin
 
     @Override
     protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
-        getCoreSubsystemPetasosEndpointsWatchdog().setIntrazoneIPC(this.getPetasosEndpoint());
+        getCoreSubsystemPetasosEndpointsWatchdog().setIntraZoneMetrics(this.getPetasosEndpoint());
     }
 
     @Override

@@ -74,6 +74,24 @@ public class PetasosActionableTaskFactory {
     // Business Methods
     //
 
+    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskWorkItemType payload ){
+        getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, fulfillmentTaskSummary->{}, payload->{}", upstreamTask, payload);
+
+        //
+        // Create an empty task
+        PetasosActionableTask newTask = newMessageBasedActionableTask(payload);
+        //
+        // create task traceability information
+        getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Start");
+        TaskTraceabilityType taskTraceabilityType = traceabilityTypeFactory.newTaskTraceabilityFromTask(upstreamTask);
+        newTask.setTaskTraceability(taskTraceabilityType);
+        getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Finish");
+        //
+        // return the object
+        getLogger().debug(".newMessageBasedActionableTask(): Exit, petasosActionableTask->{}", newTask);
+        return(newTask);
+    }
+
     public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskTraceabilityElementType fulfillmentTaskSummary, TaskWorkItemType payload ){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, fulfillmentTaskSummary->{}, payload->{}", upstreamTask, fulfillmentTaskSummary, payload);
 

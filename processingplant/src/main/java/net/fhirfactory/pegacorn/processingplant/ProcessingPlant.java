@@ -59,6 +59,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     private String hostName;
     private String instanceQualifier;
     private boolean isInitialised;
+
     private PetasosAuditEventGranularityLevelEnum processingPlantAuditLevel;
 
     ConcurrentHashMap<String, CapabilityFulfillmentInterface> capabilityDeliveryServices;
@@ -88,7 +89,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         this.capabilityDeliveryServices = new ConcurrentHashMap<>();
         this.isInitialised = false;
         this.instanceQualifier = UUID.randomUUID().toString();
-
+        this.processingPlantAuditLevel = PetasosAuditEventGranularityLevelEnum.AUDIT_LEVEL_COARSE;
     }
 
     @PostConstruct
@@ -316,7 +317,11 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
                 if(currentNameValuePair.getParameterName().equalsIgnoreCase(PetasosPropertyConstants.AUDIT_LEVEL_PARAMETER_NAME)){
                     String parameterValue = currentNameValuePair.getParameterValue();
                     PetasosAuditEventGranularityLevelEnum petasosAuditEventGranularityLevelEnum = PetasosAuditEventGranularityLevelEnum.fromDisplayName(parameterValue);
-                    return(petasosAuditEventGranularityLevelEnum);
+                    if(petasosAuditEventGranularityLevelEnum == null){
+                        return(PetasosAuditEventGranularityLevelEnum.AUDIT_LEVEL_COARSE);
+                    } else {
+                        return (petasosAuditEventGranularityLevelEnum);
+                    }
                 }
             }
         }

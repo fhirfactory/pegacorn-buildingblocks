@@ -132,7 +132,8 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressGatekeeperIngres())
 				.routeId(nameSet.getRouteWUPContainerEgressGateway())
 				.process(nodeDetailInjector)
-				.bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange)");
+				.bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange)")
+				.to(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);
 
 	}
 

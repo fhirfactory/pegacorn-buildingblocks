@@ -139,15 +139,23 @@ public abstract class PetasosTaskEndpoint extends JGroupsPetasosEndpointBase {
     }
 
     public boolean taskFulfillerIsInScope(String capabilityProviderServiceName){
+        getLogger().info(".taskFulfillerIsInScope(): Entry, capabilityProviderServiceName->{}", capabilityProviderServiceName);
+
         List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
         if(memberSetBasedOnService.isEmpty()){
+            getLogger().info(".taskFulfillerIsInScope(): Exit, no suitable endpoints to check, returning -false-");
             return(false);
         }
+
+        getLogger().info(".taskFulfillerIsInScope(): Check Intra-Zone Service Availability");
         for(String currentName: memberSetBasedOnService){
             if(isWithinScopeBasedOnChannelName(currentName)){
+                getLogger().info(".taskFulfillerIsInScope(): Exit, found a candidate, returning -true-");
                 return(true);
             }
         }
+
+        getLogger().info(".taskFulfillerIsInScope(): Exit, could not find a candidate, returning -false-");
         return(false);
     }
 

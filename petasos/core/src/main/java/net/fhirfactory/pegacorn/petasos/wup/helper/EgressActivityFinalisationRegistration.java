@@ -79,7 +79,7 @@ public class EgressActivityFinalisationRegistration {
                 synchronized (fulfillmentTask.getTaskJobCardLock()) {
                     fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                 }
-                fulfillmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskId());
+                fulfillmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskJobCard());
                 break;
             }
             case UOW_OUTCOME_INCOMPLETE:
@@ -88,7 +88,7 @@ public class EgressActivityFinalisationRegistration {
                 synchronized (fulfillmentTask.getTaskJobCardLock()){
                     fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
                 }
-                fulfillmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskId());
+                fulfillmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskJobCard());
             }
         }
         LOG.debug(".registerActivityFinishAndFinalisation(): exit, my work is done!");

@@ -21,6 +21,9 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.oam.metrics;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.json.JSONPropertyIgnore;
+
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -66,6 +69,7 @@ public class PetasosComponentMetricSet implements Serializable {
     // Other Helper Methods
     //
 
+    @JsonIgnore
     public PetasosComponentMetric getMetric(String name){
         if(getMetrics().containsKey(name)){
             PetasosComponentMetric foundMetric = getMetrics().get(name);
@@ -74,6 +78,7 @@ public class PetasosComponentMetricSet implements Serializable {
         return(null);
     }
 
+    @JsonIgnore
     public void addMetric(PetasosComponentMetric metric){
         if(metric == null){
             return;

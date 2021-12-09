@@ -119,7 +119,7 @@ public class PetasosInterZoneAuditEndpoint extends PetasosAuditEndpoint {
 
     @Override
     protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
-        getCoreSubsystemPetasosEndpointsWatchdog().setInterzoneIPC(this.getPetasosEndpoint());
+        getCoreSubsystemPetasosEndpointsWatchdog().setInterZoneAudit(this.getPetasosEndpoint());
     }
 
     @Override

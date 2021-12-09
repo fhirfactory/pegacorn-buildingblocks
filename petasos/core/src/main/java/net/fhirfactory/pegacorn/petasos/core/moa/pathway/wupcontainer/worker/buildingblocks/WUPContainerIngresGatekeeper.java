@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,13 +38,11 @@ import java.util.List;
 @ApplicationScoped
 public class WUPContainerIngresGatekeeper {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerIngresGatekeeper.class);
-    private static final String INGRES_GATEKEEPER_PROCESSED_PROPERTY = "IngresGatekeeperSemaphore";
+
     protected Logger getLogger(){
         return(LOG);
     }
 
-    @Inject
-    TopologyIM topologyProxy;
 
     /**
      * This class/method checks the status of the WUPJobCard for the parcel, and ascertains if it is to be

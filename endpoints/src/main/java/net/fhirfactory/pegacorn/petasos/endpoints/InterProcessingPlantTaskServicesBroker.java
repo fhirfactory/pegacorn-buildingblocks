@@ -43,21 +43,23 @@ public class InterProcessingPlantTaskServicesBroker implements PetasosTaskBroker
 
     @Override
     public PetasosActionableTask registerActionableTask(String taskFulfiller, PetasosActionableTask task) {
-        LOG.debug(".registerActionableTask(): Entry, taskFulfiller->{}, task->{}", taskFulfiller, task);
+        LOG.info(".registerActionableTask(): Entry, taskFulfiller->{}, task->{}", taskFulfiller, task);
 
         PetasosActionableTask registeredTask = null;
+        LOG.info(".registerActionableTask(): Check for interzone capability match");
         if(interZoneTaskingEndpoint.taskFulfillerIsInScope(taskFulfiller)){
-            LOG.trace(".registerActionableTask(): Using inter-zone communication framework");
+            LOG.info(".registerActionableTask(): Using inter-zone communication framework");
             registeredTask = interZoneTaskingEndpoint.registerActionableTask(taskFulfiller, task);
         }
+        LOG.info(".registerActionableTask(): Check for intrazone capability match");
         if(intraZoneTaskingEndpoint.taskFulfillerIsInScope(taskFulfiller)){
-            LOG.trace(".registerActionableTask(): Using intra-zone communication framework");
+            LOG.info(".registerActionableTask(): Using intra-zone communication framework");
             registeredTask = intraZoneTaskingEndpoint.registerActionableTask(taskFulfiller, task);
         }
         if(registeredTask == null) {
-            LOG.trace(".executeTask(): Can't find suitable capability provider");
+            LOG.info(".executeTask(): Can't find suitable capability provider");
         }
-        LOG.debug(".executeTask(): Exit, registeredTask->{}", registeredTask);
+        LOG.info(".executeTask(): Exit, registeredTask->{}", registeredTask);
         return(registeredTask);
     }
 
@@ -83,21 +85,21 @@ public class InterProcessingPlantTaskServicesBroker implements PetasosTaskBroker
 
     @Override
     public PetasosActionableTask updateActionableTask(String serviceProviderName, PetasosActionableTask actionableTask) {
-        LOG.debug(".updateActionableTask(): Entry, taskFulfiller->{}, actionableTask->{}", serviceProviderName, actionableTask);
+        LOG.info(".updateActionableTask(): Entry, taskFulfiller->{}, actionableTask->{}", serviceProviderName, actionableTask);
 
         PetasosActionableTask updatedTask = null;
         if(interZoneTaskingEndpoint.taskFulfillerIsInScope(serviceProviderName)){
-            LOG.trace(".updateActionableTask(): Using inter-zone communication framework");
+            LOG.info(".updateActionableTask(): Using inter-zone communication framework");
             updatedTask = interZoneTaskingEndpoint.updateActionableTask(serviceProviderName, actionableTask);
         }
         if(intraZoneTaskingEndpoint.taskFulfillerIsInScope(serviceProviderName)){
-            LOG.trace(".updateActionableTask(): Using intra-zone communication framework");
+            LOG.info(".updateActionableTask(): Using intra-zone communication framework");
             updatedTask = intraZoneTaskingEndpoint.updateActionableTask(serviceProviderName, actionableTask);
         }
         if(updatedTask == null) {
-            LOG.trace(".updateActionableTask(): Can't find suitable capability provider");
+            LOG.info(".updateActionableTask(): Can't find suitable capability provider");
         }
-        LOG.debug(".updateActionableTask(): Exit, updatedTask->{}", updatedTask);
+        LOG.info(".updateActionableTask(): Exit, updatedTask->{}", updatedTask);
         return(updatedTask);
     }
 }
