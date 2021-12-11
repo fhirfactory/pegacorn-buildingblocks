@@ -201,7 +201,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
      * @return
      */
     public PetasosEndpoint probeEndpoint(PetasosEndpointIdentifier targetEndpointID, PetasosEndpoint myEndpoint){
-        getLogger().debug(".probeEndpoint(): Entry, targetEndpointID->{}", targetEndpointID);
+        getLogger().info(".probeEndpoint(): Entry, targetEndpointID->{}", targetEndpointID);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
@@ -210,7 +210,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointChannelName());
             PetasosEndpoint targetPetasosEndpoint = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointHandler", objectSet, classSet, requestOptions);
-            getLogger().debug(".probeEndpoint(): Exit, response->{}", targetPetasosEndpoint);
+            getLogger().info(".probeEndpoint(): Exit, response->{}", targetPetasosEndpoint);
             return(targetPetasosEndpoint);
         } catch (NoSuchMethodException e) {
             getLogger().error(".probeEndpoint(): Error (NoSuchMethodException)->", e);
@@ -227,7 +227,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
      * @return
      */
     public PetasosEndpoint probeEndpointHandler(PetasosEndpoint sourcePetasosEndpoint){
-        getLogger().debug(".probeEndpointHandler(): Entry, sourcePetasosEndpoint->{}", sourcePetasosEndpoint);
+        getLogger().info(".probeEndpointHandler(): Entry, sourcePetasosEndpoint->{}", sourcePetasosEndpoint);
         getEndpointMap().addEndpoint(sourcePetasosEndpoint);
         PetasosEndpoint myEndpoint = SerializationUtils.clone(getPetasosEndpoint());
         myEndpoint.setEndpointStatus(getCoreSubsystemPetasosEndpointsWatchdog().getAggregatePetasosEndpointStatus());
@@ -333,7 +333,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         return(inScope);
     }
 
-
+/*
     protected boolean isWithinScopeOfEndpoint(PetasosEndpointIdentifier endpointID) {
         boolean sameZone = endpointID.getEndpointZone().equals(getPetasosEndpoint().getEndpointID().getEndpointZone());
         boolean sameSite = endpointID.getEndpointSite().contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
@@ -355,9 +355,11 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         }
         return(doSubscription);
     }
-
+*/
     protected boolean isWithinScopeBasedOnChannelName(String endpointChannelName) {
         getLogger().info(".isWithinScopeBasedOnChannelName(): Entry, endpointChannelName->{}", endpointChannelName);
+        getLogger().info("--->DEBUGGING ONLY-->getPetasosEndpoint()-->{}", getPetasosEndpoint());
+        getLogger().info("--->DEBUGGING ONLY-->getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName)-->{}",getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName));
         boolean sameSite = getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
         getLogger().info(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Site.... result->{}", sameSite);
         boolean sameZone = getEndpointNameUtilities().getEndpointZoneFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointZone().getDisplayName());
@@ -417,7 +419,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     //
 
     protected EndpointNodeList probeEndpointTopologyDetail(PetasosEndpointIdentifier targetEndpointID){
-        getLogger().debug(".probeEndpointTopologyDetail(): Entry, targetEndpointID->{}", targetEndpointID);
+        getLogger().info(".probeEndpointTopologyDetail(): Entry, targetEndpointID->{}", targetEndpointID);
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
@@ -426,7 +428,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Address endpointAddress = getTargetMemberAddress(targetEndpointID.getEndpointChannelName());
             EndpointNodeList nodeList = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeEndpointTopologyDetailHandler", objectSet, classSet, requestOptions);
-            getLogger().debug(".probeEndpointTopologyDetail(): Exit, response->{}", nodeList);
+            getLogger().info(".probeEndpointTopologyDetail(): Exit, response->{}", nodeList);
             return(nodeList);
         } catch (NoSuchMethodException e) {
             getLogger().error(".probeEndpointTopologyDetail(): Error (NoSuchMethodException)->", e);
@@ -438,7 +440,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
     }
 
     public EndpointNodeList probeEndpointTopologyDetailHandler(String sourceForRequest) {
-        getLogger().debug(".probeEndpointTopologyDetailHandler(): Entry, sourceForRequest->{}", sourceForRequest);
+        getLogger().info(".probeEndpointTopologyDetailHandler(): Entry, sourceForRequest->{}", sourceForRequest);
         EndpointNodeList myNodeList = new EndpointNodeList();
         myNodeList.getNodeList().addAll(topologyIM.getNodeElementSet());
         return(myNodeList);

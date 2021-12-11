@@ -215,7 +215,7 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
         List<String> memberNameList = new ArrayList<>();
         List<PetasosAdapterAddress> allGroupMembers = getAllClusterMemberAdapterAddresses();
         for (PetasosAdapterAddress currentAddress : allGroupMembers) {
-            String currentMemberName = currentAddress.toString();
+            String currentMemberName = currentAddress.getAddressName();
             memberNameList.add(currentMemberName);
         }
         getLogger().info(".getAllClusterMembers(): Exit");

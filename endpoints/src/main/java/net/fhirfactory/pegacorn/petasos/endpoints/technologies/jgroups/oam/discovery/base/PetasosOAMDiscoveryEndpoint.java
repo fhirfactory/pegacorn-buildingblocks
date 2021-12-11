@@ -91,10 +91,12 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
 
     @Override
     public void interfaceAdded(PetasosAdapterAddress addedInterface){
+        getLogger().info(".interfaceAdded(): Entry, addedInterface->{}", addedInterface);
         boolean itIsAnotherInstanceOfMe = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(addedInterface.getAddressName()).contentEquals(getEndpointServiceName());
         boolean itIsSameType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(addedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
         boolean isWithinScope = isWithinScopeBasedOnChannelName(addedInterface.getAddressName());
         if(isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType) {
+            getLogger().debug(".interfaceAdded(): isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType");
             PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
             String endpointChannelName = addedInterface.getAddressName();
             endpointID.setEndpointName(getEndpointNameUtilities().buildEndpointNameFromChannelName(endpointChannelName));
@@ -107,14 +109,17 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             getEndpointMap().scheduleEndpointCheck(endpointID, false, true);
             scheduleEndpointValidation();
         }
+        getLogger().debug(".interfaceAdded(): Exit");
     }
 
     @Override
     public void interfaceRemoved(PetasosAdapterAddress removedInterface){
+        getLogger().info(".interfaceRemoved(): Entry, removedInterface->{}", removedInterface);
         boolean itIsAnotherInstanceOfMe = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(removedInterface.getAddressName()).contentEquals(getEndpointServiceName());
         boolean itIsSameType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(removedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
         boolean isWithinScope = isWithinScopeBasedOnChannelName(removedInterface.getAddressName());
         if(isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType) {
+            getLogger().trace(".interfaceRemoved(): isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType");
             PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
             String endpointChannelName = removedInterface.getAddressName();
             endpointID.setEndpointName(getEndpointNameUtilities().buildEndpointNameFromChannelName(endpointChannelName));
@@ -127,6 +132,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
             getEndpointMap().scheduleEndpointCheck(endpointID, true, false);
             scheduleEndpointValidation();
         }
+        getLogger().debug(".interfaceRemoved(): Exit");
     }
 
     public void interfaceSuspect(PetasosAdapterAddress suspectInterface){
@@ -159,15 +165,19 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
     //
 
     public boolean discoveryServiceProviderIsInScope(String capabilityProviderServiceName){
+        getLogger().debug(".discoveryServiceProviderIsInScope(): Entry, capabilityProviderServiceName->{}", capabilityProviderServiceName);
         List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
         if(memberSetBasedOnService.isEmpty()){
+            getLogger().debug(".discoveryServiceProviderIsInScope(): Exit, memberSetBasedOnService is empty, returning -false-");
             return(false);
         }
         for(String currentName: memberSetBasedOnService){
             if(isWithinScopeBasedOnChannelName(currentName)){
+                getLogger().debug(".discoveryServiceProviderIsInScope(): Exit, found match, returning -true-");
                 return(true);
             }
         }
+        getLogger().debug(".discoveryServiceProviderIsInScope(): Exit, no match found, returning -false-");
         return(false);
     }
 

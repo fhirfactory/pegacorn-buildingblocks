@@ -25,9 +25,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-public class TaskOutcomeStatusType  {
+public class TaskOutcomeStatusType implements Serializable {
 
     private ActionableTaskOutcomeStatusEnum outcomeStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)

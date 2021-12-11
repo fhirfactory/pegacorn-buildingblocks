@@ -174,7 +174,7 @@ public class InterZoneRepeater{
     private void eventLoop(){
         while(true) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(300000);
                 petasosServices.updateDate();
                 printSomeStatistics();
             } catch (InterruptedException e) {
@@ -184,34 +184,34 @@ public class InterZoneRepeater{
     }
 
     public void printSomeStatistics(){
-        getLogger().debug(".printSomeStatistics(): Print Details(" + Date.from(Instant.now()).toString() +")");
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater IPC---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterIPC().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterIPC().dumpRoutingTable());
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater Topology---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterTopology().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterTopology().dumpRoutingTable());
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater Subscriptions---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterSubscriptions().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterSubscriptions().dumpRoutingTable());
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater Metrics---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterMetrics().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterMetrics().dumpRoutingTable());
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater Interception---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterInterception().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterInterception().dumpRoutingTable());
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater Infinispan---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterInfinispan().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterInfinispan().dumpRoutingTable());
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater Audit---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterAudit().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterAudit().dumpRoutingTable());
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater Tasking---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterTasking().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterTasking().dumpRoutingTable());
-        getLogger().debug(".printSomeStatistics(): ---Interzone Repeater Datagrid---");
-        getLogger().debug(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterDatagrid().dumpAddresssMappings());
-        getLogger().debug(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterDatagrid().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): Print Details(" + Date.from(Instant.now()).toString() +")");
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater IPC---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterIPC().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterIPC().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Topology---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterTopology().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterTopology().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Subscriptions---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterSubscriptions().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterSubscriptions().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Metrics---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterMetrics().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterMetrics().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Interception---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterInterception().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterInterception().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Infinispan---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterInfinispan().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterInfinispan().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Audit---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterAudit().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterAudit().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Tasking---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterTasking().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterTasking().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Datagrid---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterDatagrid().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterDatagrid().dumpRoutingTable());
     }
 
     //

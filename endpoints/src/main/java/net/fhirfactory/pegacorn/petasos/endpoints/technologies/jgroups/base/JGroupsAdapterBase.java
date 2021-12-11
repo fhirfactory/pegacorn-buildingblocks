@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class JGroupsAdapterBase implements MembershipListener {
 
@@ -93,12 +94,25 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
                 getLogger().info("Visible Member->{}", currentAddress);
             }
         }
-        getLogger().trace(".viewAccepted(): Checking PubSub Participants");
+        //
+        // A Report
+        //
+        if(getIPCChannel() != null) {
+            getLogger().info(".viewAccepted(): -------- Starting Channel Report -------");
+            String channelProperties = getIPCChannel().getProperties();
+            getLogger().info(".viewAccepted(): Properties->{}", channelProperties);
+            String jchannelState = getIPCChannel().getState();
+            getLogger().info(".viewAccepted(): State->{}", jchannelState);
+            getLogger().info(".viewAccepted(): -------- End Channel Report -------");
+        }
+        //
+        // Handle View Change
+        getLogger().info(".viewAccepted(): Checking PubSub Participants");
         List<PetasosAdapterAddress> removals = getMembershipRemovals(previousScannedMembership, currentScannedMembership);
         List<PetasosAdapterAddress> additions = getMembershipAdditions(previousScannedMembership, currentScannedMembership);
-        getLogger().trace(".viewAccepted(): Changes(MembersAdded->{}, MembersRemoved->{}", additions.size(), removals.size());
+        getLogger().info(".viewAccepted(): Changes(MembersAdded->{}, MembersRemoved->{}", additions.size(), removals.size());
         for(PetasosAdapterDeltasInterface currentActionInterface: this.membershipEventListeners){
-            getLogger().trace(".viewAccepted(): Iterating through ActionInterfaces");
+            getLogger().info(".viewAccepted(): Iterating through ActionInterfaces");
             for(PetasosAdapterAddress currentAddedElement: additions){
                 currentActionInterface.interfaceAdded(currentAddedElement);
             }
@@ -106,8 +120,8 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
                 currentActionInterface.interfaceRemoved(currentRemovedElement);
             }
         }
-        getLogger().trace(".viewAccepted(): PubSub Participants check completed");
-        getLogger().debug(".viewAccepted(): Exit");
+        getLogger().info(".viewAccepted(): PubSub Participants check completed");
+        getLogger().info(".viewAccepted(): Exit");
     }
 
     @Override
@@ -180,6 +194,7 @@ public abstract class JGroupsAdapterBase implements MembershipListener {
             this.setIPCChannel(newChannel);
             this.setRPCDispatcher(newRPCDispatcher);
             getLogger().trace(".establishJChannel(): Exit, JChannel & RPCDispatcher created");
+
             return;
         } catch (Exception e) {
             getLogger().error(".establishJChannel(): Cannot establish JGroups Channel, error->", e);

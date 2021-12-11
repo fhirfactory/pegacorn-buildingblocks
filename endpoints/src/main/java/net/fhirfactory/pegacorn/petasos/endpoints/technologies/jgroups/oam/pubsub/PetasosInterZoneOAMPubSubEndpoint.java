@@ -95,7 +95,7 @@ public class PetasosInterZoneOAMPubSubEndpoint extends PetasosOAMPubSubEndpoint 
 
     @Override
     protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlantInterface().getProcessingPlantNode().getInterZoneTopologyStackConfigFile());
+        return (getProcessingPlantInterface().getProcessingPlantNode().getInterZoneSubscriptionsStackConfigFile());
     }
 
     @Override

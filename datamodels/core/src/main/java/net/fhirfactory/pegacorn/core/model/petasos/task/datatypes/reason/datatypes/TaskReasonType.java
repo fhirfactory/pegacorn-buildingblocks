@@ -24,7 +24,9 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.dataty
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.valuesets.TaskReasonTypeEnum;
 
-public class TaskReasonType {
+import java.io.Serializable;
+
+public class TaskReasonType implements Serializable {
     private TaskReasonTypeEnum reasonType;
 
     //

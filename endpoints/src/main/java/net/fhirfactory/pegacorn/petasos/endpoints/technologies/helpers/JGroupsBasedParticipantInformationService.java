@@ -62,6 +62,7 @@ public class JGroupsBasedParticipantInformationService {
     private StandardEdgeIPCEndpoint myIntraZoneTopologyEndpoint;
     private StandardEdgeIPCEndpoint myInterZoneTopologyEndpoint;
     private boolean initialised;
+
     private String myIntraZoneIPCEndpointName;
     private String myInterZoneIPCEndpointName;
     private String myIntraZoneSubscriptionsEndpointName;
@@ -76,6 +77,7 @@ public class JGroupsBasedParticipantInformationService {
     private String myInterZoneTaskingEndpointName;
     private String myIntraZoneMetricsEndpointName;
     private String myInterZoneMetricsEndpointName;
+
     private String myIntraZoneIPCEndpointAddressName;
     private String myInterZoneIPCEndpointAddressName;
     private String myIntraZoneSubscriptionsEndpointAddressName;
@@ -115,8 +117,6 @@ public class JGroupsBasedParticipantInformationService {
     private static String INTRAZONE_AUDIT_GROUP_NAME = "IntraZone.Audit";
     private static String INTERZONE_IPC_GROUP_NAME = "InterZone.IPC";
     private static String INTRAZONE_IPC_GROUP_NAME = "IntraZone.IPC";
-    private static String INTRASITE_OAM_GROUP_NAME = "IntraSite.OAM";
-    private static String INTRASITE_IPC_GROUP_NAME = "IntraSite.IPC";
 
     private static Long ENDPOINT_VALIDATION_START_DELAY = 30000L;
     private static Long ENDPOINT_VALIDATION_PERIOD = 10000L;
@@ -529,14 +529,6 @@ public class JGroupsBasedParticipantInformationService {
 
     public String getIntrazoneIpcGroupName() {
         return INTRAZONE_IPC_GROUP_NAME;
-    }
-
-    public String getIntrasiteOamGroupName() {
-        return INTRASITE_OAM_GROUP_NAME;
-    }
-
-    public String getIntrasiteIpcGroupName() {
-        return INTRASITE_IPC_GROUP_NAME;
     }
 
     public String getInstanceQualifier(){
