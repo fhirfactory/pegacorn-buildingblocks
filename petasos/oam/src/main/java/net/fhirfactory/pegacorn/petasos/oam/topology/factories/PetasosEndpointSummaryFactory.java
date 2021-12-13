@@ -68,9 +68,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
             }
         }
         switch(endpointTopologyNode.getEndpointType()){
-            case EDGE_JGROUPS_INTRAZONE_SERVICE:
-            case EDGE_JGROUPS_INTERZONE_SERVICE:
-            case EDGE_JGROUPS_INTERSITE_SERVICE:{
+            case EDGE_JGROUPS_MESSAGING_SERVICE: {
                 IPCServerTopologyEndpoint jgroupsEndpoint = (IPCServerTopologyEndpoint)endpointTopologyNode;
                 JGroupsAdapter currentAdapter = (JGroupsAdapter) jgroupsEndpoint.getAdapterList().get(0);
                 PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();

@@ -19,35 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.interception.base;
+package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam;
 
+import net.fhirfactory.pegacorn.core.interfaces.interception.PetasosInterceptionBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.interception.PetasosInterceptionHandlerInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
-import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r4.model.AuditEvent;
-import org.hl7.fhir.r4.model.IdType;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public abstract class PetasosInterceptionEndpoint extends JGroupsPetasosEndpointBase {
+@ApplicationScoped
+public class PetasosOAMInterceptionEndpoint extends JGroupsPetasosEndpointBase implements PetasosInterceptionBrokerInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosOAMInterceptionEndpoint.class);
 
     @Produce
     private ProducerTemplate camelProducer;
@@ -56,10 +56,10 @@ public abstract class PetasosInterceptionEndpoint extends JGroupsPetasosEndpoint
     PetasosInterceptionHandlerInterface interceptionHandler;
 
     //
-    // Constructor
+    // Constructor(s)
     //
 
-    public PetasosInterceptionEndpoint(){
+    public PetasosOAMInterceptionEndpoint(){
         super();
     }
 
@@ -71,6 +71,98 @@ public abstract class PetasosInterceptionEndpoint extends JGroupsPetasosEndpoint
     protected void executePostConstructActivities() {
 
     }
+
+    //
+    // Getters (and Setters)
+    //
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    protected ProducerTemplate getCamelProducer(){
+        return(camelProducer);
+    }
+
+    @Override
+    protected String specifyIPCInterfaceName() {
+        return (getInterfaceNames().getPetasosInterceptionEndpointName());
+    }
+
+    @Override
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_MESSAGING_SERVICE);
+    }
+
+    @Override
+    protected String specifyJGroupsStackFileName() {
+        return (getProcessingPlantInterface().getProcessingPlantNode().getPetasosInterceptionStackConfigFile());
+    }
+
+    @Override
+    protected PetasosEndpointIdentifier specifyEndpointID() {
+        PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
+        endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
+        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getPetasosInterceptionGroupName());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getPetasosInterceptionGroupName();
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
+        return(endpointID);
+    }
+
+    @Override
+    protected String specifyEndpointServiceName() {
+        return (getProcessingPlantInterface().getIPCServiceName());
+    }
+
+    @Override
+    protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_INTERCEPTION_ENDPOINT);
+    }
+
+    @Override
+    protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_INTERCEPTION);
+    }
+
+    @Override
+    protected void resolveTopologyEndpoint() {
+        setTopologyNode(getJgroupsParticipantInformationService().getMyPetasosTopologyEndpoint());
+    }
+
+    @Override
+    protected PubSubParticipant specifyPubSubParticipant() {
+        PubSubParticipant myIntraZoneParticipantRole = getJgroupsParticipantInformationService().getMyPetasosParticipantRole();
+        if(myIntraZoneParticipantRole == null){
+            myIntraZoneParticipantRole = getJgroupsParticipantInformationService().buildMyPetasosParticipantRole(getPetasosEndpoint());
+        }
+        return (myIntraZoneParticipantRole);
+    }
+
+    @Override
+    protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
+        getCoreSubsystemPetasosEndpointsWatchdog().setPetasosInterceptionServicesEndpoint(this.getPetasosEndpoint());
+    }
+
+    //
+    // Business Methods
+    //
 
     public List<Address> getInterceptionCollectorTargetAddressSet(String endpointServiceName){
         getLogger().debug(".getInterceptionCollectorTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
@@ -107,23 +199,11 @@ public abstract class PetasosInterceptionEndpoint extends JGroupsPetasosEndpoint
     }
 
 
-    public boolean interceptionCollectorIsInScope(String capabilityProviderServiceName){
-        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
-        if(memberSetBasedOnService.isEmpty()){
-            return(false);
-        }
-        for(String currentName: memberSetBasedOnService){
-            if(isWithinScopeBasedOnChannelName(currentName)){
-                return(true);
-            }
-        }
-        return(false);
-    }
-
     //
     // Interception Methods
     //
 
+    @Override
     public PetasosFulfillmentTask redirectFulfillmentTask(String collectorServiceName, PetasosFulfillmentTask task){
         getLogger().trace(".redirectFulfillmentTask(): Entry, collectorServiceName->{}, event->{}", collectorServiceName, task);
         PetasosEndpointIdentifier endpointIdentifier = getEndpointID();
@@ -157,14 +237,5 @@ public abstract class PetasosInterceptionEndpoint extends JGroupsPetasosEndpoint
         }
         getLogger().debug(".redirectFulfillmentTaskHandler(): Exit, redirectedTaskOutcome->{}", redirectedTaskOutcome);
         return(redirectedTaskOutcome);
-    }
-
-    //
-    // Getters (and Setters)
-    //
-
-
-    public ProducerTemplate getCamelProducer() {
-        return camelProducer;
     }
 }

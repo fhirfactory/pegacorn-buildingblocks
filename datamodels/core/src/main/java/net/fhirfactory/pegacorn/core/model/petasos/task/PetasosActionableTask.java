@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
@@ -154,19 +155,19 @@ public class PetasosActionableTask extends PetasosTask{
     @Override
     public String toString() {
         return "PetasosActionableTask{" +
-                "taskFulfillment=" + taskFulfillment +
-                ", sourceResourceId=" + getSourceResourceId() +
-                ", taskCompletionSummary=" + taskCompletionSummary +
-                ", taskId=" + getTaskId() +
-                ", taskType=" + getTaskType() +
-                ", taskWorkItem=" + getTaskWorkItem() +
-                ", taskTraceability=" + getTaskTraceability() +
-                ", taskOutcomeStatus=" + getTaskOutcomeStatus() +
-                ", registered=" + isRegistered() +
-                ", taskPerformerTypes=" + getTaskPerformerTypes() +
-                ", taskReason=" + getTaskReason() +
-                ", taskNodeAffinity=" + getTaskNodeAffinity() +
-                ", taskMetadata=" + getTaskContext() +
+                "  taskFulfillment=" + taskFulfillment + ",\n" +
+                "  sourceResourceId=" + getSourceResourceId() + ",\n" +
+                "  taskCompletionSummary=" + taskCompletionSummary + ",\n" +
+                "  taskId=" + getTaskId() + ",\n" +
+                "  taskType=" + getTaskType() + ",\n" +
+                "  taskWorkItem=" + getTaskWorkItem() + ",\n" +
+                "  taskTraceability=" + getTaskTraceability() + ",\n" +
+                "  taskOutcomeStatus=" + getTaskOutcomeStatus() + ",\n" +
+                "  registered=" + isRegistered() + ",\n" +
+                "  taskPerformerTypes=" + getTaskPerformerTypes() + ",\n" +
+                "  taskReason=" + getTaskReason() + ",\n" +
+                "  taskNodeAffinity=" + getTaskNodeAffinity() + ",\n" +
+                "  taskMetadata=" + getTaskContext() + ",\n" +
                 '}';
     }
 }

@@ -13,13 +13,13 @@
     <parent>
         <groupId>net.fhirfactory.pegacorn</groupId>
         <artifactId>pegacorn-buildingblocks-petasos</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>pegacorn-buildingblocks-petasos-oam</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Platform :: Petasos :: OAM</name>
+    <name>Pegacorn :: Building Blocks :: Petasos :: OAM</name>
     <description>The Operations, Administration and Maintenance Serivces</description>
 
     <!--***********************************************************************************-->

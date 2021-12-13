@@ -36,7 +36,6 @@ public class PetasosEndpoint implements Serializable {
     private Endpoint representativeFHIREndpoint;
     private PetasosEndpointStatusEnum endpointStatus;
     private PetasosEndpointFunctionTypeEnum interfaceFunction;
-    private PetasosEndpointChannelScopeEnum endpointScope;
 
     public PetasosEndpoint(){
         this.endpointID = null;
@@ -45,7 +44,6 @@ public class PetasosEndpoint implements Serializable {
         this.endpointStatus = null;
         this.interfaceFunction = null;
         this.endpointDescription = null;
-        this.endpointScope = null;
     }
 
     public PetasosEndpoint(PetasosEndpoint ori){
@@ -55,15 +53,6 @@ public class PetasosEndpoint implements Serializable {
         this.setRepresentativeFHIREndpoint(ori.getRepresentativeFHIREndpoint());
         this.setInterfaceFunction(ori.getInterfaceFunction());
         this.setEndpointServiceName(ori.getEndpointServiceName());
-        this.setEndpointScope(ori.getEndpointScope());
-    }
-
-    public PetasosEndpointChannelScopeEnum getEndpointScope() {
-        return endpointScope;
-    }
-
-    public void setEndpointScope(PetasosEndpointChannelScopeEnum endpointScope) {
-        this.endpointScope = endpointScope;
     }
 
     public PetasosEndpointFunctionTypeEnum getInterfaceFunction() {
@@ -124,7 +113,6 @@ public class PetasosEndpoint implements Serializable {
                 ", representativeFHIREndpoint=" + representativeFHIREndpoint +
                 ", endpointStatus=" + endpointStatus +
                 ", interfaceFunction=" + interfaceFunction +
-                ", endpointScope=" + endpointScope +
                 '}';
     }
 
@@ -133,12 +121,12 @@ public class PetasosEndpoint implements Serializable {
         if (this == o) return true;
         if (!(o instanceof PetasosEndpoint)) return false;
         PetasosEndpoint that = (PetasosEndpoint) o;
-        return Objects.equals(getEndpointID(), that.getEndpointID()) && Objects.equals(getEndpointServiceName(), that.getEndpointServiceName()) && Objects.equals(getEndpointDescription(), that.getEndpointDescription()) && Objects.equals(getRepresentativeFHIREndpoint(), that.getRepresentativeFHIREndpoint()) && getEndpointStatus() == that.getEndpointStatus() && getInterfaceFunction() == that.getInterfaceFunction() && getEndpointScope() == that.getEndpointScope();
+        return Objects.equals(getEndpointID(), that.getEndpointID()) && Objects.equals(getEndpointServiceName(), that.getEndpointServiceName()) && Objects.equals(getEndpointDescription(), that.getEndpointDescription()) && Objects.equals(getRepresentativeFHIREndpoint(), that.getRepresentativeFHIREndpoint()) && getEndpointStatus() == that.getEndpointStatus() && getInterfaceFunction() == that.getInterfaceFunction();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getEndpointID(), getEndpointServiceName(), getEndpointDescription(), getRepresentativeFHIREndpoint(), getEndpointStatus(), getInterfaceFunction(), getEndpointScope());
+        return Objects.hash(getEndpointID(), getEndpointServiceName(), getEndpointDescription(), getRepresentativeFHIREndpoint(), getEndpointStatus(), getInterfaceFunction());
     }
 
     public PetasosEndpoint encrichPetasosEndpoint(PetasosEndpoint ori){
@@ -162,9 +150,6 @@ public class PetasosEndpoint implements Serializable {
         }
         if(!StringUtils.isEmpty(ori.getEndpointDescription()) && StringUtils.isEmpty(this.getEndpointDescription())){
             this.setEndpointDescription(ori.getEndpointDescription());
-        }
-        if((ori.getEndpointID() != null) && (this.getEndpointScope() == null)){
-            this.setEndpointScope(ori.getEndpointScope());
         }
         if((ori.getRepresentativeFHIREndpoint() != null) && (this.getRepresentativeFHIREndpoint() == null)){
             this.setRepresentativeFHIREndpoint(ori.getRepresentativeFHIREndpoint());

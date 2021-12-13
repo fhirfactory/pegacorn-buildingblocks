@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.messaging.forward.common;
+package net.fhirfactory.pegacorn.platform.edge.messaging.forward;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
@@ -28,23 +28,36 @@ import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubPa
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.RemoteSubscriptionStatus;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.subscriptions.manager.DataParcelSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base.PetasosIPCEndpoint;
-import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverResponseProcessingBean;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIPCMessagingEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
+import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverResponseProcessingBean;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.PetasosEdgeMessageForwarderService;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWUP {
+@ApplicationScoped
+public class PetasosEdgeMessageForwardWUPMessage extends EdgeEgressMessagingGatewayWUP implements PetasosEdgeMessageForwarderService {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosEdgeMessageForwardWUPMessage.class);
+
+    private static String WUP_VERSION = "1.0.0";
+
+    @Inject
+    private PetasosIPCMessagingEndpoint petasosMessagingEndpoint;
 
     @Inject
     private EdgeWorkshop edgeWorkshop;
@@ -60,11 +73,105 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
         return (edgeWorkshop);
     }
 
-    protected abstract String specifyIPCZoneType();
-    protected abstract PetasosIPCEndpoint specifyIPCEndpoint();
+
+    protected PetasosIPCMessagingEndpoint getPetasosMessagingEndpoint() {
+        return (petasosMessagingEndpoint);
+    }
 
     //
-    // Application Logic (Route Definition)
+    // Getters and Setters
+    //
+
+    public PegacornIPCCommonValues getIPCComponentNames() {
+        return ipcFunctionalityNames;
+    }
+
+    public DataParcelSubscriptionMapIM getTopicServer(){
+        return(this.topicServer);
+    }
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    //
+    // WUP Specification
+    //
+
+    @Override
+    protected MessageBasedWUPEndpoint specifyEgressEndpoint() {
+        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
+        assignEgressTopologyEndpoint();
+        egressEndpoint.setEndpointTopologyNode(getAssociatedEgressTopologyEndpoint());
+        egressEndpoint.setEndpointSpecification(getIPCComponentNames().getInterZoneIPCForwarderRouteEndpointName());
+        egressEndpoint.setFrameworkEnabled(false);
+        return(egressEndpoint);
+    }
+
+    @Override
+    protected List<DataParcelManifest> specifySubscriptionTopics() {
+        List<DataParcelManifest> subscriptionList = new ArrayList<>();
+        return (subscriptionList);
+    }
+
+    @Override
+    protected List<DataParcelManifest> declarePublishedTopics() {
+        return (new ArrayList<>());
+    }
+
+    @Override
+    protected String specifyWUPInstanceName() {
+        return (this.getClass().getSimpleName());
+    }
+
+    @Override
+    protected String specifyWUPInstanceVersion() {
+        return (WUP_VERSION);
+    }
+
+    @Override
+    protected String specifyEgressInterfaceName() {
+        return (getInterfaceNames().getPetasosIPCMessagingEndpointName());
+    }
+
+    @Override
+    protected IPCAdapterDefinition specifyEgressInterfaceDefinition() {
+        IPCAdapterDefinition interfaceDefinition = new IPCAdapterDefinition();
+        interfaceDefinition.setInterfaceFormalName(getIPCComponentNames().getJGroupsInterzoneRepeaterClientInterfaceType());
+        interfaceDefinition.setInterfaceFormalVersion("1.0.0");
+        return (interfaceDefinition);
+    }
+
+    @Override
+    public WorkUnitProcessorSoftwareComponent getWUPTopologyNode() {
+        return (getAssociatedTopologyNode());
+    }
+
+    @Override
+    public RemoteSubscriptionStatus subscribeOnBehalfOfRemoteSubscriber(List<DataParcelManifest> contentSubscriptionList, PubSubParticipant subscriber) {
+        RemoteSubscriptionStatus status = this.subscribeToDataParcelSet(contentSubscriptionList, subscriber);
+        return(status);
+    }
+
+    @Override
+    public boolean supportsMultiSiteIPC() {
+        return (true);
+    }
+
+    @Override
+    public boolean supportsMultiZoneIPC() {
+        return (true);
+    }
+
+    @Override
+    public boolean supportsIntraZoneIPC() {
+        return (true);
+    }
+
+
+    //
+    // Route
     //
 
     private String getWUPContinuityRoute() {
@@ -90,44 +197,10 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         InterProcessingPlantHandoverPacket packet = exchange.getIn().getBody(InterProcessingPlantHandoverPacket.class);
-                        InterProcessingPlantHandoverResponsePacket response = getIPCEndpoint().sendIPCMessage(packet.getTarget(), packet);
+                        InterProcessingPlantHandoverResponsePacket response = getPetasosMessagingEndpoint().sendIPCMessage(packet.getTarget(), packet);
                         exchange.getIn().setBody(response);
                     }
                 });
-    }
-
-    //
-    // Application Logic (Establishing WUP)
-    //
-
-    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTRAZONE_SERVICE);
-    }
-
-    @Override
-    public void executePostInitialisationActivities(){
-        this.getIPCEndpoint().initialise();
-    }
-
-    @Override
-    protected List<DataParcelManifest> declarePublishedTopics() {
-        return (new ArrayList<>());
-    }
-
-    //
-    // Getters and Setters
-    //
-
-    public PegacornIPCCommonValues getIPCComponentNames() {
-        return ipcFunctionalityNames;
-    }
-
-    public DataParcelSubscriptionMapIM getTopicServer(){
-        return(this.topicServer);
-    }
-
-    protected PetasosIPCEndpoint getIPCEndpoint(){
-        return(specifyIPCEndpoint());
     }
 
     //
@@ -157,5 +230,4 @@ public abstract class EdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWU
         getLogger().debug(".contentSubscriptionList(): Exit, okStatus->{}", okStatus);
         return (okStatus);
     }
-
 }

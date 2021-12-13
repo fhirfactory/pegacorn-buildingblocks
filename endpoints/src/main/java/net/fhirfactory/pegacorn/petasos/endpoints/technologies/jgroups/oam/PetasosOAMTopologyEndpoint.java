@@ -1,14 +1,36 @@
-package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.base;
+/*
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubPublisherRegistration;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.*;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.subscriptions.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.datatypes.PetasosEndpointCheckScheduleElement;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.common.PetasosAdapterDeltasInterface;
@@ -18,7 +40,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,7 +51,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpointBase implements PetasosAdapterDeltasInterface {
+@ApplicationScoped
+public class PetasosOAMTopologyEndpoint extends JGroupsPetasosEndpointBase implements PetasosAdapterDeltasInterface, PetasosTopologyBrokerInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosOAMTopologyEndpoint.class);
 
     private boolean endpointCheckScheduled;
 
@@ -41,11 +68,13 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
     @Inject
     private PetasosTopologyHandlerInterface topologyHandler;
 
+
+
     //
     // Constructor
     //
 
-    public PetasosOAMDiscoveryEndpoint(){
+    public PetasosOAMTopologyEndpoint(){
         super();
         endpointCheckScheduled = false;
     }
@@ -80,6 +109,107 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         return (distributedPubSubSubscriptionMapIM);
     }
 
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    //
+    // Endpoint Definition
+    //
+
+    @Override
+    protected PetasosEndpointIdentifier specifyEndpointID() {
+        PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
+        endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
+        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getPetasosTopologyServicesGroupName());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getPetasosTopologyServicesGroupName();
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
+        return(endpointID);
+    }
+
+    @Override
+    protected String specifyEndpointServiceName() {
+        return (getProcessingPlantInterface().getIPCServiceName());
+    }
+
+    @Override
+    protected String specifyIPCInterfaceName() {
+        return (getInterfaceNames().getPetasosTopologyServicesEndpointName());
+    }
+
+    @Override
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_MESSAGING_SERVICE);
+    }
+
+    @Override
+    protected String specifyJGroupsStackFileName() {
+        return (getProcessingPlantInterface().getProcessingPlantNode().getPetasosTopologyStackConfigFile());
+    }
+
+    @Override
+    protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT);
+    }
+
+    @Override
+    protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_TOPOLOGY);
+    }
+
+    @Override
+    protected void resolveTopologyEndpoint() {
+        setTopologyNode(getJgroupsParticipantInformationService().getMyPetasosTopologyEndpoint());
+    }
+
+    @Override
+    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID) {
+        if(endpointID == null){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        }
+        if(StringUtils.isEmpty(endpointID.getEndpointName())){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        }
+        String targetService = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(endpointID.getEndpointName());
+        String myServiceName = getEndpointServiceName();
+        if(targetService.contentEquals(myServiceName)){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_SAME);
+        }
+        PetasosEndpoint petasosEndpoint = probeEndpoint(endpointID, getPetasosEndpoint());
+        if(petasosEndpoint == null){
+            return(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE);
+        } else {
+            return (petasosEndpoint.getEndpointStatus());
+        }
+    }
+
+    @Override
+    protected PubSubParticipant specifyPubSubParticipant() {
+        return (getJgroupsParticipantInformationService().getMyPetasosParticipantRole());
+    }
+
+    @Override
+    protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
+        getCoreSubsystemPetasosEndpointsWatchdog().setPetasosOAMDiscoveryEndpoint(this.getPetasosEndpoint());
+    }
+
     //
     // Endpoint Discovery
     //
@@ -94,9 +224,8 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         getLogger().info(".interfaceAdded(): Entry, addedInterface->{}", addedInterface);
         boolean itIsAnotherInstanceOfMe = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(addedInterface.getAddressName()).contentEquals(getEndpointServiceName());
         boolean itIsSameType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(addedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
-        boolean isWithinScope = isWithinScopeBasedOnChannelName(addedInterface.getAddressName());
-        if(isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType) {
-            getLogger().debug(".interfaceAdded(): isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType");
+        if(!itIsAnotherInstanceOfMe && itIsSameType) {
+            getLogger().debug(".interfaceAdded(): !itIsAnotherInstanceOfMe && itIsSameType");
             PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
             String endpointChannelName = addedInterface.getAddressName();
             endpointID.setEndpointName(getEndpointNameUtilities().buildEndpointNameFromChannelName(endpointChannelName));
@@ -117,9 +246,8 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         getLogger().info(".interfaceRemoved(): Entry, removedInterface->{}", removedInterface);
         boolean itIsAnotherInstanceOfMe = getEndpointNameUtilities().getEndpointServiceNameFromEndpointName(removedInterface.getAddressName()).contentEquals(getEndpointServiceName());
         boolean itIsSameType = getEndpointNameUtilities().getEndpointFunctionFromChannelName(removedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
-        boolean isWithinScope = isWithinScopeBasedOnChannelName(removedInterface.getAddressName());
-        if(isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType) {
-            getLogger().trace(".interfaceRemoved(): isWithinScope && !itIsAnotherInstanceOfMe && itIsSameType");
+        if(!itIsAnotherInstanceOfMe && itIsSameType) {
+            getLogger().trace(".interfaceRemoved(): !itIsAnotherInstanceOfMe && itIsSameType");
             PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
             String endpointChannelName = removedInterface.getAddressName();
             endpointID.setEndpointName(getEndpointNameUtilities().buildEndpointNameFromChannelName(endpointChannelName));
@@ -161,27 +289,6 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
     }
 
     //
-    // Simple Helper
-    //
-
-    public boolean discoveryServiceProviderIsInScope(String capabilityProviderServiceName){
-        getLogger().debug(".discoveryServiceProviderIsInScope(): Entry, capabilityProviderServiceName->{}", capabilityProviderServiceName);
-        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
-        if(memberSetBasedOnService.isEmpty()){
-            getLogger().debug(".discoveryServiceProviderIsInScope(): Exit, memberSetBasedOnService is empty, returning -false-");
-            return(false);
-        }
-        for(String currentName: memberSetBasedOnService){
-            if(isWithinScopeBasedOnChannelName(currentName)){
-                getLogger().debug(".discoveryServiceProviderIsInScope(): Exit, found match, returning -true-");
-                return(true);
-            }
-        }
-        getLogger().debug(".discoveryServiceProviderIsInScope(): Exit, no match found, returning -false-");
-        return(false);
-    }
-
-    //
     // Basic Endpoint Validation Test
     //
 
@@ -205,7 +312,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
                     getLogger().debug(".endpointValidationTask(): Exit");
                 }
             };
-            String timerName = "EndpointValidationWatchdogTask-" + specifyPetasosEndpointScope().getEndpointScopeName();
+            String timerName = "EndpointValidationWatchdogTask";
             Timer timer = new Timer(timerName);
             timer.schedule(endpointValidationTask, getJgroupsParticipantInformationService().getEndpointValidationStartDelay(), getJgroupsParticipantInformationService().getEndpointValidationPeriod());
             endpointCheckScheduled = true;
@@ -231,7 +338,7 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
      */
     public boolean performEndpointValidationCheck(){
         getLogger().debug(".performEndpointValidationCheck(): Entry");
-        List<PetasosEndpointCheckScheduleElement> endpointsToCheck = getEndpointMap().getEndpointsToCheck(specifyPetasosEndpointScope());
+        List<PetasosEndpointCheckScheduleElement> endpointsToCheck = getEndpointMap().getEndpointsToCheck();
         List<PetasosEndpointCheckScheduleElement> redoList = new ArrayList<>();
         getLogger().trace(".performEndpointValidationCheck(): Iterate through...");
         for(PetasosEndpointCheckScheduleElement currentScheduleElement: endpointsToCheck) {
@@ -361,16 +468,10 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
 
     protected boolean checkEndpointAddition(PetasosEndpointCheckScheduleElement currentScheduleElement){
         getLogger().debug(".checkEndpointAddition(): Entry, currentScheduleElement->{}", currentScheduleElement);
-        String endpointName = currentScheduleElement.getPetasosEndpointID().getEndpointName();
         String endpointChannelName = currentScheduleElement.getPetasosEndpointID().getEndpointChannelName();
         if(!isOAMDiscoveryEndpoint(endpointChannelName)){
             getLogger().debug(".checkEndpointAddition(): We are not going to waste time checking non-Discovery ports, returning -true- (was processed)");
             return(true);
-        }
-        boolean isWithinScope = isWithinScopeBasedOnChannelName(endpointChannelName);
-        if(!isWithinScope){
-            getLogger().debug(".checkEndpointAddition(): Not within my scope, returning -false- (was not processed)");
-            return(false);
         }
         PetasosEndpoint synchronisedEndpoint = synchroniseEndpointCache(currentScheduleElement);
         if(synchronisedEndpoint != null){
@@ -485,4 +586,5 @@ public abstract class PetasosOAMDiscoveryEndpoint extends JGroupsPetasosEndpoint
         getLogger().debug(".logAuditEventHandler(): Exit, outcomeInstant->{}", outcomeInstant);
         return(outcomeInstant);
     }
+
 }

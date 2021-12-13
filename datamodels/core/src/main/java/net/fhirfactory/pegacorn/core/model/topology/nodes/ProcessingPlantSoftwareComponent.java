@@ -26,7 +26,6 @@ import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTy
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditEventGranularityLevelEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.common.EndpointProviderInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,23 +39,15 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     private ArrayList<TopologyNodeFDN> endpoints;
     private ArrayList<TopologyNodeFDN> connections;
     private String nameSpace;
-    private String interZoneIPCStackConfigFile;
-    private String interZoneTopologyStackConfigFile;
-    private String interZoneSubscriptionsStackConfigFile;
-    private String interZoneMetricsStackConfigFile;
-    private String interZoneInterceptionStackConfigFile;
-    private String interZoneTaskingStackConfigFile;
-    private String interZoneAuditStackConfigFile;
+    private String petasosIPCStackConfigFile;
+    private String petasosTopologyStackConfigFile;
+    private String petasosSubscriptionsStackConfigFile;
+    private String petasosMetricsStackConfigFile;
+    private String petasosInterceptionStackConfigFile;
+    private String petasosTaskingStackConfigFile;
+    private String petasosAuditStackConfigFile;
 
     private String multiZoneInfinispanStackConfigFile;
-
-    private String intraZoneIPCStackConfigFile;
-    private String intraZoneTopologyStackConfigFile;
-    private String intraZoneSubscriptionsStackConfigFile;
-    private String intraZoneMetricsStackConfigFile;
-    private String intraZoneInterceptionStackConfigFile;
-    private String intraZoneTaskingStackConfigFile;
-    private String intraZoneAuditStackConfigFile;
 
     private String defaultDNSName;
     private boolean internalTrafficEncrypted;
@@ -80,107 +71,68 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.defaultDNSName = null;
         this.internalTrafficEncrypted = false;
 
-        this.interZoneIPCStackConfigFile = null;
-        this.interZoneSubscriptionsStackConfigFile = null;
-        this.interZoneMetricsStackConfigFile = null;
-        this.interZoneInterceptionStackConfigFile = null;
-        this.interZoneTaskingStackConfigFile = null;
-        this.interZoneTopologyStackConfigFile = null;
-        this.interZoneAuditStackConfigFile = null;
+        this.petasosIPCStackConfigFile = null;
+        this.petasosSubscriptionsStackConfigFile = null;
+        this.petasosMetricsStackConfigFile = null;
+        this.petasosInterceptionStackConfigFile = null;
+        this.petasosTaskingStackConfigFile = null;
+        this.petasosTopologyStackConfigFile = null;
+        this.petasosAuditStackConfigFile = null;
 
         this.multiZoneInfinispanStackConfigFile = null;
 
-        this.intraZoneIPCStackConfigFile = null;
-        this.intraZoneTopologyStackConfigFile = null;
-        this.intraZoneSubscriptionsStackConfigFile = null;
-        this.intraZoneMetricsStackConfigFile = null;
-        this.intraZoneInterceptionStackConfigFile = null;
-        this.intraZoneTaskingStackConfigFile = null;
-        this.intraZoneAuditStackConfigFile = null;
     }
 
     //
     // Getters and Setters
     //
 
-    public String getInterZoneMetricsStackConfigFile() {
-        return interZoneMetricsStackConfigFile;
+    public String getPetasosMetricsStackConfigFile() {
+        return petasosMetricsStackConfigFile;
     }
 
-    public void setInterZoneMetricsStackConfigFile(String interZoneMetricsStackConfigFile) {
-        this.interZoneMetricsStackConfigFile = interZoneMetricsStackConfigFile;
+    public void setPetasosMetricsStackConfigFile(String interZoneMetricsStackConfigFile) {
+        this.petasosMetricsStackConfigFile = interZoneMetricsStackConfigFile;
     }
 
-    public String getInterZoneInterceptionStackConfigFile() {
-        return interZoneInterceptionStackConfigFile;
+    public String getPetasosInterceptionStackConfigFile() {
+        return petasosInterceptionStackConfigFile;
     }
 
-    public void setInterZoneInterceptionStackConfigFile(String interZoneInterceptionStackConfigFile) {
-        this.interZoneInterceptionStackConfigFile = interZoneInterceptionStackConfigFile;
+    public void setPetasosInterceptionStackConfigFile(String interZoneInterceptionStackConfigFile) {
+        this.petasosInterceptionStackConfigFile = interZoneInterceptionStackConfigFile;
     }
 
-    public String getInterZoneTaskingStackConfigFile() {
-        return interZoneTaskingStackConfigFile;
+    public String getPetasosTaskingStackConfigFile() {
+        return petasosTaskingStackConfigFile;
     }
 
-    public void setInterZoneTaskingStackConfigFile(String interZoneTaskingStackConfigFile) {
-        this.interZoneTaskingStackConfigFile = interZoneTaskingStackConfigFile;
+    public void setPetasosTaskingStackConfigFile(String interZoneTaskingStackConfigFile) {
+        this.petasosTaskingStackConfigFile = interZoneTaskingStackConfigFile;
     }
 
-    public String getInterZoneAuditStackConfigFile() {
-        return interZoneAuditStackConfigFile;
+    public String getPetasosAuditStackConfigFile() {
+        return petasosAuditStackConfigFile;
     }
 
-    public void setInterZoneAuditStackConfigFile(String interZoneAuditStackConfigFile) {
-        this.interZoneAuditStackConfigFile = interZoneAuditStackConfigFile;
+    public void setPetasosAuditStackConfigFile(String interZoneAuditStackConfigFile) {
+        this.petasosAuditStackConfigFile = interZoneAuditStackConfigFile;
     }
 
-    public String getIntraZoneMetricsStackConfigFile() {
-        return intraZoneMetricsStackConfigFile;
+    public String getPetasosIPCStackConfigFile() {
+        return petasosIPCStackConfigFile;
     }
 
-    public void setIntraZoneMetricsStackConfigFile(String intraZoneMetricsStackConfigFile) {
-        this.intraZoneMetricsStackConfigFile = intraZoneMetricsStackConfigFile;
+    public void setPetasosIPCStackConfigFile(String interZoneIPCStackConfigFile) {
+        this.petasosIPCStackConfigFile = interZoneIPCStackConfigFile;
     }
 
-    public String getIntraZoneInterceptionStackConfigFile() {
-        return intraZoneInterceptionStackConfigFile;
+    public String getPetasosTopologyStackConfigFile() {
+        return petasosSubscriptionsStackConfigFile;
     }
 
-    public void setIntraZoneInterceptionStackConfigFile(String intraZoneInterceptionStackConfigFile) {
-        this.intraZoneInterceptionStackConfigFile = intraZoneInterceptionStackConfigFile;
-    }
-
-    public String getIntraZoneTaskingStackConfigFile() {
-        return intraZoneTaskingStackConfigFile;
-    }
-
-    public void setIntraZoneTaskingStackConfigFile(String intraZoneTaskingStackConfigFile) {
-        this.intraZoneTaskingStackConfigFile = intraZoneTaskingStackConfigFile;
-    }
-
-    public String getIntraZoneAuditStackConfigFile() {
-        return intraZoneAuditStackConfigFile;
-    }
-
-    public void setIntraZoneAuditStackConfigFile(String intraZoneAuditStackConfigFile) {
-        this.intraZoneAuditStackConfigFile = intraZoneAuditStackConfigFile;
-    }
-
-    public String getInterZoneIPCStackConfigFile() {
-        return interZoneIPCStackConfigFile;
-    }
-
-    public void setInterZoneIPCStackConfigFile(String interZoneIPCStackConfigFile) {
-        this.interZoneIPCStackConfigFile = interZoneIPCStackConfigFile;
-    }
-
-    public String getInterZoneTopologyStackConfigFile() {
-        return interZoneSubscriptionsStackConfigFile;
-    }
-
-    public void setInterZoneTopologyStackConfigFile(String interZoneTopologyStackConfigFile) {
-        this.interZoneSubscriptionsStackConfigFile = interZoneTopologyStackConfigFile;
+    public void setPetasosTopologyStackConfigFile(String interZoneTopologyStackConfigFile) {
+        this.petasosSubscriptionsStackConfigFile = interZoneTopologyStackConfigFile;
     }
 
     public boolean isInternalTrafficEncrypted() {
@@ -244,28 +196,12 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         endpoints.add(endpointFDN);
     }
 
-    public String getIntraZoneIPCStackConfigFile() {
-        return intraZoneIPCStackConfigFile;
+    public String getPetasosSubscriptionsStackConfigFile() {
+        return petasosSubscriptionsStackConfigFile;
     }
 
-    public void setIntraZoneIPCStackConfigFile(String intraZoneIPCStackConfigFile) {
-        this.intraZoneIPCStackConfigFile = intraZoneIPCStackConfigFile;
-    }
-
-    public String getIntraZoneTopologyStackConfigFile() {
-        return intraZoneTopologyStackConfigFile;
-    }
-
-    public void setIntraZoneTopologyStackConfigFile(String intraZoneTopologyStackConfigFile) {
-        this.intraZoneTopologyStackConfigFile = intraZoneTopologyStackConfigFile;
-    }
-
-    public String getInterZoneSubscriptionsStackConfigFile() {
-        return interZoneSubscriptionsStackConfigFile;
-    }
-
-    public void setInterZoneSubscriptionsStackConfigFile(String interZoneSubscriptionsStackConfigFile) {
-        this.interZoneSubscriptionsStackConfigFile = interZoneSubscriptionsStackConfigFile;
+    public void setPetasosSubscriptionsStackConfigFile(String petasosSubscriptionsStackConfigFile) {
+        this.petasosSubscriptionsStackConfigFile = petasosSubscriptionsStackConfigFile;
     }
 
     public String getMultiZoneInfinispanStackConfigFile() {
@@ -274,14 +210,6 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
 
     public void setMultiZoneInfinispanStackConfigFile(String multiZoneInfinispanStackConfigFile) {
         this.multiZoneInfinispanStackConfigFile = multiZoneInfinispanStackConfigFile;
-    }
-
-    public String getIntraZoneSubscriptionsStackConfigFile() {
-        return intraZoneSubscriptionsStackConfigFile;
-    }
-
-    public void setIntraZoneSubscriptionsStackConfigFile(String intraZoneSubscriptionsStackConfigFile) {
-        this.intraZoneSubscriptionsStackConfigFile = intraZoneSubscriptionsStackConfigFile;
     }
 
     @JsonIgnore
@@ -306,41 +234,39 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
 
     @Override
     public String toString() {
-        return "ProcessingPlantTopologyNode{" +
-                "nodeRDN=" + getComponentRDN() +
-                ", nodeFDN=" + getComponentFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", nodeKey=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+        return "ProcessingPlantSoftwareComponent{" +
+                "componentFDN=" + getComponentFDN() +
+                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
                 ", securityZone=" + getSecurityZone() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                ", componentID=" + getComponentID() +
+                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                ", componentType=" + getComponentType() +
+                ", containingNodeFDN=" + getContainingNodeFDN() +
+                ", actualHostIP='" + getActualHostIP() + '\'' +
+                ", actualPodIP='" + getActualPodIP() + '\'' +
+                ", componentRDN=" + getComponentRDN() +
+                ", metrics=" + getMetrics() +
+                ", componentSystemRole=" + getComponentSystemRole() +
                 ", workshops=" + workshops +
                 ", endpoints=" + endpoints +
                 ", connections=" + connections +
-                ", nameSpace=" + nameSpace +
-                ", interZoneIPCStackConfigFile=" + interZoneIPCStackConfigFile +
-                ", intraZoneIPCStackConfigFile=" + intraZoneIPCStackConfigFile +
-                ", interZoneSubscriptionsStackConfigFile=" + interZoneSubscriptionsStackConfigFile +
-                ", intraZoneSubscriptionsStackConfigFile=" + intraZoneSubscriptionsStackConfigFile +
-                ", interZoneTopologyStackConfigFile=" + interZoneTopologyStackConfigFile +
-                ", intraZoneTopologyStackConfigFile=" + intraZoneTopologyStackConfigFile +
-                ", interZoneMetricsStackConfigFile=" + interZoneMetricsStackConfigFile +
-                ", intraZoneMetricsStackConfigFile=" + intraZoneMetricsStackConfigFile +
-                ", interZoneInterceptionStackConfigFile=" + interZoneInterceptionStackConfigFile +
-                ", intraZoneInterceptionStackConfigFile=" + intraZoneInterceptionStackConfigFile +
-                ", interZoneTaskStackConfigFile=" + interZoneTaskingStackConfigFile +
-                ", intraZoneTaskStackConfigFile=" + intraZoneTaskingStackConfigFile +
-                ", interZoneAuditStackConfigFile=" + interZoneAuditStackConfigFile +
-                ", intraZoneAuditStackConfigFile=" + intraZoneAuditStackConfigFile +
-                ", multiZoneInfinispanStackConfigFile=" + multiZoneInfinispanStackConfigFile +
-                ", defaultDNSName=" + defaultDNSName +
+                ", nameSpace='" + nameSpace + '\'' +
+                ", petasosIPCStackConfigFile='" + petasosIPCStackConfigFile + '\'' +
+                ", petasosTopologyStackConfigFile='" + petasosTopologyStackConfigFile + '\'' +
+                ", petasosSubscriptionsStackConfigFile='" + petasosSubscriptionsStackConfigFile + '\'' +
+                ", petasosMetricsStackConfigFile='" + petasosMetricsStackConfigFile + '\'' +
+                ", petasosInterceptionStackConfigFile='" + petasosInterceptionStackConfigFile + '\'' +
+                ", petasosTaskingStackConfigFile='" + petasosTaskingStackConfigFile + '\'' +
+                ", petasosAuditStackConfigFile='" + petasosAuditStackConfigFile + '\'' +
+                ", multiZoneInfinispanStackConfigFile='" + multiZoneInfinispanStackConfigFile + '\'' +
+                ", defaultDNSName='" + defaultDNSName + '\'' +
                 ", internalTrafficEncrypted=" + internalTrafficEncrypted +
                 ", instanceCount=" + instanceCount +
-                ", subsystemName=" + getSubsystemName() +
-                ", clusterServiceName=" + getClusterServiceName() +
+                ", subsystemName='" + getSubsystemName() + '\'' +
+                ", clusterServiceName='" + getClusterServiceName() + '\'' +
                 '}';
     }
 }

@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.Instant;
 
 @ApplicationScoped
 public class PetasosActionableTaskFactory {
@@ -153,6 +155,13 @@ public class PetasosActionableTaskFactory {
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Item] Start");
         newTask.setTaskWorkItem(payload);
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Item] Finish");
+        //
+        // add an empty task fullfillment
+        getLogger().trace(".newMessageBasedActionableTask(): [Add Task Fulfillment] Start");
+        TaskFulfillmentType taskFulfillment = new TaskFulfillmentType();
+        taskFulfillment.setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
+        taskFulfillment.setLastCheckedInstant(Instant.now());
+        newTask.setTaskFulfillment(taskFulfillment);
         //
         // return the object
         getLogger().debug(".newMessageBasedActionableTask(): Exit, petasosActionableTask->{}", newTask);

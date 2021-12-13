@@ -22,9 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos;
 
 public enum PetasosEndpointTopologyTypeEnum {
-    EDGE_JGROUPS_INTRAZONE_SERVICE("Edge.JGroups.IntraZone","pegacorn.fhir.endpoint.ipc_messaging.jgroups_intrazone" ),
-    EDGE_JGROUPS_INTERZONE_SERVICE("Edge.JGroups.InterZone", "pegacorn.fhir.endpoint.ipc_messaging.jgroups_interzone"),
-    EDGE_JGROUPS_INTERSITE_SERVICE("Edge.JGroups.InterSite", "pegacorn.fhir.endpoint.ipc_messaging.jgroups_intersite"),
+    EDGE_JGROUPS_MESSAGING_SERVICE("Edge.JGroups.Messaging", "pegacorn.fhir.endpoint.ipc_messaging.jgroups_messaging"),
     EDGE_HTTP_API_SERVER("Edge.HTTP.Server", "pegacorn.fhir.endpoint.ipc_messaging.http_api_server"),
     EDGE_HTTP_API_CLIENT("Edge.HTTP.Client", "pegacorn.fhir.endpoint.ipc_messaging.http_api_client"),
     INTERACT_MLLP_SERVER("Interact.MLLP.Server","pegacorn.fhir.endpoint.interact.mllp_server"),

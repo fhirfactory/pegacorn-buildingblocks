@@ -6,13 +6,13 @@
     <parent>
         <groupId>net.fhirfactory.pegacorn</groupId>
         <artifactId>pegacorn-buildingblocks</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>pegacorn-buildingblocks-fhirim</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: BuildingBlocks :: FHIR Information Manager</name>
+    <name>Pegacorn :: Building Blocks :: FHIR Information Manager</name>
     <description>The base FHIR Information Manager framework</description>
 
     <licenses>
@@ -243,12 +243,12 @@
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-server</artifactId>
-            <version>5.1.0</version>
+            <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-buildingblocks-processingplant</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 

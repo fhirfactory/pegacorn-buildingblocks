@@ -22,7 +22,10 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.map;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.*;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointConnectionTypeCodeFactory;
@@ -273,15 +276,13 @@ public class PetasosEndpointMap {
                                                  String endpointAddressType,
                                                  String endpointServiceName,
                                                  PetasosEndpointFunctionTypeEnum endpointType,
-                                                 EndpointPayloadTypeEnum payloadType,
-                                                 PetasosEndpointChannelScopeEnum scope){
+                                                 EndpointPayloadTypeEnum payloadType){
         getLogger().debug(".newPetasosEndpoint(): Entry");
         Endpoint fhirEndpoint = newEndpoint(petasosEndpointID, endpointAddressType, endpointType, payloadType);
         if(fhirEndpoint == null){
             return(null);
         }
         PetasosEndpoint petasosEndpoint = new PetasosEndpoint();
-        petasosEndpoint.setEndpointScope(scope);
         petasosEndpoint.setEndpointServiceName(endpointServiceName);
         petasosEndpoint.setRepresentativeFHIREndpoint(fhirEndpoint);
         petasosEndpoint.setEndpointID(petasosEndpointID);
@@ -301,8 +302,7 @@ public class PetasosEndpointMap {
                                        String endpointAddressType,
                                        String endpointService,
                                        PetasosEndpointFunctionTypeEnum endpointType,
-                                       EndpointPayloadTypeEnum payloadType,
-                                       PetasosEndpointChannelScopeEnum scope){
+                                       EndpointPayloadTypeEnum payloadType){
         getLogger().debug(".addEndpoint(): Entry, petasosEndpointID->{}", petasosEndpointID);
 
         if(petasosEndpointID == null){
@@ -321,7 +321,7 @@ public class PetasosEndpointMap {
             return(endpoint);
         }
 
-        PetasosEndpoint endpoint = newPetasosEndpoint(petasosEndpointID, endpointAddressType, endpointService, endpointType, payloadType, scope);
+        PetasosEndpoint endpoint = newPetasosEndpoint(petasosEndpointID, endpointAddressType, endpointService, endpointType, payloadType);
         endpoints.put(endpointName, endpoint);
         endpointLocks.put(endpointName, new Object());
         addServiceMembership(endpointService, petasosEndpointID.getEndpointName());
@@ -532,7 +532,7 @@ public class PetasosEndpointMap {
         }
     }
 
-    public List<PetasosEndpointCheckScheduleElement> getEndpointsToCheck(PetasosEndpointChannelScopeEnum channelScope){
+    public List<PetasosEndpointCheckScheduleElement> getEndpointsToCheck(){
         getLogger().debug(".getEndpointsToCheck(): Entry");
         List<PetasosEndpointCheckScheduleElement> endpointSet = new ArrayList<>();
         if(this.endpointCheckSchedule.isEmpty()){
@@ -545,11 +545,8 @@ public class PetasosEndpointMap {
             for (String currentEndpointName : endpointNameSet) {
                 PetasosEndpointCheckScheduleElement currentElement = this.endpointCheckSchedule.get(currentEndpointName);
                 getLogger().trace(".getEndpointsToCheck(): Checking entry ->{}", currentElement);
-                String endpointChannelName = currentElement.getPetasosEndpointID().getEndpointChannelName();
-                String endpointScopeName = endpointNameUtilities.getEndpointScopeFromChannelName(endpointChannelName);
-                boolean scopeMatches = endpointScopeName.contentEquals(channelScope.getEndpointScopeName());
                 boolean appropriateDelayPassed = (currentElement.getTargetTime().getEpochSecond() + ENDPOINT_CHECK_DELAY) < (Instant.now().getEpochSecond());
-                if (scopeMatches && appropriateDelayPassed) {
+                if (appropriateDelayPassed) {
                     getLogger().trace(".getEndpointsToCheck(): Adding...");
                     endpointSet.add(currentElement);
                 }

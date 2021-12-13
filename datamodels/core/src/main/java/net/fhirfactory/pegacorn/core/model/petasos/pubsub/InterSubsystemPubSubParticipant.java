@@ -74,7 +74,6 @@ public class InterSubsystemPubSubParticipant extends PetasosEndpoint implements 
     @Override
     public String toString() {
         return "InterSubsystemPubSubParticipant{" +
-                "endpointScope=" + getEndpointScope() +
                 ", interfaceFunction=" + getInterfaceFunction() +
                 ", endpointServiceName=" + getEndpointServiceName() +
                 ", representativeFHIREndpoint=" + getRepresentativeFHIREndpoint() +

@@ -227,9 +227,7 @@ public class DeviceFactory {
         Device device = newDeviceFromSoftwareComponent(ipcEndpoint);
 
         switch(ipcEndpoint.getEndpointType()){
-            case EDGE_JGROUPS_INTRAZONE_SERVICE:
-            case EDGE_JGROUPS_INTERZONE_SERVICE:
-            case EDGE_JGROUPS_INTERSITE_SERVICE:
+            case EDGE_JGROUPS_MESSAGING_SERVICE:
                 StandardEdgeIPCEndpoint jgroupsEndpoint = (StandardEdgeIPCEndpoint)ipcEndpoint;
                 JGroupsAdapter jgroupsAdapter = jgroupsEndpoint.getJGroupsAdapter();
                 Endpoint endpoint = getEndpointFactory().newJGroupsEndpoint(jgroupsEndpoint, jgroupsAdapter);
@@ -377,26 +375,20 @@ public class DeviceFactory {
 
         //
         // Add the configuration file(s)
-        Device.DevicePropertyComponent interZoneAuditConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTERZONE_AUDIT, processingPlant.getInterZoneAuditStackConfigFile());
+        Device.DevicePropertyComponent interZoneAuditConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_PETASOS_AUDIT, processingPlant.getPetasosAuditStackConfigFile());
         device.addProperty(interZoneAuditConfigFileProperty);
-        Device.DevicePropertyComponent intraZoneAuditConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTRAZONE_AUDIT, processingPlant.getIntraZoneAuditStackConfigFile());
-        device.addProperty(intraZoneAuditConfigFileProperty);
-        Device.DevicePropertyComponent interZoneIPCConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTERZONE_IPC, processingPlant.getInterZoneIPCStackConfigFile());
+        Device.DevicePropertyComponent interZoneIPCConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_PETASOS_IPC_MESSAGING, processingPlant.getPetasosIPCStackConfigFile());
         device.addProperty(interZoneIPCConfigFileProperty);
-        Device.DevicePropertyComponent intraZoneIPCConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTRAZONE_IPC, processingPlant.getIntraZoneIPCStackConfigFile());
-        device.addProperty(intraZoneIPCConfigFileProperty);
-        Device.DevicePropertyComponent interZoneInterceptionConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTERZONE_INTERCEPTION, processingPlant.getInterZoneInterceptionStackConfigFile());
+        Device.DevicePropertyComponent interZoneInterceptionConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_PETASOS_INTERCEPTION, processingPlant.getPetasosInterceptionStackConfigFile());
         device.addProperty(interZoneInterceptionConfigFileProperty);
-        Device.DevicePropertyComponent intraZoneInterceptionConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTRAZONE_INTERCEPTION, processingPlant.getIntraZoneInterceptionStackConfigFile());
-        device.addProperty(intraZoneInterceptionConfigFileProperty);
-        Device.DevicePropertyComponent interZoneMetricsConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTERZONE_METRICS, processingPlant.getInterZoneMetricsStackConfigFile());
+        Device.DevicePropertyComponent interZoneMetricsConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_PETASOS_METRICS, processingPlant.getPetasosMetricsStackConfigFile());
         device.addProperty(interZoneMetricsConfigFileProperty);
-        Device.DevicePropertyComponent intraZoneMetricsConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTRAZONE_METRICS, processingPlant.getIntraZoneMetricsStackConfigFile());
-        device.addProperty(intraZoneMetricsConfigFileProperty);
-        Device.DevicePropertyComponent interZoneTasksConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTERZONE_TASKS, processingPlant.getInterZoneTaskingStackConfigFile());
+        Device.DevicePropertyComponent interZoneTasksConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_PETASOS_TASKS, processingPlant.getPetasosTaskingStackConfigFile());
         device.addProperty(interZoneTasksConfigFileProperty);
-        Device.DevicePropertyComponent intraZoneTasksConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_INTRAZONE_TASKS, processingPlant.getIntraZoneTaskingStackConfigFile());
-        device.addProperty(intraZoneTasksConfigFileProperty);
+        Device.DevicePropertyComponent petasosSubscriptionConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_PETASOS_SUBSCRIPTION, processingPlant.getPetasosSubscriptionsStackConfigFile());
+        device.addProperty(petasosSubscriptionConfigFileProperty);
+        Device.DevicePropertyComponent petasosTopologyConfigFileProperty = getPropertyFactory().newConfigurationFileDeviceProperty(DeviceConfigurationFilePropertyTypeEnum.CONFIG_FILE_JGROUPS_PETASOS_TOPOLOGY, processingPlant.getPetasosSubscriptionsStackConfigFile());
+        device.addProperty(petasosTopologyConfigFileProperty);
 
         //
         // Add Other Configuration Parameters

@@ -19,33 +19,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base;
+package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc;
 
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
+@ApplicationScoped
+public class PetasosIPCMessagingEndpoint extends JGroupsPetasosEndpointBase {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosIPCMessagingEndpoint.class);
 
     @Produce
     private ProducerTemplate camelProducer;
 
     //
-    // Constructor
+    // Constructor(s)
     //
 
-    public PetasosIPCEndpoint(){
+    public PetasosIPCMessagingEndpoint(){
         super();
     }
 
@@ -59,10 +70,111 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
     }
 
     //
-    // Receive Messages (via RPC invocations)
+    // Getters and Setters
     //
 
-    protected abstract InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket);
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+
+    protected ProducerTemplate getCamelProducer() {
+        return camelProducer;
+    }
+
+    //
+    // Endpoint Specifications
+    //
+
+    @Override
+    protected String specifyIPCInterfaceName() {
+        return (getInterfaceNames().getPetasosIPCMessagingEndpointName());
+    }
+
+    @Override
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_MESSAGING_SERVICE);
+    }
+
+    @Override
+    protected String specifyJGroupsStackFileName() {
+        return (getProcessingPlantInterface().getProcessingPlantNode().getPetasosIPCStackConfigFile());
+    }
+
+    @Override
+    protected PetasosEndpointIdentifier specifyEndpointID() {
+        PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
+        endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
+        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getPetasosIpcMessagingGroupName());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getPetasosIpcMessagingGroupName();
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
+        return (endpointID);
+    }
+
+    @Override
+    protected String specifyEndpointServiceName() {
+        return (getProcessingPlantInterface().getIPCServiceName());
+    }
+
+    @Override
+    protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT);
+    }
+
+    @Override
+    protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_IPC);
+    }
+
+    @Override
+    protected void resolveTopologyEndpoint() {
+        setTopologyNode(getJgroupsParticipantInformationService().getMyPetasosTopologyEndpoint());
+    }
+
+    @Override
+    protected PubSubParticipant specifyPubSubParticipant() {
+        PubSubParticipant myInterZoneParticipantRole = getJgroupsParticipantInformationService().getMyPetasosParticipantRole();
+        if(myInterZoneParticipantRole == null){
+            myInterZoneParticipantRole = getJgroupsParticipantInformationService().buildMyPetasosParticipantRole(getPetasosEndpoint());
+        }
+        return (myInterZoneParticipantRole);
+    }
+
+    @Override
+    protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
+        getCoreSubsystemPetasosEndpointsWatchdog().setPetasosIPCMessagingEndpoint(this.getPetasosEndpoint());
+    }
+
+    //
+    // Local Message Route Injection
+    //
+
+    protected InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket) {
+        InterProcessingPlantHandoverResponsePacket response =
+                (InterProcessingPlantHandoverResponsePacket)getCamelProducer().sendBody(getIPCComponentNames().getInterZoneIPCReceiverRouteEndpointName(), ExchangePattern.InOut, handoverPacket);
+        return(response);
+    }
+
+    //
+    // Receive Message
+    //
 
     public InterProcessingPlantHandoverResponsePacket receiveIPCMessage(InterProcessingPlantHandoverPacket handoverPacket){
         getLogger().debug(".receiveIPCMessage(): Entry, handoverPacket->{}",handoverPacket);
@@ -151,15 +263,5 @@ public abstract class PetasosIPCEndpoint extends JGroupsPetasosEndpointBase {
         Address endpointJGroupsAddress = endpointAddressSet.get(0);
         getLogger().debug(".getCandidateIPCTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
         return(endpointJGroupsAddress);
-    }
-
-
-    //
-    // Getters (and Setters)
-    //
-
-
-    public ProducerTemplate getCamelProducer() {
-        return camelProducer;
     }
 }

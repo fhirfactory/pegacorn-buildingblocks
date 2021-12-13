@@ -13,13 +13,13 @@
     <parent>
         <groupId>net.fhirfactory.pegacorn</groupId>
         <artifactId>pegacorn-buildingblocks-petasos</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>pegacorn-buildingblocks-petasos-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Platform :: Petasos :: Core</name>
+    <name>Pegacorn :: Building Blocks :: Petasos :: Core</name>
     <description>The resilience and reliability framework for the Pegacorn solution</description>
 
     <!--***********************************************************************************-->

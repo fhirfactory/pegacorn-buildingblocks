@@ -19,16 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks.base;
+package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks;
 
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskHandlerInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedureCallRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedureCallResponse;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.factories.RemoteProcedureCallRequestFactory;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import org.apache.camel.Produce;
@@ -37,13 +42,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PetasosTaskEndpoint extends JGroupsPetasosEndpointBase {
+@ApplicationScoped
+public class PetasosTaskServicesEndpoint extends JGroupsPetasosEndpointBase implements PetasosTaskBrokerInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosTaskServicesEndpoint.class);
 
     @Produce
     private ProducerTemplate camelProducer;
@@ -55,10 +65,10 @@ public abstract class PetasosTaskEndpoint extends JGroupsPetasosEndpointBase {
     private RemoteProcedureCallRequestFactory rpcRequestFactory;
 
     //
-    // Constructor
+    // Constructor(s)
     //
 
-    public PetasosTaskEndpoint(){
+    public PetasosTaskServicesEndpoint(){
         super();
     }
 
@@ -70,6 +80,102 @@ public abstract class PetasosTaskEndpoint extends JGroupsPetasosEndpointBase {
     protected void executePostConstructActivities() {
 
     }
+
+    //
+    // Getters (and Setters)
+    //
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    public ProducerTemplate getCamelProducer() {
+        return camelProducer;
+    }
+
+    //
+    // Endpoint Specification
+    //
+
+    @Override
+    protected String specifyIPCInterfaceName() {
+        return (getInterfaceNames().getPetasosTaskServicesEndpointName());
+    }
+
+    @Override
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_MESSAGING_SERVICE);
+    }
+
+    @Override
+    protected String specifyJGroupsStackFileName() {
+        return (getProcessingPlantInterface().getProcessingPlantNode().getPetasosTaskingStackConfigFile());
+    }
+
+    @Override
+    protected PetasosEndpointIdentifier specifyEndpointID() {
+        PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
+        endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
+        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getPetasosTaskServicesGroupName());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getPetasosTaskServicesGroupName();
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
+        return (endpointID);
+    }
+
+    @Override
+    protected String specifyEndpointServiceName() {
+        return (getProcessingPlantInterface().getIPCServiceName());
+    }
+
+    @Override
+    protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_TASKING_ENDPOINT);
+    }
+
+    @Override
+    protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_TASKS);
+    }
+
+    @Override
+    protected void resolveTopologyEndpoint() {
+        setTopologyNode(getJgroupsParticipantInformationService().getMyPetasosTopologyEndpoint());
+    }
+
+    @Override
+    protected PubSubParticipant specifyPubSubParticipant() {
+        PubSubParticipant myInterZoneParticipantRole = getJgroupsParticipantInformationService().getMyPetasosParticipantRole();
+        if(myInterZoneParticipantRole == null){
+            myInterZoneParticipantRole = getJgroupsParticipantInformationService().buildMyPetasosParticipantRole(getPetasosEndpoint());
+        }
+        return (myInterZoneParticipantRole);
+    }
+
+    @Override
+    protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
+        getCoreSubsystemPetasosEndpointsWatchdog().setPetasosTaskServicesEndpoint(this.getPetasosEndpoint());
+    }
+
+    //
+    // Business Methods
+    //
 
     public List<Address> getTaskTargetAddressSet(String endpointServiceName){
         getLogger().debug(".getTaskTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
@@ -136,27 +242,6 @@ public abstract class PetasosTaskEndpoint extends JGroupsPetasosEndpointBase {
             response.setSuccessful(false);
             return(response);
         }
-    }
-
-    public boolean taskFulfillerIsInScope(String capabilityProviderServiceName){
-        getLogger().info(".taskFulfillerIsInScope(): Entry, capabilityProviderServiceName->{}", capabilityProviderServiceName);
-
-        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
-        if(memberSetBasedOnService.isEmpty()){
-            getLogger().info(".taskFulfillerIsInScope(): Exit, no suitable endpoints to check, returning -false-");
-            return(false);
-        }
-
-        getLogger().info(".taskFulfillerIsInScope(): Check Intra-Zone Service Availability");
-        for(String currentName: memberSetBasedOnService){
-            if(isWithinScopeBasedOnChannelName(currentName)){
-                getLogger().info(".taskFulfillerIsInScope(): Exit, found a candidate, returning -true-");
-                return(true);
-            }
-        }
-
-        getLogger().info(".taskFulfillerIsInScope(): Exit, could not find a candidate, returning -false-");
-        return(false);
     }
 
     //
@@ -367,12 +452,4 @@ public abstract class PetasosTaskEndpoint extends JGroupsPetasosEndpointBase {
         return(rpcResponse);
     }
 
-    //
-    // Getters (and Setters)
-    //
-
-
-    public ProducerTemplate getCamelProducer() {
-        return camelProducer;
-    }
 }

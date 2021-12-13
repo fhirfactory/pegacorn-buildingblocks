@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reporting.datatypes.TaskReportingType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.AggregateTaskStatusType;

@@ -47,21 +47,13 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         PetasosPubSubEndpointChangeCallbackRegistrationInterface {
     private static final Logger LOG = LoggerFactory.getLogger(CoreSubsystemPetasosEndpointsWatchdog.class);
 
-    private PetasosEndpoint intrazoneIPC;
-    private PetasosEndpoint intrazoneOAMPubSub;
-    private PetasosEndpoint intrazoneOAMDiscovery;
-    private PetasosEndpoint intraZoneAudit;
-    private PetasosEndpoint intraZoneTask;
-    private PetasosEndpoint intraZoneInterception;
-    private PetasosEndpoint intraZoneMetrics;
-
-    private PetasosEndpoint interzoneIPC;
-    private PetasosEndpoint interzoneOAMPubSub;
-    private PetasosEndpoint interzoneOAMDiscovery;
-    private PetasosEndpoint interZoneAudit;
-    private PetasosEndpoint interZoneTask;
-    private PetasosEndpoint interZoneInterception;
-    private PetasosEndpoint interZoneMetrics;
+    private PetasosEndpoint petasosIPCMessagingEndpoint;
+    private PetasosEndpoint petasosOAMPubSubEndpoint;
+    private PetasosEndpoint petasosOAMDiscoveryEndpoint;
+    private PetasosEndpoint petasosAuditServicesEndpoint;
+    private PetasosEndpoint petasosTaskServicesEndpoint;
+    private PetasosEndpoint petasosInterceptionServicesEndpoint;
+    private PetasosEndpoint petasosMetricsEndpoint;
 
     private PetasosEndpointStatusEnum aggregateStatus;
     private PetasosEndpoint edgeAnswerHTTP;
@@ -95,21 +87,14 @@ public class CoreSubsystemPetasosEndpointsWatchdog
     //
 
     public CoreSubsystemPetasosEndpointsWatchdog(){
-        this.intrazoneIPC = null;
-        this.intrazoneOAMDiscovery = null;
-        this.intrazoneOAMPubSub = null;
-        this.intraZoneAudit = null;
-        this.intraZoneTask = null;
-        this.intraZoneInterception = null;
-        this.intraZoneMetrics = null;
 
-        this.interzoneIPC = null;
-        this.interzoneOAMDiscovery = null;
-        this.interzoneOAMPubSub = null;
-        this.interZoneAudit = null;
-        this.interZoneTask = null;
-        this.interZoneInterception = null;
-        this.interZoneMetrics = null;
+        this.petasosIPCMessagingEndpoint = null;
+        this.petasosOAMDiscoveryEndpoint = null;
+        this.petasosOAMPubSubEndpoint = null;
+        this.petasosAuditServicesEndpoint = null;
+        this.petasosTaskServicesEndpoint = null;
+        this.petasosInterceptionServicesEndpoint = null;
+        this.petasosMetricsEndpoint = null;
 
         this.edgeAnswerHTTP = null;
         this.edgeAnswerRPC = null;
@@ -212,28 +197,16 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         boolean multiSitePortsLaunched = true;
         boolean edgeAnswerPortsLaunched = true;
 
-        if (!existsIntrazoneIPC()) {
+        if (!existsPetasosIPCMessagingEndpoint()) {
             singleSitePortsLaunched = singleSitePortsLaunched && false;
         }
-        if (!existsIntraZoneOAMDiscovery()){
+        if (!existsPotasosOAMDiscoveryEndpoint()) {
             singleSitePortsLaunched = singleSitePortsLaunched && false;
         }
-        if (!existsIntraZoneOAMPubSub()) {
+        if (!existsPetasosOAMPubSubEndpoint()) {
             singleSitePortsLaunched = singleSitePortsLaunched && false;
         }
-        if (!existsIntraZoneMetrics()){
-            singleSitePortsLaunched = singleSitePortsLaunched && false;
-        }
-        if (!existsInterZoneIPC()) {
-            singleSitePortsLaunched = singleSitePortsLaunched && false;
-        }
-        if (!existsInterZoneOAMDiscovery()) {
-            singleSitePortsLaunched = singleSitePortsLaunched && false;
-        }
-        if (!existsInterZoneOAMPubSub()) {
-            singleSitePortsLaunched = singleSitePortsLaunched && false;
-        }
-        if (!existsInterZoneMetrics()){
+        if (!existsPetasosMetricsEndpoint()){
             singleSitePortsLaunched = singleSitePortsLaunched && false;
         }
         if (!existsEdgeAnswerHTTP()) {
@@ -324,73 +297,38 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         getLogger().debug(".deriveAggregateStatus(): Entry, startingStatus->{}", startingStatus);
         List<PetasosEndpointStatusEnum> statusList = new ArrayList<>();
         getLogger().trace(".deriveAggregateStatus(): Assembling the list of status'es");
-        if (existsIntrazoneIPC()) {
-            PetasosEndpointStatusEnum intrazoneIPCStatus = getIntrazoneIPC().getEndpointStatus();
-            getLogger().debug(".deriveAggregateStatus(): Entry, getIntrazoneIPC().getEndpointStatus()->{}", intrazoneIPCStatus);
-            statusList.add(resolveStatusValue(startingStatus, intrazoneIPCStatus));
-        }
-        if (existsIntraZoneOAMDiscovery()){
-            PetasosEndpointStatusEnum intrazoneTopologyStatus = getIntrazoneOAMDiscovery().getEndpointStatus();
-            getLogger().debug(".deriveAggregateStatus(): Entry, getIntrazoneOAMDiscovery().getEndpointStatus()->{}", intrazoneTopologyStatus);
-            statusList.add(resolveStatusValue(startingStatus, intrazoneTopologyStatus));
-        }
-        if (existsIntraZoneOAMPubSub()) {
-            PetasosEndpointStatusEnum intrazoneSubscriptionStatus = getIntrazoneOAMPubSub().getEndpointStatus();
-            getLogger().debug(".deriveAggregateStatus(): Entry, getIntrazoneOAMPubSub().getEndpointStatus()->{}", intrazoneSubscriptionStatus);
-            statusList.add(resolveStatusValue(startingStatus, intrazoneSubscriptionStatus));
-        }
-        if (existsIntraZoneAudit()){
-            PetasosEndpointStatusEnum intrazoneAuditStatus = getIntraZoneAudit().getEndpointStatus();
-            getLogger().debug(".deriveAggregateStatus(): Entry, getIntraZoneAudit().getEndpointStatus()->{}", intrazoneAuditStatus);
-            statusList.add(resolveStatusValue(startingStatus, intrazoneAuditStatus));
-        }
-        if (existsIntraZoneTask()){
-            PetasosEndpointStatusEnum intrazoneTaskingStatus = getIntraZoneTask().getEndpointStatus();
-            getLogger().debug(".deriveAggregateStatus(): Entry, getIntraZoneTask().getEndpointStatus()->{}", intrazoneTaskingStatus);
-            statusList.add(resolveStatusValue(startingStatus, intrazoneTaskingStatus));
-        }
-        if (existsIntraZoneInterception()){
-            PetasosEndpointStatusEnum intrazoneInterceptionStatus = getIntraZoneInterception().getEndpointStatus();
-            getLogger().debug(".deriveAggregateStatus(): Entry, getIntraZoneInterception().getEndpointStatus()->{}", intrazoneInterceptionStatus);
-            statusList.add(resolveStatusValue(startingStatus, intrazoneInterceptionStatus));
-        }
-        if (existsIntraZoneMetrics()){
-            PetasosEndpointStatusEnum intrazoneMetricsStatus = getIntraZoneMetrics().getEndpointStatus();
-            getLogger().debug(".deriveAggregateStatus(): Entry, getIntraZoneMetrics().getEndpointStatus()->{}", intrazoneMetricsStatus);
-            statusList.add(resolveStatusValue(startingStatus, intrazoneMetricsStatus));
-        }
-        if (existsInterZoneIPC()) {
-            PetasosEndpointStatusEnum interzoneIPCStatus = getInterzoneIPC().getEndpointStatus();
+        if (existsPetasosIPCMessagingEndpoint()) {
+            PetasosEndpointStatusEnum interzoneIPCStatus = getPetasosIPCMessagingEndpoint().getEndpointStatus();
             getLogger().debug(".deriveAggregateStatus(): Entry, getInterzoneIPC().getEndpointStatus()->{}", interzoneIPCStatus);
             statusList.add(resolveStatusValue(startingStatus, interzoneIPCStatus));
         }
-        if (existsInterZoneOAMDiscovery()) {
-            PetasosEndpointStatusEnum interzoneTopologyStatus = getInterzoneOAMDiscovery().getEndpointStatus();
+        if (existsPotasosOAMDiscoveryEndpoint()) {
+            PetasosEndpointStatusEnum interzoneTopologyStatus = getPetasosOAMDiscoveryEndpoint().getEndpointStatus();
             getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneOAMDiscovery().getEndpointStatus()->{}", interzoneTopologyStatus);
             statusList.add(resolveStatusValue(startingStatus, interzoneTopologyStatus));
         }
-        if (existsInterZoneOAMPubSub()) {
-            PetasosEndpointStatusEnum interzoneSubscriptionStatus = getInterzoneOAMPubSub().getEndpointStatus();
+        if (existsPetasosOAMPubSubEndpoint()) {
+            PetasosEndpointStatusEnum interzoneSubscriptionStatus = getPetasosOAMPubSubEndpoint().getEndpointStatus();
             getLogger().debug(".deriveAggregateStatus(): Entry, getInterzoneOAMPubSub().getEndpointStatus()->{}", interzoneSubscriptionStatus);
             statusList.add(resolveStatusValue(startingStatus, interzoneSubscriptionStatus));
         }
-        if (existsInterZoneAudit()){
-            PetasosEndpointStatusEnum interzoneAuditStatus = getInterZoneAudit().getEndpointStatus();
+        if (existsPetasosAuditServicesEndpoint()){
+            PetasosEndpointStatusEnum interzoneAuditStatus = getPetasosAuditServicesEndpoint().getEndpointStatus();
             getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneAudit().getEndpointStatus()->{}", interzoneAuditStatus);
             statusList.add(resolveStatusValue(startingStatus, interzoneAuditStatus));
         }
-        if (existsInterZoneTask()){
-            PetasosEndpointStatusEnum interzoneTaskingStatus = getInterZoneTask().getEndpointStatus();
+        if (existsPetasosTaskServicesEndpoint()){
+            PetasosEndpointStatusEnum interzoneTaskingStatus = getPetasosTaskServicesEndpoint().getEndpointStatus();
             getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneTask().getEndpointStatus()->{}", interzoneTaskingStatus);
             statusList.add(resolveStatusValue(startingStatus, interzoneTaskingStatus));
         }
-        if (existsInterZoneInterception()){
-            PetasosEndpointStatusEnum interzoneInterceptionStatus = getInterZoneInterception().getEndpointStatus();
+        if (existsPetasosInterceptionServicesEndpoint()){
+            PetasosEndpointStatusEnum interzoneInterceptionStatus = getPetasosInterceptionServicesEndpoint().getEndpointStatus();
             getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneInterception().getEndpointStatus()->{}", interzoneInterceptionStatus);
             statusList.add(resolveStatusValue(startingStatus,interzoneInterceptionStatus));
         }
-        if(existsInterZoneMetrics()){
-            PetasosEndpointStatusEnum interzoneMetricsStatus = getInterZoneMetrics().getEndpointStatus();
+        if(existsPetasosMetricsEndpoint()){
+            PetasosEndpointStatusEnum interzoneMetricsStatus = getPetasosMetricsEndpoint().getEndpointStatus();
             getLogger().debug(".deriveAggregateStatus(): Entry, getInterZoneMetrics().getEndpointStatus()->{}", interzoneMetricsStatus);
             statusList.add(resolveStatusValue(startingStatus, interzoneMetricsStatus));
         }
@@ -505,161 +443,83 @@ public class CoreSubsystemPetasosEndpointsWatchdog
     // Getters (and Setters)
     //
 
-    public boolean existsIntraZoneInterception(){
-        boolean hasValue = this.intraZoneInterception != null;
+
+    public boolean existsPetasosInterceptionServicesEndpoint(){
+        boolean hasValue = this.petasosInterceptionServicesEndpoint != null;
         return(hasValue);
     }
 
-    public PetasosEndpoint getIntraZoneInterception() {
-        return intraZoneInterception;
+    public PetasosEndpoint getPetasosInterceptionServicesEndpoint() {
+        return petasosInterceptionServicesEndpoint;
     }
 
-    public void setIntraZoneInterception(PetasosEndpoint intraZoneInterception) {
-        this.intraZoneInterception = intraZoneInterception;
+    public void setPetasosInterceptionServicesEndpoint(PetasosEndpoint petasosInterceptionServicesEndpoint) {
+        this.petasosInterceptionServicesEndpoint = petasosInterceptionServicesEndpoint;
     }
 
-    public boolean existsInterZoneInterception(){
-        boolean hasValue = this.interZoneInterception != null;
+    public boolean existsPetasosAuditServicesEndpoint(){
+        boolean hasValue = this.petasosAuditServicesEndpoint != null;
         return(hasValue);
     }
 
-    public PetasosEndpoint getInterZoneInterception() {
-        return interZoneInterception;
+    public PetasosEndpoint getPetasosAuditServicesEndpoint() {
+        return petasosAuditServicesEndpoint;
     }
 
-    public void setInterZoneInterception(PetasosEndpoint interZoneInterception) {
-        this.interZoneInterception = interZoneInterception;
+    public void setPetasosAuditServicesEndpoint(PetasosEndpoint petasosAuditServicesEndpoint) {
+        this.petasosAuditServicesEndpoint = petasosAuditServicesEndpoint;
     }
 
-    public boolean existsIntraZoneAudit(){
-        boolean hasValue = this.intraZoneAudit != null;
+    public boolean existsPetasosTaskServicesEndpoint(){
+        boolean hasValue = this.petasosTaskServicesEndpoint != null;
         return(hasValue);
     }
 
-    public PetasosEndpoint getIntraZoneAudit() {
-        return intraZoneAudit;
+    public PetasosEndpoint getPetasosTaskServicesEndpoint() {
+        return petasosTaskServicesEndpoint;
     }
 
-    public void setIntraZoneAudit(PetasosEndpoint intraZoneAudit) {
-        this.intraZoneAudit = intraZoneAudit;
+    public void setPetasosTaskServicesEndpoint(PetasosEndpoint petasosTaskServicesEndpoint) {
+        this.petasosTaskServicesEndpoint = petasosTaskServicesEndpoint;
     }
 
-    public boolean existsIntraZoneTask(){
-        boolean hasValue = this.intraZoneTask != null;
-        return(hasValue);
-    }
-
-    public PetasosEndpoint getIntraZoneTask() {
-        return intraZoneTask;
-    }
-
-    public void setIntraZoneTask(PetasosEndpoint intraZoneTask) {
-        this.intraZoneTask = intraZoneTask;
-    }
-
-    public boolean existsInterZoneAudit(){
-        boolean hasValue = this.interZoneAudit != null;
-        return(hasValue);
-    }
-
-    public PetasosEndpoint getInterZoneAudit() {
-        return interZoneAudit;
-    }
-
-    public void setInterZoneAudit(PetasosEndpoint interZoneAudit) {
-        this.interZoneAudit = interZoneAudit;
-    }
-
-    public boolean existsInterZoneTask(){
-        boolean hasValue = this.interZoneTask != null;
-        return(hasValue);
-    }
-
-    public PetasosEndpoint getInterZoneTask() {
-        return interZoneTask;
-    }
-
-    public void setInterZoneTask(PetasosEndpoint interZoneTask) {
-        this.interZoneTask = interZoneTask;
-    }
-
-
-    public boolean existsIntrazoneIPC(){
-        boolean exists = this.intrazoneIPC != null;
+    public boolean existsPetasosIPCMessagingEndpoint(){
+        boolean exists = this.petasosIPCMessagingEndpoint != null;
         return(exists);
     }
 
-    public PetasosEndpoint getIntrazoneIPC() {
-        return intrazoneIPC;
+    public PetasosEndpoint getPetasosIPCMessagingEndpoint() {
+        return petasosIPCMessagingEndpoint;
     }
 
-    public void setIntrazoneIPC(PetasosEndpoint intrazoneIPC) {
-        this.intrazoneIPC = intrazoneIPC;
+    public void setPetasosIPCMessagingEndpoint(PetasosEndpoint petasosIPCMessagingEndpoint) {
+        this.petasosIPCMessagingEndpoint = petasosIPCMessagingEndpoint;
     }
 
-    public boolean existsIntraZoneOAMPubSub(){
-        boolean exists = this.intrazoneOAMPubSub != null;
+    public boolean existsPetasosOAMPubSubEndpoint(){
+        boolean exists = this.petasosOAMPubSubEndpoint != null;
         return(exists);
     }
 
-    public PetasosEndpoint getIntrazoneOAMPubSub() {
-        return intrazoneOAMPubSub;
+    public PetasosEndpoint getPetasosOAMPubSubEndpoint() {
+        return petasosOAMPubSubEndpoint;
     }
 
-    public void setIntrazoneOAMPubSub(PetasosEndpoint intrazoneOAMPubSub) {
-        this.intrazoneOAMPubSub = intrazoneOAMPubSub;
+    public void setPetasosOAMPubSubEndpoint(PetasosEndpoint petasosOAMPubSubEndpoint) {
+        this.petasosOAMPubSubEndpoint = petasosOAMPubSubEndpoint;
     }
 
-    public boolean existsIntraZoneOAMDiscovery(){
-        boolean exists = this.intrazoneOAMDiscovery != null;
+    public boolean existsPotasosOAMDiscoveryEndpoint(){
+        boolean exists = this.petasosOAMDiscoveryEndpoint != null;
         return(exists);
     }
 
-    public PetasosEndpoint getIntrazoneOAMDiscovery() {
-        return intrazoneOAMDiscovery;
+    public PetasosEndpoint getPetasosOAMDiscoveryEndpoint() {
+        return petasosOAMDiscoveryEndpoint;
     }
 
-    public void setIntrazoneOAMDiscovery(PetasosEndpoint intrazoneOAMDiscovery) {
-        this.intrazoneOAMDiscovery = intrazoneOAMDiscovery;
-    }
-
-    public boolean existsInterZoneIPC(){
-        boolean exists = this.interzoneIPC != null;
-        return(exists);
-    }
-
-    public PetasosEndpoint getInterzoneIPC() {
-        return interzoneIPC;
-    }
-
-    public void setInterzoneIPC(PetasosEndpoint interzoneIPC) {
-        this.interzoneIPC = interzoneIPC;
-    }
-
-    public boolean existsInterZoneOAMPubSub(){
-        boolean exists = this.interzoneOAMPubSub != null;
-        return(exists);
-    }
-
-    public PetasosEndpoint getInterzoneOAMPubSub() {
-        return interzoneOAMPubSub;
-    }
-
-    public void setInterzoneOAMPubSub(PetasosEndpoint interzoneOAMPubSub) {
-        this.interzoneOAMPubSub = interzoneOAMPubSub;
-    }
-
-    public boolean existsInterZoneOAMDiscovery(){
-        boolean exists = this.interzoneOAMDiscovery != null;
-        return(exists);
-    }
-
-    public PetasosEndpoint getInterzoneOAMDiscovery() {
-        return interzoneOAMDiscovery;
-    }
-
-    public void setInterzoneOAMDiscovery(PetasosEndpoint interzoneOAMDiscovery) {
-        this.interzoneOAMDiscovery = interzoneOAMDiscovery;
+    public void setPetasosOAMDiscoveryEndpoint(PetasosEndpoint petasosOAMDiscoveryEndpoint) {
+        this.petasosOAMDiscoveryEndpoint = petasosOAMDiscoveryEndpoint;
     }
 
     public PetasosEndpointStatusEnum getAggregateStatus() {
@@ -692,30 +552,17 @@ public class CoreSubsystemPetasosEndpointsWatchdog
         return(exists);
     }
 
-    public boolean existsIntraZoneMetrics(){
-        boolean exits = this.intraZoneMetrics != null;
+    public boolean existsPetasosMetricsEndpoint(){
+        boolean exits = this.petasosMetricsEndpoint != null;
         return(exits);
     }
 
-    public PetasosEndpoint getIntraZoneMetrics() {
-        return intraZoneMetrics;
+    public PetasosEndpoint getPetasosMetricsEndpoint() {
+        return petasosMetricsEndpoint;
     }
 
-    public void setIntraZoneMetrics(PetasosEndpoint intraZoneMetrics) {
-        this.intraZoneMetrics = intraZoneMetrics;
-    }
-
-    public boolean existsInterZoneMetrics(){
-        boolean exits = this.interZoneMetrics != null;
-        return(exits);
-    }
-
-    public PetasosEndpoint getInterZoneMetrics() {
-        return interZoneMetrics;
-    }
-
-    public void setInterZoneMetrics(PetasosEndpoint interZoneMetrics) {
-        this.interZoneMetrics = interZoneMetrics;
+    public void setPetasosMetricsEndpoint(PetasosEndpoint petasosMetricsEndpoint) {
+        this.petasosMetricsEndpoint = petasosMetricsEndpoint;
     }
 
     public PetasosEndpoint getEdgeAnswerRPC() {

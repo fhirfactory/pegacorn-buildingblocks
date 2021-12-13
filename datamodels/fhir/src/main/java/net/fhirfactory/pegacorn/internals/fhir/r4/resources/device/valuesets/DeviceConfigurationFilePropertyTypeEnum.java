@@ -22,18 +22,14 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets;
 
 public enum DeviceConfigurationFilePropertyTypeEnum {
-    CONFIG_FILE_JGROUPS_INTRAZONE_IPC("JGroupsIntraZoneIPC", "pegacorn.fhir.device.property.configuration_fule.jgroups_intrazone_ipc", "JGroups Intra-Zone IPC Configuration File"),
-    CONFIG_FILE_JGROUPS_INTERZONE_IPC("JGroupsInterZoneIPC", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_ipc", "JGroups Inter-Zone IPC Configuration File"),
-    CONFIG_FILE_JGROUPS_INTRAZONE_OAM("JGroupsIntraZoneOAM", "pegacorn.fhir.device.property.configuration_fule.jgroups_intrazone_oam", "JGroups Intra-Zone OAM Configuration File"),
-    CONFIG_FILE_JGROUPS_INTERZONE_OAM("JGroupsInterZoneOAM", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_oam", "JGroups Inter-Zone OAM Configuration File"),
-    CONFIG_FILE_JGROUPS_INTRAZONE_AUDIT("JGroupsIntraZoneAudit", "pegacorn.fhir.device.property.configuration_fule.jgroups_intrazone_audit", "JGroups Intra-Zone AuditTrail Configuration File"),
-    CONFIG_FILE_JGROUPS_INTERZONE_AUDIT("JGroupsInterZoneAudit", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_audit", "JGroups Inter-Zone AuditTrail Configuration File"),
-    CONFIG_FILE_JGROUPS_INTRAZONE_TASKS("JGroupsIntraZoneTasks", "pegacorn.fhir.device.property.configuration_fule.jgroups_intrazone_tasks", "JGroups Intra-Zone Tasks Configuration File"),
-    CONFIG_FILE_JGROUPS_INTERZONE_TASKS("JGroupsInterZoneTasks", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_tasks", "JGroups Inter-Zone Tasks Configuration File"),
-    CONFIG_FILE_JGROUPS_INTRAZONE_METRICS("JGroupsIntraZoneMetrics", "pegacorn.fhir.device.property.configuration_fule.jgroups_intrazone_metrics", "JGroups Intra-Zone Metrics Configuration File"),
-    CONFIG_FILE_JGROUPS_INTERZONE_METRICS("JGroupsInterZoneMetrics", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_metrics", "JGroups Inter-Zone Metrics Configuration File"),
-    CONFIG_FILE_JGROUPS_INTRAZONE_INTERCEPTION("JGroupsIntraZoneInterception", "pegacorn.fhir.device.property.configuration_fule.jgroups_intrazone_interception", "JGroups Intra-Zone Interception Configuration File"),
-    CONFIG_FILE_JGROUPS_INTERZONE_INTERCEPTION("JGroupsInterZoneInterception", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_interception", "JGroups Inter-Zone Interception Configuration File");
+    CONFIG_FILE_JGROUPS_PETASOS_IPC_MESSAGING("JGroupsInterZoneIPC", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_ipc", "JGroups Inter-Zone IPC Messaging Configuration File"),
+    CONFIG_FILE_JGROUPS_PETASOS_TOPOLOGY("JGroupsInterZoneTopology", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_topology", "JGroups Inter-Zone Topology Services Configuration File"),
+    CONFIG_FILE_JGROUPS_PETASOS_AUDIT("JGroupsIntraZoneAudit", "pegacorn.fhir.device.property.configuration_fule.jgroups_intrazone_audit", "JGroups Intra-Zone Audit Services Configuration File"),
+    CONFIG_FILE_JGROUPS_PETASOS_TASKS("JGroupsInterZoneTasks", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_tasks", "JGroups Inter-Zone Task Services Configuration File"),
+    CONFIG_FILE_JGROUPS_PETASOS_SUBSCRIPTION("JGroupsInterZoneSubscription", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_subscription", "JGroups Inter-Zone Subscription Configuration File"),
+    CONFIG_FILE_JGROUPS_PETASOS_METRICS("JGroupsInterZoneMetrics", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_metrics", "JGroups Inter-Zone Metrics Configuration File"),
+    CONFIG_FILE_JGROUPS_MULTIUSE_INFINISPAN("JGroupsMultiZoneInfinispan", "pegacorn.fhir.device.property.configuration_fule.jgroups_multizone_infinispan", "JGroups Multi-Zone Infinispan Configuration File"),
+    CONFIG_FILE_JGROUPS_PETASOS_INTERCEPTION("JGroupsInterZoneInterception", "pegacorn.fhir.device.property.configuration_fule.jgroups_interzone_interception", "JGroups Inter-Zone Interception Configuration File");
 
     private String displayName;
     private String token;

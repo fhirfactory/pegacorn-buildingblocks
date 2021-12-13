@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers;
 
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointChannelScopeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
 import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -35,36 +36,33 @@ public class EndpointNameUtilities {
 
     private String CHANNEL_NAME_SEPARATOR = "::";
 
-    private static String INTERZONE_OAM_GROUP_NAME = "InterZone.OAM";
-    private static String INTERZONE_IPC_GROUP_NAME = "InterZone.IPC";
-    private static String INTRAZONE_OAM_GROUP_NAME = "IntraZone.OAM";
-    private static String INTRAZONE_IPC_GROUP_NAME = "IntraZone.IPC";
-    private static String INTRASITE_OAM_GROUP_NAME = "IntraSite.OAM";
-    private static String INTRASITE_IPC_GROUP_NAME = "IntraSite.IPC";
+    private static String PETASOS_TOPOLOGY_SERVICES_GROUP_NAME = "Petasos.Topology";
+    private static String PETASOS_SUBSCRIPTIONS_SERVICES_GROUP_NAME = "Petasos.Subscriptions";
+    private static String PETASOS_TASK_SERVICES_GROUP_NAME = "Petasos.Tasking";
+    private static String PETASOS_INTERCEPTION_GROUP_NAME = "Petasos.Snoop";
+    private static String PETASOS_METRICS_GROUP_NAME = "Petasos.Metrics";
+    private static String PETASOS_AUDIT_SERVICES_GROUP_NAME = "Petasos.Audit";
+    private static String PETASOS_IPC_MESSAGING_GROUP_NAME = "Petasos.IPC";
 
     private static int ENDPOINT_SITE_POSITION_IN_CHANNEL_NAME = 0;
     private static int ENDPOINT_ZONE_POSITION_IN_CHANNEL_NAME = 1;
     private static int ENDPOINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME = 2;
-    private static int ENDPOINT_SCOPE_POSITION_IN_CHANNEL_NAME = 3;
-    private static int ENDPOINT_FUNCTION_POSITION_IN_CHANNEL_NAME = 4;
-    private static int ENDPOINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME = 5;
+    private static int ENDPOINT_FUNCTION_POSITION_IN_CHANNEL_NAME = 3;
+    private static int ENDPOINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME = 4;
 
     private static int ENDPOINT_SERVICE_NAME_POSITION_IN_ENDPOINT_NAME = 0;
-    private static int ENDPOINT_SCOPE_POSITION_IN_ENDPOINT_NAME = 1;
-    private static int ENDPOINT_UNIQUE_ID_POSITION_IN_ENDPOINT_NAME = 2;
+    private static int ENDPOINT_UNIQUE_ID_POSITION_IN_ENDPOINT_NAME = 1;
 
     public EndpointNameUtilities(){
         this.currentUUID = UUID.randomUUID().toString();
     }
 
-    public String buildChannelName(String endpointSite, String endpointZone, String endpointServiceName, String endpointScope, String endpointFunction, String endpointUniqueID){
+    public String buildChannelName(String endpointSite, String endpointZone, String endpointServiceName, String endpointFunction, String endpointUniqueID){
         String channelName = endpointSite
                 + getChannelNameSeparator()
                 + endpointZone
                 + getChannelNameSeparator()
                 + endpointServiceName
-                + getChannelNameSeparator()
-                + endpointScope
                 + getChannelNameSeparator()
                 + endpointFunction
                 + getChannelNameSeparator()
@@ -72,10 +70,8 @@ public class EndpointNameUtilities {
         return(channelName);
     }
 
-    public String buildEndpointName(String endpointServiceName, String endpointScope, String endpointUniqueID ){
+    public String buildEndpointName(String endpointServiceName, String endpointUniqueID ){
         String endpointName =  endpointServiceName
-                + getChannelNameSeparator()
-                + endpointScope
                 + getChannelNameSeparator()
                 + endpointUniqueID;
         return(endpointName);
@@ -86,9 +82,8 @@ public class EndpointNameUtilities {
             return(null);
         }
         String endpointServiceName = getEndpointServiceNameFromChannelName(channelName);
-        String endpointScopeName = getEndpointScopeFromChannelName(channelName);
         String endpointUniqueID = getEndpointUniqueIDFromChannelName(channelName);
-        String endpointName = buildEndpointName(endpointServiceName, endpointScopeName, endpointUniqueID);
+        String endpointName = buildEndpointName(endpointServiceName,endpointUniqueID);
         return(endpointName);
     }
 
@@ -124,10 +119,9 @@ public class EndpointNameUtilities {
         String endpointServiceName = nameSplit[ENDPOINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME];
         String endpointSiteName = nameSplit[ENDPOINT_SITE_POSITION_IN_CHANNEL_NAME];
         String endpointZoneName = nameSplit[ENDPOINT_ZONE_POSITION_IN_CHANNEL_NAME];
-        String endpointScopeName = nameSplit[ENDPOINT_SCOPE_POSITION_IN_CHANNEL_NAME];
         String endpointFunctionName = functionType.getDisplayName();
         String endpointUUID = nameSplit[ENDPOINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME];
-        String oamPubSubName = buildChannelName(endpointSiteName,endpointZoneName,endpointServiceName,endpointScopeName,endpointFunctionName,endpointUUID);
+        String oamPubSubName = buildChannelName(endpointSiteName,endpointZoneName,endpointServiceName,endpointFunctionName,endpointUUID);
         return(oamPubSubName);
     }
 
@@ -137,9 +131,8 @@ public class EndpointNameUtilities {
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
         String endpointServiceName = nameSplit[ENDPOINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME];
-        String endpointScopeName = nameSplit[ENDPOINT_SCOPE_POSITION_IN_CHANNEL_NAME];
         String endpointUniqueID = nameSplit[ENDPOINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME];
-        String endpointName = buildEndpointName(endpointServiceName, endpointScopeName, endpointUniqueID);
+        String endpointName = buildEndpointName(endpointServiceName, endpointUniqueID);
         return(endpointName);
     }
 
@@ -209,28 +202,6 @@ public class EndpointNameUtilities {
         return(areSameService);
     }
 
-    public String getEndpointScopeFromChannelName(String channelName){
-        if(StringUtils.isEmpty(channelName)){
-            return(null);
-        }
-        String[] nameSplit = channelName.split(getChannelNameSeparator());
-        String endpointScopeName = nameSplit[ENDPOINT_SCOPE_POSITION_IN_CHANNEL_NAME];
-        return(endpointScopeName);
-    }
-
-    public boolean isEndpointsSupportingSameScopeBasedOnChannelNames(String endpointChannelName1, String endpointChannelName2){
-        if(StringUtils.isEmpty(endpointChannelName1) || StringUtils.isEmpty(endpointChannelName2)){
-            return(false);
-        }
-        String endpointScopeName1 = getEndpointScopeFromChannelName(endpointChannelName1);
-        String endpointScopeName2 = getEndpointScopeFromChannelName(endpointChannelName2);
-        if(StringUtils.isEmpty(endpointScopeName1) || StringUtils.isEmpty(endpointScopeName2)){
-            return(false);
-        }
-        boolean areSameScope = endpointScopeName1.contentEquals(endpointScopeName2);
-        return(areSameScope);
-    }
-
     public String getEndpointFunctionFromChannelName(String channelName){
         if(StringUtils.isEmpty(channelName)){
             return(null);
@@ -284,28 +255,6 @@ public class EndpointNameUtilities {
         return (areSameService);
     }
 
-    public String getEndpointScopeFromEndpointName(String endpointName){
-        if(StringUtils.isEmpty(endpointName)){
-            return(null);
-        }
-        String[] nameSplit = endpointName.split(getChannelNameSeparator());
-        String endpointScopeName = nameSplit[ENDPOINT_SCOPE_POSITION_IN_ENDPOINT_NAME];
-        return(endpointScopeName);
-    }
-
-    public boolean isEndpointsSupportingSameScopeBasedOnEndpointNames(String endpointName1, String endpointName2) {
-        if (StringUtils.isEmpty(endpointName1) || StringUtils.isEmpty(endpointName2)) {
-            return (false);
-        }
-        String endpointScopeName1 = getEndpointScopeFromEndpointName(endpointName1);
-        String endpointScopeName2 = getEndpointScopeFromEndpointName(endpointName2);
-        if (StringUtils.isEmpty(endpointScopeName1) || StringUtils.isEmpty(endpointScopeName2)) {
-            return (false);
-        }
-        boolean areSameScope = endpointScopeName1.contentEquals(endpointScopeName2);
-        return (areSameScope);
-    }
-
     public String getEndpointUniqueIDFromEndpointName(String endpointName){
         if(StringUtils.isEmpty(endpointName)){
             return(null);
@@ -327,18 +276,6 @@ public class EndpointNameUtilities {
         return(this.currentUUID);
     }
 
-    public String getIntersiteScopeName() {
-        return (PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERSITE.getEndpointScopeName());
-    }
-
-    public String getIntrazoneScopeName() {
-        return (PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE.getEndpointScopeName());
-    }
-
-    public String getInterzoneScopeName() {
-        return (PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE.getEndpointScopeName());
-    }
-
     public  String getOAMPubSubFunctionName(){
         return(PetasosEndpointFunctionTypeEnum.PETASOS_SUBSCRIPTIONS_ENDPOINT.getDisplayName());
     }
@@ -349,5 +286,45 @@ public class EndpointNameUtilities {
 
     public String getIPCFunctionName(){
         return(PetasosEndpointFunctionTypeEnum.PETASOS_IPC_ENDPOINT.getDisplayName());
+    }
+
+    public String getPetasosTaskServicesFunctionName(){
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_TASKING_ENDPOINT.getDisplayName());
+    }
+
+    public String getPetasosInterceptionFunctionName(){
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_INTERCEPTION_ENDPOINT.getDisplayName());
+    }
+
+    public String getPetasosMetricsFunctionName(){
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_METRICS_ENDPOINT.getDisplayName());
+    }
+
+    public String getPetasosTopologyServicesGroupName() {
+        return PETASOS_TOPOLOGY_SERVICES_GROUP_NAME;
+    }
+
+    public String getPetasosSubscriptionsServicesGroupName() {
+        return PETASOS_SUBSCRIPTIONS_SERVICES_GROUP_NAME;
+    }
+
+    public String getPetasosTaskServicesGroupName() {
+        return PETASOS_TASK_SERVICES_GROUP_NAME;
+    }
+
+    public String getPetasosInterceptionGroupName() {
+        return PETASOS_INTERCEPTION_GROUP_NAME;
+    }
+
+    public String getPetasosMetricsGroupName() {
+        return PETASOS_METRICS_GROUP_NAME;
+    }
+
+    public String getPetasosAuditServicesGroupName() {
+        return PETASOS_AUDIT_SERVICES_GROUP_NAME;
+    }
+
+    public String getPetasosIpcMessagingGroupName() {
+        return PETASOS_IPC_MESSAGING_GROUP_NAME;
     }
 }

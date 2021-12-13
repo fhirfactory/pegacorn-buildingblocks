@@ -22,12 +22,16 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Objects;
 
@@ -162,21 +166,21 @@ public class PetasosFulfillmentTask extends PetasosTask{
 
     @Override
     public String toString() {
-        return "PetasosFulfillmentTask{" +
-                "taskFulfillment=" + taskFulfillment +
-                ", taskJobCard=" + taskJobCard +
-                ", actionableTaskId=" + actionableTaskId +
-                ", sourceResourceId=" + getSourceResourceId() +
-                ", taskId=" + getTaskId() +
-                ", hasTaskType=" + hasTaskType() +
-                ", taskType=" + getTaskType() +
-                ", taskWorkItem=" + getTaskWorkItem() +
-                ", taskTraceability=" + getTaskTraceability() +
-                ", taskOutcomeStatus=" + getTaskOutcomeStatus() +
-                ", registered=" + isRegistered() +
-                ", taskPerformerTypes=" + getTaskPerformerTypes() +
-                ", isARetry=" + isaRetry() +
-                ", taskMetadata=" + getTaskContext() +
+        return "PetasosFulfillmentTask{" + "\n" +
+                "  taskFulfillment=" + taskFulfillment + ",\n" +
+                "  taskJobCard=" + taskJobCard + ",\n" +
+                "  actionableTaskId=" + actionableTaskId + ",\n" +
+                "  sourceResourceId=" + getSourceResourceId() + ",\n" +
+                "  taskId=" + getTaskId() + ",\n" +
+                "  hasTaskType=" + hasTaskType() + ",\n" +
+                "  taskType=" + getTaskType() + ",\n" +
+                "  taskWorkItem=" + getTaskWorkItem() + ",\n" +
+                "  taskTraceability=" + getTaskTraceability() + ",\n" +
+                "  taskOutcomeStatus=" + getTaskOutcomeStatus() + ",\n" +
+                "  registered=" + isRegistered() + ",\n" +
+                "  taskPerformerTypes=" + getTaskPerformerTypes() + ",\n" +
+                "  isARetry=" + isaRetry() + ",\n" +
+                "  taskMetadata=" + getTaskContext() +
                 '}';
     }
 }

@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.core.interfaces.pubsub.PetasosSubscriptionReport
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.petasos.endpoints.InterProcessingPlantSubscriptionServicesBroker;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.PetasosOAMPubSubEndpoint;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.PetasosSubscriptionReportingAgent;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class PetasosSubscriptionReportWorker implements PetasosSubscriptionRepor
     private PetasosSubscriptionReportingAgent pubSubCollectionAgent;
 
     @Inject
-    private InterProcessingPlantSubscriptionServicesBroker subscriptionServicesBroker;
+    private PetasosOAMPubSubEndpoint subscriptionServicesBroker;
 
     @Inject
     private PetasosSubscriptionReportingServiceProviderNameInterface serviceProviderName;

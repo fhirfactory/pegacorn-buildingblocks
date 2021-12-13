@@ -82,13 +82,17 @@ public class LocalPetasosActionableTaskActivityController {
     //
 
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask){
+        getLogger().info(".registerActionableTask(): Entry, actionableTask->{}",actionableTask);
         getSharedActionableTaskDM().registerActionableTask(actionableTask);
         getTaskRepositoryService().registerActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), actionableTask);
+        getLogger().debug(".registerActionableTask(): Exit, actionableTask->{}", actionableTask);
         return(actionableTask);
     }
 
     public PetasosActionableTask deregisterActionableTask(PetasosActionableTask actionableTask){
+        getLogger().debug(".deregisterActionableTask(): Entry, actionableTask->{}",actionableTask);
         getSharedActionableTaskDM().unregisterActionableTask(actionableTask);
+        getLogger().debug(".deregisterActionableTask(): Exit, actionableTask->{}",actionableTask);
         return(actionableTask);
     }
 
@@ -138,7 +142,7 @@ public class LocalPetasosActionableTaskActivityController {
     }
 
     public PetasosActionableTask notifyActionableTaskExecutionFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().debug(".notifyActionableTaskExecutionFailure(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        getLogger().info(".notifyActionableTaskExecutionFailure(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
         if(fulfillmentTask == null){
             getLogger().debug(".notifyActionableTaskExecutionFailure(): Exit, fulfillmentTask is null");
             return(null);
@@ -170,7 +174,7 @@ public class LocalPetasosActionableTaskActivityController {
     }
 
     public PetasosActionableTask notifyActionableTaskExecutionCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().debug(".notifyActionableTaskExecutionCancellation(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        getLogger().info(".notifyActionableTaskExecutionCancellation(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
         if(fulfillmentTask == null){
             getLogger().debug(".notifyActionableTaskExecutionCancellation(): Exit, fulfillmentTask is null");
             return(null);

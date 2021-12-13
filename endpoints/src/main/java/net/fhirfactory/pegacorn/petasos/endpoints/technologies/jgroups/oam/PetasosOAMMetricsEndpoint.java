@@ -19,34 +19,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.metrics.base;
+package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam;
 
+import net.fhirfactory.pegacorn.core.interfaces.oam.metrics.PetasosMetricsBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.metrics.PetasosMetricsHandlerInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetric;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetricSet;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
-import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r4.model.AuditEvent;
-import org.hl7.fhir.r4.model.IdType;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public abstract class PetasosOAMMetricsEndpoint extends JGroupsPetasosEndpointBase {
+@ApplicationScoped
+public class PetasosOAMMetricsEndpoint extends JGroupsPetasosEndpointBase implements PetasosMetricsBrokerInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosOAMMetricsEndpoint.class);
 
     @Produce
     private ProducerTemplate camelProducer;
@@ -55,7 +58,7 @@ public abstract class PetasosOAMMetricsEndpoint extends JGroupsPetasosEndpointBa
     private PetasosMetricsHandlerInterface metricsHandler;
 
     //
-    // Constructor
+    // Constructor(s)
     //
 
     public PetasosOAMMetricsEndpoint(){
@@ -70,6 +73,102 @@ public abstract class PetasosOAMMetricsEndpoint extends JGroupsPetasosEndpointBa
     protected void executePostConstructActivities() {
 
     }
+
+    //
+    // Getters (and Setters)
+    //
+
+    public ProducerTemplate getCamelProducer() {
+        return camelProducer;
+    }
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    @Override
+    protected String specifyIPCInterfaceName() {
+        return (getInterfaceNames().getPetasosMetricsEndpointName());
+    }
+
+    @Override
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_MESSAGING_SERVICE);
+    }
+
+    //
+    // Endpoint Definition
+    //
+
+    @Override
+    protected String specifyJGroupsStackFileName() {
+        return (getProcessingPlantInterface().getProcessingPlantNode().getPetasosMetricsStackConfigFile());
+    }
+
+    @Override
+    protected PetasosEndpointIdentifier specifyEndpointID() {
+        PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
+        endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
+        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getPetasosMetricsGroupName());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getPetasosMetricsGroupName();
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
+        return (endpointID);
+    }
+
+    @Override
+    protected String specifyEndpointServiceName() {
+        return (getProcessingPlantInterface().getIPCServiceName());
+    }
+
+    @Override
+    protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_METRICS_ENDPOINT);
+    }
+
+    @Override
+    protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_METRICS);
+    }
+
+    @Override
+    protected void resolveTopologyEndpoint() {
+        setTopologyNode(getJgroupsParticipantInformationService().getMyPetasosTopologyEndpoint());
+    }
+
+    @Override
+    protected PubSubParticipant specifyPubSubParticipant() {
+        PubSubParticipant myInterZoneParticipantRole = getJgroupsParticipantInformationService().getMyPetasosParticipantRole();
+        if(myInterZoneParticipantRole == null){
+            myInterZoneParticipantRole = getJgroupsParticipantInformationService().buildMyPetasosParticipantRole(getPetasosEndpoint());
+        }
+        return (myInterZoneParticipantRole);
+    }
+
+    @Override
+    protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
+        getCoreSubsystemPetasosEndpointsWatchdog().setPetasosMetricsEndpoint(this.getPetasosEndpoint());
+    }
+
+    //
+    // Metrics Service Methods
+    //
 
     public List<Address> getMetricsServerTargetAddressSet(String endpointServiceName){
         getLogger().debug(".getMetricsServerTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
@@ -103,19 +202,6 @@ public abstract class PetasosOAMMetricsEndpoint extends JGroupsPetasosEndpointBa
         Address endpointJGroupsAddress = endpointAddressSet.get(0);
         getLogger().debug(".getCandidateMetricsServerTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
         return(endpointJGroupsAddress);
-    }
-
-    public boolean metricsServiceProviderIsInScope(String capabilityProviderServiceName){
-        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
-        if(memberSetBasedOnService.isEmpty()){
-            return(false);
-        }
-        for(String currentName: memberSetBasedOnService){
-            if(isWithinScopeBasedOnChannelName(currentName)){
-                return(true);
-            }
-        }
-        return(false);
     }
 
     //
@@ -192,11 +278,26 @@ public abstract class PetasosOAMMetricsEndpoint extends JGroupsPetasosEndpointBa
     }
 
     //
-    // Getters (and Setters)
+    // Metrics Services
     //
 
+    @Override
+    public Instant captureMetric(String serviceProviderName, PetasosComponentMetric metric) {
+        getLogger().debug(".captureMetric(): Entry, serviceProviderName->{}, metric->{}", serviceProviderName, metric);
 
-    public ProducerTemplate getCamelProducer() {
-        return camelProducer;
+        Instant captureInstant = updateMetric(serviceProviderName, metric);
+
+        getLogger().debug(".captureMetric(): Exit, captureInstant->{}", captureInstant);
+        return(captureInstant);
+    }
+
+    @Override
+    public Instant captureMetrics(String serviceProviderName, PetasosComponentMetricSet metricSet) {
+        getLogger().debug(".captureMetrics(): Entry, serviceProviderName->{}, metricSet->{}", serviceProviderName, metricSet);
+
+        Instant captureInstant = updateMetrics(serviceProviderName, metricSet);
+
+        getLogger().debug(".captureMetrics(): Exit, captureInstant->{}", captureInstant);
+        return(captureInstant);
     }
 }

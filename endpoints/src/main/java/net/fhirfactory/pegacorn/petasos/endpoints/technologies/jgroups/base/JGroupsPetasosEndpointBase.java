@@ -111,7 +111,7 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
         this.setEndpointID(specifyEndpointID());
         PetasosEndpoint petasosEndpoint = getEndpointMap().newPetasosEndpoint(
                 getEndpointID(), "JGroups", getEndpointServiceName(),
-                getPetasosEndpointFunctionType(), getPetasosEndpointPayloadType(), specifyPetasosEndpointScope());
+                getPetasosEndpointFunctionType(), getPetasosEndpointPayloadType());
         this.petasosEndpoint = petasosEndpoint;
         this.getPetasosEndpoint().setEndpointStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
         getLogger().info(".initialise(): Step 2: Completed ==> PetasosEndpoint created ->{}", getPetasosEndpoint());
@@ -326,92 +326,6 @@ public abstract class JGroupsPetasosEndpointBase extends JGroupsPetasosAdapterBa
             endpointStatus = PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_UNREACHABLE;
         }
         return(endpointStatus);
-    }
-
-    protected boolean isWithinScopeOfEndpoint(InterSubsystemPubSubParticipant testParticipant) {
-        boolean inScope = testParticipant.getEndpointScope().equals(getPetasosEndpoint().getEndpointScope());
-        return(inScope);
-    }
-
-/*
-    protected boolean isWithinScopeOfEndpoint(PetasosEndpointIdentifier endpointID) {
-        boolean sameZone = endpointID.getEndpointZone().equals(getPetasosEndpoint().getEndpointID().getEndpointZone());
-        boolean sameSite = endpointID.getEndpointSite().contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
-        boolean doSubscription = false;
-        if (sameSite && sameZone) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE)) {
-                doSubscription = true;
-            }
-        }
-        if (sameSite && !sameZone) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE)) {
-                doSubscription = true;
-            }
-        }
-        if (!sameSite) {
-            if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERSITE)) {
-                doSubscription = true;
-            }
-        }
-        return(doSubscription);
-    }
-*/
-    protected boolean isWithinScopeBasedOnChannelName(String endpointChannelName) {
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Entry, endpointChannelName->{}", endpointChannelName);
-        getLogger().info("--->DEBUGGING ONLY-->getPetasosEndpoint()-->{}", getPetasosEndpoint());
-        getLogger().info("--->DEBUGGING ONLY-->getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName)-->{}",getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName));
-        boolean sameSite = getEndpointNameUtilities().getEndpointSiteFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointSite());
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Site.... result->{}", sameSite);
-        boolean sameZone = getEndpointNameUtilities().getEndpointZoneFromChannelName(endpointChannelName).contentEquals(getPetasosEndpoint().getEndpointID().getEndpointZone().getDisplayName());
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking to see if other endpoint is in same Zone.... result->{}", sameZone);
-        String otherChannelScope = getEndpointNameUtilities().getEndpointScopeFromChannelName(endpointChannelName);
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Checking endpoint channel scope->{}", otherChannelScope);
-        switch(specifyPetasosEndpointScope()){
-            case ENDPOINT_CHANNEL_SCOPE_INTRAZONE:{
-                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTRAZONE");
-                if (otherChannelScope.contentEquals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE.getEndpointScopeName())) {
-                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
-                    if(sameSite && sameZone){
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
-                        return(true);
-                    } else {
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
-                        return(false);
-                    }
-                }
-                break;
-            }
-            case ENDPOINT_CHANNEL_SCOPE_INTERZONE:{
-                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTERZONE");
-                if (otherChannelScope.contentEquals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE.getEndpointScopeName())) {
-                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
-                    if(sameSite && !sameZone){
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
-                        return(true);
-                    } else {
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
-                        return(false);
-                    }
-                }
-                break;
-            }
-            case ENDPOINT_CHANNEL_SCOPE_INTERSITE:{
-                getLogger().info(".isWithinScopeBasedOnChannelName(): My Scope is -> ENDPOINT_CHANNEL_SCOPE_INTERSITE");
-                if (specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERSITE)) {
-                    getLogger().info(".isWithinScopeBasedOnChannelName(): Other endpoint Scope is the same");
-                    if(!sameSite){
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning True");
-                        return(true);
-                    } else {
-                        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, returning False");
-                        return(false);
-                    }
-                }
-                break;
-            }
-        }
-        getLogger().info(".isWithinScopeBasedOnChannelName(): Exit, default returning False");
-        return(false);
     }
 
     //

@@ -45,7 +45,7 @@ public class RouteElementNames {
     private String wupVersion;
     private static final String INTRA_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String DIRECT_INTER_FUNCTION_DIRECT_TYPE = "direct:";
-    private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda:";
+    private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda://";
 
     public RouteElementNames(TopologyNodeFunctionFDNToken functionToken, boolean mustBeDirect){
         getLogger().debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);

@@ -105,6 +105,10 @@ public class GlobalPetasosTaskExecutionController {
                                 jobcard.setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
                             }
                         }
+                        globalCacheJobCard.setGlobalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
+                        globalCacheJobCard.setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
+                        jobcard.setGlobalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
+                        jobcard.setGlobalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
                     }
                 }
             }
@@ -113,12 +117,16 @@ public class GlobalPetasosTaskExecutionController {
     }
 
     public PetasosTaskJobCard reportTaskExecutionStart(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".reportTaskExecutionStart(): Entry, localJobCard->{}", localJobCard);
+        getLogger().info(".reportTaskExecutionStart(): Entry, localJobCard->{}", localJobCard);
         PetasosTaskJobCard globalJobCard = getTaskJobCardDM().getJobCardForFulfillmentTask(localJobCard.getFulfillmentTaskIdentifier());
         if(globalJobCard.getGrantedStatus().equals(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING)){
+            getLogger().info(".reportTaskExecutionStart(): globalJobCard.getGrantedStatus() equals PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING");
             globalJobCard.setLocalFulfillmentStatus(localJobCard.getLocalFulfillmentStatus());
+            globalJobCard.setGlobalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
             globalJobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
+            globalJobCard.setLocalUpdateInstant(Instant.now());
         } else {
+            getLogger().info(".reportTaskExecutionStart(): globalJobCard.getGrantedStatus() not-equals PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING");
             globalJobCard.setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
             globalJobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
             localJobCard.setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
@@ -126,18 +134,21 @@ public class GlobalPetasosTaskExecutionController {
         }
         localJobCard.setCoordinatorUpdateInstant(Instant.now());
         globalJobCard.setCoordinatorUpdateInstant(Instant.now());
-        getLogger().debug(".reportTaskExecutionStart(): Exit, localJobCard->{}", localJobCard);
+        getLogger().info(".reportTaskExecutionStart(): Exit, localJobCard->{}", localJobCard);
         return(localJobCard);
     }
 
     public PetasosTaskJobCard reportTaskExecutionFinish(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".reportTaskExecutionFinish(): Entry, localJobCard->{}", localJobCard);
+        getLogger().info(".reportTaskExecutionFinish(): Entry, localJobCard->{}", localJobCard);
         PetasosTaskJobCard globalJobCard = getTaskJobCardDM().getJobCardForFulfillmentTask(localJobCard.getFulfillmentTaskIdentifier());
         if(globalJobCard.getGrantedStatus().equals(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING)){
+            getLogger().info(".reportTaskExecutionStart(): globalJobCard.getGrantedStatus() equals PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING");
             globalJobCard.setLocalFulfillmentStatus(localJobCard.getLocalFulfillmentStatus());
             globalJobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
+            globalJobCard.setGlobalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
             localJobCard.setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
         } else {
+            getLogger().info(".reportTaskExecutionStart(): globalJobCard.getGrantedStatus() not-equals PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING");
             globalJobCard.setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
             globalJobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
             localJobCard.setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
@@ -145,12 +156,12 @@ public class GlobalPetasosTaskExecutionController {
         }
         localJobCard.setCoordinatorUpdateInstant(Instant.now());
         globalJobCard.setCoordinatorUpdateInstant(Instant.now());
-        getLogger().debug(".reportTaskExecutionFinish(): Exit, localJobCard->{}", localJobCard);
+        getLogger().info(".reportTaskExecutionFinish(): Exit, localJobCard->{}", localJobCard);
         return(localJobCard);
     }
 
     public PetasosTaskJobCard reportTaskExecutionFailure(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".reportTaskExecutionFailure(): Entry, localJobCard->{}", localJobCard);
+        getLogger().info(".reportTaskExecutionFailure(): Entry, localJobCard->{}", localJobCard);
         PetasosTaskJobCard globalJobCard = getTaskJobCardDM().getJobCardForFulfillmentTask(localJobCard.getFulfillmentTaskIdentifier());
         globalJobCard.setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
         globalJobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
@@ -158,12 +169,12 @@ public class GlobalPetasosTaskExecutionController {
         localJobCard.setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
         localJobCard.setCoordinatorUpdateInstant(Instant.now());
         globalJobCard.setCoordinatorUpdateInstant(Instant.now());
-        getLogger().debug(".reportTaskExecutionFailure(): Exit, localJobCard->{}", localJobCard);
+        getLogger().info(".reportTaskExecutionFailure(): Exit, localJobCard->{}", localJobCard);
         return(localJobCard);
     }
 
     public PetasosTaskJobCard reportTaskCancellation(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".reportTaskCancellation(): Entry, localJobCard->{}", localJobCard);
+        getLogger().info(".reportTaskCancellation(): Entry, localJobCard->{}", localJobCard);
         PetasosTaskJobCard globalJobCard = getTaskJobCardDM().getJobCardForFulfillmentTask(localJobCard.getFulfillmentTaskIdentifier());
         if(globalJobCard.getGrantedStatus().equals(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING)){
             globalJobCard.setLocalFulfillmentStatus(localJobCard.getLocalFulfillmentStatus());
@@ -177,7 +188,7 @@ public class GlobalPetasosTaskExecutionController {
         }
         localJobCard.setCoordinatorUpdateInstant(Instant.now());
         globalJobCard.setCoordinatorUpdateInstant(Instant.now());
-        getLogger().debug(".reportTaskCancellation(): Exit, localJobCard->{}", localJobCard);
+        getLogger().info(".reportTaskCancellation(): Exit, localJobCard->{}", localJobCard);
         return(localJobCard);
     }
 

@@ -64,7 +64,6 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
 //    protected abstract String specifyEndpointServiceName();
     protected abstract String specifyIPCInterfaceName();
     protected abstract PetasosEndpointTopologyTypeEnum specifyIPCType();
-    abstract protected PetasosEndpointChannelScopeEnum specifyPetasosEndpointScope();
 
     //
     // Getters and Setters
@@ -97,19 +96,9 @@ public abstract class JGroupsPetasosAdapterBase extends JGroupsAdapterBase {
     @Override
     protected String specifyJGroupsClusterName() {
         getLogger().debug(".specifyJGroupsClusterName(): Entry");
-        if(specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTRAZONE)) {
-            String clusterName = specifyEndpointID().getEndpointZone().getDisplayName()+"-"+specifyEndpointID().getEndpointGroup();
-            getLogger().debug(".specifyJGroupsClusterName(): IntraZone Scope, returning->{}", clusterName);
-            return (clusterName);
-        }
-        if(specifyPetasosEndpointScope().equals(PetasosEndpointChannelScopeEnum.ENDPOINT_CHANNEL_SCOPE_INTERZONE)){
-            String clusterName = specifyEndpointID().getEndpointGroup();
-            getLogger().debug(".specifyJGroupsClusterName(): InterZone Scope, returning->{}", clusterName);
-            return(clusterName);
-        }
-        String interSiteClusterName = specifyEndpointID().getEndpointGroup();
-        getLogger().info(".specifyJGroupsClusterName(): InterSite Scope, returning->{}", interSiteClusterName);
-        return(interSiteClusterName);
+        String clusterName = specifyEndpointID().getEndpointGroup();
+        getLogger().debug(".specifyJGroupsClusterName(): IntraZone Scope, returning->{}", clusterName);
+        return (clusterName);
     }
 
 

@@ -57,19 +57,19 @@ public abstract class PetasosTaskServicesManagerHandler extends PetasosTasksDist
 
     @Override
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
-        getLogger().debug(".retrievePendingActionableTasks(): Entry, actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
+        getLogger().debug(".registerActionableTask(): Entry, actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
         PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().registerPetasosActionableTask(actionableTask, requesterEndpointIdentifier);
         actionableTask.setRegistered(petasosActionableTaskRegistration.getRegistrationInstant()!= null);
-        getLogger().debug(".retrievePendingActionableTasks(): Exit, actionableTask->{}", actionableTask);
+        getLogger().debug(".registerActionableTask(): Exit, actionableTask->{}", actionableTask);
         return(actionableTask);
     }
 
     @Override
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
-        getLogger().debug(".retrievePendingActionableTasks(): Entry, actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
+        getLogger().debug(".updateActionableTask(): Entry, actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
         PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().updatePetasosActionableTask(actionableTask, requesterEndpointIdentifier);
         PetasosActionableTask updatedActionableTask = getActionableTaskDM().getPetasosActionableTask(actionableTask.getTaskId());
-        getLogger().debug(".retrievePendingActionableTasks(): Exit, updatedActionableTask->{}", updatedActionableTask);
+        getLogger().debug(".updateActionableTask(): Exit, updatedActionableTask->{}", updatedActionableTask);
         return(updatedActionableTask);
     }
 

@@ -26,6 +26,6 @@ import net.fhirfactory.pegacorn.platform.edge.model.ipc.interfaces.common.EdgeFo
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 
-public interface InterZoneEdgeForwarderService extends EdgeForwarderService {
+public interface PetasosEdgeMessageForwarderService extends EdgeForwarderService {
 
 }

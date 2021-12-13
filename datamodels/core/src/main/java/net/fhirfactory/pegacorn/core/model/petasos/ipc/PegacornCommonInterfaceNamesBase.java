@@ -36,23 +36,15 @@ public abstract class PegacornCommonInterfaceNamesBase {
     public String getJolokiaEndpointName(){return("KubernetesSystemJolokia");}
     public String getKubeReadinessEndpointName(){return("KubernetesSystemReadiness");}
     public String getKubeLivelinessEndpointName(){return("KubernetesSystemLiveliness");}
-    public String getIntraZoneJGroupsIPCEndpointName(){return("intra-ipc");}
-    public String getInterZoneJGroupsIPCEndpointName(){return("inter-ipc");}
-    public String getIntraZoneJGroupsTopologyEndpointName(){return("intra-top");}
-    public String getInterZoneJGroupsTopologyEndpointName(){return("inter-top");}
-    public String getIntraZoneJGroupsSubscriptionsEndpointName(){return("intra-sub");}
-    public String getInterZoneJGroupsSubscriptionsEndpointName(){return("inter-sub");}
-    public String getIntraZoneJGroupsTaskingEndpointName(){return("intra-task");}
-    public String getInterZoneJGroupsTaskingEndpointName(){return("inter-task");}
-    public String getIntraZoneJGroupsAuditEndpointName(){return("intra-audit");}
-    public String getInterZoneJGroupsAuditEndpointName(){return("inter-audit");}
-    public String getIntraZoneJGroupsInterceptionEndpointName(){return("intra-snoop");}
-    public String getInterZoneJGroupsInterceptionEndpointName(){return("inter-snoop");}
-    public String getIntraZoneJGroupsMetricsEndpointName(){return("intra-metrics");}
-    public String getInterZoneJGroupsMetricsEndpointName(){return("inter-metrics");}
+
+    public String getPetasosIPCMessagingEndpointName(){return("petasos-ipc");}
+    public String getPetasosTopologyServicesEndpointName(){return("petasos-top");}
+    public String getPetasosSubscriptionsEndpointName(){return("petasos-sub");}
+    public String getPetasosTaskServicesEndpointName(){return("petasos-task");}
+    public String getPetasosAuditServicesEndpointName(){return("petasos-audit");}
+    public String getPetasosInterceptionEndpointName(){return("petasos-snoop");}
+    public String getPetasosMetricsEndpointName(){return("petasos-metric");}
     public String getMultiZoneInfinispaEndpointName(){return("multi-infini");}
-    public String getEdgeReceiveEndpointName(){return("edge-rec");}
-    public String getEdgeForwardEndpointName(){return("edge-snd");}
     public String getEdgeAnswerEndpointName(){return("edge-answer");}
     public String getEdgeAskEndpointName(){return("edge-ask");}
     //

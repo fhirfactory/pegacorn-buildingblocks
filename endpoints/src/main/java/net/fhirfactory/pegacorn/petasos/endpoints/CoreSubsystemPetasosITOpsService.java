@@ -1,20 +1,13 @@
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.audit.PetasosInterZoneAuditEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.audit.PetasosIntraZoneAuditEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.interception.PetasosInterZoneInterceptionEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.interception.PetasosIntraZoneInterceptionEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosInterZoneOAMDiscoveryEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.discovery.PetasosIntraZoneOAMDiscoveryEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.metrics.PetasosInterZoneOAMMetricsEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.metrics.PetasosIntraZoneOAMMetricsEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.PetasosInterZoneOAMPubSubEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.pubsub.PetasosIntraZoneOAMPubSubEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks.PetasosInterZoneTaskEndpoint;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks.PetasosIntraZoneTaskEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.audit.PetasosAuditServicesEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIPCMessagingEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.PetasosOAMInterceptionEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.PetasosOAMMetricsEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.PetasosOAMPubSubEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.PetasosOAMTopologyEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.tasks.PetasosTaskServicesEndpoint;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -33,52 +26,41 @@ public class CoreSubsystemPetasosITOpsService extends RouteBuilder {
     private ProcessingPlantInterface processingPlant;
 
     @Inject
-    private PetasosInterZoneIPCEndpoint interZoneIPCEndpoint;
+    private PetasosIPCMessagingEndpoint petasosIPCMessagingEndpoint;
 
     @Inject
-    private PetasosIntraZoneIPCEndpoint intraZoneIPCEndpoint;
+    private PetasosOAMTopologyEndpoint petasosOAMTopologyEndpoint;
 
     @Inject
-    private PetasosIntraZoneOAMPubSubEndpoint intraZoneOAMPubSubEndpoint;
+    private PetasosOAMPubSubEndpoint petasosOAMPubSubEndpoint;
 
     @Inject
-    private PetasosIntraZoneOAMDiscoveryEndpoint intraZoneOAMDiscoveryEndpoint;
+    private PetasosAuditServicesEndpoint petasosAuditServicesEndpoint;
 
     @Inject
-    private PetasosInterZoneOAMDiscoveryEndpoint interZoneOAMDiscoveryEndpoint;
+    private PetasosOAMInterceptionEndpoint petasosOAMInterceptionEndpoint;
 
     @Inject
-    private PetasosInterZoneOAMPubSubEndpoint interZoneOAMPubSubEndpoint;
+    private PetasosOAMInterceptionEndpoint petasosOAMInterceptionEndpoint1;
 
     @Inject
-    private PetasosInterZoneAuditEndpoint interZoneAuditEndpoint;
+    private PetasosOAMMetricsEndpoint petasosOAMMetricsEndpoint;
 
     @Inject
-    private PetasosIntraZoneAuditEndpoint intraZoneAuditEndpoint;
+    private PetasosTaskServicesEndpoint petasosTaskServicesEndpoint;
 
-    @Inject
-    private PetasosInterZoneInterceptionEndpoint interZoneInterceptionEndpoint;
-
-    @Inject
-    private PetasosIntraZoneInterceptionEndpoint intraZoneInterceptionEndpoint;
-
-    @Inject
-    private PetasosInterZoneOAMMetricsEndpoint interZoneOAMMetricsEndpoint;
-
-    @Inject
-    private PetasosIntraZoneOAMMetricsEndpoint intraZoneOAMMetricsEndpoint;
-
-    @Inject
-    private PetasosInterZoneTaskEndpoint interZoneTaskEndpoint;
-
-    @Inject
-    private PetasosIntraZoneTaskEndpoint intraZoneTaskEndpoint;
-
+    //
+    // Constructor(s)
+    //
 
     public CoreSubsystemPetasosITOpsService(){
         super();
         this.initialised = false;
     }
+
+    //
+    // Post Constructor
+    //
 
     @PostConstruct
     public void initialise(){
@@ -88,20 +70,14 @@ public class CoreSubsystemPetasosITOpsService extends RouteBuilder {
             LOG.info(".initialise(): [ITOpsAgent Initialisation] Start");
 
             LOG.info(".initialise(): [ITOpsAgent Initialisation] Finish");
-            LOG.info(".initialise(): interZoneIPCEndpoint ==> {}", interZoneIPCEndpoint.getEndpointID());
-            LOG.info(".initialise(): intraZoneIPCEndpoint ==> {}", intraZoneIPCEndpoint.getEndpointID());
-            LOG.info(".initialise(): intraZoneOAMPubSubEndpoint ==> {}", intraZoneOAMPubSubEndpoint.getEndpointID());
-            LOG.info(".initialise(): interZoneOAMPubSubEndpoint ==> {}", interZoneOAMPubSubEndpoint.getEndpointID());
-            LOG.info(".initialise(): intraZoneOAMDiscoveryEndpoint ==> {}", intraZoneOAMDiscoveryEndpoint.getEndpointID());
-            LOG.info(".initialise(): interZoneOAMDiscoveryEndpoint ==> {}", interZoneOAMDiscoveryEndpoint.getEndpointID());
-            LOG.info(".initialise(): interZoneAuditEndpoint ==>{}", interZoneAuditEndpoint.getEndpointID());
-            LOG.info(".initialise(): intraZoneAuditEndpoint ==>{}", intraZoneAuditEndpoint.getEndpointID());
-            LOG.info(".initialise(): interZoneOAMMetricsEndpoint ==>{}", interZoneOAMMetricsEndpoint.getEndpointID());
-            LOG.info(".initialise(): intraZoneOAMMetricsEndpoint ==>{}", intraZoneOAMMetricsEndpoint.getEndpointID());
-            LOG.info(".initialise(): interZoneInterceptionEndpoint ==>{}", interZoneInterceptionEndpoint.getEndpointID());
-            LOG.info(".initialise(): intraZoneInterceptionEndpoint ==>{}", intraZoneInterceptionEndpoint.getEndpointID());
-            LOG.info(".initialise(): interZoneTaskEndpoint ==>{}", interZoneTaskEndpoint.getEndpointID());
-            LOG.info(".initialise(): intraZoneTaskEndpoint ==>{}", intraZoneTaskEndpoint.getEndpointID());
+            LOG.info(".initialise(): petasosIPCMessagingEndpoint ==> {}", petasosIPCMessagingEndpoint.getEndpointID());
+            LOG.info(".initialise(): petasosOAMPubSubEndpoint ==> {}", petasosOAMPubSubEndpoint.getEndpointID());
+            LOG.info(".initialise(): petasosOAMTopologyEndpoint ==> {}", petasosOAMTopologyEndpoint.getEndpointID());
+            LOG.info(".initialise(): petasosAuditServicesEndpoint ==>{}", petasosAuditServicesEndpoint.getEndpointID());
+            LOG.info(".initialise(): petasosOAMMetricsEndpoint ==>{}", petasosOAMMetricsEndpoint.getEndpointID());
+            LOG.info(".initialise(): petasosOAMInterceptionEndpoint ==>{}", petasosOAMInterceptionEndpoint.getEndpointID());
+            LOG.info(".initialise(): petasosOAMInterceptionEndpoint1 ==>{}", petasosOAMInterceptionEndpoint1.getEndpointID());
+            LOG.info(".initialise(): petasosTaskServicesEndpoint ==>{}", petasosTaskServicesEndpoint.getEndpointID());
             LOG.info(".initialise(): Done.");
         } else {
             LOG.debug(".initialise(): Already initialised, nothing to do!");

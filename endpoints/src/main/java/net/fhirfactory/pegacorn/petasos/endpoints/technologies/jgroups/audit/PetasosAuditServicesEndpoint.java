@@ -19,15 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.audit.base;
+package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.audit;
 
+import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceHandlerInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.transaction.factories.PegacornTransactionMethodOutcomeFactory;
 import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionStatusEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import org.apache.camel.Produce;
@@ -38,13 +43,18 @@ import org.hl7.fhir.r4.model.IdType;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class PetasosAuditEndpoint extends JGroupsPetasosEndpointBase {
+@ApplicationScoped
+public class PetasosAuditServicesEndpoint extends JGroupsPetasosEndpointBase implements PetasosAuditEventServiceBrokerInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosAuditServicesEndpoint.class);
 
     @Produce
     private ProducerTemplate camelProducer;
@@ -56,10 +66,10 @@ public abstract class PetasosAuditEndpoint extends JGroupsPetasosEndpointBase {
     private PegacornTransactionMethodOutcomeFactory outcomeFactory;
 
     //
-    // Constructor
+    // Constructor(s)
     //
 
-    public PetasosAuditEndpoint(){
+    public PetasosAuditServicesEndpoint(){
         super();
     }
 
@@ -71,6 +81,102 @@ public abstract class PetasosAuditEndpoint extends JGroupsPetasosEndpointBase {
     protected void executePostConstructActivities() {
 
     }
+
+    //
+    // Getters (and Setters)
+    //
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    public ProducerTemplate getCamelProducer() {
+        return camelProducer;
+    }
+
+    //
+    // Endpoint Specification
+    //
+
+    @Override
+    protected String specifyIPCInterfaceName() {
+        return (getInterfaceNames().getPetasosAuditServicesEndpointName());
+    }
+
+    @Override
+    protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
+        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_MESSAGING_SERVICE);
+    }
+
+    @Override
+    protected String specifyJGroupsStackFileName() {
+        return (getProcessingPlantInterface().getProcessingPlantNode().getPetasosAuditStackConfigFile());
+    }
+
+    @Override
+    protected PetasosEndpointIdentifier specifyEndpointID() {
+        PetasosEndpointIdentifier endpointID = new PetasosEndpointIdentifier();
+        // Get Core Values
+        String endpointServiceName = specifyEndpointServiceName();
+        String endpointFunctionName = specifyPetasosEndpointFunctionType().getDisplayName();
+        String endpointUUID = getEndpointNameUtilities().getCurrentUUID();
+        String endpointSite = getProcessingPlantInterface().getDeploymentSite();
+        String endpointZone = getProcessingPlantInterface().getNetworkZone().getDisplayName();
+        // Build EndpointName
+        String endpointName = getEndpointNameUtilities().buildEndpointName(endpointServiceName, endpointUUID);
+        // Build EndpointChannelName
+        String endpointChannelName = getEndpointNameUtilities().buildChannelName(endpointSite, endpointZone, endpointServiceName, endpointFunctionName, endpointUUID);
+        // Build EndpointID
+        endpointID.setEndpointChannelName(endpointChannelName);
+        endpointID.setEndpointName(endpointName);
+        endpointID.setEndpointZone(getProcessingPlantInterface().getNetworkZone());
+        endpointID.setEndpointSite(getProcessingPlantInterface().getDeploymentSite());
+        endpointID.setEndpointGroup(getJgroupsParticipantInformationService().getPetasosAuditGroupName());
+        endpointID.setEndpointComponentID(getTopologyNode().getComponentID());
+        endpointID.setProcessingPlantComponentID(getProcessingPlantInterface().getProcessingPlantNode().getComponentID());
+        String endpointAddress = "JGroups:" + endpointChannelName + ":" + getJgroupsParticipantInformationService().getPetasosAuditGroupName();
+        endpointID.setEndpointDetailedAddressName(endpointAddress);
+        return (endpointID);
+    }
+
+    @Override
+    protected String specifyEndpointServiceName() {
+        return (getProcessingPlantInterface().getIPCServiceName());
+    }
+
+    @Override
+    protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_INTERCEPTION_ENDPOINT);
+    }
+
+    @Override
+    protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_AUDITEVENTS);
+    }
+
+    @Override
+    protected void resolveTopologyEndpoint() {
+        setTopologyNode(getJgroupsParticipantInformationService().getMyPetasosTopologyEndpoint());
+    }
+
+    @Override
+    protected PubSubParticipant specifyPubSubParticipant() {
+        PubSubParticipant myInterZoneParticipantRole = getJgroupsParticipantInformationService().getMyPetasosParticipantRole();
+        if(myInterZoneParticipantRole == null){
+            myInterZoneParticipantRole = getJgroupsParticipantInformationService().buildMyPetasosParticipantRole(getPetasosEndpoint());
+        }
+        return (myInterZoneParticipantRole);
+    }
+
+    @Override
+    protected void registerWithCoreSubsystemPetasosEndpointsWatchdog() {
+        getCoreSubsystemPetasosEndpointsWatchdog().setPetasosAuditServicesEndpoint(this.getPetasosEndpoint());
+    }
+
+    //
+    // Business Methods
+    //
 
     public List<Address> getAuditServerTargetAddressSet(String endpointServiceName){
         getLogger().debug(".getAuditServerTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
@@ -146,23 +252,11 @@ public abstract class PetasosAuditEndpoint extends JGroupsPetasosEndpointBase {
         return(response);
     }
 
-    public boolean auditServiceProviderIsInScope(String capabilityProviderServiceName){
-        List<String> memberSetBasedOnService = getClusterMemberSetBasedOnService(capabilityProviderServiceName);
-        if(memberSetBasedOnService.isEmpty()){
-            return(false);
-        }
-        for(String currentName: memberSetBasedOnService){
-            if(isWithinScopeBasedOnChannelName(currentName)){
-                return(true);
-            }
-        }
-        return(false);
-    }
-
     //
     // AuditEvent RPC Method Support
     //
 
+    @Override
     public PegacornTransactionMethodOutcome logAuditEvent(String serviceProviderName, AuditEvent event){
         getLogger().trace(".logAuditEvent(): Entry, serviceProviderName->{}, event->{}", serviceProviderName, event);
         PetasosEndpointIdentifier endpointIdentifier = getEndpointID();
@@ -207,6 +301,7 @@ public abstract class PetasosAuditEndpoint extends JGroupsPetasosEndpointBase {
         return(outcome);
     }
 
+    @Override
     public PegacornTransactionMethodOutcome logAuditEvent(String serviceProviderName, List<AuditEvent> eventList){
         getLogger().trace(".logAuditEvent(): Entry, serviceProviderName->{}, eventList->{}", serviceProviderName, eventList);
         PetasosEndpointIdentifier endpointIdentifier = getEndpointID();
@@ -243,14 +338,5 @@ public abstract class PetasosAuditEndpoint extends JGroupsPetasosEndpointBase {
         }
         getLogger().debug(".logAuditEventHandler(): Exit, outcome->{}", outcome);
         return(outcome);
-    }
-
-    //
-    // Getters (and Setters)
-    //
-
-
-    public ProducerTemplate getCamelProducer() {
-        return camelProducer;
     }
 }

@@ -32,7 +32,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentM
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
 import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.petasos.endpoints.InterProcessingPlantMetricsServicesBroker;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.oam.PetasosOAMMetricsEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,7 @@ public class PetasosMetricsAgentWorker implements PetasosMetricsHandlerInterface
     private ProcessingPlantInterface processingPlant;
 
     @Inject
-    private InterProcessingPlantMetricsServicesBroker metricsServicesBroker;
+    private PetasosOAMMetricsEndpoint metricsServicesBroker;
 
     @Inject
     private SubsystemNames subsystemNames;

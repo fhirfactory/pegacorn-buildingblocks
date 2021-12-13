@@ -24,12 +24,12 @@ package net.fhirfactory.pegacorn.services.oam.topology.agent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosTopologyReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.petasos.endpoints.InterProcessingPlantTopologyServicesBroker;
 import net.fhirfactory.pegacorn.petasos.oam.topology.PetasosMonitoredTopologyReportingAgent;
 import net.fhirfactory.pegacorn.petasos.oam.topology.cache.PetasosLocalTopologyReportingDM;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class PetasosTopologyReportWorker implements PetasosTopologyHandlerInterf
     private PetasosMonitoredTopologyReportingAgent topologyReportingAgent;
 
     @Inject
-    private InterProcessingPlantTopologyServicesBroker topologyServicesBroker;
+    private PetasosTopologyBrokerInterface topologyServicesBroker;
 
     @Inject
     private PetasosTopologyReportingServiceProviderNameInterface topologyReportingServiceProviderName;

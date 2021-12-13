@@ -23,6 +23,9 @@ package net.fhirfactory.pegacorn.core.model.petasos.wup;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
@@ -32,6 +35,7 @@ import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +68,7 @@ public class PetasosTaskJobCard implements Serializable {
     private boolean isToBeDiscarded;
     private String currentStateReason;
 
+
     //
     // Constructor(s)
     //
@@ -86,6 +91,7 @@ public class PetasosTaskJobCard implements Serializable {
         this.workUnitProcessor = null;
 
         this.updateLock = new SerializableObject();
+
     }
 
     public PetasosTaskJobCard(
@@ -468,21 +474,22 @@ public class PetasosTaskJobCard implements Serializable {
 
     @Override
     public String toString() {
+
         return "PetasosTaskJobCard{" +
-                "fulfillmentTaskIdentifier=" + fulfillmentTaskIdentifier +
-                ", actionableTaskIdentifier=" + actionableTaskIdentifier +
-                ", updateInstant=" + localUpdateInstant +
-                ", currentStatus=" + currentStatus +
-                ", requestedStatus=" + requestedStatus +
-                ", grantedStatus=" + grantedStatus +
-                ", localFulfillmentStatus=" + localFulfillmentStatus +
-                ", globalFulfillmentStatus=" + globalFulfillmentStatus +
-                ", clusterMode=" + clusterMode +
-                ", systemMode=" + systemMode +
-                ", isToBeDiscarded=" + isToBeDiscarded +
-                ", currentStateReason='" + currentStateReason + '\'' +
-                ", workUnitProcessor=" + getWorkUnitProcessor() +
-                ", processingPlant=" + getProcessingPlant() +
+                "  fulfillmentTaskIdentifier=" + fulfillmentTaskIdentifier + ",\n" +
+                "  actionableTaskIdentifier=" + actionableTaskIdentifier + ",\n" +
+                "  updateInstant=" + localUpdateInstant + ",\n" +
+                "  currentStatus=" + currentStatus + ",\n" +
+                "  requestedStatus=" + requestedStatus + ",\n" +
+                "  grantedStatus=" + grantedStatus + ",\n" +
+                "  localFulfillmentStatus=" + localFulfillmentStatus + ",\n" +
+                "  globalFulfillmentStatus=" + globalFulfillmentStatus + ",\n" +
+                "  clusterMode=" + clusterMode + ",\n" +
+                "  systemMode=" + systemMode + ",\n" +
+                "  isToBeDiscarded=" + isToBeDiscarded + ",\n" +
+                "  currentStateReason=" + currentStateReason + ",\n" +
+                "  workUnitProcessor=" + getWorkUnitProcessor() + ",\n" +
+                "  processingPlant=" + getProcessingPlant() +
                 '}';
     }
 }
