@@ -91,6 +91,7 @@ public class WUPEgressConduit {
                     fulfillmentTask.getTaskFulfillment().setFinishedDate(Date.from(Instant.now()));
                 }
                 synchronized (fulfillmentTask.getTaskJobCardLock()) {
+                    fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                     fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
                     fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                     fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());

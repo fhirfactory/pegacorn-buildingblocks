@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
@@ -35,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.Instant;
+import java.util.Date;
 
 @ApplicationScoped
 public class WUPContainerIngresProcessor {
@@ -88,7 +91,7 @@ public class WUPContainerIngresProcessor {
         while (waitState) {
             switch (fulfillmentTask.getTaskJobCard().getCurrentStatus()) {
                 case WUP_ACTIVITY_STATUS_WAITING:
-                    getLogger().trace(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}", PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING );
+                    getLogger().info(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}", PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING );
                     synchronized (fulfillmentTask.getTaskJobCardLock()) {
                         fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
                     }
@@ -96,6 +99,12 @@ public class WUPContainerIngresProcessor {
                     if (fulfillmentTask.getTaskJobCard().getGrantedStatus() == PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) {
                         synchronized (fulfillmentTask.getTaskJobCardLock()) {
                             fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
+                            fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+                            fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
+                        }
+                        synchronized (fulfillmentTask.getTaskFulfillmentLock()){
+                            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+                            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
                         }
                         fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
                         getLogger().trace(".ingresContentProcessor(): We've been granted execution privileges!");
@@ -108,12 +117,19 @@ public class WUPContainerIngresProcessor {
                 case WUP_ACTIVITY_STATUS_FAILED:
                 case WUP_ACTIVITY_STATUS_CANCELED:
                 default:
-                    getLogger().trace(".ingresContentProcessor(): jobCard.getCurrentStatus --> Default");
+                    getLogger().info(".ingresContentProcessor(): jobCard.getCurrentStatus --> Default");
                     synchronized(fulfillmentTask.getTaskJobCardLock()) {
                         fulfillmentTask.getTaskJobCard().setToBeDiscarded(true);
                         fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
                         fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
+                        fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
                     }
+                    synchronized (fulfillmentTask.getTaskFulfillmentLock()){
+                        fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
+                        fulfillmentTask.getTaskFulfillment().setCancellationDate(Date.from(Instant.now()));
+                    }
+                    fulfillmentActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask.getTaskJobCard());
+                    getLogger().trace(".ingresContentProcessor(): We've been cancelled!");
                     waitState = false;
             }
             if (waitState) {

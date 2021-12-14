@@ -84,27 +84,27 @@ public class LocalTaskDistributionBean {
      * this route.
      * @return An endpoint (name) for a recipient for the incoming UoW
      */
-    @RecipientList
-    public PetasosActionableTask distributeNewFulfillmentTasks(PetasosActionableTask actionableTask, Exchange camelExchange) {
+
+    public void distributeNewFulfillmentTasks(PetasosActionableTask actionableTask, Exchange camelExchange) {
         getLogger().debug(".distributeNewFulfillmentTasks(): Entry, actionableTask (WorkUnitTransportPacket)->{}", actionableTask);
 
         //
         // Defensive Programming
         if(actionableTask == null){
             getLogger().debug(".distributeNewFulfillmentTasks(): Exit, Ingres Actionable Task is null, returning an empty list for routing.");
-            return(actionableTask);
+            return;
         }
         if(!actionableTask.hasTaskWorkItem()){
             getLogger().debug(".distributeNewFulfillmentTasks(): Exit, Ingres Actionable Task has no work item, returning an empty list for routing.");
-            return(actionableTask);
+            return;
         }
         if(!actionableTask.getTaskWorkItem().hasIngresContent()){
             getLogger().debug(".distributeNewFulfillmentTasks(): Exit, Ingres Actionable Task has a work item with no ingres content, returning an empty list for routing.");
-            return(actionableTask);
+            return;
         }
         if(!actionableTask.getTaskWorkItem().getIngresContent().hasDataParcelQualityStatement()){
             getLogger().debug(".distributeNewFulfillmentTasks(): Exit, Ingres Actionable Task has a work item with no ingres content manifest, returning an empty list for routing.");
-            return(actionableTask);
+            return;
         }
 
         DataParcelManifest uowTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();
@@ -165,7 +165,7 @@ public class LocalTaskDistributionBean {
             }
         }
         getLogger().debug(".distributeNewFulfillmentTasks(): Exiting");
-        return (actionableTask);
+        return;
     }
 
     private boolean hasRemoteServiceName(PubSubParticipant subscriber){
@@ -195,9 +195,9 @@ public class LocalTaskDistributionBean {
     }
 
     private void forwardTask(PubSubParticipant subscriber, PetasosActionableTask actionableTask){
-        getLogger().debug(".forwardTask(): Subscriber --> {}", subscriber);
+        getLogger().info(".forwardTask(): Subscriber --> {}", subscriber);
         IntraSubsystemPubSubParticipantIdentifier localSubscriberIdentifier = subscriber.getIntraSubsystemParticipant().getIdentifier();
-        getLogger().debug(".forwardTask(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
+        getLogger().debug(".forwardTask(): The (LocalSubscriber aspect) IdentifieFHIRCommunicationToUoWr->{}", localSubscriberIdentifier);
         WorkUnitProcessorSoftwareComponent currentNodeElement = (WorkUnitProcessorSoftwareComponent)topologyProxy.getNode(localSubscriberIdentifier);
         getLogger().debug(".forwardTask(): The TopologyNode for the target currentNodeElement->{}", currentNodeElement);
         TopologyNodeFunctionFDNToken targetWUPFunctionToken = currentNodeElement.getNodeFunctionFDN().getFunctionToken();
@@ -226,14 +226,14 @@ public class LocalTaskDistributionBean {
         }
         //
         // Register The FulfillmentTask
-        getLogger().debug(".forwardTask(): Register PetasosFulfillmentTask: Start");
+        getLogger().info(".forwardTask(): Register PetasosFulfillmentTask: Start");
         fulfilmentTaskBroker.registerFulfillmentTask(petasosFulfillmentTask, false);
-        getLogger().debug(".forwardTask(): Register PetasosFulfillmentTask: Finish");
-        getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Start");
+        getLogger().info(".forwardTask(): Register PetasosFulfillmentTask: Finish");
+        getLogger().info(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Start");
         String targetCamelEndpoint = routeName.getEndPointWUPContainerIngresProcessorIngres();
-        getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: targetCamelEndpoint->{}", targetCamelEndpoint);
+        getLogger().info(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: targetCamelEndpoint->{}", targetCamelEndpoint);
         camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentTask);
-        getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
+        getLogger().info(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
     }
 
     private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorSoftwareComponent> wupSet) {

@@ -36,6 +36,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.d
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityElementTypeFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
 import org.apache.camel.CamelContext;
 import org.apache.commons.lang3.SerializationUtils;
@@ -100,8 +101,18 @@ public class LocalPetasosActionableTaskActivityController {
     // Notifications
     //
 
-    public Instant notifyActionTaskExecutionStart(TaskIdType taskId){
-
+    public Instant notifyActionTaskExecutionStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
+        getLogger().info(".notifyActionableTaskExecutionFinish(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        if(fulfillmentTask == null){
+            getLogger().debug(".notifyActionableTaskExecutionFinish(): Exit, fulfillmentTask is null");
+            return(null);
+        }
+        if(fulfillmentTask.getTaskJobCard().getGrantedStatus().equals(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING)){
+            PetasosActionableTask actionableTask = getSharedActionableTaskDM().getActionableTask(taskId);
+            actionableTask.getTaskFulfillment().setStartInstant(Instant.now());
+            actionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+            actionableTask.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
+        }
         Instant updateInstant = Instant.now();
         return(updateInstant);
     }
@@ -122,6 +133,7 @@ public class LocalPetasosActionableTaskActivityController {
         actionableTask.getTaskFulfillment().setFinishInstant(Instant.now());
         actionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
         actionableTask.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
+        actionableTask.getTaskFulfillment().setFulfillerComponent(fulfillmentTask.getTaskFulfillment().getFulfillerComponent());
         //
         // Update Outcome Status
         if(actionableTask.getTaskOutcomeStatus() == null){
