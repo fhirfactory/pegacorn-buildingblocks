@@ -23,11 +23,11 @@ package net.fhirfactory.pegacorn.core.interfaces.oam.metrics;
 
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetric;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetricSet;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
 import java.time.Instant;
 
 public interface PetasosMetricsHandlerInterface {
-    public Instant captureMetric(PetasosComponentMetric metric, PetasosEndpointIdentifier endpointIdentifier);
-    public Instant captureMetrics(PetasosComponentMetricSet metricSet, PetasosEndpointIdentifier endpointIdentifier);
+    public Instant replicateMetricToServerHandler(PetasosComponentMetric metric, JGroupsIntegrationPointSummary endpointIdentifier);
+    public Instant replicateMetricSetToServerHandler(PetasosComponentMetricSet metricSet, JGroupsIntegrationPointSummary endpointIdentifier);
 }

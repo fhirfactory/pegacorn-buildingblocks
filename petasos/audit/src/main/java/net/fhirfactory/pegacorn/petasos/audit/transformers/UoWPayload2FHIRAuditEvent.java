@@ -195,7 +195,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                         switch (wup.getIngresEndpoint().getEndpointType()) {
                             case INTERACT_MLLP_SERVER: {
                                 InteractMLLPServerEndpoint mllpServerEndpoint = (InteractMLLPServerEndpoint) wup.getIngresEndpoint();
-                                String source = processingPlant.getIPCServiceName();
+                                String source = processingPlant.getSubsystemParticipantName();
                                 String port = mllpServerEndpoint.getMLLPServerAdapter().getPortNumber().toString();
                                 String sourceSite = source + ":" + port;
                                 return(sourceSite);

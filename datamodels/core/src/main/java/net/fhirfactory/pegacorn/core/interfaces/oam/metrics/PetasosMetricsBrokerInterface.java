@@ -27,6 +27,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentM
 import java.time.Instant;
 
 public interface PetasosMetricsBrokerInterface {
-    public Instant captureMetric(String collectorServiceName, PetasosComponentMetric metric);
-    public Instant captureMetrics(String collectorServiceName, PetasosComponentMetricSet metricSet);
+    public Instant replicateMetricToServer(String collectorServiceName, PetasosComponentMetric metric);
+    public Instant replicateMetricSetToServer(String collectorServiceName, PetasosComponentMetricSet metricSet);
 }

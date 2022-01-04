@@ -33,10 +33,23 @@ public class PlatformTopologyNode extends SoftwareComponent {
 
     private ArrayList<TopologyNodeFDN> processingPlants;
     private Integer instanceCount;
+    private String actualHostIP;
+    private String actualPodIP;
+
+    //
+    // Constructor(s)
+    //
 
     public PlatformTopologyNode(){
+        super();
         this.processingPlants = new ArrayList<>();
+        this.actualPodIP = null;
+        this.actualHostIP = null;
     }
+
+    //
+    // Getters and Setters
+    //
 
     @Override
     protected Logger getLogger() {
@@ -51,11 +64,59 @@ public class PlatformTopologyNode extends SoftwareComponent {
         this.processingPlants = processingPlants;
     }
 
+    public String getActualHostIP() {
+        return actualHostIP;
+    }
+
+    public void setActualHostIP(String actualHostIP) {
+        this.actualHostIP = actualHostIP;
+    }
+
+    public String getActualPodIP() {
+        return actualPodIP;
+    }
+
+    public void setActualPodIP(String actualPodIP) {
+        this.actualPodIP = actualPodIP;
+    }
+
     public Integer getInstanceCount() {
         return instanceCount;
     }
 
     public void setInstanceCount(Integer instanceCount) {
         this.instanceCount = instanceCount;
+    }
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "PlatformTopologyNode{" +
+                "lastActivityInstant=" + getLastActivityInstant() +
+                ", lastReportingInstant=" + getLastReportingInstant() +
+                ", serviceName='" + getSubsystemParticipantName() + '\'' +
+                ", componentFDN=" + getComponentFDN() +
+                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
+                ", concurrencyMode=" + getConcurrencyMode() +
+                ", resilienceMode=" + getResilienceMode() +
+                ", securityZone=" + getSecurityZone() +
+                ", componentID=" + getComponentID() +
+                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
+                ", componentType=" + getComponentType() +
+                ", containingNodeFDN=" + getContainingNodeFDN() +
+                ", componentRDN=" + getComponentRDN() +
+                ", metrics=" + getMetrics() +
+                ", componentSystemRole=" + getComponentSystemRole() +
+                ", componentStatus=" + getComponentStatus() +
+                ", componentExecutionControl=" + getComponentExecutionControl() +
+                ", processingPlants=" + processingPlants +
+                ", instanceCount=" + instanceCount +
+                ", actualHostIP='" + actualHostIP + '\'' +
+                ", actualPodIP='" + actualPodIP + '\'' +
+                '}';
     }
 }

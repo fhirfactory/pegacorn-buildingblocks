@@ -55,6 +55,28 @@ import java.time.Instant;
         @Inject
         private SharedActionableTaskDM actionableTaskDM;
 
+        /**
+         * This method constructs the handover packet (forwarding packet) to be used to transport a "Task" from one
+         * ProcessingPlant (PetasosParticipant) to another (PetasosParticipant) as part of a publish/subscribe process.
+         *
+         * The handover packet contains essentially three things:
+         * (1) The ActionableTask
+         * (2) A TaskTraceabilityElementType for the current FulfillmentTask (which this bean is being executed within), and
+         * (3) Some basic hand-shaking details which includes the target ProcessingPlant's ParticipantName.
+         *
+         * It constructs a TaskTraceabilityElementType for the current fulfillment task, as the present ActionableTask
+         * will not have the "fulfiller" details populated at this point in the WUP processing lifecycle (the values
+         * are normally populated into the ActionableTask when the FulfillmentTask is complete).
+         *
+         * The method extracts the FulfillmentTask from the CamelExchange Properties, and uses this to obtain the
+         * ActionableTask from the (infinispan) shared ActionableTask cache (SharedActionableTaskDM).
+         *
+         * It ignores the incoming UoW (theUoW).
+         *
+         * @param theUoW ignored...
+         * @param camelExchange The Apache Camel Exchange which contains the FulfillmentTask being "fulfilled"
+         * @return A handover packet for forwarding to one (and only one) "downstream" ProcessingPlant
+         */
         public InterProcessingPlantHandoverPacket constructInterProcessingPlantHandoverPacket(UoW theUoW, Exchange camelExchange){
             LOG.debug(".constructInterProcessingPlantHandoverPacket(): Entry, theUoW (UoW) --> {}, wupInstanceKey (String) --> {}", theUoW);
 
@@ -91,8 +113,8 @@ import java.time.Instant;
             synchronized (fulfillmentTask.getTaskWorkItemLock()){
                 fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL);
             }
-            forwardingPacket.setTarget(theUoW.getPayloadTopicID().getIntendedTargetSystem());
-            forwardingPacket.setSource(processingPlant.getIPCServiceName());
+            forwardingPacket.setTarget(theUoW.getPayloadTopicID().getTargetProcessingPlantParticipantName());
+            forwardingPacket.setSource(processingPlant.getSubsystemParticipantName());
             LOG.debug(".constructInterProcessingPlantHandoverPacket(): Exit, forwardingPacket (InterProcessingPlantHandoverPacket) --> {}", forwardingPacket);
             return(forwardingPacket);
         }

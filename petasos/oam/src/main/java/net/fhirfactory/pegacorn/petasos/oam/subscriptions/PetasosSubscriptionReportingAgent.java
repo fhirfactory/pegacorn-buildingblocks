@@ -21,19 +21,19 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.subscriptions;
 
+import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosProcessingPlantSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosPublisherSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriberSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosWorkUnitProcessorSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.valuesets.PetasosSubscriptionSummaryTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubPublisherRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubSubscription;
-import net.fhirfactory.pegacorn.petasos.core.subscriptions.manager.DataParcelSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.core.subscriptions.manager.DistributedPubSubSubscriptionMapIM;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscription;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.factories.PetasosTopicSummaryFactory;
 import org.slf4j.Logger;
@@ -41,10 +41,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @ApplicationScoped
 public class PetasosSubscriptionReportingAgent {
@@ -54,10 +54,13 @@ public class PetasosSubscriptionReportingAgent {
     private PetasosLocalSubscriptionReportingDM subscriptionReportingDM;
 
     @Inject
-    private DataParcelSubscriptionMapIM subscriptionMapIM;
+    private LocalPetasosParticipantSubscriptionMapIM subscriptionMapIM;
 
     @Inject
-    private DistributedPubSubSubscriptionMapIM distributedSubscriptionMapIM;
+    private TaskPathwayManagementServiceInterface taskPathwayManagementService;
+
+    @Inject
+    private LocalPetasosParticipantSubscriptionMapIM localTaskWorkItemPerformerMapIM;
 
     @Inject
     private PetasosTopicSummaryFactory topicSummaryFactory;
@@ -68,11 +71,11 @@ public class PetasosSubscriptionReportingAgent {
     public void refreshLocalProcessingPlantPubSubMap(){
         LOG.debug(".refreshLocalProcessingPlantPubSubMap(): Entry");
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Get all InterSubsystemPubSubPublisherSubscriptionRegistration(s)");
-        List<InterSubsystemPubSubPublisherSubscriptionRegistration> allPublisherServiceSubscriptions = distributedSubscriptionMapIM.getAllPublisherServiceSubscriptions();
+        List<TaskWorkItemSubscription> allPublisherServiceSubscriptions = localTaskWorkItemPerformerMapIM.getAllSubscriptions();
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Create a ProcessingPlantSubscriptionSummary skeleton");
         PetasosProcessingPlantSubscriptionSummary processingPlantSubscriptionSummary = new PetasosProcessingPlantSubscriptionSummary();
-        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Assign the ProcessintPlant ComponentID (processingPlantNode->{})", processingPlant.getProcessingPlantNode());
-        processingPlantSubscriptionSummary.setComponentID(processingPlant.getProcessingPlantNode().getComponentID());
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Assign the ProcessintPlant ComponentID (processingPlantNode->{})", processingPlant.getMeAsASoftwareComponent());
+        processingPlantSubscriptionSummary.setComponentID(processingPlant.getMeAsASoftwareComponent().getComponentID());
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Check if there are any subscriptions, if not, exit out");
         if(allPublisherServiceSubscriptions.isEmpty()){
             LOG.debug(".refreshLocalProcessingPlantPubSubMap(): Exit, publisher service subscriptions is empty");
@@ -80,19 +83,19 @@ public class PetasosSubscriptionReportingAgent {
         }
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): There are subscriptions, so processing them.");
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterate Through Registrations");
-        for(InterSubsystemPubSubPublisherSubscriptionRegistration currentRegistration: allPublisherServiceSubscriptions){
-            String publisherServiceName = currentRegistration.getPublisherServiceName();
-            LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For Service Name->{}", publisherServiceName);
-            List<InterSubsystemPubSubPublisherRegistration> publisherServiceProviderInstanceRegistrations = distributedSubscriptionMapIM.getPublisherServiceProviderInstanceRegistrations(publisherServiceName);
-            for(InterSubsystemPubSubPublisherRegistration currentPublisherRegistration: publisherServiceProviderInstanceRegistrations) {
-                ComponentIdType processingPlantComponentID = currentPublisherRegistration.getPublisher().getEndpointID().getProcessingPlantComponentID();
+        for(TaskWorkItemSubscription currentRegistration: allPublisherServiceSubscriptions){
+            String publisherServiceName = currentRegistration.getParticipant().getSubsystemParticipantName();
+            LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For currentRegistration->{}", currentRegistration);
+            Set<PetasosParticipantRegistration> publisherServiceProviderInstanceRegistrations = taskPathwayManagementService.getParticipantRegistrationSetForService(publisherServiceName);
+            for(PetasosParticipantRegistration currentPublisherRegistration: publisherServiceProviderInstanceRegistrations) {
+                ComponentIdType processingPlantComponentID = currentPublisherRegistration.getParticipant().getComponentID();
                 LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For ProcessingPlant Name->{}", processingPlantComponentID);
                 PetasosSubscriberSubscriptionSummary publisherSubscriptionSummary = new PetasosSubscriberSubscriptionSummary();
                 publisherSubscriptionSummary.setPublisherServiceName(publisherServiceName);
-                publisherSubscriptionSummary.setTimestamp(Instant.from(currentRegistration.getRegistrationDate().toInstant()));
+                publisherSubscriptionSummary.setTimestamp(currentRegistration.getRegistrationInstant());
                 publisherSubscriptionSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.PROCESSING_PLANT_SUBSCRIPTION_SUMMARY);
                 publisherSubscriptionSummary.setPublisher(processingPlantComponentID);
-                for(DataParcelManifest currentManifest: currentRegistration.getSubscriptionList()){
+                for(TaskWorkItemManifestType currentManifest: currentRegistration.getParticipant().getSubscribedWorkItemManifests()){
                     String simpleTopicName = topicSummaryFactory.transformToSimpleTopicName(currentManifest);
                     LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding Topic->{}", simpleTopicName);
                     publisherSubscriptionSummary.getSubscribedTopics().add(simpleTopicName);
@@ -102,18 +105,21 @@ public class PetasosSubscriptionReportingAgent {
             }
         }
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Create Summary Set");
-        List<PubSubSubscription> allSubscriptions = subscriptionMapIM.getAllSubscriptions();
-        for(PubSubSubscription currentSubscription: allSubscriptions){
-            if(currentSubscription.getSubscriber().getInterSubsystemParticipant() != null){
-                ComponentIdType processingPlantID = currentSubscription.getSubscriber().getInterSubsystemParticipant().getEndpointID().getProcessingPlantComponentID();
-                String topic = topicSummaryFactory.transformToSimpleTopicName(currentSubscription.getParcelManifest());
+        List<TaskWorkItemSubscription> allSubscriptions = subscriptionMapIM.getAllSubscriptions();
+        for(TaskWorkItemSubscription currentSubscription: allSubscriptions){
+            PetasosParticipant currentParticipant  = currentSubscription.getParticipant();
+            String currentParticipantSeviceName = currentParticipant.getSubsystemParticipantName();
+            String myProcessingPlantServiceName = processingPlant.getSubsystemParticipantName();
+            if(!currentParticipantSeviceName.equals(myProcessingPlantServiceName)){
+                ComponentIdType processingPlantID = currentSubscription.getParticipant().getComponentID();
+                String topic = topicSummaryFactory.transformToSimpleTopicName(currentSubscription.getTaskWorkItemManifest());
                 boolean added = processingPlantSubscriptionSummary.addSubscriptionForExistingSubscriber(processingPlantID, topic);
                 if(!added){
                     PetasosPublisherSubscriptionSummary subscriberSummary = new PetasosPublisherSubscriptionSummary();
                     subscriberSummary.setSubscriber(processingPlantID);
                     subscriberSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.PROCESSING_PLANT_SUBSCRIPTION_SUMMARY);
                     subscriberSummary.setTimestamp(currentSubscription.getRegistrationInstant());
-                    subscriberSummary.setSubscriberServiceName(currentSubscription.getSubscriber().getInterSubsystemParticipant().getEndpointServiceName());
+                    subscriberSummary.setSubscriberServiceName(currentSubscription.getParticipant().getSubsystemParticipantName());
                     subscriberSummary.addTopic(topic);
                     subscriberSummary.setComponentID(processingPlantID);
                     processingPlantSubscriptionSummary.addPublisherSummary(subscriberSummary);
@@ -127,19 +133,19 @@ public class PetasosSubscriptionReportingAgent {
 
     public void refreshWorkUnitProcessorPubSubMap(){
         LOG.debug(".refreshWorkUnitProcessorPubSubMap(): Entry");
-        List<PubSubSubscription> allSubscriptions = subscriptionMapIM.getAllSubscriptions();
+        List<TaskWorkItemSubscription> allSubscriptions = subscriptionMapIM.getAllSubscriptions();
         Map<ComponentIdType, PetasosWorkUnitProcessorSubscriptionSummary> summaries = new HashMap<>();
-        for(PubSubSubscription currentSubscription: allSubscriptions){
-            if(summaries.containsKey(currentSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier())){
-                PetasosWorkUnitProcessorSubscriptionSummary currentSummary = summaries.get(currentSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier());
-                currentSummary.addTopic(topicSummaryFactory.transformToSimpleTopicName(currentSubscription.getParcelManifest()));
+        for(TaskWorkItemSubscription currentSubscription: allSubscriptions){
+            if(summaries.containsKey(currentSubscription.getParticipant().getComponentID())){
+                PetasosWorkUnitProcessorSubscriptionSummary currentSummary = summaries.get(currentSubscription.getParticipant().getComponentID());
+                currentSummary.addTopic(topicSummaryFactory.transformToSimpleTopicName(currentSubscription.getTaskWorkItemManifest()));
             } else {
                 PetasosWorkUnitProcessorSubscriptionSummary currentSummary = new PetasosWorkUnitProcessorSubscriptionSummary();
                 currentSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.WORK_UNIT_PROCESSOR_SUMMARY);
-                currentSummary.setSubscriber(currentSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier());
+                currentSummary.setSubscriber(currentSubscription.getParticipant().getComponentID());
                 currentSummary.setTimestamp(currentSubscription.getRegistrationInstant());
-                currentSummary.addTopic(topicSummaryFactory.transformToSimpleTopicName(currentSubscription.getParcelManifest()));
-                currentSummary.setComponentID(currentSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier());
+                currentSummary.addTopic(topicSummaryFactory.transformToSimpleTopicName(currentSubscription.getTaskWorkItemManifest()));
+                currentSummary.setComponentID(currentSubscription.getParticipant().getComponentID());
                 summaries.put(currentSummary.getSubscriber(), currentSummary);
             }
         }

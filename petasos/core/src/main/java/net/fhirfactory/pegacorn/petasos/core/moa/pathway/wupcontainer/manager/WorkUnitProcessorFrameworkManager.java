@@ -28,10 +28,7 @@ import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAudi
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalIngresWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.StandardWUPContainerRoute;
-import net.fhirfactory.pegacorn.petasos.core.subscriptions.manager.DataParcelSubscriptionMapIM;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubParticipantIdentifier;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
@@ -53,7 +50,7 @@ public class WorkUnitProcessorFrameworkManager {
     private CamelContext camelctx;
 
     @Inject
-    private DataParcelSubscriptionMapIM topicServer;
+    private LocalPetasosParticipantSubscriptionMapIM topicServer;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -71,16 +68,12 @@ public class WorkUnitProcessorFrameworkManager {
                     StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, true);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
                     camelctx.addRoutes(standardWUPRoute);
-                    LOG.trace(".buildWUPFramework(): Now subscribing this WUP/Route to UoW Content Topics");
-                    uowTopicSubscribe(subscribedTopics, wupNode);
-                    LOG.trace(".buildWUPFramework(): Subscribed to Topics, work is done!");
                     break;
                 }
                 case WUP_NATURE_TIMER_TRIGGERED_WORKFLOW: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR route");
                     ExternalIngresWUPContainerRoute ingresRoute = new ExternalIngresWUPContainerRoute(camelctx, wupNode, auditBroker);
                     camelctx.addRoutes(ingresRoute);
-                    LOG.trace(".buildWUPFramework(): Note, this type of WUP/Route does not subscribe to Topics (it is purely a producer)");
                     break;
                 }
                 case WUP_NATURE_LADON_BEHAVIOUR_WRAPPER:
@@ -89,9 +82,6 @@ public class WorkUnitProcessorFrameworkManager {
                     StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, true);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
                     camelctx.addRoutes(standardWUPRoute);
-                    LOG.trace(".buildWUPFramework(): Now subscribing this WUP/Route to UoW Content Topics");
-                    uowTopicSubscribe(subscribedTopics, wupNode);
-                    LOG.trace(".buildWUPFramework(): Subscribed to Topics, work is done!");
                     break;
                 }
                 case WUP_NATURE_MESSAGE_WORKER: {
@@ -99,9 +89,6 @@ public class WorkUnitProcessorFrameworkManager {
                     StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
                     camelctx.addRoutes(standardWUPRoute);
-                    LOG.trace(".buildWUPFramework(): Now subscribing this WUP/Route to UoW Content Topics");
-                    uowTopicSubscribe(subscribedTopics, wupNode);
-                    LOG.trace(".buildWUPFramework(): Subscribed to Topics, work is done!");
                     break;
                 }
                 case WUP_NATURE_API_PUSH:
@@ -120,15 +107,11 @@ public class WorkUnitProcessorFrameworkManager {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT route");
                     ExternalEgressWUPContainerRoute egressRoute = new ExternalEgressWUPContainerRoute(camelctx, wupNode, auditBroker);
                     camelctx.addRoutes(egressRoute);
-                    LOG.trace(".buildWUPFramework(): Now subscribing this WUP/Route to UoW Content Topics");
-                    uowTopicSubscribe(subscribedTopics, wupNode);
-                    LOG.trace(".buildWUPFramework(): Subscribed to Topics, work is done!");
                     break;
                 case WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT:
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT route");
                     ExternalIngresWUPContainerRoute ingresRoute = new ExternalIngresWUPContainerRoute(camelctx, wupNode, auditBroker);
                     camelctx.addRoutes(ingresRoute);
-                    LOG.trace(".buildWUPFramework(): Note, this type of WUP/Route does not subscribe to Topics (it is purely a producer)");
                     break;
                 case WUP_NATURE_MESSAGE_EXTERNAL_CONCURRENT_INGRES_POINT:
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_MESSAGE_EXTERNAL_CONCURRENT_INGRES_POINT route");
@@ -138,6 +121,7 @@ public class WorkUnitProcessorFrameworkManager {
         }
     }
 
+    /*
     public void uowTopicSubscribe(List<DataParcelManifest> subscribedTopics, WorkUnitProcessorSoftwareComponent wupNode) {
         LOG.debug(".uowTopicSubscribe(): Entry, subscribedTopics --> {}, wupNode --> {}", subscribedTopics, wupNode);
         if (subscribedTopics.isEmpty()) {
@@ -146,7 +130,19 @@ public class WorkUnitProcessorFrameworkManager {
         }
         for(DataParcelManifest currentTopicID: subscribedTopics) {
             LOG.trace(".uowTopicSubscribe(): wupNode --> {} is subscribing to UoW Content Topic --> {}", wupNode, currentTopicID);
-            PubSubParticipant subscriber = constructPubSubSubscriber(wupNode);
+            PetasosParticipant subscriber = new PetasosParticipant(wupNode);
+            if(!subscriber.hasProcessingPlantServiceName()){
+                subscriber.setProcessingPlantServiceName(processingPlant.getIPCServiceName());
+            }
+            for(DataParcelManifest currentParcelManifest: subscribedTopics){
+                TaskWorkItemManifestType workItemManifest = new TaskWorkItemManifestType(currentParcelManifest);
+                workItemManifest.setTaskProducerProcessingPlantServiceName(processingPlant.getIPCServiceName());
+                if(subscriber.getSubscribedWorkItemManifests().contains(workItemManifest)) {
+                    // Do nothing
+                } else {
+                    subscriber.getSubscribedWorkItemManifests().add(workItemManifest);
+                }
+            }
             topicServer.addTopicSubscriber(currentTopicID, subscriber);
         }
         LOG.debug(".uowTopicSubscribe(): Exit");
@@ -160,4 +156,6 @@ public class WorkUnitProcessorFrameworkManager {
         subscriber.setIntraSubsystemParticipant(localSubscriber);
         return(subscriber);
     }
+
+     */
 }

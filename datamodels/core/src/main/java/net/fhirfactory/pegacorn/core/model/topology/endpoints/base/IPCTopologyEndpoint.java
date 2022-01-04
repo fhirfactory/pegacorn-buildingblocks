@@ -22,9 +22,11 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import mjson.Json;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IPCTopologyEndpoint extends SoftwareComponent {
+public class IPCTopologyEndpoint extends PetasosEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(IPCTopologyEndpoint.class);
 
     private PetasosEndpointTopologyTypeEnum endpointType;
@@ -56,10 +58,36 @@ public class IPCTopologyEndpoint extends SoftwareComponent {
         this.endpointConfigurationName = null;
     }
 
+    public IPCTopologyEndpoint(IPCTopologyEndpoint ori){
+        super(ori);
+        this.adapterList = new ArrayList<>();
+        if(ori.hasConnectedSystemName()){
+            setConnectedSystemName(ori.getConnectedSystemName());
+        }
+        if(ori.hasEndpointConfigurationName()){
+            setEndpointConfigurationName(ori.getEndpointConfigurationName());
+        }
+        if(ori.hasImplementingWUP()){
+            setImplementingWUP(ori.getImplementingWUP());
+        }
+        setServer(ori.isServer());
+        if(!adapterList.isEmpty()){
+            this.adapterList.addAll(ori.getAdapterList());
+        }
+        if(ori.hasEndpointType()){
+            setEndpointType(ori.getEndpointType());
+        }
+    }
+
     //
     // Getters and Setters
     //
 
+    @JsonIgnore
+    public boolean hasEndpointConfigurationName(){
+        boolean hasValue = this.endpointConfigurationName != null;
+        return(hasValue);
+    }
 
     public String getEndpointConfigurationName() {
         return endpointConfigurationName;
@@ -77,6 +105,12 @@ public class IPCTopologyEndpoint extends SoftwareComponent {
         this.server = server;
     }
 
+    @JsonIgnore
+    public boolean hasImplementingWUP(){
+        boolean hasValue = this.implementingWUP != null;
+        return(hasValue);
+    }
+
     public ComponentIdType getImplementingWUP() {
         return implementingWUP;
     }
@@ -85,12 +119,24 @@ public class IPCTopologyEndpoint extends SoftwareComponent {
         this.implementingWUP = implementingWUP;
     }
 
+    @JsonIgnore
+    public boolean hasConnectedSystemName(){
+        boolean hasValue = this.connectedSystemName != null;
+        return(hasValue);
+    }
+
     public String getConnectedSystemName() {
         return connectedSystemName;
     }
 
     public void setConnectedSystemName(String connectedSystemName) {
         this.connectedSystemName = connectedSystemName;
+    }
+
+    @JsonIgnore
+    public boolean hasEndpointType(){
+        boolean hasValue = this.endpointType != null;
+        return(hasValue);
     }
 
     public PetasosEndpointTopologyTypeEnum getEndpointType() {
@@ -132,8 +178,6 @@ public class IPCTopologyEndpoint extends SoftwareComponent {
                 ", nodeFunctionFDN=" + getNodeFunctionFDN() +
                 ", componentType=" + getComponentType() +
                 ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", actualHostIP=" + getActualHostIP() +
-                ", actualPodIP=" + getActualPodIP() +
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +

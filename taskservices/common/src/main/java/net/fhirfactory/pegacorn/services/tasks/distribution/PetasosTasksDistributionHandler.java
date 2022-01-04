@@ -24,7 +24,8 @@ package net.fhirfactory.pegacorn.services.tasks.distribution;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskHandlerInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -42,7 +43,7 @@ public abstract class PetasosTasksDistributionHandler implements PetasosTaskHand
     }
 
     @Override
-    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
+    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier) {
         template.sendBody(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE, ExchangePattern.InOnly, actionableTask);
         return(actionableTask);
     }

@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCClusteredServerTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +86,6 @@ public class HTTPServerTopologyEndpoint extends IPCClusteredServerTopologyEndpoi
                 ", componentType=" + getComponentType() +
                 ", containingNodeFDN=" + getContainingNodeFDN() +
                 ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", actualPodIP='" + getActualPodIP() + '\'' +
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +

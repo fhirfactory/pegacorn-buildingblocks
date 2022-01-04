@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TaskCompletionSummaryType implements Serializable {
     private Map<TaskIdType, DownstreamTaskStatusType> downstreamTaskMap;
-    private boolean end;
+    private boolean lastInChain;
     private boolean finalised;
 
     //
@@ -42,7 +42,7 @@ public class TaskCompletionSummaryType implements Serializable {
 
     public TaskCompletionSummaryType(){
         this.downstreamTaskMap = new ConcurrentHashMap<TaskIdType, DownstreamTaskStatusType>();
-        this.end = false;
+        this.lastInChain = false;
         this.finalised = false;
     }
 
@@ -87,12 +87,12 @@ public class TaskCompletionSummaryType implements Serializable {
         this.finalised = finalised;
     }
 
-    public boolean isEnd() {
-        return end;
+    public boolean isLastInChain() {
+        return lastInChain;
     }
 
-    public void setEnd(boolean end) {
-        this.end = end;
+    public void setLastInChain(boolean lastInChain) {
+        this.lastInChain = lastInChain;
     }
 
     @JsonIgnore
@@ -118,6 +118,7 @@ public class TaskCompletionSummaryType implements Serializable {
         return "TaskFinalisationStatusType{" +
                 "finalisationMap=" + downstreamTaskMap +
                 ", hasFinalisationMap=" + hasFinalisationMap() +
+                ", isLastInChain-" + isLastInChain() +
                 '}';
     }
 }

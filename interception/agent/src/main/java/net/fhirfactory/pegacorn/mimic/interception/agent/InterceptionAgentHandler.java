@@ -22,7 +22,8 @@
 package net.fhirfactory.pegacorn.mimic.interception.agent;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.mimic.interception.InterceptionHandlerBase;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -31,7 +32,7 @@ import javax.enterprise.context.ApplicationScoped;
 public class InterceptionAgentHandler extends InterceptionHandlerBase {
 
     @Override
-    public PetasosFulfillmentTask redirectFulfillmentTask(PetasosFulfillmentTask task, PetasosEndpointIdentifier endpointIdentifier) {
+    public PetasosFulfillmentTask redirectFulfillmentTask(PetasosFulfillmentTask task, JGroupsIntegrationPointSummary integrationPoint) {
         return task;
     }
 }

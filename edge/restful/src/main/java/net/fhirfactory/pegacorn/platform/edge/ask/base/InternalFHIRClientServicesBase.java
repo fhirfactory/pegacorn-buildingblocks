@@ -21,8 +21,6 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.ask.base;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -36,17 +34,8 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ExternalS
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.external.ConnectedExternalSystemTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle.BundleContentHelper;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.ask.base.http.InternalFHIRClientProxy;
-import net.fhirfactory.pegacorn.util.FHIRContextUtility;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 
 import ca.uhn.fhir.parser.IParser;
 
@@ -118,7 +107,7 @@ public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientP
 
     protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
         getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
-        ArrayList<TopologyNodeFDN> endpointFDNs = processingPlant.getProcessingPlantNode().getEndpoints();
+        ArrayList<TopologyNodeFDN> endpointFDNs = processingPlant.getMeAsASoftwareComponent().getEndpoints();
         for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)topologyIM.getNode(currentEndpointFDN);
             if(endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)){

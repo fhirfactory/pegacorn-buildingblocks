@@ -108,8 +108,6 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
                 ", nodeFunctionFDN=" + getNodeFunctionFDN() +
                 ", componentType=" + getComponentType() +
                 ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", actualPodIP='" + getActualPodIP() + '\'' +
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +

@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.services.tasks.cache;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.services.tasks.datatypes.PetasosActionableTaskRegistrationType;
 import org.slf4j.Logger;
 
@@ -45,9 +45,9 @@ public abstract class PetasosActionableTaskDM {
 
     abstract protected Logger specifyLogger();
 
-    abstract public PetasosActionableTaskRegistrationType registerPetasosActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier endpointIdentifier);
+    abstract public PetasosActionableTaskRegistrationType registerPetasosActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary integrationPoint);
 
-    abstract public PetasosActionableTaskRegistrationType updatePetasosActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier endpointIdentifier);
+    abstract public PetasosActionableTaskRegistrationType updatePetasosActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary integrationPoint);
 
     abstract public PetasosActionableTask getPetasosActionableTask(TaskIdType taskId);
 

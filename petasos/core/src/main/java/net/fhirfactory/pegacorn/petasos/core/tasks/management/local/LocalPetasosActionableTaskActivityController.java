@@ -34,13 +34,11 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatyp
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityElementTypeFactory;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
 import org.apache.camel.CamelContext;
 import org.apache.commons.lang3.SerializationUtils;
-import org.hl7.fhir.r4.model.SearchParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +81,7 @@ public class LocalPetasosActionableTaskActivityController {
     //
 
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask){
-        getLogger().info(".registerActionableTask(): Entry, actionableTask->{}",actionableTask);
+        getLogger().debug(".registerActionableTask(): Entry, actionableTask->{}",actionableTask);
         getSharedActionableTaskDM().registerActionableTask(actionableTask);
         getTaskRepositoryService().registerActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), actionableTask);
         getLogger().debug(".registerActionableTask(): Exit, actionableTask->{}", actionableTask);
@@ -92,7 +90,7 @@ public class LocalPetasosActionableTaskActivityController {
 
     public PetasosActionableTask deregisterActionableTask(PetasosActionableTask actionableTask){
         getLogger().debug(".deregisterActionableTask(): Entry, actionableTask->{}",actionableTask);
-        getSharedActionableTaskDM().unregisterActionableTask(actionableTask);
+        getSharedActionableTaskDM().removeActionableTask(actionableTask);
         getLogger().debug(".deregisterActionableTask(): Exit, actionableTask->{}",actionableTask);
         return(actionableTask);
     }
@@ -102,7 +100,7 @@ public class LocalPetasosActionableTaskActivityController {
     //
 
     public Instant notifyActionTaskExecutionStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().info(".notifyActionableTaskExecutionFinish(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        getLogger().debug(".notifyActionableTaskExecutionFinish(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
         if(fulfillmentTask == null){
             getLogger().debug(".notifyActionableTaskExecutionFinish(): Exit, fulfillmentTask is null");
             return(null);
@@ -118,7 +116,7 @@ public class LocalPetasosActionableTaskActivityController {
     }
 
     public PetasosActionableTask notifyActionableTaskExecutionFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().info(".notifyActionableTaskExecutionFinish(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        getLogger().debug(".notifyActionableTaskExecutionFinish(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
         if(fulfillmentTask == null){
             getLogger().debug(".notifyActionableTaskExecutionFinish(): Exit, fulfillmentTask is null");
             return(null);
@@ -149,12 +147,12 @@ public class LocalPetasosActionableTaskActivityController {
         actionableTask.getTaskTraceability().addToTaskJourney(traceabilityElementType);
         PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), actionableTask);
         PetasosActionableTask clonedTask = SerializationUtils.clone(petasosActionableTask);
-        getLogger().info(".notifyActionableTaskExecutionFinish(): Exit, clonedTask->{}", clonedTask);
+        getLogger().debug(".notifyActionableTaskExecutionFinish(): Exit, clonedTask->{}", clonedTask);
         return(clonedTask);
     }
 
     public PetasosActionableTask notifyActionableTaskExecutionFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().info(".notifyActionableTaskExecutionFailure(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        getLogger().debug(".notifyActionableTaskExecutionFailure(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
         if(fulfillmentTask == null){
             getLogger().debug(".notifyActionableTaskExecutionFailure(): Exit, fulfillmentTask is null");
             return(null);
@@ -186,7 +184,7 @@ public class LocalPetasosActionableTaskActivityController {
     }
 
     public PetasosActionableTask notifyActionableTaskExecutionCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().info(".notifyActionableTaskExecutionCancellation(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
+        getLogger().debug(".notifyActionableTaskExecutionCancellation(): Entry, taskId->{}, fulfillmentTask->{}", taskId, fulfillmentTask);
         if(fulfillmentTask == null){
             getLogger().debug(".notifyActionableTaskExecutionCancellation(): Exit, fulfillmentTask is null");
             return(null);
@@ -215,6 +213,21 @@ public class LocalPetasosActionableTaskActivityController {
         PetasosActionableTask clonedTask = SerializationUtils.clone(petasosActionableTask);
         getLogger().debug(".notifyActionableTaskExecutionCancellation(): Exit");
         return(clonedTask);
+    }
+
+    public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask){
+        getLogger().debug(".updateActionableTaskFinalisationStatus(): Entry, actionableTask->{}", actionableTask);
+        if(actionableTask == null){
+            getLogger().debug(".updateActionableTaskFinalisationStatus(): Exit, fulfillmentTask is null");
+            return(null);
+        }
+        PetasosActionableTask cachedActionableTask = getSharedActionableTaskDM().getActionableTask(actionableTask.getTaskId());
+        if(cachedActionableTask != null){
+            cachedActionableTask.update(actionableTask);
+        }
+        PetasosActionableTask syncrhonisedActionableTask = getTaskRepositoryService().updateActionableTask(taskRepositoryServiceProviderNameInterface.getPetasosTaskRepositoryServiceProviderName(), cachedActionableTask);
+        cachedActionableTask.update(syncrhonisedActionableTask);
+        return(syncrhonisedActionableTask);
     }
 
     //

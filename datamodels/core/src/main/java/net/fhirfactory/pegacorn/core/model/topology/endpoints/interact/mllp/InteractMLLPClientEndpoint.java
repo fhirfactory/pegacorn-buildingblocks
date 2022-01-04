@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
 import net.fhirfactory.pegacorn.core.model.topology.connector.ActiveIPCConnection;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPClientAdapter;
 
@@ -146,8 +146,6 @@ public class InteractMLLPClientEndpoint extends StandardInteractClientTopologyEn
                 ", nodeFunctionFDN=" + getNodeFunctionFDN() +
                 ", componentType=" + getComponentType() +
                 ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", actualPodIP='" + getActualPodIP() + '\'' +
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +

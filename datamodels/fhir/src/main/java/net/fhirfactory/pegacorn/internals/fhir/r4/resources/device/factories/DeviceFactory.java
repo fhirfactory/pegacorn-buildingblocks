@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEn
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer.StandardEdgeAnswerHTTPEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer.StandardEdgeIPCEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.ask.StandardEdgeAskHTTPEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.datatypes.JGroupsAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.datatypes.JGroupsAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPClientTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPClientEndpoint;
@@ -188,6 +188,7 @@ public class DeviceFactory {
 
         //
         // Add the Pod/Host IP Addresses (if set)
+        /*
         if(node.getActualPodIP() != null){
             Coding podIPAddressTag = getMetaTagFactory().newPodIPAddressTag(node.getActualPodIP());
             device.getMeta().addTag(podIPAddressTag);
@@ -196,6 +197,8 @@ public class DeviceFactory {
             Coding hostIPAddressTag = getMetaTagFactory().newHostIPAddressTag(node.getActualHostIP());
             device.getMeta().addTag(hostIPAddressTag);
         }
+
+         */
 
         //
         // Add the Component Role (if present)
@@ -227,7 +230,7 @@ public class DeviceFactory {
         Device device = newDeviceFromSoftwareComponent(ipcEndpoint);
 
         switch(ipcEndpoint.getEndpointType()){
-            case EDGE_JGROUPS_MESSAGING_SERVICE:
+            case EDGE_JGROUPS_INTEGRATION_POINT:
                 StandardEdgeIPCEndpoint jgroupsEndpoint = (StandardEdgeIPCEndpoint)ipcEndpoint;
                 JGroupsAdapter jgroupsAdapter = jgroupsEndpoint.getJGroupsAdapter();
                 Endpoint endpoint = getEndpointFactory().newJGroupsEndpoint(jgroupsEndpoint, jgroupsAdapter);
@@ -362,14 +365,14 @@ public class DeviceFactory {
         //
         // Set the Model Name (Subsystem Name)
         Device.DeviceDeviceNameComponent nameComponent = new Device.DeviceDeviceNameComponent();
-        nameComponent.setName(processingPlant.getSubsystemName());
+        nameComponent.setName(processingPlant.getSubsystemParticipantName());
         nameComponent.setType(Device.DeviceNameType.MODELNAME);
         device.addDeviceName(nameComponent);
 
         //
         // Set the Other Name (Cluster Service Name)
         Device.DeviceDeviceNameComponent clusterServiceNameComponent = new Device.DeviceDeviceNameComponent();
-        clusterServiceNameComponent.setName(processingPlant.getSubsystemName());
+        clusterServiceNameComponent.setName(processingPlant.getSubsystemParticipantName());
         clusterServiceNameComponent.setType(Device.DeviceNameType.OTHER);
         device.addDeviceName(clusterServiceNameComponent);
 

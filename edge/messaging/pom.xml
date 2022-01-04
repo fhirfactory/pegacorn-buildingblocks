@@ -44,7 +44,7 @@
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>${version-javax.enterprise-cdi-api}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.ejb</groupId>
@@ -220,12 +220,6 @@
         </dependency>
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-datamodels-core</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-buildingblocks-workshop</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -331,12 +325,6 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${version-ch.qos.logback-classic}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-properties</artifactId>
-            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 

@@ -22,6 +22,8 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes;
 
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
@@ -32,6 +34,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.subscription.TaskSubscriptionCheck;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +61,12 @@ public class TaskOutcome2NewTasksBean {
 
     @Inject
     private PetasosActionableTaskFactory actionableTaskFactory;
+
+    @Inject
+    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+
+    @Inject
+    private TaskSubscriptionCheck taskSubscriptionCheck;
     
     /**
      * This method performs tree key tasks:
@@ -86,21 +96,50 @@ public class TaskOutcome2NewTasksBean {
                 counter++;
             }
         }
+
+        //
+        // We need to establish whether this actionableTask has any successor (downstream) tasks (subscribed), cause if
+        // it doesn't, then we need to tag the message as being the "last-in-chain" and also "finalised". If it does
+        // have
+        synchronized (actionableTask.getTaskCompletionLock()) {
+            if (!actionableTask.hasTaskCompletionSummary()) {
+                actionableTask.setTaskCompletionSummary(new TaskCompletionSummaryType());
+                actionableTask.getTaskCompletionSummary().setLastInChain(false);
+                actionableTask.getTaskCompletionSummary().setFinalised(false);
+            }
+        }
+
         ArrayList<PetasosActionableTask> newActionableTaskList = new ArrayList<>();
         for(UoWPayload currentPayload: egressPayloadList) {
-            TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
-            getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): newWorkItem->{}", newWorkItem);
-            PetasosActionableTask transportPacket = newActionableTask(actionableTask, newWorkItem);
-            newActionableTaskList.add(transportPacket);
-        }
-        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newActionableTaskList.size());
+            DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
+            if(taskSubscriptionCheck.hasAtLeastOneSubscriber(payloadManifest)) {
+                TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
+                getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): newWorkItem->{}", newWorkItem);
 
+                PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask, newWorkItem);
+                newActionableTaskList.add(newDownstreamTask);
+
+                synchronized (actionableTask.getTaskCompletionLock()) {
+                    actionableTask.getTaskCompletionSummary().addDownstreamTask(newDownstreamTask.getTaskId());
+                }
+            }
+        }
+        synchronized (actionableTask.getTaskCompletionLock()) {
+            if (actionableTask.getTaskCompletionSummary().getDownstreamTaskMap().isEmpty()){
+                actionableTask.getTaskCompletionSummary().setLastInChain(true);
+                actionableTask.getTaskCompletionSummary().setFinalised(true);
+            }
+        }
+
+        getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): Updating actionableTask with task completion details");
+        actionableTaskActivityController.updateActionableTask(actionableTask);
+
+        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newActionableTaskList.size());
         return (newActionableTaskList);
     }
 
     private PetasosActionableTask newActionableTask(PetasosActionableTask previousActionableTask, TaskWorkItemType work){
         getLogger().debug(".newActionableTask(): Entry, previousActionableTask->{}, work->{}", previousActionableTask,  work);
-
         if(previousActionableTask == null){
             getLogger().debug(".newActionableTask(): Exit, previousTaskFulfillmentDetail is null, returning null");
             return(null);

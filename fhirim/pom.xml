@@ -45,7 +45,7 @@
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>${version-javax.enterprise-cdi-api}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.ejb</groupId>
@@ -244,12 +244,6 @@
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-server</artifactId>
             <version>${version-ca.uhn.hapi.fhir}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-processingplant</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <!--         -->

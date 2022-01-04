@@ -16,9 +16,10 @@ public interface ProcessingPlantInterface extends CapabilityFulfillmentManagemen
     public String getHostName();
     public String getDeploymentSite();
     public PegacornTopologyFactoryInterface getTopologyFactory();
-    public ProcessingPlantSoftwareComponent getProcessingPlantNode();
+    public ProcessingPlantSoftwareComponent getMeAsASoftwareComponent();
+    public String getSubsystemParticipantName();
+    public String getSubsystemName();
     public WorkshopSoftwareComponent getWorkshop(String workshopName, String version);
     public WorkshopSoftwareComponent getWorkshop(String workshopName);
-    public String getIPCServiceName();
     public boolean isITOpsNode();
 }

@@ -45,7 +45,7 @@
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>${version-javax.enterprise-cdi-api}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.ejb</groupId>
@@ -103,7 +103,12 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-topology</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Pegacorn Common Code -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
@@ -204,18 +209,7 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-topology</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-topology</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
+
 
         <!--         -->
         <!-- Logging -->

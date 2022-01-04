@@ -56,7 +56,10 @@ public class WUPContainerIngresGatekeeper {
      */
     @RecipientList
     public List<String> ingresGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
-        getLogger().info(".ingresGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask);
+        getLogger().debug(".ingresGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask);
+        if(getLogger().isInfoEnabled()) {
+            getLogger().info(".ingresGatekeeper(): jobcard->{}", fulfillmentTask.getTaskJobCard());
+        }
         // Get Route Names
         TopologyNodeFunctionFDNToken wupToken = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
@@ -65,10 +68,10 @@ public class WUPContainerIngresGatekeeper {
         ArrayList<String> targetList = new ArrayList<String>();
         getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
         if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
-            getLogger().info(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
+            getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             return (targetList);
         } else {
-            getLogger().info(".ingresGatekeeper(): And we return the ingres point to the associated WUP Ingres Conduit");
+            getLogger().trace(".ingresGatekeeper(): We return the channel name of the associated WUP Ingres Conduit");
             String targetEndpoint = nameSet.getEndPointWUPIngresConduitIngres();
             targetList.add(targetEndpoint);
             getLogger().debug(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);

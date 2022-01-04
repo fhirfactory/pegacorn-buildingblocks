@@ -176,7 +176,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     }
     
     public String getEndpointHostName(){
-        String dnsName = getProcessingPlant().getProcessingPlantNode().getDefaultDNSName();
+        String dnsName = getProcessingPlant().getMeAsASoftwareComponent().getAssignedDNSName();
         return(dnsName);
     }
     
@@ -298,7 +298,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
      */
     protected IPCServerTopologyEndpoint deriveAssociatedTopologyEndpoint(String interfaceName, IPCAdapterDefinition interfaceDefinition){
         getLogger().debug(".deriveServerTopologyEndpoint(): Entry, interfaceName->{}, interfaceDefinition->{}", interfaceName, interfaceDefinition);
-        ProcessingPlantSoftwareComponent processingPlantSoftwareComponent = processingPlantServices.getProcessingPlantNode();
+        ProcessingPlantSoftwareComponent processingPlantSoftwareComponent = processingPlantServices.getMeAsASoftwareComponent();
         getLogger().trace(".deriveServerTopologyEndpoint(): Parse through all endpoints and their IPC Definitions");
         for(TopologyNodeFDN endpointFDN: processingPlantSoftwareComponent.getEndpoints()){
             IPCServerTopologyEndpoint endpoint = (IPCServerTopologyEndpoint)topologyIM.getNode(endpointFDN);
@@ -323,7 +323,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
         getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
-        ArrayList<TopologyNodeFDN> endpointFDNs = getProcessingPlant().getProcessingPlantNode().getEndpoints();
+        ArrayList<TopologyNodeFDN> endpointFDNs = getProcessingPlant().getMeAsASoftwareComponent().getEndpoints();
         for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
             if(endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)){

@@ -37,11 +37,19 @@ public class PetasosSubscriptionSummaryReport implements Serializable {
     private Map<ComponentIdType, PetasosProcessingPlantSubscriptionSummary> processingPlantSubscriptionSummarySet;
     private Map<ComponentIdType, PetasosWorkUnitProcessorSubscriptionSummary> wupSubscriptionSummarySet;
 
+    //
+    // Constructor(s)
+    //
+
     public PetasosSubscriptionSummaryReport(){
         this.timestamp = Instant.now();
         wupSubscriptionSummarySet = new HashMap<>();
         processingPlantSubscriptionSummarySet = new HashMap<>();
     }
+
+    //
+    // Getters and Setters
+    //
 
     public Instant getTimestamp() {
         return timestamp;
@@ -87,5 +95,20 @@ public class PetasosSubscriptionSummaryReport implements Serializable {
             processingPlantSubscriptionSummarySet.remove(summary.getComponentID());
         }
         processingPlantSubscriptionSummarySet.put(summary.getComponentID(), summary);
+    }
+
+    //
+    // To String
+    //
+
+
+    @Override
+    public String toString() {
+        return "PetasosSubscriptionSummaryReport{" +
+                "timestamp=" + timestamp +
+                ", processingPlantComponentID=" + processingPlantComponentID +
+                ", processingPlantSubscriptionSummarySet=" + processingPlantSubscriptionSummarySet +
+                ", wupSubscriptionSummarySet=" + wupSubscriptionSummarySet +
+                '}';
     }
 }

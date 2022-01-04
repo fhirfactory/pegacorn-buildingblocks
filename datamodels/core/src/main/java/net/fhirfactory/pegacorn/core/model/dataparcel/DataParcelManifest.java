@@ -42,6 +42,8 @@ public class DataParcelManifest implements Serializable {
     private PolicyEnforcementPointApprovalStatusEnum enforcementPointApprovalStatus;
     private boolean interSubsystemDistributable;
     private DataParcelDirectionEnum dataParcelFlowDirection;
+    private String sourceProcessingPlantParticipantName;
+    private String targetProcessingPlantParticipantName;
 
     public DataParcelManifest(){
         this.contentDescriptor = null;
@@ -50,6 +52,8 @@ public class DataParcelManifest implements Serializable {
         this.intendedTargetSystem = null;
         this.interSubsystemDistributable = false;
         this.dataParcelFlowDirection = null;
+        this.sourceProcessingPlantParticipantName = null;
+        this.targetProcessingPlantParticipantName = null;
         this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
@@ -63,6 +67,8 @@ public class DataParcelManifest implements Serializable {
         this.intendedTargetSystem = null;
         this.interSubsystemDistributable = false;
         this.dataParcelFlowDirection = null;
+        this.sourceProcessingPlantParticipantName = null;
+        this.targetProcessingPlantParticipantName = null;
         this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
@@ -70,6 +76,16 @@ public class DataParcelManifest implements Serializable {
     }
 
     public DataParcelManifest(DataParcelManifest ori){
+        if(ori.hasTargetProcessingPlantParticipantName()){
+            this.setTargetProcessingPlantParticipantName(ori.getTargetProcessingPlantParticipantName());
+        } else {
+            this.setTargetProcessingPlantParticipantName(null);
+        }
+        if(ori.hasSourceProcessingPlantParticipantName()){
+            this.setSourceProcessingPlantParticipantName(ori.getSourceProcessingPlantParticipantName());
+        } else {
+            this.setSourceProcessingPlantParticipantName(null);
+        }
         if(ori.hasContainerDescriptor()) {
             this.containerDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContainerDescriptor());
         } else {
@@ -107,7 +123,7 @@ public class DataParcelManifest implements Serializable {
             this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         }
         if(ori.hasValidationStatus()){
-            this.setNormalisationStatus(ori.getNormalisationStatus());
+            this.setValidationStatus(ori.getValidationStatus());
         } else {
             this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
         }
@@ -116,6 +132,36 @@ public class DataParcelManifest implements Serializable {
         } else {
             this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
         }
+    }
+
+    //
+    // Getters and Setters (and Has's)
+    //
+
+    public boolean hasTargetProcessingPlantParticipantName(){
+        boolean hasValue = this.targetProcessingPlantParticipantName != null;
+        return(hasValue);
+    }
+
+    public String getTargetProcessingPlantParticipantName() {
+        return targetProcessingPlantParticipantName;
+    }
+
+    public void setTargetProcessingPlantParticipantName(String targetProcessingPlantParticipantName) {
+        this.targetProcessingPlantParticipantName = targetProcessingPlantParticipantName;
+    }
+
+    public boolean hasSourceProcessingPlantParticipantName(){
+        boolean hasValue = this.sourceProcessingPlantParticipantName != null;
+        return(hasValue);
+    }
+
+    public String getSourceProcessingPlantParticipantName() {
+        return sourceProcessingPlantParticipantName;
+    }
+
+    public void setSourceProcessingPlantParticipantName(String taskProducerProcessingPlantParticipantName) {
+        this.sourceProcessingPlantParticipantName = taskProducerProcessingPlantParticipantName;
     }
 
     public boolean hasDataParcelType(){
@@ -256,6 +302,10 @@ public class DataParcelManifest implements Serializable {
         this.dataParcelFlowDirection = dataParcelFlowDirection;
     }
 
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
         return "DataParcelManifest{" +
@@ -265,25 +315,30 @@ public class DataParcelManifest implements Serializable {
                 ", normalisationStatus=" + normalisationStatus +
                 ", validationStatus=" + validationStatus +
                 ", dataParcelType=" + dataParcelType +
-                ", sourceSystem=" + sourceSystem +
-                ", intendedTargetSystem=" + intendedTargetSystem +
+                ", sourceSystem='" + sourceSystem + '\'' +
+                ", intendedTargetSystem='" + intendedTargetSystem + '\'' +
+                ", enforcementPointApprovalStatus=" + enforcementPointApprovalStatus +
                 ", interSubsystemDistributable=" + interSubsystemDistributable +
-                ", enforcementPointApprovalStatus=" + getEnforcementPointApprovalStatus() +
-                ", dataParcelFlowDirection=" + getDataParcelFlowDirection() +
+                ", dataParcelFlowDirection=" + dataParcelFlowDirection +
+                ", sourceProcessingPlantParticipantName='" + sourceProcessingPlantParticipantName + '\'' +
+                ", targetProcessingPlantParticipantName='" + targetProcessingPlantParticipantName + '\'' +
                 '}';
     }
 
+    //
+    // Hash and Equals
+    //
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DataParcelManifest)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         DataParcelManifest that = (DataParcelManifest) o;
-        return isInterSubsystemDistributable() == that.isInterSubsystemDistributable() && Objects.equals(getContentDescriptor(), that.getContentDescriptor()) && Objects.equals(getContainerDescriptor(), that.getContainerDescriptor()) && Objects.equals(getPayloadQuality(), that.getPayloadQuality()) && getNormalisationStatus() == that.getNormalisationStatus() && getValidationStatus() == that.getValidationStatus() && getDataParcelType() == that.getDataParcelType() && Objects.equals(getSourceSystem(), that.getSourceSystem()) && Objects.equals(getIntendedTargetSystem(), that.getIntendedTargetSystem()) && getEnforcementPointApprovalStatus() == that.getEnforcementPointApprovalStatus() && getDataParcelFlowDirection() == that.getDataParcelFlowDirection();
+        return isInterSubsystemDistributable() == that.isInterSubsystemDistributable() && Objects.equals(getContentDescriptor(), that.getContentDescriptor()) && Objects.equals(getContainerDescriptor(), that.getContainerDescriptor()) && Objects.equals(getPayloadQuality(), that.getPayloadQuality()) && getNormalisationStatus() == that.getNormalisationStatus() && getValidationStatus() == that.getValidationStatus() && getDataParcelType() == that.getDataParcelType() && Objects.equals(getSourceSystem(), that.getSourceSystem()) && Objects.equals(getIntendedTargetSystem(), that.getIntendedTargetSystem()) && getEnforcementPointApprovalStatus() == that.getEnforcementPointApprovalStatus() && getDataParcelFlowDirection() == that.getDataParcelFlowDirection() && Objects.equals(getSourceProcessingPlantParticipantName(), that.getSourceProcessingPlantParticipantName()) && Objects.equals(getTargetProcessingPlantParticipantName(), that.getTargetProcessingPlantParticipantName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getContentDescriptor(), getContainerDescriptor(), getPayloadQuality(), getNormalisationStatus(), getValidationStatus(), getDataParcelType(), getSourceSystem(), getIntendedTargetSystem(), getEnforcementPointApprovalStatus(), isInterSubsystemDistributable(), getDataParcelFlowDirection());
+        return Objects.hash(getContentDescriptor(), getContainerDescriptor(), getPayloadQuality(), getNormalisationStatus(), getValidationStatus(), getDataParcelType(), getSourceSystem(), getIntendedTargetSystem(), getEnforcementPointApprovalStatus(), isInterSubsystemDistributable(), getDataParcelFlowDirection(), getSourceProcessingPlantParticipantName(), getTargetProcessingPlantParticipantName());
     }
 }

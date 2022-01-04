@@ -21,19 +21,25 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution;
 
+import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosEdgeMessageForwarderService;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.IntraSubsystemPubSubParticipantIdentifier;
-import net.fhirfactory.pegacorn.core.model.petasos.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.subscriptions.manager.DataParcelSubscriptionMapIM;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
-import org.apache.camel.*;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.subscription.TaskSubscriptionCheck;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +63,7 @@ public class LocalTaskDistributionBean {
     }
 
     @Inject
-    DataParcelSubscriptionMapIM topicServer;
+    LocalPetasosParticipantSubscriptionMapIM topicServer;
 
     @Inject
     TopologyIM topologyProxy;
@@ -70,6 +76,15 @@ public class LocalTaskDistributionBean {
 
     @Inject
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskBroker;
+
+    @Inject
+    private TaskSubscriptionCheck taskSubscriptionCheck;
+
+    @Inject
+    private PetasosEdgeMessageForwarderService forwarderService;
+
+    @Inject
+    private ProcessingPlantInterface myProcessingPlant;
 
     /**
      * Essentially, we get the set of WUPs subscribing to a particular UoW type,
@@ -108,97 +123,66 @@ public class LocalTaskDistributionBean {
         }
 
         DataParcelManifest uowTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();
-
-        getLogger().trace(".distributeNewFulfillmentTasks(): Getting the set of subscribers for the given topic (calling the topicServer)");
         getLogger().trace(".distributeNewFulfillmentTasks(): Looking for Subscribers To->{}:", uowTopicID);
-        List<PubSubParticipant> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
-        getLogger().trace(".distributeNewFulfillmentTasks(): Before we do a general routing attempt, let's see if the message is directed somewhere specific");
-        //
-        // Because auditing is not running yet
-        // Remove once Auditing is in place
-        //
-        if(getLogger().isWarnEnabled()) {
-            int subscriberSetSize = 0;
-            if (subscriberSet != null) {
-                subscriberSetSize = subscriberSet.size();
-            }
-            getLogger().warn("Number of Subscribers->{}", subscriberSetSize);
-        }
-        //
-        // Check to see if the message has a Target defined in the ParcelManifest
-        //
-        String alreadySentTo = "";
-        if(!StringUtils.isEmpty(uowTopicID.getIntendedTargetSystem())){
-            getLogger().trace(".distributeNewFulfillmentTasks(): It's not empty, so let's see if the appropriate downstream system is registered");
-            for(PubSubParticipant currentSubscriber: subscriberSet){
-                if(hasRemoteServiceName(currentSubscriber)) {
-                    String subscriberName = currentSubscriber.getInterSubsystemParticipant().getEndpointServiceName();
-                    if (subscriberName.contentEquals(uowTopicID.getIntendedTargetSystem())) {
-                        forwardTask(currentSubscriber, actionableTask);
-                        alreadySentTo = subscriberName;
-                    }
-                }
-            }
+        getLogger().trace(".distributeNewFulfillmentTasks(): Getting the set of subscribers for the given topic (calling the topicServer)");
+        List<PetasosParticipant> subscriberSet = taskSubscriptionCheck.getSubscriberSet(uowTopicID);
+        if(subscriberSet.isEmpty()){
+            getLogger().debug(".distributeNewFulfillmentTasks(): There are no subscribers, exiting");
+            return;
         }
 
-        getLogger().trace(".distributeNewFulfillmentTasks(): Iterate through the subscribers");
-        if(getLogger().isDebugEnabled()){
-            getLogger().debug(".distributeNewFulfillmentTasks(): number of subscribers to this UoW->{}", subscriberSet.size());
+        getLogger().trace(".distributeNewFulfillmentTasks(): Distributing new PetasosTaskFulfillment tasks");
+        for(PetasosParticipant currentSubscriber: subscriberSet){
+            forwardTask(currentSubscriber, actionableTask);
         }
-        if (subscriberSet != null) {
-            if(!subscriberSet.isEmpty()) {
-                getLogger().trace(".distributeNewFulfillmentTasks(): Iterating through....");
-                for (PubSubParticipant currentSubscriber : subscriberSet) {
-                    getLogger().trace(".distributeNewFulfillmentTasks(): Iterating, currentSubscriber->{}", currentSubscriber);
-                    boolean dontSendAgain = false;
-                    if (hasRemoteServiceName(currentSubscriber)) {
-                        getLogger().trace(".distributeNewFulfillmentTasks(): has Inter-Subsystem element");
-                        if (currentSubscriber.getInterSubsystemParticipant().getEndpointServiceName().contentEquals(alreadySentTo)) {
-                            dontSendAgain = true;
-                        }
-                    }
-                    if (!dontSendAgain) {
-                        getLogger().trace(".distributeNewFulfillmentTasks(): does not have Inter-Subsystem element");
-                        forwardTask(currentSubscriber, actionableTask);
-                    }
-                }
-            }
-        }
+
         getLogger().debug(".distributeNewFulfillmentTasks(): Exiting");
         return;
     }
 
-    private boolean hasRemoteServiceName(PubSubParticipant subscriber){
-        if(subscriber == null){
-            return(false);
-        }
-        if(subscriber.getInterSubsystemParticipant() == null){
-            return(false);
-        }
-        if(subscriber.getInterSubsystemParticipant().getEndpointID() == null){
-            return(false);
-        }
-        if(subscriber.getInterSubsystemParticipant().getEndpointServiceName() == null){
-            return(false);
-        }
-        return(true);
-    }
 
-    private boolean hasIntendedTarget(DataParcelManifest parcelManifest){
-        if(parcelManifest == null){
-            return(false);
-        }
-        if(StringUtils.isEmpty(parcelManifest.getIntendedTargetSystem())){
-            return(false);
-        }
-        return(true);
-    }
 
-    private void forwardTask(PubSubParticipant subscriber, PetasosActionableTask actionableTask){
-        getLogger().info(".forwardTask(): Subscriber --> {}", subscriber);
-        IntraSubsystemPubSubParticipantIdentifier localSubscriberIdentifier = subscriber.getIntraSubsystemParticipant().getIdentifier();
-        getLogger().debug(".forwardTask(): The (LocalSubscriber aspect) IdentifieFHIRCommunicationToUoWr->{}", localSubscriberIdentifier);
-        WorkUnitProcessorSoftwareComponent currentNodeElement = (WorkUnitProcessorSoftwareComponent)topologyProxy.getNode(localSubscriberIdentifier);
+    private void forwardTask(PetasosParticipant subscriber, PetasosActionableTask actionableTask){
+        getLogger().debug(".forwardTask(): Subscriber --> {}", subscriber);
+        // 1st check if the Subscriber is actually a remote one! If so, ensure it has a proper "IntendedTarget" entry
+        boolean isRemoteTarget = false;
+        String intendedTargetName = null;
+        DataParcelManifest payloadTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();
+        if(taskSubscriptionCheck.hasIntendedTarget(payloadTopicID)){
+            if(!payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER)){
+                if(!payloadTopicID.getIntendedTargetSystem().equals(myProcessingPlant.getSubsystemParticipantName())){
+                    isRemoteTarget = true;
+                }
+            }
+        }
+        if(!isRemoteTarget) {
+            if (taskSubscriptionCheck.hasRemoteServiceName(subscriber)) {
+                getLogger().trace(".forwardTask(): Has Remote Service as Target");
+                boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
+                boolean hasWildcardTarget = false;
+                if (taskSubscriptionCheck.hasIntendedTarget(payloadTopicID)) {
+                    hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
+                }
+                boolean hasRemoteElement = taskSubscriptionCheck.hasRemoteServiceName(subscriber);
+                getLogger().trace(".forwardTask(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
+                if ((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement) {
+                    intendedTargetName = subscriber.getSubsystemParticipantName();
+                    getLogger().trace(".forwardTask(): Setting the intendedTargetSystem->{}", subscriber.getSubsystemParticipantName());
+                    isRemoteTarget = true;
+                }
+            }
+        }
+        ComponentIdType actualSubscriberId = null;
+        getLogger().debug(".forwardTask(): Assigning target component id, based on whether it is a remote component or local");
+        if(isRemoteTarget){
+            getLogger().debug(".forwardTask(): It is a remote target, so routing via the local forwarder service");
+            actualSubscriberId = forwarderService.getComponentId();
+        } else {
+            getLogger().debug(".forwardTask(): It is a local target, so routing directly to target");
+            actualSubscriberId = subscriber.getComponentID();
+        }
+        getLogger().debug(".forwardTask(): The (LocalSubscriber aspect) IdentifieFHIRCommunicationToUoWr->{}", actualSubscriberId);
+        WorkUnitProcessorSoftwareComponent currentNodeElement = (WorkUnitProcessorSoftwareComponent)topologyProxy.getNode(actualSubscriberId);
         getLogger().debug(".forwardTask(): The TopologyNode for the target currentNodeElement->{}", currentNodeElement);
         TopologyNodeFunctionFDNToken targetWUPFunctionToken = currentNodeElement.getNodeFunctionFDN().getFunctionToken();
         getLogger().debug(".forwardTask(): The WUPToken for the target targetWUPFunctionToken->{}", targetWUPFunctionToken);
@@ -208,32 +192,17 @@ public class LocalTaskDistributionBean {
         PetasosFulfillmentTask petasosFulfillmentTask = fulfillmentTaskFactory.newFulfillmentTask(actionableTask, currentNodeElement);
         getLogger().trace(".forwardTask(): Create actually PetasosFulfillmentTask: petasosFulfillmentTask->{}", petasosFulfillmentTask);
         getLogger().debug(".forwardTask(): Create actually PetasosFulfillmentTask: Finish");
-        // Now check if the Subscriber is actually a remote one! If so, ensure it has a proper "IntendedTarget" entry
-        if(hasRemoteServiceName(subscriber)){
-            getLogger().trace(".forwardTask(): Has Remote Service as Target");
-            DataParcelManifest payloadTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();
-            boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
-            boolean hasWildcardTarget = false;
-            if(hasIntendedTarget(payloadTopicID)){
-                hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
-            }
-            boolean hasRemoteElement = hasRemoteServiceName(subscriber);
-            getLogger().trace(".forwardTask(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
-            if((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement){
-                petasosFulfillmentTask.getTaskWorkItem().getPayloadTopicID().setIntendedTargetSystem(subscriber.getInterSubsystemParticipant().getEndpointServiceName());
-                getLogger().trace(".forwardTask(): Setting the intendedTargetSystem->{}", subscriber.getInterSubsystemParticipant().getEndpointServiceName());
-            }
-        }
+        petasosFulfillmentTask.getTaskWorkItem().getPayloadTopicID().setTargetProcessingPlantParticipantName(subscriber.getSubsystemParticipantName());
         //
         // Register The FulfillmentTask
-        getLogger().info(".forwardTask(): Register PetasosFulfillmentTask: Start");
+        getLogger().debug(".forwardTask(): Register PetasosFulfillmentTask: Start");
         fulfilmentTaskBroker.registerFulfillmentTask(petasosFulfillmentTask, false);
-        getLogger().info(".forwardTask(): Register PetasosFulfillmentTask: Finish");
-        getLogger().info(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Start");
+        getLogger().debug(".forwardTask(): Register PetasosFulfillmentTask: Finish");
+        getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Start");
         String targetCamelEndpoint = routeName.getEndPointWUPContainerIngresProcessorIngres();
         getLogger().info(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: targetCamelEndpoint->{}", targetCamelEndpoint);
         camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentTask);
-        getLogger().info(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
+        getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
     }
 
     private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorSoftwareComponent> wupSet) {

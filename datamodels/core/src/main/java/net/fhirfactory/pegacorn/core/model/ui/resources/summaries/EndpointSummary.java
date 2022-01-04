@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 
 import java.util.HashSet;
 import java.util.Set;

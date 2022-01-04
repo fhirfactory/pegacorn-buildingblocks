@@ -22,17 +22,17 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.InitialHostSpecification;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.datatypes.JGroupsAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.datatypes.JGroupsAdapter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StandardEdgeIPCEndpoint extends IPCTopologyEndpoint {
+public class StandardEdgeIPCEndpoint extends IPCServerTopologyEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(StandardEdgeIPCEndpoint.class);
 
     private List<InitialHostSpecification> initialHosts;
@@ -48,6 +48,22 @@ public class StandardEdgeIPCEndpoint extends IPCTopologyEndpoint {
         this.initialHosts = new ArrayList<>();
         this.nameSpace = null;
         this.configurationFileName = null;
+    }
+
+    public StandardEdgeIPCEndpoint(StandardEdgeIPCEndpoint ori){
+        super(ori);
+        this.initialHosts = new ArrayList<>();
+        this.nameSpace = null;
+        this.configurationFileName = null;
+        if(!ori.getInitialHosts().isEmpty()){
+            getInitialHosts().addAll(ori.getInitialHosts());
+        }
+        if(StringUtils.isNotEmpty(ori.getNameSpace())){
+            setNameSpace(ori.getNameSpace());
+        }
+        if(StringUtils.isNotEmpty(ori.getConfigurationFileName())){
+            setConfigurationFileName(ori.getConfigurationFileName());
+        }
     }
 
     //
@@ -119,7 +135,6 @@ public class StandardEdgeIPCEndpoint extends IPCTopologyEndpoint {
                 ", componentType=" + getComponentType() +
                 ", containingNodeFDN=" + getContainingNodeFDN() +
                 ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", actualPodIP='" + getActualPodIP() + '\'' +
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +

@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories;
 
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
@@ -50,7 +52,7 @@ public class TaskTraceabilityTypeFactory {
     //
 
     public TaskTraceabilityType newTaskTraceabilityFromTask(PetasosActionableTask task){
-        getLogger().debug(".newTaskTraceabilityFromTask(): Entry, task->{}", task);
+        getLogger().info(".newTaskTraceabilityFromTask(): Entry, task->{}", task);
         if(task == null){
             return(null);
         }
@@ -61,10 +63,32 @@ public class TaskTraceabilityTypeFactory {
             traceability = new TaskTraceabilityType();
         }
         if(task.hasTaskFulfillment()){
-            TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(task.getTaskId(), task.getTaskFulfillment());
+            TaskIdType taskId = task.getTaskId();
+            getLogger().info(".newTaskTraceabilityFromTask(): taskId->{}", taskId);
+            TaskFulfillmentType taskFulfillment = task.getTaskFulfillment();
+            getLogger().info(".newTaskTraceabilityFromTask(): taskFulfillment->{}", taskFulfillment);
+            TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(taskId, taskFulfillment);
             if(traceabilityElementType != null){
                 traceability.addToTaskJourney(traceabilityElementType);
             }
+        }
+        getLogger().debug(".newTaskTraceabilityFromTask(): Exit, traceability->{}", traceability);
+        return(traceability);
+    }
+
+    public TaskTraceabilityType newTaskTraceabilityFromTask(PetasosActionableTask task, TaskTraceabilityElementType lastTraceabilityElement) {
+        getLogger().info(".newTaskTraceabilityFromTask(): Entry, task->{}", task);
+        if (task == null) {
+            return (null);
+        }
+        TaskTraceabilityType traceability = null;
+        if (task.hasTaskTraceability()) {
+            traceability = SerializationUtils.clone(task.getTaskTraceability());
+        } else {
+            traceability = new TaskTraceabilityType();
+        }
+        if (lastTraceabilityElement != null){
+            traceability.addToTaskJourney(lastTraceabilityElement);
         }
         getLogger().debug(".newTaskTraceabilityFromTask(): Exit, traceability->{}", traceability);
         return(traceability);

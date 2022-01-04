@@ -22,7 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.factories;
 
 import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedureCallRequest;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.time.Instant;
@@ -31,7 +32,7 @@ import java.util.UUID;
 @ApplicationScoped
 public class RemoteProcedureCallRequestFactory {
 
-    public RemoteProcedureCallRequest newRemoteProcedureCallRequest(Object content, Class contentType, PetasosEndpointIdentifier endpointIdentifier){
+    public RemoteProcedureCallRequest newRemoteProcedureCallRequest(Object content, Class contentType, JGroupsIntegrationPointSummary endpointIdentifier){
         RemoteProcedureCallRequest rpcRequest = new RemoteProcedureCallRequest();
         rpcRequest.setRequestContentType(contentType);
         rpcRequest.setRequestID(UUID.randomUUID().toString());

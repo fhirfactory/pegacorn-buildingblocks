@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.datatypes.JGroupsAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.datatypes.JGroupsAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPClientEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPClientAdapter;
@@ -68,7 +68,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
             }
         }
         switch(endpointTopologyNode.getEndpointType()){
-            case EDGE_JGROUPS_MESSAGING_SERVICE: {
+            case EDGE_JGROUPS_INTEGRATION_POINT: {
                 IPCServerTopologyEndpoint jgroupsEndpoint = (IPCServerTopologyEndpoint)endpointTopologyNode;
                 JGroupsAdapter currentAdapter = (JGroupsAdapter) jgroupsEndpoint.getAdapterList().get(0);
                 PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();

@@ -21,16 +21,28 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.global.watchdogs;
 
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedTaskJobCardDM;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @ApplicationScoped
 public class GlobalPetasosTaskContinuityWatchdog {
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalPetasosTaskContinuityWatchdog.class);
+
+    private Long TASK_CONTINUITY_CHECK_INITIAL_DELAY = 60000L; // milliseconds
+    private Long TASK_CONTINUITY_CHECK_PERIOD = 15000L; // milliseconds
+    private Long MINIMUM_TASK_AGE_FOR_RETIREMENT = 15L; // Seconds
 
     private Instant actionableTaskCheckInstant;
     private Instant taskJobCardCheckInstant;
@@ -58,21 +70,97 @@ public class GlobalPetasosTaskContinuityWatchdog {
 
     @PostConstruct
     public void initialise(){
-
+        getLogger().debug(".initialise(): Entry");
+        if(this.initialised){
+            getLogger().debug(".initialise(): Exit, already initialised, nothing to do!");
+            return;
+        } else {
+            getLogger().info("GlobalPetasosTaskContinuityWatchdog::initialise(): Starting initialisation");
+            scheduleTaskContinuityWatchdog();
+            getLogger().info("GlobalPetasosTaskContinuityWatchdog::initialise(): Finished initialisation");
+            this.initialised = true;
+            getLogger().debug(".initialise(): Exit");
+        }
     }
 
     //
     // Scheduling & Initialisation
     //
 
+    public void scheduleTaskContinuityWatchdog() {
+        getLogger().debug(".scheduleTaskContinuityWatchdog(): Entry");
+        TimerTask startupWatchdogTask = new TimerTask() {
+            public void run() {
+                getLogger().debug(".taskContinuityWatchdog(): Entry");
+                taskContinuityWatchdog();
+                getLogger().debug(".taskContinuityWatchdog(): Exit");
+            }
+        };
+        Timer timer = new Timer("taskContinuityWatchdogTimer");
+        timer.schedule(startupWatchdogTask, TASK_CONTINUITY_CHECK_INITIAL_DELAY, TASK_CONTINUITY_CHECK_PERIOD);
+        getLogger().debug(".scheduleTaskContinuityWatchdog(): Exit");
+    }
 
 
     //
     // Actionable Task Controller / Watchdog
     //
 
-    protected void actionableTaskWatchdog(){
+    protected void taskContinuityWatchdog(){
+        getLogger().debug(".taskContinuityWatchdog(): Entry");
+        Set<TaskIdType> allTaskIds = actionableTaskDM.getAllTaskIds();
+        for(TaskIdType currentTaskId: allTaskIds){
+            if(getLogger().isInfoEnabled()){
+                getLogger().debug(".taskContinuityWatchdog(): Checking task {}", currentTaskId);
+            }
+            boolean unregisterTask = false;
+            synchronized (actionableTaskDM.getActionableTaskLock(currentTaskId)){
+                PetasosActionableTask currentActionableTask = actionableTaskDM.getActionableTask(currentTaskId);
+                if(currentActionableTask.hasTaskCompletionSummary()){
+                    if (currentActionableTask.getTaskCompletionSummary().isFinalised()) {
+                        unregisterTask = true;
+                    }
+                }
+                if(!unregisterTask) {
+                    if (currentActionableTask.hasTaskFulfillment()) {
+                        if (currentActionableTask.getTaskFulfillment().hasStatus()) {
+                            switch (currentActionableTask.getTaskFulfillment().getStatus()) {
+                                case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
+                                case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
+                                case FULFILLMENT_EXECUTION_STATUS_INITIATED:
+                                case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
+                                case FULFILLMENT_EXECUTION_STATUS_ACTIVE_ELSEWHERE:
 
+                                    break;
+                                case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
+                                case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
+                                case FULFILLMENT_EXECUTION_STATUS_FINISHED:
+                                case FULFILLMENT_EXECUTION_STATUS_FAILED:
+                                case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
+                                    Long age = Instant.now().getEpochSecond() - currentActionableTask.getCreationInstant().getEpochSecond();
+                                    if (age > MINIMUM_TASK_AGE_FOR_RETIREMENT) {
+                                        unregisterTask = true;
+                                    }
+                                    break;
+                                case FULFILLMENT_EXECUTION_STATUS_FINALISED:
+                                case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
+                                    unregisterTask = true;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            if(unregisterTask){
+                getLogger().debug(".taskContinuityWatchdog(): Task {} is finalised, removing from shared cache... start", currentTaskId);
+                PetasosActionableTask unregisteredActionableTask = actionableTaskDM.removeActionableTask(currentTaskId);
+                getLogger().debug(".taskContinuityWatchdog(): Task {} is finalised, removing from shared cache... done...");
+            }
+            if(getLogger().isDebugEnabled()){
+                getLogger().debug(".taskContinuityWatchdog(): Shared ActionableTaskCache size->{}", actionableTaskDM.getAllTaskIds().size());
+            }
+        }
+        getLogger().debug(".taskContinuityWatchdog(): Exit");
     }
 
     //
@@ -117,5 +205,9 @@ public class GlobalPetasosTaskContinuityWatchdog {
 
     public SharedTaskJobCardDM getTaskJobCardDM() {
         return taskJobCardDM;
+    }
+
+    protected Logger getLogger(){
+        return(LOG);
     }
 }

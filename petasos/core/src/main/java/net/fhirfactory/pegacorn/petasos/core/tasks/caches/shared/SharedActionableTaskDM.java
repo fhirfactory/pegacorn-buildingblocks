@@ -27,7 +27,9 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
 
@@ -96,21 +98,34 @@ public class SharedActionableTaskDM {
         return(actionableTask);
     }
 
-    public PetasosActionableTask unregisterActionableTask(PetasosActionableTask actionableTask){
+    public PetasosActionableTask removeActionableTask(PetasosActionableTask actionableTask){
         getLogger().debug(".unregisterActionableTask(): Entry, actionableTask->{}", actionableTask);
         if(actionableTask == null){
             getLogger().debug(".unregisterActionableTask(): Exit, actionableTask is null, returning null");
             return(null);
         }
+        PetasosActionableTask unregisteredActionableTask = removeActionableTask(actionableTask.getTaskId());
+        getLogger().debug(".unregisterActionableTask(): Exit, unregisteredActionableTask->{}", unregisteredActionableTask);
+        return(unregisteredActionableTask);
+    }
+
+    public PetasosActionableTask removeActionableTask(TaskIdType taskId){
+        getLogger().debug(".unregisterActionableTask(): Entry, taskId->{}", taskId);
+        if(taskId == null){
+            getLogger().debug(".unregisterActionableTask(): Exit, taskId is null, returning null");
+            return(null);
+        }
+        PetasosActionableTask unregisteredActionableTask = null;
         synchronized(getTaskCacheLock()){
-            if(getTaskCache().containsKey(actionableTask.getTaskId())){
+            if(getTaskCache().containsKey(taskId)){
                 getLogger().trace(".unregisterActionableTask(): actionableTask exists in cache, removing");
-                getTaskCache().remove(actionableTask.getTaskId());
-                getTaskSpecificLockMap().remove(actionableTask.getTaskId());
+                unregisteredActionableTask = getTaskCache().get(taskId);
+                getTaskCache().remove(taskId);
+                getTaskSpecificLockMap().remove(taskId);
             }
         }
-        getLogger().debug(".unregisterActionableTask(): Exit, actionableTask->{}", actionableTask);
-        return(actionableTask);
+        getLogger().debug(".unregisterActionableTask(): Exit, unregisteredActionableTask->{}", unregisteredActionableTask);
+        return(unregisteredActionableTask);
     }
 
     public PetasosActionableTask getActionableTask(TaskIdType taskId){
@@ -126,6 +141,31 @@ public class SharedActionableTaskDM {
         }
         LOG.debug(".getActionableTask(): Exit, Task with TaskId({}) is not within the cahce", taskId);
         return(null);
+    }
+
+    public Object getActionableTaskLock(TaskIdType taskId){
+        if(taskId == null){
+            return(null);
+        }
+        if(getTaskSpecificLockMap().containsKey(taskId)){
+            return(getTaskSpecificLockMap().get(taskId));
+        } else {
+            return(null);
+        }
+    }
+
+    public Set<TaskIdType> getAllTaskIds(){
+        getLogger().debug(".getAllTaskIds(): Entry");
+        HashSet<TaskIdType> idSet = new HashSet<>();
+        if(getTaskCache().isEmpty()){
+            getLogger().debug(".getAllTaskIds(): Exit, cache is empty, returning empty set");
+            return(idSet);
+        }
+        synchronized (getTaskCacheLock()){
+            idSet.addAll(getTaskCache().keySet());
+        }
+        getLogger().debug(".getAllTaskIds(): Exit");
+        return(idSet);
     }
 
     //

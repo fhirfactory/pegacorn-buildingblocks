@@ -123,6 +123,12 @@ public class PetasosTask implements Serializable {
     // Getters and Setters (Bean Methods)
     //
 
+    @JsonIgnore
+    public boolean hasSourceResourceId(){
+        boolean hasValue = this.sourceResourceId != null;
+        return(hasValue);
+    }
+
     public DatagridElementSourceResourceIdType getSourceResourceId() {
         return sourceResourceId;
     }
@@ -450,5 +456,165 @@ public class PetasosTask implements Serializable {
                 ", aggregateTaskMembership=" + aggregateTaskMembership +
                 ", registered=" + registered +
                 '}';
+    }
+
+    //
+    // Update
+    //
+
+    public PetasosTask update(PetasosTask update){
+        PetasosTask petasosTask = updatePetasosTask(update);
+        return(petasosTask);
+    }
+
+    protected PetasosTask updatePetasosTask(PetasosTask update){
+        if(update == null){
+            return(this);
+        }
+        // sourceResourceId
+        synchronized (sourceResourceIdLock){
+            if(update.hasSourceResourceId()){
+                this.setSourceResourceId(update.getSourceResourceId());
+            }
+        }
+        // taskContext
+        synchronized(taskContextLock){
+            if(update.hasTaskContext()){
+                if(!this.hasTaskContext()){
+                    this.setTaskContext(update.getTaskContext());
+                } else {
+                    if(update.getTaskContext().hasTaskEncounter()) {
+                        this.getTaskContext().setTaskEncounter(update.getTaskContext().getTaskEncounter());
+                    }
+                    if(update.getTaskContext().hasTaskBeneficiary()){
+                        this.getTaskContext().setTaskBeneficiary(update.getTaskContext().getTaskBeneficiary());
+                    }
+                    if(update.getTaskContext().hasTaskTriggerSummary()){
+                        this.getTaskContext().setTaskTriggerSummary(update.getTaskContext().getTaskTriggerSummary());
+                    }
+                }
+            }
+        }
+        // taskType
+        synchronized (taskTypeLock){
+            if(update.hasTaskType()){
+                if(!this.hasTaskType()){
+                    this.setTaskType(update.getTaskType());
+                } else {
+                    if(update.getTaskType().hasTaskSubType()) {
+                        this.getTaskType().setTaskSubType(update.getTaskType().getTaskSubType());
+                    }
+                    if(update.getTaskType().hasTaskType()){
+                        this.getTaskType().setTaskType(update.getTaskType().getTaskType());
+                    }
+                }
+            }
+        }
+        // taskWorkItem
+        synchronized(taskWorkItemLock){
+            if(update.hasTaskWorkItem()){
+                if(!this.hasTaskWorkItem()){
+                    this.setTaskWorkItem(update.getTaskWorkItem());
+                } else {
+                    if(update.getTaskWorkItem().hasIngresContent()){
+                        this.getTaskWorkItem().setIngresContent(update.getTaskWorkItem().getIngresContent());
+                    }
+                    if(update.getTaskWorkItem().hasEgressContent()){
+                        this.getTaskWorkItem().setEgressContent(update.getTaskWorkItem().getEgressContent());
+                    }
+                    if(update.getTaskWorkItem().hasFailureDescription()){
+                        this.getTaskWorkItem().setFailureDescription(update.getTaskWorkItem().getFailureDescription());
+                    }
+                    if(update.getTaskWorkItem().hasInstanceID()){
+                        this.getTaskWorkItem().setInstanceID(update.getTaskWorkItem().getInstanceID());
+                    }
+                    if(update.getTaskWorkItem().hasPayloadTopicID()){
+                        this.getTaskWorkItem().setUoWTypeID(update.getTaskWorkItem().getTypeID());
+                    }
+                    if(update.getTaskWorkItem().hasProcessingOutcome()){
+                        this.getTaskWorkItem().setProcessingOutcome(update.getTaskWorkItem().getProcessingOutcome());
+                    }
+                }
+            }
+        }
+        // taskTraceability
+        synchronized (taskTraceabilityLock){
+            if(update.hasTaskTraceability()){
+                if(!this.hasTaskTraceability()){
+                    this.setTaskTraceability(update.getTaskTraceability());
+                } else {
+                    if(update.getTaskTraceability().getTaskJourney() != null){
+                        this.getTaskTraceability().setTaskJourney(update.getTaskTraceability().getTaskJourney());
+                    }
+                }
+            }
+        }
+        // taskOutcomeStatus
+        synchronized (taskOutcomeStatusLock){
+            if(update.hasTaskOutcomeStatus()){
+                if(!this.hasTaskOutcomeStatus()){
+                    this.setTaskOutcomeStatus(update.getTaskOutcomeStatus());
+                } else {
+                    if(update.getTaskOutcomeStatus().getOutcomeStatus() != null){
+                        this.getTaskOutcomeStatus().setOutcomeStatus(update.getTaskOutcomeStatus().getOutcomeStatus());
+                    }
+                    if(update.getTaskOutcomeStatus().getEntryInstant() != null){
+                        this.getTaskOutcomeStatus().setEntryInstant(update.getTaskOutcomeStatus().getEntryInstant());
+                    }
+                }
+            }
+        }
+        // taskPerformerTypes
+        synchronized (taskPerformerTypesLock){
+            if(update.hasTaskPerformerTypes()){
+                if(!this.hasTaskPerformerTypes()){
+                    this.setTaskPerformerTypes(update.getTaskPerformerTypes());
+                }
+            }
+        }
+        // taskReason
+        synchronized (taskReasonLock){
+            if(update.hasTaskReason()){
+                this.setTaskReason(update.getTaskReason());
+            }
+        }
+        // taskNodeAffinity
+        synchronized(taskNodeAffinityLock){
+            if(update.hasTaskNodeAffinity()){
+                if(!this.hasTaskNodeAffinity()){
+                    this.setTaskNodeAffinity(update.getTaskNodeAffinity());
+                } else {
+                    if(update.getTaskNodeAffinity().hasIdValidityEndInstant()){
+                        this.getTaskNodeAffinity().setIdValidityEndInstant(update.getTaskNodeAffinity().getIdValidityEndInstant());
+                    }
+                    if(update.getTaskNodeAffinity().hasIdValidityStartInstant()){
+                        this.getTaskNodeAffinity().setIdValidityStartInstant(update.getTaskNodeAffinity().getIdValidityStartInstant());
+                    }
+                    if(update.getTaskNodeAffinity().hasId()){
+                        this.getTaskNodeAffinity().setId(update.getTaskNodeAffinity().getId());
+                    }
+                    if(update.getTaskNodeAffinity().hasDisplayName()){
+                        this.getTaskNodeAffinity().setDisplayName(this.getTaskNodeAffinity().getDisplayName());
+                    }
+                }
+            }
+        }
+        // aggregateTaskMembership
+        synchronized(aggregateTaskMembershipLock){
+            if(update.hasAggregateTaskMembership()){
+                if(!this.hasAggregateTaskMembership()){
+                    this.setAggregateTaskMembership(update.getAggregateTaskMembership());
+                } else {
+                    this.getAggregateTaskMembership().clear();
+                    this.getAggregateTaskMembership().addAll(update.getAggregateTaskMembership());
+                }
+            }
+        }
+        // registered
+        this.setRegistered(update.isRegistered());
+        // done... except for updateInstant
+        this.setUpdateInstant(update.getUpdateInstant());
+        // now, definitely done!
+        return(this);
     }
 }

@@ -22,8 +22,8 @@
 package net.fhirfactory.pegacorn.core.interfaces.interception;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
 public interface PetasosInterceptionHandlerInterface {
-    public PetasosFulfillmentTask redirectFulfillmentTask(PetasosFulfillmentTask task, PetasosEndpointIdentifier endpointIdentifier);
+    public PetasosFulfillmentTask redirectFulfillmentTask(PetasosFulfillmentTask task, JGroupsIntegrationPointSummary endpointIdentifier);
 }

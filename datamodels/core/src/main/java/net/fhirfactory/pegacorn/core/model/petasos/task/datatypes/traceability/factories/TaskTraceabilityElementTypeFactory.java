@@ -56,30 +56,32 @@ public class TaskTraceabilityElementTypeFactory {
     }
 
     public TaskTraceabilityElementType newTaskTraceabilityElementFromTask(TaskIdType taskId, TaskFulfillmentType taskFulfillment){
-        getLogger().debug(".newTaskTraceabilityElementFromTask(): Entry, taskId->{}, taskFulfillment->{}", taskId, taskFulfillment);
+        getLogger().info(".newTaskTraceabilityElementFromTask(): Entry, taskId->{}, taskFulfillment->{}", taskId, taskFulfillment);
         if(taskId == null || taskFulfillment == null){
             return(null);
         }
         TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
-        traceabilityElement.setFulfillerId(SerializationUtils.clone(taskFulfillment.getFulfillerComponent().getComponentID()));
+        if(taskFulfillment.hasFulfillerComponent()) {
+            traceabilityElement.setFulfillerId(SerializationUtils.clone(taskFulfillment.getFulfillerComponent().getComponentID()));
+        }
         traceabilityElement.setActionableTaskId(SerializationUtils.clone(taskId));
         traceabilityElement.setFulfillerTaskId(SerializationUtils.clone(taskFulfillment.getTrackingID()));
         if(taskFulfillment.hasFinalisationInstant()){
-            traceabilityElement.setFinalisationInstant(SerializationUtils.clone(taskFulfillment.getFinalisationInstant()));
+            traceabilityElement.setFinalisationInstant(taskFulfillment.getFinalisationInstant());
         }
         if(taskFulfillment.hasReadyInstant()){
-            traceabilityElement.setReadyInstant(SerializationUtils.clone(taskFulfillment.getReadyInstant()));
+            traceabilityElement.setReadyInstant(taskFulfillment.getReadyInstant());
         }
         if(taskFulfillment.hasFinishInstant()){
-            traceabilityElement.setFinishInstant(SerializationUtils.clone(taskFulfillment.getFinishInstant()));
+            traceabilityElement.setFinishInstant(taskFulfillment.getFinishInstant());
         }
         if(taskFulfillment.hasStartInstant()){
-            traceabilityElement.setStartInstant(SerializationUtils.clone(taskFulfillment.getStartInstant()));
+            traceabilityElement.setStartInstant(taskFulfillment.getStartInstant());
         }
         if(taskFulfillment.hasRegistrationInstant()){
-            traceabilityElement.setRegistrationInstant(SerializationUtils.clone(taskFulfillment.getRegistrationInstant()));
+            traceabilityElement.setRegistrationInstant(taskFulfillment.getRegistrationInstant());
         }
-        getLogger().debug(".newTaskTraceabilityElementFromTask(): Exit, traceabilityElement->{}", traceabilityElement);
+        getLogger().info(".newTaskTraceabilityElementFromTask(): Exit, traceabilityElement->{}", traceabilityElement);
         return(traceabilityElement);
     }
 

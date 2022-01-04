@@ -96,6 +96,11 @@ public class PetasosLocalMetricsDM extends LocalOAMCacheBase {
 
     public WorkUnitProcessorMetricsAgent getWorkUnitProcessorMetricsAgent(ComponentIdType componetId){
         WorkUnitProcessorMetricsAgent nodeMetrics = (WorkUnitProcessorMetricsAgent)getNodeMetrics(componetId);
+        if(nodeMetrics == null){
+            nodeMetrics = new WorkUnitProcessorMetricsAgent(componetId);
+            getNodeMetricsMap().put(componetId, nodeMetrics);
+            getNodeMetricsLockMap().put(componetId, new Object());
+        }
         return(nodeMetrics);
     }
 

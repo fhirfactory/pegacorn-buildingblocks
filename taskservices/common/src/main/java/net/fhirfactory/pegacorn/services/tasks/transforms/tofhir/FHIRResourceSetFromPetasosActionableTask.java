@@ -62,7 +62,7 @@ public class FHIRResourceSetFromPetasosActionableTask {
         resourceList.add(fhirTask);
         //
         // Now the FHIR::Provenance
-        Provenance fhirProvenance = provenanceFromPetasosTaskJourney.newProvenanceFromTaskJourney(processingPlant.getProcessingPlantNode().getComponentID(), fhirTask.getIdentifierFirstRep(), actionableTask.getTaskTraceability());
+        Provenance fhirProvenance = provenanceFromPetasosTaskJourney.newProvenanceFromTaskJourney(processingPlant.getMeAsASoftwareComponent().getComponentID(), fhirTask.getIdentifierFirstRep(), actionableTask.getTaskTraceability());
         resourceList.add(fhirProvenance);
         //
         // Now check to see if we need to build metadata set

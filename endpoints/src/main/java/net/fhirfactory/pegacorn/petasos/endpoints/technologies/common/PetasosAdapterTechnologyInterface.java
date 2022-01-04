@@ -22,12 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.common;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
 public interface PetasosAdapterTechnologyInterface {
 
     public void initialise();
     public void registerInterfaceEventCallbacks(PetasosAdapterDeltasInterface interfaceEventCallbacks);
-    public PetasosEndpointStatusEnum checkInterfaceStatus(PetasosEndpointIdentifier endpointID);
+    public PetasosParticipantStatusEnum checkInterfaceStatus(JGroupsIntegrationPointSummary endpointID);
 }

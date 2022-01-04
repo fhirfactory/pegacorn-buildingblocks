@@ -26,13 +26,16 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
@@ -41,6 +44,7 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -51,7 +55,9 @@ import org.slf4j.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Generic Message Orientated Architecture (MOA) Work Unit Processor (WUP) Template
@@ -71,7 +77,8 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(specifyLogger());
     }
 
-    private WorkUnitProcessorSoftwareComponent associatedTopologyNode;
+    private WorkUnitProcessorSoftwareComponent meAsATopologyComponent;
+    private PetasosParticipant meAsAPetasosParticipant;
     private RouteElementNames nameSet;
     private WUPArchetypeEnum wupArchetype;
     private List<DataParcelManifest> topicSubscriptionSet;
@@ -96,6 +103,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     @Inject
     private FHIRContextUtility fhirContextUtility;
 
+    @Inject
+    private LocalPetasosParticipantCacheIM participantCacheIM;
+
     public GenericMessageBasedWUPTemplate() {
         super();
     }
@@ -114,9 +124,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().trace(".initialise(): WUP Instance Version --> {}", specifyWUPInstanceVersion());
         this.getProcessingPlant().initialisePlant();
         getLogger().trace(".initialise(): Setting up the wupTopologyElement (NodeElement) instance, which is the Topology Server's representation of this WUP ");
-        this.associatedTopologyNode = buildWUPNodeElement();
+        this.meAsATopologyComponent = buildWUPNodeElement();
         getLogger().trace(".initialise(): Setting the WUP nameSet, which is the set of Route EndPoints that the WUP Framework will use to link various enablers");
-        this.nameSet = new RouteElementNames(getAssociatedTopologyNode().getNodeFunctionFDN().getFunctionToken());
+        this.nameSet = new RouteElementNames(getMeAsATopologyComponent().getNodeFunctionFDN().getFunctionToken());
         getLogger().trace(".initialise(): Setting the WUP EgressEndpoint");
         this.egressEndpoint = specifyEgressEndpoint();
         getLogger().trace(".initialise(): Setting the WUP IngresEndpoint");
@@ -125,12 +135,16 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         this.wupArchetype =  specifyWUPArchetype();
         getLogger().trace(".initialise(): Now invoking subclass initialising function(s)");
         executePostInitialisationActivities();
+        getLogger().trace(".initialise(): Building my PetasosParticipant");
+        this.meAsAPetasosParticipant = buildPetasosParticipant();
         getLogger().trace(".initialise(): Setting the Topic Subscription Set (i.e. the list of Data Sets we will process)");
         this.topicSubscriptionSet = specifySubscriptionTopics();
         getLogger().trace(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
         buildWUPFramework(this.getContext());
 
         registerCapabilities();
+
+        this.getMeAsATopologyComponent().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
 
         getLogger().debug(".initialise(): Exit");
     }
@@ -184,12 +198,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     public void buildWUPFramework(CamelContext routeContext) {
         getLogger().debug(".buildWUPFramework(): Entry");
-        wupFrameworkManager.buildWUPFramework(this.associatedTopologyNode, this.getTopicSubscriptionSet(), this.getWupArchetype());
+        wupFrameworkManager.buildWUPFramework(this.meAsATopologyComponent, this.getTopicSubscriptionSet(), this.getWupArchetype());
         getLogger().debug(".buildWUPFramework(): Exit");
     }
     
     public String getEndpointHostName(){
-        String dnsName = getProcessingPlant().getProcessingPlantNode().getDefaultDNSName();
+        String dnsName = getProcessingPlant().getMeAsASoftwareComponent().getAssignedDNSName();
         return(dnsName);
     }
     
@@ -201,8 +215,8 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(topologyIM);
     }
 
-    public void setAssociatedTopologyNode(WorkUnitProcessorSoftwareComponent associatedTopologyNode) {
-        this.associatedTopologyNode = associatedTopologyNode;
+    public void setMeAsATopologyComponent(WorkUnitProcessorSoftwareComponent meAsATopologyComponent) {
+        this.meAsATopologyComponent = meAsATopologyComponent;
     }
 
     public RouteElementNames getNameSet() {
@@ -210,7 +224,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     public String getWupInstanceName() {
-        return getAssociatedTopologyNode().getComponentRDN().getTag();
+        return getMeAsATopologyComponent().getComponentRDN().getTag();
     }
 
     public WUPArchetypeEnum getWupArchetype() {
@@ -226,7 +240,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     public String getVersion() {
-        return associatedTopologyNode.getComponentRDN().getNodeVersion();
+        return meAsATopologyComponent.getComponentRDN().getNodeVersion();
     }
 
     public FHIRElementTopicFactory getFHIRTopicIDBuilder(){
@@ -239,6 +253,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     protected FHIRContextUtility getFHIRContextUtility(){
         return(this.fhirContextUtility);
+    }
+
+    public PetasosParticipant getMeAsAPetasosParticipant() {
+        return meAsAPetasosParticipant;
     }
 
     //
@@ -265,13 +283,13 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
                 }
             }
             if(!alreadyInPlace) {
-                exchange.setProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, getAssociatedTopologyNode());
+                exchange.setProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, getMeAsATopologyComponent());
             }
         }
     }
 
-    public WorkUnitProcessorSoftwareComponent getAssociatedTopologyNode() {
-        return associatedTopologyNode;
+    public WorkUnitProcessorSoftwareComponent getMeAsATopologyComponent() {
+        return meAsATopologyComponent;
     }
 
     /**
@@ -286,6 +304,45 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         ;
         return route;
     }
+
+    //
+    // PetasosParticipant Functions
+    //
+
+    private PetasosParticipant buildPetasosParticipant(){
+        getLogger().debug(".buildPetasosParticipant(): Entry");
+        Set<TaskWorkItemManifestType> subscribedTopicSet = new HashSet<>();
+        if (!specifySubscriptionTopics().isEmpty()) {
+            for (DataParcelManifest currentTopicID : specifySubscriptionTopics()) {
+                TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
+                if (subscribedTopicSet.contains(taskWorkItem)) {
+                    // Do nothing
+                } else {
+                    subscribedTopicSet.add(taskWorkItem);
+                }
+            }
+        }
+
+        Set<TaskWorkItemManifestType> publishedTopicSet = new HashSet<>();
+        if (!declarePublishedTopics().isEmpty()) {
+            for (DataParcelManifest currentTopicID : declarePublishedTopics()) {
+                TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
+                if (publishedTopicSet.contains(taskWorkItem)) {
+                    // Do nothing
+                } else {
+                    publishedTopicSet.add(taskWorkItem);
+                }
+            }
+        }
+
+        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(getMeAsATopologyComponent(),  publishedTopicSet, subscribedTopicSet);
+        PetasosParticipant participant = null;
+        if(participantRegistration != null){
+            participant = participantRegistration.getParticipant();
+        }
+        return(participant);
+    }
+
 
     //
     // Topology Functions
@@ -311,7 +368,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
      */
     protected IPCTopologyEndpoint deriveAssociatedTopologyEndpoint(String interfaceName, IPCAdapterDefinition interfaceDefinition){
         getLogger().debug(".deriveServerTopologyEndpoint(): Entry, interfaceName->{}, interfaceDefinition->{}", interfaceName, interfaceDefinition);
-        ProcessingPlantSoftwareComponent processingPlantSoftwareComponent = processingPlantServices.getProcessingPlantNode();
+        ProcessingPlantSoftwareComponent processingPlantSoftwareComponent = processingPlantServices.getMeAsASoftwareComponent();
         getLogger().trace(".deriveServerTopologyEndpoint(): Parse through all endpoints and their IPC Definitions");
         for(TopologyNodeFDN endpointFDN: processingPlantSoftwareComponent.getEndpoints()){
             IPCTopologyEndpoint endpoint = (IPCTopologyEndpoint)topologyIM.getNode(endpointFDN);
@@ -336,7 +393,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
         getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
-        ArrayList<TopologyNodeFDN> endpointFDNs = getProcessingPlant().getProcessingPlantNode().getEndpoints();
+        ArrayList<TopologyNodeFDN> endpointFDNs = getProcessingPlant().getMeAsASoftwareComponent().getEndpoints();
         for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
             getLogger().trace(".getTopologyEndpoint(): Iterating Through Endpoints, current->{}", endpointTopologyNode);

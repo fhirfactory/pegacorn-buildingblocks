@@ -24,9 +24,11 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
@@ -52,6 +54,9 @@ public class WUPEgressConduit {
 
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
+
+    @Inject
+    private ProcessingPlantPetasosParticipantNameHolder participantNameHolder;
     
     /**
      * This function reconstitutes the WorkUnitTransportPacket by extracting the WUPJobCard and ParcelStatusElement
@@ -75,6 +80,17 @@ public class WUPEgressConduit {
         getLogger().trace(".receiveFromWUP(): We only want to check if the UoW was successful and modify the JobCard/StatusElement accordingly.");
         getLogger().trace(".receiveFromWUP(): All detailed checking of the Cluster/SiteWide details is done in the WUPContainerEgressProcessor");
         //
+        // Ensure assignment of the ParticipantName
+        if(incomingUoW.hasEgressContent()){
+            for(UoWPayload currentEgressPayload: incomingUoW.getEgressContent().getPayloadElements()){
+                if(currentEgressPayload.getPayloadManifest() != null){
+                    if(!currentEgressPayload.getPayloadManifest().hasSourceProcessingPlantParticipantName()){
+                        currentEgressPayload.getPayloadManifest().setSourceProcessingPlantParticipantName(participantNameHolder.getSubsystemParticipantName());
+                    }
+                }
+            }
+        }
+        //
         // Merge the content
         synchronized(fulfillmentTask.getTaskWorkItemLock()) {
             fulfillmentTask.getTaskWorkItem().setProcessingOutcome(incomingUoW.getProcessingOutcome());
@@ -88,7 +104,7 @@ public class WUPEgressConduit {
                 getLogger().trace(".receiveFromWUP(): UoW was processed successfully - updating JobCard/StatusElement to FINISHED!");
                 synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
                     fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
-                    fulfillmentTask.getTaskFulfillment().setFinishedDate(Date.from(Instant.now()));
+                    fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
                 }
                 synchronized (fulfillmentTask.getTaskJobCardLock()) {
                     fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
@@ -101,7 +117,7 @@ public class WUPEgressConduit {
                 getLogger().trace(".receiveFromWUP(): UoW was processed with no actions required - updating JobCard/StatusElement to FINISHED!");
                 synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
                     fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED);
-                    fulfillmentTask.getTaskFulfillment().setFinishedDate(Date.from(Instant.now()));
+                    fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
                 }
                 synchronized (fulfillmentTask.getTaskJobCardLock()) {
                     fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED);
@@ -115,7 +131,7 @@ public class WUPEgressConduit {
                 getLogger().trace(".receiveFromWUP(): UoW was processed with task to be discarded/filtered!");
                synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
                     fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
-                    fulfillmentTask.getTaskFulfillment().setFinishedDate(Date.from(Instant.now()));
+                    fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
                 }
                 synchronized (fulfillmentTask.getTaskJobCardLock()) {
                     fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
@@ -131,7 +147,7 @@ public class WUPEgressConduit {
                 getLogger().trace(".receiveFromWUP(): UoW was not processed or processing failed - updating JobCard/StatusElement to FAILED!");
                 synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
                     fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
-                    fulfillmentTask.getTaskFulfillment().setFinishedDate(Date.from(Instant.now()));
+                    fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
                 }
                 synchronized (fulfillmentTask.getTaskJobCardLock()) {
                     fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
@@ -140,6 +156,9 @@ public class WUPEgressConduit {
                     fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
                 }
                 break;
+        }
+        if(getLogger().isDebugEnabled()) {
+            getLogger().debug(".receiveFromWUP(): jobcard->{}, taskFulfillment->{}", fulfillmentTask.getTaskJobCard(), fulfillmentTask.getTaskFulfillment());
         }
         return (fulfillmentTask);
     }

@@ -103,8 +103,7 @@ public class PetasosActionableTaskFactory {
         //
         // create task traceability information
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Start");
-        TaskTraceabilityType taskTraceabilityType = traceabilityTypeFactory.newTaskTraceabilityFromTask(upstreamTask);
-        taskTraceabilityType.addToTaskJourney(fulfillmentTaskSummary);
+        TaskTraceabilityType taskTraceabilityType = traceabilityTypeFactory.newTaskTraceabilityFromTask(upstreamTask, fulfillmentTaskSummary);
         newTask.setTaskTraceability(taskTraceabilityType);
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Finish");
         //
@@ -148,7 +147,7 @@ public class PetasosActionableTaskFactory {
         //
         // add the task node affinity
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Node Affinity] Start");
-        newTask.setTaskNodeAffinity(processingPlant.getProcessingPlantNode().getComponentID());
+        newTask.setTaskNodeAffinity(processingPlant.getMeAsASoftwareComponent().getComponentID());
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Node Affinity] Finish");
         //
         // add the task work item

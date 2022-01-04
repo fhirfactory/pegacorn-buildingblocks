@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServic
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.factories.MethodOutcomeFactory;
-import net.fhirfactory.pegacorn.petasos.endpoints.CapabilityUtilisationBroker;
+import net.fhirfactory.pegacorn.petasos.endpoints.services.tasking.CapabilityUtilisationBroker;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;

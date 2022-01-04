@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,6 +74,10 @@ public class LocalPetasosFulfillmentTaskDM {
             fulfillmentTaskCache.remove(taskId);
         }
         fulfillmentTaskCache.put(taskId, task);
+        synchronized (task.getTaskFulfillmentLock()) {
+            task.getTaskFulfillment().setRegistrationInstant(Instant.now());
+            task.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
+        }
         synchronized (task.getTaskJobCardLock()){
             task.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
         }

@@ -170,4 +170,65 @@ public class PetasosActionableTask extends PetasosTask{
                 "  taskMetadata=" + getTaskContext() + ",\n" +
                 '}';
     }
+
+    //
+    // Update ActionableTask
+    //
+
+    @JsonIgnore
+    public PetasosTask update(PetasosActionableTask update){
+
+        PetasosActionableTask petasosTaskUpdate = (PetasosActionableTask)updatePetasosTask(update);
+        PetasosActionableTask petasosActionableTaskUpdate = updatePetasosActionableTask(petasosTaskUpdate);
+
+        return(petasosActionableTaskUpdate);
+    }
+
+    @JsonIgnore
+    protected PetasosActionableTask updatePetasosActionableTask(PetasosActionableTask update){
+        if(update == null){
+            return(this);
+        }
+        synchronized (getTaskCompletionLock()) {
+            if (update.hasTaskCompletionSummary()) {
+                if (!this.hasTaskCompletionSummary()){
+                    this.setTaskCompletionSummary(update.getTaskCompletionSummary());
+                }else {
+                    this.getTaskCompletionSummary().setLastInChain(update.getTaskCompletionSummary().isLastInChain());
+                    this.getTaskCompletionSummary().setFinalised(update.getTaskCompletionSummary().isFinalised());
+                    this.getTaskCompletionSummary().setDownstreamTaskMap(update.getTaskCompletionSummary().getDownstreamTaskMap());
+                }
+            }
+        }
+        synchronized (getTaskFulfillmentLock()){
+            if(update.hasTaskFulfillment()){
+                if(!this.hasTaskFulfillment()){
+                    this.setTaskFulfillment(update.getTaskFulfillment());
+                } else {
+                    if(update.getTaskFulfillment().hasFulfillerComponent()) {
+                        this.getTaskFulfillment().setFulfillerComponent(update.getTaskFulfillment().getFulfillerComponent());
+                    }
+                    if(update.getTaskFulfillment().hasFinalisationInstant()){
+                        this.getTaskFulfillment().setFinishInstant(update.getTaskFulfillment().getFinishInstant());
+                    }
+                    if(update.getTaskFulfillment().hasLastCheckedInstant()){
+                        this.getTaskFulfillment().setLastCheckedInstant(update.getTaskFulfillment().getLastCheckedInstant());
+                    }
+                    if(update.getTaskFulfillment().hasReadyInstant()){
+                        this.getTaskFulfillment().setReadyInstant(update.getTaskFulfillment().getReadyInstant());
+                    }
+                    if(update.getTaskFulfillment().hasRegistrationInstant()){
+                        this.getTaskFulfillment().setRegistrationInstant(update.getTaskFulfillment().getRegistrationInstant());
+                    }
+                    if(update.getTaskFulfillment().hasStartInstant()){
+                        this.getTaskFulfillment().setStartInstant(update.getTaskFulfillment().getStartInstant());
+                    }
+                    if(update.getTaskFulfillment().hasStatus()){
+                        this.getTaskFulfillment().setStatus(update.getTaskFulfillment().getStatus());
+                    }
+                }
+            }
+        }
+        return(this);
+    }
 }

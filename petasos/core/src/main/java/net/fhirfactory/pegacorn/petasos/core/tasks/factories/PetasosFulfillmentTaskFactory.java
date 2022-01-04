@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
+import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
@@ -55,6 +56,9 @@ public class PetasosFulfillmentTaskFactory {
 
     @Inject
     private PetasosTaskJobCardFactory jobCardFactory;
+
+    @Inject
+    private ProcessingPlantPetasosParticipantNameHolder participantNameHolder;
 
     //
     // Constructor(s)

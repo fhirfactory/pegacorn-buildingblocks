@@ -49,7 +49,9 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
 
     private String multiZoneInfinispanStackConfigFile;
 
-    private String defaultDNSName;
+    private String actualHostIP;
+    private String actualPodIP;
+    private String assignedDNSName;
     private boolean internalTrafficEncrypted;
     private Integer instanceCount;
 
@@ -68,7 +70,9 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.connections = new ArrayList<>();
 
         this.nameSpace = null;
-        this.defaultDNSName = null;
+        this.assignedDNSName = null;
+        this.actualHostIP = null;
+        this.actualPodIP = null;
         this.internalTrafficEncrypted = false;
 
         this.petasosIPCStackConfigFile = null;
@@ -80,12 +84,27 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.petasosAuditStackConfigFile = null;
 
         this.multiZoneInfinispanStackConfigFile = null;
-
     }
 
     //
     // Getters and Setters
     //
+
+    public String getActualHostIP() {
+        return actualHostIP;
+    }
+
+    public void setActualHostIP(String actualHostIP) {
+        this.actualHostIP = actualHostIP;
+    }
+
+    public String getActualPodIP() {
+        return actualPodIP;
+    }
+
+    public void setActualPodIP(String actualPodIP) {
+        this.actualPodIP = actualPodIP;
+    }
 
     public String getPetasosMetricsStackConfigFile() {
         return petasosMetricsStackConfigFile;
@@ -128,11 +147,11 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     }
 
     public String getPetasosTopologyStackConfigFile() {
-        return petasosSubscriptionsStackConfigFile;
+        return petasosTopologyStackConfigFile;
     }
 
     public void setPetasosTopologyStackConfigFile(String interZoneTopologyStackConfigFile) {
-        this.petasosSubscriptionsStackConfigFile = interZoneTopologyStackConfigFile;
+        this.petasosTopologyStackConfigFile = interZoneTopologyStackConfigFile;
     }
 
     public boolean isInternalTrafficEncrypted() {
@@ -167,12 +186,12 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.connections = connections;
     }
 
-    public String getDefaultDNSName() {
-        return defaultDNSName;
+    public String getAssignedDNSName() {
+        return assignedDNSName;
     }
 
-    public void setDefaultDNSName(String defaultDNSName) {
-        this.defaultDNSName = defaultDNSName;
+    public void setAssignedDNSName(String assignedDNSName) {
+        this.assignedDNSName = assignedDNSName;
     }
 
     public Integer getInstanceCount() {
@@ -210,14 +229,6 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
 
     public void setMultiZoneInfinispanStackConfigFile(String multiZoneInfinispanStackConfigFile) {
         this.multiZoneInfinispanStackConfigFile = multiZoneInfinispanStackConfigFile;
-    }
-
-    @JsonIgnore
-    public String getSubsystemName(){
-        TopologyNodeFDN nodeFDN = getComponentFDN();
-        TopologyNodeRDN subsystemRDN = nodeFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.SUBSYSTEM);
-        String subsystemName = subsystemRDN.getNodeName();
-        return(subsystemName);
     }
 
     @JsonIgnore
@@ -262,10 +273,11 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
                 ", petasosTaskingStackConfigFile='" + petasosTaskingStackConfigFile + '\'' +
                 ", petasosAuditStackConfigFile='" + petasosAuditStackConfigFile + '\'' +
                 ", multiZoneInfinispanStackConfigFile='" + multiZoneInfinispanStackConfigFile + '\'' +
-                ", defaultDNSName='" + defaultDNSName + '\'' +
+                ", defaultDNSName='" + assignedDNSName + '\'' +
                 ", internalTrafficEncrypted=" + internalTrafficEncrypted +
                 ", instanceCount=" + instanceCount +
-                ", subsystemName='" + getSubsystemName() + '\'' +
+                ", subsystemName='" + this.getSubsystemParticipantName() + '\'' +
+                ", subsystemParticipantName=" + getSubsystemParticipantName() +
                 ", clusterServiceName='" + getClusterServiceName() + '\'' +
                 '}';
     }

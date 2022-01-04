@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.ipc;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 
 public abstract class PegacornCommonInterfaceNamesBase {
 

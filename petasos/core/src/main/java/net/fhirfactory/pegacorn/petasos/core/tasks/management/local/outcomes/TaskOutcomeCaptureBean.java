@@ -21,12 +21,18 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +42,8 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class TaskOutcomeCaptureBean {
     private static final Logger LOG = LoggerFactory.getLogger(TaskOutcomeCaptureBean.class);
+
+    private ObjectMapper jsonMapper;
 
     @Inject
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
@@ -47,6 +55,11 @@ public class TaskOutcomeCaptureBean {
     // Constructor
     //
 
+    public TaskOutcomeCaptureBean() {
+        jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);;
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
+    }
 
     //
     // Post Construct
@@ -58,7 +71,9 @@ public class TaskOutcomeCaptureBean {
     //
 
     public PetasosActionableTask captureAndRegisterOutcome(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange){
-        getLogger().info(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        if(getLogger().isInfoEnabled()) {
+            getLogger().info(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", convertToString(fulfillmentTask));
+        }
         TaskIdType actionableTaskId = fulfillmentTask.getActionableTaskId();
         PetasosActionableTask actionableTask = null;
         switch(fulfillmentTask.getTaskFulfillment().getStatus()){
@@ -82,8 +97,19 @@ public class TaskOutcomeCaptureBean {
                 actionableTask = actionableTaskActivityController.notifyActionableTaskExecutionFinish(actionableTaskId, fulfillmentTask);
                 break;
         }
-        getLogger().info(".captureAndRegisterOutcome(): Exit, actionableTask->{}", actionableTask);
+        if(getLogger().isDebugEnabled()) {
+            getLogger().debug(".captureAndRegisterOutcome(): Exit, actionableTask->{}", convertToString(actionableTask));
+        }
         return(actionableTask);
+    }
+
+    protected String convertToString(PetasosTask petasosTask){
+        try {
+            String jsonString = jsonMapper.writeValueAsString(petasosTask);
+            return(jsonString);
+        } catch (JsonProcessingException e) {
+            return(ExceptionUtils.getStackTrace(e));
+        }
     }
 
     //

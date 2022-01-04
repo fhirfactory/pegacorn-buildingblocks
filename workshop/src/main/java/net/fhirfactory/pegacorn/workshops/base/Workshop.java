@@ -97,8 +97,8 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     private void buildWorkshop() {
         getLogger().debug(".buildWorkshop(): Entry, adding Workshop --> {}, version --> {}", specifyWorkshopName(), specifyWorkshopVersion());
-        WorkshopSoftwareComponent workshop = getTopologyFactory().createWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getProcessingPlantNode(),specifyWorkshopType());
-        topologyIM.addTopologyNode(getProcessingPlant().getProcessingPlantNode().getComponentFDN(), workshop);
+        WorkshopSoftwareComponent workshop = getTopologyFactory().createWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getMeAsASoftwareComponent(),specifyWorkshopType());
+        topologyIM.addTopologyNode(getProcessingPlant().getMeAsASoftwareComponent().getComponentFDN(), workshop);
         this.workshopNode = workshop;
         getLogger().debug(".buildWorkshop(): Exit");
     }

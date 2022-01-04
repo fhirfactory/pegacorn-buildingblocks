@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.services.tasks.agent;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.services.tasks.distribution.PetasosTasksDistributionHandler;
 import org.slf4j.Logger;
 
@@ -32,22 +32,22 @@ import java.util.List;
 @ApplicationScoped
 public class PetasosTasksAgentHandler extends PetasosTasksDistributionHandler {
     @Override
-    public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
+    public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier) {
         return null;
     }
 
     @Override
-    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
+    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier) {
         return null;
     }
 
     @Override
-    public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, PetasosEndpointIdentifier requesterEndpointIdentifier) {
+    public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier) {
         return null;
     }
 
     @Override
-    public List<PetasosActionableTask> retrievePendingActionableTasks(PetasosEndpointIdentifier requestorEndpointIdentifier) {
+    public List<PetasosActionableTask> retrievePendingActionableTasks(JGroupsIntegrationPointSummary requestorEndpointIdentifier) {
         return null;
     }
 

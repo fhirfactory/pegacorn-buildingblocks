@@ -21,11 +21,6 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.matrix;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointTopologyTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ClusteredInteractServerTopologyEndpointPort;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPServerTopologyEndpoint;
 
 public class InteractMatrixServerEndpoint extends InteractHTTPServerTopologyEndpoint {

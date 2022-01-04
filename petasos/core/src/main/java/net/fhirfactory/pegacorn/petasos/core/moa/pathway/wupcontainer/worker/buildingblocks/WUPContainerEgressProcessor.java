@@ -44,7 +44,6 @@ public class WUPContainerEgressProcessor {
 
     public PetasosFulfillmentTask egressContentProcessor(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
       	getLogger().debug(".egressContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask);
-
         switch (fulfillmentTask.getTaskFulfillment().getStatus()) {
             case FULFILLMENT_EXECUTION_STATUS_FINISHED:
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskJobCard());

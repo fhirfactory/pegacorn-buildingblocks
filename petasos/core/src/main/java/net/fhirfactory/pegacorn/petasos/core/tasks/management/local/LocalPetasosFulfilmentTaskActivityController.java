@@ -72,7 +72,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
     //
 
     public PetasosFulfillmentTask registerFulfillmentTask(PetasosFulfillmentTask task, boolean synchronousWriteToAudit){
-        getLogger().info(".registerFulfillmentTask(): Entry, fulfillmentTask->{}", task);
+        getLogger().debug(".registerFulfillmentTask(): Entry, fulfillmentTask->{}", task);
         PetasosTaskJobCard petasosTaskJobCard = null;
         if(task.hasTaskJobCard()) {
             petasosTaskJobCard = task.getTaskJobCard();
@@ -117,7 +117,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
     //
 
     public Instant requestFulfillmentTaskExecutionPrivilege(PetasosTaskJobCard localJobCard){
-        getLogger().info(".requestFulfillmentTaskExecutionPrivilege(): Entry, localJobCard->{}", localJobCard);
+        getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Entry, localJobCard->{}", localJobCard);
         PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.requestTaskExecutionPrivilege(localJobCard);
         Instant updateInstant = Instant.now();
         return(updateInstant);
@@ -128,10 +128,10 @@ public class LocalPetasosFulfilmentTaskActivityController {
     //
 
     public Instant notifyFulfillmentTaskExecutionStart(PetasosTaskJobCard localJobCard){
-        getLogger().info(".notifyFulfillmentTaskExecutionStart(): Entry, localJobCard->{}", localJobCard);
+        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Entry, localJobCard->{}", localJobCard);
         PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskExecutionStart(localJobCard);
         Instant updateInstant = Instant.now();
-        getLogger().info(".notifyFulfillmentTaskExecutionStart(): Exit, localJobCard->{}", localJobCard);
+        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Exit, localJobCard->{}", localJobCard);
         return(updateInstant);
     }
 

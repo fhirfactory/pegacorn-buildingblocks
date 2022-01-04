@@ -21,4 +21,12 @@
         <module>communicate</module>
         <module>hl7v2x</module>
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>2.0.SP1</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>

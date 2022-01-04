@@ -26,10 +26,10 @@ import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServic
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceClientWriterInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceProviderNameInterface;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpointIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import net.fhirfactory.pegacorn.services.audit.cache.AsynchronousWriterAuditEventCache;
-import net.fhirfactory.pegacorn.services.audit.forwarder.beans.AuditEventPersistenceAccessor;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
@@ -178,12 +178,12 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
     }
 
     @Override
-    public PegacornTransactionMethodOutcome logAuditEvent(AuditEvent event, PetasosEndpointIdentifier endpointIdentifier) {
+    public PegacornTransactionMethodOutcome logAuditEvent(AuditEvent event, JGroupsIntegrationPointSummary endpointIdentifier) {
         return(null);
     }
 
     @Override
-    public PegacornTransactionMethodOutcome logAuditEvent(List<AuditEvent> eventList, PetasosEndpointIdentifier endpointIdentifier) {
+    public PegacornTransactionMethodOutcome logAuditEvent(List<AuditEvent> eventList, JGroupsIntegrationPointSummary endpointIdentifier) {
         return null;
     }
 }

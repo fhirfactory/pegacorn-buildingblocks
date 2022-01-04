@@ -44,7 +44,7 @@ public class WorkflowWorkshop extends PetasosEnabledWorkshop {
 
     @Override
     protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getProcessingPlantNode().getComponentRDN().getNodeVersion());
+        return (getProcessingPlant().getMeAsASoftwareComponent().getComponentRDN().getNodeVersion());
     }
 
     @Override

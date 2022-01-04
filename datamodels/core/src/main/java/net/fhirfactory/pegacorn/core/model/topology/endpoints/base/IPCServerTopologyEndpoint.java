@@ -31,6 +31,8 @@ import java.util.ArrayList;
 public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(IPCServerTopologyEndpoint.class);
 
+    private String assignedDNSName;
+    private String actualHostIP;
 
     //
     // Constructor(s)
@@ -38,10 +40,51 @@ public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
 
     public IPCServerTopologyEndpoint(){
         super();
+        this.actualHostIP = null;
+        this.assignedDNSName = null;
+    }
+
+    public IPCServerTopologyEndpoint(IPCServerTopologyEndpoint ori){
+        super(ori);
+        if(ori.hasActualHostIP()){
+            setActualHostIP(ori.getActualHostIP());
+        }
+        if(ori.hasAssignedDNSName()){
+            setAssignedDNSName(ori.getAssignedDNSName());
+        }
     }
 
     //
     // Getters and Setters
+
+    @JsonIgnore
+    public boolean hasAssignedDNSName(){
+        boolean hasValue = this.assignedDNSName != null;
+        return(hasValue);
+    }
+
+    public String getAssignedDNSName() {
+        return assignedDNSName;
+    }
+
+    public void setAssignedDNSName(String assignedDNSName) {
+        this.assignedDNSName = assignedDNSName;
+    }
+
+    @JsonIgnore
+    public boolean hasActualHostIP(){
+        boolean hasValue = this.actualHostIP != null;
+        return(hasValue);
+    }
+
+    public String getActualHostIP() {
+        return actualHostIP;
+    }
+
+    public void setActualHostIP(String actualHostIP) {
+        this.actualHostIP = actualHostIP;
+    }
+
     //
 
     @JsonIgnore
@@ -68,7 +111,7 @@ public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
                 ", componentType=" + getComponentType() +
                 ", containingNodeFDN=" + getContainingNodeFDN() +
                 ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", actualPodIP='" + getActualPodIP() + '\'' +
+                ", assignedDNSName='" + getAssignedDNSName() + '\'' +
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +

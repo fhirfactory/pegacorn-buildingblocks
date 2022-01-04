@@ -50,9 +50,9 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
         this.resilientActivity = false;
     }
 
-    public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, SoftwareComponent fulfillerCommponent) {
+    public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, SoftwareComponent fulfillerComponent) {
         super();
-        this.fulfillerComponent = fulfillerComponent;
+        this.fulfillerComponent = this.fulfillerComponent;
         this.trackingID = SerializationUtils.clone(trackingID);
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;

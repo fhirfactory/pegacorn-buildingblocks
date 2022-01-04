@@ -107,9 +107,14 @@ public class WUPContainerIngresProcessor {
                             fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
                         }
                         fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
-                        getLogger().trace(".ingresContentProcessor(): We've been granted execution privileges!");
+                        if(getLogger().isInfoEnabled()) {
+                            getLogger().info(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
+                        }
                         waitState = false;
                         break;
+                    }
+                    if(getLogger().isInfoEnabled()) {
+                        getLogger().info(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
                     }
                     break;
                 case WUP_ACTIVITY_STATUS_EXECUTING:
@@ -129,7 +134,9 @@ public class WUPContainerIngresProcessor {
                         fulfillmentTask.getTaskFulfillment().setCancellationDate(Date.from(Instant.now()));
                     }
                     fulfillmentActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask.getTaskJobCard());
-                    getLogger().trace(".ingresContentProcessor(): We've been cancelled!");
+                    if(getLogger().isInfoEnabled()) {
+                        getLogger().info(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
+                    }
                     waitState = false;
             }
             if (waitState) {
