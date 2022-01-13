@@ -30,7 +30,7 @@ public enum PetasosMonitoredComponentTypeEnum {
     PETASOS_MONITORED_COMPONENT_WORKSHOP("petasos.aom.monitored_node_type.workshop"),
     PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR("petasos.oam.monitored_node_type.wup"),
     PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR_COMPONENT("petasos.oam.monitored_node_type.wup_component"),
-    PETASOS_MONITORED_COMPONENT_ENDPOINT("petasos.oam.monitored_node_type.subsystem");
+    PETASOS_MONITORED_COMPONENT_ENDPOINT("petasos.oam.monitored_node_type.endpoint");
 
     private String nodeType;
 

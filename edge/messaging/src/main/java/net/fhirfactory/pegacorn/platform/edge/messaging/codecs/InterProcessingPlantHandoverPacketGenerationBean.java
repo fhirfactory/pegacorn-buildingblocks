@@ -86,6 +86,9 @@ import java.time.Instant;
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Retrieving the associated PetasosActionableTask from the Exchange object");
             PetasosActionableTask actionableTask = actionableTaskDM.getActionableTask(fulfillmentTask.getActionableTaskId());
 
+            LOG.trace(".constructInterProcessingPlantHandoverPacket(): Retrieving the associated Metrics Agent");
+            WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Create TaskFullment Traceability element");
             TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
             traceabilityElement.setFulfillerId(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID());
@@ -101,10 +104,9 @@ import java.time.Instant;
             String processingPlantName = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID().getDisplayName();
             forwardingPacket.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
             forwardingPacket.setMessageSendStartInstant(Instant.now());
-            WorkUnitProcessorMetricsAgent nodeMetrics = metricsAgent.getWorkUnitProcessorMetricsAgent(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID());
-            if(nodeMetrics != null){
-                int messageProcessingCount = nodeMetrics.getIngresMessageCount();
-                Instant messageProcessingStartInstant = nodeMetrics.getEventProcessingStartInstant();
+            if(metricsAgent != null){
+                int messageProcessingCount = metricsAgent.getWUPMetricsData().getIngresMessageCount();
+                Instant messageProcessingStartInstant = metricsAgent.getWUPMetricsData().getEventProcessingStartInstant();
                 forwardingPacket.setMessageTransferCount(messageProcessingCount);
                 if(messageProcessingStartInstant != null){
                     forwardingPacket.setEventProcessingStartTime(messageProcessingStartInstant);

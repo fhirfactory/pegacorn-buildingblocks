@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCA
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -59,9 +59,9 @@ public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedW
     }
 
     @Override
-    protected MessageBasedWUPEndpoint specifyEgressEndpoint(){
+    protected MessageBasedWUPEndpointContainer specifyEgressEndpoint(){
         getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
-        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
+        MessageBasedWUPEndpointContainer egressEndpoint = new MessageBasedWUPEndpointContainer();
         egressEndpoint.setFrameworkEnabled(true);
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");

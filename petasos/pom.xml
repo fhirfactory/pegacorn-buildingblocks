@@ -23,7 +23,6 @@
     <modules>
         <module>core</module>
         <module>audit</module>
-	<module>oam</module>
     </modules>
     <dependencies>
         <dependency>

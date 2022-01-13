@@ -21,13 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.oam.topology;
 
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetricSet;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosAggregateTask;
-
-import java.time.Instant;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.reporting.PetasosMonitoredTopologyGraph;
 
 public interface PetasosTopologyReportingBrokerInterface {
     public void reportTopologyMap(PetasosMonitoredTopologyGraph topologyGraph);

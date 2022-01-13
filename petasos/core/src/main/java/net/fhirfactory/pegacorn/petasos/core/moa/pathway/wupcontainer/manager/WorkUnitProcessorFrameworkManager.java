@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.arc
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.StandardWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,42 +59,42 @@ public class WorkUnitProcessorFrameworkManager {
     @Inject
     private PetasosFulfillmentTaskAuditServicesBroker auditBroker;
 
-    public void buildWUPFramework(WorkUnitProcessorSoftwareComponent wupNode, List<DataParcelManifest> subscribedTopics, WUPArchetypeEnum wupArchetype) {
+    public void buildWUPFramework(WorkUnitProcessorSoftwareComponent wupNode, List<DataParcelManifest> subscribedTopics, WUPArchetypeEnum wupArchetype, WorkUnitProcessorMetricsAgent metricsAgent) {
         LOG.debug(".buildWUPFramework(): Entry, wupNode --> {}, subscribedTopics --> {}, wupArchetype --> {}", wupNode, subscribedTopics, wupArchetype);
         try {
             switch (wupArchetype) {
 
                 case WUP_NATURE_STIMULI_TRIGGERED_WORKFLOW: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_STIMULI_TRIGGERED_BEHAVIOUR route");
-                    StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, true);
+                    StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, true, metricsAgent);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
                     camelctx.addRoutes(standardWUPRoute);
                     break;
                 }
                 case WUP_NATURE_TIMER_TRIGGERED_WORKFLOW: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR route");
-                    ExternalIngresWUPContainerRoute ingresRoute = new ExternalIngresWUPContainerRoute(camelctx, wupNode, auditBroker);
+                    ExternalIngresWUPContainerRoute ingresRoute = new ExternalIngresWUPContainerRoute(camelctx, wupNode, auditBroker, metricsAgent);
                     camelctx.addRoutes(ingresRoute);
                     break;
                 }
                 case WUP_NATURE_LADON_BEHAVIOUR_WRAPPER:
                 case WUP_NATURE_LADON_STANDARD_MOA: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_LADON_STANDARD_MOA route");
-                    StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, true);
+                    StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, true, metricsAgent);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
                     camelctx.addRoutes(standardWUPRoute);
                     break;
                 }
                 case WUP_NATURE_MESSAGE_WORKER: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_MESSAGE_WORKER route");
-                    StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker);
+                    StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, metricsAgent);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
                     camelctx.addRoutes(standardWUPRoute);
                     break;
                 }
                 case WUP_NATURE_API_PUSH:
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_API_PUSH route");
-                    ExternalIngresWUPContainerRoute ingresRouteForAPIPush = new ExternalIngresWUPContainerRoute(camelctx, wupNode, auditBroker);
+                    ExternalIngresWUPContainerRoute ingresRouteForAPIPush = new ExternalIngresWUPContainerRoute(camelctx, wupNode, auditBroker, metricsAgent);
                     camelctx.addRoutes(ingresRouteForAPIPush);
                     break;
                 case WUP_NATURE_API_ANSWER:
@@ -105,12 +106,12 @@ public class WorkUnitProcessorFrameworkManager {
                 case WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT:
                 case WUP_NATURE_API_CLIENT:
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT route");
-                    ExternalEgressWUPContainerRoute egressRoute = new ExternalEgressWUPContainerRoute(camelctx, wupNode, auditBroker);
+                    ExternalEgressWUPContainerRoute egressRoute = new ExternalEgressWUPContainerRoute(camelctx, wupNode, auditBroker, metricsAgent);
                     camelctx.addRoutes(egressRoute);
                     break;
                 case WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT:
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT route");
-                    ExternalIngresWUPContainerRoute ingresRoute = new ExternalIngresWUPContainerRoute(camelctx, wupNode, auditBroker);
+                    ExternalIngresWUPContainerRoute ingresRoute = new ExternalIngresWUPContainerRoute(camelctx, wupNode, auditBroker, metricsAgent);
                     camelctx.addRoutes(ingresRoute);
                     break;
                 case WUP_NATURE_MESSAGE_EXTERNAL_CONCURRENT_INGRES_POINT:

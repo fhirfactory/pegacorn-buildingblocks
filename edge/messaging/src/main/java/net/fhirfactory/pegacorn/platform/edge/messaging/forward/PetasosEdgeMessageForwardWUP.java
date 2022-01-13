@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PetasosIPCMessagingEndpoint;
@@ -38,7 +38,6 @@ import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingP
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
-import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
@@ -103,8 +102,8 @@ public class PetasosEdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWUP 
     //
 
     @Override
-    protected MessageBasedWUPEndpoint specifyEgressEndpoint() {
-        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
+    protected MessageBasedWUPEndpointContainer specifyEgressEndpoint() {
+        MessageBasedWUPEndpointContainer egressEndpoint = new MessageBasedWUPEndpointContainer();
         assignEgressTopologyEndpoint();
         egressEndpoint.setEndpointTopologyNode(getAssociatedEgressTopologyEndpoint());
         egressEndpoint.setEndpointSpecification(getIPCComponentNames().getInterZoneIPCForwarderRouteEndpointName());

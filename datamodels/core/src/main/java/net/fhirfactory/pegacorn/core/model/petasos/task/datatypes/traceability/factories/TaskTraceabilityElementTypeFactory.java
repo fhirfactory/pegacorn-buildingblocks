@@ -56,7 +56,7 @@ public class TaskTraceabilityElementTypeFactory {
     }
 
     public TaskTraceabilityElementType newTaskTraceabilityElementFromTask(TaskIdType taskId, TaskFulfillmentType taskFulfillment){
-        getLogger().info(".newTaskTraceabilityElementFromTask(): Entry, taskId->{}, taskFulfillment->{}", taskId, taskFulfillment);
+        getLogger().debug(".newTaskTraceabilityElementFromTask(): Entry, taskId->{}, taskFulfillment->{}", taskId, taskFulfillment);
         if(taskId == null || taskFulfillment == null){
             return(null);
         }
@@ -81,7 +81,7 @@ public class TaskTraceabilityElementTypeFactory {
         if(taskFulfillment.hasRegistrationInstant()){
             traceabilityElement.setRegistrationInstant(taskFulfillment.getRegistrationInstant());
         }
-        getLogger().info(".newTaskTraceabilityElementFromTask(): Exit, traceabilityElement->{}", traceabilityElement);
+        getLogger().debug(".newTaskTraceabilityElementFromTask(): Exit, traceabilityElement->{}", traceabilityElement);
         return(traceabilityElement);
     }
 

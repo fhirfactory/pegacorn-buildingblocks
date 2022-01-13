@@ -21,13 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosEndpointContainerInterface;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 
-public class TriggerBasedWUPEndpoint {
+public class TriggerBasedWUPEndpoint implements PetasosEndpointContainerInterface {
     private IPCTopologyEndpoint endpointTopologyNode;
     private String endpointSpecification;
     private boolean frameworkEnabled;
 
+    @Override
     public IPCTopologyEndpoint getEndpointTopologyNode() {
         return endpointTopologyNode;
     }
@@ -36,6 +38,7 @@ public class TriggerBasedWUPEndpoint {
         this.endpointTopologyNode = endpointTopologyNode;
     }
 
+    @Override
     public String getEndpointSpecification() {
         return endpointSpecification;
     }
@@ -44,6 +47,7 @@ public class TriggerBasedWUPEndpoint {
         this.endpointSpecification = endpointSpecification;
     }
 
+    @Override
     public boolean isFrameworkEnabled() {
         return frameworkEnabled;
     }

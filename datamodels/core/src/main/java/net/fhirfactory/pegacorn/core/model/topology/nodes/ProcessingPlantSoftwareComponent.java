@@ -53,7 +53,7 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     private String actualPodIP;
     private String assignedDNSName;
     private boolean internalTrafficEncrypted;
-    private Integer instanceCount;
+    private Integer replicationCount;
 
     @Override
     protected Logger getLogger() {
@@ -194,12 +194,12 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.assignedDNSName = assignedDNSName;
     }
 
-    public Integer getInstanceCount() {
-        return instanceCount;
+    public Integer getReplicationCount() {
+        return replicationCount;
     }
 
-    public void setInstanceCount(Integer instanceCount) {
-        this.instanceCount = instanceCount;
+    public void setReplicationCount(Integer replicationCount) {
+        this.replicationCount = replicationCount;
     }
 
     public String getNameSpace() {
@@ -275,7 +275,7 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
                 ", multiZoneInfinispanStackConfigFile='" + multiZoneInfinispanStackConfigFile + '\'' +
                 ", defaultDNSName='" + assignedDNSName + '\'' +
                 ", internalTrafficEncrypted=" + internalTrafficEncrypted +
-                ", instanceCount=" + instanceCount +
+                ", replicationCount=" + replicationCount +
                 ", subsystemName='" + this.getSubsystemParticipantName() + '\'' +
                 ", subsystemParticipantName=" + getSubsystemParticipantName() +
                 ", clusterServiceName='" + getClusterServiceName() + '\'' +

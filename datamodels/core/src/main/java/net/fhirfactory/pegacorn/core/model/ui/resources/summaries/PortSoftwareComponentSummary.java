@@ -119,14 +119,12 @@ public class PortSoftwareComponentSummary extends SoftwareComponentSummary {
                 ", servicePort=" + servicePort +
                 ", serviceDNSName=" + serviceDNSName +
                 ", portType=" + portType +
-                ", routing=" + getRouting() +
                 ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +
                 ", nodeVersion=" + getNodeVersion() +
                 ", nodeType=" + getNodeType() +
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
-                ", componentName=" + getComponentName() +
                 ", encrypted=" + isEncrypted() +
                 ", resourceId=" + getResourceId() +
                 '}';

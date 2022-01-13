@@ -26,7 +26,6 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEn
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
 import org.hl7.fhir.r4.model.Device;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

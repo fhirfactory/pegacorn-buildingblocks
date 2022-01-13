@@ -56,6 +56,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTa
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -101,6 +102,9 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".ipcReceiverActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
 
+        LOG.trace(".ipcReceiverActivityStart(): get Metrics Agent from Exchange");
+        WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+
         LOG.trace(".ipcReceiverActivityStart(): Create and register a new ActionableTask: Start");
         TaskWorkItemType taskWorkItem = SerializationUtils.clone(handoverPacket.getActionableTask().getTaskWorkItem());
         PetasosActionableTask incomingActionableTask = handoverPacket.getActionableTask();
@@ -133,10 +137,10 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
 
 
         LOG.trace(".ipcReceiverActivityStart(): Capture some metrics: Start");
-        metricsAgent.getWorkUnitProcessorMetricsAgent(node.getComponentID()).incrementIngresMessageCount();
-        metricsAgent.getWorkUnitProcessorMetricsAgent(node.getComponentID()).incrementRegisteredTasks();
-        metricsAgent.getWorkUnitProcessorMetricsAgent(node.getComponentID()).incrementStartedTasks();
-        metricsAgent.getWorkUnitProcessorMetricsAgent(node.getComponentID()).setEventProcessingStartInstant(handoverPacket.getEventProcessingStartTime());
+        metricsAgent.incrementIngresMessageCount();
+        metricsAgent.incrementRegisteredTasks();
+        metricsAgent.incrementStartedTasks();
+        metricsAgent.getWUPMetricsData().setEventProcessingStartInstant(handoverPacket.getEventProcessingStartTime());
         LOG.trace(".ipcReceiverActivityStart(): Capture some metrics: Finish");
 
         LOG.trace(".ipcReceiverActivityStart(): Injecting Fulfillment Task into Exchange for extraction by the WUP Egress Conduit");

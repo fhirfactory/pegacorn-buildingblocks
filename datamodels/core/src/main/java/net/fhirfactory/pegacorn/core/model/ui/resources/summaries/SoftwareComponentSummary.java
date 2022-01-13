@@ -21,28 +21,71 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 
+import java.time.Instant;
+
 public class SoftwareComponentSummary extends ResourceSummaryBase {
     private ComponentIdType componentID;
-    private String componentName;
+    private String participantName;
+    private String subsystemParticipantName;
     private String nodeVersion;
     private String concurrencyMode;
     private String resilienceMode;
-    private PetasosEndpoint routing;
     private TopologyNodeFDN topologyNodeFDN;
+    private TopologyNodeFunctionFDN topologyNodeFunctionFDN;
     private PetasosMonitoredComponentTypeEnum nodeType;
 
-    public PetasosEndpoint getRouting() {
-        return routing;
+    //
+    // Constructor(s)
+    //
+
+    public SoftwareComponentSummary(){
+        this.componentID = null;
+        this.participantName = null;
+        this.nodeVersion = null;
+        this.subsystemParticipantName = null;
+        this.concurrencyMode = null;
+        this.resilienceMode = null;
+        this.topologyNodeFDN = null;
+        this.nodeType = null;
+        this.topologyNodeFunctionFDN = null;
     }
 
-    public void setRouting(PetasosEndpoint routing) {
-        this.routing = routing;
+    //
+    // Getters and Setters
+    //
+
+
+    public TopologyNodeFunctionFDN getTopologyNodeFunctionFDN() {
+        return topologyNodeFunctionFDN;
+    }
+
+    public void setTopologyNodeFunctionFDN(TopologyNodeFunctionFDN topologyNodeFunctionFDN) {
+        this.topologyNodeFunctionFDN = topologyNodeFunctionFDN;
+    }
+
+    public String getParticipantName() {
+        return participantName;
+    }
+
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
+    }
+
+    public String getSubsystemParticipantName() {
+        return subsystemParticipantName;
+    }
+
+    public void setSubsystemParticipantName(String subsystemParticipantName) {
+        this.subsystemParticipantName = subsystemParticipantName;
     }
 
     public TopologyNodeFDN getTopologyNodeFDN() {
@@ -52,7 +95,6 @@ public class SoftwareComponentSummary extends ResourceSummaryBase {
     public void setTopologyNodeFDN(TopologyNodeFDN topologyNodeFDN) {
         this.topologyNodeFDN = topologyNodeFDN;
     }
-
 
 
     public ComponentIdType getComponentID() {
@@ -95,26 +137,25 @@ public class SoftwareComponentSummary extends ResourceSummaryBase {
         this.resilienceMode = resilienceMode;
     }
 
-    public String getComponentName() {
-        return componentName;
-    }
-
-    public void setComponentName(String componentName) {
-        this.componentName = componentName;
-    }
+    //
+    // To String
+    //
 
     @Override
     public String toString() {
-        return "ITOpsMonitoredNode{" +
+        return "SoftwareComponentSummary{" +
                 "componentID=" + componentID +
-                ", componentName=" + componentName +
-                ", nodeVersion=" + nodeVersion +
-                ", concurrencyMode=" + concurrencyMode +
-                ", resilienceMode=" + resilienceMode +
-                ", routing=" + routing +
+                ", participantName='" + participantName + '\'' +
+                ", subsystemParticipantName=" + subsystemParticipantName +
+                ", nodeVersion='" + nodeVersion + '\'' +
+                ", concurrencyMode='" + concurrencyMode + '\'' +
+                ", resilienceMode='" + resilienceMode + '\'' +
                 ", topologyNodeFDN=" + topologyNodeFDN +
+                ", topologyNodeFunctionFDN=" + topologyNodeFunctionFDN +
                 ", nodeType=" + nodeType +
-                ", resourceId=" + getResourceId() +
+                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
+                ", lastActivityInstant=" + getLastActivityInstant() +
+                ", resourceId='" + getResourceId() + '\'' +
                 '}';
     }
 }

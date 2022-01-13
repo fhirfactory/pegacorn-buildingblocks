@@ -112,7 +112,7 @@ public abstract class PetasosOAMMetricsEndpointBase extends JGroupsIntegrationPo
 
     }
 
-//
+    //
     // Metrics Service Methods
     //
 

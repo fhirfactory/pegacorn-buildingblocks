@@ -35,6 +35,7 @@ public class WorkshopSummary extends SoftwareComponentSummary {
     //
 
     public WorkshopSummary(){
+        super();
         this.workUnitProcessors = new ConcurrentHashMap<>();
     }
 
@@ -67,17 +68,19 @@ public class WorkshopSummary extends SoftwareComponentSummary {
 
     @Override
     public String toString() {
-        return "PetasosMonitoredWorkshop{" +
-                "workUnitProcessors=" + workUnitProcessors +
-                ", routing=" + getRouting() +
+        return "WorkshopSummary{" +
+                "participantName='" + getParticipantName() + '\'' +
+                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
                 ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +
-                ", nodeVersion=" + getNodeVersion() +
+                ", nodeVersion='" + getNodeVersion() + '\'' +
                 ", nodeType=" + getNodeType() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", componentName=" + getComponentName() +
-                ", resourceId=" + getResourceId() +
+                ", concurrencyMode='" + getConcurrencyMode() + '\'' +
+                ", resilienceMode='" + getResilienceMode() + '\'' +
+                ", workUnitProcessors=" + workUnitProcessors +
+                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
+                ", lastActivityInstant=" + getLastActivityInstant() +
+                ", resourceId='" + getResourceId() + '\'' +
                 '}';
     }
 }

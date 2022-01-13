@@ -22,8 +22,13 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,22 +46,44 @@ public class WUPContainerEgressProcessor {
     @Inject
     LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
 
+    @Inject
+    private PetasosITOpsNotificationAgentInterface notificationAgent;
+
 
     public PetasosFulfillmentTask egressContentProcessor(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
       	getLogger().debug(".egressContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask);
+
+        //
+        // Get out metricsAgent & do add some metrics
+        WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+
         switch (fulfillmentTask.getTaskFulfillment().getStatus()) {
             case FULFILLMENT_EXECUTION_STATUS_FINISHED:
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskJobCard());
+                metricsAgent.touchLastActivityFinishInstant();
+                metricsAgent.incrementFinishedTasks();
                 break;
             case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask.getTaskJobCard());
+                metricsAgent.incrementCancelledTasks();
+                metricsAgent.touchLastActivityFinishInstant();
                 break;
             case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionNoActionRequired(fulfillmentTask.getTaskJobCard());
+                metricsAgent.incrementFinishedTasks();
+                metricsAgent.touchLastActivityFinishInstant();
                 break;
             default:
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskJobCard());
+                metricsAgent.incrementFailedTasks();
+                metricsAgent.touchLastActivityFinishInstant();
         }
+        metricsAgent.touchLastActivityInstant();
+        //
+        // Add some notifications
+        metricsAgent.sendITOpsNotification("Task (Outcome) --> " + fulfillmentTask.getTaskId().getId() + ", status--> " + fulfillmentTask.getTaskFulfillment().getStatus());
+        //
+        // And we're done!
         return (fulfillmentTask);
     }
 }

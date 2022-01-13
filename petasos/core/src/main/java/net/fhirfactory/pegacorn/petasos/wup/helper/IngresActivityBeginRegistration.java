@@ -39,6 +39,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTa
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,15 +80,22 @@ public class IngresActivityBeginRegistration {
     //
 
     public UoW registerActivityStart(UoW theUoW, Exchange camelExchange){
-        getLogger().info(".registerActivityStart(): Entry, payload --> {}", theUoW);
-        getLogger().info(".registerActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
+        getLogger().debug(".registerActivityStart(): Entry, payload --> {}", theUoW);
+
+        getLogger().trace(".registerActivityStart(): Retrieve NodeElement");
         WorkUnitProcessorSoftwareComponent wup = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorSoftwareComponent.class);
 
-        getLogger().info(".registerActivityStart(): Node Element retrieved --> {}", wup);
+        getLogger().trace(".registerActivityStart(): Node Element retrieved --> {}", wup);
         TopologyNodeFunctionFDNToken wupFunctionToken = wup.getNodeFunctionFDN().getFunctionToken();
-        getLogger().info(".registerActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        getLogger().trace(".registerActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
 
-        getLogger().info(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Start");
+        //
+        // add to WUP Metrics
+        WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+        metricsAgent.incrementIngresMessageCount();
+        metricsAgent.touchLastActivityInstant();
+
+        getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Start");
         TaskWorkItemType workItem = new TaskWorkItemType(theUoW.getIngresContent());
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
         TaskContextType taskContext = new TaskContextType();
@@ -101,39 +109,39 @@ public class IngresActivityBeginRegistration {
         petasosActionableTask.getTaskFulfillment().setStartInstant(Instant.now());
         petasosActionableTask.getTaskFulfillment().setFulfillerComponent(wup);
         petasosActionableTask.getTaskFulfillment().setReadyInstant(Instant.now());
-        getLogger().info(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Finish");
+        getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Finish");
 
-        getLogger().info(".registerActivityStart(): Create a PetasosFulfillmentTask for the (local) processing implementation activity: Start");
+        getLogger().trace(".registerActivityStart(): Create a PetasosFulfillmentTask for the (local) processing implementation activity: Start");
         PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, wup);
-        getLogger().info(".registerActivityStart(): Create a PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
+        getLogger().trace(".registerActivityStart(): Create a PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
 
-        getLogger().info(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Start");
+        getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Start");
         petasosActionableTask.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
         getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
-        getLogger().info(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Finish");
+        getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Finish");
 
-        getLogger().info(".registerActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Start");
+        getLogger().trace(".registerActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Start");
         getFulfilmentTaskActivityController().registerFulfillmentTask(fulfillmentTask, true); // by default, use synchronous audit writing
-        getLogger().info(".registerActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
+        getLogger().trace(".registerActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
 
         //
         // Now, because this registration activity was the actual source of both the Actionable Task and the Fullfilment Task,
         // it is safe to say that it should continue the fulfillment process unhindered...
-        getLogger().info(".registerActivityStart(): Update status to reflect local processing is proceeding: Start");
+        getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Start");
         synchronized(fulfillmentTask.getTaskJobCardLock()){
             fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
             fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
             fulfillmentTask.getTaskJobCard().setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
         }
         getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
-        getLogger().info(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
+        getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
         //
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
-        getLogger().info(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
+        getLogger().trace(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
         camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, fulfillmentTask);
         //
         // And now we are done!
-        getLogger().info(".registerActivityStart(): exit, my work is done!");
+        getLogger().debug(".registerActivityStart(): exit, my work is done!");
         return(theUoW);
     }
 

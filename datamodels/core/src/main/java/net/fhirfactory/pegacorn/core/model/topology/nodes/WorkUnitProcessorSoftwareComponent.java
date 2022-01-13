@@ -37,6 +37,7 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
     private ArrayList<TopologyNodeFDN> wupInterchangeComponents;
     private IPCTopologyEndpoint ingresEndpoint;
     private IPCTopologyEndpoint egressEndpoint;
+    private Integer replicationCount;
 
     //
     // Constructor(s)
@@ -47,11 +48,27 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
         this.wupInterchangeComponents = new ArrayList<>();
         this.ingresEndpoint = null;
         this.egressEndpoint = null;
+        this.replicationCount = null;
     }
 
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasReplicationCount(){
+        boolean hasValue = this.replicationCount != null;
+        return(hasValue);
+    }
+
+
+    public Integer getReplicationCount() {
+        return replicationCount;
+    }
+
+    public void setReplicationCount(Integer replicationCount) {
+        this.replicationCount = replicationCount;
+    }
 
     @JsonIgnore
     @Override
@@ -95,10 +112,15 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "WorkUnitProcessorTopologyNode{" +
-                "componentFDN=" + getComponentFDN() +
+        return "WorkUnitProcessorSoftwareComponent{" +
+                "deploymentSite='" + getDeploymentSite() + '\'' +
+                ", lastActivityInstant=" + getLastActivityInstant() +
+                ", lastReportingInstant=" + getLastReportingInstant() +
+                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
+                ", componentFDN=" + getComponentFDN() +
                 ", kubernetesDeployed=" + isKubernetesDeployed() +
                 ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
                 ", concurrencyMode=" + getConcurrencyMode() +
@@ -111,10 +133,14 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +
+                ", componentStatus=" + getComponentStatus() +
+                ", componentExecutionControl=" + getComponentExecutionControl() +
                 ", wupComponents=" + wupComponents +
+                ", participantName='" + getParticipantName() + '\'' +
                 ", wupInterchangeComponents=" + wupInterchangeComponents +
                 ", ingresEndpoint=" + ingresEndpoint +
                 ", egressEndpoint=" + egressEndpoint +
+                ", replicationCount=" + replicationCount +
                 '}';
     }
 }

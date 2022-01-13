@@ -101,7 +101,7 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
             responseOK = false;
             responseReason = "Mismatch Message Flows (Passed PetasosFullmentTask id differs)";
         }
-        metricsAgent.getWorkUnitProcessorMetricsAgent(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
+        metricsAgent.getWorkUnitProcessingMetricsData(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
 
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): formulate the processing outcome");
         UoW uow = SerializationUtils.clone(fulfillmentTask.getTaskWorkItem());

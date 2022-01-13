@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.oam.subscriptions;
 
-import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosSubscriptionSummaryReport;
 
 import java.time.Instant;
 

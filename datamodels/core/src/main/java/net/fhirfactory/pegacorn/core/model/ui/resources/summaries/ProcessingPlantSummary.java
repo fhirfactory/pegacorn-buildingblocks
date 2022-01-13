@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,12 +31,36 @@ public class ProcessingPlantSummary extends SoftwareComponentSummary {
     private String platformID;
     private String securityZone;
     private String site;
+    private Integer replicationCount;
     private Map<ComponentIdType, WorkshopSummary> workshops;
     private String actualHostIP;
     private String actualPodIP;
 
+    //
+    // Constructor(s)
+    //
+
     public ProcessingPlantSummary(){
-        workshops = new ConcurrentHashMap<>();
+        super();
+        this.platformID = null;
+        this.actualHostIP = null;
+        this.actualPodIP = null;
+        this.replicationCount = null;
+        this.site = null;
+        this.workshops = new HashMap<>();
+        this.securityZone = null;
+    }
+
+    //
+    // To String
+    //
+
+    public Integer getReplicationCount() {
+        return replicationCount;
+    }
+
+    public void setReplicationCount(Integer replicationCount) {
+        this.replicationCount = replicationCount;
     }
 
     public String getPlatformID() {
@@ -97,24 +122,31 @@ public class ProcessingPlantSummary extends SoftwareComponentSummary {
         this.actualPodIP = actualPodIP;
     }
 
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
-        return "PetasosMonitoredProcessingPlant{" +
-                "platformID=" + platformID +
-                ", securityZone='" + securityZone +
-                ", site=" + site +
+        return "ProcessingPlantSummary{" +
+                "platformID='" + platformID + '\'' +
+                ", securityZone='" + securityZone + '\'' +
+                ", site='" + site + '\'' +
                 ", workshops=" + workshops +
-                ", actualHostIP=" + actualHostIP +
-                ", actualPodIP=" + actualPodIP +
-                ", routing=" + getRouting() +
+                ", actualHostIP='" + actualHostIP + '\'' +
+                ", actualPodIP='" + actualPodIP + '\'' +
+                ", participantName='" + getParticipantName() + '\'' +
+                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
                 ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +
-                ", nodeVersion=" + getNodeVersion() +
+                ", nodeVersion='" + getNodeVersion() + '\'' +
                 ", nodeType=" + getNodeType() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", componentName=" + getComponentName() +
-                ", resourceId=" + getResourceId() +
+                ", concurrencyMode='" + getConcurrencyMode() + '\'' +
+                ", resilienceMode='" + getResilienceMode() + '\'' +
+                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
+                ", lastActivityInstant=" + getLastActivityInstant() +
+                ", resourceId='" + getResourceId() + '\'' +
+                ", replicationCount=" + replicationCount +
                 '}';
     }
 }

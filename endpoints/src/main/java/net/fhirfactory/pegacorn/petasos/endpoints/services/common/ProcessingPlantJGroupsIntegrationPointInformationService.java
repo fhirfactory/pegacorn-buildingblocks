@@ -55,7 +55,7 @@ public class ProcessingPlantJGroupsIntegrationPointInformationService {
     private static String PETASOS_EDGE_MESSAGE_FORWARDER_WUP_NAME = "PetasosIPCMessageForwardWUP";
     private static String EDGE_FORWARDER_WUP_VERSION = "1.0.0";
 
-    private static Long ENDPOINT_VALIDATION_START_DELAY = 30000L;
+    private static Long ENDPOINT_VALIDATION_START_DELAY = 60000L;
     private static Long ENDPOINT_VALIDATION_PERIOD = 10000L;
 
     @Inject
@@ -129,9 +129,6 @@ public class ProcessingPlantJGroupsIntegrationPointInformationService {
         TopologyNodeFDNToken associatedForwarderWUPToken = wupNodeFDN.getToken();
         return(associatedForwarderWUPToken);
     }
-
-
-
 
     //
     // Building the FDN

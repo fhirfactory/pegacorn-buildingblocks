@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAudi
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.*;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -47,23 +48,26 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 
 	private WorkUnitProcessorSoftwareComponent wupTopologyNode;
 	private RouteElementNames nameSet;
+	WorkUnitProcessorMetricsAgent metricsAgent;
 
 	//
 	// Constructor(s)
 	//
 
-	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker) {
+	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker, WorkUnitProcessorMetricsAgent metricsAgent) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
 		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken());
+		this.metricsAgent = metricsAgent;
 	}
 
-	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker, boolean requiresDirect) {
+	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker, boolean requiresDirect, WorkUnitProcessorMetricsAgent metricsAgent) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
 		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken(), requiresDirect);
+		this.metricsAgent = metricsAgent;
 	}
 
 	//
@@ -155,6 +159,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 			if(!alreadyInPlace) {
 				exchange.setProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, getWupTopologyNode());
 			}
+			exchange.setProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, getMetricsAgent());
 		}
 	}
 
@@ -164,6 +169,10 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 
 	public WorkUnitProcessorSoftwareComponent getWupTopologyNode() {
 		return wupTopologyNode;
+	}
+
+	protected WorkUnitProcessorMetricsAgent getMetricsAgent(){
+		return(this.metricsAgent);
 	}
 
 	protected RouteElementNames getNameSet() {

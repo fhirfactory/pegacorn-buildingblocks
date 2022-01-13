@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.participant;
 
 public enum PubSubParticipantUtilisationStatusEnum {
-    PUB_SUB_NETWORK_CONNECTION_ESTABLISHED,
-    PUB_SUB_PARTICIPANT_NO_SUBSCRIBERS,
-    PUB_SUB_NETWORK_CONNECTION_FAILED
+    PETASOS_PARTICIPANT_ESTABLISHED,
+    PETASOS_PARTICIPANT_NO_SUBSCRIBERS,
+    PETASOS_PARTICIPANT_FAILED
 }

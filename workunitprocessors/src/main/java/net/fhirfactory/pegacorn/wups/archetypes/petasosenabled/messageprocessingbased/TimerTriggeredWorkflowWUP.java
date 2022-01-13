@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +46,9 @@ public abstract class TimerTriggeredWorkflowWUP extends GenericMessageBasedWUPTe
     }
 
     @Override
-    protected MessageBasedWUPEndpoint specifyIngresEndpoint(){
+    protected MessageBasedWUPEndpointContainer specifyIngresEndpoint(){
         getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
-        MessageBasedWUPEndpoint ingresEndpoint = new MessageBasedWUPEndpoint();
+        MessageBasedWUPEndpointContainer ingresEndpoint = new MessageBasedWUPEndpointContainer();
         ingresEndpoint.setFrameworkEnabled(false);
         // Get Port
         String ingresEndPoint;
@@ -65,9 +65,9 @@ public abstract class TimerTriggeredWorkflowWUP extends GenericMessageBasedWUPTe
     }
 
     @Override
-    protected MessageBasedWUPEndpoint specifyEgressEndpoint(){
+    protected MessageBasedWUPEndpointContainer specifyEgressEndpoint(){
         getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
-        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
+        MessageBasedWUPEndpointContainer egressEndpoint = new MessageBasedWUPEndpointContainer();
         egressEndpoint.setFrameworkEnabled(true);
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");

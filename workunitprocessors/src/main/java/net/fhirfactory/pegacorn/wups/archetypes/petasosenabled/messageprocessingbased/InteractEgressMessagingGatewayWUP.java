@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
@@ -45,9 +45,9 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
     }
 
     @Override
-    protected MessageBasedWUPEndpoint specifyIngresEndpoint(){
+    protected MessageBasedWUPEndpointContainer specifyIngresEndpoint(){
         getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
-        MessageBasedWUPEndpoint ingressEndpoint = new MessageBasedWUPEndpoint();
+        MessageBasedWUPEndpointContainer ingressEndpoint = new MessageBasedWUPEndpointContainer();
         ingressEndpoint.setFrameworkEnabled(true);
         ingressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPIngres());
         getLogger().debug(".specifyIngresTopologyEndpoint(): Exit");

@@ -127,7 +127,7 @@ public class WUPEgressConduit {
                 }
                 break;
             case UOW_OUTCOME_DISCARD:
-                        case UOW_OUTCOME_FILTERED:
+            case UOW_OUTCOME_FILTERED:
                 getLogger().trace(".receiveFromWUP(): UoW was processed with task to be discarded/filtered!");
                synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
                     fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);

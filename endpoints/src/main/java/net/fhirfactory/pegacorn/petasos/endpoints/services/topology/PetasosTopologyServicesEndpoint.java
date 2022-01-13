@@ -29,6 +29,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGrou
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import net.fhirfactory.pegacorn.petasos.endpoints.topology.SoftwareComponentSet;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
@@ -187,6 +188,7 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
     //
 
     protected SoftwareComponentSet probeProcessingPlantTopologyDetail(JGroupsIntegrationPointSummary targetJGroupsIntegrationPoint){
+        getLogger().info(".probeEndpointTopologyDetail(): Entry, targetJGroupsIntegrationPoint->{}",targetJGroupsIntegrationPoint.getChannelName());
         getLogger().debug(".probeEndpointTopologyDetail(): Entry, targetJGroupsIntegrationPoint->{}", targetJGroupsIntegrationPoint);
         try {
             Object objectSet[] = new Object[1];
@@ -199,10 +201,10 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
             getLogger().debug(".probeEndpointTopologyDetail(): Exit, response->{}", nodeList);
             return(nodeList);
         } catch (NoSuchMethodException e) {
-            getLogger().error(".probeEndpointTopologyDetail(): Error (NoSuchMethodException)->", e);
+            getLogger().error(".probeEndpointTopologyDetail(): Error (NoSuchMethodException) message->{}, stacktrace->{}", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         } catch (Exception e) {
-            getLogger().error(".probeEndpointTopologyDetail: Error (GeneralException) ->",e);
+            getLogger().error(".probeEndpointTopologyDetail: Error (GeneralException) message->{}, stacktrace->{}", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         }
     }

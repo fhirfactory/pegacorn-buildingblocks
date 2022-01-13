@@ -115,8 +115,8 @@ public abstract class JGroupsIntegrationPointAdapterBase extends JGroupsAdapterB
             return(addressSet);
         }
         getLogger().debug(".getTargetMemberAdapterSetForService(): IPCChannel is NOT null, get updated Address set via view");
+        List<Address> addressList = getAllViewMembers();
         synchronized (getCurrentScannedMembershipLock()) {
-            List<Address> addressList = getCurrentScannedMembership();
             for (Address currentAddress : addressList) {
                 getLogger().debug(".getTargetMemberAdapterSetForSubsystemName(): Checking->{}", currentAddress);
                 String currentSubsystemName = getComponentNameUtilities().getEndpointSubsystemNameFromChannelName(currentAddress.toString());

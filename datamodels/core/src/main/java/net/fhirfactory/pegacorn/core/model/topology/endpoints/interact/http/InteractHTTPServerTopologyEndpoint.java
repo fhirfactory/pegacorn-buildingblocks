@@ -25,9 +25,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractServerTopologyEndpointPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InteractHTTPServerTopologyEndpoint extends StandardInteractServerTopologyEndpointPort {
+    private static final Logger LOG = LoggerFactory.getLogger(InteractHTTPServerTopologyEndpoint.class);
 
     public InteractHTTPServerTopologyEndpoint(){
         super();
@@ -37,11 +41,14 @@ public class InteractHTTPServerTopologyEndpoint extends StandardInteractServerTo
 
     @JsonIgnore
     public HTTPServerAdapter getHTTPServerAdapter(){
+        getLogger().info(".getHTTPServerAdapter(): Entry");
         if(getAdapterList().isEmpty()){
+            getLogger().info(".getHTTPServerAdapter(): Exit, Adapter list is empty, returning null");
             return(null);
         }
-        HTTPServerAdapter mllpServer = (HTTPServerAdapter) getAdapterList().get(0);
-        return(mllpServer);
+        HTTPServerAdapter httpServer = (HTTPServerAdapter) getAdapterList().get(0);
+        getLogger().info(".getHTTPServerAdapter(): Exit, httpServer->{}", httpServer);
+        return(httpServer);
     }
 
     @JsonIgnore
@@ -49,5 +56,14 @@ public class InteractHTTPServerTopologyEndpoint extends StandardInteractServerTo
         if(httpServer != null){
             getAdapterList().add(httpServer);
         }
+    }
+
+    //
+    // Getters
+    //
+
+    @Override
+    protected Logger getLogger(){
+        return(LOG);
     }
 }

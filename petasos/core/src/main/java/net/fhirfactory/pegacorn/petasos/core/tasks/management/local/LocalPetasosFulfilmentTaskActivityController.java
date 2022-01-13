@@ -98,14 +98,14 @@ public class LocalPetasosFulfilmentTaskActivityController {
         //
         // Request Execution Privileges
         taskExecutionController.requestTaskExecutionPrivilege(task.getTaskJobCard());
-        getLogger().info(".registerFulfillmentTask(): Exit, fulfillmentTask->{}", task);
+        getLogger().debug(".registerFulfillmentTask(): Exit, fulfillmentTask->{}", task);
         return(task);
     }
 
     public void deregisterFulfillmentTask(PetasosFulfillmentTask task){
-        getLogger().info(".deregisterFulfillmentTask(): Entry, task->{}", task);
+        getLogger().debug(".deregisterFulfillmentTask(): Entry, task->{}", task);
         fulfillmentTaskDM.removeFulfillmentTask(task.getTaskId());
-        getLogger().info(".deregisterFulfillmentTask(): Exit");
+        getLogger().debug(".deregisterFulfillmentTask(): Exit");
     }
 
     public void deregisterFulfillmentTask(TaskIdType taskId){

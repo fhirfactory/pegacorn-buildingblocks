@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.service.oam.model.factories;
 
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetric;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetric;
 import org.hl7.fhir.r4.model.DeviceMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

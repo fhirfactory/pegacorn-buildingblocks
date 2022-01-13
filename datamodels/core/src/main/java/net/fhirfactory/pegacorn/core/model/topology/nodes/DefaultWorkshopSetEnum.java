@@ -22,6 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
 public enum DefaultWorkshopSetEnum {
+    DATA_GRID_WORKSHOP("DataGrid"),
+    INTER_SUBSYSTEM_INTEGRATION_WORKSHOP("ISSI"),
     BEHAVIOUR_WORKSHOP("Behaviour"),
     INTERACT_WORKSHOP("Interact"),
     TRANSFORM_WORKSHOP("Transform"),

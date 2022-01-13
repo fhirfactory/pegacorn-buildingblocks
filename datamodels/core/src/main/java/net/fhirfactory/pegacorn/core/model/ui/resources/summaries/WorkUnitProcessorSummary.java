@@ -28,9 +28,28 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class WorkUnitProcessorSummary extends SoftwareComponentSummary {
     Map<ComponentIdType, EndpointSummary> endpoints;
+    private String workshopParticipantName;
+
+    //
+    // Constructor(s)
+    //
 
     public WorkUnitProcessorSummary(){
+        super();
         this.endpoints = new ConcurrentHashMap<>();
+        this.workshopParticipantName = null;
+    }
+
+    //
+    // Getters and Setters
+    //
+
+    public String getWorkshopParticipantName() {
+        return workshopParticipantName;
+    }
+
+    public void setWorkshopParticipantName(String workshopParticipantName) {
+        this.workshopParticipantName = workshopParticipantName;
     }
 
     public Map<ComponentIdType, EndpointSummary> getEndpoints() {
@@ -52,19 +71,26 @@ public class WorkUnitProcessorSummary extends SoftwareComponentSummary {
         endpoints.put(endpoint.getComponentID(), endpoint);
     }
 
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
-        return "PetasosMonitoredWorkUnitProcessor{" +
-                "endpoints=" + endpoints +
-                ", routing=" + getRouting() +
+        return "WorkUnitProcessorSummary{" +
+                "participantName='" + getParticipantName() + '\'' +
+                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
+                ", workshopParticipantName=" + getWorkshopParticipantName() +
                 ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +
-                ", nodeVersion=" + getNodeVersion() +
+                ", nodeVersion='" + getNodeVersion() + '\'' +
                 ", nodeType=" + getNodeType() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", componentName=" + getComponentName() +
-                ", resourceId=" + getResourceId() +
+                ", concurrencyMode='" + getConcurrencyMode() + '\'' +
+                ", resilienceMode='" + getResilienceMode() + '\'' +
+                ", endpoints=" + endpoints +
+                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
+                ", lastActivityInstant=" + getLastActivityInstant() +
+                ", resourceId='" + getResourceId() + '\'' +
                 '}';
     }
 }

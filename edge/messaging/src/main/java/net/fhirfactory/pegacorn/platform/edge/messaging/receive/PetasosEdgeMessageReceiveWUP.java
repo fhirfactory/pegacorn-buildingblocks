@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.*;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeIngresMessagingGatewayWUP;
@@ -82,8 +82,8 @@ public class PetasosEdgeMessageReceiveWUP extends EdgeIngresMessagingGatewayWUP 
     }
 
     @Override
-    protected MessageBasedWUPEndpoint specifyIngresEndpoint() {
-        MessageBasedWUPEndpoint ingresEndpoint = new MessageBasedWUPEndpoint();
+    protected MessageBasedWUPEndpointContainer specifyIngresEndpoint() {
+        MessageBasedWUPEndpointContainer ingresEndpoint = new MessageBasedWUPEndpointContainer();
         assignIngresTopologyEndpoint();
         ingresEndpoint.setEndpointTopologyNode(getAssociatedIngresTopologyEndpoint());
         ingresEndpoint.setEndpointSpecification(getIPCComponentNames().getInterZoneIPCReceiverRouteEndpointName());

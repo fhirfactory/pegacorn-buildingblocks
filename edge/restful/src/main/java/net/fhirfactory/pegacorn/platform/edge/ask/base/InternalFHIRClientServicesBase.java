@@ -34,7 +34,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ExternalS
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.external.ConnectedExternalSystemTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.platform.edge.ask.base.http.InternalFHIRClientProxy;
 
 import ca.uhn.fhir.parser.IParser;
@@ -88,7 +88,7 @@ public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientP
     @Override
     protected String deriveTargetEndpointDetails(){
         getLogger().debug(".deriveTargetEndpointDetails(): Entry");
-        MessageBasedWUPEndpoint endpoint = new MessageBasedWUPEndpoint();
+        MessageBasedWUPEndpointContainer endpoint = new MessageBasedWUPEndpointContainer();
         StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getTopologyEndpoint(interfaceNames.getEdgeAskEndpointName());
         ConnectedExternalSystemTopologyNode targetSystem = clientTopologyEndpoint.getTargetSystem();
         ExternalSystemIPCEndpoint externalSystemIPCEndpoint = (ExternalSystemIPCEndpoint)targetSystem.getTargetPorts().get(0);

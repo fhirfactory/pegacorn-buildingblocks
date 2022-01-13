@@ -23,13 +23,15 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,9 @@ public class WUPContainerIngresProcessor {
 
     @Inject
     private PetasosFulfillmentTaskAuditServicesBroker auditServicesBroker;
+
+    @Inject
+    private PetasosITOpsNotificationAgentInterface notificationAgent;
     
     /**
      * This class/method is used as the injection point into the WUP Processing Framework for the specific WUP Type/Instance in question.
@@ -84,6 +89,16 @@ public class WUPContainerIngresProcessor {
         // Set our wait-loop check state
         boolean waitState = true;
         //
+        // Get out metricsAgent & do add some metrics
+        WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+        metricsAgent.incrementRegisteredTasks();
+        metricsAgent.touchLastActivityInstant();
+
+        //
+        // Add some notifications
+        metricsAgent.sendITOpsNotification("Task (Received) --> " + fulfillmentTask.getTaskId());
+
+        //
         // Write an AuditEvent
         auditServicesBroker.logActivity(fulfillmentTask);
         //
@@ -111,6 +126,7 @@ public class WUPContainerIngresProcessor {
                             getLogger().info(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
                         }
                         waitState = false;
+                        metricsAgent.touchLastActivityStartInstant();
                         break;
                     }
                     if(getLogger().isInfoEnabled()) {
@@ -138,6 +154,7 @@ public class WUPContainerIngresProcessor {
                         getLogger().info(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
                     }
                     waitState = false;
+                    metricsAgent.incrementCancelledTasks();
             }
             if (waitState) {
                 try {

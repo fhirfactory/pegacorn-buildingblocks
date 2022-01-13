@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.Petasos
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.MembershipListener;
@@ -183,7 +184,7 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
     //
 
     protected void establishJChannel(){
-        getLogger().debug(".establishJChannel(): Entry, fileName->{}, groupName->{}, channelName->{}",  specifyJGroupsStackFileName(), specifyJGroupsClusterName(), specifyJGroupsChannelName());
+        getLogger().info(".establishJChannel(): Entry, fileName->{}, groupName->{}, channelName->{}",  specifyJGroupsStackFileName(), specifyJGroupsClusterName(), specifyJGroupsChannelName());
         try {
             getLogger().trace(".establishJChannel(): Creating JChannel");
             getLogger().trace(".establishJChannel(): Getting the required ProtocolStack");
@@ -267,6 +268,23 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
     // JGroups Membership Methods
     //
 
+    public List<Address> getAllViewMembers() {
+        if (getIPCChannel() == null) {
+            return (new ArrayList<>());
+        }
+        if (getIPCChannel().getView() == null) {
+            return (new ArrayList<>());
+        }
+        try {
+            List<Address> members = getIPCChannel().getView().getMembers();
+            return (members);
+        } catch (Exception ex) {
+            getLogger().warn(".getAllMembers(): Failed to get View Members, Error: Message->{}, StackTrace->{}", ExceptionUtils.getMessage(ex), ExceptionUtils.getStackTrace(ex));
+        }
+        return (new ArrayList<>());
+    }
+
+
     public Address getTargetMemberAddress(String name){
         getLogger().debug(".getTargetMemberAddress(): Entry, name->{}", name);
         if(getIPCChannel() == null){
@@ -274,9 +292,9 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
             return(null);
         }
         getLogger().trace(".getTargetMemberAddress(): IPCChannel is NOT null, get updated Address set via view");
+        List<Address> addressList = getAllViewMembers();
         Address foundAddress = null;
         synchronized (this.currentScannedMembershipLock) {
-            List<Address> addressList = getCurrentScannedMembership();
             getLogger().trace(".getTargetMemberAddress(): Got the Address set via view, now iterate through and see if one is suitable");
             for (Address currentAddress : addressList) {
                 getLogger().trace(".getTargetMemberAddress(): Iterating through Address list, current element->{}", currentAddress);
@@ -299,9 +317,9 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
             return(null);
         }
         getLogger().trace(".getCandidateTargetServiceAddress(): IPCChannel is NOT null, get updated Address set via view");
+        List<Address> addressList = getAllViewMembers();
         Address foundAddress = null;
         synchronized (this.currentScannedMembershipLock) {
-            List<Address> addressList = getCurrentScannedMembership();
             getLogger().debug(".getCandidateTargetServiceAddress(): Got the Address set via view, now iterate through and see if one is suitable");
             for (Address currentAddress : addressList) {
                 getLogger().debug(".getCandidateTargetServiceAddress(): Iterating through Address list, current element->{}", currentAddress);
@@ -330,9 +348,9 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
             return(false);
         }
         getLogger().trace(".isTargetAddressActive(): IPCChannel is NOT null, get updated Address set via view");
+        List<Address> addressList = getAllViewMembers();
         boolean addressIsActive = false;
         synchronized (this.currentScannedMembershipLock) {
-            List<Address> addressList = getCurrentScannedMembership();
             getLogger().trace(".isTargetAddressActive(): Got the Address set via view, now iterate through and see our address is there");
             for (Address currentAddress : addressList) {
                 getLogger().trace(".isTargetAddressActive(): Iterating through Address list, current element->{}", currentAddress);
@@ -349,7 +367,7 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
 
     public List<PetasosAdapterAddress> getAllClusterTargets(){
         getLogger().debug(".getAllClusterTargets(): Entry");
-        List<Address> addressList = getCurrentScannedMembership();
+        List<Address> addressList = getAllViewMembers();
         List<PetasosAdapterAddress> petasosAdapterAddresses = new ArrayList<>();
         synchronized (this.currentScannedMembershipLock) {
             for (Address currentAddress : addressList) {

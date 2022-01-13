@@ -22,17 +22,19 @@
 package net.fhirfactory.pegacorn.services.oam.endpoint;
 
 import net.fhirfactory.pegacorn.core.interfaces.oam.metrics.PetasosMetricsBrokerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.subscriptions.PetasosSubscriptionReportBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.topology.PetasosTopologyReportingBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.topology.PetasosTopologyReportingServiceProviderNameInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetric;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetricSet;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.PetasosSubscriptionSummaryReport;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.PetasosMonitoredTopologyGraph;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetric;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosSubscriptionSummaryReport;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.reporting.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.metrics.PetasosOAMMetricsEndpointBase;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
@@ -45,7 +47,10 @@ import java.time.Instant;
 
 @ApplicationScoped
 public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBase
-    implements PetasosMetricsBrokerInterface, PetasosSubscriptionReportBrokerInterface, PetasosTopologyReportingBrokerInterface {
+    implements PetasosMetricsBrokerInterface,
+        PetasosSubscriptionReportBrokerInterface,
+        PetasosTopologyReportingBrokerInterface,
+        PetasosITOpsNotificationBrokerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosOAMMetricsAgentEndpoint.class);
 
     @Inject
@@ -83,12 +88,16 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
 
     @Override
     public Instant replicateMetricSetToServer(String serviceProviderName, PetasosComponentMetricSet metricSet){
-        getLogger().trace(".updateMetrics(): Entry, serviceProviderName->{}, metricSet->{}", serviceProviderName, metricSet);
+        getLogger().info(".replicateMetricSetToServer(): Entry, serviceProviderName->{}, metricSet->{}", serviceProviderName, metricSet);
         JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
         PetasosAdapterAddress targetPetasosAddress = getTargetMemberAdapterInstanceForSubsystem(serviceProviderName);
+        if(targetPetasosAddress == null){
+            getLogger().warn(".replicateMetricSetToServer(): No Metrics Server available");
+            return(Instant.now());
+        }
         Address targetAddress = targetPetasosAddress.getJGroupsAddress();
         if(targetAddress == null){
-            getLogger().warn(".shareLocalTopologyGraph(): No Metrics Server available");
+            getLogger().warn(".replicateMetricSetToServer(): No Metrics Server available");
             return(Instant.now());
         }
         try {
@@ -99,15 +108,15 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             objectSet[1] = myIntegrationPoint;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Instant response = getRPCDispatcher().callRemoteMethod(targetAddress, "updateMetricSetHandler", objectSet, classSet, requestOptions);
-            getLogger().debug(".updateMetrics(): Exit, response->{}", response);
+            Instant response = getRPCDispatcher().callRemoteMethod(targetAddress, "captureMetrics", objectSet, classSet, requestOptions);
+            getLogger().info(".replicateMetricSetToServer(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
-            getLogger().error(".updateMetrics(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".replicateMetricSetToServer(): Error (NoSuchMethodException) Message->{}, StackTrace->{} ", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         } catch (Exception e) {
             e.printStackTrace();
-            getLogger().error(".updateMetrics(): Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".replicateMetricSetToServer(): Error (GeneralException) Message->{}, StackTrace->{} ", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         }
     }
@@ -117,6 +126,10 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
         getLogger().trace(".replicateMetricToServer(): Entry, serviceProviderName->{}, metric->{}", serviceProviderName, metric);
         JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
         PetasosAdapterAddress targetPetasosAddress = getTargetMemberAdapterInstanceForSubsystem(serviceProviderName);
+        if(targetPetasosAddress == null){
+            getLogger().warn(".replicateMetricSetToServer(): No Metrics Server available");
+            return(Instant.now());
+        }
         Address targetAddress = targetPetasosAddress.getJGroupsAddress();
         if(targetAddress == null){
             getLogger().warn(".replicateMetricToServer(): No Metrics Server available");
@@ -130,7 +143,7 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             objectSet[1] = myIntegrationPoint;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "updateMetricHandler", objectSet, classSet, requestOptions);
+            Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "captureMetric", objectSet, classSet, requestOptions);
             getLogger().debug(".replicateMetricToServer(): Exit, responseInstant->{}", responseInstant);
             return(responseInstant);
         } catch (NoSuchMethodException e) {
@@ -212,6 +225,41 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             e.printStackTrace();
             getLogger().error(".shareLocalTopologyGraph: Error (GeneralException) ->{}", e.getMessage());
             return(null);
+        }
+    }
+
+    //
+    // Notifications Service
+    //
+
+
+    @Override
+    public void sendNotification(PetasosComponentITOpsNotification notification) {
+        getLogger().info(".sendNotification(): Entry, notification->{}", notification);
+        JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
+        Address targetAddress = getCandidateTargetServiceAddress(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".sendNotification(): No Metrics Server available");
+            return;
+        }
+        try {
+            Object objectSet[] = new Object[2];
+            Class classSet[] = new Class[2];
+            objectSet[0] = notification;
+            classSet[0] = PetasosComponentITOpsNotification.class;
+            objectSet[1] = myIntegrationPoint;
+            classSet[1] = JGroupsIntegrationPointSummary.class;
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            getRPCDispatcher().callRemoteMethod(targetAddress, "receiveNotification", objectSet, classSet, requestOptions);
+            getLogger().debug(".sendNotification(): Exit, responseInstant");
+            return;
+        } catch (NoSuchMethodException e) {
+            getLogger().error(".sendNotification(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            getLogger().error(".sendNotification: Error (GeneralException) ->{}", e.getMessage());
+            return;
         }
     }
 }

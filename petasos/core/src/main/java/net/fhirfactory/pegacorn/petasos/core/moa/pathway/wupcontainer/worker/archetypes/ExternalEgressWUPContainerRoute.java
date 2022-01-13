@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementName
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerIngresGatekeeper;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerIngresProcessor;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPIngresConduit;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -49,12 +50,14 @@ public class ExternalEgressWUPContainerRoute extends BasePetasosContainerRoute {
 
 	private WorkUnitProcessorSoftwareComponent wupTopologyNode;
 	private RouteElementNames nameSet;
+	private WorkUnitProcessorMetricsAgent metricsAgent;
 
-	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker) {
+	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker, WorkUnitProcessorMetricsAgent metricsAgent) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupTopologyNode = wupNode;
 		nameSet = new RouteElementNames(wupNode.getNodeFunctionFDN().getFunctionToken());
+		this.metricsAgent = metricsAgent;
 	}
 
 	@Override
@@ -107,6 +110,7 @@ public class ExternalEgressWUPContainerRoute extends BasePetasosContainerRoute {
 			if(!alreadyInPlace) {
 				exchange.setProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, getWupTopologyNode());
 			}
+			exchange.setProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, metricsAgent);
 		}
 	}
 

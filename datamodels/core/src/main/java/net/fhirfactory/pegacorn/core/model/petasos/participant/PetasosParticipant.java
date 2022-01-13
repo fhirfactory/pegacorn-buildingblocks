@@ -43,6 +43,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     private Set<TaskWorkItemManifestType> publishedWorkItemManifests;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant utilisationUpdateInstant;
+    private PetasosParticipantFulfillment fulfillmentState;
 
     //
     // Constructor(s)
@@ -54,6 +55,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         this.utilisationUpdateInstant = null;
         this.subscribedWorkItemManifests = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
+        this.fulfillmentState = null;
     }
 
     public PetasosParticipant(PetasosParticipant ori){
@@ -76,6 +78,9 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         if(!ori.getPublishedWorkItemManifests().isEmpty()){
             this.getPublishedWorkItemManifests().addAll(ori.getPublishedWorkItemManifests());
         }
+        if(ori.hasFulfillmentState()){
+            this.setFulfillmentState(ori.getFulfillmentState());
+        }
     }
 
     public PetasosParticipant(SoftwareComponent ori){
@@ -89,6 +94,19 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     //
     // Getters (and Setters)
     //
+
+    public boolean hasFulfillmentState(){
+        boolean hasValue = this.fulfillmentState != null;
+        return(hasValue);
+    }
+
+    public PetasosParticipantFulfillment getFulfillmentState() {
+        return fulfillmentState;
+    }
+
+    public void setFulfillmentState(PetasosParticipantFulfillment fulfillmentState) {
+        this.fulfillmentState = fulfillmentState;
+    }
 
     @Override
     protected Logger getLogger() {
@@ -168,6 +186,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
                 ", subscribedWorkItemManifests=" + subscribedWorkItemManifests +
                 ", publishedWorkItemManifests=" + publishedWorkItemManifests +
                 ", utilisationUpdateInstant=" + utilisationUpdateInstant +
+                ", fulfillmentState=" + fulfillmentState +
                 '}';
     }
 

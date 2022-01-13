@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCClusteredServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +44,9 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMes
     }
 
     @Override
-    protected MessageBasedWUPEndpoint specifyIngresEndpoint(){
+    protected MessageBasedWUPEndpointContainer specifyIngresEndpoint(){
         getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
-        MessageBasedWUPEndpoint ingresEndpoint = new MessageBasedWUPEndpoint();
+        MessageBasedWUPEndpointContainer ingresEndpoint = new MessageBasedWUPEndpointContainer();
         ingresEndpoint.setFrameworkEnabled(false);
         String ingresEndPoint = "direct:" + this.getWupInstanceName() + "-" + this.specifyIngresEndpointPath();
         ingresEndpoint.setEndpointSpecification(ingresEndPoint);
@@ -55,9 +55,9 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMes
     }
 
     @Override
-    protected MessageBasedWUPEndpoint specifyEgressEndpoint(){
+    protected MessageBasedWUPEndpointContainer specifyEgressEndpoint(){
         getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
-        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
+        MessageBasedWUPEndpointContainer egressEndpoint = new MessageBasedWUPEndpointContainer();
         egressEndpoint.setFrameworkEnabled(true);
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");

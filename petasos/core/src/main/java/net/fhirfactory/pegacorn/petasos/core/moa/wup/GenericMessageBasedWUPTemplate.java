@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactory
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
@@ -45,6 +46,10 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTop
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -82,8 +87,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     private RouteElementNames nameSet;
     private WUPArchetypeEnum wupArchetype;
     private List<DataParcelManifest> topicSubscriptionSet;
-    private MessageBasedWUPEndpoint egressEndpoint;
-    private MessageBasedWUPEndpoint ingresEndpoint;
+    private MessageBasedWUPEndpointContainer egressEndpoint;
+    private MessageBasedWUPEndpointContainer ingresEndpoint;
+    private WorkUnitProcessorMetricsAgent metricsAgent;
 
     @Inject
     private WorkUnitProcessorFrameworkManager wupFrameworkManager;
@@ -105,6 +111,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     @Inject
     private LocalPetasosParticipantCacheIM participantCacheIM;
+
+    @Inject
+    private PetasosMetricAgentFactory metricAgentFactory;
+
+    @Inject
+    private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgentAccessor;
 
     public GenericMessageBasedWUPTemplate() {
         super();
@@ -139,6 +151,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         this.meAsAPetasosParticipant = buildPetasosParticipant();
         getLogger().trace(".initialise(): Setting the Topic Subscription Set (i.e. the list of Data Sets we will process)");
         this.topicSubscriptionSet = specifySubscriptionTopics();
+        getLogger().trace(".initialise(): Establish the metrics agent");
+        ComponentIdType componentId = getMeAsATopologyComponent().getComponentID();
+        String participantName = getMeAsAPetasosParticipant().getParticipantName();
+        String workshopParticipantName = getWorkshop().getWorkshopNode().getParticipantName();
+        String processingPlantParticipantName = getProcessingPlant().getSubsystemParticipantName();
+        this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(componentId, processingPlantParticipantName, workshopParticipantName, participantName);
         getLogger().trace(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
         buildWUPFramework(this.getContext());
 
@@ -162,8 +180,8 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     protected abstract WorkshopInterface specifyWorkshop();
-    protected abstract MessageBasedWUPEndpoint specifyIngresEndpoint();
-    protected abstract MessageBasedWUPEndpoint specifyEgressEndpoint();
+    protected abstract MessageBasedWUPEndpointContainer specifyIngresEndpoint();
+    protected abstract MessageBasedWUPEndpointContainer specifyEgressEndpoint();
 
     protected WorkshopInterface getWorkshop(){
         return(specifyWorkshop());
@@ -175,11 +193,11 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(processingPlantServices.getTopologyFactory());
     }
 
-    public MessageBasedWUPEndpoint getEgressEndpoint() {
+    public MessageBasedWUPEndpointContainer getEgressEndpoint() {
         return egressEndpoint;
     }
 
-    public MessageBasedWUPEndpoint getIngresEndpoint() {
+    public MessageBasedWUPEndpointContainer getIngresEndpoint() {
         return ingresEndpoint;
     }
 
@@ -194,11 +212,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         // Subclasses can optionally override
     }
 
+
     protected SolutionTopologyNode getSolutionTopology(){return(processingPlantServices.getSolutionNode());}
 
     public void buildWUPFramework(CamelContext routeContext) {
         getLogger().debug(".buildWUPFramework(): Entry");
-        wupFrameworkManager.buildWUPFramework(this.meAsATopologyComponent, this.getTopicSubscriptionSet(), this.getWupArchetype());
+        wupFrameworkManager.buildWUPFramework(this.meAsATopologyComponent, this.getTopicSubscriptionSet(), this.getWupArchetype(), getMetricsAgent());
         getLogger().debug(".buildWUPFramework(): Exit");
     }
     
@@ -259,6 +278,14 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return meAsAPetasosParticipant;
     }
 
+    protected WorkUnitProcessorMetricsAgent getMetricsAgent(){
+        return(this.metricsAgent);
+    }
+
+    protected ProcessingPlantMetricsAgent getProcessingPlantMetricsAgent(){
+        return(this.processingPlantMetricsAgentAccessor.getMetricsAgent());
+    }
+
     //
     // Routing Support Functions
     //
@@ -288,6 +315,14 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         }
     }
 
+    public class AuditAgentInjector implements Processor{
+        @Override
+        public void process(Exchange camelExchange) throws Exception{
+            getLogger().debug("AuditAgentInjector.process(): Entry");
+            camelExchange.setProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, getMetricsAgent());
+        }
+    }
+
     public WorkUnitProcessorSoftwareComponent getMeAsATopologyComponent() {
         return meAsATopologyComponent;
     }
@@ -298,9 +333,11 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
      */
     protected RouteDefinition fromIncludingPetasosServices(String uri) {
         NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
         RouteDefinition route = fromWithStandardExceptionHandling(uri);
         route
                 .process(nodeDetailInjector)
+                .process(auditAgentInjector)
         ;
         return route;
     }

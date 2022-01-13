@@ -224,11 +224,11 @@ public class JGroupsIntegrationPointSharedMap {
 
     public void printMap(){
         Enumeration<String> endpointNames = integrationPoints.keys();
-        getLogger().info("---------------EndpointMap-------------");
+        getLogger().debug("---------------EndpointMap-------------");
         while(endpointNames.hasMoreElements()){
             String endpointName = endpointNames.nextElement();
             JGroupsIntegrationPointSummary jgroupsIPSummary = integrationPoints.get(endpointName);
-            getLogger().info("Endpoint->{}", jgroupsIPSummary.getComponentId().getDisplayName());
+            getLogger().debug("Endpoint->{}", jgroupsIPSummary.getComponentId().getDisplayName());
         }
     }
 

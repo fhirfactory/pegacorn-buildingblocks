@@ -54,6 +54,9 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTop
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.global.watchdogs.GlobalPetasosTaskContinuityWatchdog;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.global.watchdogs.GlobalPetasosTaskRecoveryWatchdog;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -71,6 +74,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     private ProcessingPlantSoftwareComponent meAsASoftwareComponent;
     private String instanceQualifier;
     private boolean isInitialised;
+    private ProcessingPlantMetricsAgent metricsAgent;
 
     private PetasosAuditEventGranularityLevelEnum processingPlantAuditLevel;
 
@@ -105,6 +109,12 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Inject
     private PegacornReferenceProperties pegacornReferenceProperties;
+
+    @Inject
+    private ProcessingPlantMetricsAgentAccessor metricsAgentAccessor;
+
+    @Inject
+    private PetasosMetricAgentFactory metricAgentFactory;
 
     //
     // Constructor(s)
@@ -186,6 +196,10 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return processingPlantAuditLevel;
     }
 
+    protected ProcessingPlantMetricsAgent getMetricsAgent(){
+        return(metricsAgent);
+    }
+
     //
     // Post Construct
     //
@@ -238,6 +252,10 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             getLogger().info("ProcessingPlant::initialise(): [Initialise Task Recovery Watchdog] Start");
             this.petasosTaskRecoveryWatchdog.initialise();
             getLogger().info("ProcessingPlant::initialise(): [Initialise Task Recovery Watchdog] Finish");
+            getLogger().info("ProcessingPlant::initialise(): [Initialise Metrics Agent] Start");
+            this.metricsAgent = metricAgentFactory.newProcessingPlantMetricsAgent(getMeAsASoftwareComponent().getComponentID(), getSubsystemParticipantName());
+            metricsAgentAccessor.setMetricsAgent(this.metricsAgent);
+            getLogger().info("ProcessingPlant::initialise(): [Initialise Metrics Agent] Finish");
             isInitialised = true;
             getLogger().info("StandardProcessingPlatform::initialise(): Done...");
         } else {

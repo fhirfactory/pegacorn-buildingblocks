@@ -26,11 +26,17 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityUtilisationBrokerInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetric;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.ProcessingPlantMetricsData;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.WorkUnitProcessorMetricsData;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.factories.PetasosComponentMetricSetFactory;
 import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.services.oam.endpoint.PetasosOAMMetricsAgentEndpoint;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import net.fhirfactory.pegacorn.services.oam.agent.common.AgentWorkerBase;
+import net.fhirfactory.pegacorn.services.oam.endpoint.PetasosOAMMetricsAgentEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,12 +45,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ApplicationScoped
-public class PetasosMetricsAgentWorker extends AgentWorkerBase  {
+public class PetasosMetricsAgentWorker extends AgentWorkerBase {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosMetricsAgentWorker.class);
 
-    private ArrayList<PetasosComponentMetric> metricsQueue;
+    private ConcurrentHashMap<ComponentIdType, PetasosComponentMetricSet> metricsQueue;
     private SerializableObject metricQueueLock = new SerializableObject();
 
     private static long SYNCHRONIZATION_CHECK_PERIOD = 30000;
@@ -65,13 +72,19 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase  {
     @Inject
     private SubsystemNames subsystemNames;
 
+    @Inject
+    private PetasosLocalMetricsDM metricsDM;
+
+    @Inject
+    private PetasosComponentMetricSetFactory componentMetricSetFactory;
+
     //
     // Constructor(s)
     //
 
     public PetasosMetricsAgentWorker(){
         this.initialised = false;
-        this.metricsQueue = new ArrayList<>();
+        this.metricsQueue = new ConcurrentHashMap<>();
         this.backgroundCheckInitiated = false;
         this.jsonMapper = new ObjectMapper();
         JavaTimeModule module = new JavaTimeModule();
@@ -101,25 +114,68 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase  {
         getLogger().debug(".initialise(): Exit");
     }
 
-    protected void forwardMetrics(){
-        LOG.debug(".forwardMetricsReports(): Entry");
-        List<PetasosComponentMetric> allMetrics = new ArrayList<>();
+    //
+    // Actual Daemon Tasks
+    //
+
+    protected void captureLocalMetrics(){
+        getLogger().info(".captureLocalMetrics(): Entry");
+        //
+        // Get Metrics from the Cache
+        List<CommonComponentMetricsData> allLocalMetricsSets = getMetricsDM().getAllMetricsSets();
+        getLogger().info(".captureLocalMetrics(): Iterating through Metrics retrieved from local cache");
+        for(CommonComponentMetricsData currentMetrics: allLocalMetricsSets){
+            PetasosComponentMetricSet metricSet = null;
+            ComponentIdType componentId = currentMetrics.getComponentID();
+            getLogger().info(".captureLocalMetrics(): Iterating through Metrics (Processing->{})", componentId);
+            if(currentMetrics instanceof ProcessingPlantMetricsData){
+                getLogger().info(".captureLocalMetrics(): Iterating through Metrics (Is a ProcessingPlant)");
+                ProcessingPlantMetricsData plantMetricsData = (ProcessingPlantMetricsData) currentMetrics;
+                metricSet = getComponentMetricSetFactory().convertProcessingPlantMetricsData(plantMetricsData);
+            }
+            if(currentMetrics instanceof  WorkUnitProcessorMetricsData){
+                getLogger().info(".captureLocalMetrics(): Iterating through Metrics (Is a WorkUnitProcessor)");
+                WorkUnitProcessorMetricsData wupMetricsData = (WorkUnitProcessorMetricsData) currentMetrics;
+                metricSet = getComponentMetricSetFactory().convertWorkUnitProcessorMetricsData(wupMetricsData);
+            }
+            if(metricSet != null) {
+                synchronized (getMetricQueueLock()) {
+                    if (getMetricsQueue().containsKey(componentId)) {
+                        getMetricsQueue().remove(componentId);
+                    }
+                    getMetricsQueue().put(componentId, metricSet);
+                }
+            }
+        }
+        getLogger().info(".captureLocalMetrics(): Exit");
+    }
+
+    protected void forwardLocalMetricsToServer(){
+        LOG.info(".forwardLocalMetricsToServer(): Entry");
+        List<PetasosComponentMetricSet> allMetrics = new ArrayList<>();
+        LOG.info(".forwardLocalMetricsToServer(): Number of MetricSets to processing->{}", metricsQueue.size());
         synchronized (metricQueueLock) {
-            allMetrics.addAll(metricsQueue);
+            allMetrics.addAll(metricsQueue.values());
             metricsQueue.clear();
         }
+        LOG.info(".forwardLocalMetricsToServer(): Loaded metrics form local cache, forwarding");
         boolean metricsUpdateFailed = false;
-        for(PetasosComponentMetric currentMetric: allMetrics){
-            Instant captureInstant = metricsServicesBroker.replicateMetricToServer(subsystemNames.getITOpsIMParticipantName(), currentMetric);
+        for(PetasosComponentMetricSet currentMetric: allMetrics){
+            LOG.info(".forwardLocalMetricsToServer(): Sending metrics for component->{}", currentMetric.getMetricSourceComponentId());
+            Instant captureInstant = metricsServicesBroker.replicateMetricSetToServer(subsystemNames.getITOpsIMParticipantName(), currentMetric);
             if(captureInstant == null){
                 metricsUpdateFailed = true;
-                break;
+                synchronized (metricQueueLock){
+                    if(!metricsQueue.containsKey(currentMetric.getMetricSourceComponentId())) {
+                        metricsQueue.put(currentMetric.getMetricSourceComponentId(), currentMetric);
+                    }
+                }
             }
         }
         if(metricsUpdateFailed){
-            LOG.debug(".forwardMetricsReports(): Exit, failed to update");
+            LOG.info(".forwardLocalMetricsToServer(): Exit, failed to update");
         } else {
-            LOG.debug(".forwardMetricsReports(): Exit, Update successful");
+            LOG.info(".forwardLocalMetricsToServer(): Exit, Update successful");
         }
     }
 
@@ -127,7 +183,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase  {
     // Schedule Period Synchronisation Check/Update Activity
     //
 
-    public void scheduleMetricsSynchronisation() {
+    protected void scheduleMetricsSynchronisation() {
 
         getLogger().debug(".scheduleMetricsSynchronisation(): Entry");
         if(isBackgroundCheckInitiated()){
@@ -136,7 +192,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase  {
             TimerTask MetricsCacheSynchronisation = new TimerTask() {
                 public void run() {
                     getLogger().debug(".MetricsCacheSynchronisation(): Entry");
-                    forwardMetrics();
+                    metricsSynchronisationDaemon();
                     getLogger().debug(".MetricsCacheSynchronisation(): Exit");
                 }
             };
@@ -147,6 +203,17 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase  {
         }
         getLogger().debug(".scheduleMetricsSynchronisation(): Exit");
     }
+
+    protected void metricsSynchronisationDaemon(){
+        getLogger().info(".scheduleMetricsSynchronisation(): Entry");
+        captureLocalMetrics();
+        forwardLocalMetricsToServer();
+        getLogger().info(".scheduleMetricsSynchronisation(): Exit");
+    }
+
+    //
+    // Getters (and Setters)
+    //
 
     @Override
     protected String getFriendlyName() {
@@ -161,32 +228,47 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase  {
         return(LOG);
     }
 
-    public boolean isBackgroundCheckInitiated() {
+    protected boolean isBackgroundCheckInitiated() {
         return backgroundCheckInitiated;
     }
 
-    public void setBackgroundCheckInitiated(boolean backgroundCheckInitiated) {
+    protected void setBackgroundCheckInitiated(boolean backgroundCheckInitiated) {
         this.backgroundCheckInitiated = backgroundCheckInitiated;
     }
 
-    public static long getSynchronizationCheckPeriod() {
+    protected static long getSynchronizationCheckPeriod() {
         return SYNCHRONIZATION_CHECK_PERIOD;
     }
 
-    public static long getInitialCheckDelayPeriod() {
+    protected static long getInitialCheckDelayPeriod() {
         return INITIAL_CHECK_DELAY_PERIOD;
     }
 
-    public CapabilityUtilisationBrokerInterface getCapabilityUtilisationBroker() {
+    protected CapabilityUtilisationBrokerInterface getCapabilityUtilisationBroker() {
         return capabilityUtilisationBroker;
     }
 
-    public ObjectMapper getJsonMapper() {
+    protected ObjectMapper getJsonMapper() {
         return jsonMapper;
     }
 
-    public ProcessingPlantInterface getProcessingPlant() {
+    protected ProcessingPlantInterface getProcessingPlant() {
         return processingPlant;
     }
 
+    protected PetasosLocalMetricsDM getMetricsDM() {
+        return metricsDM;
+    }
+
+    protected PetasosComponentMetricSetFactory getComponentMetricSetFactory() {
+        return componentMetricSetFactory;
+    }
+
+    protected SerializableObject getMetricQueueLock() {
+        return metricQueueLock;
+    }
+
+    protected ConcurrentHashMap<ComponentIdType, PetasosComponentMetricSet> getMetricsQueue() {
+        return metricsQueue;
+    }
 }

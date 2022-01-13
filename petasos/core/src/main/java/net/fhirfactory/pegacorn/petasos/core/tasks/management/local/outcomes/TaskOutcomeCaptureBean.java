@@ -71,8 +71,8 @@ public class TaskOutcomeCaptureBean {
     //
 
     public PetasosActionableTask captureAndRegisterOutcome(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange){
-        if(getLogger().isInfoEnabled()) {
-            getLogger().info(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", convertToString(fulfillmentTask));
+        if(getLogger().isDebugEnabled()) {
+            getLogger().debug(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", convertToString(fulfillmentTask));
         }
         TaskIdType actionableTaskId = fulfillmentTask.getActionableTaskId();
         PetasosActionableTask actionableTask = null;

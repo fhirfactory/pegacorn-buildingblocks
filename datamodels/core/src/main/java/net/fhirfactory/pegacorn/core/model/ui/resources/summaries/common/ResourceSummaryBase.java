@@ -21,10 +21,18 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+
 import java.io.Serializable;
+import java.time.Instant;
 
 public class ResourceSummaryBase implements Serializable {
     private String resourceId;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant lastSynchronisationInstant;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant lastActivityInstant;
 
     //
     // Constructor(s)
@@ -32,11 +40,29 @@ public class ResourceSummaryBase implements Serializable {
 
     public ResourceSummaryBase(){
         this.resourceId = null;
+        this.lastActivityInstant = null;
+        this.lastSynchronisationInstant = null;
     }
 
     //
     // Getters And Setters
     //
+
+    public Instant getLastSynchronisationInstant() {
+        return lastSynchronisationInstant;
+    }
+
+    public void setLastSynchronisationInstant(Instant lastSynchronisationInstant) {
+        this.lastSynchronisationInstant = lastSynchronisationInstant;
+    }
+
+    public Instant getLastActivityInstant() {
+        return lastActivityInstant;
+    }
+
+    public void setLastActivityInstant(Instant lastActivityInstant) {
+        this.lastActivityInstant = lastActivityInstant;
+    }
 
     public String getResourceId() {
         return resourceId;
@@ -53,7 +79,9 @@ public class ResourceSummaryBase implements Serializable {
     @Override
     public String toString() {
         return "ResourceSummaryBase{" +
-                "resourceId=" + resourceId +
+                "resourceId='" + resourceId + '\'' +
+                ", lastSynchronisationInstant=" + lastSynchronisationInstant +
+                ", lastActivityInstant=" + lastActivityInstant +
                 '}';
     }
 }

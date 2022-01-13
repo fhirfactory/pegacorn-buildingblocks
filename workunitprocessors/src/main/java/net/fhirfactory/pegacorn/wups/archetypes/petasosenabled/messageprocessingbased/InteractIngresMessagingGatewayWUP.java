@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEn
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
@@ -53,9 +53,9 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
     }
 
     @Override
-    protected MessageBasedWUPEndpoint specifyEgressEndpoint(){
+    protected MessageBasedWUPEndpointContainer specifyEgressEndpoint(){
         getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
-        MessageBasedWUPEndpoint egressEndpoint = new MessageBasedWUPEndpoint();
+        MessageBasedWUPEndpointContainer egressEndpoint = new MessageBasedWUPEndpointContainer();
         egressEndpoint.setFrameworkEnabled(true);
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
@@ -79,14 +79,12 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
      * @return the RouteBuilder.from(uri) with all exceptions logged but not handled
      */
     protected RouteDefinition fromInteractIngresService(String uri) {
-        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
         SourceSystemDetailInjector sourceSystemDetailInjector = new SourceSystemDetailInjector();
         PortDetailInjector portDetailInjector = new PortDetailInjector();
-        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        RouteDefinition route = fromIncludingPetasosServices(uri);
         route
                 .process(sourceSystemDetailInjector)
                 .process(portDetailInjector)
-                .process(nodeDetailInjector)
         ;
         return route;
     }

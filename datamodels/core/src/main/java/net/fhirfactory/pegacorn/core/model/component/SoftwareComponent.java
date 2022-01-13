@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.*;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.PetasosComponentMetricSet;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 
@@ -60,6 +60,7 @@ public abstract class SoftwareComponent implements Serializable {
     private SoftwareComponentStatusEnum componentStatus;
     private SoftwareComponentExecutionControlEnum componentExecutionControl;
     private String subsystemParticipantName;
+    private String participantName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant lastActivityInstant;
@@ -87,6 +88,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.subsystemParticipantName = null;
         this.lastActivityInstant = Instant.now();
         this.lastReportingInstant = null;
+        this.participantName = null;
     }
 
     public SoftwareComponent(SoftwareComponent ori){
@@ -143,11 +145,31 @@ public abstract class SoftwareComponent implements Serializable {
         if(ori.hasLastReportingInstant()){
             setLastReportingInstant(ori.getLastReportingInstant());
         }
+        if(ori.hasParticipantName()){
+            setParticipantName(ori.getParticipantName());
+        }
+        if(ori.hasSubsystemParticipantName()){
+            setSubsystemParticipantName(ori.getSubsystemParticipantName());
+        }
     }
 
     //
     // Some Helper Functions
     //
+
+    @JsonIgnore
+    public boolean hasParticipantName(){
+        boolean hasValue = this.participantName != null;
+        return(hasValue);
+    }
+
+    public String getParticipantName() {
+        return participantName;
+    }
+
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
+    }
 
     @JsonIgnore
     public boolean hasDeploymentSite(){
