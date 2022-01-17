@@ -22,11 +22,13 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
+import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosServicesEndpointRegistrationService;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.factories.PetasosComponentMetricSetFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -36,13 +38,15 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGrou
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.map.JGroupsIntegrationPointSharedMap;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.JGroupsIntegrationPointCheckScheduleMap;
+import net.fhirfactory.pegacorn.petasos.endpoints.map.JGroupsIntegrationPointSharedMap;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.datatypes.JGroupsIntegrationPointCheckScheduleElement;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.common.ProcessingPlantJGroupsIntegrationPointInformationService;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.common.ProcessingPlantJGroupsIntegrationPointSet;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.common.ProcessingPlantJGroupsIntegrationPointWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -60,6 +64,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     private boolean endpointCheckScheduled;
     private JGroupsIntegrationPointCheckScheduleMap integrationPointCheckScheduleMap;
+    private EndpointMetricsAgent metricsAgent;
 
     private int MAX_PROBE_RETRIES = 5;
 
@@ -83,6 +88,12 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     @Inject
     private ProcessingPlantJGroupsIntegrationPointSet jgroupsIPSet;
+
+    @Inject
+    private PetasosServicesEndpointRegistrationService endpointRegistrationService;
+
+    @Inject
+    private PetasosMetricAgentFactory metricsFactory;
 
     //
     // Constructor
@@ -166,6 +177,19 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         getLogger().info(".initialise(): Step 7: Start ==> Executing subclass PostConstruct activities");
         executePostConstructActivities();
         getLogger().info(".initialise(): Step 7: Completed ==> Executing subclass PostConstruct activities");
+        //
+        // Register myself with a WUP for Metrics Reporting
+        //
+        getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
+        endpointRegistrationService.registerEndpoint(specifyPetasosEndpointFunctionType(), getJGroupsIntegrationPoint());
+        getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
+        //
+        // Create my Metrics Agent
+        //
+        getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
+        String participantName = getProcessingPlant().getSubsystemParticipantName()+"."+specifyPetasosEndpointFunctionType().getEndpointParticipantName();
+        this.metricsAgent = metricsFactory.newEndpointMetricsAgent(getJGroupsIntegrationPoint().getComponentID(),participantName, "Internal", specifyJGroupsChannelName());
+        getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
         // We're done!
         setInitialised(true);
 
@@ -174,6 +198,10 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
     //
     // Getters (and Setters)
     //
+
+    protected EndpointMetricsAgent getMetricsAgent(){
+        return(this.metricsAgent);
+    }
 
     protected JGroupsIntegrationPointSharedMap getIntegrationPointMap(){
         return(endpointMap);
@@ -230,7 +258,10 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
             classSet[0] = JGroupsIntegrationPointProbeQuery.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Address endpointAddress = getTargetMemberAddress(targetIntegrationPoint.getChannelName());
-            JGroupsIntegrationPointProbeReport report = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeJGroupsIntegrationPointHandler", objectSet, classSet, requestOptions);
+            JGroupsIntegrationPointProbeReport report = null;
+            synchronized(getIPCChannelLock()) {
+                report = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeJGroupsIntegrationPointHandler", objectSet, classSet, requestOptions);
+            }
             getLogger().debug(".probeJGroupsIntegrationPoint(): Exit, report->{}", report);
             return(report);
         } catch (NoSuchMethodException e) {
@@ -307,14 +338,14 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     protected JGroupsIntegrationPoint resolveTopologyNodeForJGroupsIntegrationPoint(){
         getLogger().debug(".resolveTopologyNodeForJGroupsIntegrationPoint(): Entry, endpointFunction->{}", specifyPetasosEndpointFunctionType());
-        String name = getInterfaceNames().getEndpointName(PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT, specifyPetasosEndpointFunctionType().getDisplayName());
+        String name = getInterfaceNames().getEndpointName(PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT, specifyPetasosEndpointFunctionType().getDisplayName());
         getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): Required TopologyNodeRDN.nodeName->{}", name);
         for(TopologyNodeFDN currentEndpointFDN: getProcessingPlant().getMeAsASoftwareComponent().getEndpoints()){
             getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): currentEndpointFDN->{}",currentEndpointFDN);
             IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
             getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): currentEndpoint->{}",currentEndpoint);
             PetasosEndpointTopologyTypeEnum endpointType = currentEndpoint.getEndpointType();
-            boolean endpointTypeMatches = endpointType.equals(PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT);
+            boolean endpointTypeMatches = endpointType.equals(PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
             if(endpointTypeMatches){
                 getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): endpointTypeMatches!!!");
                 if(currentEndpoint.getComponentRDN().getNodeName().contentEquals(name)) {

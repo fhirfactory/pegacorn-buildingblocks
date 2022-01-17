@@ -60,7 +60,7 @@ public class WUPContainerIngresGatekeeper {
     public List<String> ingresGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
         getLogger().debug(".ingresGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask);
         if(getLogger().isInfoEnabled()) {
-            getLogger().info(".ingresGatekeeper(): jobcard->{}", fulfillmentTask.getTaskJobCard());
+            getLogger().info(".ingresGatekeeper(): fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
         }
         // Get Route Names
         TopologyNodeFunctionFDNToken wupToken = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getNodeFunctionFDN().getFunctionToken();
@@ -73,7 +73,7 @@ public class WUPContainerIngresGatekeeper {
         ArrayList<String> targetList = new ArrayList<String>();
         getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
         if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
-            getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
+            getLogger().info(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             metricsAgent.touchLastActivityFinishInstant();
             targetList.add(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);
             return (targetList);
@@ -81,7 +81,7 @@ public class WUPContainerIngresGatekeeper {
             getLogger().trace(".ingresGatekeeper(): We return the channel name of the associated WUP Ingres Conduit");
             String targetEndpoint = nameSet.getEndPointWUPIngresConduitIngres();
             targetList.add(targetEndpoint);
-            getLogger().debug(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
+            getLogger().info(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
             return (targetList);
         }
     }

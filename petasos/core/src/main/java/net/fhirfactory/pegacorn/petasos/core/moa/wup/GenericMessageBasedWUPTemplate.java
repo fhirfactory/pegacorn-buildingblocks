@@ -75,12 +75,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     public static final Integer IPC_PACKET_MAXIMUM_FRAME_SIZE = 25 * 1024 * 1024; // 25 MB
 
-    
-    abstract protected Logger specifyLogger();
-
-    protected Logger getLogger(){
-        return(specifyLogger());
-    }
+    private boolean initialised;
 
     private WorkUnitProcessorSoftwareComponent meAsATopologyComponent;
     private PetasosParticipant meAsAPetasosParticipant;
@@ -118,8 +113,13 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     @Inject
     private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgentAccessor;
 
+    //
+    // Constructor(s)
+    //
+
     public GenericMessageBasedWUPTemplate() {
         super();
+        this.initialised = false;
     }
 
     /**
@@ -131,49 +131,95 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
      */
     @PostConstruct
     protected void initialise(){
-        getLogger().debug(".initialise(): Entry, Default Post Constructor function to setup the WUP");
-        getLogger().trace(".initialise(): WUP Instance Name --> {}", specifyWUPInstanceName());
-        getLogger().trace(".initialise(): WUP Instance Version --> {}", specifyWUPInstanceVersion());
-        this.getProcessingPlant().initialisePlant();
-        getLogger().trace(".initialise(): Setting up the wupTopologyElement (NodeElement) instance, which is the Topology Server's representation of this WUP ");
-        this.meAsATopologyComponent = buildWUPNodeElement();
-        getLogger().trace(".initialise(): Setting the WUP nameSet, which is the set of Route EndPoints that the WUP Framework will use to link various enablers");
-        this.nameSet = new RouteElementNames(getMeAsATopologyComponent().getNodeFunctionFDN().getFunctionToken());
-        getLogger().trace(".initialise(): Setting the WUP EgressEndpoint");
-        this.egressEndpoint = specifyEgressEndpoint();
-        getLogger().trace(".initialise(): Setting the WUP IngresEndpoint");
-        this.ingresEndpoint = specifyIngresEndpoint();
-        getLogger().trace(".initialise(): Setting the WUP Archetype - which is used by the WUP Framework to ascertain what wrapping this WUP needs");
-        this.wupArchetype =  specifyWUPArchetype();
-        getLogger().trace(".initialise(): Now invoking subclass initialising function(s)");
-        executePostInitialisationActivities();
-        getLogger().trace(".initialise(): Building my PetasosParticipant");
-        this.meAsAPetasosParticipant = buildPetasosParticipant();
-        getLogger().trace(".initialise(): Setting the Topic Subscription Set (i.e. the list of Data Sets we will process)");
-        this.topicSubscriptionSet = specifySubscriptionTopics();
-        getLogger().trace(".initialise(): Establish the metrics agent");
-        ComponentIdType componentId = getMeAsATopologyComponent().getComponentID();
-        String participantName = getMeAsAPetasosParticipant().getParticipantName();
-        String workshopParticipantName = getWorkshop().getWorkshopNode().getParticipantName();
-        String processingPlantParticipantName = getProcessingPlant().getSubsystemParticipantName();
-        this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(componentId, processingPlantParticipantName, workshopParticipantName, participantName);
-        getLogger().trace(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
-        buildWUPFramework(this.getContext());
+        getLogger().debug(".initialise(): Entry");
+        if(!isInitialised()) {
+            getLogger().info(".initialise(): Initialising...");
 
-        registerCapabilities();
+            getLogger().info(".initialise(): Metadata: WUP Instance Name --> {}", specifyWUPInstanceName());
+            getLogger().info(".initialise(): Metadata: WUP Instance Version --> {}", specifyWUPInstanceVersion());
 
-        this.getMeAsATopologyComponent().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
+            getLogger().info(".initialise(): [Initialise Containing Processing Plant (if required)] Start");
+            this.getProcessingPlant().initialisePlant();
+            getLogger().info(".initialise(): [Initialise Containing Processing Plant (if required)] Finish");
 
+            getLogger().info(".initialise(): [Initialise My WUP Topology Node] Start");
+            this.meAsATopologyComponent = buildWUPNodeElement();
+            getLogger().info(".initialise(): [Initialise My WUP Topology Node] Finish");
+
+            getLogger().info(".initialise(): [Initialise Route NameSet for this WUP] Start");
+            this.nameSet = new RouteElementNames(getMeAsATopologyComponent().getNodeFunctionFDN().getFunctionToken());
+            getLogger().info(".initialise(): [Initialise Route NameSet for this WUP] Finish");
+
+            getLogger().info(".initialise(): [Setting the WUP EgressEndpoint] Start");
+            this.egressEndpoint = specifyEgressEndpoint();
+            this.getMeAsATopologyComponent().setEgressEndpoint(this.egressEndpoint.getEndpointTopologyNode());
+            getLogger().info(".initialise(): [Setting the WUP EgressEndpoint] Finish");
+
+            getLogger().info(".initialise(): [Setting the WUP IngresEndpoint] Start");
+            this.ingresEndpoint = specifyIngresEndpoint();
+            this.getMeAsATopologyComponent().setIngresEndpoint(this.ingresEndpoint.getEndpointTopologyNode());
+            getLogger().info(".initialise(): [Setting the WUP IngresEndpoint] Finish");
+
+            getLogger().info(".initialise(): [Setting the WUP Archetype] Start");
+            this.wupArchetype = specifyWUPArchetype();
+            getLogger().info(".initialise(): [Setting the WUP Archetype] Finish");
+
+            getLogger().info(".initialise(): [Invoking subclass initialising function(s)] Start");
+            executePostInitialisationActivities();
+            getLogger().info(".initialise(): [Invoking subclass initialising function(s)] Finish");
+
+            getLogger().info(".initialise(): [Building my PetasosParticipant] Start");
+            this.meAsAPetasosParticipant = buildPetasosParticipant();
+            getLogger().info(".initialise(): [Building my PetasosParticipant] Finish");
+
+            getLogger().info(".initialise(): [Setting the Topic Subscription Set] Start");
+            this.topicSubscriptionSet = specifySubscriptionTopics();
+            getLogger().info(".initialise(): [Setting the Topic Subscription Set] Finish");
+
+            getLogger().info(".initialise(): [Establish the WorkUnitProcessor Metrics Agent] Start");
+            ComponentIdType componentId = getMeAsATopologyComponent().getComponentID();
+            String participantName = getMeAsAPetasosParticipant().getParticipantName();
+            this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(componentId, participantName);
+            getLogger().info(".initialise(): [Establish the WorkUnitProcessor Metrics Agent] Start");
+
+            getLogger().info(".initialise(): [Establish (if any) Endpoint Metric Agents] Start");
+            establishEndpointMetricAgents();
+            getLogger().info(".initialise(): [Establish (if any) Endpoint Metric Agents] Finish");
+
+            getLogger().info(".initialise(): [Build Surrounding WUP Framework] Start");
+            buildWUPFramework(this.getContext());
+            getLogger().info(".initialise(): [Build Surrounding WUP Framework] Finish");
+
+            getLogger().info(".initialise(): [Register any Capabilities this Work Unit Processor supports] Start");
+            registerCapabilities();
+            getLogger().info(".initialise(): [Register any Capabilities this Work Unit Processor supports] Finish");
+
+            getLogger().info(".initialise(): [Set my component status!] Start");
+            this.getMeAsATopologyComponent().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
+            getLogger().info(".initialise(): [Set my component status!] Finish");
+
+            this.initialised = true;
+
+            getLogger().info(".initialise(): Initialising... Done...");
+        } else {
+            getLogger().debug(".initialise(): Already initialised");
+        }
         getLogger().debug(".initialise(): Exit");
     }
-    
+
+    //
     // To be implemented methods (in Specialisations)
-    
+    //
+
     protected abstract List<DataParcelManifest> specifySubscriptionTopics();
     protected abstract List<DataParcelManifest> declarePublishedTopics();
     protected abstract WUPArchetypeEnum specifyWUPArchetype();
     protected abstract String specifyWUPInstanceName();
     protected abstract String specifyWUPInstanceVersion();
+
+    protected void establishEndpointMetricAgents(){
+        // no nothing
+    }
 
     protected void registerCapabilities(){
         // do nothing
@@ -183,14 +229,30 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     protected abstract MessageBasedWUPEndpointContainer specifyIngresEndpoint();
     protected abstract MessageBasedWUPEndpointContainer specifyEgressEndpoint();
 
+    abstract protected Logger specifyLogger();
+
+    //
+    // Getters (and Setters)
+    //
+
+    private boolean isInitialised(){
+        return(this.initialised);
+    }
+
     protected WorkshopInterface getWorkshop(){
         return(specifyWorkshop());
     }
+
     protected ProcessingPlantInterface getProcessingPlant(){
         return(processingPlantServices);
     }
+
     protected PegacornTopologyFactoryInterface getTopologyFactory(){
         return(processingPlantServices.getTopologyFactory());
+    }
+
+    protected Logger getLogger(){
+        return(specifyLogger());
     }
 
     public MessageBasedWUPEndpointContainer getEgressEndpoint() {
@@ -215,58 +277,53 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     protected SolutionTopologyNode getSolutionTopology(){return(processingPlantServices.getSolutionNode());}
 
-    public void buildWUPFramework(CamelContext routeContext) {
-        getLogger().debug(".buildWUPFramework(): Entry");
-        wupFrameworkManager.buildWUPFramework(this.meAsATopologyComponent, this.getTopicSubscriptionSet(), this.getWupArchetype(), getMetricsAgent());
-        getLogger().debug(".buildWUPFramework(): Exit");
+
+    protected PetasosMetricAgentFactory getMetricAgentFactory(){
+        return(this.metricAgentFactory);
     }
-    
-    public String getEndpointHostName(){
+
+    protected String getEndpointHostName(){
         String dnsName = getProcessingPlant().getMeAsASoftwareComponent().getAssignedDNSName();
         return(dnsName);
     }
     
-//    public LocalTaskActivityController getServicesBroker(){
-//        return(this.servicesBroker);
-//    }
-    
-    public TopologyIM getTopologyIM(){
+    protected TopologyIM getTopologyIM(){
         return(topologyIM);
     }
 
-    public void setMeAsATopologyComponent(WorkUnitProcessorSoftwareComponent meAsATopologyComponent) {
+    protected void setMeAsATopologyComponent(WorkUnitProcessorSoftwareComponent meAsATopologyComponent) {
         this.meAsATopologyComponent = meAsATopologyComponent;
     }
 
-    public RouteElementNames getNameSet() {
+    protected RouteElementNames getNameSet() {
         return nameSet;
     }
 
-    public String getWupInstanceName() {
+    protected String getWupInstanceName() {
         return getMeAsATopologyComponent().getComponentRDN().getTag();
     }
 
-    public WUPArchetypeEnum getWupArchetype() {
+    protected WUPArchetypeEnum getWupArchetype() {
         return wupArchetype;
     }
 
-    public List<DataParcelManifest> getTopicSubscriptionSet() {
+    protected List<DataParcelManifest> getTopicSubscriptionSet() {
         return topicSubscriptionSet;
     }
 
-    public void setTopicSubscriptionSet(List<DataParcelManifest> topicSubscriptionSet) {
+    protected void setTopicSubscriptionSet(List<DataParcelManifest> topicSubscriptionSet) {
         this.topicSubscriptionSet = topicSubscriptionSet;
     }
 
-    public String getVersion() {
+    protected String getVersion() {
         return meAsATopologyComponent.getComponentRDN().getNodeVersion();
     }
 
-    public FHIRElementTopicFactory getFHIRTopicIDBuilder(){
+    protected FHIRElementTopicFactory getFHIRTopicIDBuilder(){
         return(this.fhirTopicIDBuilder);
     }
 
-    public CamelContext getCamelContext() {
+    protected CamelContext getCamelContext() {
         return camelContext;
     }
 
@@ -274,7 +331,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(this.fhirContextUtility);
     }
 
-    public PetasosParticipant getMeAsAPetasosParticipant() {
+    protected PetasosParticipant getMeAsAPetasosParticipant() {
         return meAsAPetasosParticipant;
     }
 
@@ -346,6 +403,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     // PetasosParticipant Functions
     //
 
+    public void buildWUPFramework(CamelContext routeContext) {
+        getLogger().debug(".buildWUPFramework(): Entry");
+        wupFrameworkManager.buildWUPFramework(this.meAsATopologyComponent, this.getTopicSubscriptionSet(), this.getWupArchetype(), getMetricsAgent());
+        getLogger().debug(".buildWUPFramework(): Exit");
+    }
+
     private PetasosParticipant buildPetasosParticipant(){
         getLogger().debug(".buildPetasosParticipant(): Entry");
         Set<TaskWorkItemManifestType> subscribedTopicSet = new HashSet<>();
@@ -371,8 +434,8 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
                 }
             }
         }
-
-        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(getMeAsATopologyComponent(),  publishedTopicSet, subscribedTopicSet);
+        String participantName = getMeAsATopologyComponent().getParticipantName();
+        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(participantName, getMeAsATopologyComponent(),  publishedTopicSet, subscribedTopicSet);
         PetasosParticipant participant = null;
         if(participantRegistration != null){
             participant = participantRegistration.getParticipant();
@@ -387,9 +450,11 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     private WorkUnitProcessorSoftwareComponent buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
+        String participantName = getWorkshop().getWorkshopNode().getParticipantName() + "." + specifyWUPInstanceName();
         WorkUnitProcessorSoftwareComponent wupNode = getTopologyFactory().createWorkUnitProcessor(
                 specifyWUPInstanceName(),
                 specifyWUPInstanceVersion(),
+                participantName,
                 getWorkshop().getWorkshopNode(),
                 PegacornSystemComponentTypeTypeEnum.WUP);
         getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getComponentFDN(), wupNode);
@@ -444,5 +509,4 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().debug(".getTopologyEndpoint(): Exit, Could not find node!");
         return(null);
     }
-
 }

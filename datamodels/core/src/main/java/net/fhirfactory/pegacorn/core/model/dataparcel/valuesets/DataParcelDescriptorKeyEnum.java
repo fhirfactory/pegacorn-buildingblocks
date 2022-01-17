@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
 
-public enum DataParcelTypeKeyEnum {
+public enum DataParcelDescriptorKeyEnum {
     DATASET_DEFINER("definer"),
     DATASET_CATEGORY("category"),
     DATASET_SUBCATEGORY("subcategory"),
@@ -39,7 +39,7 @@ public enum DataParcelTypeKeyEnum {
    
     private String topicKey;
 
-    private DataParcelTypeKeyEnum(String mapElementType){
+    private DataParcelDescriptorKeyEnum(String mapElementType){
         this.topicKey = mapElementType;
     }
 
@@ -47,8 +47,8 @@ public enum DataParcelTypeKeyEnum {
         return(this.topicKey);
     }
 
-    public static DataParcelTypeKeyEnum fromTopicKeyString(String keyString){
-        for (DataParcelTypeKeyEnum b : DataParcelTypeKeyEnum.values()) {
+    public static DataParcelDescriptorKeyEnum fromTopicKeyString(String keyString){
+        for (DataParcelDescriptorKeyEnum b : DataParcelDescriptorKeyEnum.values()) {
             if (b.getTopicKey().equalsIgnoreCase(keyString)) {
                 return b;
             }

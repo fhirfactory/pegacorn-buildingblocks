@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.issi.matrix;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
 
-public class MatrixEventReceiverEndpoint extends InteractHTTPServerTopologyEndpoint {
+public class MatrixEventReceiverEndpoint extends HTTPServerTopologyEndpoint {
 
     public MatrixEventReceiverEndpoint(){
         super();

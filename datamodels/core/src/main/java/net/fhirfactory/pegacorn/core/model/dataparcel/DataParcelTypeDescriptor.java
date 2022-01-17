@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.core.model.dataparcel;
 
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeKeyEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -223,31 +223,31 @@ public class DataParcelTypeDescriptor implements Serializable {
     public FDN toFDN() {
         FDN fdn = new FDN();
         if (hasDataParcelDefiner()) {
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DEFINER.getTopicKey(), getDataParcelDefiner()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_DEFINER.getTopicKey(), getDataParcelDefiner()));
         }
         if (hasDataParcelCategory()) {
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_CATEGORY.getTopicKey(), getDataParcelCategory()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_CATEGORY.getTopicKey(), getDataParcelCategory()));
         }
         if (hasDataParcelSubCategory()) {
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicKey(), getDataParcelSubCategory()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_SUBCATEGORY.getTopicKey(), getDataParcelSubCategory()));
         }
         if (hasDataParcelResource()) {
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicKey(), getDataParcelResource()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_RESOURCE.getTopicKey(), getDataParcelResource()));
         }
         if (hasDataParcelSegment()) {
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SEGMENT.getTopicKey(), getDataParcelSegment()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_SEGMENT.getTopicKey(), getDataParcelSegment()));
         }
         if (hasDataParcelAttribute()) {
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_ATTRIBUTE.getTopicKey(), getDataParcelAttribute()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_ATTRIBUTE.getTopicKey(), getDataParcelAttribute()));
         }
         if (hasDataParcelDiscriminatorType()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DISCRIMINATOR_TYPE.getTopicKey(), getDataParcelDiscriminatorType()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_DISCRIMINATOR_TYPE.getTopicKey(), getDataParcelDiscriminatorType()));
         }
         if (hasDataParcelDiscriminatorValue()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DISCRIMINATOR_VALUE.getTopicKey(), getDataParcelDiscriminatorValue()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_DISCRIMINATOR_VALUE.getTopicKey(), getDataParcelDiscriminatorValue()));
         }
         if (hasVersion()) {
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_VERSION.getTopicKey(), getVersion()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_VERSION.getTopicKey(), getVersion()));
         }
         return (fdn);
     }
@@ -257,7 +257,7 @@ public class DataParcelTypeDescriptor implements Serializable {
             return;
         }
         for (RDN rdn : fdn.getRDNSet()) {
-            DataParcelTypeKeyEnum keyEnum = DataParcelTypeKeyEnum.fromTopicKeyString(rdn.getQualifier());
+            DataParcelDescriptorKeyEnum keyEnum = DataParcelDescriptorKeyEnum.fromTopicKeyString(rdn.getQualifier());
             switch (keyEnum) {
                 case DATASET_DEFINER:
                     setDataParcelDefiner(rdn.getValue());

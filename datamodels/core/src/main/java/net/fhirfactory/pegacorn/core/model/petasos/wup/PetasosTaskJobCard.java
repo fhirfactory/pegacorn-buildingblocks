@@ -476,19 +476,19 @@ public class PetasosTaskJobCard implements Serializable {
     public String toString() {
 
         return "PetasosTaskJobCard{" +
-                "  fulfillmentTaskIdentifier=" + fulfillmentTaskIdentifier + ",\n" +
-                "  actionableTaskIdentifier=" + actionableTaskIdentifier + ",\n" +
-                "  updateInstant=" + localUpdateInstant + ",\n" +
-                "  currentStatus=" + currentStatus + ",\n" +
-                "  requestedStatus=" + requestedStatus + ",\n" +
-                "  grantedStatus=" + grantedStatus + ",\n" +
-                "  localFulfillmentStatus=" + localFulfillmentStatus + ",\n" +
-                "  globalFulfillmentStatus=" + globalFulfillmentStatus + ",\n" +
-                "  clusterMode=" + clusterMode + ",\n" +
-                "  systemMode=" + systemMode + ",\n" +
-                "  isToBeDiscarded=" + isToBeDiscarded + ",\n" +
-                "  currentStateReason=" + currentStateReason + ",\n" +
-                "  workUnitProcessor=" + getWorkUnitProcessor() + ",\n" +
+                "  fulfillmentTaskIdentifier=" + fulfillmentTaskIdentifier + "," +
+                "  actionableTaskIdentifier=" + actionableTaskIdentifier + "," +
+                "  updateInstant=" + localUpdateInstant + "," +
+                "  currentStatus=" + currentStatus + "," +
+                "  requestedStatus=" + requestedStatus + "," +
+                "  grantedStatus=" + grantedStatus + "," +
+                "  localFulfillmentStatus=" + localFulfillmentStatus + "," +
+                "  globalFulfillmentStatus=" + globalFulfillmentStatus + "," +
+                "  clusterMode=" + clusterMode + "," +
+                "  systemMode=" + systemMode + "," +
+                "  isToBeDiscarded=" + isToBeDiscarded + "," +
+                "  currentStateReason=" + currentStateReason + "," +
+                "  workUnitProcessor=" + getWorkUnitProcessor() + "," +
                 "  processingPlant=" + getProcessingPlant() +
                 '}';
     }

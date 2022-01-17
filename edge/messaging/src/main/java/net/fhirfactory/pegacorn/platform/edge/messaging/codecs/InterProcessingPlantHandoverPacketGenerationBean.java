@@ -47,9 +47,6 @@ import java.time.Instant;
         private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverPacketGenerationBean.class);
 
         @Inject
-        private PetasosLocalMetricsDM metricsAgent;
-
-        @Inject
         private ProcessingPlantInterface processingPlant;
 
         @Inject
@@ -104,7 +101,11 @@ import java.time.Instant;
             String processingPlantName = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID().getDisplayName();
             forwardingPacket.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
             forwardingPacket.setMessageSendStartInstant(Instant.now());
-            if(metricsAgent != null){
+
+            //
+            // Do some metrics
+            WorkUnitProcessorMetricsAgent wupMetricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+            if(wupMetricsAgent != null){
                 int messageProcessingCount = metricsAgent.getWUPMetricsData().getIngresMessageCount();
                 Instant messageProcessingStartInstant = metricsAgent.getWUPMetricsData().getEventProcessingStartInstant();
                 forwardingPacket.setMessageTransferCount(messageProcessingCount);

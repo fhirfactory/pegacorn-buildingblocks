@@ -25,12 +25,12 @@ public enum DefaultWorkshopSetEnum {
     DATA_GRID_WORKSHOP("DataGrid"),
     INTER_SUBSYSTEM_INTEGRATION_WORKSHOP("ISSI"),
     BEHAVIOUR_WORKSHOP("Behaviour"),
-    INTERACT_WORKSHOP("Interact"),
+    INTERACT_WORKSHOP("ExternalIPC"),
     TRANSFORM_WORKSHOP("Transform"),
     WORKFLOW_WORKSHOP("Workflow"),
     POLICY_ENFORCEMENT_WORKSHOP("PolicyEnforcement"),
     AUDIT_SERVICES_WORKSHOP("Audit"),
-    EDGE_WORKSHOP("EdgeIPC");
+    EDGE_WORKSHOP("InternalIPC");
 
     private String workshop;
 

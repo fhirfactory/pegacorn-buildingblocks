@@ -49,18 +49,18 @@ public abstract class APIServicesFacadeBase extends RouteBuilder {
     abstract protected Logger getLogger();
 
     public String getServerPort() {
-        int portValue = topologyNode.getPropertyFile().getPrometheusPort().getPortValue();
+        int portValue = topologyNode.getPropertyFile().getPrometheusPort().getServerPort();
         String portValueAsString = Integer.toString(portValue);
         return (portValueAsString);
     }
 
     public String getServerHost() {
-        String hostValue = topologyNode.getPropertyFile().getPrometheusPort().getHostDNSEntry();
+        String hostValue = topologyNode.getPropertyFile().getPrometheusPort().getServerHostname();
         return (hostValue);
     }
 
     public String getWebContext(){
-        String webContext = topologyNode.getPropertyFile().getPrometheusPort().getWebServicePath();
+        String webContext = topologyNode.getPropertyFile().getPrometheusPort().getContextPath();
         return(webContext);
     }
 

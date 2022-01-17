@@ -91,7 +91,7 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
         return(fulfillmentTaskAuditEntry);
     }
 
-    public void logMLLPTransactions(PetasosFulfillmentTask fulfillmentTask, String activity, String filteredState, boolean requiresSynchronousWrite){
+    public void logMLLPTransactions(PetasosFulfillmentTask fulfillmentTask, String filteredState, boolean requiresSynchronousWrite){
         boolean isInteractEgressActivity = false;
         boolean isInteractIngresActivity = false;
         if(fulfillmentTask.hasTaskFulfillment()){

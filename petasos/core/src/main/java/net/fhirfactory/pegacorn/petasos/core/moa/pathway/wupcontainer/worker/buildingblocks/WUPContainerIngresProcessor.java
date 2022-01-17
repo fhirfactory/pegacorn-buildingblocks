@@ -28,11 +28,14 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComp
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.notifications.PetasosITOpsNotificationContentFactory;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +59,9 @@ public class WUPContainerIngresProcessor {
 
     @Inject
     private PetasosITOpsNotificationAgentInterface notificationAgent;
+
+    @Inject
+    private PetasosITOpsNotificationContentFactory notificationContentFactory;
     
     /**
      * This class/method is used as the injection point into the WUP Processing Framework for the specific WUP Type/Instance in question.
@@ -96,7 +102,17 @@ public class WUPContainerIngresProcessor {
 
         //
         // Add some notifications
-        metricsAgent.sendITOpsNotification("Task (Received) --> " + fulfillmentTask.getTaskId());
+        String notificationContent = null;
+        if(fulfillmentTask.hasTaskWorkItem()) {
+            if(fulfillmentTask.getTaskWorkItem().hasIngresContent()) {
+                UoWPayload payload = fulfillmentTask.getTaskWorkItem().getIngresContent();
+                notificationContent = notificationContentFactory.newNotificationContentFromUoWPayload(payload);
+            }
+        }
+        if(StringUtils.isEmpty(notificationContent)){
+            notificationContent = "Task Id --> " + fulfillmentTask.getTaskId();
+        }
+        metricsAgent.sendITOpsNotification("Task Received (Metadata) \n" + notificationContent);
 
         //
         // Write an AuditEvent
@@ -104,9 +120,11 @@ public class WUPContainerIngresProcessor {
         //
         // Now check status
         while (waitState) {
+            if(getLogger().isInfoEnabled()){
+                getLogger().info(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}",fulfillmentTask.getTaskJobCard().getCurrentStatus());
+            }
             switch (fulfillmentTask.getTaskJobCard().getCurrentStatus()) {
                 case WUP_ACTIVITY_STATUS_WAITING:
-                    getLogger().info(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}", PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING );
                     synchronized (fulfillmentTask.getTaskJobCardLock()) {
                         fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
                     }
@@ -122,15 +140,12 @@ public class WUPContainerIngresProcessor {
                             fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
                         }
                         fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
-                        if(getLogger().isInfoEnabled()) {
-                            getLogger().info(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
-                        }
                         waitState = false;
                         metricsAgent.touchLastActivityStartInstant();
                         break;
                     }
-                    if(getLogger().isInfoEnabled()) {
-                        getLogger().info(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
+                    if(getLogger().isDebugEnabled()) {
+                        getLogger().debug(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
                     }
                     break;
                 case WUP_ACTIVITY_STATUS_EXECUTING:
@@ -138,7 +153,6 @@ public class WUPContainerIngresProcessor {
                 case WUP_ACTIVITY_STATUS_FAILED:
                 case WUP_ACTIVITY_STATUS_CANCELED:
                 default:
-                    getLogger().info(".ingresContentProcessor(): jobCard.getCurrentStatus --> Default");
                     synchronized(fulfillmentTask.getTaskJobCardLock()) {
                         fulfillmentTask.getTaskJobCard().setToBeDiscarded(true);
                         fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
@@ -150,8 +164,8 @@ public class WUPContainerIngresProcessor {
                         fulfillmentTask.getTaskFulfillment().setCancellationDate(Date.from(Instant.now()));
                     }
                     fulfillmentActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask.getTaskJobCard());
-                    if(getLogger().isInfoEnabled()) {
-                        getLogger().info(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
+                    if(getLogger().isDebugEnabled()) {
+                        getLogger().debug(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
                     }
                     waitState = false;
                     metricsAgent.incrementCancelledTasks();
@@ -163,6 +177,12 @@ public class WUPContainerIngresProcessor {
                     getLogger().trace(".ingresContentProcessor(): Something interrupted my nap! reason --> {}", e.getMessage());
                 }
             }
+            if(getLogger().isInfoEnabled()){
+                getLogger().info(".ingresContentProcessor(): Looping, current fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
+            }
+        }
+        if(getLogger().isInfoEnabled()){
+            getLogger().debug(".ingresContentProcessor(): Exit, fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
         }
         getLogger().debug(".ingresContentProcessor(): Exit, newTransportPacket --> {}", fulfillmentTask);
         return (fulfillmentTask);

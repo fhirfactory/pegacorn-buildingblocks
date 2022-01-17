@@ -67,7 +67,7 @@ public class IPCClusteredSocketBasedAdapter extends IPCSocketBasedAdapter {
                 "servicePortValue=" + servicePortValue +
                 ", serviceDNSName=" + serviceDNSName +
                 ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
-                ", targetNameInstant=" + getTargetNameInstant() +
+                ", targetNameInstant=" + getTargetSystemName() +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
                 ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
                 ", supportInterfaceTags=" + getSupportInterfaceTags() +

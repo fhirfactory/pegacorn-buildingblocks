@@ -22,6 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.petasos.endpoint;
 
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -29,6 +31,7 @@ import java.util.UUID;
 
 @ApplicationScoped
 public class JGroupsIntegrationPointNamingUtilities {
+    private static final Logger LOG = LoggerFactory.getLogger(JGroupsIntegrationPointNamingUtilities.class);
 
     private String currentUUID;
 
@@ -51,9 +54,25 @@ public class JGroupsIntegrationPointNamingUtilities {
     private static int SUBSYSTEM_NAME_POSITION_IN_PROCESSING_PLANT_ID = 0;
     private static int UNIQUE_KEY_POSITION_IN_PROCESSING_PLANT_ID = 1;
 
+    //
+    // Constructor(s)
+    //
+
     public JGroupsIntegrationPointNamingUtilities(){
         this.currentUUID = UUID.randomUUID().toString();
     }
+
+    //
+    // Getters (and Setters)
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
+    //
+    // Business Methods
+    //
 
     public String buildChannelName(String site, String zone, String subsystemName, String functionName, String uniqueId){
         String channelName = site
@@ -205,6 +224,10 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_FUNCTION_POSITION_IN_CHANNEL_NAME){
+            getLogger().warn(".getEndpointFunctionFromChannelName(): channelName is not properly formed, value->{}", channelName);
+            return(null);
+        }
         String endpointFunctionName = nameSplit[JGROUPS_INTEGRATION_POINT_FUNCTION_POSITION_IN_CHANNEL_NAME];
         return(endpointFunctionName);
     }

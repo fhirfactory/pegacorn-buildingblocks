@@ -90,6 +90,8 @@ public class PetasosOAMMetricsCollectorEndpoint extends PetasosOAMMetricsEndpoin
 
         Instant captureInstant = metricsHandler.replicateMetricToServerHandler(metric, createSummary(getJGroupsIntegrationPoint()));
 
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         getLogger().debug(".captureMetric(): Exit, captureInstant->{}", captureInstant);
         return(captureInstant);
     }
@@ -99,18 +101,28 @@ public class PetasosOAMMetricsCollectorEndpoint extends PetasosOAMMetricsEndpoin
 
         Instant captureInstant = metricsHandler.replicateMetricSetToServerHandler( metricSet, createSummary(getJGroupsIntegrationPoint()));
 
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         getLogger().debug(".captureMetrics(): Exit, captureInstant->{}", captureInstant);
         return(captureInstant);
     }
 
 
     public Instant captureMetric(PetasosComponentMetric metric, JGroupsIntegrationPointSummary integrationPoint) {
+
         Instant captureInstance = metricsHandler.replicateMetricToServerHandler(metric, integrationPoint);
+
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         return (captureInstance);
     }
 
     public Instant captureMetrics(PetasosComponentMetricSet metricSet, JGroupsIntegrationPointSummary integrationPoint) {
+
         Instant captureInstance = metricsHandler.replicateMetricSetToServerHandler(metricSet, integrationPoint);
+
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         return (captureInstance);
     }
 
@@ -120,19 +132,31 @@ public class PetasosOAMMetricsCollectorEndpoint extends PetasosOAMMetricsEndpoin
 
     public Instant shareSubscriptionSummaryReport(String targetName, PetasosSubscriptionSummaryReport summaryReport) {
         getLogger().debug(".shareSubscriptionSummaryReport(): Entry, summaryReport->{}", summaryReport);
+
         Instant instant = subscriptionHandler.replicateSubscriptionSummaryReportHandler(summaryReport, createSummary(getJGroupsIntegrationPoint()));
+
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         return(instant);
     }
 
     public Instant shareSubscriptionSummaryReport(PetasosSubscriptionSummaryReport summaryReport, JGroupsIntegrationPointSummary integrationPoint) {
         getLogger().debug(".shareSubscriptionSummaryReport(): Entry, summaryReport->{}", summaryReport);
+
         Instant instant = subscriptionHandler.replicateSubscriptionSummaryReportHandler(summaryReport, integrationPoint);
+
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         return(instant);
     }
 
     public Instant replicateSubscriptionSummaryReportHandler(PetasosSubscriptionSummaryReport summaryReport, JGroupsIntegrationPointSummary integrationPoint){
         getLogger().debug(".shareSubscriptionSummaryReport(): Entry, summaryReport->{}", summaryReport);
+
         Instant instant = subscriptionHandler.replicateSubscriptionSummaryReportHandler(summaryReport, integrationPoint);
+
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         return(instant);
     }
 
@@ -142,10 +166,14 @@ public class PetasosOAMMetricsCollectorEndpoint extends PetasosOAMMetricsEndpoin
 
     public Instant topologyGraphHandler(PetasosMonitoredTopologyGraph topologyGraph, JGroupsIntegrationPointSummary integrationPoint){
         getLogger().trace(".topologyGraphHandler(): Entry, topologyGraph->{}, integrationPoint->{}", topologyGraph, integrationPoint);
+
         Instant outcomeInstant = null;
         if((topologyGraph != null) && (integrationPoint != null)) {
             outcomeInstant = topologyHandler.mergeTopologyGraph(integrationPoint, topologyGraph);
         }
+
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         getLogger().debug(".topologyGraphHandler(): Exit, outcomeInstant->{}", outcomeInstant);
         return(outcomeInstant);
     }
@@ -156,9 +184,13 @@ public class PetasosOAMMetricsCollectorEndpoint extends PetasosOAMMetricsEndpoin
 
     public void receiveNotification(PetasosComponentITOpsNotification notification, JGroupsIntegrationPointSummary integrationPoint){
         getLogger().info(".topologyGraphHandler(): Entry, topologyGraph->{}, integrationPoint->{}", notification, integrationPoint);
+
         if((notification != null) && (integrationPoint != null)) {
             notificationHandler.processNotification(notification);
         }
+
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+
         getLogger().debug(".topologyGraphHandler(): Exit");
         return;
     }

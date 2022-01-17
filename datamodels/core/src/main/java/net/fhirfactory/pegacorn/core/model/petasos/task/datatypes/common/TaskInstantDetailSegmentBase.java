@@ -26,9 +26,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-public class TaskInstantDetailSegmentBase {
+public class TaskInstantDetailSegmentBase implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant registrationInstant;

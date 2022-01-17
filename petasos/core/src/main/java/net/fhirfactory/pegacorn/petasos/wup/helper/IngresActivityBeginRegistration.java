@@ -92,6 +92,9 @@ public class IngresActivityBeginRegistration {
         //
         // add to WUP Metrics
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+        if(metricsAgent == null){
+            getLogger().warn(".registerActivityStart(): Could not get metricsAgent");
+        }
         metricsAgent.incrementIngresMessageCount();
         metricsAgent.touchLastActivityInstant();
 

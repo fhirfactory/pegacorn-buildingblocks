@@ -23,13 +23,16 @@
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import org.apache.camel.Exchange;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,41 +60,48 @@ public class EgressActivityFinalisationRegistration {
     @Inject
     private LocalPetasosFulfilmentTaskActivityController fulfillmentTaskActivityController;
 
-    public UoW registerActivityFinishAndFinalisation(UoW theUoW, Exchange camelExchange, String wupInstanceKey){
-        LOG.debug(".registerActivityFinishAndFinalisation(): Entry, payload --> {}, wupInstanceKey --> {}", theUoW, wupInstanceKey);
-        LOG.trace(".registerActivityFinishAndFinalisation(): Retrieve the Fulfillment Task from the Camel Exchange object");
+    @Produce
+    private ProducerTemplate camelRouterInjector;
+
+    //
+    // Constructor(s)
+    //
+
+    //
+    // Getters (and Setters)
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
+    protected ProducerTemplate getCamelRouterInjector(){
+        return(camelRouterInjector);
+    }
+
+    //
+    // Business Methods
+    //
+
+    public String registerActivityFinishAndFinalisation(UoW theUoW, Exchange camelExchange, String wupInstanceKey){
+        getLogger().debug(".registerActivityFinishAndFinalisation(): Entry, payload --> {}, wupInstanceKey --> {}", theUoW, wupInstanceKey);
+        getLogger().trace(".registerActivityFinishAndFinalisation(): Retrieve the Fulfillment Task from the Camel Exchange object");
         PetasosFulfillmentTask fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTask.class);
-        LOG.trace(".registerActivityFinishAndFinalisation(): Merge the UoW Egress Content into the PetasosFulfillmentTask object & process");
-        if(theUoW.hasEgressContent()){
-            synchronized (fulfillmentTask.getTaskWorkItemLock()) {
-                fulfillmentTask.getTaskWorkItem().getEgressContent().getPayloadElements().addAll(theUoW.getEgressContent().getPayloadElements());
-            }
-        }
-        synchronized (fulfillmentTask.getTaskWorkItemLock()){
-            fulfillmentTask.getTaskWorkItem().setProcessingOutcome(theUoW.getProcessingOutcome());
-            if(StringUtils.isNotEmpty(theUoW.getFailureDescription())){
-                fulfillmentTask.getTaskWorkItem().setFailureDescription(theUoW.getFailureDescription());
-            }
-        }
-        LOG.trace(".registerActivityFinishAndFinalisation(): Process the status");
-        switch(theUoW.getProcessingOutcome()){
-            case UOW_OUTCOME_SUCCESS:{
-                synchronized (fulfillmentTask.getTaskJobCardLock()) {
-                    fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
-                }
-                fulfillmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskJobCard());
-                break;
-            }
-            case UOW_OUTCOME_INCOMPLETE:
-            case UOW_OUTCOME_NOTSTARTED:
-            case UOW_OUTCOME_FAILED:{
-                synchronized (fulfillmentTask.getTaskJobCardLock()){
-                    fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
-                }
-                fulfillmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskJobCard());
-            }
-        }
+        getLogger().trace(".registerActivityFinishAndFinalisation(): Merge the UoW Egress Content into the PetasosFulfillmentTask object & process");
+        TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getNodeFunctionFDN().getFunctionToken();
+        getLogger().trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+
+        //
+        // Now, get the target point (
+        RouteElementNames elementNames = new RouteElementNames(wupFunctionToken);
+
+        //
+        // Send to Task Outcome Collector
+        camelRouterInjector.send(elementNames.getEndPointWUPEgress(), camelExchange);
+
+        //
+        // Now we're done!
         LOG.debug(".registerActivityFinishAndFinalisation(): exit, my work is done!");
-        return(theUoW);
+        return(null);
     }
 }

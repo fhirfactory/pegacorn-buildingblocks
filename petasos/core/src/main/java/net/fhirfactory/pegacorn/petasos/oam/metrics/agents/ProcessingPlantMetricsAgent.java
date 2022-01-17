@@ -40,10 +40,7 @@ import java.time.Instant;
 public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantMetricsAgent.class);
 
-    public static final String PROCESSING_PLANT_METRICS_TYPE = "ProcessingPlantBasedMetrics";
-
     private ProcessingPlantMetricsData metricsData;
-
 
     //
     // Constructors
@@ -56,7 +53,7 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
         this.metricsData.setParticipantName(participantName);
         this.metricsData.setComponentID(componentId);
         this.metricsData.setComponentStartupInstant(Instant.now());
-        getLogger().info(".WorkUnitProcessorMetricsAgent(): Initialising Working Unit Processor Metrics Agent ->{}", participantName);
+        getLogger().info(".WorkUnitProcessorMetricsAgent(): Initialising Processing Plant Metrics Agent ->{}", participantName);
     }
 
     //
@@ -80,7 +77,7 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     public void sendITOpsNotification(String message) {
         PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
         notification.setComponentId(getMetricsData().getComponentID());
-        notification.setProcessingPlantParticipantName(getProcessingPlantMetricsData().getParticipantName());
+        notification.setParticipantName(getProcessingPlantMetricsData().getParticipantName());
         notification.setContent(message);
         notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_SUBSYSTEM);
         getNotificationAgent().sendNotification(notification);
@@ -89,6 +86,19 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     //
     // Helpers
     //
+
+    public void incrementForwardedMessageCount(String targetParticipantName){
+        if(StringUtils.isNotEmpty(targetParticipantName)){
+            synchronized (getMetricsDataLock()){
+                if(!getMetricsData().getDistributionCountMap().containsKey(targetParticipantName)){
+                    getMetricsData().getDistributionCountMap().put(targetParticipantName, 0);
+                }
+                Integer count = getMetricsData().getDistributionCountMap().get(targetParticipantName);
+                count += 1;
+                getMetricsData().getDistributionCountMap().replace(targetParticipantName, count);
+            }
+        }
+    }
 
     public void updateLocalCacheStatus(String cacheName, String cacheStatus){
         if(StringUtils.isEmpty(cacheName) || StringUtils.isEmpty(cacheStatus)){

@@ -22,17 +22,18 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.datatypes.JGroupsAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPClientTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPServerTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPClientEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPClientAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPClientTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPClientEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters.MLLPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.EndpointSummary;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.PortSoftwareComponentSummary;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentSummary;
@@ -56,7 +57,20 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
         return (LOG);
     }
 
-    public SoftwareComponentSummary newEndpoint(String workshopParticipantName, String wupParticipantName, IPCTopologyEndpoint endpointTopologyNode){
+    public SoftwareComponentSummary newEndpoint(String wupParticipantName, PetasosEndpoint petasosEndpoint){
+        getLogger().debug(".newEndpoint(): Entry, endpointTopologyNode->{}", petasosEndpoint);
+
+        EndpointSummary endpoint = new EndpointSummary();
+        endpoint = (EndpointSummary) newPetasosMonitoredComponent(endpoint, petasosEndpoint);
+        endpoint.setEndpointType(petasosEndpoint.getEndpointType());
+        endpoint.setWupParticipantName(wupParticipantName);
+
+        getLogger().debug(".newEndpoint(): Exit, endpoint->{}", endpoint);
+        return(endpoint);
+    }
+
+
+    public SoftwareComponentSummary newEndpoint(String wupParticipantName, IPCTopologyEndpoint endpointTopologyNode){
         getLogger().debug(".newEndpoint(): Entry, endpointTopologyNode->{}", endpointTopologyNode);
         if(endpointTopologyNode == null){
             return(null);
@@ -64,7 +78,6 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
         EndpointSummary endpoint = new EndpointSummary();
         endpoint = (EndpointSummary) newPetasosMonitoredComponent(endpoint, endpointTopologyNode);
         endpoint.setEndpointType(endpointTopologyNode.getEndpointType());
-        endpoint.setWorkshopParticipantName(workshopParticipantName);
         endpoint.setWupParticipantName(wupParticipantName);
         boolean isEncrypted = false;
         for(IPCAdapter currentAdapter: endpointTopologyNode.getAdapterList()){
@@ -74,14 +87,14 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
             }
         }
         switch(endpointTopologyNode.getEndpointType()){
-            case EDGE_JGROUPS_INTEGRATION_POINT: {
+            case JGROUPS_INTEGRATION_POINT: {
                 IPCServerTopologyEndpoint jgroupsEndpoint = (IPCServerTopologyEndpoint)endpointTopologyNode;
                 if(jgroupsEndpoint.getAdapterList() != null) {
                     for(IPCAdapter currentAdapter: jgroupsEndpoint.getAdapterList()) {
                         JGroupsAdapter jgroupsAdapter = (JGroupsAdapter) currentAdapter;
                         PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
                         portSummary.setEncrypted(isEncrypted);
-                        portSummary.setPortType(PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT.getDisplayName());
+                        portSummary.setPortType(PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT.getDisplayName());
                         if (jgroupsAdapter.getPortNumber() != null) {
                             portSummary.setHostPort(Integer.toString(jgroupsAdapter.getPortNumber()));
                         } else {
@@ -93,12 +106,36 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 }
                 break;
             }
-            case EDGE_HTTP_API_SERVER:
+            case HTTP_API_SERVER:
+                HTTPServerTopologyEndpoint edgeHTTPServer = (HTTPServerTopologyEndpoint)endpointTopologyNode;
+                if(edgeHTTPServer.getHTTPServerAdapter() != null) {
+                    PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
+                    portSummary.setHostPort(Integer.toString(edgeHTTPServer.getHTTPServerAdapter().getPortNumber()));
+                    portSummary.setHostDNSName(edgeHTTPServer.getHTTPServerAdapter().getHostName());
+                    endpoint.setConnectedSystemName(edgeHTTPServer.getConnectedSystemName());
+                    portSummary.setServicePort(Integer.toString(edgeHTTPServer.getHTTPServerAdapter().getServicePortValue()));
+                    portSummary.setServiceDNSName(edgeHTTPServer.getHTTPServerAdapter().getServiceDNSName());
+                    portSummary.setPortType(PetasosEndpointTopologyTypeEnum.HTTP_API_SERVER.getDisplayName());
+                    endpoint.getServerPorts().add(portSummary);
+                }
                 break;
-            case EDGE_HTTP_API_CLIENT:
+            case HTTP_API_CLIENT:
+                HTTPClientTopologyEndpoint edgeHTTPClient = (HTTPClientTopologyEndpoint)endpointTopologyNode;
+                if(edgeHTTPClient.getHTTPClientAdapters() != null) {
+                    for(HTTPClientAdapter currentAdapter: edgeHTTPClient.getHTTPClientAdapters()) {
+                        PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
+                        portSummary.setHostPort(Integer.toString(currentAdapter.getPortNumber()));
+                        portSummary.setHostDNSName(currentAdapter.getHostName());
+                        endpoint.setConnectedSystemName(edgeHTTPClient.getConnectedSystemName());
+                        portSummary.setServicePort(Integer.toString(currentAdapter.getPortNumber()));
+                        portSummary.setServiceDNSName(currentAdapter.getHostName());
+                        portSummary.setPortType(PetasosEndpointTopologyTypeEnum.HTTP_API_CLIENT.getDisplayName());
+                        endpoint.getServerPorts().add(portSummary);
+                    }
+                }
                 break;
-            case INTERACT_MLLP_SERVER: {
-                InteractMLLPServerEndpoint mllpServerEndpoint = (InteractMLLPServerEndpoint)endpointTopologyNode;
+            case MLLP_SERVER: {
+                MLLPServerEndpoint mllpServerEndpoint = (MLLPServerEndpoint)endpointTopologyNode;
                 if(mllpServerEndpoint.getMLLPServerAdapter() != null) {
                     PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
                     portSummary.setHostPort(Integer.toString(mllpServerEndpoint.getMLLPServerAdapter().getPortNumber()));
@@ -106,19 +143,19 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                     endpoint.setConnectedSystemName(mllpServerEndpoint.getConnectedSystemName());
                     portSummary.setServicePort(Integer.toString(mllpServerEndpoint.getMLLPServerAdapter().getServicePortValue()));
                     portSummary.setServiceDNSName(mllpServerEndpoint.getMLLPServerAdapter().getServiceDNSName());
-                    portSummary.setPortType(PetasosEndpointTopologyTypeEnum.INTERACT_MLLP_SERVER.getDisplayName());
+                    portSummary.setPortType(PetasosEndpointTopologyTypeEnum.MLLP_SERVER.getDisplayName());
                     endpoint.getServerPorts().add(portSummary);
                 }
                 break;
             }
-            case INTERACT_MLLP_CLIENT: {
-                InteractMLLPClientEndpoint mllpClientEndpoint = (InteractMLLPClientEndpoint)endpointTopologyNode;
+            case MLLP_CLIENT: {
+                MLLPClientEndpoint mllpClientEndpoint = (MLLPClientEndpoint)endpointTopologyNode;
                 if(mllpClientEndpoint.getMLLPClientAdapters() != null) {
                     if (!mllpClientEndpoint.getMLLPClientAdapters().isEmpty()) {
                         for(MLLPClientAdapter currentAdapter: mllpClientEndpoint.getMLLPClientAdapters()){
                             PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
                             portSummary.setEncrypted(currentAdapter.isEncrypted());
-                            portSummary.setPortType(PetasosEndpointTopologyTypeEnum.INTERACT_MLLP_CLIENT.getDisplayName());
+                            portSummary.setPortType(PetasosEndpointTopologyTypeEnum.MLLP_CLIENT.getDisplayName());
                             endpoint.setConnectedSystemName(mllpClientEndpoint.getConnectedSystemName());
                             portSummary.setHostDNSName(currentAdapter.getHostName());
                             if (currentAdapter.getPortNumber() != null) {
@@ -132,46 +169,13 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 }
                 break;
             }
-            case INTERACT_HTTP_API_SERVER:
-                InteractHTTPServerTopologyEndpoint httpServerEndpoint = (InteractHTTPServerTopologyEndpoint)endpointTopologyNode;
-                if(httpServerEndpoint.getHTTPServerAdapter() != null) {
-                    PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
-                    portSummary.setHostPort(Integer.toString(httpServerEndpoint.getHTTPServerAdapter().getPortNumber()));
-                    portSummary.setHostDNSName(httpServerEndpoint.getHTTPServerAdapter().getHostName());
-                    endpoint.setConnectedSystemName(httpServerEndpoint.getConnectedSystemName());
-                    portSummary.setServicePort(Integer.toString(httpServerEndpoint.getHTTPServerAdapter().getServicePortValue()));
-                    portSummary.setServiceDNSName(httpServerEndpoint.getHTTPServerAdapter().getServiceDNSName());
-                    portSummary.setPortType(PetasosEndpointTopologyTypeEnum.INTERACT_HTTP_API_SERVER.getDisplayName());
-                    endpoint.getServerPorts().add(portSummary);
-                }
+            case SQL_SERVER:
                 break;
-            case INTERACT_HTTP_API_CLIENT:
-                InteractHTTPClientTopologyEndpoint httpClientEndpoint = (InteractHTTPClientTopologyEndpoint)endpointTopologyNode;
-                if(httpClientEndpoint.getHTTPClientAdapters() != null) {
-                    if (!httpClientEndpoint.getHTTPClientAdapters().isEmpty()) {
-                        for(HTTPClientAdapter currentAdapter: httpClientEndpoint.getHTTPClientAdapters()){
-                            PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
-                            portSummary.setEncrypted(currentAdapter.isEncrypted());
-                            portSummary.setPortType(PetasosEndpointTopologyTypeEnum.INTERACT_MLLP_CLIENT.getDisplayName());
-                            endpoint.setConnectedSystemName(httpClientEndpoint.getConnectedSystemName());
-                            portSummary.setHostDNSName(currentAdapter.getHostName());
-                            if (currentAdapter.getPortNumber() != null) {
-                                portSummary.setHostPort(Integer.toString(currentAdapter.getPortNumber()));
-                            } else {
-                                portSummary.setHostPort("Unknown");
-                            }
-                            endpoint.getServerPorts().add(portSummary);
-                        }
-                    }
-                }
+            case SQL_CLIENT:
                 break;
-            case INTERACT_SQL_SERVER:
+            case LDAP_SERVER:
                 break;
-            case INTERACT_SQL_CLIENT:
-                break;
-            case INTERACT_LDAP_SERVER:
-                break;
-            case INTERACT_LDAP_CLIENT:
+            case LDAP_CLIENT:
                 break;
             case OTHER_API_SERVER:
                 break;

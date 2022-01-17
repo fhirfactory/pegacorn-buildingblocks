@@ -28,9 +28,7 @@ import java.io.Serializable;
 
 public class PetasosComponentITOpsNotification implements Serializable {
     private ComponentIdType componentId;
-    private String processingPlantParticipantName;
-    private String workshopParticipantName;
-    private String workUnitProcessorParticipantName;
+    private String participantName;
     private PetasosMonitoredComponentTypeEnum componentType;
     private String content;
 
@@ -40,20 +38,16 @@ public class PetasosComponentITOpsNotification implements Serializable {
 
     public PetasosComponentITOpsNotification(){
         this.componentId = null;
-        this.processingPlantParticipantName = null;
+        this.participantName = null;
         this.componentType = null;
         this.content = null;
-        this.workshopParticipantName = null;
-        this.workUnitProcessorParticipantName = null;
     }
 
     public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content){
         this.componentType = componentType;
-        this.processingPlantParticipantName = name;
+        this.participantName = name;
         this.componentId = componentId;
         this.content = content;
-        this.workshopParticipantName = null;
-        this.workUnitProcessorParticipantName = null;
     }
 
     //
@@ -68,12 +62,12 @@ public class PetasosComponentITOpsNotification implements Serializable {
         this.componentId = componentId;
     }
 
-    public String getProcessingPlantParticipantName() {
-        return processingPlantParticipantName;
+    public String getParticipantName() {
+        return participantName;
     }
 
-    public void setProcessingPlantParticipantName(String processingPlantParticipantName) {
-        this.processingPlantParticipantName = processingPlantParticipantName;
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
     }
 
     public PetasosMonitoredComponentTypeEnum getComponentType() {
@@ -92,22 +86,6 @@ public class PetasosComponentITOpsNotification implements Serializable {
         this.content = content;
     }
 
-    public String getWorkshopParticipantName() {
-        return workshopParticipantName;
-    }
-
-    public void setWorkshopParticipantName(String workshopParticipantName) {
-        this.workshopParticipantName = workshopParticipantName;
-    }
-
-    public String getWorkUnitProcessorParticipantName() {
-        return workUnitProcessorParticipantName;
-    }
-
-    public void setWorkUnitProcessorParticipantName(String workUnitProcessorParticipantName) {
-        this.workUnitProcessorParticipantName = workUnitProcessorParticipantName;
-    }
-
     //
     // To String
     //
@@ -116,9 +94,7 @@ public class PetasosComponentITOpsNotification implements Serializable {
     public String toString() {
         return "PetasosComponentITOpsNotification{" +
                 "componentId=" + componentId +
-                ", processingPlantParticipantName='" + processingPlantParticipantName + '\'' +
-                ", workshopParticipantName='" + workshopParticipantName + '\'' +
-                ", workUnitProcessorParticipantName='" + workUnitProcessorParticipantName + '\'' +
+                ", participantName='" + participantName + '\'' +
                 ", componentType=" + componentType +
                 ", content='" + content + '\'' +
                 '}';

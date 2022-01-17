@@ -93,7 +93,7 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT);
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }
 
     @Override
@@ -140,10 +140,10 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
     //
 
     protected InterProcessingPlantHandoverResponsePacket injectMessageIntoRoute(InterProcessingPlantHandoverPacket handoverPacket) {
-        getLogger().info(".injectMessageIntoRoute(): Entry, handoverPacket->{}", handoverPacket);
+        getLogger().debug(".injectMessageIntoRoute(): Entry, handoverPacket->{}", handoverPacket);
         InterProcessingPlantHandoverResponsePacket response =
                 (InterProcessingPlantHandoverResponsePacket)getCamelProducer().sendBody(getIPCComponentNames().getInterZoneIPCReceiverRouteEndpointName(), ExchangePattern.InOut, handoverPacket);
-        getLogger().info(".injectMessageIntoRoute(): Exit, response->{}", response);
+        getLogger().debug(".injectMessageIntoRoute(): Exit, response->{}", response);
         return(response);
     }
 
@@ -177,6 +177,9 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
 
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(Address targetAddress, InterProcessingPlantHandoverPacket handoverPacket){
         getLogger().debug(".sendIPCMessage(): Entry, targetAddress->{}", targetAddress);
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".sendIPCMessage(): Forwarding Task To->{}", targetAddress);
+        }
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
@@ -184,8 +187,14 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
             classSet[0] = InterProcessingPlantHandoverPacket.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             getLogger().trace(".sendIPCMessage(): Message.SEND: targetAddress->{}, handoverPacket->{}", targetAddress, handoverPacket);
-            InterProcessingPlantHandoverResponsePacket response = getRPCDispatcher().callRemoteMethod(targetAddress, "receiveIPCMessage", objectSet, classSet, requestOptions);
+            InterProcessingPlantHandoverResponsePacket response = null;
+            synchronized(getIPCChannelLock()) {
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "receiveIPCMessage", objectSet, classSet, requestOptions);
+            }
             getLogger().trace(".sendIPCMessage(): Message.SEND.RESPONSE: response->{}", response);
+            if(getLogger().isInfoEnabled()){
+                getLogger().info(".sendIPCMessage(): Forwarding of Task Complete");
+            }
             return(response);
         } catch (NoSuchMethodException e) {
             getLogger().error(".sendIPCMessage(): Error (NoSuchMethodException) ->{}", e.getMessage());

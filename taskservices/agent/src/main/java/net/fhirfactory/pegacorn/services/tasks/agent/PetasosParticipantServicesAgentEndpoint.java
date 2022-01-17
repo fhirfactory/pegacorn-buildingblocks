@@ -146,7 +146,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
         if(!downstreamTaskPerformers.isEmpty()){
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] There are downstream subscribers!");
             for(PetasosParticipant currentDownstreamPerformer: downstreamTaskPerformers){
-                if(getLogger().isInfoEnabled()){
+                if(getLogger().isTraceEnabled()){
                     getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getSubsystemParticipantName());
                 }
                 localPetasosParticipantCacheIM.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
@@ -180,7 +180,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
     public PetasosParticipantRegistration registerPetasosParticipant(PetasosParticipant participant) {
         getLogger().debug(".registerPetasosParticipant(): Entry, participant->{}", participant);
         if(participant == null ){
-            getLogger().warn(".registerPetasosParticipant: participant is null");
+            getLogger().trace(".registerPetasosParticipant: participant is null");
             PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
             registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
             registration.setRegistrationCommentary("participant (PetasosParticipant) is null");
@@ -194,7 +194,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
         getLogger().trace(".registerPetasosParticipant(): Extract JGroups Address->{}", taskServicesAddress);
         if(taskServicesAddress == null){
-            getLogger().warn(".registerPetasosParticipant(): Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            getLogger().trace(".registerPetasosParticipant(): Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
             PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
             registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
             registration.setRegistrationCommentary(" Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
@@ -209,10 +209,12 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             classSet[0] = PetasosParticipant.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             PetasosParticipantRegistration registration = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "registerPetasosParticipant", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".registerPetasosParticipant(): Exit, registration->{}", registration);
             return(registration);
         } catch (NoSuchMethodException e) {
             getLogger().debug(".registerPetasosParticipant(): Error (NoSuchMethodException)->", e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
             registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
             registration.setRegistrationInstant(Instant.now());
@@ -220,6 +222,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             return(registration);
         } catch (Exception e) {
             getLogger().debug(".registerPetasosParticipant(): Error (GeneralException) ->",e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
             registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
             registration.setRegistrationInstant(Instant.now());
@@ -247,13 +250,16 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             classSet[0] = String.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Set<PetasosParticipant> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getDownstreamTaskPerformersForTaskProducer", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".getDownstreamTaskPerformersForTaskProducer(): Exit, participantSet->{}", participantSet);
             return(participantSet);
         } catch (NoSuchMethodException e) {
             getLogger().debug(".getDownstreamTaskPerformersForTaskProducer(): Error (NoSuchMethodException)->", e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         } catch (Exception e) {
             getLogger().debug(".getDownstreamTaskPerformersForTaskProducer(): Error (GeneralException) ->",e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         }
     }
@@ -280,13 +286,16 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             classSet[0] = PetasosParticipant.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             PetasosParticipantRegistration registration = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "updatePetasosParticipant", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".getTaskPerformersForTaskProducer(): Exit, registration->{}", registration);
             return(registration);
         } catch (NoSuchMethodException e) {
             getLogger().debug(".getTaskPerformersForTaskProducer(): Error (NoSuchMethodException)->", e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         } catch (Exception e) {
             getLogger().debug(".getTaskPerformersForTaskProducer(): Error (GeneralException) ->",e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         }
     }
@@ -310,13 +319,16 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             classSet[0] = PetasosParticipant.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             PetasosParticipantRegistration registration = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "deregisterPetasosParticipant", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".deregisterPetasosParticipant(): Exit, registration->{}", registration);
             return(registration);
         } catch (NoSuchMethodException e) {
             getLogger().debug(".deregisterPetasosParticipant(): Error (NoSuchMethodException)->", e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         } catch (Exception e) {
             getLogger().debug(".deregisterPetasosParticipant(): Error (GeneralException) ->",e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         }
     }
@@ -340,13 +352,16 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             classSet[0] = ComponentIdType.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             PetasosParticipantRegistration registration = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getPetasosParticipantRegistration", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".getPetasosParticipantRegistration(): Exit, registration->{}", registration);
             return(registration);
         } catch (NoSuchMethodException e) {
             getLogger().debug(".getPetasosParticipantRegistration(): Error (NoSuchMethodException)->", e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         } catch (Exception e) {
             getLogger().debug(".getPetasosParticipantRegistration(): Error (GeneralException) ->",e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         }
     }
@@ -370,13 +385,16 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             classSet[0] = String.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Set<PetasosParticipantRegistration> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getParticipantRegistrationSetForService", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".getParticipantRegistrationSetForService(): Exit, participantSet->{}", participantSet);
             return(participantSet);
         } catch (NoSuchMethodException e) {
             getLogger().debug(".getParticipantRegistrationSetForService(): Error (NoSuchMethodException)->", e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         } catch (Exception e) {
             getLogger().debug(".getParticipantRegistrationSetForService(): Error (GeneralException) ->",e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         }
     }
@@ -393,13 +411,16 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
         try {
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Set<PetasosParticipantRegistration> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getAllRegistrations", null, null, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".getTaskPerformerServiceRegistration(): Exit, participantSet->{}", participantSet);
             return(participantSet);
         } catch (NoSuchMethodException e) {
             getLogger().debug(".getTaskPerformerServiceRegistration(): Error (NoSuchMethodException)->", e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         } catch (Exception e) {
             getLogger().debug(".getTaskPerformerServiceRegistration(): Error (GeneralException) ->",e);
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         }
     }

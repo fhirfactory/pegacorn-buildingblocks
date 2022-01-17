@@ -35,7 +35,7 @@ import java.util.Objects;
 
 public class IPCAdapter implements Serializable {
     private ComponentIdType enablingTopologyEndpoint;
-    private String targetNameInstant;
+    private String targetSystemName;
     private String groupName;
     private boolean encrypted;
     private boolean active;
@@ -53,7 +53,7 @@ public class IPCAdapter implements Serializable {
         this.supportedInterfaceDefinitions = new ArrayList<>();
         this.encrypted = false;
         this.active = false;
-        this.targetNameInstant = null;
+        this.targetSystemName = null;
         this.groupName = null;
         this.enablingTopologyEndpoint = null;
         this.additionalParameters = new HashMap<>();
@@ -72,12 +72,12 @@ public class IPCAdapter implements Serializable {
         this.supportedDeploymentModes = supportedDeploymentModes;
     }
 
-    public String getTargetNameInstant() {
-        return targetNameInstant;
+    public String getTargetSystemName() {
+        return targetSystemName;
     }
 
-    public void setTargetNameInstant(String targetNameInstant) {
-        this.targetNameInstant = targetNameInstant;
+    public void setTargetSystemName(String targetSystemName) {
+        this.targetSystemName = targetSystemName;
     }
 
     public ComponentIdType getEnablingTopologyEndpoint() {
@@ -161,7 +161,7 @@ public class IPCAdapter implements Serializable {
     public String toString() {
         return "IPCInterface{" +
                 "enablingTopologyEndpoint=" + enablingTopologyEndpoint +
-                ", targetNameInstant=" + targetNameInstant +
+                ", targetNameInstant=" + targetSystemName +
                 ", groupName=" + groupName +
                 ", encrypted=" + encrypted +
                 ", supportedDeploymentModes=" + supportedDeploymentModes +
@@ -181,11 +181,11 @@ public class IPCAdapter implements Serializable {
         if (this == o) return true;
         if (!(o instanceof IPCAdapter)) return false;
         IPCAdapter that = (IPCAdapter) o;
-        return isEncrypted() == that.isEncrypted() && isActive() == that.isActive() && Objects.equals(getEnablingTopologyEndpoint(), that.getEnablingTopologyEndpoint()) && Objects.equals(getTargetNameInstant(), that.getTargetNameInstant()) && Objects.equals(getGroupName(), that.getGroupName()) && Objects.equals(getSupportedDeploymentModes(), that.getSupportedDeploymentModes()) && Objects.equals(getSupportedInterfaceDefinitions(), that.getSupportedInterfaceDefinitions()) && Objects.equals(getAdditionalParameters(), that.getAdditionalParameters()) && Objects.equals(getLastActivity(), that.getLastActivity());
+        return isEncrypted() == that.isEncrypted() && isActive() == that.isActive() && Objects.equals(getEnablingTopologyEndpoint(), that.getEnablingTopologyEndpoint()) && Objects.equals(getTargetSystemName(), that.getTargetSystemName()) && Objects.equals(getGroupName(), that.getGroupName()) && Objects.equals(getSupportedDeploymentModes(), that.getSupportedDeploymentModes()) && Objects.equals(getSupportedInterfaceDefinitions(), that.getSupportedInterfaceDefinitions()) && Objects.equals(getAdditionalParameters(), that.getAdditionalParameters()) && Objects.equals(getLastActivity(), that.getLastActivity());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getEnablingTopologyEndpoint(), getTargetNameInstant(), getGroupName(), isEncrypted(), isActive(), getSupportedDeploymentModes(), getSupportedInterfaceDefinitions(), getAdditionalParameters(), getLastActivity());
+        return Objects.hash(getEnablingTopologyEndpoint(), getTargetSystemName(), getGroupName(), isEncrypted(), isActive(), getSupportedDeploymentModes(), getSupportedInterfaceDefinitions(), getAdditionalParameters(), getLastActivity());
     }
 }

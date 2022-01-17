@@ -118,6 +118,9 @@ public class LocalPetasosFulfilmentTaskActivityController {
 
     public Instant requestFulfillmentTaskExecutionPrivilege(PetasosTaskJobCard localJobCard){
         getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Entry, localJobCard->{}", localJobCard);
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".requestFulfillmentTaskExecutionPrivilege(): Entry, WUP Component Id->{}", localJobCard.getWorkUnitProcessor().getDisplayName());
+        }
         PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.requestTaskExecutionPrivilege(localJobCard);
         Instant updateInstant = Instant.now();
         return(updateInstant);

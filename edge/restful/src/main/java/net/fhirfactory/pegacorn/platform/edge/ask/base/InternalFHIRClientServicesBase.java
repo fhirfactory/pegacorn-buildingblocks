@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterfac
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ExternalSystemIPCEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ExternalSystemIPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.external.ConnectedExternalSystemTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -91,15 +91,15 @@ public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientP
         MessageBasedWUPEndpointContainer endpoint = new MessageBasedWUPEndpointContainer();
         StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getTopologyEndpoint(interfaceNames.getEdgeAskEndpointName());
         ConnectedExternalSystemTopologyNode targetSystem = clientTopologyEndpoint.getTargetSystem();
-        ExternalSystemIPCEndpoint externalSystemIPCEndpoint = (ExternalSystemIPCEndpoint)targetSystem.getTargetPorts().get(0);
+        ExternalSystemIPCAdapter externalSystemIPCAdapter = (ExternalSystemIPCAdapter)targetSystem.getTargetPorts().get(0);
         String http_type = null;
-        if(externalSystemIPCEndpoint.isEncrypted()) {
+        if(externalSystemIPCAdapter.isEncrypted()) {
             http_type = "https";
         } else {
             http_type = "http";
         }
-        String dnsName = externalSystemIPCEndpoint.getTargetPortDNSName();
-        String portNumber = Integer.toString(externalSystemIPCEndpoint.getTargetPortValue());
+        String dnsName = externalSystemIPCAdapter.getTargetPortDNSName();
+        String portNumber = Integer.toString(externalSystemIPCAdapter.getTargetPortValue());
         String endpointDetails = http_type + "://" + dnsName + ":" + portNumber + systemWideProperties.getPegacornInternalFhirResourceR4Path();
         getLogger().info(".deriveTargetEndpointDetails(): Exit, endpointDetails --> {}", endpointDetails);
         return(endpointDetails);

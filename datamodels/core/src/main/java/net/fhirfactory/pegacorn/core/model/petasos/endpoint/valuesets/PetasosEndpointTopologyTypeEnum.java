@@ -21,29 +21,31 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets;
 
+import org.apache.commons.lang3.StringUtils;
+
 public enum PetasosEndpointTopologyTypeEnum {
-    EDGE_JGROUPS_INTEGRATION_POINT("Edge.JGroups.IntegrationPoint", "pegacorn.fhir.endpoint.jgroups.integration_point"),
-    EDGE_HTTP_API_SERVER("Edge.HTTP.Server", "pegacorn.fhir.endpoint.ipc_messaging.http_api_server"),
-    EDGE_HTTP_API_CLIENT("Edge.HTTP.Client", "pegacorn.fhir.endpoint.ipc_messaging.http_api_client"),
-    INTERACT_MLLP_SERVER("Interact.MLLP.Server","pegacorn.fhir.endpoint.interact.mllp_server"),
-    INTERACT_MLLP_CLIENT("Interact.MLLP.Client","pegacorn.fhir.endpoint.interact.mllp_client"),
-    INTERACT_HTTP_API_SERVER("Interact.HTTP.Server", "pegacorn.fhir.endpoint.interact.http_api_server"),
-    INTERACT_HTTP_API_CLIENT("Interact.HTTP.Client", "pegacorn.fhir.endpoint.interact.http_api_client"),
-    INTERACT_SQL_SERVER("Interact.SQL.Server", "pegacorn.fhir.endpoint.interact.sql_server"),
-    INTERACT_SQL_CLIENT("Interact.SQL.Client", "pegacorn.fhir.endpoint.interact.sql_client"),
-    INTERACT_LDAP_SERVER("Interact.LDAP.Server", "pegacorn.fhir.endpoint.interact.ldap_server"),
-    INTERACT_LDAP_CLIENT("Interact.LDAP.Client", "pegacorn.fhir.endpoint.interact.ldap_client"),
-    OTHER_API_SERVER("API.Server", "endpoint.other_type_of_server"),
-    OTHER_API_CLIENT("API.Client", "endpoint.other_type_of_client"),
-    OTHER_SERVER("Other.Server", "endpoint.other_server"),
-    OTHER_CLIENT("Other.Client", "endpoint.other_client");
+    JGROUPS_INTEGRATION_POINT("JGroups.IntegrationPoint", "pegacorn.endpoint.jgroups.integration_point", "endpoint.ipc_messaging.jgroups_interzone_client"),
+    HTTP_API_SERVER("HTTP.Server", "pegacorn.fhir.endpoint.http_api_server", "endpoint.http.server" ),
+    HTTP_API_CLIENT("HTTP.Client", "pegacorn.fhir.endpoint.http_api_client", "endpoint.http.client"),
+    MLLP_SERVER("MLLP.Server","pegacorn.fhir.endpoint.mllp_server", "endpoint.mllp.server"),
+    MLLP_CLIENT("MLLP.Client","pegacorn.fhir.endpoint.mllp_client", "endpoint.mllp.client"),
+    SQL_SERVER("SQL.Server", "pegacorn.fhir.endpoint.sql_server", "endpoint.sql.server"),
+    SQL_CLIENT("SQL.Client", "pegacorn.fhir.endpoint.sql_client", "endpoint.sql.client"),
+    LDAP_SERVER("LDAP.Server", "pegacorn.fhir.endpoint.ldap_server","endpoint.ldap.server"),
+    LDAP_CLIENT("LDAP.Client", "pegacorn.fhir.endpoint.ldap_client", "endpoint.ldap.client"),
+    OTHER_API_SERVER("API.Server", "endpoint.other_type_of_server", "endpoint.other_api.server"),
+    OTHER_API_CLIENT("API.Client", "endpoint.other_type_of_client","endpoint.other_api.client"),
+    OTHER_SERVER("Other.Server", "endpoint.other_server", "endpoint.other.server"),
+    OTHER_CLIENT("Other.Client", "endpoint.other_client", "endpoint.other.client");
 
     private String token;
     private String displayName;
+    private String configTypeName;
 
-    private PetasosEndpointTopologyTypeEnum(String displayName, String token){
+    private PetasosEndpointTopologyTypeEnum(String displayName, String token, String configTypeName){
         this.token = token;
         this.displayName = displayName;
+        this.configTypeName = configTypeName;
     }
 
     public String getToken(){
@@ -54,4 +56,19 @@ public enum PetasosEndpointTopologyTypeEnum {
         return(this.displayName);
     }
 
+    public String getConfigTypeName(){
+        return(this.configTypeName);
+    }
+
+    public static PetasosEndpointTopologyTypeEnum fromConfigTypeName(String configName){
+        if(StringUtils.isEmpty(configName)){
+            return(null);
+        }
+        for(PetasosEndpointTopologyTypeEnum currentType: PetasosEndpointTopologyTypeEnum.values()){
+            if(currentType.getConfigTypeName().equalsIgnoreCase(configName)){
+                return(currentType);
+            }
+        }
+        return(null);
+    }
 }

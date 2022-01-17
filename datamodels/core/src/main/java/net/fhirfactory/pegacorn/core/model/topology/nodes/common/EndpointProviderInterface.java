@@ -13,4 +13,5 @@ public interface EndpointProviderInterface {
     public PegacornSystemComponentTypeTypeEnum getComponentType();
     public ResilienceModeEnum getResilienceMode();
     public ConcurrencyModeEnum getConcurrencyMode();
+    public String getParticipantName();
 }

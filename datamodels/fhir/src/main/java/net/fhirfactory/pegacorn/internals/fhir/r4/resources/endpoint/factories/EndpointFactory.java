@@ -24,17 +24,14 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
-
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer.StandardEdgeAnswerHTTPEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer.StandardEdgeIPCEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.ask.StandardEdgeAskHTTPEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.datatypes.JGroupsAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPClientTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPServerTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPClientEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPClientAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPServerAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPClientTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPClientEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters.MLLPClientAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters.MLLPServerAdapter;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
@@ -91,7 +88,7 @@ public class EndpointFactory {
         return (endpoint);
     }
 
-    public Endpoint newEndpoint(InteractMLLPClientEndpoint mllpClientEndpoint, MLLPClientAdapter clientAdapter) {
+    public Endpoint newEndpoint(MLLPClientEndpoint mllpClientEndpoint, MLLPClientAdapter clientAdapter) {
         Endpoint endpoint = newEndpointFromIPCTopologyEndpoint(mllpClientEndpoint);
         //
         // Set URL
@@ -115,7 +112,7 @@ public class EndpointFactory {
         return (endpoint);
     }
 
-    public Endpoint newEndpoint(InteractMLLPServerEndpoint mllpServerEndpoint, MLLPServerAdapter serverAdapter) {
+    public Endpoint newEndpoint(MLLPServerEndpoint mllpServerEndpoint, MLLPServerAdapter serverAdapter) {
         Endpoint endpoint = newEndpointFromIPCTopologyEndpoint(mllpServerEndpoint);
         //
         // Set URL
@@ -155,13 +152,7 @@ public class EndpointFactory {
         return (endpoint);
     }
 
-    public Endpoint newEndpoint(StandardEdgeAskHTTPEndpoint askHTTPEndpoint, HTTPClientAdapter clientAdapter){
-        Endpoint endpoint = newEndpointFromIPCTopologyEndpoint(askHTTPEndpoint);
-        Endpoint enhancedEnpoint = newHTTPClientBasedEndpoint(endpoint, clientAdapter);
-        return(enhancedEnpoint);
-    }
-
-    public Endpoint newEndpoint(InteractHTTPClientTopologyEndpoint httpEndpoint, HTTPClientAdapter clientAdapter){
+    public Endpoint newEndpoint(HTTPClientTopologyEndpoint httpEndpoint, HTTPClientAdapter clientAdapter){
         Endpoint endpoint = newEndpointFromIPCTopologyEndpoint(httpEndpoint);
         Endpoint enhancedEnpoint = newHTTPClientBasedEndpoint(endpoint, clientAdapter);
         return(enhancedEnpoint);
@@ -204,15 +195,7 @@ public class EndpointFactory {
             return(endpoint);
     }
 
-    public Endpoint newEndpoint(StandardEdgeAnswerHTTPEndpoint answerHTTPEndpoint, HTTPServerAdapter serverAdapter){
-        Endpoint endpoint = newEndpointFromIPCTopologyEndpoint(answerHTTPEndpoint);
-        Endpoint enhancedEndpoint = newHTTPServerBasedEndpoint(endpoint, serverAdapter);
-        //
-        // All Done!
-        return(enhancedEndpoint);
-    }
-
-    public Endpoint newEndpoint(InteractHTTPServerTopologyEndpoint httpEndpoint, HTTPServerAdapter httpServerAdapter){
+    public Endpoint newEndpoint(HTTPServerTopologyEndpoint httpEndpoint, HTTPServerAdapter httpServerAdapter){
         Endpoint endpoint = newEndpointFromIPCTopologyEndpoint(httpEndpoint);
         Endpoint enhancedEndpoint = newHTTPServerBasedEndpoint(endpoint, httpServerAdapter);
         //

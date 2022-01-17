@@ -33,7 +33,6 @@ public class EndpointSummary extends SoftwareComponentSummary {
     private boolean server;
     private Set<PortSoftwareComponentSummary> serverPorts;
     private Set<PortSoftwareComponentSummary> clientPorts;
-    private String workshopParticipantName;
     private String wupParticipantName;
 
     //
@@ -46,21 +45,12 @@ public class EndpointSummary extends SoftwareComponentSummary {
         this.server = false;
         this.serverPorts = new HashSet<>();
         this.clientPorts = new HashSet<>();
-        this.workshopParticipantName = null;
         this.wupParticipantName = null;
     }
 
     //
     // Getters and Setters
     //
-
-    public String getWorkshopParticipantName() {
-        return workshopParticipantName;
-    }
-
-    public void setWorkshopParticipantName(String workshopParticipantName) {
-        this.workshopParticipantName = workshopParticipantName;
-    }
 
     public String getWupParticipantName() {
         return wupParticipantName;
@@ -124,7 +114,6 @@ public class EndpointSummary extends SoftwareComponentSummary {
                 ", clientPorts=" + clientPorts +
                 ", participantName='" + getParticipantName() + '\'' +
                 ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", workshopParticipantName=" + getWorkshopParticipantName() +
                 ", wupParticipantName=" + getWupParticipantName() +
                 ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +

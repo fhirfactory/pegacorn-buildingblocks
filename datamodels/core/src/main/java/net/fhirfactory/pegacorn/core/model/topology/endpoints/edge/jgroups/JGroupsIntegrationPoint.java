@@ -112,7 +112,6 @@ public class JGroupsIntegrationPoint extends StandardEdgeIPCEndpoint {
                 ", componentExecutionControl=" + getComponentExecutionControl() +
                 ", enablingProcessingPlantId=" + getEnablingProcessingPlantId() +
                 ", interfaceFunction=" + getInterfaceFunction() +
-                ", endpointServiceName='" + getEndpointServiceName() + '\'' +
                 ", endpointStatus=" + getEndpointStatus() +
                 ", endpointDescription='" + getEndpointDescription() + '\'' +
                 ", assignedDNSName='" + getAssignedDNSName() + '\'' +

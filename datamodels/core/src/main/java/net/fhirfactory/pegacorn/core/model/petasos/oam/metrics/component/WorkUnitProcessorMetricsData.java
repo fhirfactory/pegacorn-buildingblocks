@@ -30,10 +30,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import java.time.Instant;
 
 public class WorkUnitProcessorMetricsData extends CommonComponentMetricsData {
-
-    private String processingPlantParticipantName;
-    private String workshopParticipantName;
-
     private double averageEventProcessingDuration;
     private double rollingEventProcessingDuration;
     private double lastEventProcessingDuration;
@@ -108,23 +104,6 @@ public class WorkUnitProcessorMetricsData extends CommonComponentMetricsData {
     //
     // Getters and Setters
     //
-
-
-    public String getProcessingPlantParticipantName() {
-        return processingPlantParticipantName;
-    }
-
-    public void setProcessingPlantParticipantName(String processingPlantParticipantName) {
-        this.processingPlantParticipantName = processingPlantParticipantName;
-    }
-
-    public String getWorkshopParticipantName() {
-        return workshopParticipantName;
-    }
-
-    public void setWorkshopParticipantName(String workshopParticipantName) {
-        this.workshopParticipantName = workshopParticipantName;
-    }
 
     public double getAverageEventProcessingDuration() {
         return averageEventProcessingDuration;
@@ -305,8 +284,6 @@ public class WorkUnitProcessorMetricsData extends CommonComponentMetricsData {
                 ", lastActivityInstant=" + getLastActivityInstant() +
                 ", componentStartupInstant=" + getComponentStartupInstant() +
                 ", componentStatus='" + getComponentStatus() + '\'' +
-                ", processingPlantParticipantName=" + getProcessingPlantParticipantName() +
-                ", workshopParticipantName=" + getWorkshopParticipantName() +
                 '}';
     }
 }

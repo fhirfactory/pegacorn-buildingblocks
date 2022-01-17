@@ -93,7 +93,7 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT);
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }
 
     @Override
@@ -197,13 +197,19 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
             classSet[0] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Address endpointAddress = getTargetMemberAddress(targetJGroupsIntegrationPoint.getChannelName());
-            SoftwareComponentSet nodeList = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeProcessingPlantTopologyDetailHandler", objectSet, classSet, requestOptions);
+            SoftwareComponentSet nodeList = null;
+            synchronized (getIPCChannelLock()) {
+                nodeList = getRPCDispatcher().callRemoteMethod(endpointAddress, "probeProcessingPlantTopologyDetailHandler", objectSet, classSet, requestOptions);
+            }
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".probeEndpointTopologyDetail(): Exit, response->{}", nodeList);
             return(nodeList);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".probeEndpointTopologyDetail(): Error (NoSuchMethodException) message->{}, stacktrace->{}", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".probeEndpointTopologyDetail: Error (GeneralException) message->{}, stacktrace->{}", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         }
@@ -213,6 +219,7 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
         getLogger().debug(".probeEndpointTopologyDetailHandler(): Entry, sourceForRequest->{}", sourceForRequest);
         SoftwareComponentSet myReport = new SoftwareComponentSet();
         myReport.getComponentSet().addAll(getTopologyIM().getNodeElementSet());
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
         return(myReport);
     }
 

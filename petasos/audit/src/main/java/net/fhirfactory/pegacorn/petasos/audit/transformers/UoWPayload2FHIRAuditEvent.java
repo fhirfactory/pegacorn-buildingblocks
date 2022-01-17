@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
@@ -148,7 +148,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {
                         switch (wup.getIngresEndpoint().getEndpointType()) {
-                            case INTERACT_MLLP_SERVER: {
+                            case MLLP_SERVER: {
                                 String descriptionText = "Interact.Ingres: MLLP Message Reception";
                                 return (descriptionText);
                             }
@@ -161,7 +161,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 case COMPONENT_ROLE_INTERACT_EGRESS: {
                     if (wup.getEgressEndpoint() != null) {
                         switch (wup.getEgressEndpoint().getEndpointType()) {
-                            case INTERACT_MLLP_CLIENT: {
+                            case MLLP_CLIENT: {
                                 String descriptionText = "Interact.Egress: MLLP Message Forwarding";
                                 return (descriptionText);
                             }
@@ -193,8 +193,8 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {
                         switch (wup.getIngresEndpoint().getEndpointType()) {
-                            case INTERACT_MLLP_SERVER: {
-                                InteractMLLPServerEndpoint mllpServerEndpoint = (InteractMLLPServerEndpoint) wup.getIngresEndpoint();
+                            case MLLP_SERVER: {
+                                MLLPServerEndpoint mllpServerEndpoint = (MLLPServerEndpoint) wup.getIngresEndpoint();
                                 String source = processingPlant.getSubsystemParticipantName();
                                 String port = mllpServerEndpoint.getMLLPServerAdapter().getPortNumber().toString();
                                 String sourceSite = source + ":" + port;

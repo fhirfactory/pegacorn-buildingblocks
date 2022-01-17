@@ -136,7 +136,7 @@ public class PetasosNotificationsAgentWorker extends AgentWorkerBase implements 
             }
             if(nextNotification != null) {
                 LOG.info(".forwardLocalNotificationsToServer(): Loaded metrics form local cache, forwarding");
-                LOG.info(".forwardLocalMetricsToServer(): Sending notification for Participant->{}", nextNotification.getProcessingPlantParticipantName());
+                LOG.info(".forwardLocalMetricsToServer(): Sending notification for Participant->{}", nextNotification.getParticipantName());
                 notificationBroker.sendNotification(nextNotification);
             }
         }
@@ -172,12 +172,12 @@ public class PetasosNotificationsAgentWorker extends AgentWorkerBase implements 
     }
 
     protected void notificationSynchronisationDaemon(){
-        getLogger().info(".notificationSynchronisationDaemon(): Entry");
+        getLogger().debug(".notificationSynchronisationDaemon(): Entry");
         this.daemonIsStillRunning = true;
         forwardLocalNotificationsToServer();
         this.daemonIsStillRunning = false;
         this.daemonLastRunTime = Instant.now();
-        getLogger().info(".notificationSynchronisationDaemon(): Exit");
+        getLogger().debug(".notificationSynchronisationDaemon(): Exit");
     }
 
     //
@@ -243,7 +243,7 @@ public class PetasosNotificationsAgentWorker extends AgentWorkerBase implements 
     //
 
     public void addNotification(PetasosComponentITOpsNotification notification){
-        getLogger().info(".addNotification(): Entry, notification->{}", notification);
+        getLogger().debug(".addNotification(): Entry, notification->{}", notification);
         if(notification == null){
             return;
         }
@@ -251,7 +251,7 @@ public class PetasosNotificationsAgentWorker extends AgentWorkerBase implements 
     }
 
     public PetasosComponentITOpsNotification getNextNotification(){
-        getLogger().info(".getNextNotification(): Entry");
+        getLogger().debug(".getNextNotification(): Entry");
         if(getNotificationQueue().isEmpty()){
             return(null);
         }

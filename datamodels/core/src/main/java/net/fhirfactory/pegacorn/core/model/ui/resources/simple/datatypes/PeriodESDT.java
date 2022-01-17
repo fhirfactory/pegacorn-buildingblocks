@@ -24,9 +24,10 @@ package net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-public class PeriodESDT {
+public class PeriodESDT implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant startInstant;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)

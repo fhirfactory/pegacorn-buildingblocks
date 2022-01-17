@@ -52,8 +52,9 @@ public class TaskTraceabilityTypeFactory {
     //
 
     public TaskTraceabilityType newTaskTraceabilityFromTask(PetasosActionableTask task){
-        getLogger().info(".newTaskTraceabilityFromTask(): Entry, task->{}", task);
+        getLogger().debug(".newTaskTraceabilityFromTask(): Entry, task->{}", task);
         if(task == null){
+            getLogger().debug(".newTaskTraceabilityFromTask(): Exit, task is null, returing null");
             return(null);
         }
         TaskTraceabilityType traceability = null;
@@ -64,9 +65,9 @@ public class TaskTraceabilityTypeFactory {
         }
         if(task.hasTaskFulfillment()){
             TaskIdType taskId = task.getTaskId();
-            getLogger().info(".newTaskTraceabilityFromTask(): taskId->{}", taskId);
+            getLogger().trace(".newTaskTraceabilityFromTask(): taskId->{}", taskId);
             TaskFulfillmentType taskFulfillment = task.getTaskFulfillment();
-            getLogger().info(".newTaskTraceabilityFromTask(): taskFulfillment->{}", taskFulfillment);
+            getLogger().trace(".newTaskTraceabilityFromTask(): taskFulfillment->{}", taskFulfillment);
             TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(taskId, taskFulfillment);
             if(traceabilityElementType != null){
                 traceability.addToTaskJourney(traceabilityElementType);
@@ -77,8 +78,9 @@ public class TaskTraceabilityTypeFactory {
     }
 
     public TaskTraceabilityType newTaskTraceabilityFromTask(PetasosActionableTask task, TaskTraceabilityElementType lastTraceabilityElement) {
-        getLogger().info(".newTaskTraceabilityFromTask(): Entry, task->{}", task);
+        getLogger().debug(".newTaskTraceabilityFromTask(): Entry, task->{}", task);
         if (task == null) {
+            getLogger().debug(".newTaskTraceabilityFromTask(): Exit, task is null, returing null");
             return (null);
         }
         TaskTraceabilityType traceability = null;

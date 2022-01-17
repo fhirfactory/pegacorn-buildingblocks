@@ -56,12 +56,19 @@ public class TaskSubscriptionCheck {
         // Because auditing is not running yet
         // Remove once Auditing is in place
         //
-        if(getLogger().isWarnEnabled()) {
+        if(getLogger().isInfoEnabled()) {
             int subscriberSetSize = 0;
             if (subscriberSet != null) {
                 subscriberSetSize = subscriberSet.size();
             }
-            getLogger().warn("Number of Subscribers->{}", subscriberSetSize);
+            if(getLogger().isInfoEnabled()) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(".getSubscriberSet(): Number of Subscribers->"+subscriberSetSize);
+                for(PetasosParticipant currentParticipant: subscriberSet) {
+                    builder.append(", participant->"+currentParticipant.getParticipantName());
+                }
+                getLogger().warn(builder.toString());
+            }
         }
         if(subscriberSet == null){
             getLogger().debug(".subscriberSet(): Exit, number of subscribers is 0");

@@ -57,7 +57,7 @@ public class HTTPServerAdapter extends IPCClusteredSocketBasedAdapter {
         return "HTTPServerAdapter{" +
                 "contextPath='" + contextPath + '\'' +
                 ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
-                ", targetNameInstant='" + getTargetNameInstant() + '\'' +
+                ", targetNameInstant='" + getTargetSystemName() + '\'' +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
                 ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
                 ", supportInterfaceTags=" + getSupportInterfaceTags() +

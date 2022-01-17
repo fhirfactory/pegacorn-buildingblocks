@@ -87,42 +87,67 @@ public class LocalPetasosParticipantCacheIM {
 		return(registration);
 	}
 
-	public PetasosParticipantRegistration registerPetasosParticipant(SoftwareComponent participantSoftwareComponent, Set<TaskWorkItemManifestType> publishedTopics, Set<TaskWorkItemManifestType> subscribedTopics) {
-		getLogger().info(".registerPetasosParticipant(): Entry, participantSoftwareComponent->{}", participantSoftwareComponent);
+	public PetasosParticipantRegistration registerPetasosParticipant(String preferredParticipantName, SoftwareComponent participantSoftwareComponent, Set<TaskWorkItemManifestType> publishedTopics, Set<TaskWorkItemManifestType> subscribedTopics) {
+		getLogger().debug(".registerPetasosParticipant(): Entry, preferredParticipantName->{}, participantSoftwareComponent->{}", preferredParticipantName, participantSoftwareComponent);
 		if (participantSoftwareComponent == null || publishedTopics == null) {
-			getLogger().info(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
+			getLogger().debug(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
 			return (null);
 		}
-		PetasosParticipant participant = new PetasosParticipant(participantSoftwareComponent);
+		PetasosParticipant participant = new PetasosParticipant(preferredParticipantName, participantSoftwareComponent);
 		participant.setSubsystemParticipantName(participantNameHolder.getSubsystemParticipantName());
 		if (!publishedTopics.isEmpty()) {
-			getLogger().info(".registerPetasosParticipant(): Has published topics");
+			getLogger().trace(".registerPetasosParticipant(): Has published topics");
 			for (TaskWorkItemManifestType currentParcelManifest : publishedTopics) {
 				participant.getPublishedWorkItemManifests().add(currentParcelManifest);
 			}
 		}
 		if(!subscribedTopics.isEmpty()) {
-			getLogger().info(".registerPetasosParticipant(): Has topics to subscribe to!");
+			getLogger().trace(".registerPetasosParticipant(): Has topics to subscribe to!");
 			for (TaskWorkItemManifestType currentParcelManifest : subscribedTopics) {
 				participant.getSubscribedWorkItemManifests().add(currentParcelManifest);
 			}
 		}
 		PetasosParticipantRegistration registeredParticipant = registerPetasosParticipant(participant);
-		getLogger().info(".registerPetasosParticipant(): Exit, registeredParticipant->{}", registeredParticipant);
+		getLogger().debug(".registerPetasosParticipant(): Exit, registeredParticipant->{}", registeredParticipant);
+		return(registeredParticipant);
+	}
+	public PetasosParticipantRegistration registerPetasosParticipant(SoftwareComponent participantSoftwareComponent, Set<TaskWorkItemManifestType> publishedTopics, Set<TaskWorkItemManifestType> subscribedTopics) {
+		getLogger().debug(".registerPetasosParticipant(): Entry, participantSoftwareComponent->{}", participantSoftwareComponent);
+		if (participantSoftwareComponent == null || publishedTopics == null) {
+			getLogger().debug(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
+			return (null);
+		}
+		PetasosParticipant participant = new PetasosParticipant(participantSoftwareComponent);
+		participant.setSubsystemParticipantName(participantNameHolder.getSubsystemParticipantName());
+		if (!publishedTopics.isEmpty()) {
+			getLogger().trace(".registerPetasosParticipant(): Has published topics");
+			for (TaskWorkItemManifestType currentParcelManifest : publishedTopics) {
+				participant.getPublishedWorkItemManifests().add(currentParcelManifest);
+			}
+		}
+		if(!subscribedTopics.isEmpty()) {
+			getLogger().trace(".registerPetasosParticipant(): Has topics to subscribe to!");
+			for (TaskWorkItemManifestType currentParcelManifest : subscribedTopics) {
+				participant.getSubscribedWorkItemManifests().add(currentParcelManifest);
+			}
+		}
+		PetasosParticipantRegistration registeredParticipant = registerPetasosParticipant(participant);
+		getLogger().debug(".registerPetasosParticipant(): Exit, registeredParticipant->{}", registeredParticipant);
 		return(registeredParticipant);
 	}
 
+
 	public PetasosParticipantRegistration registerPetasosParticipant(PetasosParticipant participant){
-		getLogger().info(".registerPetasosParticipant(): Entry, participant->{}", participant);
+		getLogger().debug(".registerPetasosParticipant(): Entry, participant->{}", participant);
 		if(participant == null ){
-			getLogger().info(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
+			getLogger().debug(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
 			return(null);
 		}
 		//
 		// Register with local DM
-		getLogger().info(".registerPetasosParticipant(): [Register Participant into the DM] Start");
+		getLogger().trace(".registerPetasosParticipant(): [Register Participant into the DM] Start");
 		PetasosParticipantRegistration registration = getParticipantCacheDM().addPetasosParticipant(participant);
-		getLogger().info(".registerPetasosParticipant(): [Register Participant into the DM] Finish");
+		getLogger().trace(".registerPetasosParticipant(): [Register Participant into the DM] Finish");
 		/*
 		//
 		// Register with global Pathway Service Manager
@@ -133,13 +158,13 @@ public class LocalPetasosParticipantCacheIM {
 		 */
 		//
 		// Now update local subscription map
-		getLogger().info(".registerPetasosParticipant(): [Update local Subscription Map] Start");
+		getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] Start");
 		PetasosParticipant registeredParticipant = registration.getParticipant();
 		if(!registeredParticipant.getSubscribedWorkItemManifests().isEmpty()){
-			getLogger().info(".registerPetasosParticipant(): [Update local Subscription Map] Has subscription requirements");
-			getLogger().info(".registerPetasosParticipant(): [Update local Subscription Map] Subscribing to Topics");
+			getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] Has subscription requirements");
+			getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] Subscribing to Topics");
 			for (TaskWorkItemManifestType currentSubscribedManifest : registeredParticipant.getSubscribedWorkItemManifests()) {
-				getLogger().info(".registerPetasosParticipant(): [Update local Subscription Map] adding topic->{}", currentSubscribedManifest);
+				getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] adding topic->{}", currentSubscribedManifest);
 				boolean doSubscribe = true;
 				if(currentSubscribedManifest.hasSourceProcessingPlantParticipantName()) {
 					boolean sourceTaskProducerIsMe = currentSubscribedManifest.getSourceProcessingPlantParticipantName().equals(participantNameHolder.getSubsystemParticipantName());
@@ -157,7 +182,7 @@ public class LocalPetasosParticipantCacheIM {
 				}
 			}
 		}
-		getLogger().info(".registerPetasosParticipant(): [Update local Subscription Map] Finish");
+		getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] Finish");
 		//
 		// Our work is done
 		getLogger().debug(".registerPetasosParticipant(): Exit, registration->{}", registration);
@@ -255,29 +280,29 @@ public class LocalPetasosParticipantCacheIM {
 	}
 
 	public void synchroniseLocalWithCentralCacheDetail(PetasosParticipant participant){
-		getLogger().info(".synchroniseLocalWithCentralCacheDetail(): Entry, participant->{}", participant);
+		getLogger().debug(".synchroniseLocalWithCentralCacheDetail(): Entry, participant->{}", participant);
 		if(participant != null) {
 			//
 			// Update local DM with Gobal details
-			getLogger().info(".synchroniseLocalWithCentralCacheDetail(): [Synchronise Local Cache] Start");
+			getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Synchronise Local Cache] Start");
 			getParticipantCacheDM().updatePetasosParticipant(participant);
-			getLogger().info(".synchroniseLocalWithCentralCacheDetail(): [Synchronise Local Cache] Finish");
+			getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Synchronise Local Cache] Finish");
 			//
 			// Now update local subscription map
-			getLogger().info(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] Start");
+			getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] Start");
 			if(participant.getComponentType().equals(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT)) {
-				getLogger().info(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] is processing plant...");
+				getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] is processing plant...");
 				if (!participant.getSubscribedWorkItemManifests().isEmpty()) {
-					getLogger().info(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] subscribed manifest set is NOT empty");
+					getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] subscribed manifest set is NOT empty");
 					for (TaskWorkItemManifestType currentSubscribedManifest : participant.getSubscribedWorkItemManifests()) {
-						getLogger().info(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] currentSubscribedManifest->{}", currentSubscribedManifest);
+						getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] currentSubscribedManifest->{}", currentSubscribedManifest);
 						getParticipantSubscriptionMapDM().addSubscriber(currentSubscribedManifest, participant);
 					}
 				}
 			}
-			getLogger().info(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] finish");
+			getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] finish");
 		}
-		getLogger().info(".synchroniseLocalWithCentralCacheDetail(): Exit");
+		getLogger().debug(".synchroniseLocalWithCentralCacheDetail(): Exit");
 	}
 
 	public void synchroniseLocalWithCentralCacheDetail(PetasosParticipantRegistration registration){

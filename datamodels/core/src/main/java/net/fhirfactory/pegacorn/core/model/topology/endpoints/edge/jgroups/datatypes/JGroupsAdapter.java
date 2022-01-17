@@ -41,7 +41,7 @@ public class JGroupsAdapter extends IPCSocketBasedAdapter {
     public String toString() {
         return "JGroupsAdapter{" +
                 "supportedDeploymentModes=" + getSupportedDeploymentModes() +
-                ", targetNameInstant='" + getTargetNameInstant() + '\'' +
+                ", targetNameInstant='" + getTargetSystemName() + '\'' +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
                 ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
                 ", supportInterfaceTags=" + getSupportInterfaceTags() +

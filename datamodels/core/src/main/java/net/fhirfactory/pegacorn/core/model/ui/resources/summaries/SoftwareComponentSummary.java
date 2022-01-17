@@ -36,6 +36,7 @@ public class SoftwareComponentSummary extends ResourceSummaryBase {
     private ComponentIdType componentID;
     private String participantName;
     private String subsystemParticipantName;
+    private String participantDisplayName;
     private String nodeVersion;
     private String concurrencyMode;
     private String resilienceMode;
@@ -57,12 +58,21 @@ public class SoftwareComponentSummary extends ResourceSummaryBase {
         this.topologyNodeFDN = null;
         this.nodeType = null;
         this.topologyNodeFunctionFDN = null;
+        this.participantDisplayName = null;
     }
 
     //
     // Getters and Setters
     //
 
+
+    public String getParticipantDisplayName() {
+        return participantDisplayName;
+    }
+
+    public void setParticipantDisplayName(String participantDisplayName) {
+        this.participantDisplayName = participantDisplayName;
+    }
 
     public TopologyNodeFunctionFDN getTopologyNodeFunctionFDN() {
         return topologyNodeFunctionFDN;
@@ -146,7 +156,8 @@ public class SoftwareComponentSummary extends ResourceSummaryBase {
         return "SoftwareComponentSummary{" +
                 "componentID=" + componentID +
                 ", participantName='" + participantName + '\'' +
-                ", subsystemParticipantName=" + subsystemParticipantName +
+                ", subsystemParticipantName='" + subsystemParticipantName + '\'' +
+                ", participantDisplayName='" + participantDisplayName + '\'' +
                 ", nodeVersion='" + nodeVersion + '\'' +
                 ", concurrencyMode='" + concurrencyMode + '\'' +
                 ", resilienceMode='" + resilienceMode + '\'' +

@@ -21,25 +21,21 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PeriodESDT;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.datatypes.TaskMetadataSummary;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class TaskSummary extends ResourceSummaryBase {
     private String taskId;
-    private String taskFocus;
-    private String taskBeneficiary;
-    private String taskEncounter;
-    private String taskStartPoint;
-    private Map<Integer, String> subTasks;
-    private String taskEndPoint;
+    private TaskMetadataSummary taskMetadata;
     private PeriodESDT taskPeriod;
     private ActionableTaskOutcomeStatusEnum taskStatus;
-    private String taskTriggerType;
-    private String taskTriggerId;
 
     //
     // Constructor(s)
@@ -47,21 +43,39 @@ public class TaskSummary extends ResourceSummaryBase {
 
     public TaskSummary(){
         this.taskId = null;
-        this.taskFocus = null;
-        this.taskBeneficiary = null;
-        this.taskEncounter = null;
-        this.taskStartPoint = null;
-        this.subTasks = new HashMap<>();
-        this.taskEndPoint = null;
         this.taskPeriod = null;
         this.taskStatus = null;
-        this.taskTriggerId = null;
-        this.taskTriggerType = null;
+        this.taskMetadata = null;
+    }
+
+    public TaskSummary(TaskSummary ori){
+        this.taskId = null;
+        this.taskPeriod = null;
+        this.taskStatus = null;
+        this.taskMetadata = null;
+        if(ori.hasTaskId()){
+            this.setTaskId(SerializationUtils.clone(ori.getTaskId()));
+        }
+        if(ori.hasTaskPeriod()){
+            this.setTaskPeriod(SerializationUtils.clone(ori.getTaskPeriod()));
+        }
+        if (ori.hasTaskStatus()) {
+            this.setTaskStatus(ori.getTaskStatus());
+        }
+        if(ori.hasTaskMetadata()){
+            this.setTaskMetadata(SerializationUtils.clone(ori.getTaskMetadata()));
+        }
     }
 
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasTaskId(){
+        boolean hasValue = this.taskId != null;
+        return(hasValue);
+    }
 
     public String getTaskId() {
         return taskId;
@@ -71,52 +85,10 @@ public class TaskSummary extends ResourceSummaryBase {
         this.taskId = taskId;
     }
 
-    public String getTaskFocus() {
-        return taskFocus;
-    }
-
-    public void setTaskFocus(String taskFocus) {
-        this.taskFocus = taskFocus;
-    }
-
-    public String getTaskBeneficiary() {
-        return taskBeneficiary;
-    }
-
-    public void setTaskBeneficiary(String taskBeneficiary) {
-        this.taskBeneficiary = taskBeneficiary;
-    }
-
-    public String getTaskEncounter() {
-        return taskEncounter;
-    }
-
-    public void setTaskEncounter(String taskEncounter) {
-        this.taskEncounter = taskEncounter;
-    }
-
-    public String getTaskStartPoint() {
-        return taskStartPoint;
-    }
-
-    public void setTaskStartPoint(String taskStartPoint) {
-        this.taskStartPoint = taskStartPoint;
-    }
-
-    public Map<Integer, String> getSubTasks() {
-        return subTasks;
-    }
-
-    public void setSubTasks(Map<Integer, String> subTasks) {
-        this.subTasks = subTasks;
-    }
-
-    public String getTaskEndPoint() {
-        return taskEndPoint;
-    }
-
-    public void setTaskEndPoint(String taskEndPoint) {
-        this.taskEndPoint = taskEndPoint;
+    @JsonIgnore
+    public boolean hasTaskPeriod(){
+        boolean hasValue = this.taskPeriod != null;
+        return(hasValue);
     }
 
     public PeriodESDT getTaskPeriod() {
@@ -127,6 +99,12 @@ public class TaskSummary extends ResourceSummaryBase {
         this.taskPeriod = taskPeriod;
     }
 
+    @JsonIgnore
+    public boolean hasTaskStatus(){
+        boolean hasValue = this.taskStatus != null;
+        return(hasValue);
+    }
+
     public ActionableTaskOutcomeStatusEnum getTaskStatus() {
         return taskStatus;
     }
@@ -135,20 +113,18 @@ public class TaskSummary extends ResourceSummaryBase {
         this.taskStatus = taskStatus;
     }
 
-    public String getTaskTriggerType() {
-        return taskTriggerType;
+    @JsonIgnore
+    public boolean hasTaskMetadata(){
+        boolean hasValue = this.taskMetadata != null;
+        return(hasValue);
     }
 
-    public void setTaskTriggerType(String taskTriggerType) {
-        this.taskTriggerType = taskTriggerType;
+    public TaskMetadataSummary getTaskMetadata() {
+        return taskMetadata;
     }
 
-    public String getTaskTriggerId() {
-        return taskTriggerId;
-    }
-
-    public void setTaskTriggerId(String taskTriggerId) {
-        this.taskTriggerId = taskTriggerId;
+    public void setTaskMetadata(TaskMetadataSummary taskMetadata) {
+        this.taskMetadata = taskMetadata;
     }
 
     //
@@ -158,18 +134,13 @@ public class TaskSummary extends ResourceSummaryBase {
     @Override
     public String toString() {
         return "TaskSummary{" +
-                "taskId=" + taskId +
-                ", taskFocus=" + taskFocus +
-                ", taskBeneficiary=" + taskBeneficiary +
-                ", taskEncounter=" + taskEncounter +
-                ", taskStartPoint=" + taskStartPoint +
-                ", subTasks=" + subTasks +
-                ", taskEndPoint=" + taskEndPoint +
+                "taskId='" + taskId + '\'' +
+                ", taskMetadata=" + taskMetadata +
                 ", taskPeriod=" + taskPeriod +
                 ", taskStatus=" + taskStatus +
-                ", taskTriggerType=" + taskTriggerType +
-                ", taskTriggerId=" + taskTriggerId +
-                ", resourceId=" + getResourceId() +
+                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
+                ", lastActivityInstant=" + getLastActivityInstant() +
+                ", resourceId='" + getResourceId() + '\'' +
                 '}';
     }
 }

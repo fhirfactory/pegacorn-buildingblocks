@@ -119,6 +119,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 			throw(new IllegalArgumentException(".addSubscriber(): parcelManifest does not contain suitable contentDescriptor or containerDescriptor"));
 		}
 		List<TaskWorkItemSubscription> subscriptionList = this.distributionList.get(descriptorToRegister);
+		boolean newSubscriberAdded = false;
     	synchronized (this.distributionListUpdateLock) {
 			if (subscriptionList != null) {
 				LOG.trace(".addSubscriber(): Topic Subscription Map: Adding subscriber to existing map for parcelManifest --> {}", parcelManifest);
@@ -134,6 +135,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 				if(existingSubscription == null) {
 					TaskWorkItemSubscription newSubscription = new TaskWorkItemSubscription(parcelManifest, subscriber);
 					subscriptionList.add(newSubscription);
+					newSubscriberAdded = true;
 				}
 				if(subscriber.hasSubsystemParticipantName()) {
 					if(!subscriber.getSubsystemParticipantName().equals(participantNameHolder.getSubsystemParticipantName())) {
@@ -154,15 +156,18 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 						subscriber.setParticipantStatus(subscriber.getParticipantStatus());
 					}
 				}
+				newSubscriberAdded = true;
 			}
 		}
-		if (LOG.isDebugEnabled()) {
-			LOG.debug(".addSubscriber(): Exit, here is the Subscription list for the Topic:");
-			int count = 0;
-			for(TaskWorkItemSubscription currentSubscription : subscriptionList){
-				PetasosParticipant currentSubscriber = currentSubscription.getParticipant();
-				LOG.debug(".addSubscriber(): Subscriber[{}]->{}", count, currentSubscriber.getComponentID());
-				count++;
+		if (LOG.isInfoEnabled()) {
+			if(newSubscriberAdded) {
+				int count = 0;
+				LOG.info(".addSubscriber(): New Subscriber Added for Topic->{}", parcelManifest);
+				for (TaskWorkItemSubscription currentSubscription : subscriptionList) {
+					PetasosParticipant currentSubscriber = currentSubscription.getParticipant();
+					LOG.info(".addSubscriber(): Subscriber[{}]->{}", count, currentSubscriber.getComponentID() + "\n");
+					count++;
+				}
 			}
 		}
 		printAllSubscriptionSets();
@@ -333,10 +338,10 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 	public List<PetasosParticipant> deriveSubscriberList(DataParcelManifest parcelManifest){
 		LOG.debug(".deriveSubscriberList(): Entry, parcelManifest->{}", parcelManifest);
 		printAllSubscriptionSets();
-		if(LOG.isInfoEnabled()){
+		if(LOG.isDebugEnabled()){
 			if(parcelManifest.hasContentDescriptor()){
 				String messageToken = parcelManifest.getContentDescriptor().toFDN().getToken().toTag();
-				LOG.trace(".deriveSubscriberList(): parcel.ContentDescriptor->{}", messageToken);
+				LOG.debug(".deriveSubscriberList(): parcel.ContentDescriptor->{}", messageToken);
 			}
 		}
 		DataParcelTypeDescriptor parcelContentDescriptor = parcelManifest.getContentDescriptor();
@@ -428,9 +433,9 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 					&& matchedDistributionStatus;
 			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 			if(goodEnoughMatch || containerBasedOKMatch){
-				if(LOG.isWarnEnabled()) {
+				if(LOG.isDebugEnabled()) {
 					ComponentIdType subscriber = currentRegisteredSubscription.getParticipant().getComponentID();
-					LOG.warn(".deriveSubscriberList(): subscriber->{}", subscriber);
+					LOG.debug(".deriveSubscriberList(): Adding Subscriber->{}", subscriber);
 				}
 				derivedSubscriberList.add(currentRegisteredSubscription.getParticipant());
 			}

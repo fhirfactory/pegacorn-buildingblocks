@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class ExternalSystemIPCEndpoint extends IPCAdapter implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(ExternalSystemIPCEndpoint.class);
+public class ExternalSystemIPCAdapter extends IPCAdapter implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(ExternalSystemIPCAdapter.class);
 
     private IPCAdapterDefinition supportedInterfaceDefinition;
     private Integer targetPortValue;
@@ -76,14 +76,28 @@ public class ExternalSystemIPCEndpoint extends IPCAdapter implements Serializabl
         this.targetPath = targetPath;
     }
 
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
-        return "ExternalSystemIPCEndpoint{" +
-                "supportedInterfaceDefinition=" + supportedInterfaceDefinition +
-                ", encryptionRequired=" + isEncrypted() +
+        return "ExternalSystemIPCAdapter{" +
+                "supportedDeploymentModes=" + getSupportedDeploymentModes() +
+                ", targetNameInstant='" + getTargetSystemName() + '\'' +
+                ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
+                ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
+                ", supportInterfaceTags=" + getSupportInterfaceTags() +
+                ", encrypted=" + isEncrypted() +
+                ", groupName='" + getGroupName() + '\'' +
+                ", active=" + isActive() +
+                ", additionalParameters=" + getAdditionalParameters() +
+                ", lastActivity=" + getLastActivity() +
+                ", supportedInterfaceDefinition=" + supportedInterfaceDefinition +
                 ", targetPortValue=" + targetPortValue +
-                ", targetPortDNSName=" + targetPortDNSName +
-                ", targetPath=" + targetPath +
+                ", targetPortDNSName='" + targetPortDNSName + '\'' +
+                ", targetPath='" + targetPath + '\'' +
+                ", encryptionRequired=" + getEncryptionRequired() +
                 '}';
     }
 }

@@ -32,6 +32,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointCont
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PetasosIPCMessagingEndpoint;
+import net.fhirfactory.pegacorn.petasos.wup.helper.EgressActivityFinalisationRegistration;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverResponseProcessingBean;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -50,8 +51,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
-public class PetasosEdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWUP implements PetasosEdgeMessageForwarderService {
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosEdgeMessageForwardWUP.class);
+public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWUP implements PetasosEdgeMessageForwarderService {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosEdgeMessageForwarderWUP.class);
 
     private static String WUP_VERSION = "1.0.0";
 
@@ -157,17 +158,20 @@ public class PetasosEdgeMessageForwardWUP extends EdgeEgressMessagingGatewayWUP 
 
         fromIncludingPetasosServices(ingresFeed())
                 .routeId(getNameSet().getRouteCoreWUP())
-                .log(LoggingLevel.INFO, "${body}")
                 .process(new NodeDetailInjector())
                 .bean(InterProcessingPlantHandoverPacketGenerationBean.class, "constructInterProcessingPlantHandoverPacket(*,  Exchange)")
                 .to(egressFeed())
-                .bean(InterProcessingPlantHandoverResponseProcessingBean.class, "processResponse(*, Exchange)");
+                .bean(InterProcessingPlantHandoverResponseProcessingBean.class, "processResponse(*, Exchange)")
+                .bean(EgressActivityFinalisationRegistration.class,"registerActivityFinishAndFinalisation(*,  Exchange)");
 
         from(egressFeed())
                 .process(new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         InterProcessingPlantHandoverPacket packet = exchange.getIn().getBody(InterProcessingPlantHandoverPacket.class);
+                        if(getLogger().isInfoEnabled()) {
+                            getLogger().info(".forwardingProcessing(): sending packet to->{}", packet.getTarget());
+                        }
                         InterProcessingPlantHandoverResponsePacket response = getPetasosMessagingEndpoint().sendIPCMessage(packet.getTarget(), packet);
                         exchange.getIn().setBody(response);
                     }

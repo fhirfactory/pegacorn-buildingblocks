@@ -66,7 +66,7 @@ public abstract class PetasosOAMMetricsEndpointBase extends JGroupsIntegrationPo
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT);
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }
 
     //
@@ -111,49 +111,4 @@ public abstract class PetasosOAMMetricsEndpointBase extends JGroupsIntegrationPo
     protected void doIntegrationPointBusinessFunctionCheck(JGroupsIntegrationPointSummary integrationPointSummary, boolean isRemoved, boolean isAdded) {
 
     }
-
-    //
-    // Metrics Service Methods
-    //
-
-    /*
-    public List<Address> getMetricsServerTargetAddressSet(String endpointServiceName){
-        getLogger().info(".getMetricsServerTargetAddressSet(): Entry, endpointServiceName->{}", endpointServiceName);
-        List<Address> endpointAddressSet = new ArrayList<>();
-        if(StringUtils.isEmpty(endpointServiceName)){
-            getLogger().debug(".getMetricsServerTargetAddressSet(): Exit, endpointServiceName is empty");
-            return(endpointAddressSet);
-        }
-        List<PetasosAdapterAddress> memberAdapterSetForService = getTargetMemberAdapterSetForService(endpointServiceName);
-        for(PetasosAdapterAddress currentMember: memberAdapterSetForService){
-            Address currentMemberAddress = currentMember.getJGroupsAddress();
-            if(currentMemberAddress != null){
-                endpointAddressSet.add(currentMemberAddress);
-            }
-        }
-        getLogger().debug(".getMetricsServerTargetAddressSet(): Exit, endpointAddressSet->{}", endpointAddressSet);
-        return(endpointAddressSet);
-    }
-
-    public Address getCandidateMetricsServerTargetAddress(String endpointServiceName){
-        getLogger().info(".getCandidateMetricsServerTargetAddress(): Entry, endpointServiceName->{}", endpointServiceName);
-        if(StringUtils.isEmpty(endpointServiceName)){
-            getLogger().debug(".getCandidateMetricsServerTargetAddress(): Exit, endpointServiceName is empty");
-            return(null);
-        }
-        List<Address> endpointAddressSet = getMetricsServerTargetAddressSet(endpointServiceName);
-        if(endpointAddressSet.isEmpty()){
-            getLogger().debug(".getCandidateMetricsServerTargetAddress(): Exit, endpointAddressSet is empty");
-            return(null);
-        }
-        Address endpointJGroupsAddress = endpointAddressSet.get(0);
-        getLogger().debug(".getCandidateMetricsServerTargetAddress(): Exit, selected address->{}", endpointJGroupsAddress);
-        return(endpointJGroupsAddress);
-    }
-
-     */
-
-
-
-
 }

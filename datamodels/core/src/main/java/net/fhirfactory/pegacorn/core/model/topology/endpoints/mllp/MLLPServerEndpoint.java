@@ -19,25 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp;
+package net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
 import net.fhirfactory.pegacorn.core.model.topology.connector.ActiveIPCConnection;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ClusteredInteractServerTopologyEndpointPort;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPServerAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters.MLLPServerAdapter;
 
 import java.util.Set;
 
-public class InteractMLLPServerEndpoint extends ClusteredInteractServerTopologyEndpointPort implements ActiveIPCConnection {
+public class MLLPServerEndpoint extends ClusteredInteractServerTopologyEndpointPort implements ActiveIPCConnection {
 
     //
     // Constructor(s)
     //
-    public InteractMLLPServerEndpoint(){
+    public MLLPServerEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_MLLP_SERVER);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.MLLP_SERVER);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_INGRES);
     }
 

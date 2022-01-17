@@ -145,9 +145,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().trace(".initialise(): Establish the metrics agent");
         ComponentIdType componentId = getMeAsASoftwareComponent().getComponentID();
         String participantName = getMeAsAPetasosParticipant().getParticipantName();
-        String workshopParticipantName = getWorkshop().getWorkshopNode().getParticipantName();
-        String processingPlantParticipantName = getProcessingPlant().getSubsystemParticipantName();
-        this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(componentId, processingPlantParticipantName, workshopParticipantName, participantName);
+        this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(componentId, participantName);
         getLogger().trace(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
         buildWUPFramework(this.getContext());
         getLogger().debug(".initialise(): Exit");
@@ -314,9 +312,11 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     private WorkUnitProcessorSoftwareComponent buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
+        String participantName = getWorkshop().getWorkshopNode().getParticipantName() + "." + getWUPInstanceName();
         WorkUnitProcessorSoftwareComponent wupNode = getTopologyFactory().createWorkUnitProcessor(
                 getWUPInstanceName(),
                 specifyWUPInstanceVersion(),
+                participantName,
                 getWorkshop().getWorkshopNode(),
                 PegacornSystemComponentTypeTypeEnum.WUP);
         getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getComponentFDN(), wupNode);
@@ -398,8 +398,8 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
                 }
             }
         }
-
-        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(getMeAsASoftwareComponent(),  publishedTopicSet, subscribedTopicSet);
+        String participantName = getMeAsASoftwareComponent().getParticipantName();
+        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(participantName, getMeAsASoftwareComponent(),  publishedTopicSet, subscribedTopicSet);
         PetasosParticipant participant = null;
         if(participantRegistration != null){
             participant = participantRegistration.getParticipant();

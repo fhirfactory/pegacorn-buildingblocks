@@ -138,8 +138,9 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
 
     private void buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
+        String participantName = getWorkshop().getWorkshopNode().getParticipantName() + "." + specifyWUPInstanceName();
         WorkUnitProcessorSoftwareComponent wupNode = getTopologyFactory()
-                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), PegacornSystemComponentTypeTypeEnum.WUP);
+                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), participantName, getWorkshop().getWorkshopNode(), PegacornSystemComponentTypeTypeEnum.WUP);
         getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getComponentFDN(), wupNode);
         wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());

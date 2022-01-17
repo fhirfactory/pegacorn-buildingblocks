@@ -37,6 +37,7 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.E
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
@@ -102,7 +103,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT);
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }
 
     @Override
@@ -158,18 +159,23 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             objectSet[0] = task;
             classSet[0] = CapabilityUtilisationRequest.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            CapabilityUtilisationResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "executeTaskHandler", objectSet, classSet, requestOptions);
+            CapabilityUtilisationResponse response = null;
+            synchronized (getIPCChannelLock()) {
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "executeTaskHandler", objectSet, classSet, requestOptions);
+            }
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".executeTask(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
-            getLogger().error(".executeTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".executeTask: Error (GeneralException) Message->{}, StackTrace->{}", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
             response.setAssociatedRequestID(task.getRequestID());
             response.setSuccessful(false);
             return(response);
         } catch (Exception e) {
-            e.printStackTrace();
-            getLogger().error(".executeTask: Error (GeneralException) ->{}", e.getMessage());
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".executeTask: Error (GeneralException) Message->{}, StackTrace->{}", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
             response.setAssociatedRequestID(task.getRequestID());
             response.setSuccessful(false);
@@ -194,7 +200,10 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             objectSet[0] = remoteProcedureCallRequest;
             classSet[0] = RemoteProcedureCallRequest.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            RemoteProcedureCallResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "registerActionableTaskHandler", objectSet, classSet, requestOptions);
+            RemoteProcedureCallResponse response = null;
+            synchronized (getIPCChannelLock()) {
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "registerActionableTaskHandler", objectSet, classSet, requestOptions);
+            }
             getLogger().debug(".registerActionableTask(): Exit, response->{}", response);
             if(response.isSuccessful()){
                 PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
@@ -262,7 +271,10 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             objectSet[0] = remoteProcedureCallRequest;
             classSet[0] = RemoteProcedureCallRequest.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            RemoteProcedureCallResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "fulfillActionableTaskHandler", objectSet, classSet, requestOptions);
+            RemoteProcedureCallResponse response = null;
+            synchronized(getIPCChannelLock()) {
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "fulfillActionableTaskHandler", objectSet, classSet, requestOptions);
+            }
             getLogger().debug(".fulfillActionableTask(): Exit, response->{}", response);
             if(response.isSuccessful()){
                 PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
@@ -331,7 +343,10 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             objectSet[0] = remoteProcedureCallRequest;
             classSet[0] = RemoteProcedureCallRequest.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            RemoteProcedureCallResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "updateActionableTaskHandler", objectSet, classSet, requestOptions);
+            RemoteProcedureCallResponse response = null;
+            synchronized (getIPCChannelLock()) {
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "updateActionableTaskHandler", objectSet, classSet, requestOptions);
+            }
             getLogger().debug(".updateActionableTask(): Exit, response->{}", response);
             if(response.isSuccessful()){
                 PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();

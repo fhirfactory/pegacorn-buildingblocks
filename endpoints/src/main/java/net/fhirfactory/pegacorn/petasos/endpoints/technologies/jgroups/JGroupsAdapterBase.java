@@ -46,11 +46,16 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
     private JChannel ipcChannel;
     private RpcDispatcher rpcDispatcher;
 
+    private Object ipcChannelLock;
+
     private ArrayList<Address> previousScannedMembership;
     private ArrayList<Address> currentScannedMembership;
     private Object currentScannedMembershipLock;
 
     private static Long RPC_UNICAST_TIMEOUT = 5000L;
+
+    private static int INITIALISATION_RETRY_COUNT = 5;
+    private static Long INITIALISATION_RETRY_WAIT = 500L;
 
     //
     // Constructor(s)
@@ -62,6 +67,7 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
         this.currentScannedMembership = new ArrayList<>();
         this.rpcDispatcher = null;
         this.currentScannedMembershipLock = new Object();
+        this.ipcChannelLock = new Object();
     }
 
     //
@@ -99,11 +105,13 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
             this.currentScannedMembership.clear();
             this.currentScannedMembership.addAll(addressList);
         }
+
         if(getLogger().isInfoEnabled()) {
             for (Address currentAddress : addressList) {
                 getLogger().debug("Visible Member->{}", currentAddress);
             }
         }
+
         //
         // A Report
         //
@@ -185,28 +193,44 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
 
     protected void establishJChannel(){
         getLogger().info(".establishJChannel(): Entry, fileName->{}, groupName->{}, channelName->{}",  specifyJGroupsStackFileName(), specifyJGroupsClusterName(), specifyJGroupsChannelName());
-        try {
-            getLogger().trace(".establishJChannel(): Creating JChannel");
-            getLogger().trace(".establishJChannel(): Getting the required ProtocolStack");
-            JChannel newChannel = new JChannel(specifyJGroupsStackFileName());
-            getLogger().trace(".establishJChannel(): JChannel initialised, now setting JChannel name");
-            newChannel.name(specifyJGroupsChannelName());
-            getLogger().trace(".establishJChannel(): JChannel Name set, now set ensure we don't get our own messages");
-            newChannel.setDiscardOwnMessages(true);
-            getLogger().trace(".establishJChannel(): Now setting RPCDispatcher");
-            RpcDispatcher newRPCDispatcher = new RpcDispatcher(newChannel, this);
-            newRPCDispatcher.setMembershipListener(this);
-            getLogger().trace(".establishJChannel(): RPCDispatcher assigned, now connect to JGroup");
-            newChannel.connect( specifyJGroupsClusterName());
-            getLogger().trace(".establishJChannel(): Connected to JGroup complete, now assigning class attributes");
-            this.setIPCChannel(newChannel);
-            this.setRPCDispatcher(newRPCDispatcher);
-            getLogger().trace(".establishJChannel(): Exit, JChannel & RPCDispatcher created");
-
-            return;
-        } catch (Exception e) {
-            getLogger().error(".establishJChannel(): Cannot establish JGroups Channel, error->", e);
-            return;
+        int retryCount = 0;
+        synchronized (getIPCChannelLock()) {
+            while (retryCount < 5) {
+                try {
+                    getLogger().trace(".establishJChannel(): Creating JChannel");
+                    getLogger().trace(".establishJChannel(): Getting the required ProtocolStack");
+                    JChannel newChannel = new JChannel(specifyJGroupsStackFileName());
+                    getLogger().trace(".establishJChannel(): JChannel initialised, now setting JChannel name");
+                    newChannel.name(specifyJGroupsChannelName());
+                    getLogger().trace(".establishJChannel(): JChannel Name set, now set ensure we don't get our own messages");
+                    newChannel.setDiscardOwnMessages(true);
+                    getLogger().trace(".establishJChannel(): Now setting RPCDispatcher");
+                    RpcDispatcher newRPCDispatcher = new RpcDispatcher(newChannel, this);
+                    newRPCDispatcher.setMembershipListener(this);
+                    getLogger().trace(".establishJChannel(): RPCDispatcher assigned, now connect to JGroup");
+                    newChannel.connect(specifyJGroupsClusterName());
+                    getLogger().trace(".establishJChannel(): Connected to JGroup complete, now assigning class attributes");
+                    this.setIPCChannel(newChannel);
+                    this.setRPCDispatcher(newRPCDispatcher);
+                    getLogger().trace(".establishJChannel(): Exit, JChannel & RPCDispatcher created");
+                    break;
+                } catch (Exception e) {
+                    getLogger().error(".establishJChannel(): Cannot establish JGroups Channel, error->{}", ExceptionUtils.getMessage(e));
+                    if (retryCount < INITIALISATION_RETRY_COUNT) {
+                        getLogger().error(".establishJChannel(): Cannot establish JGroups Channel, retrying");
+                    }
+                }
+                retryCount += 1;
+                if (retryCount >= INITIALISATION_RETRY_COUNT) {
+                    break;
+                } else {
+                    try {
+                        Thread.sleep(INITIALISATION_RETRY_WAIT);
+                    } catch (Exception e) {
+                        getLogger().warn(".establishJChannel():Sleep period interrupted, warn->{}", ExceptionUtils.getMessage(e));
+                    }
+                }
+            }
         }
     }
 
@@ -264,6 +288,10 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
         return currentScannedMembershipLock;
     }
 
+    protected Object getIPCChannelLock(){
+        return(this.ipcChannelLock);
+    }
+
     //
     // JGroups Membership Methods
     //
@@ -276,7 +304,10 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
             return (new ArrayList<>());
         }
         try {
-            List<Address> members = getIPCChannel().getView().getMembers();
+            List<Address> members = null;
+            synchronized (getIPCChannelLock()) {
+                members = getIPCChannel().getView().getMembers();
+            }
             return (members);
         } catch (Exception ex) {
             getLogger().warn(".getAllMembers(): Failed to get View Members, Error: Message->{}, StackTrace->{}", ExceptionUtils.getMessage(ex), ExceptionUtils.getStackTrace(ex));

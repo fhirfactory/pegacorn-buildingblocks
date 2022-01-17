@@ -26,16 +26,16 @@ import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 
 import java.util.Objects;
 
 public abstract class PetasosEndpoint extends SoftwareComponent {
-
-    private String endpointServiceName;
     private String endpointDescription;
     private PetasosEndpointStatusEnum endpointStatus;
     private PetasosEndpointFunctionTypeEnum interfaceFunction;
     private ComponentIdType enablingProcessingPlantId;
+    private PetasosEndpointTopologyTypeEnum endpointType;
 
     //
     // Constructor(s)
@@ -43,11 +43,11 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
 
     public PetasosEndpoint(){
         super();
-        this.endpointServiceName = null;
         this.endpointStatus = PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED;
         this.interfaceFunction = null;
         this.endpointDescription = null;
         this.enablingProcessingPlantId = null;
+        this.endpointType = null;
     }
 
     public PetasosEndpoint(PetasosEndpoint ori){
@@ -57,17 +57,32 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
         }
         this.setEndpointStatus(ori.getEndpointStatus());
         this.setInterfaceFunction(ori.getInterfaceFunction());
-        if(ori.hasEndpointServiceName()) {
-            this.setEndpointServiceName(ori.getEndpointServiceName());
-        }
         if(ori.hasEnablingProcessingPlant()){
             setEnablingProcessingPlantId(ori.getEnablingProcessingPlantId());
+        }
+        if(ori.hasEndpointType()){
+            setEndpointType(ori.getEndpointType());
         }
     }
 
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasEndpointType(){
+        boolean hasValue = this.endpointType != null;
+        return(hasValue);
+    }
+
+    public PetasosEndpointTopologyTypeEnum getEndpointType() {
+        return endpointType;
+    }
+
+    public void setEndpointType(PetasosEndpointTopologyTypeEnum endpointType) {
+        this.endpointType = endpointType;
+    }
+
 
     @JsonIgnore
     public boolean hasEnablingProcessingPlant(){
@@ -91,15 +106,6 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
         this.interfaceFunction = interfaceFunction;
     }
 
-    @JsonIgnore
-    public boolean hasEndpointServiceName(){
-        boolean hasValue = endpointServiceName != null;
-        return(hasValue);
-    }
-
-    public String getEndpointServiceName() {
-        return endpointServiceName;
-    }
 
     public PetasosEndpointStatusEnum getEndpointStatus() {
         return endpointStatus;
@@ -121,10 +127,6 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
 
     public void setEndpointDescription(String endpointDescription) {
         this.endpointDescription = endpointDescription;
-    }
-
-    public void setEndpointServiceName(String endpointServiceName) {
-        this.endpointServiceName = endpointServiceName;
     }
 
     //
@@ -150,7 +152,6 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
                 ", componentSystemRole=" + getComponentSystemRole() +
                 ", componentStatus=" + getComponentStatus() +
                 ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", endpointServiceName='" + endpointServiceName + '\'' +
                 ", endpointDescription='" + endpointDescription + '\'' +
                 ", endpointStatus=" + endpointStatus +
                 ", interfaceFunction=" + interfaceFunction +
@@ -166,12 +167,12 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
         if (this == o) return true;
         if (!(o instanceof PetasosEndpoint)) return false;
         PetasosEndpoint that = (PetasosEndpoint) o;
-        return Objects.equals(getEndpointServiceName(), that.getEndpointServiceName()) && Objects.equals(getEndpointDescription(), that.getEndpointDescription()) && getEndpointStatus() == that.getEndpointStatus() && getInterfaceFunction() == that.getInterfaceFunction();
+        return Objects.equals(getEndpointDescription(), that.getEndpointDescription()) && getEndpointStatus() == that.getEndpointStatus() && getInterfaceFunction() == that.getInterfaceFunction();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash( getEndpointServiceName(), getEndpointDescription(), getEndpointStatus(), getInterfaceFunction());
+        return Objects.hash( getEndpointDescription(), getEndpointStatus(), getInterfaceFunction());
     }
 
 }

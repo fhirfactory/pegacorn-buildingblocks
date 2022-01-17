@@ -23,20 +23,27 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories.common;
 
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentSummary;
 import org.slf4j.Logger;
+
+import javax.inject.Inject;
 
 public abstract class PetasosMonitoredComponentFactory {
 
     abstract protected Logger getLogger();
+
+    @Inject
+    private ProcessingPlantPetasosParticipantNameHolder participantNameHolder;
 
     protected SoftwareComponentSummary newPetasosMonitoredComponent(SoftwareComponentSummary monitoredNode, SoftwareComponent topologyNode){
         getLogger().debug(".newITOpsMonitoredNode(): Entry, monitoredNode->{}, topologyNode->{}", monitoredNode, topologyNode);
         monitoredNode.setComponentID(topologyNode.getComponentID());
         monitoredNode.setTopologyNodeFunctionFDN(topologyNode.getNodeFunctionFDN());
         monitoredNode.setTopologyNodeFDN(topologyNode.getComponentFDN());
-        monitoredNode.setSubsystemParticipantName(topologyNode.getSubsystemParticipantName());
+        monitoredNode.setSubsystemParticipantName(participantNameHolder.getSubsystemParticipantName());
         monitoredNode.setParticipantName(topologyNode.getParticipantName());
+        monitoredNode.setParticipantDisplayName(topologyNode.getParticipantDisplayName());
         PetasosMonitoredComponentTypeEnum nodeTypeEnum = PetasosMonitoredComponentTypeEnum.nodeTypeFromTopologyNodeType(topologyNode.getComponentType());
         monitoredNode.setNodeType(nodeTypeEnum);
         monitoredNode.setNodeVersion(topologyNode.getComponentRDN().getNodeVersion());

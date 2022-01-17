@@ -32,7 +32,7 @@ public interface PegacornTopologyFactoryInterface {
 
     public WorkshopSoftwareComponent createWorkshop(String name, String version, ProcessingPlantSoftwareComponent processingPlant, PegacornSystemComponentTypeTypeEnum nodeType);
 
-    public WorkUnitProcessorSoftwareComponent createWorkUnitProcessor(String name, String version, WorkshopSoftwareComponent workshop, PegacornSystemComponentTypeTypeEnum nodeType);
+    public WorkUnitProcessorSoftwareComponent createWorkUnitProcessor(String name, String version, String participantName, WorkshopSoftwareComponent workshop, PegacornSystemComponentTypeTypeEnum nodeType);
 
     public WorkUnitProcessorSubComponentSoftwareComponent createWorkUnitProcessorComponent(String name, PegacornSystemComponentTypeTypeEnum topologyType, WorkUnitProcessorSoftwareComponent wup);
 

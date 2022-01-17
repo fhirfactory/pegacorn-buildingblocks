@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.petasos.endpoints.services.audit;
 
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceHandlerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosServicesEndpointRegistrationService;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
@@ -105,7 +106,7 @@ public class PetasosAuditServicesEndpoint extends JGroupsIntegrationPointBase im
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT);
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }
 
     @Override
@@ -189,16 +190,22 @@ public class PetasosAuditServicesEndpoint extends JGroupsIntegrationPointBase im
             objectSet[0] = task;
             classSet[0] = CapabilityUtilisationRequest.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            CapabilityUtilisationResponse response = getRPCDispatcher().callRemoteMethod(targetAddress, "executeTaskHandler", objectSet, classSet, requestOptions);
+            CapabilityUtilisationResponse response = null;
+            synchronized (getIPCChannelLock()){
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "executeTaskHandler", objectSet, classSet, requestOptions);
+            }
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".executeTask(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".executeTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
             response.setAssociatedRequestID(task.getRequestID());
             response.setSuccessful(false);
             return(response);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".executeTask: Error (GeneralException) ->{}", e.getMessage());
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
@@ -211,6 +218,7 @@ public class PetasosAuditServicesEndpoint extends JGroupsIntegrationPointBase im
     public CapabilityUtilisationResponse executeTaskHandler(CapabilityUtilisationRequest task){
         getLogger().debug(".executeTaskHandler(): Entry, task->{}", task);
         CapabilityUtilisationResponse response = getProcessingPlant().executeTask(task);
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
         getLogger().debug(".executeTaskHandler(): Exit, response->{}", response);
         return(response);
     }
@@ -232,13 +240,19 @@ public class PetasosAuditServicesEndpoint extends JGroupsIntegrationPointBase im
             objectSet[1] = myJGroupsIP;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PegacornTransactionMethodOutcome response = getRPCDispatcher().callRemoteMethod(targetAddress, "logAuditEventHandler", objectSet, classSet, requestOptions);
+            PegacornTransactionMethodOutcome response = null;
+            synchronized (getIPCChannelLock()){
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "logAuditEventHandler", objectSet, classSet, requestOptions);
+            }
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".logAuditEvent(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".logAuditEvent(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".logAuditEvent: Error (GeneralException) ->{}", e.getMessage());
             return(null);
@@ -277,13 +291,19 @@ public class PetasosAuditServicesEndpoint extends JGroupsIntegrationPointBase im
             objectSet[1] = jgroupsIP;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PegacornTransactionMethodOutcome response = getRPCDispatcher().callRemoteMethod(targetAddress, "logMultipleAuditEventHandler", objectSet, classSet, requestOptions);
+            PegacornTransactionMethodOutcome response = null;
+            synchronized (getIPCChannelLock()){
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "logMultipleAuditEventHandler", objectSet, classSet, requestOptions);
+            }
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".logAuditEvent(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".logAuditEvent(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".logAuditEvent: Error (GeneralException) ->{}", e.getMessage());
             return(null);
@@ -299,6 +319,7 @@ public class PetasosAuditServicesEndpoint extends JGroupsIntegrationPointBase im
         if(outcome == null) {
             outcome = outcomeFactory.createResourceActivityOutcome(null, PegacornTransactionStatusEnum.CREATION_FAILURE, getProcessingPlant().getSimpleInstanceName());
         }
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
         getLogger().debug(".logAuditEventHandler(): Exit, outcome->{}", outcome);
         return(outcome);
     }

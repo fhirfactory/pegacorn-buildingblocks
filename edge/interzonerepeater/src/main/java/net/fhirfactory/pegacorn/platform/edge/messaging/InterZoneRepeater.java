@@ -63,8 +63,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise IPC Repeater
-        String interzoneRepeaterIPCIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterIPC().getHostDNSEntry();
-        int interzoneRepeaterIPCPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterIPC().getPortValue();
+        String interzoneRepeaterIPCIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterIPC().getServerHostname();
+        int interzoneRepeaterIPCPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterIPC().getServerPort();
         this.interzoneRepeaterIPC = new GossipRouter(interzoneRepeaterIPCIPAddress, interzoneRepeaterIPCPortNumber);
         try {
             getInterzoneRepeaterIPC().start();
@@ -75,8 +75,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise Topology Repeater
-        String interzoneRepeaterTopologyIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTopology().getHostDNSEntry();
-        int interzoneRepeaterTopologyPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTopology().getPortValue();
+        String interzoneRepeaterTopologyIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTopology().getServerHostname();
+        int interzoneRepeaterTopologyPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTopology().getServerPort();
         this.interzoneRepeaterTopology = new GossipRouter(interzoneRepeaterTopologyIPAddress, interzoneRepeaterTopologyPortNumber);
         try {
             getInterzoneRepeaterTopology().start();
@@ -87,8 +87,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise Subscription Repeater
-        String interzoneRepeaterSubscriptionIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterSubscriptions().getHostDNSEntry();
-        int interzoneRepeaterSubscriptionPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterSubscriptions().getPortValue();
+        String interzoneRepeaterSubscriptionIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterSubscriptions().getServerHostname();
+        int interzoneRepeaterSubscriptionPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterSubscriptions().getServerPort();
         this.interzoneRepeaterSubscriptions = new GossipRouter(interzoneRepeaterSubscriptionIPAddress, interzoneRepeaterSubscriptionPortNumber);
         try {
             getInterzoneRepeaterSubscriptions().start();
@@ -99,8 +99,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise Metrics Repeater
-        String interzoneRepeaterMetricsIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterMetrics().getHostDNSEntry();
-        int interzoneRepeaterMetricsPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterMetrics().getPortValue();
+        String interzoneRepeaterMetricsIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterMetrics().getServerHostname();
+        int interzoneRepeaterMetricsPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterMetrics().getServerPort();
         this.interzoneRepeaterMetrics = new GossipRouter(interzoneRepeaterMetricsIPAddress, interzoneRepeaterMetricsPortNumber);
         try {
             getInterzoneRepeaterMetrics().start();
@@ -111,8 +111,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise Interception Repeater
-        String interzoneRepeaterInterceptionIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterInterception().getHostDNSEntry();
-        int interzoneRepeaterInterceptionPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterInterception().getPortValue();
+        String interzoneRepeaterInterceptionIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterInterception().getServerHostname();
+        int interzoneRepeaterInterceptionPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterInterception().getServerPort();
         this.interzoneRepeaterInterception = new GossipRouter(interzoneRepeaterInterceptionIPAddress, interzoneRepeaterInterceptionPortNumber);
         try {
             getInterzoneRepeaterInterception().start();
@@ -123,8 +123,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise Infinispan Repeater
-        String interzoneRepeaterInfinispanIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterInfinspan().getHostDNSEntry();
-        int interzoneRepeaterInfinispanPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterInfinspan().getPortValue();
+        String interzoneRepeaterInfinispanIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterInfinspan().getServerHostname();
+        int interzoneRepeaterInfinispanPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterInfinspan().getServerPort();
         this.interzoneRepeaterInfinispan = new GossipRouter(interzoneRepeaterInfinispanIPAddress, interzoneRepeaterInfinispanPortNumber);
         try {
             getInterzoneRepeaterInfinispan().start();
@@ -135,8 +135,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise Audit Repeater
-        String interzoneRepeaterAuditIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterAudit().getHostDNSEntry();
-        int interzoneRepeaterAuditPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterAudit().getPortValue();
+        String interzoneRepeaterAuditIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterAudit().getServerHostname();
+        int interzoneRepeaterAuditPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterAudit().getServerPort();
         this.interzoneRepeaterAudit = new GossipRouter(interzoneRepeaterAuditIPAddress, interzoneRepeaterAuditPortNumber);
         try {
             getInterzoneRepeaterAudit().start();
@@ -147,8 +147,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise Tasking Repeater
-        String interzoneRepeaterTaskingIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTasking().getHostDNSEntry();
-        int interzoneRepeaterTaskingPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTasking().getPortValue();
+        String interzoneRepeaterTaskingIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTasking().getServerHostname();
+        int interzoneRepeaterTaskingPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTasking().getServerPort();
         this.interzoneRepeaterTasking = new GossipRouter(interzoneRepeaterTaskingIPAddress, interzoneRepeaterTaskingPortNumber);
         try {
             getInterzoneRepeaterTasking().start();
@@ -159,8 +159,8 @@ public class InterZoneRepeater{
 
         //
         // Initialise Tasking Repeater
-        String interzoneRepeaterDatagridIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterDatagrid().getHostDNSEntry();
-        int interzoneRepeaterDatagridPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterDatagrid().getPortValue();
+        String interzoneRepeaterDatagridIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterDatagrid().getServerHostname();
+        int interzoneRepeaterDatagridPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterDatagrid().getServerPort();
         this.interzoneRepeaterDatagrid = new GossipRouter(interzoneRepeaterDatagridIPAddress, interzoneRepeaterDatagridPortNumber);
         try {
             getInterzoneRepeaterDatagrid().start();

@@ -19,23 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http;
+package net.fhirfactory.pegacorn.core.model.topology.endpoints.http;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractServerTopologyEndpointPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InteractHTTPServerTopologyEndpoint extends StandardInteractServerTopologyEndpointPort {
-    private static final Logger LOG = LoggerFactory.getLogger(InteractHTTPServerTopologyEndpoint.class);
+public class HTTPServerTopologyEndpoint extends StandardInteractServerTopologyEndpointPort {
+    private static final Logger LOG = LoggerFactory.getLogger(HTTPServerTopologyEndpoint.class);
 
-    public InteractHTTPServerTopologyEndpoint(){
+    public HTTPServerTopologyEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_HTTP_API_SERVER);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.HTTP_API_SERVER);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_INGRES);
     }
 

@@ -33,9 +33,7 @@ public class PetasosComponentMetricSet implements Serializable {
     private ComponentIdType metricSourceComponentId;
 
     private PetasosMonitoredComponentTypeEnum componentType;
-    private String sourceProcessingPlantParticipantName;
-    private String sourceWorkshopParticipantName;
-    private String sourceWorkUnitProcessorParticipantName;
+    private String sourceParticipantName;
 
     //
     // Contructor(s)
@@ -44,35 +42,19 @@ public class PetasosComponentMetricSet implements Serializable {
     public PetasosComponentMetricSet(){
         this.metrics = new HashMap<>();
         this.metricSourceComponentId = null;
-        this.sourceWorkUnitProcessorParticipantName = null;
+        this.sourceParticipantName = null;
     }
 
     public PetasosComponentMetricSet(ComponentIdType sourceId, PetasosMonitoredComponentTypeEnum componentType){
         metrics = new HashMap<>();
         this.metricSourceComponentId = sourceId;
-        this.sourceWorkUnitProcessorParticipantName = null;
+        this.sourceParticipantName = null;
         this.componentType = componentType;
     }
 
     //
     // Getters and Setters
     //
-
-    public String getSourceProcessingPlantParticipantName() {
-        return sourceProcessingPlantParticipantName;
-    }
-
-    public void setSourceProcessingPlantParticipantName(String sourceProcessingPlantParticipantName) {
-        this.sourceProcessingPlantParticipantName = sourceProcessingPlantParticipantName;
-    }
-
-    public String getSourceWorkshopParticipantName() {
-        return sourceWorkshopParticipantName;
-    }
-
-    public void setSourceWorkshopParticipantName(String sourceWorkshopParticipantName) {
-        this.sourceWorkshopParticipantName = sourceWorkshopParticipantName;
-    }
 
     public HashMap<String, PetasosComponentMetric> getMetrics() {
         return metrics;
@@ -90,12 +72,12 @@ public class PetasosComponentMetricSet implements Serializable {
         this.metricSourceComponentId = metricSourceComponentId;
     }
 
-    public String getSourceWorkUnitProcessorParticipantName() {
-        return sourceWorkUnitProcessorParticipantName;
+    public String getSourceParticipantName() {
+        return sourceParticipantName;
     }
 
-    public void setSourceWorkUnitProcessorParticipantName(String sourceWorkUnitProcessorParticipantName) {
-        this.sourceWorkUnitProcessorParticipantName = sourceWorkUnitProcessorParticipantName;
+    public void setSourceParticipantName(String sourceParticipantName) {
+        this.sourceParticipantName = sourceParticipantName;
     }
 
     public PetasosMonitoredComponentTypeEnum getComponentType() {
@@ -140,9 +122,7 @@ public class PetasosComponentMetricSet implements Serializable {
                 "metrics=" + metrics +
                 ", metricSourceComponentId=" + metricSourceComponentId +
                 ", componentType=" + componentType +
-                ", sourceProcessingPlantParticipantName='" + sourceProcessingPlantParticipantName + '\'' +
-                ", sourceWorkshopParticipantName='" + sourceWorkshopParticipantName + '\'' +
-                ", sourceWorkUnitProcessorParticipantName='" + sourceWorkUnitProcessorParticipantName + '\'' +
+                ", sourceWorkUnitProcessorParticipantName='" + sourceParticipantName + '\'' +
                 '}';
     }
 }

@@ -35,7 +35,7 @@ public class StandardEdgeAnswerHTTPEndpoint extends ClusteredInteractServerTopol
 
     public StandardEdgeAnswerHTTPEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_HTTP_API_SERVER);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.HTTP_API_SERVER);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_SUBSYSTEM_EDGE);
     }
 

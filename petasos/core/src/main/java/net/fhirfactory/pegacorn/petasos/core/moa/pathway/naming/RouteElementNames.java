@@ -26,6 +26,9 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thymeleaf.util.StringUtils;
+
+import java.time.chrono.IsoEra;
 
 
 /**
@@ -43,15 +46,17 @@ public class RouteElementNames {
     private boolean mustBeDirect;
     private String wupTypeName;
     private String wupVersion;
+    private String sedaParameters;
     private static final String INTRA_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String DIRECT_INTER_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda://";
 
-    public RouteElementNames(TopologyNodeFunctionFDNToken functionToken, boolean mustBeDirect){
+    public RouteElementNames(TopologyNodeFunctionFDNToken functionToken, boolean mustBeDirect, String sedaParameters){
         getLogger().debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
         this.nodeFunctionFDNToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = mustBeDirect;
+        this.sedaParameters = sedaParameters;
     }
 
     public RouteElementNames(TopologyNodeFunctionFDNToken functionToken){
@@ -59,6 +64,7 @@ public class RouteElementNames {
         this.nodeFunctionFDNToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = false;
+        this.sedaParameters = null;
     }
 
     public String simplifyName(){
@@ -92,7 +98,11 @@ public class RouteElementNames {
         if(this.mustBeDirect){
             endpointName = DIRECT_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Ingres";
         } else {
-            endpointName = SEDA_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Ingres";
+            if(StringUtils.isEmpty(this.sedaParameters)) {
+                endpointName = SEDA_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Ingres";
+            } else {
+                endpointName = SEDA_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Ingres" + sedaParameters;
+            }
         }
         return(endpointName);
     }

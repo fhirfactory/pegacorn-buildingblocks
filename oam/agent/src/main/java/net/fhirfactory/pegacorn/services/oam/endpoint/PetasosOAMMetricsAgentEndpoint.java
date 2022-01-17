@@ -88,7 +88,7 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
 
     @Override
     public Instant replicateMetricSetToServer(String serviceProviderName, PetasosComponentMetricSet metricSet){
-        getLogger().info(".replicateMetricSetToServer(): Entry, serviceProviderName->{}, metricSet->{}", serviceProviderName, metricSet);
+        getLogger().debug(".replicateMetricSetToServer(): Entry, serviceProviderName->{}, metricSet->{}", serviceProviderName, metricSet);
         JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
         PetasosAdapterAddress targetPetasosAddress = getTargetMemberAdapterInstanceForSubsystem(serviceProviderName);
         if(targetPetasosAddress == null){
@@ -110,11 +110,14 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Instant response = getRPCDispatcher().callRemoteMethod(targetAddress, "captureMetrics", objectSet, classSet, requestOptions);
             getLogger().info(".replicateMetricSetToServer(): Exit, response->{}", response);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             return(response);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".replicateMetricSetToServer(): Error (NoSuchMethodException) Message->{}, StackTrace->{} ", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".replicateMetricSetToServer(): Error (GeneralException) Message->{}, StackTrace->{} ", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
@@ -144,12 +147,15 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "captureMetric", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".replicateMetricToServer(): Exit, responseInstant->{}", responseInstant);
             return(responseInstant);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".replicateMetricToServer(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".replicateMetricToServer: Error (GeneralException) ->{}", e.getMessage());
             return(null);
@@ -178,13 +184,16 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "replicateSubscriptionSummaryReportHandler", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".shareLocalSubscriptionSummaries(): Exit, responseInstant->{}", responseInstant);
             return(responseInstant);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".shareLocalSubscriptionSummaries(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
             e.printStackTrace();
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".shareLocalSubscriptionSummaries: Error (GeneralException) ->{}", e.getMessage());
             return(null);
         }
@@ -216,12 +225,15 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "topologyGraphHandler", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".shareLocalTopologyGraph(): Exit, responseInstant->{}", responseInstant);
             return(responseInstant);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".shareLocalTopologyGraph(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".shareLocalTopologyGraph: Error (GeneralException) ->{}", e.getMessage());
             return(null);
@@ -235,7 +247,7 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
 
     @Override
     public void sendNotification(PetasosComponentITOpsNotification notification) {
-        getLogger().info(".sendNotification(): Entry, notification->{}", notification);
+        getLogger().debug(".sendNotification(): Entry, notification->{}", notification);
         JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
         Address targetAddress = getCandidateTargetServiceAddress(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
         if(targetAddress == null){
@@ -251,13 +263,16 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             getRPCDispatcher().callRemoteMethod(targetAddress, "receiveNotification", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".sendNotification(): Exit, responseInstant");
             return;
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendNotification(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return;
         } catch (Exception e) {
             e.printStackTrace();
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendNotification: Error (GeneralException) ->{}", e.getMessage());
             return;
         }

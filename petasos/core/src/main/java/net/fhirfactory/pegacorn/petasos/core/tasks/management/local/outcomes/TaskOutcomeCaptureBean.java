@@ -84,16 +84,16 @@ public class TaskOutcomeCaptureBean {
             case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
             case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
             case FULFILLMENT_EXECUTION_STATUS_FAILED:
-                getLogger().info(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies failure...");
+                getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies failure...");
                 actionableTask = actionableTaskActivityController.notifyActionableTaskExecutionFailure(actionableTaskId, fulfillmentTask);
                 break;
             case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
-                getLogger().info(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies cancellation...");
+                getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies cancellation...");
                 actionableTask = actionableTaskActivityController.notifyActionableTaskExecutionCancellation(actionableTaskId, fulfillmentTask);
                 break;
             case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
             case FULFILLMENT_EXECUTION_STATUS_FINISHED:
-                getLogger().info(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies (good) finish...");
+                getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies (good) finish...");
                 actionableTask = actionableTaskActivityController.notifyActionableTaskExecutionFinish(actionableTaskId, fulfillmentTask);
                 break;
         }

@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeKeyEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelValidationStatusEnum;
 
 import java.io.Serializable;
@@ -130,28 +130,28 @@ public class DataParcelToken extends DataParcelTypeDescriptor implements Seriali
     public FDN toFDN(){
         FDN fdn = new FDN();
         if(hasDataParcelDefiner()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DEFINER.getTopicKey(), getDataParcelDefiner()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_DEFINER.getTopicKey(), getDataParcelDefiner()));
         }
         if(hasDataParcelCategory()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_CATEGORY.getTopicKey(), getDataParcelCategory()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_CATEGORY.getTopicKey(), getDataParcelCategory()));
         }
         if(hasDataParcelSubCategory()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicKey(), getDataParcelSubCategory()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_SUBCATEGORY.getTopicKey(), getDataParcelSubCategory()));
         }
         if(hasDataParcelResource()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicKey(), getDataParcelResource()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_RESOURCE.getTopicKey(), getDataParcelResource()));
         }
         if(hasDataParcelSegment()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SEGMENT.getTopicKey(), getDataParcelSegment()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_SEGMENT.getTopicKey(), getDataParcelSegment()));
         }
         if(hasDataParcelAttribute()){
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_ATTRIBUTE.getTopicKey(), getDataParcelAttribute()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_ATTRIBUTE.getTopicKey(), getDataParcelAttribute()));
         }
-        fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_TYPE.getTopicKey(), getDataParcelType().getDataParcelTypeValue()));
-        fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_NORMALISATION_STATUS.getTopicKey(), getNormalisationStatus().getNormalisationStatusValue()));
-        fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_VALIDATION_STATUS.getTopicKey(), getValidationStatus().getValidationStatusValue()));
+        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_TYPE.getTopicKey(), getDataParcelType().getDataParcelTypeValue()));
+        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_NORMALISATION_STATUS.getTopicKey(), getNormalisationStatus().getNormalisationStatusValue()));
+        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_VALIDATION_STATUS.getTopicKey(), getValidationStatus().getValidationStatusValue()));
         if(hasVersion()) {
-            fdn.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_VERSION.getTopicKey(), getVersion()));
+            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_VERSION.getTopicKey(), getVersion()));
         }
         return(fdn);
     }
@@ -162,7 +162,7 @@ public class DataParcelToken extends DataParcelTypeDescriptor implements Seriali
             return;
         }
         for(RDN rdn: fdn.getRDNSet()){
-            DataParcelTypeKeyEnum keyEnum = DataParcelTypeKeyEnum.fromTopicKeyString(rdn.getQualifier());
+            DataParcelDescriptorKeyEnum keyEnum = DataParcelDescriptorKeyEnum.fromTopicKeyString(rdn.getQualifier());
             switch(keyEnum) {
                 case DATASET_DEFINER:
                     setDataParcelDefiner(rdn.getValue());

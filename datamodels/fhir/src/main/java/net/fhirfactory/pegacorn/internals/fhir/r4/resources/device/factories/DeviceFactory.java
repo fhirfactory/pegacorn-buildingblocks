@@ -28,16 +28,14 @@ import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTy
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer.StandardEdgeAnswerHTTPEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.answer.StandardEdgeIPCEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.ask.StandardEdgeAskHTTPEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.datatypes.JGroupsAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPClientTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPServerTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPClientEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPClientAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPServerAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPClientTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPClientEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters.MLLPClientAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters.MLLPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
@@ -230,58 +228,45 @@ public class DeviceFactory {
         Device device = newDeviceFromSoftwareComponent(ipcEndpoint);
 
         switch(ipcEndpoint.getEndpointType()){
-            case EDGE_JGROUPS_INTEGRATION_POINT:
+            case JGROUPS_INTEGRATION_POINT:
                 StandardEdgeIPCEndpoint jgroupsEndpoint = (StandardEdgeIPCEndpoint)ipcEndpoint;
                 JGroupsAdapter jgroupsAdapter = jgroupsEndpoint.getJGroupsAdapter();
                 Endpoint endpoint = getEndpointFactory().newJGroupsEndpoint(jgroupsEndpoint, jgroupsAdapter);
                 device.addContained(endpoint);
                 return(device);
-            case EDGE_HTTP_API_SERVER:
-                StandardEdgeAnswerHTTPEndpoint answerHTTPEndpoint = (StandardEdgeAnswerHTTPEndpoint) ipcEndpoint;
-                HTTPServerAdapter httpServerAdapter = answerHTTPEndpoint.getHTTPServerAdapter();
-                Endpoint edgeAnswerEndpoint = getEndpointFactory().newEndpoint(answerHTTPEndpoint, httpServerAdapter);
+            case HTTP_API_SERVER:
+                HTTPServerTopologyEndpoint httpServer = (HTTPServerTopologyEndpoint) ipcEndpoint;
+                HTTPServerAdapter httpServerAdapter = httpServer.getHTTPServerAdapter();
+                Endpoint edgeAnswerEndpoint = getEndpointFactory().newEndpoint(httpServer, httpServerAdapter);
                 device.addContained(edgeAnswerEndpoint);
                 return(device);
-            case EDGE_HTTP_API_CLIENT:
-                StandardEdgeAskHTTPEndpoint askHTTPEndpoint = (StandardEdgeAskHTTPEndpoint) ipcEndpoint;
-                for(HTTPClientAdapter currentHTTPClientAdapter: askHTTPEndpoint.getHTTPClientAdapters()) {
-                    Endpoint edgeAskEndpoint = getEndpointFactory().newEndpoint(askHTTPEndpoint, currentHTTPClientAdapter);
-                    device.addContained(edgeAskEndpoint);
-                }
-                return(device);
-            case INTERACT_MLLP_SERVER:
-                InteractMLLPServerEndpoint mllpServerEndpoint = (InteractMLLPServerEndpoint)ipcEndpoint;
-                MLLPServerAdapter mllpServerAdapter = mllpServerEndpoint.getMLLPServerAdapter();
-                Endpoint mllpServerFHIREndpoint = getEndpointFactory().newEndpoint(mllpServerEndpoint, mllpServerAdapter);
-                device.addContained(mllpServerFHIREndpoint);
-                return(device);
-            case INTERACT_MLLP_CLIENT:
-                InteractMLLPClientEndpoint mllpClientEndpoint = (InteractMLLPClientEndpoint) ipcEndpoint;
-                for(MLLPClientAdapter currentMLLPClientAdapter: mllpClientEndpoint.getMLLPClientAdapters() ){
-                    Endpoint mllpClientFHIREndpoint = getEndpointFactory().newEndpoint(mllpClientEndpoint, currentMLLPClientAdapter);
-                    device.addContained(mllpClientFHIREndpoint);
-                }
-                return(device);
-            case INTERACT_HTTP_API_SERVER:
-                InteractHTTPServerTopologyEndpoint httpServerTopologyEndpoint = (InteractHTTPServerTopologyEndpoint) ipcEndpoint;
-                HTTPServerAdapter interactHTTPServiceAdapter = httpServerTopologyEndpoint.getHTTPServerAdapter();
-                Endpoint interactHTTPEndpoint = getEndpointFactory().newEndpoint(httpServerTopologyEndpoint, interactHTTPServiceAdapter);
-                device.addContained(interactHTTPEndpoint);
-                return(device);
-            case INTERACT_HTTP_API_CLIENT:
-                InteractHTTPClientTopologyEndpoint httpClientTopologyEndpoint = (InteractHTTPClientTopologyEndpoint) ipcEndpoint;
+            case HTTP_API_CLIENT:
+                HTTPClientTopologyEndpoint httpClientTopologyEndpoint = (HTTPClientTopologyEndpoint) ipcEndpoint;
                 for(HTTPClientAdapter currentHTTPClientAdapter: httpClientTopologyEndpoint.getHTTPClientAdapters()) {
                     Endpoint edgeAskEndpoint = getEndpointFactory().newEndpoint(httpClientTopologyEndpoint, currentHTTPClientAdapter);
                     device.addContained(edgeAskEndpoint);
                 }
                 return(device);
-            case INTERACT_SQL_SERVER:
+            case MLLP_SERVER:
+                MLLPServerEndpoint mllpServerEndpoint = (MLLPServerEndpoint)ipcEndpoint;
+                MLLPServerAdapter mllpServerAdapter = mllpServerEndpoint.getMLLPServerAdapter();
+                Endpoint mllpServerFHIREndpoint = getEndpointFactory().newEndpoint(mllpServerEndpoint, mllpServerAdapter);
+                device.addContained(mllpServerFHIREndpoint);
+                return(device);
+            case MLLP_CLIENT:
+                MLLPClientEndpoint mllpClientEndpoint = (MLLPClientEndpoint) ipcEndpoint;
+                for(MLLPClientAdapter currentMLLPClientAdapter: mllpClientEndpoint.getMLLPClientAdapters() ){
+                    Endpoint mllpClientFHIREndpoint = getEndpointFactory().newEndpoint(mllpClientEndpoint, currentMLLPClientAdapter);
+                    device.addContained(mllpClientFHIREndpoint);
+                }
+                return(device);
+            case SQL_SERVER:
                 break;
-            case INTERACT_SQL_CLIENT:
+            case SQL_CLIENT:
                 break;
-            case INTERACT_LDAP_SERVER:
+            case LDAP_SERVER:
                 break;
-            case INTERACT_LDAP_CLIENT:
+            case LDAP_CLIENT:
                 break;
             case OTHER_API_SERVER:
                 break;

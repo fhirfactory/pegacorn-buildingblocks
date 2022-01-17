@@ -38,10 +38,7 @@ import java.time.Instant;
 public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
     private static final Logger LOG = LoggerFactory.getLogger(WorkUnitProcessorMetricsAgent.class);
 
-    public static final String WORK_UNIT_PROCESSOR_METRICS_TYPE = "WorkUnitProcessorBasedMetrics";
-
     private WorkUnitProcessorMetricsData metricsData;
-
 
     //
     // Constructor(s)
@@ -49,6 +46,7 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
 
     public WorkUnitProcessorMetricsAgent(PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName){
         super();
+        getLogger().info(".WorkUnitProcessorMetricsAgent(): Initialising Working Unit Processor Metrics");
         this.metricsData = new WorkUnitProcessorMetricsData();
         setLocalMetricsDM(localMetricsDM);
         this.metricsData.setParticipantName(participantName);
@@ -78,12 +76,13 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
     public void sendITOpsNotification(String message) {
         PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
         notification.setComponentId(getMetricsData().getComponentID());
-        notification.setProcessingPlantParticipantName(getWUPMetricsData().getProcessingPlantParticipantName());
-        notification.setWorkshopParticipantName(getWUPMetricsData().getWorkshopParticipantName());
-        notification.setWorkUnitProcessorParticipantName(getWUPMetricsData().getParticipantName());
+        notification.setParticipantName(getWUPMetricsData().getParticipantName());
         notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR);
         notification.setContent(message);
         getNotificationAgent().sendNotification(notification);
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".sendITOpsNotification(): Send Notification->{}", notification);
+        }
     }
 
     //

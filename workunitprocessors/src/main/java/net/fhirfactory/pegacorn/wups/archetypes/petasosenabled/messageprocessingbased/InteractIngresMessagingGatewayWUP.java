@@ -26,10 +26,11 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.InteractMLLPServerEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
@@ -39,13 +40,41 @@ import java.util.List;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
+    private EndpointMetricsAgent endpointMetricsAgent;
+
+    //
+    // Constructor(s)
+    //
+
     public InteractIngresMessagingGatewayWUP() {
         super();
-//        getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
+        this.endpointMetricsAgent = null;
+        getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
+
+    //
+    // Abstract Method Declarations
+    //
 
     protected abstract String specifyIngresTopologyEndpointName();
     protected abstract String specifyIngresEndpointVersion();
+    protected abstract String specifyEndpointParticipantName();
+
+    //
+    // Getters (and Setters)
+    //
+
+    protected EndpointMetricsAgent getEndpointMetricsAgent(){
+        return(endpointMetricsAgent);
+    }
+
+    protected void setEndpointMetricsAgent(EndpointMetricsAgent agent){
+        this.endpointMetricsAgent = agent;
+    }
+
+    //
+    // Superclass Method Overrides/Implementations
+    //
 
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
@@ -60,6 +89,19 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
         egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
         return(egressEndpoint);
+    }
+
+    @Override
+    protected void establishEndpointMetricAgents(){
+        getLogger().debug(".establishEndpointMetricAgents(): Entry");
+        String connectedSystem = getSourceSystemName();
+        String endpointDescription = getIngresEndpoint().getEndpointTopologyNode().getEndpointDescription();
+        this.endpointMetricsAgent = getMetricAgentFactory().newEndpointMetricsAgent(
+                getIngresEndpoint().getEndpointTopologyNode().getComponentID(),
+                getIngresEndpoint().getEndpointTopologyNode().getParticipantName(),
+                connectedSystem,
+                endpointDescription);
+        getLogger().debug(".establishEndpointMetricAgents(): Exit");
     }
 
     /**
@@ -115,6 +157,10 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
         }
     }
 
+    //
+    // Detail Injectors for Routes
+    //
+
     protected class PortDetailInjector implements Processor {
         @Override
         public void process(Exchange exchange) throws Exception {
@@ -128,16 +174,22 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
             }
             if (!alreadyInPlace) {
                 switch(getIngresEndpoint().getEndpointTopologyNode().getEndpointType()) {
-                    case INTERACT_MLLP_SERVER: {
-                        InteractMLLPServerEndpoint serverTopologyEndpoint = (InteractMLLPServerEndpoint) getIngresEndpoint().getEndpointTopologyNode();
+                    case MLLP_SERVER: {
+                        MLLPServerEndpoint serverTopologyEndpoint = (MLLPServerEndpoint) getIngresEndpoint().getEndpointTopologyNode();
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, serverTopologyEndpoint.getEndpointType().getToken());
-                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, serverTopologyEndpoint.getMLLPServerAdapter().getPortNumber());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_PORT_VALUE, serverTopologyEndpoint.getMLLPServerAdapter().getPortNumber());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_TOPOLOGY_NODE_EXCHANGE_PROPERTY, serverTopologyEndpoint);
+                        exchange.setProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, getMetricsAgent());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getEndpointMetricsAgent());
                         break;
                     }
-                    case INTERACT_MLLP_CLIENT:{
-                        StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getEgressEndpoint().getEndpointTopologyNode();
-                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getToken());
-                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_VALUE, getEgressEndpoint().getEndpointSpecification());
+                    case HTTP_API_SERVER:{
+                        HTTPServerTopologyEndpoint serverTopologyEndpoint = (HTTPServerTopologyEndpoint) getIngresEndpoint().getEndpointTopologyNode();
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, serverTopologyEndpoint.getEndpointType().getToken());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_PORT_VALUE, serverTopologyEndpoint.getHTTPServerAdapter().getPortNumber());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_TOPOLOGY_NODE_EXCHANGE_PROPERTY, serverTopologyEndpoint);
+                        exchange.setProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, getMetricsAgent());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getEndpointMetricsAgent());
                     }
                     default:{
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, "Undisclosed");

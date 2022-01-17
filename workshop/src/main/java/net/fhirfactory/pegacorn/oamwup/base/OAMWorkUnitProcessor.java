@@ -111,7 +111,8 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
 
     private void buildOAMWorkUnitProcessor() {
         getLogger().debug(".buildOAMWorkUnitProcessor(): Entry, adding Workshop --> {}, version --> {}", specifyOAMWUPName(), specifyOAMWUPVersion());
-        WorkUnitProcessorSoftwareComponent wup = getTopologyFactory().createWorkUnitProcessor(specifyOAMWUPName(), specifyOAMWUPVersion(), specifyOAMWorkshop().getWorkshopNode(), PegacornSystemComponentTypeTypeEnum.OAM_WORK_UNIT_PROCESSOR);
+        String participantName = getWorkshop().getWorkshopNode().getParticipantName() + "." + specifyOAMWUPName();
+        WorkUnitProcessorSoftwareComponent wup = getTopologyFactory().createWorkUnitProcessor(specifyOAMWUPName(), specifyOAMWUPVersion(), participantName, specifyOAMWorkshop().getWorkshopNode(), PegacornSystemComponentTypeTypeEnum.OAM_WORK_UNIT_PROCESSOR);
         topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getComponentFDN(), wup);
         this.wupTopologyNode = wup;
         getLogger().debug(".buildOAMWorkUnitProcessor(): Exit");

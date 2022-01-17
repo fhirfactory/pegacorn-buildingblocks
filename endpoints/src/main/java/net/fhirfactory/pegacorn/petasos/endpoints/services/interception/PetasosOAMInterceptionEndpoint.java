@@ -91,7 +91,7 @@ public class PetasosOAMInterceptionEndpoint extends JGroupsIntegrationPointBase 
 
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
-        return (PetasosEndpointTopologyTypeEnum.EDGE_JGROUPS_INTEGRATION_POINT);
+        return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }
 
     @Override
@@ -193,13 +193,19 @@ public class PetasosOAMInterceptionEndpoint extends JGroupsIntegrationPointBase 
             objectSet[1] = myIP;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PetasosFulfillmentTask redirectedTaskOutcome = getRPCDispatcher().callRemoteMethod(targetAddress, "redirectFulfillmentTaskHandler", objectSet, classSet, requestOptions);
+            PetasosFulfillmentTask redirectedTaskOutcome = null;
+            synchronized (getIPCChannelLock()) {
+                redirectedTaskOutcome = getRPCDispatcher().callRemoteMethod(targetAddress, "redirectFulfillmentTaskHandler", objectSet, classSet, requestOptions);
+            }
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             getLogger().debug(".redirectFulfillmentTask(): Exit, redirectedTask->{}", redirectedTaskOutcome);
             return(redirectedTaskOutcome);
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".redirectFulfillmentTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".redirectFulfillmentTask: Error (GeneralException) ->{}", e.getMessage());
             return(null);
@@ -212,6 +218,7 @@ public class PetasosOAMInterceptionEndpoint extends JGroupsIntegrationPointBase 
         if((task != null) && (endpointIdentifier != null)) {
             redirectedTaskOutcome = interceptionHandler.redirectFulfillmentTask(task, endpointIdentifier);
         }
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
         getLogger().debug(".redirectFulfillmentTaskHandler(): Exit, redirectedTaskOutcome->{}", redirectedTaskOutcome);
         return(redirectedTaskOutcome);
     }

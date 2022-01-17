@@ -24,11 +24,13 @@ package net.fhirfactory.pegacorn.core.model.topology.nodes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(WorkUnitProcessorSoftwareComponent.class);
@@ -37,6 +39,7 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
     private ArrayList<TopologyNodeFDN> wupInterchangeComponents;
     private IPCTopologyEndpoint ingresEndpoint;
     private IPCTopologyEndpoint egressEndpoint;
+    private Map<PetasosEndpointFunctionTypeEnum, PetasosEndpoint> serviceEndpoints;
     private Integer replicationCount;
 
     //
@@ -49,11 +52,30 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
         this.ingresEndpoint = null;
         this.egressEndpoint = null;
         this.replicationCount = null;
+        this.serviceEndpoints = new HashMap<>();
     }
 
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasServiceEndpoints(){
+        boolean hasValue = this.serviceEndpoints != null;
+        if(hasValue){
+            boolean hasValues = this.serviceEndpoints.isEmpty() != true;
+            return(hasValues);
+        }
+        return(hasValue);
+    }
+
+    public Map<PetasosEndpointFunctionTypeEnum, PetasosEndpoint> getServiceEndpoints() {
+        return serviceEndpoints;
+    }
+
+    public void setServiceEndpoints(Map<PetasosEndpointFunctionTypeEnum, PetasosEndpoint> serviceEndpoints) {
+        this.serviceEndpoints = serviceEndpoints;
+    }
 
     @JsonIgnore
     public boolean hasReplicationCount(){

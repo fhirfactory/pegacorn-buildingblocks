@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http;
+package net.fhirfactory.pegacorn.core.model.topology.endpoints.http;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
@@ -10,11 +10,11 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardI
 import java.util.ArrayList;
 import java.util.List;
 
-public class InteractHTTPClientTopologyEndpoint extends StandardInteractClientTopologyEndpointPort {
+public class HTTPClientTopologyEndpoint extends StandardInteractClientTopologyEndpointPort {
 
-    public InteractHTTPClientTopologyEndpoint(){
+    public HTTPClientTopologyEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_HTTP_API_CLIENT);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.HTTP_API_CLIENT);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_EGRESS);
     }
 

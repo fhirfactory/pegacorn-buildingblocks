@@ -83,6 +83,15 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         }
     }
 
+    public PetasosParticipant(String participantName, SoftwareComponent ori){
+        super(ori);
+        this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
+        this.setParticipantName(participantName);
+        this.utilisationUpdateInstant = null;
+        this.subscribedWorkItemManifests = new HashSet<>();
+        this.publishedWorkItemManifests = new HashSet<>();
+    }
+
     public PetasosParticipant(SoftwareComponent ori){
         super(ori);
         this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;

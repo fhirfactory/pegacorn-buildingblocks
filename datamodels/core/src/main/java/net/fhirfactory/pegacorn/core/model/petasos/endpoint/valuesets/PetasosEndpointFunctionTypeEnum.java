@@ -22,22 +22,24 @@
 package net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets;
 
 public enum PetasosEndpointFunctionTypeEnum {
-    PETASOS_INFINISPAN_ENDPOINT("petasos.endpoint_function.infinispan", "Infinispan"),
-    PETASOS_INTERACT_ENDPOINT("petasos.endpoint_function.interact", "Interact"),
-    PETASOS_MESSAGING_ENDPOINT("petasos.endpoint_function.messaging","Messaging"),
-    PETASOS_SUBSCRIPTIONS_ENDPOINT("petasos.endpoint_function.subscription_services", "SubscriptionServices"),
-    PETASOS_INTERCEPTION_ENDPOINT("petasos.endpoint_function.interception_services", "InterceptionServices"),
-    PETASOS_TASKING_ENDPOINT("petasos.endpoint_function.tasking_services", "TaskingServices"),
-    PETASOS_AUDIT_ENDPOINT("petasos.endpoint_function.audit_services", "AuditServices"),
-    PETASOS_METRICS_ENDPOINT("petasos.endpoint_function.metrics_services", "MetricsServices"),
-    PETASOS_TOPOLOGY_ENDPOINT("petasos.endpoint_function.topology_services", "TopologyServices");
+    PETASOS_INFINISPAN_ENDPOINT("petasos.endpoint_function.infinispan", "Infinispan", "JGroups.Infinispan"),
+    PETASOS_INTERACT_ENDPOINT("petasos.endpoint_function.interact", "Interact", "JGroups.Interact"),
+    PETASOS_MESSAGING_ENDPOINT("petasos.endpoint_function.messaging","Messaging", "JGroups.MessagingIPC"),
+    PETASOS_SUBSCRIPTIONS_ENDPOINT("petasos.endpoint_function.subscription_services", "SubscriptionServices","JGroups.SubscriptionServices"),
+    PETASOS_INTERCEPTION_ENDPOINT("petasos.endpoint_function.interception_services", "InterceptionServices", "JGroups.InterceptionServices"),
+    PETASOS_TASKING_ENDPOINT("petasos.endpoint_function.tasking_services", "TaskingServices", "JGroups.TaskingServices"),
+    PETASOS_AUDIT_ENDPOINT("petasos.endpoint_function.audit_services", "AuditServices", "JGroups.AuditServices"),
+    PETASOS_METRICS_ENDPOINT("petasos.endpoint_function.metrics_services", "MetricsServices", "JGroups.MetricServices"),
+    PETASOS_TOPOLOGY_ENDPOINT("petasos.endpoint_function.topology_services", "TopologyServices", "JGroups.TopologyServices");
 
     private String token;
     private String displayName;
+    private String endpointParticipantName;
 
-    private PetasosEndpointFunctionTypeEnum(String functionType, String functionName ){
+    private PetasosEndpointFunctionTypeEnum(String functionType, String displayName, String participantName ){
         this.token = functionType;
-        this.displayName = functionName;
+        this.displayName = displayName;
+        this.endpointParticipantName = participantName;
     }
 
     public String getToken(){
@@ -46,6 +48,10 @@ public enum PetasosEndpointFunctionTypeEnum {
 
     public String getDisplayName(){
         return(this.displayName);
+    }
+
+    public String getEndpointParticipantName(){
+        return(this.endpointParticipantName);
     }
 
     public static PetasosEndpointFunctionTypeEnum getFunctionEnumFromDisplayName(String displayName){

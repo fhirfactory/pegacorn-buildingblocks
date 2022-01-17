@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.EndpointSummary;
@@ -51,14 +52,20 @@ public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredCo
         wup.setWorkshopParticipantName(workshopParticipantName);
         if(wupTopologyNode.getEgressEndpoint() != null){
             IPCTopologyEndpoint egressEndpoint = wupTopologyNode.getEgressEndpoint();
-            EndpointSummary egressMonitoredEndpoint = (EndpointSummary)endpointFactory.newEndpoint(workshopParticipantName, wup.getParticipantName(), egressEndpoint);
+            EndpointSummary egressMonitoredEndpoint = (EndpointSummary)endpointFactory.newEndpoint(wup.getParticipantName(), egressEndpoint);
             wup.addEndpoint(egressMonitoredEndpoint);
 
         }
         if(wupTopologyNode.getIngresEndpoint() != null){
             IPCTopologyEndpoint ingresEndpoint = wupTopologyNode.getIngresEndpoint();
-            EndpointSummary ingresMonitoredEndpoint = (EndpointSummary)endpointFactory.newEndpoint(workshopParticipantName, wup.getParticipantName(), ingresEndpoint);
+            EndpointSummary ingresMonitoredEndpoint = (EndpointSummary)endpointFactory.newEndpoint(wup.getParticipantName(), ingresEndpoint);
             wup.addEndpoint(ingresMonitoredEndpoint);
+        }
+        if(!wupTopologyNode.getServiceEndpoints().isEmpty()){
+            for(PetasosEndpoint currentEndpoint: wupTopologyNode.getServiceEndpoints().values()){
+                EndpointSummary jgroupsEndpoint = (EndpointSummary)endpointFactory.newEndpoint(wup.getParticipantName(), currentEndpoint);
+                wup.addEndpoint(jgroupsEndpoint);
+            }
         }
         getLogger().debug(".newWorkUnitProcessor(): wup->{}", wup);
         return(wup);

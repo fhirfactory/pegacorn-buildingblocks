@@ -27,9 +27,12 @@ import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNo
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.notifications.PetasosITOpsNotificationContentFactory;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,9 @@ public class WUPContainerEgressProcessor {
 
     @Inject
     private PetasosITOpsNotificationAgentInterface notificationAgent;
+
+    @Inject
+    private PetasosITOpsNotificationContentFactory notificationContentFactory;
 
 
     public PetasosFulfillmentTask egressContentProcessor(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
@@ -81,7 +87,15 @@ public class WUPContainerEgressProcessor {
         metricsAgent.touchLastActivityInstant();
         //
         // Add some notifications
-        metricsAgent.sendITOpsNotification("Task (Outcome) --> " + fulfillmentTask.getTaskId().getId() + ", status--> " + fulfillmentTask.getTaskFulfillment().getStatus());
+        String notificationContent = null;
+        if(fulfillmentTask.hasTaskWorkItem()) {
+            if(fulfillmentTask.getTaskWorkItem().hasEgressContent()) {
+                for(UoWPayload payload: fulfillmentTask.getTaskWorkItem().getEgressContent().getPayloadElements()){
+                    String notification = notificationContentFactory.newNotificationContentFromUoWPayload(fulfillmentTask.getTaskFulfillment().getStatus(), payload);
+                    metricsAgent.sendITOpsNotification(notification);
+                }
+            }
+        }
         //
         // And we're done!
         return (fulfillmentTask);

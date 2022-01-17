@@ -37,7 +37,7 @@ import java.util.List;
 public class IPCTopologyEndpoint extends PetasosEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(IPCTopologyEndpoint.class);
 
-    private PetasosEndpointTopologyTypeEnum endpointType;
+
     private String connectedSystemName;
     private boolean server;
     private ComponentIdType implementingWUP;
@@ -50,7 +50,7 @@ public class IPCTopologyEndpoint extends PetasosEndpoint {
 
     public IPCTopologyEndpoint(){
         super();
-        this.endpointType = null;
+
         this.connectedSystemName = null;
         this.server = true;
         this.implementingWUP = null;
@@ -73,9 +73,6 @@ public class IPCTopologyEndpoint extends PetasosEndpoint {
         setServer(ori.isServer());
         if(!adapterList.isEmpty()){
             this.adapterList.addAll(ori.getAdapterList());
-        }
-        if(ori.hasEndpointType()){
-            setEndpointType(ori.getEndpointType());
         }
     }
 
@@ -133,19 +130,7 @@ public class IPCTopologyEndpoint extends PetasosEndpoint {
         this.connectedSystemName = connectedSystemName;
     }
 
-    @JsonIgnore
-    public boolean hasEndpointType(){
-        boolean hasValue = this.endpointType != null;
-        return(hasValue);
-    }
 
-    public PetasosEndpointTopologyTypeEnum getEndpointType() {
-        return endpointType;
-    }
-
-    public void setEndpointType(PetasosEndpointTopologyTypeEnum endpointType) {
-        this.endpointType = endpointType;
-    }
 
     public List<IPCAdapter> getAdapterList() {
         return adapterList;
@@ -181,7 +166,7 @@ public class IPCTopologyEndpoint extends PetasosEndpoint {
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +
-                ", endpointType=" + endpointType +
+                ", endpointType=" + getEndpointType() +
                 ", connectedSystemName=" + connectedSystemName +
                 ", implementingWUP=" + implementingWUP +
                 ", server=" + isServer() +

@@ -57,7 +57,7 @@ public class HTTPClientAdapter extends IPCSocketBasedAdapter {
         return "HTTPClientAdapter{" +
                 "contextPath='" + contextPath + '\'' +
                 ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
-                ", targetNameInstant='" + getTargetNameInstant() + '\'' +
+                ", targetNameInstant='" + getTargetSystemName() + '\'' +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
                 ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
                 ", supportInterfaceTags=" + getSupportInterfaceTags() +

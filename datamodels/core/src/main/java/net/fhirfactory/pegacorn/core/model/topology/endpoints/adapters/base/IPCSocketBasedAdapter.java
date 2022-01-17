@@ -64,7 +64,7 @@ public class IPCSocketBasedAdapter extends IPCAdapter {
     public String toString() {
         return "IPCSocketBasedInterface{" +
                 "supportedDeploymentModes=" + getSupportedDeploymentModes() +
-                ", targetNameInstant=" + getTargetNameInstant() +
+                ", targetNameInstant=" + getTargetSystemName() +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
                 ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
                 ", supportInterfaceTags=" + getSupportInterfaceTags() +

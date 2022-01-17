@@ -21,19 +21,9 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.itops.configuration;
 
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.DeploymentModeSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.DeploymentSiteSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.DeploymentZoneSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.JavaDeploymentSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.LoadBalancerSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.SecurityCredentialSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.SubsystemImageSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.SubsystemInstanceSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.VolumeMountSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.base.StandardClusterServiceServerPortSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.interact.ClusteredInteractServerPortSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.ipc.JGroupsInterZoneRepeaterServerPortSegment;
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.standard.HTTPProcessingPlantServerPortSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.*;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.http.HTTPServerPortSegment;
+import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.ports.jgroups.JGroupsInterZoneRepeaterServerPortSegment;
 
 
 public class JGroupsGossipRouterNodeConfig {
@@ -42,10 +32,10 @@ public class JGroupsGossipRouterNodeConfig {
     private DeploymentModeSegment deploymentMode;
     private DeploymentSiteSegment deploymentSites;
     private DeploymentZoneSegment deploymentZone;
-    private HTTPProcessingPlantServerPortSegment kubeReadinessProbe;
-    private HTTPProcessingPlantServerPortSegment kubeLivelinessProbe;
-    private HTTPProcessingPlantServerPortSegment prometheusPort;
-    private HTTPProcessingPlantServerPortSegment jolokiaPort;
+    private HTTPServerPortSegment kubeReadinessProbe;
+    private HTTPServerPortSegment kubeLivelinessProbe;
+    private HTTPServerPortSegment prometheusPort;
+    private HTTPServerPortSegment jolokiaPort;
     private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterIPC;
     private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterTasking;
     private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterTopology;
@@ -71,13 +61,13 @@ public class JGroupsGossipRouterNodeConfig {
         this.subsystemInstant = new SubsystemInstanceSegment();
         this.deploymentMode = new DeploymentModeSegment();
         this.deploymentSites = new DeploymentSiteSegment();
-        this.kubeLivelinessProbe = new HTTPProcessingPlantServerPortSegment();
-        this.kubeReadinessProbe = new HTTPProcessingPlantServerPortSegment();
+        this.kubeLivelinessProbe = new HTTPServerPortSegment();
+        this.kubeReadinessProbe = new HTTPServerPortSegment();
         this.subsystemImageProperties = new SubsystemImageSegment();
         this.trustStorePassword = new SecurityCredentialSegment();
         this.keyPassword = new SecurityCredentialSegment();
-        this.jolokiaPort = new HTTPProcessingPlantServerPortSegment();
-        this.prometheusPort = new HTTPProcessingPlantServerPortSegment();
+        this.jolokiaPort = new HTTPServerPortSegment();
+        this.prometheusPort = new HTTPServerPortSegment();
         this.deploymentZone = new DeploymentZoneSegment();
         this.multizoneRepeaterAudit = new JGroupsInterZoneRepeaterServerPortSegment();
         this.multizoneRepeaterDatagrid = new JGroupsInterZoneRepeaterServerPortSegment();
@@ -121,35 +111,35 @@ public class JGroupsGossipRouterNodeConfig {
         this.loadBalancer = loadBalancer;
     }
 
-    public HTTPProcessingPlantServerPortSegment getKubeReadinessProbe() {
+    public HTTPServerPortSegment getKubeReadinessProbe() {
         return kubeReadinessProbe;
     }
 
-    public void setKubeReadinessProbe(HTTPProcessingPlantServerPortSegment kubeReadinessProbe) {
+    public void setKubeReadinessProbe(HTTPServerPortSegment kubeReadinessProbe) {
         this.kubeReadinessProbe = kubeReadinessProbe;
     }
 
-    public HTTPProcessingPlantServerPortSegment getKubeLivelinessProbe() {
+    public HTTPServerPortSegment getKubeLivelinessProbe() {
         return kubeLivelinessProbe;
     }
 
-    public void setKubeLivelinessProbe(HTTPProcessingPlantServerPortSegment kubeLivelinessProbe) {
+    public void setKubeLivelinessProbe(HTTPServerPortSegment kubeLivelinessProbe) {
         this.kubeLivelinessProbe = kubeLivelinessProbe;
     }
 
-    public HTTPProcessingPlantServerPortSegment getPrometheusPort() {
+    public HTTPServerPortSegment getPrometheusPort() {
         return prometheusPort;
     }
 
-    public void setPrometheusPort(HTTPProcessingPlantServerPortSegment prometheusPort) {
+    public void setPrometheusPort(HTTPServerPortSegment prometheusPort) {
         this.prometheusPort = prometheusPort;
     }
 
-    public HTTPProcessingPlantServerPortSegment getJolokiaPort() {
+    public HTTPServerPortSegment getJolokiaPort() {
         return jolokiaPort;
     }
 
-    public void setJolokiaPort(HTTPProcessingPlantServerPortSegment jolokiaPort) {
+    public void setJolokiaPort(HTTPServerPortSegment jolokiaPort) {
         this.jolokiaPort = jolokiaPort;
     }
 

@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.issi.matrix;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.http.InteractHTTPClientTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPClientTopologyEndpoint;
 
-public class MatrixAPIClientEndpoint extends InteractHTTPClientTopologyEndpoint {
+public class MatrixAPIClientEndpoint extends HTTPClientTopologyEndpoint {
 
     public MatrixAPIClientEndpoint(){
         super();

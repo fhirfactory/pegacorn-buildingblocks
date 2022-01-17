@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp;
+package net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
@@ -27,21 +27,21 @@ import net.fhirfactory.pegacorn.core.model.topology.connector.ActiveIPCConnectio
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters.MLLPClientAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters.MLLPClientAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class InteractMLLPClientEndpoint extends StandardInteractClientTopologyEndpointPort implements ActiveIPCConnection {
+public class MLLPClientEndpoint extends StandardInteractClientTopologyEndpointPort implements ActiveIPCConnection {
 
     //
     // Constructor(s)
     //
 
-    public InteractMLLPClientEndpoint(){
+    public MLLPClientEndpoint(){
         super();
-        setEndpointType(PetasosEndpointTopologyTypeEnum.INTERACT_MLLP_CLIENT);
+        setEndpointType(PetasosEndpointTopologyTypeEnum.MLLP_CLIENT);
         setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_EGRESS);
     }
 

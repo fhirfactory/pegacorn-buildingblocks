@@ -19,24 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.mllp.adapters;
+package net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCClusteredSocketBasedAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCSocketBasedAdapter;
 
-public class MLLPServerAdapter extends IPCClusteredSocketBasedAdapter {
+import java.io.Serializable;
+
+public class MLLPClientAdapter extends IPCSocketBasedAdapter implements Serializable {
+    private Integer priority;
 
     //
     // Constructor(s)
     //
 
-    public MLLPServerAdapter(){
+    public MLLPClientAdapter(){
         super();
+        this.priority = 0;
     }
 
     //
     // Getters and Setters
     //
 
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
     //
     // To String
@@ -44,21 +55,20 @@ public class MLLPServerAdapter extends IPCClusteredSocketBasedAdapter {
 
     @Override
     public String toString() {
-        return "MLLPServerAdapter{" +
+        return "MLLPClientAdapter{" +
                 "supportedDeploymentModes=" + getSupportedDeploymentModes() +
-                ", targetNameInstant='" + getTargetNameInstant() + '\'' +
+                ", targetNameInstant=" + getTargetSystemName() +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
                 ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
                 ", supportInterfaceTags=" + getSupportInterfaceTags() +
                 ", encrypted=" + isEncrypted() +
-                ", groupName='" + getGroupName() + '\'' +
+                ", groupName=" + getGroupName() +
                 ", active=" + isActive() +
                 ", additionalParameters=" + getAdditionalParameters() +
                 ", lastActivity=" + getLastActivity() +
-                ", servicePortValue=" + getServicePortValue() +
-                ", serviceDNSName='" + getServiceDNSName() + '\'' +
                 ", portNumber=" + getPortNumber() +
-                ", hostName='" + getHostName() + '\'' +
+                ", hostName=" + getHostName() +
+                ", priority=" + priority +
                 '}';
     }
 }

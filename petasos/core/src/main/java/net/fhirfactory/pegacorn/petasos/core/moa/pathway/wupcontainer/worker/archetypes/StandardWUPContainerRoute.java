@@ -31,6 +31,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bui
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 
 	private WorkUnitProcessorSoftwareComponent wupTopologyNode;
 	private RouteElementNames nameSet;
-	WorkUnitProcessorMetricsAgent metricsAgent;
+	private WorkUnitProcessorMetricsAgent metricsAgent;
 
 	//
 	// Constructor(s)
@@ -62,11 +63,11 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		this.metricsAgent = metricsAgent;
 	}
 
-	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker, boolean requiresDirect, WorkUnitProcessorMetricsAgent metricsAgent) {
+	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorSoftwareComponent wupTopologyNode, PetasosFulfillmentTaskAuditServicesBroker auditTrailBroker, boolean requiresDirect, String sedaParameters, WorkUnitProcessorMetricsAgent metricsAgent) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken(), requiresDirect);
+		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken(), requiresDirect, sedaParameters);
 		this.metricsAgent = metricsAgent;
 	}
 
@@ -94,6 +95,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresProcessorIngres())
 				.routeId(nameSet.getRouteWUPContainerIngressProcessor())
+				.log(LoggingLevel.INFO, "Processing Task->${body}")
 				.process(nodeDetailInjector)
 				.bean(WUPContainerIngresProcessor.class, "ingresContentProcessor(*, Exchange)")
 				.to(nameSet.getEndPointWUPContainerIngresProcessorEgress());

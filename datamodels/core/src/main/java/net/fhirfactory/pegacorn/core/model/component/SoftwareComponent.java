@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,6 +62,7 @@ public abstract class SoftwareComponent implements Serializable {
     private SoftwareComponentExecutionControlEnum componentExecutionControl;
     private String subsystemParticipantName;
     private String participantName;
+    private String participantDisplayName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant lastActivityInstant;
@@ -89,6 +91,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.lastActivityInstant = Instant.now();
         this.lastReportingInstant = null;
         this.participantName = null;
+        this.participantDisplayName = null;
     }
 
     public SoftwareComponent(SoftwareComponent ori){
@@ -98,6 +101,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.concurrencyMode = null;
         this.resilienceMode = null;
         this.componentID = null;
+        this.participantDisplayName = null;
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
         this.componentSystemRole = SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
@@ -151,11 +155,28 @@ public abstract class SoftwareComponent implements Serializable {
         if(ori.hasSubsystemParticipantName()){
             setSubsystemParticipantName(ori.getSubsystemParticipantName());
         }
+        if(ori.hasParticipantDisplayName()){
+            setParticipantDisplayName(ori.getParticipantDisplayName());
+        }
     }
 
     //
     // Some Helper Functions
     //
+
+    @JsonIgnore
+    public boolean hasParticipantDisplayName(){
+        boolean hasValue = this.participantDisplayName != null;
+        return(hasValue);
+    }
+
+    public String getParticipantDisplayName() {
+        return participantDisplayName;
+    }
+
+    public void setParticipantDisplayName(String participantDisplayName) {
+        this.participantDisplayName = participantDisplayName;
+    }
 
     @JsonIgnore
     public boolean hasParticipantName(){
@@ -492,9 +513,10 @@ public abstract class SoftwareComponent implements Serializable {
                 ", componentStatus=" + componentStatus +
                 ", componentExecutionControl=" + componentExecutionControl +
                 ", subsystemParticipantName='" + subsystemParticipantName + '\'' +
+                ", participantName='" + participantName + '\'' +
+                ", participantDisplayName='" + participantDisplayName + '\'' +
                 ", lastActivityInstant=" + lastActivityInstant +
                 ", lastReportingInstant=" + lastReportingInstant +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
                 '}';
     }
 
