@@ -98,7 +98,7 @@ public class GlobalPetasosTaskExecutionController {
                         } else {
                             //
                             // If no one else is executing, but this jobcard does not have node affinity with the ActionableTask, then wait
-                            // "n" seconds begore granting it... This allows time for the synchronisation of state across all the
+                            // "n" seconds before granting it... This allows time for the synchronisation of state across all the
                             // WUPs/ProcessingPlants associated within the ActionableTask.
                             Long timeSinceRegistrationOrLastCheck = Instant.now().getEpochSecond() - jobcard.getCoordinatorUpdateInstant().getEpochSecond();
                             if (timeSinceRegistrationOrLastCheck > PetasosPropertyConstants.PETASOS_DISTRIBUTED_CACHE_SYNCHRONISATION_WAIT) {

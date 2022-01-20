@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.services.oam.endpoint;
 import net.fhirfactory.pegacorn.core.interfaces.oam.metrics.PetasosMetricsBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.subscriptions.PetasosSubscriptionReportBrokerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.oam.tasks.PetasosITOpsTaskReportingBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.topology.PetasosTopologyReportingBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.topology.PetasosTopologyReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetric;
@@ -50,7 +51,8 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
     implements PetasosMetricsBrokerInterface,
         PetasosSubscriptionReportBrokerInterface,
         PetasosTopologyReportingBrokerInterface,
-        PetasosITOpsNotificationBrokerInterface {
+        PetasosITOpsNotificationBrokerInterface,
+        PetasosITOpsTaskReportingBrokerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosOAMMetricsAgentEndpoint.class);
 
     @Inject
@@ -274,6 +276,44 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             e.printStackTrace();
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendNotification: Error (GeneralException) ->{}", e.getMessage());
+            return;
+        }
+    }
+
+    //
+    // TaskReport Service
+    //
+
+
+    @Override
+    public void sendTaskReport(PetasosComponentITOpsNotification taskReportNotification) {
+        getLogger().debug(".sendTaskReport(): Entry, taskReportNotification->{}", taskReportNotification);
+        JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
+        Address targetAddress = getCandidateTargetServiceAddress(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".sendTaskReport(): No Metrics Server available");
+            return;
+        }
+        try {
+            Object objectSet[] = new Object[2];
+            Class classSet[] = new Class[2];
+            objectSet[0] = taskReportNotification;
+            classSet[0] = PetasosComponentITOpsNotification.class;
+            objectSet[1] = myIntegrationPoint;
+            classSet[1] = JGroupsIntegrationPointSummary.class;
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            getRPCDispatcher().callRemoteMethod(targetAddress, "processTaskReport", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            getLogger().debug(".sendTaskReport(): Exit, responseInstant");
+            return;
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".sendTaskReport(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".sendTaskReport: Error (GeneralException) ->{}", e.getMessage());
             return;
         }
     }

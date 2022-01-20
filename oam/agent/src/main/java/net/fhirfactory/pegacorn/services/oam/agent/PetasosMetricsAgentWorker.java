@@ -55,7 +55,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
     private ConcurrentHashMap<ComponentIdType, PetasosComponentMetricSet> metricsQueue;
     private SerializableObject metricQueueLock = new SerializableObject();
 
-    private static long SYNCHRONIZATION_CHECK_PERIOD = 30000;
+    private static long SYNCHRONIZATION_CHECK_PERIOD = 15000;
     private static long INITIAL_CHECK_DELAY_PERIOD=60000;
     private boolean backgroundCheckInitiated;
     private ObjectMapper jsonMapper;

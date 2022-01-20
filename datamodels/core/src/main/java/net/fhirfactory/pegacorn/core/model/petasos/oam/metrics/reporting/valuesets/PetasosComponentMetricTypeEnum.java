@@ -22,22 +22,38 @@
 package net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.valuesets;
 
 public enum PetasosComponentMetricTypeEnum {
-    CACHE_SIZE("CacheSize", "petasos.component.metric.type.cache-size"),
-    MESSAGES_RECEIVED("MessagesReceived", "petasos.component.metric.type.messages-sent"),
-    MESSAGES_FORWARDED("MessagesForwarded", "petasos.component.metric.type.message-received"),
-    TASK_PROCESSING_TIME("TaskProcessingTime", "petasos.component.metric.type.task-processing-time"),
-    ACTIVITY_TIMESTAMP("ActivityTimestamp", "petasos.component.metric.type.activity-timestamp"),
-    TASK_COUNT("TaskCount", "petasos.component.metric.type.task-count"),
-    AUDIT_EVENT_WRITES("AuditEventWrites", "petasos.component.metric.type.aduit-event-writes"),
-    CONTEXTUAL("ContextualMetric", "petasos.component.metric.type.contextual-metric"),
-    COMPONENT_GENERAL_STATUS("ComponentStatus", "petasos.component.metric.type.status-general");
+    CACHE_SIZE("CacheSize", "CacheSize", "petasos.component.metric.type.cache-size"),
+    MESSAGES_RECEIVED("Received", "MessagesReceived", "petasos.component.metric.type.messages-sent"),
+    MESSAGES_FORWARDED("Forwarded", "MessagesForwarded", "petasos.component.metric.type.message-received"),
+    TASK_PROCESSING_TIME("TaskProcessingTime", "TaskProcessingTime", "petasos.component.metric.type.task-processing-time"),
+    ACTIVITY_TIMESTAMP("ActivityTimestamp", "ActivityTimestamp", "petasos.component.metric.type.activity-timestamp"),
+    TASK_COUNT("TaskCount", "TaskCount", "petasos.component.metric.type.task-count"),
+    AUDIT_EVENT_WRITES("AuditEventWrites", "AuditEventWrites", "petasos.component.metric.type.aduit-event-writes"),
+    CONTEXTUAL("ContextualMetric", "ContextualMetric", "petasos.component.metric.type.contextual-metric"),
+    COMPONENT_GENERAL_STATUS("ComponentStatus", "ComponentStatus", "petasos.component.metric.type.status-general"),
+
+    REGISTERED_TASK_COUNT("Registered", "TaskCount", "petasos.component.metric.type.finished-task-count"),
+    FINISHED_TASK_COUNT("Finished", "TaskCount", "petasos.component.metric.type.finished-task-count"),
+    FINALISED_TASK_COUNT("Finalised", "TaskCount", "petasos.component.metric.type.finalised-task-count"),
+    STARTED_TASK_COUNT("Started", "TaskCount", "petasos.component.metric.type.started-task-count"),
+    CANCELLED_TASK_COUNT("Cancelled", "TaskCount", "petasos.component.metric.type.cancelled-task-count"),
+    FAILED_TASK_COUNT("Failed", "TaskCount", "petasos.component.metric.type.failed-task-count"),
+
+    ROLLING_TASK_PROCESSING_TIME("Rolling-Average", "TaskProcessingTime", "petasos.component.metric.type.task-processing-time"),
+    CUMULATIVE_TASK_PROCESSING_TIME("Cumulative-Average", "TaskProcessingTime", "petasos.component.metric.type.task-processing-time"),
+
+    LAST_TASK_PROCESSING_TIME("Last-Task", "TaskProcessingTime", "petasos.component.metric.type.task-processing-time"),
+    LAST_TASK_ID("Last-Task", "Task-ID", "petasos.component.metric.type.task-id"),
+    LAST_TASK_INSTANT("Last-Task-Timestamp", "Date/Time", "petasos.component.metric.type.timestamp");
 
     private String displayName;
+    private String typeName;
     private String token;
 
-    private PetasosComponentMetricTypeEnum(String name, String token){
+    private PetasosComponentMetricTypeEnum(String name, String type, String token){
         this.displayName = name;
         this.token = token;
+        this.typeName = type;
     }
 
     public String getDisplayName(){
@@ -46,5 +62,9 @@ public enum PetasosComponentMetricTypeEnum {
 
     public String getToken(){
         return(this.token);
+    }
+
+    public String getTypeName(){
+        return(this.typeName);
     }
 }

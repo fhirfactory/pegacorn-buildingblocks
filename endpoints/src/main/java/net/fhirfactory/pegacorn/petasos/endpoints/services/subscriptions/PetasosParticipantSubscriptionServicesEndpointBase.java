@@ -158,32 +158,6 @@ public abstract class PetasosParticipantSubscriptionServicesEndpointBase extends
         return(false);
     }
 
-    /*
-
-    protected boolean isAParticipantSubsystemAvailable(String participantSubsystemName){
-        getLogger().debug(".isParticipantAvailable(): Entry, publisherServiceName->{}", participantSubsystemName);
-        boolean participantIsAvailable = getAvailableParticipantInstance(participantSubsystemName) != null;
-        getLogger().debug(".isParticipantAvailable(): Exit, returning->{}", participantIsAvailable);
-        return(participantIsAvailable);
-    }
-
-     */
-
-    /*
-    protected String getAvailableParticipantInstance(String participantSubsystemName){
-        getLogger().debug(".getAvailableParticipantInstance(): Entry, participantSubsystemName->{}", participantSubsystemName);
-        String serviceInstanceName = null;
-        if(!getParticipantHolder().getMyProcessingPlantPetasosParticipant().getSubsystemName().contentEquals(participantSubsystemName)) {
-            Set<PetasosParticipant> participantSetForSubsystem = participantCacheIM.getParticipantSetForSubsystem(participantSubsystemName);
-            if()
-            String publisherServiceName = getAvailableParticipantInstanceName(participant.getInterSubsystemParticipant().getRoutingEndpoint().getEndpointServiceName());
-            serviceInstanceName = getAvailableParticipantInstanceName(publisherServiceName);
-        }
-        getLogger().debug(".getAvailableParticipantInstance(): Exit, serviceInstanceName->{}", serviceInstanceName);
-        return(serviceInstanceName);
-    }
-     */
-
     public String getAvailableParticipantInstanceName(String participantServiceName){
         getLogger().debug(".getAvailableParticipantInstanceName(): Entry, participantServiceName->{}", participantServiceName);
         PetasosAdapterAddress targetAddress = getTargetMemberAdapterInstanceForSubsystem(participantServiceName);

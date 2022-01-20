@@ -31,6 +31,7 @@ public class PetasosComponentITOpsNotification implements Serializable {
     private String participantName;
     private PetasosMonitoredComponentTypeEnum componentType;
     private String content;
+    private String formattedContent;
 
     //
     // Constructor
@@ -41,6 +42,7 @@ public class PetasosComponentITOpsNotification implements Serializable {
         this.participantName = null;
         this.componentType = null;
         this.content = null;
+        this.formattedContent = null;
     }
 
     public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content){
@@ -48,11 +50,28 @@ public class PetasosComponentITOpsNotification implements Serializable {
         this.participantName = name;
         this.componentId = componentId;
         this.content = content;
+        this.formattedContent = null;
+    }
+
+    public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content, String formattedContent){
+        this.componentType = componentType;
+        this.participantName = name;
+        this.componentId = componentId;
+        this.content = content;
+        this.formattedContent = formattedContent;
     }
 
     //
     // Getters and Setters
     //
+
+    public String getFormattedContent() {
+        return formattedContent;
+    }
+
+    public void setFormattedContent(String formattedContent) {
+        this.formattedContent = formattedContent;
+    }
 
     public ComponentIdType getComponentId() {
         return componentId;
@@ -97,6 +116,7 @@ public class PetasosComponentITOpsNotification implements Serializable {
                 ", participantName='" + participantName + '\'' +
                 ", componentType=" + componentType +
                 ", content='" + content + '\'' +
+                ", formattedContent='" + formattedContent + '\'' +
                 '}';
     }
 }

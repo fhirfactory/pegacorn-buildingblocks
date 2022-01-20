@@ -26,11 +26,13 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashMap;
 
 public class PetasosComponentMetricSet implements Serializable {
     private HashMap<String, PetasosComponentMetric> metrics;
     private ComponentIdType metricSourceComponentId;
+    private Instant reportingInstant;
 
     private PetasosMonitoredComponentTypeEnum componentType;
     private String sourceParticipantName;
@@ -43,6 +45,7 @@ public class PetasosComponentMetricSet implements Serializable {
         this.metrics = new HashMap<>();
         this.metricSourceComponentId = null;
         this.sourceParticipantName = null;
+        this.reportingInstant = Instant.now();
     }
 
     public PetasosComponentMetricSet(ComponentIdType sourceId, PetasosMonitoredComponentTypeEnum componentType){
@@ -50,11 +53,20 @@ public class PetasosComponentMetricSet implements Serializable {
         this.metricSourceComponentId = sourceId;
         this.sourceParticipantName = null;
         this.componentType = componentType;
+        this.reportingInstant = Instant.now();
     }
 
     //
     // Getters and Setters
     //
+
+    public Instant getReportingInstant() {
+        return reportingInstant;
+    }
+
+    public void setReportingInstant(Instant reportingInstant) {
+        this.reportingInstant = reportingInstant;
+    }
 
     public HashMap<String, PetasosComponentMetric> getMetrics() {
         return metrics;

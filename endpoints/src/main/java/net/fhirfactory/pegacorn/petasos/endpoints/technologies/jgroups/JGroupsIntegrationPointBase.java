@@ -188,6 +188,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         //
         getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
         String participantName = getProcessingPlant().getSubsystemParticipantName()+"."+specifyPetasosEndpointFunctionType().getEndpointParticipantName();
+        getLogger().info(".initialise(): Step 8: participantName->{}", participantName);
         this.metricsAgent = metricsFactory.newEndpointMetricsAgent(getJGroupsIntegrationPoint().getComponentID(),participantName, "Internal", specifyJGroupsChannelName());
         getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
         // We're done!

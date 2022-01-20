@@ -27,7 +27,6 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescri
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.HL7V2XTopicFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +77,6 @@ public class PetasosITOpsNotificationContentFactory {
         }
         if (isHL7V2Payload(payload)) {
             StringBuilder notificationContentBuilder = new StringBuilder();
-            notificationContentBuilder.append("Task: Internal Timestamp:" + getTimeFormatter().format(Instant.now()) + "\n");
             if(payload.getPayloadManifest().hasContainerDescriptor()){
                 String containerMessageDefiner = payload.getPayloadManifest().getContainerDescriptor().getDataParcelDefiner();
                 String containerMessageCategory= payload.getPayloadManifest().getContainerDescriptor().getDataParcelCategory();
@@ -94,14 +92,16 @@ public class PetasosITOpsNotificationContentFactory {
                 notificationContentBuilder.append("Content Payload: HL7 v2.x: Trigger:"+messageType+"^"+messageTrigger+"("+messageVersion+")");
             } else {
                 notificationContentBuilder.append("Content Payload: HL7 v2.x: Trigger:" + messageType + "^" + messageTrigger + "(" + messageVersion + ") \n");
-                notificationContentBuilder.append(makeNotificationContentFromHL7V2Message(payload.getPayload()));
+                List<String> metadataBody = extractMetadataFromHL7v2xMessage(payload.getPayload());
+                for(String metadataSegment: metadataBody) {
+                    notificationContentBuilder.append(metadataSegment);
+                }
             }
             return (notificationContentBuilder.toString());
         }
         //
         // Default Message
         StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append("Task: Internal Timestamp:" + getTimeFormatter().format(Instant.now()) + "\n");
         if(payload.getPayloadManifest().hasContainerDescriptor()){
             if(payload.getPayloadManifest().hasContainerDescriptor()){
                 String containerMessageDefiner = payload.getPayloadManifest().getContainerDescriptor().getDataParcelDefiner();
@@ -143,7 +143,10 @@ public class PetasosITOpsNotificationContentFactory {
                 notificationContentBuilder.append("Content Payload: HL7 v2.x: Trigger: "+messageType+"^"+messageTrigger+"("+messageVersion+")");
             } else {
                 notificationContentBuilder.append("Content Payload: HL7 v2.x: Trigger: " + messageType + "^" + messageTrigger + "(" + messageVersion + ") \n");
-                notificationContentBuilder.append(makeNotificationContentFromHL7V2Message(payload.getPayload()));
+                List<String> metadataBody = extractMetadataFromHL7v2xMessage(payload.getPayload());
+                for(String metadataSegment: metadataBody) {
+                    notificationContentBuilder.append(metadataSegment);
+                }
             }
             return(notificationContentBuilder.toString());
         }
@@ -168,6 +171,28 @@ public class PetasosITOpsNotificationContentFactory {
         String version = getContentDescriptorElement(payload, DataParcelDescriptorKeyEnum.DATASET_VERSION);
         messageBuilder.append("Content Payload: "+definer+"::"+category+"::"+subcategory+"::"+ resource+"("+version+") \n");
         return(messageBuilder.toString());
+    }
+
+    public List<String> getHL7v2MetadataHeaderInfo(UoWPayload payload){
+
+        List<String> headerInfo = new ArrayList<>();
+        if(payload.getPayloadManifest().hasContainerDescriptor()){
+            StringBuilder containerBuilder = new StringBuilder();
+            String containerMessageDefiner = payload.getPayloadManifest().getContainerDescriptor().getDataParcelDefiner();
+            String containerMessageCategory= payload.getPayloadManifest().getContainerDescriptor().getDataParcelCategory();
+            String containerMessageSubcategory = payload.getPayloadManifest().getContainerDescriptor().getDataParcelSubCategory();
+            String containerMessageResource= payload.getPayloadManifest().getContainerDescriptor().getDataParcelResource();
+            String containerMessageVersion = payload.getPayloadManifest().getContainerDescriptor().getVersion();
+            containerBuilder.append("Container Payload: "+containerMessageDefiner+"::"+containerMessageCategory+"::"+containerMessageSubcategory+"::"+ containerMessageResource+"("+containerMessageVersion+")");
+            headerInfo.add(containerBuilder.toString());
+        }
+        StringBuilder contentBuilder = new StringBuilder();
+        String messageType = payload.getPayloadManifest().getContentDescriptor().getDataParcelSubCategory();
+        String messageTrigger = payload.getPayloadManifest().getContentDescriptor().getDataParcelResource();
+        String messageVersion = payload.getPayloadManifest().getContentDescriptor().getVersion();
+        contentBuilder.append("Content Payload: HL7 v2.x: Trigger: " + messageType + "^" + messageTrigger + "(" + messageVersion + ")");
+        headerInfo.add(contentBuilder.toString());
+        return(headerInfo);
     }
 
     protected String getContentDescriptorElement(UoWPayload payload, DataParcelDescriptorKeyEnum descriptorKey) {
@@ -222,7 +247,7 @@ public class PetasosITOpsNotificationContentFactory {
         return(null);
     }
 
-    protected boolean isHL7V2Payload(UoWPayload payload){
+    public boolean isHL7V2Payload(UoWPayload payload){
         if(payload == null){
             return(false);
         }
@@ -241,9 +266,11 @@ public class PetasosITOpsNotificationContentFactory {
         return(false);
     }
 
-    private String makeNotificationContentFromHL7V2Message(String payload){
+    public List<String> extractMetadataFromHL7v2xMessage(String payload){
         if(payload == null){
-            return("*empty payload*");
+            List<String> errorPayload = new ArrayList<>();
+            errorPayload.add("*empty payload*");
+            return(errorPayload);
         }
         List<String> segmentList = getSegmentList(payload);
         String pid = null;
@@ -252,17 +279,17 @@ public class PetasosITOpsNotificationContentFactory {
             pid = getPatientIdentitySegment(segmentList);
             msh = getMessageHeaderSegment(segmentList);
         }
+        List<String> metadata = new ArrayList<>();
+        if(msh == null){
+            metadata.add("*malformed payload (cannot resolve MSH)*");
+            return(metadata);
+        }
+        metadata.add(msh);
         if(pid == null){
             pid = "No PID Segment";
         }
-        if(msh == null){
-            return("*malformed payload (cannot resolve MSH)*");
-        }
-        String notificationContent = "--- \n" +
-                msh + "\n" +
-                pid + "\n" +
-                "---";
-        return(notificationContent);
+        metadata.add(pid);
+        return(metadata);
     }
 
     private String getMessageHeaderSegment(List<String> segmentList){

@@ -314,8 +314,6 @@ public abstract class SoftwareComponent implements Serializable {
                 this.nodeFunctionFDN = newFunctionFDN;
             }
         }
-        setComponentRDN(nodeRDN);
-        constructComponentID();
         getLogger().debug(".constructFunctionFDN(): Exit, nodeFunctionFDN->{}", this.getNodeFunctionFDN());
     }
 

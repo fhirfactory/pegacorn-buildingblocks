@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.services.oam.endpoint;
 import net.fhirfactory.pegacorn.core.interfaces.oam.metrics.PetasosMetricsHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.subscriptions.PetasosSubscriptionReportHandlerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.oam.tasks.PetasosITOpsTaskReportingHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.topology.PetasosTopologyReportingHandlerInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetric;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
@@ -54,6 +55,9 @@ public class PetasosOAMMetricsCollectorEndpoint extends PetasosOAMMetricsEndpoin
 
     @Inject
     private PetasosITOpsNotificationHandlerInterface notificationHandler;
+
+    @Inject
+    private PetasosITOpsTaskReportingHandlerInterface taskReportHandler;
 
     //
     // Constructor(s)
@@ -170,9 +174,8 @@ public class PetasosOAMMetricsCollectorEndpoint extends PetasosOAMMetricsEndpoin
         Instant outcomeInstant = null;
         if((topologyGraph != null) && (integrationPoint != null)) {
             outcomeInstant = topologyHandler.mergeTopologyGraph(integrationPoint, topologyGraph);
+            getMetricsAgent().incrementRemoteProcedureCallHandledCount();
         }
-
-        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
 
         getLogger().debug(".topologyGraphHandler(): Exit, outcomeInstant->{}", outcomeInstant);
         return(outcomeInstant);
@@ -187,11 +190,25 @@ public class PetasosOAMMetricsCollectorEndpoint extends PetasosOAMMetricsEndpoin
 
         if((notification != null) && (integrationPoint != null)) {
             notificationHandler.processNotification(notification);
+            getMetricsAgent().incrementRemoteProcedureCallHandledCount();
         }
-
-        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
 
         getLogger().debug(".topologyGraphHandler(): Exit");
         return;
+    }
+
+    //
+    // Task Report Receiver
+    //
+
+    public void processTaskReport(PetasosComponentITOpsNotification taskReportNotification, JGroupsIntegrationPointSummary integrationPoint) {
+        getLogger().info(".processTaskReport(): Entry, taskReportNotification->{}", taskReportNotification);
+
+        if((taskReportNotification != null) && (integrationPoint != null)) {
+            taskReportHandler.processTaskReport(taskReportNotification);
+            getMetricsAgent().incrementRemoteProcedureCallHandledCount();
+        }
+
+        getLogger().info(".processTaskReport(): Exit");
     }
 }

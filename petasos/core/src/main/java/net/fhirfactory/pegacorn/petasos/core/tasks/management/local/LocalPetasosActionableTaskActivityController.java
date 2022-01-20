@@ -128,6 +128,7 @@ public class LocalPetasosActionableTaskActivityController {
             TaskFulfillmentType taskFulfillment = SerializationUtils.clone(fulfillmentTask.getTaskFulfillment());
             actionableTask.setTaskFulfillment(taskFulfillment);
         }
+        actionableTask.getTaskFulfillment().setStartInstant(fulfillmentTask.getTaskFulfillment().getStartInstant());
         actionableTask.getTaskFulfillment().setFinishInstant(Instant.now());
         actionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
         actionableTask.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));

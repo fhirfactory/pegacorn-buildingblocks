@@ -95,7 +95,7 @@ public class IngresActivityBeginRegistration {
         if(metricsAgent == null){
             getLogger().warn(".registerActivityStart(): Could not get metricsAgent");
         }
-        metricsAgent.incrementIngresMessageCount();
+        metricsAgent.touchLastActivityStartInstant();
         metricsAgent.touchLastActivityInstant();
 
         getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Start");
@@ -137,6 +137,11 @@ public class IngresActivityBeginRegistration {
             fulfillmentTask.getTaskJobCard().setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
         }
         getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
+        //
+        // Add some more metrics
+        metricsAgent.incrementRegisteredTasks();
+        metricsAgent.incrementStartedTasks();
+
         getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
         //
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
@@ -144,6 +149,8 @@ public class IngresActivityBeginRegistration {
         camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, fulfillmentTask);
         //
         // And now we are done!
+
+
         getLogger().debug(".registerActivityStart(): exit, my work is done!");
         return(theUoW);
     }

@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -36,6 +37,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.subscription.TaskSubscriptionCheck;
+import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,17 +124,25 @@ public class TaskOutcome2NewTasksBean {
                 synchronized (actionableTask.getTaskCompletionLock()) {
                     actionableTask.getTaskCompletionSummary().addDownstreamTask(newDownstreamTask.getTaskId());
                 }
-            }
-        }
-        synchronized (actionableTask.getTaskCompletionLock()) {
-            if (actionableTask.getTaskCompletionSummary().getDownstreamTaskMap().isEmpty()){
-                actionableTask.getTaskCompletionSummary().setLastInChain(true);
-                actionableTask.getTaskCompletionSummary().setFinalised(true);
+            } else {
+                synchronized (actionableTask.getTaskCompletionLock()) {
+                    if (actionableTask.getTaskCompletionSummary().getDownstreamTaskMap().isEmpty()){
+                        actionableTask.getTaskCompletionSummary().setLastInChain(true);
+                        actionableTask.getTaskCompletionSummary().setFinalised(true);
+                    }
+                }
             }
         }
 
         getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): Updating actionableTask with task completion details");
         actionableTaskActivityController.updateActionableTask(actionableTask);
+
+        //
+        // Get out metricsAgent for the WUP that sent the task & do add some metrics
+        WorkUnitProcessorTaskReportAgent taskReportAgent = camelExchange.getProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorTaskReportAgent.class);
+        if(taskReportAgent != null){
+            taskReportAgent.sendITOpsTaskReport(actionableTask, newActionableTaskList);
+        }
 
         getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newActionableTaskList.size());
         return (newActionableTaskList);

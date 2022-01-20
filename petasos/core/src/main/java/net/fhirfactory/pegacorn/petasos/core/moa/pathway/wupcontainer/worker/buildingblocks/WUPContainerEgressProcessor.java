@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.Instant;
 
 @ApplicationScoped
 public class WUPContainerEgressProcessor {
@@ -62,7 +63,7 @@ public class WUPContainerEgressProcessor {
         //
         // Get out metricsAgent & do add some metrics
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
-
+        boolean createNotification = false;
         switch (fulfillmentTask.getTaskFulfillment().getStatus()) {
             case FULFILLMENT_EXECUTION_STATUS_FINISHED:
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask.getTaskJobCard());
@@ -83,16 +84,19 @@ public class WUPContainerEgressProcessor {
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask.getTaskJobCard());
                 metricsAgent.incrementFailedTasks();
                 metricsAgent.touchLastActivityFinishInstant();
+                createNotification = true;
         }
         metricsAgent.touchLastActivityInstant();
         //
         // Add some notifications
-        String notificationContent = null;
-        if(fulfillmentTask.hasTaskWorkItem()) {
-            if(fulfillmentTask.getTaskWorkItem().hasEgressContent()) {
-                for(UoWPayload payload: fulfillmentTask.getTaskWorkItem().getEgressContent().getPayloadElements()){
-                    String notification = notificationContentFactory.newNotificationContentFromUoWPayload(fulfillmentTask.getTaskFulfillment().getStatus(), payload);
-                    metricsAgent.sendITOpsNotification(notification);
+        if(createNotification) {
+            String notificationContent = null;
+            if (fulfillmentTask.hasTaskWorkItem()) {
+                if (fulfillmentTask.getTaskWorkItem().hasEgressContent()) {
+                    for (UoWPayload payload : fulfillmentTask.getTaskWorkItem().getEgressContent().getPayloadElements()) {
+                        String notification = notificationContentFactory.newNotificationContentFromUoWPayload(fulfillmentTask.getTaskFulfillment().getStatus(), payload);
+                        metricsAgent.sendITOpsNotification(notification);
+                    }
                 }
             }
         }

@@ -25,12 +25,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -97,11 +100,21 @@ public class TaskOutcomeCaptureBean {
                 actionableTask = actionableTaskActivityController.notifyActionableTaskExecutionFinish(actionableTaskId, fulfillmentTask);
                 break;
         }
+
+        //
+        // Get out metricsAgent for the WUP that sent the task & do add some metrics
+        WorkUnitProcessorTaskReportAgent taskReportAgent = camelExchange.getProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorTaskReportAgent.class);
+        if(taskReportAgent != null){
+            taskReportAgent.sendITOpsTaskReport(actionableTask);
+        }
+
         if(getLogger().isDebugEnabled()) {
             getLogger().debug(".captureAndRegisterOutcome(): Exit, actionableTask->{}", convertToString(actionableTask));
         }
         return(actionableTask);
     }
+
+
 
     protected String convertToString(PetasosTask petasosTask){
         try {

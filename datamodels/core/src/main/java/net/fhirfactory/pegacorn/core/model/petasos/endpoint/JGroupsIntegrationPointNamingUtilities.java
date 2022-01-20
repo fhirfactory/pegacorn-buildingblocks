@@ -22,11 +22,13 @@
 package net.fhirfactory.pegacorn.core.model.petasos.endpoint;
 
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.util.PegacornProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -53,6 +55,9 @@ public class JGroupsIntegrationPointNamingUtilities {
 
     private static int SUBSYSTEM_NAME_POSITION_IN_PROCESSING_PLANT_ID = 0;
     private static int UNIQUE_KEY_POSITION_IN_PROCESSING_PLANT_ID = 1;
+
+    @Inject
+    private PegacornProperties pegacornProperties;
 
     //
     // Constructor(s)
@@ -92,6 +97,14 @@ public class JGroupsIntegrationPointNamingUtilities {
                 + getChannelNameSeparator()
                 + endpointUniqueID;
         return(endpointName);
+    }
+
+    public String buildUniqueComponentName(String name){
+        String uuidString = getCurrentUUID().replace("-","");
+        String uniqueQualifier = pegacornProperties.getProperty("MY_POD_IP", uuidString);
+        String uniqueUsefulQualifier = uniqueQualifier.replace(".", "-");
+        String uniqueName = name + "-" + uniqueUsefulQualifier;
+        return(uniqueName);
     }
 
     public String buildProcessingPlantFromChannelName(String channelName){

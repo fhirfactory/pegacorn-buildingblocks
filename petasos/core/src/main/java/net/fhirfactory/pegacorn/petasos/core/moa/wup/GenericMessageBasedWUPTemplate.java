@@ -50,11 +50,15 @@ import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportFactory;
+import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
@@ -85,6 +89,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     private MessageBasedWUPEndpointContainer egressEndpoint;
     private MessageBasedWUPEndpointContainer ingresEndpoint;
     private WorkUnitProcessorMetricsAgent metricsAgent;
+    private WorkUnitProcessorTaskReportAgent taskReportAgent;
 
     @Inject
     private WorkUnitProcessorFrameworkManager wupFrameworkManager;
@@ -112,6 +117,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     @Inject
     private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgentAccessor;
+
+    @Inject
+    private PetasosTaskReportAgentFactory taskReportAgentFactory;
 
     //
     // Constructor(s)
@@ -180,6 +188,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             ComponentIdType componentId = getMeAsATopologyComponent().getComponentID();
             String participantName = getMeAsAPetasosParticipant().getParticipantName();
             this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(componentId, participantName);
+            getLogger().info(".initialise(): [Establish the WorkUnitProcessor Metrics Agent] Finish");
+
+            getLogger().info(".initialise(): [Establish the WorkUnitProcessor Metrics Agent] Start");
+            this.taskReportAgent = taskReportAgentFactory.newWorkUnitProcessorTaskReportingAgent(componentId, participantName);
             getLogger().info(".initialise(): [Establish the WorkUnitProcessor Metrics Agent] Start");
 
             getLogger().info(".initialise(): [Establish (if any) Endpoint Metric Agents] Start");
@@ -274,9 +286,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         // Subclasses can optionally override
     }
 
-
     protected SolutionTopologyNode getSolutionTopology(){return(processingPlantServices.getSolutionNode());}
-
 
     protected PetasosMetricAgentFactory getMetricAgentFactory(){
         return(this.metricAgentFactory);
@@ -343,6 +353,14 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(this.processingPlantMetricsAgentAccessor.getMetricsAgent());
     }
 
+    protected WorkUnitProcessorTaskReportAgent getTaskReportAgent(){
+        return(this.taskReportAgent);
+    }
+
+    protected String specifyParticipantDisplayName(){
+        return(specifyWUPInstanceName());
+    }
+
     //
     // Routing Support Functions
     //
@@ -380,6 +398,14 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         }
     }
 
+    public class TaskReportAgentInjector implements Processor{
+        @Override
+        public void process(Exchange camelExchange) throws Exception{
+            getLogger().debug("TaskReportAgentInjector.process(): Entry");
+            camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, getTaskReportAgent());
+        }
+    }
+
     public WorkUnitProcessorSoftwareComponent getMeAsATopologyComponent() {
         return meAsATopologyComponent;
     }
@@ -391,10 +417,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     protected RouteDefinition fromIncludingPetasosServices(String uri) {
         NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
         AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
         RouteDefinition route = fromWithStandardExceptionHandling(uri);
         route
                 .process(nodeDetailInjector)
                 .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
         ;
         return route;
     }
@@ -457,6 +485,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
                 participantName,
                 getWorkshop().getWorkshopNode(),
                 PegacornSystemComponentTypeTypeEnum.WUP);
+        if(StringUtils.isNotEmpty(specifyParticipantDisplayName())){
+            wupNode.setParticipantDisplayName(specifyParticipantDisplayName());
+        }
         getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getComponentFDN(), wupNode);
         wupNode.setResilienceMode(getWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(getWorkshop().getWorkshopNode().getConcurrencyMode());
