@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosEdgeMessageForwarderService;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
@@ -36,6 +37,7 @@ import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosPa
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.subscription.TaskSubscriptionCheck;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
@@ -46,6 +48,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -58,9 +63,8 @@ import java.util.Set;
 public class LocalTaskDistributionBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalTaskDistributionBean.class);
-    protected Logger getLogger(){
-        return(LOG);
-    }
+
+    private DateTimeFormatter timeFormatter;
 
     @Inject
     LocalPetasosParticipantSubscriptionMapIM topicServer;
@@ -85,6 +89,30 @@ public class LocalTaskDistributionBean {
 
     @Inject
     private ProcessingPlantInterface myProcessingPlant;
+
+    //
+    // Constructor(s)
+    //
+
+    public LocalTaskDistributionBean(){
+        timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS").withZone(ZoneId.of(PetasosPropertyConstants.DEFAULT_TIMEZONE));
+    }
+
+    //
+    // Getters and Setters
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
+    protected DateTimeFormatter getTimeFormatter(){
+        return(this.timeFormatter);
+    }
+
+    //
+    // Business Logic
+    //
 
     /**
      * Essentially, we get the set of WUPs subscribing to a particular UoW type,
@@ -133,7 +161,7 @@ public class LocalTaskDistributionBean {
 
         getLogger().trace(".distributeNewFulfillmentTasks(): Distributing new PetasosTaskFulfillment tasks");
         for(PetasosParticipant currentSubscriber: subscriberSet){
-            forwardTask(currentSubscriber, actionableTask);
+            forwardTask(currentSubscriber, actionableTask, camelExchange);
         }
 
         getLogger().debug(".distributeNewFulfillmentTasks(): Exiting");
@@ -142,7 +170,7 @@ public class LocalTaskDistributionBean {
 
 
 
-    private void forwardTask(PetasosParticipant subscriber, PetasosActionableTask actionableTask){
+    private void forwardTask(PetasosParticipant subscriber, PetasosActionableTask actionableTask, Exchange camelExchange){
         getLogger().debug(".forwardTask(): Subscriber --> {}", subscriber);
         // 1st check if the Subscriber is actually a remote one! If so, ensure it has a proper "IntendedTarget" entry
         boolean isRemoteTarget = false;
@@ -200,7 +228,21 @@ public class LocalTaskDistributionBean {
         getLogger().debug(".forwardTask(): Register PetasosFulfillmentTask: Finish");
         getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Start");
         String targetCamelEndpoint = routeName.getEndPointWUPContainerIngresProcessorIngres();
-        getLogger().info(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: targetCamelEndpoint->{}", targetCamelEndpoint);
+        getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: targetCamelEndpoint->{}", targetCamelEndpoint);
+        //
+        // Get out metricsAgent & do add some metrics
+        WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+        metricsAgent.incrementDistributedMessageCount();
+        metricsAgent.touchLastActivityInstant();
+        StringBuilder distributionMessageBuilder = new StringBuilder();
+        distributionMessageBuilder.append("--- Distributing new PetasosFulfillmentTask ---");
+        distributionMessageBuilder.append(" ("+ getTimeFormatter().format(Instant.now())+ ") ---\n");
+        distributionMessageBuilder.append("TaskID (FulfillmentTask) --> " + petasosFulfillmentTask.getTaskId().getId() + "\n");
+        distributionMessageBuilder.append("TaskID (ActionableTask) --> " + petasosFulfillmentTask.getActionableTaskId().getId() + "\n");
+        distributionMessageBuilder.append("Target --> " + subscriber.getParticipantName() + "\n");
+        metricsAgent.sendITOpsNotification(distributionMessageBuilder.toString());
+        //
+        // Forward the Task
         camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentTask);
         getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
     }
@@ -212,4 +254,6 @@ public class LocalTaskDistributionBean {
             getLogger().trace(".forwardUoW2WUPs(): Subscribed WUP Ingres Point --> {}", tokenIterator.next());
         }
     }
+
+
 }

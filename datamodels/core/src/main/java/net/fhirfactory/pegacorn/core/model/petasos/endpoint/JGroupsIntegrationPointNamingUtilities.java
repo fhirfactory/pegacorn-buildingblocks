@@ -146,11 +146,23 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointServiceName = nameSplit[JGROUPS_INTEGRATION_POINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME];
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_SITE_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointSiteName = nameSplit[JGROUPS_INTEGRATION_POINT_SITE_POSITION_IN_CHANNEL_NAME];
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_ZONE_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointZoneName = nameSplit[JGROUPS_INTEGRATION_POINT_ZONE_POSITION_IN_CHANNEL_NAME];
-        String endpointFunctionName = functionType.getDisplayName();
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointUUID = nameSplit[JGROUPS_INTEGRATION_POINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME];
+        String endpointFunctionName = functionType.getDisplayName();
         String oamPubSubName = buildChannelName(endpointSiteName,endpointZoneName,endpointServiceName,endpointFunctionName,endpointUUID);
         return(oamPubSubName);
     }
@@ -160,7 +172,13 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointServiceName = nameSplit[JGROUPS_INTEGRATION_POINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME];
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointUniqueID = nameSplit[JGROUPS_INTEGRATION_POINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME];
         String endpointName = buildProcessingPlantName(endpointServiceName, endpointUniqueID);
         return(endpointName);
@@ -171,6 +189,9 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_SITE_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointSite = nameSplit[JGROUPS_INTEGRATION_POINT_SITE_POSITION_IN_CHANNEL_NAME];
         return(endpointSite);
     }
@@ -193,6 +214,9 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_ZONE_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointZone = nameSplit[JGROUPS_INTEGRATION_POINT_ZONE_POSITION_IN_CHANNEL_NAME];
         return(endpointZone);
     }
@@ -215,6 +239,9 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointServiceName = nameSplit[JGROUPS_INTEGRATION_POINT_SERVICE_NAME_POSITION_IN_CHANNEL_NAME];
         return(endpointServiceName);
     }
@@ -263,6 +290,9 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
+        if(nameSplit.length < JGROUPS_INTEGRATION_POINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME){
+            return(null);
+        }
         String endpointUniqueID = nameSplit[JGROUPS_INTEGRATION_POINT_UNIQUE_ID_POSITION_IN_CHANNEL_NAME];
         return(endpointUniqueID);
     }
@@ -272,6 +302,9 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = channelName.split(getChannelNameSeparator());
+        if(nameSplit.length < SUBSYSTEM_NAME_POSITION_IN_PROCESSING_PLANT_ID){
+            return(null);
+        }
         String endpointFunctionName = nameSplit[SUBSYSTEM_NAME_POSITION_IN_PROCESSING_PLANT_ID];
         return(endpointFunctionName);
     }
@@ -294,6 +327,9 @@ public class JGroupsIntegrationPointNamingUtilities {
             return(null);
         }
         String[] nameSplit = endpointName.split(getChannelNameSeparator());
+        if(nameSplit.length < UNIQUE_KEY_POSITION_IN_PROCESSING_PLANT_ID){
+            return(null);
+        }
         String endpointScopeName = nameSplit[UNIQUE_KEY_POSITION_IN_PROCESSING_PLANT_ID];
         return(endpointScopeName);
     }

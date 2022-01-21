@@ -72,7 +72,7 @@ public class PetasosTaskReportFactory {
     //
 
     public PetasosComponentITOpsNotification newTaskSummaryReport(PetasosActionableTask actionableTask){
-        getLogger().info(".newTaskSummaryReport(): Entry");
+        getLogger().debug(".newTaskSummaryReport(): Entry");
 
         //
         // Derive the Key Information
@@ -89,8 +89,14 @@ public class PetasosTaskReportFactory {
         } else {
             finishTime = "-";
         }
-        String fulfillerComponentName = actionableTask.getTaskFulfillment().getFulfillerComponent().getParticipantDisplayName();
-        String fulfillerComponentId = actionableTask.getTaskFulfillment().getFulfillerComponent().getComponentID().getId();
+        String fulfillerComponentName = "Not Available";
+        String fulfillerComponentId = "Not Available";
+        if(actionableTask.getTaskFulfillment().hasFulfillerComponent()) {
+            fulfillerComponentName = actionableTask.getTaskFulfillment().getFulfillerComponent().getParticipantDisplayName();
+            fulfillerComponentId = actionableTask.getTaskFulfillment().getFulfillerComponent().getComponentID().getId();
+        } else {
+            getLogger().warn(".newTaskSummaryReport(): No Task Fulfiller Component Defined on Task->{}", actionableTask.getTaskId());
+        }
         ActionableTaskOutcomeStatusEnum outcomeStatus = actionableTask.getTaskOutcomeStatus().getOutcomeStatus();
         if(outcomeStatus == null){
             outcomeStatus = ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN;
@@ -180,7 +186,7 @@ public class PetasosTaskReportFactory {
         formattedReportBuilder.append("<tr>");
         formattedReportBuilder.append("<td><b>Outcome</b></td>");
         if(outcomeStatus.equals(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FAILED)) {
-            formattedReportBuilder.append("<td><font 'color=Red'" + taskOutcomeStatus + "</font></td>");
+            formattedReportBuilder.append("<td><font color=Red" + taskOutcomeStatus + "</font></td>");
         } else {
             formattedReportBuilder.append("<td>" + taskOutcomeStatus + "</td>");
         }
@@ -226,7 +232,7 @@ public class PetasosTaskReportFactory {
         taskReport.setContent(reportBuilder.toString());
         taskReport.setFormattedContent(formattedReportBuilder.toString());
 
-        getLogger().info(".newTaskSummaryReport(): Exit, taskReport->{}", taskReport);
+        getLogger().debug(".newTaskSummaryReport(): Exit, taskReport->{}", taskReport);
         return(taskReport);
     }
 
@@ -237,9 +243,9 @@ public class PetasosTaskReportFactory {
     }
 
     public PetasosComponentITOpsNotification newTaskSummaryReport(PetasosActionableTask actionableTask, List<PetasosActionableTask> newActionableTasks){
-        getLogger().info(".newTaskSummaryReport(): Entry");
+        getLogger().debug(".newTaskSummaryReport(): Entry");
         if(actionableTask == null){
-            getLogger().info(".newTaskSummaryReport(): Exit, actionableTask is null");
+            getLogger().debug(".newTaskSummaryReport(): Exit, actionableTask is null");
             return(null);
         }
         //
@@ -259,9 +265,9 @@ public class PetasosTaskReportFactory {
         // Build the Standard Text Body
         StringBuilder reportBuilder = new StringBuilder();
         reportBuilder.append(":: -------------------- Task Report ------------------ :: \n");
-        reportBuilder.append(":: Task Id --> "+taskId +"\n");
+        reportBuilder.append(":: Current Task Id --> "+taskId +"\n");
         if(noNewTasks){
-            reportBuilder.append("::  No Downstream Tasks Created ::"+"\n");
+            reportBuilder.append("::  No Downstream Tasks Created (no downstream subscribers present) ::"+"\n");
         } else {
             Integer counter = 0;
             for(String currentDownstreamTaskId: downstreamTaskIDs){
@@ -277,14 +283,13 @@ public class PetasosTaskReportFactory {
         formattedReportBuilder.append("<hr width=100%>");
         formattedReportBuilder.append("<table style='width:100%'>");
         formattedReportBuilder.append("<tr>");
-        formattedReportBuilder.append("<td><b>TaskId</b></td>");
+        formattedReportBuilder.append("<td><b>Current TaskId</b></td>");
         formattedReportBuilder.append("<td>"+taskId+"</td>");
         formattedReportBuilder.append("</tr>");
-        formattedReportBuilder.append("<tr>");
         if(noNewTasks){
             formattedReportBuilder.append("<tr>");
-            formattedReportBuilder.append("<td><b>TaskId</b></td>");
-            formattedReportBuilder.append("<td> No Downstream Tasks Created </td>");
+            formattedReportBuilder.append("<td><b>Downstream Task ID</b></td>");
+            formattedReportBuilder.append("<td> No Downstream Tasks Created (no downstream subscribers present) </td>");
             formattedReportBuilder.append("</tr>");
             formattedReportBuilder.append("<tr>");
         } else {
@@ -305,7 +310,7 @@ public class PetasosTaskReportFactory {
         taskReport.setContent(reportBuilder.toString());
         taskReport.setFormattedContent(formattedReportBuilder.toString());
 
-        getLogger().info(".newTaskSummaryReport(): Exit, taskReport->{}", taskReport);
+        getLogger().debug(".newTaskSummaryReport(): Exit, taskReport->{}", taskReport);
         return(taskReport);
     }
 

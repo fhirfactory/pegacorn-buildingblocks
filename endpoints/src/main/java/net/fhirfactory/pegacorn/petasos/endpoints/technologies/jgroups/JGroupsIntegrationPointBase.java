@@ -425,32 +425,60 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     }
 
+    /**
+     * This method parses the list of "interfaces" ADDED (exposed/visible) to a JChannel instance (i.e. visible within the
+     * same JGroups cluster) and works out if a scan of the enpoint is (a) not another instance (different POD) of
+     * this service and is implementing the same "function".
+     *
+     * Note, it has to check the "name" quality/validity/structure - as sometimes JGroups can pass some wacky values
+     * to us...
+     *
+     * @param addedInterface
+     */
     @Override
     public void processInterfaceAddition(PetasosAdapterAddress addedInterface){
-        getLogger().debug(".interfaceAdded(): Entry, addedInterface->{}", addedInterface);
-        boolean itIsAnotherInstanceOfMe = getComponentNameUtilities().getSubsystemNameFromEndpointName(addedInterface.getAddressName()).contentEquals(getSubsystemParticipantName());
-        boolean itIsSameType = getComponentNameUtilities().getEndpointFunctionFromChannelName(addedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
-        if(!itIsAnotherInstanceOfMe && itIsSameType) {
-            getLogger().debug(".interfaceAdded(): itIsAnotherInstanceOfMe && !itIsSameType");
-            String endpointChannelName = addedInterface.getAddressName();
-            JGroupsIntegrationPointSummary jgroupsIP = buildFromChannelName(endpointChannelName);
-            integrationPointCheckScheduleMap.scheduleJGroupsIntegrationPointCheck(jgroupsIP, false, true);
-            scheduleEndpointValidation();
+        getLogger().info(".interfaceAdded(): Entry, addedInterface->{}", addedInterface);
+        String endpointSubsystemName = getComponentNameUtilities().getSubsystemNameFromEndpointName(addedInterface.getAddressName());
+        String endpointFunctionName = getComponentNameUtilities().getEndpointFunctionFromChannelName(addedInterface.getAddressName());
+        if(StringUtils.isNotEmpty(endpointSubsystemName) && StringUtils.isNotEmpty(endpointFunctionName)) {
+            boolean itIsAnotherInstanceOfMe = endpointSubsystemName.contentEquals(getSubsystemParticipantName());
+            boolean itIsSameType = endpointFunctionName.contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
+            if (!itIsAnotherInstanceOfMe && itIsSameType) {
+                getLogger().debug(".interfaceAdded(): itIsAnotherInstanceOfMe && !itIsSameType");
+                String endpointChannelName = addedInterface.getAddressName();
+                JGroupsIntegrationPointSummary jgroupsIP = buildFromChannelName(endpointChannelName);
+                integrationPointCheckScheduleMap.scheduleJGroupsIntegrationPointCheck(jgroupsIP, false, true);
+                scheduleEndpointValidation();
+            }
         }
         getLogger().debug(".interfaceAdded(): Exit");
     }
 
+    /**
+     * This method parses the list of "interfaces" REMOVED (exposed/visible) to a JChannel instance (i.e. visible within the
+     * same JGroups cluster) and works out if a scan of the enpoint is (a) not another instance (different POD) of
+     * this service and is implementing the same "function".
+     *
+     * Note, it has to check the "name" quality/validity/structure - as sometimes JGroups can pass some wacky values
+     * to us...
+     *
+     * @param removedInterface
+     */
     @Override
     public void processInterfaceRemoval(PetasosAdapterAddress removedInterface){
         getLogger().debug(".interfaceRemoved(): Entry, removedInterface->{}", removedInterface);
-        boolean itIsAnotherInstanceOfMe = getComponentNameUtilities().getSubsystemNameFromEndpointName(removedInterface.getAddressName()).contentEquals(getSubsystemParticipantName());
-        boolean itIsSameType = getComponentNameUtilities().getEndpointFunctionFromChannelName(removedInterface.getAddressName()).contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
-        if(!itIsAnotherInstanceOfMe && itIsSameType) {
-            getLogger().trace(".interfaceRemoved(): !itIsAnotherInstanceOfMe && itIsSameType");
-            String endpointChannelName = removedInterface.getAddressName();
-            JGroupsIntegrationPointSummary jgroupsIP = buildFromChannelName(endpointChannelName);
-            integrationPointCheckScheduleMap.scheduleJGroupsIntegrationPointCheck(jgroupsIP, true, false);
-            scheduleEndpointValidation();
+        String endpointSubsystemName = getComponentNameUtilities().getSubsystemNameFromEndpointName(removedInterface.getAddressName());
+        String endpointFunctionName = getComponentNameUtilities().getEndpointFunctionFromChannelName(removedInterface.getAddressName());
+        if(StringUtils.isNotEmpty(endpointSubsystemName) && StringUtils.isNotEmpty(endpointFunctionName)) {
+            boolean itIsAnotherInstanceOfMe = endpointSubsystemName.contentEquals(getSubsystemParticipantName());
+            boolean itIsSameType = endpointFunctionName.contentEquals(PetasosEndpointFunctionTypeEnum.PETASOS_TOPOLOGY_ENDPOINT.getDisplayName());
+            if (!itIsAnotherInstanceOfMe && itIsSameType) {
+                getLogger().trace(".interfaceRemoved(): !itIsAnotherInstanceOfMe && itIsSameType");
+                String endpointChannelName = removedInterface.getAddressName();
+                JGroupsIntegrationPointSummary jgroupsIP = buildFromChannelName(endpointChannelName);
+                integrationPointCheckScheduleMap.scheduleJGroupsIntegrationPointCheck(jgroupsIP, true, false);
+                scheduleEndpointValidation();
+            }
         }
         getLogger().debug(".interfaceRemoved(): Exit");
     }

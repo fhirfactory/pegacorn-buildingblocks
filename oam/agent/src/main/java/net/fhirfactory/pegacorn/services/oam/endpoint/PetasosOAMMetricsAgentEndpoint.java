@@ -111,7 +111,7 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Instant response = getRPCDispatcher().callRemoteMethod(targetAddress, "captureMetrics", objectSet, classSet, requestOptions);
-            getLogger().info(".replicateMetricSetToServer(): Exit, response->{}", response);
+            getLogger().debug(".replicateMetricSetToServer(): Exit, response->{}", response);
             getMetricsAgent().incrementRemoteProcedureCallCount();
             return(response);
         } catch (NoSuchMethodException e) {

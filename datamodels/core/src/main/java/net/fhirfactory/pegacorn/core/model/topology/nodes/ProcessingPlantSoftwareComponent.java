@@ -246,8 +246,13 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     @Override
     public String toString() {
         return "ProcessingPlantSoftwareComponent{" +
-                "componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                "participantDisplayName='" + getParticipantDisplayName() + '\'' +
+                ", participantName='" + getParticipantName() + '\'' +
+                ", deploymentSite='" + getDeploymentSite() + '\'' +
+                ", lastActivityInstant=" + getLastActivityInstant() +
+                ", lastReportingInstant=" + getLastReportingInstant() +
+                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
+                ", componentFDN=" + getComponentFDN() +
                 ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
@@ -256,11 +261,10 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
                 ", nodeFunctionFDN=" + getNodeFunctionFDN() +
                 ", componentType=" + getComponentType() +
                 ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", actualPodIP='" + getActualPodIP() + '\'' +
                 ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +
+                ", componentStatus=" + getComponentStatus() +
+                ", componentExecutionControl=" + getComponentExecutionControl() +
                 ", workshops=" + workshops +
                 ", endpoints=" + endpoints +
                 ", connections=" + connections +
@@ -273,12 +277,11 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
                 ", petasosTaskingStackConfigFile='" + petasosTaskingStackConfigFile + '\'' +
                 ", petasosAuditStackConfigFile='" + petasosAuditStackConfigFile + '\'' +
                 ", multiZoneInfinispanStackConfigFile='" + multiZoneInfinispanStackConfigFile + '\'' +
-                ", defaultDNSName='" + assignedDNSName + '\'' +
+                ", actualHostIP='" + actualHostIP + '\'' +
+                ", actualPodIP='" + actualPodIP + '\'' +
+                ", assignedDNSName='" + assignedDNSName + '\'' +
                 ", internalTrafficEncrypted=" + internalTrafficEncrypted +
                 ", replicationCount=" + replicationCount +
-                ", subsystemName='" + this.getSubsystemParticipantName() + '\'' +
-                ", subsystemParticipantName=" + getSubsystemParticipantName() +
-                ", clusterServiceName='" + getClusterServiceName() + '\'' +
                 '}';
     }
 }

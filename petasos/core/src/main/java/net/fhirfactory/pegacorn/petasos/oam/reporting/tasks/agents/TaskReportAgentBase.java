@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComp
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportFactory;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,23 +103,30 @@ public abstract class TaskReportAgentBase {
 
     public void sendITOpsTaskReport(PetasosActionableTask task){
         getLogger().info(".sendITOpsTaskReport(): Entry");
-        PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task);
-        notification.setComponentType(specifyComponentType());
-        notification.setComponentId(getComponentId());
-        notification.setParticipantName(getParticipantName());
+        try {
+            PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task);
+            notification.setComponentType(specifyComponentType());
+            notification.setComponentId(getComponentId());
+            notification.setParticipantName(getParticipantName());
 
-        taskReportingAgent.sendTaskReport(notification);
+            taskReportingAgent.sendTaskReport(notification);
+        } catch (Exception generalException){
+            getLogger().warn(".sendITOpsTaskReport(): Problem Sending ITOps TaskReport, message->{}, stackTrace->{}", ExceptionUtils.getMessage(generalException), ExceptionUtils.getStackTrace(generalException));
+        }
         getLogger().info(".sendITOpsTaskReport(): Exit");
     }
 
     public void sendITOpsTaskReport(PetasosActionableTask task, List<PetasosActionableTask> newTasks){
         getLogger().info(".sendITOpsTaskReport(): Entry");
-        PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task, newTasks);
-        notification.setComponentType(specifyComponentType());
-        notification.setComponentId(getComponentId());
-        notification.setParticipantName(getParticipantName());
-
-        taskReportingAgent.sendTaskReport(notification);
+        try {
+            PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task, newTasks);
+            notification.setComponentType(specifyComponentType());
+            notification.setComponentId(getComponentId());
+            notification.setParticipantName(getParticipantName());
+            taskReportingAgent.sendTaskReport(notification);
+        } catch (Exception generalException){
+            getLogger().warn(".sendITOpsTaskReport(): Problem Sending ITOps TaskReport, message->{}, stackTrace->{}", ExceptionUtils.getMessage(generalException), ExceptionUtils.getStackTrace(generalException));
+        }
         getLogger().info(".sendITOpsTaskReport(): Exit");
     }
 }

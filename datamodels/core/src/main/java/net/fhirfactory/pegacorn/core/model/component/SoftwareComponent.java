@@ -152,9 +152,6 @@ public abstract class SoftwareComponent implements Serializable {
         if(ori.hasParticipantName()){
             setParticipantName(ori.getParticipantName());
         }
-        if(ori.hasSubsystemParticipantName()){
-            setSubsystemParticipantName(ori.getSubsystemParticipantName());
-        }
         if(ori.hasParticipantDisplayName()){
             setParticipantDisplayName(ori.getParticipantDisplayName());
         }

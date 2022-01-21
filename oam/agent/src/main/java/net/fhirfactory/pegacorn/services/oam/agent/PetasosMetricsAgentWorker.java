@@ -181,7 +181,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
         if(metricsUpdateFailed){
             LOG.info(".forwardLocalMetricsToServer(): Exit, failed to update");
         } else {
-            LOG.info(".forwardLocalMetricsToServer(): Exit, Update successful");
+            LOG.debug(".forwardLocalMetricsToServer(): Exit, Update successful");
         }
     }
 

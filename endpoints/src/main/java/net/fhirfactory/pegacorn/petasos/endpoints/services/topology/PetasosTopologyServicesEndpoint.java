@@ -154,35 +154,6 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
         getLogger().debug(".doIntegrationPointBusinessFunctionCheck(): Exit, nothing to do!");
     }
 
-/*
-
-    //
-    // Publisher Management
-    //
-
-    protected void addPetasosParticipantToLocalRegistry(PetasosEndpoint addedPetasosEndpoint) {
-        getLogger().debug(".addPetasosParticipantToLocalRegistry(): Entry, addedPetasosEndpoint->{}", addedPetasosEndpoint);
-        PetasosEndpoint publisherEndpoint = buildPetasosEndpoint(addedPetasosEndpoint);
-        if(publisherEndpoint == null){
-            getLogger().warn(".addPetasosParticipantToLocalRegistry(): Exit, could not resolve Subscription Endpoint for a given Topology endpoint");
-            return;
-        }
-        participantCacheIM.synchroniseLocalWithCentralCache(publisherEndpoint.getEndpointID().getProcessingPlantComponentID());
-        getLogger().debug(".addPetasosParticipantToLocalRegistry(): Exit");
-    }
-
-    protected void removePetasosParticipantFromLocalRegistry(PetasosEndpoint addedPetasosEndpoint) {
-        getLogger().debug(".addPetasosParticipantToLocalRegistry(): Entry, addedPetasosEndpoint->{}", addedPetasosEndpoint);
-        PetasosEndpoint publisherEndpoint = buildPetasosEndpoint(addedPetasosEndpoint);
-        if(publisherEndpoint == null){
-            getLogger().warn(".addPetasosParticipantToLocalRegistry(): Exit, could not resolve Subscription Endpoint for a given Topology endpoint");
-            return;
-        }
-        participantCacheIM.synchroniseLocalWithCentralCache(publisherEndpoint.getEndpointID().getProcessingPlantComponentID());
-        getLogger().debug(".addPetasosParticipantToLocalRegistry(): Exit");
-    }
-*/
-
     //
     // Topology (Detailed) Information Collection
     //

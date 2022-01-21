@@ -16,7 +16,7 @@
 
     <modules>
         <module>agent</module>
-        <module>collector</module>
+        <!--module>collector</module-->
         <module>common</module>
     </modules>
     <dependencies>

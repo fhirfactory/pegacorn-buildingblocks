@@ -150,6 +150,7 @@ public class PetasosComponentMetricSetFactory {
             metricSet.addMetric(ingresMessageCount);
         }
 
+        getLogger().info(".convertProcessingPlantMetricsData(): [EgressMessageCount] Check");
         if(plantMetricsData.getEgressMessageCount() > 0){
             PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
             egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
@@ -160,6 +161,26 @@ public class PetasosComponentMetricSetFactory {
             egressMessageCount.setMetricValue(new PetasosComponentMetricValue(plantMetricsData.getEgressMessageCount()));
             metricSet.addMetric(egressMessageCount);
         }
+        getLogger().info(".convertProcessingPlantMetricsData(): [EgressMessageCount] Done...");
+        getLogger().info(".convertProcessingPlantMetricsData(): [DistributionCountMap] Check");
+        if(!plantMetricsData.getDistributionCountMap().isEmpty()){
+            getLogger().info(".convertProcessingPlantMetricsData(): [Processing DistributionCountMap] Start");
+            int counter = 0;
+            for(String currentTargetName: plantMetricsData.getDistributionCountMap().keySet()){
+                PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
+                egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                egressMessageCount.setMetricSource(plantMetricsData.getComponentID());
+                egressMessageCount.setMetricName("Messages-Forwarded["+currentTargetName+"]");
+                egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED);
+                egressMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+                Integer forwardedMessageCount = plantMetricsData.getDistributionCountMap().get(currentTargetName);
+                egressMessageCount.setMetricValue(new PetasosComponentMetricValue(forwardedMessageCount));
+                metricSet.addMetric(egressMessageCount);
+                counter += 1;
+            }
+            getLogger().info(".convertProcessingPlantMetricsData(): [Processing DistributionCountMap] Finish (entries={})", counter);
+        }
+        getLogger().info(".convertProcessingPlantMetricsData(): [DistributionCountMap] Done...");
 
         getLogger().debug(".convertProcessingPlantMetricsData(): Exit, metricSet->{}", metricSet);
         return(metricSet);

@@ -24,15 +24,20 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.notifications.PetasosITOpsNotificationContentFactory;
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +66,13 @@ public class WUPContainerIngresProcessor {
 
     @Inject
     private PetasosITOpsNotificationContentFactory notificationContentFactory;
+
+    @Inject
+    private ProcessingPlantMetricsAgentAccessor metricsAgentAccessor;
+
+    @Inject
+    private CamelContext camelctx;
+
 
     //
     // Constructor(s)
@@ -111,15 +123,20 @@ public class WUPContainerIngresProcessor {
      */
     public PetasosFulfillmentTask ingresContentProcessor(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
         getLogger().debug(".ingresContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask );
-        if(getLogger().isInfoEnabled()){
-            getLogger().info(".ingresContentProcessor(): Entry, fulfillmentTask.getTaskId()->{}", fulfillmentTask.getTaskId().getId());
-        }
         //
         // Now, set out wait-loop sleep period
         long waitTime = PetasosPropertyConstants.WUP_SLEEP_INTERVAL_MILLISECONDS;
         //
         // Set our wait-loop check state
         boolean waitState = true;
+
+        TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getNodeFunctionFDN().getFunctionToken();
+        getLogger().trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        //
+        // Now, continue with business logic
+        RouteElementNames elementNames = new RouteElementNames(wupFunctionToken);
+        SedaEndpoint seda = (SedaEndpoint) camelctx.getEndpoint(elementNames.getEndPointWUPContainerIngresProcessorIngres());
+        int currentQueueSize = seda.getCurrentQueueSize();
         //
         // Get out metricsAgent & do add some metrics
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
@@ -133,7 +150,7 @@ public class WUPContainerIngresProcessor {
             if(fulfillmentTask.getTaskWorkItem().hasIngresContent()) {
                 UoWPayload payload = fulfillmentTask.getTaskWorkItem().getIngresContent();
                 StringBuilder notificationMessageBuilder = new StringBuilder();
-                notificationMessageBuilder.append("--- Tasked with new PetasosFulfillmentTask ---");
+                notificationMessageBuilder.append("--- Received Task (PetasosFulfillmentTask): Ingres Queue Size: "+currentQueueSize+" ---");
                 notificationMessageBuilder.append(" ("+ getTimeFormatter().format(Instant.now())+ ") ---\n");
                 notificationMessageBuilder.append("Task ID (FulfillmentTask) --> " + fulfillmentTask.getTaskId().getId() + "\n");
                 notificationMessageBuilder.append("Task ID (ActionableTask) --> " + fulfillmentTask.getActionableTaskId().getId() + "\n");
@@ -156,8 +173,8 @@ public class WUPContainerIngresProcessor {
         boolean willExecute = false;
         boolean willBeCancelled = false;
         while (waitState) {
-            if(getLogger().isInfoEnabled()){
-                getLogger().info(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}",fulfillmentTask.getTaskJobCard().getCurrentStatus());
+            if(getLogger().isDebugEnabled()){
+                getLogger().debug(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}",fulfillmentTask.getTaskJobCard().getCurrentStatus());
             }
             switch (fulfillmentTask.getTaskJobCard().getCurrentStatus()) {
                 case WUP_ACTIVITY_STATUS_WAITING:
@@ -234,13 +251,13 @@ public class WUPContainerIngresProcessor {
                 }
             }
             if(getLogger().isInfoEnabled()){
-                getLogger().info(".ingresContentProcessor(): Looping, current fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
+                getLogger().debug(".ingresContentProcessor(): Looping, current fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
             }
         }
         //
         // Write Some Metrics
         if(willExecute){
-            getLogger().info(".ingresContentProcessor(): Will be executing!");
+            getLogger().debug(".ingresContentProcessor(): Will be executing!");
             metricsAgent.incrementStartedTasks();
             metricsAgent.touchLastActivityStartInstant();
         }
@@ -249,7 +266,7 @@ public class WUPContainerIngresProcessor {
         }
         //
         // Do some Logging
-        if(getLogger().isInfoEnabled()){
+        if(getLogger().isDebugEnabled()){
             getLogger().debug(".ingresContentProcessor(): Exit, fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
         }
         getLogger().debug(".ingresContentProcessor(): Exit, newTransportPacket --> {}", fulfillmentTask);
