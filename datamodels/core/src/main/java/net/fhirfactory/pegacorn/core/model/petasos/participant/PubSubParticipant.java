@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.participant;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Deprecated
 public class PubSubParticipant implements Serializable {
     private IntraSubsystemPubSubParticipant intraSubsystemParticipant;
     private PetasosParticipant interSubsystemParticipant;

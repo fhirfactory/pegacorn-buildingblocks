@@ -22,13 +22,13 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosServicesEndpointRegistrationService;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.factories.PetasosComponentMetricSetFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -94,6 +94,9 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     @Inject
     private PetasosMetricAgentFactory metricsFactory;
+
+    @Inject
+    private ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement;
 
     //
     // Constructor
@@ -189,7 +192,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
         String participantName = getProcessingPlant().getSubsystemParticipantName()+"."+specifyPetasosEndpointFunctionType().getEndpointParticipantName();
         getLogger().info(".initialise(): Step 8: participantName->{}", participantName);
-        this.metricsAgent = metricsFactory.newEndpointMetricsAgent(getJGroupsIntegrationPoint().getComponentID(),participantName, "Internal", specifyJGroupsChannelName());
+        this.metricsAgent = metricsFactory.newEndpointMetricsAgent(processingPlantCapabilityStatement, getJGroupsIntegrationPoint().getComponentID(),participantName, "Internal", specifyJGroupsChannelName());
         getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
         // We're done!
         setInitialised(true);

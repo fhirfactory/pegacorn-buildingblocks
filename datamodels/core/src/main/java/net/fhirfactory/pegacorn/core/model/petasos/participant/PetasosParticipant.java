@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     private static final Logger LOG = LoggerFactory.getLogger(PetasosParticipant.class);
 
     private PetasosParticipantStatusEnum participantStatus;
-    private Set<TaskWorkItemManifestType> subscribedWorkItemManifests;
+    private Set<TaskWorkItemSubscriptionType> subscriptions;
     private Set<TaskWorkItemManifestType> publishedWorkItemManifests;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant utilisationUpdateInstant;
@@ -53,7 +54,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         super();
         this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
         this.utilisationUpdateInstant = null;
-        this.subscribedWorkItemManifests = new HashSet<>();
+        this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
         this.fulfillmentState = null;
     }
@@ -63,7 +64,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
 
         this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
         this.utilisationUpdateInstant = null;
-        this.subscribedWorkItemManifests = new HashSet<>();
+        this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
 
         if(ori.hasParticipantStatus()) {
@@ -72,8 +73,8 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         if(ori.hasUtilisationUpdateInstant()) {
             this.setUtilisationUpdateInstant(ori.getUtilisationUpdateInstant());
         }
-        if(!ori.getSubscribedWorkItemManifests().isEmpty()){
-            this.getSubscribedWorkItemManifests().addAll(ori.getSubscribedWorkItemManifests());
+        if(!ori.getSubscriptions().isEmpty()){
+            this.getSubscriptions().addAll(ori.getSubscriptions());
         }
         if(!ori.getPublishedWorkItemManifests().isEmpty()){
             this.getPublishedWorkItemManifests().addAll(ori.getPublishedWorkItemManifests());
@@ -88,15 +89,15 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
         this.setParticipantName(participantName);
         this.utilisationUpdateInstant = null;
-        this.subscribedWorkItemManifests = new HashSet<>();
+        this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
     }
 
     public PetasosParticipant(SoftwareComponent ori){
         super(ori);
-        this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
+        this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;;
         this.utilisationUpdateInstant = null;
-        this.subscribedWorkItemManifests = new HashSet<>();
+        this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
     }
 
@@ -151,12 +152,12 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         return utilisationUpdateInstant;
     }
 
-    public Set<TaskWorkItemManifestType> getSubscribedWorkItemManifests() {
-        return subscribedWorkItemManifests;
+    public Set<TaskWorkItemSubscriptionType> getSubscriptions() {
+        return subscriptions;
     }
 
-    public void setSubscribedWorkItemManifests(Set<TaskWorkItemManifestType> subscribedWorkItemManifests) {
-        this.subscribedWorkItemManifests = subscribedWorkItemManifests;
+    public void setSubscriptions(Set<TaskWorkItemSubscriptionType> subscriptions) {
+        this.subscriptions = subscriptions;
     }
 
     public Set<TaskWorkItemManifestType> getPublishedWorkItemManifests() {
@@ -192,7 +193,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
                 ", componentStatus=" + getComponentStatus() +
                 ", componentExecutionControl=" + getComponentExecutionControl() +
                 ", utilisationStatus=" + participantStatus +
-                ", subscribedWorkItemManifests=" + subscribedWorkItemManifests +
+                ", subscribedWorkItemManifests=" + subscriptions +
                 ", publishedWorkItemManifests=" + publishedWorkItemManifests +
                 ", utilisationUpdateInstant=" + utilisationUpdateInstant +
                 ", fulfillmentState=" + fulfillmentState +
@@ -209,11 +210,11 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         if (!(o instanceof PetasosParticipant)) return false;
         if (!super.equals(o)) return false;
         PetasosParticipant that = (PetasosParticipant) o;
-        return getParticipantStatus() == that.getParticipantStatus() && Objects.equals(getSubscribedWorkItemManifests(), that.getSubscribedWorkItemManifests()) && Objects.equals(getPublishedWorkItemManifests(), that.getPublishedWorkItemManifests()) && Objects.equals(getUtilisationUpdateInstant(), that.getUtilisationUpdateInstant());
+        return getParticipantStatus() == that.getParticipantStatus() && Objects.equals(getSubscriptions(), that.getSubscriptions()) && Objects.equals(getPublishedWorkItemManifests(), that.getPublishedWorkItemManifests()) && Objects.equals(getUtilisationUpdateInstant(), that.getUtilisationUpdateInstant());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getParticipantStatus(), getSubscribedWorkItemManifests(), getPublishedWorkItemManifests(), getUtilisationUpdateInstant());
+        return Objects.hash(super.hashCode(), getParticipantStatus(), getSubscriptions(), getPublishedWorkItemManifests(), getUtilisationUpdateInstant());
     }
 }

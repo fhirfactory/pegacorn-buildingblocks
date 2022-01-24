@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTy
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistrationStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -198,10 +198,10 @@ public class LocalPetasosParticipantCacheDM {
 			Enumeration<ComponentIdType> participantKeys = getParticipantCache().keys();
 			while (participantKeys.hasMoreElements()) {
 				PetasosParticipant currentParticipant = getParticipantCache().get(participantKeys.nextElement()).getParticipant();
-				if(!currentParticipant.getSubscribedWorkItemManifests().isEmpty()){
+				if(!currentParticipant.getSubscriptions().isEmpty()){
 					if(!currentParticipant.getSubsystemParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
-						for(TaskWorkItemManifestType currentWorkItemManifest: currentParticipant.getSubscribedWorkItemManifests()){
-							if(currentWorkItemManifest.getSourceProcessingPlantParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
+						for(TaskWorkItemSubscriptionType currentParticipantSubscription: currentParticipant.getSubscriptions()){
+							if(currentParticipantSubscription.getSourceProcessingPlantParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
 								if(!downstreamParticipants.contains(currentParticipant)){
 									downstreamParticipants.add(currentParticipant);
 								}
@@ -233,6 +233,21 @@ public class LocalPetasosParticipantCacheDM {
 			}
 		}
     	return(serviceParticipantSet);
+	}
+
+	public Set<PetasosParticipant> getAllPetasosParticipants(){
+		Set<PetasosParticipant> participants = new HashSet<>();
+		synchronized (getParticipantCacheLock()){
+			for(PetasosParticipantRegistration currentRegistration: getParticipantCache().values()){
+				PetasosParticipant currentParticipant = currentRegistration.getParticipant();
+				if(participants.contains(currentParticipant)){
+					// do nothing
+				} else {
+					participants.add(currentParticipant);
+				}
+			}
+		}
+		return(participants);
 	}
 
 	//

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,26 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.participant;
+package net.fhirfactory.pegacorn.core.interfaces.capabilities;
 
-import javax.enterprise.context.ApplicationScoped;
+import net.fhirfactory.pegacorn.core.model.capabilities.valuesets.WorkUnitProcessorCapabilityEnum;
 
-@ApplicationScoped
-public class ProcessingPlantPetasosParticipantNameHolder {
-    private String subsystemParticipantName;
-
-    public String getSubsystemParticipantName() {
-        return subsystemParticipantName;
-    }
-
-    public void setSubsystemParticipantName(String subsystemParticipantName) {
-        this.subsystemParticipantName = subsystemParticipantName;
-    }
-
-    @Override
-    public String toString() {
-        return "ParticipantNameHolder{" +
-                "subsystemParticipantName='" + subsystemParticipantName + '\'' +
-                '}';
-    }
+public interface WorkUnitProcessorCapabilityStatementInterface {
+    public WorkUnitProcessorCapabilityEnum getWorkUnitProcessorCapability();
 }

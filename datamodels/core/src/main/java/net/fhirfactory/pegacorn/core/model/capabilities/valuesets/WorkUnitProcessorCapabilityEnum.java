@@ -19,26 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.participant;
+package net.fhirfactory.pegacorn.core.model.capabilities.valuesets;
 
-import javax.enterprise.context.ApplicationScoped;
+public enum WorkUnitProcessorCapabilityEnum {
+    CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS("ITOps.IM", "pegacorn.capability.im.itops"),
+    CAPABILITY_INFORMATION_MANAGEMENT_AUDIT_EVENTS("AuditEvent-IM", "pegacorn.capability.im.audit-event"),
+    CAPABILITY_INFORMATION_MANAGEMENT_TASK_SERVICES("Ponos.Manager", "pegacorn.capability.im.task-services"),
+    CAPABILITY_DATA_MANAGEMENT_AUDIT_EVENTS("AuditEvent-DM","pegacorn.capability.dm.audit-event"),
+    CAPABILITY_SERVICE_PROVIDER_A19QRY("A19Query-Task", "pegacorn.capability.task.a19query");
 
-@ApplicationScoped
-public class ProcessingPlantPetasosParticipantNameHolder {
-    private String subsystemParticipantName;
+    private String displayName;
+    private String token;
 
-    public String getSubsystemParticipantName() {
-        return subsystemParticipantName;
+    private WorkUnitProcessorCapabilityEnum(String name, String token){
+        this.displayName = name;
+        this.token = token;
     }
 
-    public void setSubsystemParticipantName(String subsystemParticipantName) {
-        this.subsystemParticipantName = subsystemParticipantName;
+    public String getDisplayName(){
+        return(this.displayName);
     }
 
-    @Override
-    public String toString() {
-        return "ParticipantNameHolder{" +
-                "subsystemParticipantName='" + subsystemParticipantName + '\'' +
-                '}';
+    public String getToken(){
+        return(this.token);
     }
 }

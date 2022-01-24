@@ -32,6 +32,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
@@ -56,9 +57,11 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
-
     @Inject
     PetasosLocalMetricsDM metricsAgent;
+
+    @Inject
+    ProcessingPlantMetricsAgentAccessor plantMetricsAgentAccessor;
 
     @PostConstruct
     public void initialise() {
@@ -85,6 +88,7 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
                 }
                 case PACKET_RECEIVED_AND_DECODED: {
                     responseOK = true;
+                    break;
                 }
                 case PACKET_RECEIVED_BUT_FAILED_DECODING: {
                     responseOK = false;
@@ -120,15 +124,20 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
             egressContent.setPayloadManifest(egressContentManifest);
             uow.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_SUCCESS);
             uow.getEgressContent().addPayloadElement(egressContent);
+            //
+            // Do some metrics
+            WorkUnitProcessorMetricsAgent wupMetricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+            wupMetricsAgent.incrementDistributedMessageEndpointCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
+
+            //
+            // Do some Processing Plant metrics
+            plantMetricsAgentAccessor.getMetricsAgent().incrementForwardedMessageCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
+            plantMetricsAgentAccessor.getMetricsAgent().incrementEgressMessageCount();
+
         } else {
             uow.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_FAILED);
             uow.setFailureDescription(responseReason);
         }
-
-        //
-        // Do some metrics
-        WorkUnitProcessorMetricsAgent wupMetricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
-        wupMetricsAgent.incrementDistributedMessageEndpointCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
 
         return (uow);
     }

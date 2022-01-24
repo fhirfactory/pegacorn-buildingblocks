@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.ask;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
@@ -40,7 +40,7 @@ public class StandardEdgeAskHTTPEndpoint extends StandardInteractClientTopologyE
     public StandardEdgeAskHTTPEndpoint(){
         super();
         setEndpointType(PetasosEndpointTopologyTypeEnum.HTTP_API_CLIENT);
-        setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_SUBSYSTEM_EDGE);
+        setComponentSystemRole(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_EDGE);
     }
 
     //

@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceClientWriterInterface;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.Exception2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.PetasosFulfillmentTask2FHIRAuditEvent;
@@ -97,8 +97,8 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
         if(fulfillmentTask.hasTaskFulfillment()){
             if(fulfillmentTask.getTaskFulfillment().hasFulfillerComponent()) {
                 if (fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole() != null) {
-                    isInteractEgressActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_EGRESS);
-                    isInteractIngresActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_INGRES);
+                    isInteractEgressActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
+                    isInteractIngresActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES);
                 }
             }
         }

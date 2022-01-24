@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosEndpointContainerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
@@ -86,6 +87,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     private PetasosEndpointContainerInterface ingresEndpoint;
     private String wupInstanceName;
     private WorkUnitProcessorMetricsAgent metricsAgent;
+    private boolean initialised;
 
     @Inject
     private WorkUnitProcessorFrameworkManager frameworkManager;
@@ -108,9 +110,17 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     @Inject
     private LocalPetasosParticipantCacheIM participantCacheIM;
 
+    @Inject
+    private ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement;
+
+    //
+    // Constructor(s)
+    //
+
     public GenericTriggerBasedWUPTemplate() {
         super();
         this.wupInstanceName = getClass().getSimpleName();
+        this.initialised = false;
     }
 
     /**
@@ -122,32 +132,49 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
      */
     @PostConstruct
     protected void initialise(){
-        getLogger().debug(".initialise(): Entry, Default Post Constructor function to setup the WUP");
-        getLogger().trace(".initialise(): WUP Instance Name --> {}", getWUPInstanceName());
-        getLogger().trace(".initialise(): WUP Instance Version --> {}", specifyWUPInstanceVersion());
+        getLogger().debug(".initialise(): Entry");
+        if(initialised){
+            getLogger().debug(".initialise(): Already initialised, nothing to do");
+            return;
+        }
+        getLogger().info(".initialise(): [WUP Base] Initialising.... ");
+        getLogger().info(".initialise(): WUP Instance Name --> {}", getWUPInstanceName());
+        getLogger().info(".initialise(): WUP Instance Version --> {}", specifyWUPInstanceVersion());
+
+        getLogger().info(".initialise(): [Initialise the Processing Plant] Start");
         this.getProcessingPlant().initialisePlant();
-        getLogger().trace(".initialise(): Setting up the wupTopologyElement (NodeElement) instance, which is the Topology Server's representation of this WUP ");
+        getLogger().info(".initialise(): [Initialise the Processing Plant] Finish");
+
+        getLogger().info(".initialise(): [Build WUP Topology Node Element] Start");
         this.meAsASoftwareComponent = buildWUPNodeElement();
-        getLogger().trace(".initialise(): Setting the WUP nameSet, which is the set of Route EndPoints that the WUP Framework will use to link various enablers");
+        getLogger().info(".initialise(): [Build WUP Topology Node Element] Finish");
+
+        getLogger().info(".initialise(): [Build WUP Component Name-set] Start");
         this.nameSet = new RouteElementNames(getMeAsASoftwareComponent().getNodeFunctionFDN().getFunctionToken());
-        getLogger().trace(".initialise(): Setting the WUP EgressEndpoint");
+        getLogger().info(".initialise(): [Build WUP Component Name-set] Finish");
+
+        getLogger().info(".initialise(): Setting the WUP EgressEndpoint");
         this.egressEndpoint = specifyEgressEndpoint();
-        getLogger().trace(".initialise(): Setting the WUP IngresEndpoint");
+        getLogger().info(".initialise(): Setting the WUP IngresEndpoint");
         this.ingresEndpoint = specifyIngresEndpoint();
-        getLogger().trace(".initialise(): Setting the WUP Archetype - which is used by the WUP Framework to ascertain what wrapping this WUP needs");
+        getLogger().info(".initialise(): Setting the WUP Archetype - which is used by the WUP Framework to ascertain what wrapping this WUP needs");
         this.wupArchetype =  specifyWUPArchetype();
-        getLogger().trace(".initialise(): Now invoking subclass initialising function(s)");
+        getLogger().info(".initialise(): Now invoking subclass initialising function(s)");
         executePostInitialisationActivities();
-        getLogger().trace(".initialise(): Setting the Topic Subscription Set (i.e. the list of Data Sets we will process)");
+        getLogger().info(".initialise(): Setting the Topic Subscription Set (i.e. the list of Data Sets we will process)");
         this.topicSubscriptionSet = specifySubscriptionTopics();
-        getLogger().trace(".initialise(): Building my PetasosParticipant");
+        getLogger().info(".initialise(): Building my PetasosParticipant");
         this.meAsAPetasosParticipant = buildPetasosParticipant();
-        getLogger().trace(".initialise(): Establish the metrics agent");
+        getLogger().info(".initialise(): Establish the metrics agent");
         ComponentIdType componentId = getMeAsASoftwareComponent().getComponentID();
         String participantName = getMeAsAPetasosParticipant().getParticipantName();
-        this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(componentId, participantName);
-        getLogger().trace(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
+        this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(processingPlantCapabilityStatement, componentId, participantName);
+        getLogger().info(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
         buildWUPFramework(this.getContext());
+
+        this.initialised = true;
+
+        getLogger().info(".initialise(): [WUP Base] Initialising.... Done...");
         getLogger().debug(".initialise(): Exit");
     }
     
@@ -259,6 +286,11 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     protected WorkUnitProcessorMetricsAgent getMetricsAgent(){
         return(this.metricsAgent);
     }
+
+    public ProcessingPlantRoleSupportInterface getProcessingPlantServiceProviderFunction() {
+        return (processingPlantCapabilityStatement);
+    }
+
 
     //
     // Routing Support Functions

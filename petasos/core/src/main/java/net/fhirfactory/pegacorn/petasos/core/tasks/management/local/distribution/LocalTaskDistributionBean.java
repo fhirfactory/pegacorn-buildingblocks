@@ -33,10 +33,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.subscription.TaskSubscriptionCheck;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
@@ -67,9 +65,6 @@ public class LocalTaskDistributionBean {
     private DateTimeFormatter timeFormatter;
 
     @Inject
-    LocalPetasosParticipantSubscriptionMapIM topicServer;
-
-    @Inject
     TopologyIM topologyProxy;
 
     @Produce
@@ -82,13 +77,13 @@ public class LocalTaskDistributionBean {
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskBroker;
 
     @Inject
-    private TaskSubscriptionCheck taskSubscriptionCheck;
-
-    @Inject
     private PetasosEdgeMessageForwarderService forwarderService;
 
     @Inject
     private ProcessingPlantInterface myProcessingPlant;
+
+    @Inject
+    private LocalTaskDistributionDecisionEngine taskDistributionDecisionEngine;
 
     //
     // Constructor(s)
@@ -108,6 +103,10 @@ public class LocalTaskDistributionBean {
 
     protected DateTimeFormatter getTimeFormatter(){
         return(this.timeFormatter);
+    }
+
+    protected LocalTaskDistributionDecisionEngine getTaskDistributionDecisionEngine(){
+        return(taskDistributionDecisionEngine);
     }
 
     //
@@ -153,7 +152,7 @@ public class LocalTaskDistributionBean {
         DataParcelManifest uowTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();
         getLogger().trace(".distributeNewFulfillmentTasks(): Looking for Subscribers To->{}:", uowTopicID);
         getLogger().trace(".distributeNewFulfillmentTasks(): Getting the set of subscribers for the given topic (calling the topicServer)");
-        List<PetasosParticipant> subscriberSet = taskSubscriptionCheck.getSubscriberSet(uowTopicID);
+        List<PetasosParticipant> subscriberSet = getTaskDistributionDecisionEngine().deriveSubscriberList(uowTopicID);
         if(subscriberSet.isEmpty()){
             getLogger().debug(".distributeNewFulfillmentTasks(): There are no subscribers, exiting");
             return;
@@ -176,7 +175,7 @@ public class LocalTaskDistributionBean {
         boolean isRemoteTarget = false;
         String intendedTargetName = null;
         DataParcelManifest payloadTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();
-        if(taskSubscriptionCheck.hasIntendedTarget(payloadTopicID)){
+        if(getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)){
             if(!payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER)){
                 if(!payloadTopicID.getIntendedTargetSystem().equals(myProcessingPlant.getSubsystemParticipantName())){
                     isRemoteTarget = true;
@@ -184,14 +183,14 @@ public class LocalTaskDistributionBean {
             }
         }
         if(!isRemoteTarget) {
-            if (taskSubscriptionCheck.hasRemoteServiceName(subscriber)) {
+            if (getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber)) {
                 getLogger().trace(".forwardTask(): Has Remote Service as Target");
                 boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
                 boolean hasWildcardTarget = false;
-                if (taskSubscriptionCheck.hasIntendedTarget(payloadTopicID)) {
+                if (getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)) {
                     hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
                 }
-                boolean hasRemoteElement = taskSubscriptionCheck.hasRemoteServiceName(subscriber);
+                boolean hasRemoteElement = getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber);
                 getLogger().trace(".forwardTask(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
                 if ((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement) {
                     intendedTargetName = subscriber.getSubsystemParticipantName();
@@ -254,6 +253,4 @@ public class LocalTaskDistributionBean {
             getLogger().trace(".forwardUoW2WUPs(): Subscribed WUP Ingres Point --> {}", tokenIterator.next());
         }
     }
-
-
 }

@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.topology.connector.ActiveIPCConnection;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
@@ -42,7 +42,7 @@ public class MLLPClientEndpoint extends StandardInteractClientTopologyEndpointPo
     public MLLPClientEndpoint(){
         super();
         setEndpointType(PetasosEndpointTopologyTypeEnum.MLLP_CLIENT);
-        setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_EGRESS);
+        setComponentSystemRole(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
     }
 
     //

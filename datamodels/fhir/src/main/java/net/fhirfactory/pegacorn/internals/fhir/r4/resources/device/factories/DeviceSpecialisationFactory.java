@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Device;
@@ -47,7 +47,7 @@ public class DeviceSpecialisationFactory {
         return (codeSystem);
     }
 
-    public Device.DeviceSpecializationComponent newDeviceSpecialisation(SoftwareComponentSystemRoleEnum role){
+    public Device.DeviceSpecializationComponent newDeviceSpecialisation(SoftwareComponentConnectivityContextEnum role){
         Device.DeviceSpecializationComponent specialisation = new Device.DeviceSpecializationComponent();
         CodeableConcept specialisationCC = new CodeableConcept();
         Coding specialisationCoding = new Coding();

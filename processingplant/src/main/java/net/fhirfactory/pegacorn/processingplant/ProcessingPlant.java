@@ -24,10 +24,11 @@ package net.fhirfactory.pegacorn.processingplant;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
@@ -72,7 +73,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface {
+public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantRoleSupportInterface, ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface {
 
     private ProcessingPlantSoftwareComponent meAsASoftwareComponent;
     private String instanceQualifier;
@@ -256,7 +257,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             this.petasosTaskRecoveryWatchdog.initialise();
             getLogger().info("ProcessingPlant::initialise(): [Initialise Task Recovery Watchdog] Finish");
             getLogger().info("ProcessingPlant::initialise(): [Initialise Metrics Agent] Start");
-            this.metricsAgent = metricAgentFactory.newProcessingPlantMetricsAgent(getMeAsASoftwareComponent().getComponentID(), getSubsystemParticipantName());
+            this.metricsAgent = metricAgentFactory.newProcessingPlantMetricsAgent(this, getMeAsASoftwareComponent().getComponentID(), getSubsystemParticipantName());
             metricsAgentAccessor.setMetricsAgent(this.metricsAgent);
             getLogger().info("ProcessingPlant::initialise(): [Initialise Metrics Agent] Finish");
             isInitialised = true;

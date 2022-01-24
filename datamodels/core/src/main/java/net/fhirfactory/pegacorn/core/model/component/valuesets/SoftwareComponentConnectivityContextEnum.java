@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.component.valuesets;
 
-public enum SoftwareComponentSystemRoleEnum {
+public enum SoftwareComponentConnectivityContextEnum {
     COMPONENT_ROLE_INTERACT_INGRES("InteractIngresRole", "pegacorn.fhir.device.specialisation.component_role.interact_ingres", "Interact Ingres Role (Inbound Content Handling)"),
     COMPONENT_ROLE_INTERACT_EGRESS("InteractEgressRole", "pegacorn.fhir.device.specialisation.component_role.interact_egress", "Interact Egress Role (Output Content Handling)"),
     COMPONENT_ROLE_SUBSYSTEM_EDGE("SubsystemEdgeRole", "pegacorn.fhir.device.specialisation.component_role.subsystem_edge", "Subsystem Edge (Inter-Process Communication Services for Pegacorn subsystems)"),
@@ -32,7 +32,7 @@ public enum SoftwareComponentSystemRoleEnum {
     private String token;
     private String displayText;
 
-    private SoftwareComponentSystemRoleEnum(String displayName, String token, String displayText){
+    private SoftwareComponentConnectivityContextEnum(String displayName, String token, String displayText){
         this.displayName = displayName;
         this.token = token;
         this.displayText = displayText;

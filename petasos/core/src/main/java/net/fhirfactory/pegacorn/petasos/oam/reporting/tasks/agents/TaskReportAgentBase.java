@@ -18,13 +18,16 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- */ package net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents;
+ */
+package net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents;
 
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.tasks.PetasosITOpsTaskReportingAgentInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportFactory;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -42,22 +45,33 @@ public abstract class TaskReportAgentBase {
     private ComponentIdType componentId;
     private PetasosTaskReportFactory reportFactory;
     private PetasosITOpsTaskReportingAgentInterface taskReportingAgent;
+    private ProcessingPlantRoleSupportInterface processingPlantFunctionStatement;
 
     //
     // Constructor(s)
     //
 
-    public TaskReportAgentBase(String participantName, ComponentIdType componentId, PetasosTaskReportFactory reportFactory, PetasosITOpsTaskReportingAgentInterface taskReportingAgent) {
+    public TaskReportAgentBase(ProcessingPlantRoleSupportInterface processingPlantFunction, String participantName, ComponentIdType componentId, PetasosTaskReportFactory reportFactory, PetasosITOpsTaskReportingAgentInterface taskReportingAgent) {
         this.participantName = participantName;
         this.componentId = componentId;
         this.reportFactory = reportFactory;
         this.initialised = false;
         this.taskReportingAgent = taskReportingAgent;
+        this.processingPlantFunctionStatement = processingPlantFunction;
     }
 
     //
     // Getters and Setters
     //
+
+
+    public ProcessingPlantRoleSupportInterface getProcessingPlantFunctionStatement() {
+        return processingPlantFunctionStatement;
+    }
+
+    public void setProcessingPlantFunctionStatement(ProcessingPlantRoleSupportInterface processingPlantFunctionStatement) {
+        this.processingPlantFunctionStatement = processingPlantFunctionStatement;
+    }
 
     public boolean isInitialised() {
         return initialised;
@@ -102,7 +116,12 @@ public abstract class TaskReportAgentBase {
     //
 
     public void sendITOpsTaskReport(PetasosActionableTask task){
-        getLogger().info(".sendITOpsTaskReport(): Entry");
+        getLogger().debug(".sendITOpsTaskReport(): Entry");
+        if(getProcessingPlantFunctionStatement().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)) {
+            getLogger().info(".sendITOpsTaskReport(): Am the ITOps Node --> so report NOTHING!");
+            // do nothing
+            return;
+        }
         try {
             PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task);
             notification.setComponentType(specifyComponentType());
@@ -110,7 +129,7 @@ public abstract class TaskReportAgentBase {
             notification.setParticipantName(getParticipantName());
 
             taskReportingAgent.sendTaskReport(notification);
-        } catch (Exception generalException){
+        } catch (Exception generalException) {
             getLogger().warn(".sendITOpsTaskReport(): Problem Sending ITOps TaskReport, message->{}, stackTrace->{}", ExceptionUtils.getMessage(generalException), ExceptionUtils.getStackTrace(generalException));
         }
         getLogger().info(".sendITOpsTaskReport(): Exit");
@@ -118,6 +137,11 @@ public abstract class TaskReportAgentBase {
 
     public void sendITOpsTaskReport(PetasosActionableTask task, List<PetasosActionableTask> newTasks){
         getLogger().info(".sendITOpsTaskReport(): Entry");
+        if(getProcessingPlantFunctionStatement().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)) {
+            getLogger().info(".sendITOpsTaskReport(): Am the ITOps Node --> so report NOTHING!");
+            // do nothing
+            return;
+        }
         try {
             PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task, newTasks);
             notification.setComponentType(specifyComponentType());

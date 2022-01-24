@@ -28,6 +28,18 @@ public class PetasosSubscriberSubscriptionSummary extends PetasosSubscriptionSum
     private ComponentIdType publisher;
     private String publisherServiceName;
 
+    //
+    // Constructor(s)
+    //
+
+    public PetasosSubscriberSubscriptionSummary(){
+        super();
+    }
+
+    //
+    // Getters and Setters
+    //
+
     public ComponentIdType getPublisher() {
         return publisher;
     }
@@ -42,5 +54,21 @@ public class PetasosSubscriberSubscriptionSummary extends PetasosSubscriptionSum
 
     public void setPublisherServiceName(String publisherServiceName) {
         this.publisherServiceName = publisherServiceName;
+    }
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "PetasosSubscriberSubscriptionSummary{" +
+                "componentID=" + getComponentID() +
+                ", subscribedTopics=" + getSubscribedTopics() +
+                ", summaryType=" + getSummaryType() +
+                ", timestamp=" + getTimestamp() +
+                ", publisher=" + publisher +
+                ", publisherServiceName='" + publisherServiceName + '\'' +
+                '}';
     }
 }

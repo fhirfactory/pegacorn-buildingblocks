@@ -23,6 +23,7 @@
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
@@ -34,6 +35,8 @@ import org.apache.camel.Processor;
 public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
     private EndpointMetricsAgent endpointMetricsAgent;
+
+    private ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement;
 
     //
     // Constructor(s)
@@ -88,6 +91,7 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
         String connectedSystem = getEgressEndpoint().getEndpointTopologyNode().getConnectedSystemName();
         String endpointDescription = getEgressEndpoint().getEndpointSpecification();
         this.endpointMetricsAgent = getMetricAgentFactory().newEndpointMetricsAgent(
+                processingPlantCapabilityStatement,
                 getEgressEndpoint().getEndpointTopologyNode().getComponentID(),
                 getEgressEndpoint().getEndpointTopologyNode().getParticipantName(),
                 connectedSystem,

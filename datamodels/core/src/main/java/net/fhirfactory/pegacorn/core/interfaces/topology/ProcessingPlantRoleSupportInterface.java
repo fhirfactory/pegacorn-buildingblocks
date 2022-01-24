@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,27 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.capabilities.valuesets;
+package net.fhirfactory.pegacorn.core.interfaces.topology;
 
-public enum CapabilityProviderTitlesEnum {
-    CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS("IT-Ops-IM", "pegacorn.capability.im.itops"),
-    CAPABILITY_INFORMATION_MANAGEMENT_AUDIT_EVENTS("AuditEvent-IM", "pegacorn.capability.im.audit-event"),
-    CAPABILITY_DATA_MANAGEMENT_AUDIT_EVENTS("AuditEvent-DM","pegacorn.capability.dm.audit-event"),
-    CAPABILITY_SERVICE_PROVIDER_A19QRY("A19Query-Task", "pegacorn.capability.task.a19query");
+import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
 
-    private String displayName;
-    private String token;
-
-    private CapabilityProviderTitlesEnum(String name, String token){
-        this.displayName = name;
-        this.token = token;
-    }
-
-    public String getDisplayName(){
-        return(this.displayName);
-    }
-
-    public String getToken(){
-        return(this.token);
-    }
+public interface ProcessingPlantRoleSupportInterface {
+    public ProcessingPlantRoleEnum getProcessingPlantCapability();
 }

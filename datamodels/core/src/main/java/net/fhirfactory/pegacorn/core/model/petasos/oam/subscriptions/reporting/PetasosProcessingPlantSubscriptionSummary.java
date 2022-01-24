@@ -31,6 +31,11 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
     private Map<ComponentIdType, PetasosSubscriberSubscriptionSummary> asSubscriber;
     private Map<ComponentIdType, PetasosPublisherSubscriptionSummary> asPublisher;
     private ComponentIdType componentID;
+    private String participantName;
+
+    //
+    // Constructor(s)
+    //
 
     public PetasosProcessingPlantSubscriptionSummary(){
         asPublisher = new HashMap<>();
@@ -38,7 +43,12 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
         componentID = new ComponentIdType();
         componentID.setId("unknown");
         componentID.setDisplayName("unknown");
+        this.participantName = null;
     }
+
+    //
+    // Getters and Setters
+    //
 
     public Map<ComponentIdType, PetasosSubscriberSubscriptionSummary> getAsSubscriber() {
         return asSubscriber;
@@ -55,6 +65,26 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
     public void setAsPublisher(Map<ComponentIdType, PetasosPublisherSubscriptionSummary> asPublisher) {
         this.asPublisher = asPublisher;
     }
+
+    public ComponentIdType getComponentID() {
+        return componentID;
+    }
+
+    public void setComponentID(ComponentIdType componentID) {
+        this.componentID = componentID;
+    }
+
+    public String getParticipantName() {
+        return participantName;
+    }
+
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
+    }
+
+    //
+    // Helper Methods
+    //
 
     public void addPublisherSummary(PetasosPublisherSubscriptionSummary publisherSubscriptionSummary){
         if(asPublisher.containsKey(publisherSubscriptionSummary.getSubscriber())){
@@ -79,20 +109,17 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
         }
     }
 
-    public ComponentIdType getComponentID() {
-        return componentID;
-    }
-
-    public void setComponentID(ComponentIdType componentID) {
-        this.componentID = componentID;
-    }
+    //
+    // To String
+    //
 
     @Override
     public String toString() {
-        return "ProcessingPlantSubscriptionSummary{" +
+        return "PetasosProcessingPlantSubscriptionSummary{" +
                 "asSubscriber=" + asSubscriber +
                 ", asPublisher=" + asPublisher +
-                ", componentID='" + componentID + '\'' +
+                ", componentID=" + componentID +
+                ", participantName='" + participantName + '\'' +
                 '}';
     }
 }

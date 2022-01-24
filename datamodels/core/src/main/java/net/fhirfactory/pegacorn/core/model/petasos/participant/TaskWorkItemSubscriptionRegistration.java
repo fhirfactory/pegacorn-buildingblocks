@@ -25,14 +25,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
-public class TaskWorkItemSubscription implements Serializable {
-    private TaskWorkItemManifestType taskWorkItemManifest;
+public class TaskWorkItemSubscriptionRegistration implements Serializable {
+    private TaskWorkItemSubscriptionType workItemSubscription;
     private PetasosParticipant participant;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant registrationInstant;
@@ -41,17 +41,26 @@ public class TaskWorkItemSubscription implements Serializable {
     // Constructor(s)
     //
 
-    public TaskWorkItemSubscription(){
+    public TaskWorkItemSubscriptionRegistration(){
         this.participant = null;
-        this.taskWorkItemManifest = null;
+        this.workItemSubscription = null;
         this.registrationInstant = Instant.now();
     }
 
-    public TaskWorkItemSubscription(DataParcelManifest taskWorkItemManifest, PetasosParticipant subscriber){
+    public TaskWorkItemSubscriptionRegistration(DataParcelManifest taskWorkItemManifest, PetasosParticipant subscriber){
         this.participant = subscriber;
-        this.taskWorkItemManifest = new TaskWorkItemManifestType(taskWorkItemManifest);
-        if(!subscriber.getSubscribedWorkItemManifests().contains(getTaskWorkItemManifest())){
-            subscriber.getSubscribedWorkItemManifests().add(getTaskWorkItemManifest());
+        this.workItemSubscription = new TaskWorkItemSubscriptionType(taskWorkItemManifest);
+        if(!subscriber.getSubscriptions().contains(getWorkItemSubscription())){
+            subscriber.getSubscriptions().add(getWorkItemSubscription());
+        }
+        this.registrationInstant = Instant.now();
+    }
+
+    public TaskWorkItemSubscriptionRegistration(TaskWorkItemSubscriptionType taskWorkItemSubscriptionFilter, PetasosParticipant subscriber){
+        this.participant = subscriber;
+        this.workItemSubscription = new TaskWorkItemSubscriptionType(taskWorkItemSubscriptionFilter);
+        if(!subscriber.getSubscriptions().contains(getWorkItemSubscription())){
+            subscriber.getSubscriptions().add(getWorkItemSubscription());
         }
         this.registrationInstant = Instant.now();
     }
@@ -60,17 +69,17 @@ public class TaskWorkItemSubscription implements Serializable {
     // Getters and Setters
     //
 
-    public TaskWorkItemManifestType getTaskWorkItemManifest() {
-        return taskWorkItemManifest;
+    public TaskWorkItemSubscriptionType getWorkItemSubscription() {
+        return workItemSubscription;
     }
 
     @JsonIgnore
-    public void setTaskWorkItemManifest(DataParcelManifest taskWorkItemManifest) {
-        this.taskWorkItemManifest = new TaskWorkItemManifestType(taskWorkItemManifest);
+    public void setWorkItemSubscription(DataParcelManifest workItemSubscription) {
+        this.workItemSubscription = new TaskWorkItemSubscriptionType(workItemSubscription);
     }
 
-    public void setTaskWorkItemManifest(TaskWorkItemManifestType taskWorkItemManifest){
-        this.taskWorkItemManifest = taskWorkItemManifest;
+    public void setTaskWorkItemManifest(TaskWorkItemSubscriptionType taskWorkItemManifest){
+        this.workItemSubscription = taskWorkItemManifest;
     }
 
     public Instant getRegistrationInstant() {
@@ -96,7 +105,7 @@ public class TaskWorkItemSubscription implements Serializable {
     @Override
     public String toString() {
         return "TaskWorkItemSubscription{" +
-                "taskWorkItemManifest=" + taskWorkItemManifest +
+                "subscriptionFilter=" + workItemSubscription +
                 ", participant=" + participant +
                 ", registrationInstant=" + registrationInstant +
                 '}';
@@ -110,12 +119,12 @@ public class TaskWorkItemSubscription implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TaskWorkItemSubscription that = (TaskWorkItemSubscription) o;
-        return Objects.equals(taskWorkItemManifest, that.taskWorkItemManifest) && Objects.equals(participant, that.participant) && Objects.equals(registrationInstant, that.registrationInstant);
+        TaskWorkItemSubscriptionRegistration that = (TaskWorkItemSubscriptionRegistration) o;
+        return Objects.equals(workItemSubscription, that.workItemSubscription) && Objects.equals(participant, that.participant) && Objects.equals(registrationInstant, that.registrationInstant);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(taskWorkItemManifest, participant, registrationInstant);
+        return Objects.hash(workItemSubscription, participant, registrationInstant);
     }
 }

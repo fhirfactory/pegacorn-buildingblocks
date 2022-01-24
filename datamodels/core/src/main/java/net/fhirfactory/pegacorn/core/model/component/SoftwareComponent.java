@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentExecutionControlEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.*;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +56,7 @@ public abstract class SoftwareComponent implements Serializable {
     private String deploymentSite;
     private ConcurrentHashMap<String, String> otherConfigurationParameters;
     private PetasosComponentMetricSet metrics;
-    private SoftwareComponentSystemRoleEnum componentSystemRole;
+    private SoftwareComponentConnectivityContextEnum componentSystemRole;
     private SoftwareComponentStatusEnum componentStatus;
     private SoftwareComponentExecutionControlEnum componentExecutionControl;
     private String subsystemParticipantName;
@@ -84,7 +83,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
         this.deploymentSite = null;
-        this.componentSystemRole = SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
+        this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
         this.componentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
         this.componentExecutionControl = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
         this.subsystemParticipantName = null;
@@ -102,9 +101,11 @@ public abstract class SoftwareComponent implements Serializable {
         this.resilienceMode = null;
         this.componentID = null;
         this.participantDisplayName = null;
+        this.participantName = null;
+        this.subsystemParticipantName = null;
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
-        this.componentSystemRole = SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
+        this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
         this.componentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
         this.componentExecutionControl = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
         // Now update with passed value
@@ -461,11 +462,11 @@ public abstract class SoftwareComponent implements Serializable {
         this.metrics = metrics;
     }
 
-    public SoftwareComponentSystemRoleEnum getComponentSystemRole() {
+    public SoftwareComponentConnectivityContextEnum getComponentSystemRole() {
         return componentSystemRole;
     }
 
-    public void setComponentSystemRole(SoftwareComponentSystemRoleEnum componentSystemRole) {
+    public void setComponentSystemRole(SoftwareComponentConnectivityContextEnum componentSystemRole) {
         this.componentSystemRole = componentSystemRole;
     }
 

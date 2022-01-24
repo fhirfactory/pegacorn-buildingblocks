@@ -25,8 +25,10 @@ import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementSer
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PubSubParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscription;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscriptionRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantSubscriptionMapDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution.LocalTaskDistributionDecisionEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +51,9 @@ public class LocalPetasosParticipantSubscriptionMapIM {
     @Inject
     TaskPathwayManagementServiceInterface pathwayManagementService;
 
+    @Inject
+    LocalTaskDistributionDecisionEngine taskDistributionDecisionEngine;
+
     //
     // Constructor(s)
     //
@@ -66,7 +71,7 @@ public class LocalPetasosParticipantSubscriptionMapIM {
      */
     public List<PetasosParticipant> getSubscriberSet(DataParcelManifest parcelManifest) {
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Entry, parcelManifest --> {}", parcelManifest);
-        List<PetasosParticipant> subscribedTopicSet = subscriptionCache.deriveSubscriberList(parcelManifest);
+        List<PetasosParticipant> subscribedTopicSet = taskDistributionDecisionEngine.deriveSubscriberList(parcelManifest);
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Exit");
         return (subscribedTopicSet);
     }
@@ -84,7 +89,8 @@ public class LocalPetasosParticipantSubscriptionMapIM {
             LOG.debug(".addTopicSubscriber(): Exit, Either contentTopicID or subscriber is null!");
             return;
         }
-        subscriptionCache.addSubscriber(contentTopicID, subscriber);
+        TaskWorkItemSubscriptionType newFilter = new TaskWorkItemSubscriptionType(contentTopicID);
+        subscriptionCache.addSubscriber(newFilter, subscriber);
         LOG.debug(".addTopicSubscriber(): Exit");
     }
 
@@ -94,9 +100,9 @@ public class LocalPetasosParticipantSubscriptionMapIM {
         LOG.debug(".removeSubscriber(): Exit");
     }
 
-    public List<TaskWorkItemSubscription> getAllSubscriptions(){
+    public List<TaskWorkItemSubscriptionRegistration> getAllSubscriptions(){
         LOG.debug(".getAllSubscriptions(): Entry");
-        List<TaskWorkItemSubscription> subscriptions = subscriptionCache.getAllSubscriptions();
+        List<TaskWorkItemSubscriptionRegistration> subscriptions = subscriptionCache.getAllSubscriptions();
         LOG.debug(".getAllSubscriptions(): Exit");
         return(subscriptions);
     }

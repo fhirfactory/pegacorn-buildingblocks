@@ -1,7 +1,7 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.http;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentSystemRoleEnum;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
@@ -15,7 +15,7 @@ public class HTTPClientTopologyEndpoint extends StandardInteractClientTopologyEn
     public HTTPClientTopologyEndpoint(){
         super();
         setEndpointType(PetasosEndpointTopologyTypeEnum.HTTP_API_CLIENT);
-        setComponentSystemRole(SoftwareComponentSystemRoleEnum.COMPONENT_ROLE_INTERACT_EGRESS);
+        setComponentSystemRole(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
     }
 
     @JsonIgnore

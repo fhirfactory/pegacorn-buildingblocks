@@ -29,14 +29,11 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.subscription.TaskSubscriptionCheck;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution.LocalTaskDistributionDecisionEngine;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -68,7 +65,7 @@ public class TaskOutcome2NewTasksBean {
     private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
 
     @Inject
-    private TaskSubscriptionCheck taskSubscriptionCheck;
+    private LocalTaskDistributionDecisionEngine distributionDecisionEngine;
     
     /**
      * This method performs tree key tasks:
@@ -114,7 +111,7 @@ public class TaskOutcome2NewTasksBean {
         ArrayList<PetasosActionableTask> newActionableTaskList = new ArrayList<>();
         for(UoWPayload currentPayload: egressPayloadList) {
             DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
-            if(taskSubscriptionCheck.hasAtLeastOneSubscriber(payloadManifest)) {
+            if(distributionDecisionEngine.hasAtLeastOneSubscriber(payloadManifest)) {
                 TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
                 getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): newWorkItem->{}", newWorkItem);
 

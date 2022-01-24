@@ -21,10 +21,12 @@
  */
 package net.fhirfactory.pegacorn.core.model.dataparcel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -39,6 +41,10 @@ public class DataParcelTypeDescriptor implements Serializable {
     private String dataParcelDiscriminatorType;
     private String dataParcelDiscriminatorValue;
     private String version;
+
+    //
+    // Constructor(s)
+    //
 
     public DataParcelTypeDescriptor(){
         this.dataParcelCategory = null;
@@ -82,6 +88,11 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    //
+    // Getters and Setters
+    //
+
+    @JsonIgnore
     public boolean hasVersion(){
         if(this.version == null){
             return(false);
@@ -90,6 +101,7 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean hasDataParcelDefiner(){
         if(this.dataParcelDefiner == null){
             return(false);
@@ -98,6 +110,7 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean hasDataParcelCategory(){
         if(this.dataParcelCategory == null){
             return(false);
@@ -106,6 +119,7 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean hasDataParcelSubCategory(){
         if(this.dataParcelSubCategory == null){
             return(false);
@@ -114,6 +128,7 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean hasDataParcelResource(){
         if(this.dataParcelResource == null){
             return(false);
@@ -122,6 +137,7 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean hasDataParcelSegment(){
         if(this.dataParcelSegment == null){
             return(false);
@@ -130,6 +146,7 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean hasDataParcelAttribute(){
         if(this.dataParcelAttribute == null){
             return(false);
@@ -138,11 +155,13 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean hasDataParcelDiscriminatorType(){
         boolean hasDiscriminatorType = this.getDataParcelDiscriminatorType() != null;
         return(hasDiscriminatorType);
     }
 
+    @JsonIgnore
     public boolean hasDataParcelDiscriminatorValue(){
         boolean hasDiscriminatorValue = this.getDataParcelDiscriminatorValue() != null;
         return(hasDiscriminatorValue);
@@ -220,6 +239,10 @@ public class DataParcelTypeDescriptor implements Serializable {
         this.dataParcelDiscriminatorValue = dataParcelDiscriminatorValue;
     }
 
+    //
+    // Helper Methods
+    //
+
     public FDN toFDN() {
         FDN fdn = new FDN();
         if (hasDataParcelDefiner()) {
@@ -290,6 +313,10 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
     }
 
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
         return "DataParcelReference{" +
@@ -305,6 +332,10 @@ public class DataParcelTypeDescriptor implements Serializable {
                 '}';
     }
 
+    //
+    // Equals and Hashcode
+    //
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -316,5 +347,62 @@ public class DataParcelTypeDescriptor implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getDataParcelDefiner(), getDataParcelCategory(), getDataParcelSubCategory(), getDataParcelResource(), getDataParcelSegment(), getDataParcelAttribute(), getDataParcelDiscriminatorType(), getDataParcelDiscriminatorValue(), getVersion());
+    }
+
+    //
+    // Equals with Wildcards (in testObject)
+    //
+
+    public boolean isEqualWithWildcardsInOther(DataParcelTypeDescriptor otherDescriptor){
+
+        boolean parcelDefinerIsEqual = StringUtils.equals(this.getDataParcelDefiner(),otherDescriptor.getDataParcelDefiner());
+        boolean parcelDefinedHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDefiner(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDefinerIsGoodEnoughMatch = parcelDefinerIsEqual || parcelDefinedHasWildcard;
+        if (!parcelDefinerIsGoodEnoughMatch) {
+            return (false);
+        }
+        boolean parcelCategoryIsEqual = StringUtils.equals(this.getDataParcelCategory(),otherDescriptor.getDataParcelCategory());
+        boolean parcelCategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelCategoryIsGoodEnoughMatch = parcelCategoryIsEqual || parcelCategoryHasWildcard;
+        if(!parcelCategoryIsGoodEnoughMatch){
+            return(false);
+        }
+        boolean parcelSubcategoryIsEqual = StringUtils.equals(this.getDataParcelSubCategory(),otherDescriptor.getDataParcelSubCategory());
+        boolean parcelSubcategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSubCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelSubcategoryIsGoodEnoughMatch = parcelSubcategoryIsEqual || parcelSubcategoryHasWildcard;
+        if(!parcelSubcategoryIsGoodEnoughMatch){
+            return(false);
+        }
+        boolean parcelResourceIsEqual = StringUtils.equals(this.getDataParcelResource(),otherDescriptor.getDataParcelResource());
+        boolean parcelResourceHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelResource(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelResourceIsGoodEnoughMatch = parcelResourceIsEqual || parcelResourceHasWildcard;
+        if (!parcelResourceIsGoodEnoughMatch) {
+            return(false);
+        }
+        boolean parcelSegmentIsEqual = StringUtils.equals(this.getDataParcelSegment(),otherDescriptor.getDataParcelSegment());
+        boolean parcelSegmentHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSegment(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelSegmentIsGoodEnoughMatch = parcelSegmentIsEqual || parcelSegmentHasWildcard;
+        if (!parcelSegmentIsGoodEnoughMatch) {
+            return(false);
+        }
+        boolean parcelAttributeIsEqual = StringUtils.equals(this.getDataParcelAttribute(),otherDescriptor.getDataParcelAttribute());
+        boolean parcelAttributeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelAttribute(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelAttributeIsGoodEnoughMatch = parcelAttributeIsEqual || parcelAttributeHasWildcard;
+        if(!parcelAttributeIsGoodEnoughMatch){
+            return(false);
+        }
+        boolean parcelDiscriminatorTypeIsEqual = StringUtils.equals(this.getDataParcelDiscriminatorType(),otherDescriptor.getDataParcelDiscriminatorType());
+        boolean parcelDiscriminatorTypeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorType(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDiscriminatorTypeIsGoodEnoughMatch = parcelDiscriminatorTypeIsEqual || parcelDiscriminatorTypeHasWildcard;
+        if(!parcelDiscriminatorTypeIsGoodEnoughMatch){
+            return(false);
+        }
+        boolean parcelDiscriminatorValueIsEqual = StringUtils.equals(this.getDataParcelDiscriminatorValue(),otherDescriptor.getDataParcelDiscriminatorValue());
+        boolean parcelDiscriminatorValueHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorValue(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDiscriminatorValueIsGoodEnoughMatch = parcelDiscriminatorValueIsEqual || parcelDiscriminatorValueHasWildcard;
+        if(!parcelDiscriminatorValueIsGoodEnoughMatch){
+            return(false);
+        }
+        return(true);
     }
 }

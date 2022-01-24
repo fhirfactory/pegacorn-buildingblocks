@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Deprecated
 public class IntraSubsystemPubSubParticipant implements Serializable {
     private IntraSubsystemPubSubParticipantIdentifier identifier;
 

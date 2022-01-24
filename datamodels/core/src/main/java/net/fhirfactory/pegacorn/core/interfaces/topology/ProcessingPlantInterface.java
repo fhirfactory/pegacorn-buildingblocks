@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.topology;
 
-import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityFulfillmentManagementInterface;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentManagementInterface;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
