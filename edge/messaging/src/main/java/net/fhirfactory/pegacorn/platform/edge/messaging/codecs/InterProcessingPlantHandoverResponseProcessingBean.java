@@ -127,12 +127,12 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
             //
             // Do some metrics
             WorkUnitProcessorMetricsAgent wupMetricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
-            wupMetricsAgent.incrementDistributedMessageEndpointCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
+            wupMetricsAgent.incrementInternalMessageDistributionCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
 
             //
             // Do some Processing Plant metrics
-            plantMetricsAgentAccessor.getMetricsAgent().incrementForwardedMessageCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
-            plantMetricsAgentAccessor.getMetricsAgent().incrementEgressMessageCount();
+            plantMetricsAgentAccessor.getMetricsAgent().incrementInternalMessageDistributionCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
+            plantMetricsAgentAccessor.getMetricsAgent().incrementInternalMessageDistributionCount();
 
         } else {
             uow.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_FAILED);

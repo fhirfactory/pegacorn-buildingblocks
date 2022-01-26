@@ -22,23 +22,29 @@
 package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
 
 public enum DataParcelValidationStatusEnum {
-    DATA_PARCEL_CONTENT_VALIDATED_TRUE("data-parcel-content-validation-true"),
-    DATA_PARCEL_CONTENT_VALIDATED_FALSE("data-parcel-content-validation-false"),
-    DATA_PARCEL_CONTENT_VALIDATION_ANY("data-parcel-content-validation-any");
+    DATA_PARCEL_CONTENT_VALIDATED_TRUE("Validated.True","pegacorn.data-parcel.validation-status.true"),
+    DATA_PARCEL_CONTENT_VALIDATED_FALSE("Validated.False", "pegacorn.data-parcel.validation-status.false"),
+    DATA_PARCEL_CONTENT_VALIDATION_ANY("Validated.Any", "pegacorn.data-parcel.validation-status.any");
 
-    private String validationStatus;
+    private String token;
+    private String displayName;
 
-    private DataParcelValidationStatusEnum(String normalisation){
-        this.validationStatus = normalisation;
+    private DataParcelValidationStatusEnum(String displayName, String token){
+        this.token = token;
+        this.displayName = displayName;
     }
 
-    public String getValidationStatusValue(){
-        return(this.validationStatus);
+    public String getToken(){
+        return(this.token);
+    }
+
+    public String getDisplayName(){
+        return(this.displayName);
     }
 
     public static DataParcelValidationStatusEnum fromValidationStatusString(String statusString){
         for (DataParcelValidationStatusEnum b : DataParcelValidationStatusEnum.values()) {
-            if (b.getValidationStatusValue().equalsIgnoreCase(statusString)) {
+            if (b.getToken().equalsIgnoreCase(statusString)) {
                 return b;
             }
         }

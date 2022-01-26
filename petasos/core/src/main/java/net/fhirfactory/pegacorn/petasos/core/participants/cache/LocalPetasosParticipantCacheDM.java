@@ -136,6 +136,10 @@ public class LocalPetasosParticipantCacheDM {
 			getLogger().debug(".updatePetasosParticipantRegistration(): Exit, registration is null");
 			return;
 		}
+		if(registration.getParticipant() == null){
+			getLogger().warn(".updatePetasosParticipantRegistration(): Exit, registration contains malformed content, registration->{}", registration);
+			return;
+		}
 		PetasosParticipantRegistration localRegistration = null;
 		synchronized (getParticipantCacheLock()){
 			boolean inCache = false;

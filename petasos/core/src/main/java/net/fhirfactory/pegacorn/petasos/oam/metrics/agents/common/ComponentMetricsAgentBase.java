@@ -22,21 +22,19 @@
 package net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
-import net.fhirfactory.pegacorn.core.interfaces.oam.tasks.PetasosITOpsTaskReportingAgentInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import java.time.Instant;
 
 public abstract class ComponentMetricsAgentBase  {
 
     private Object metricsDataLock;
     private boolean initialised;
+    private ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement;
 
     private static Long ROLLING_AVERAGE_COUNT = 10L;
     private PetasosLocalMetricsDM localMetricsDM;
@@ -80,6 +78,14 @@ public abstract class ComponentMetricsAgentBase  {
     // Getters and Setters
     //
 
+    public ProcessingPlantRoleSupportInterface getProcessingPlantCapabilityStatement() {
+        return processingPlantCapabilityStatement;
+    }
+
+    public void setProcessingPlantCapabilityStatement(ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement) {
+        this.processingPlantCapabilityStatement = processingPlantCapabilityStatement;
+    }
+
     public Object getMetricsDataLock() {
         return metricsDataLock;
     }
@@ -111,6 +117,61 @@ public abstract class ComponentMetricsAgentBase  {
     public void setNotificationAgent(PetasosITOpsNotificationAgentInterface notificationAgent) {
         this.notificationAgent = notificationAgent;
     }
+
+    //
+    // Business Methods
+    //
+
+    @JsonIgnore
+    public void incrementIngresMessageCount(){
+        synchronized (getMetricsDataLock()) {
+            int count = getMetricsData().getIngresMessageCount();
+            count += 1;
+            getMetricsData().setIngresMessageCount(count);
+        }
+    }
+
+    @JsonIgnore
+    public void incrementEgressMessageCount(){
+        synchronized (getMetricsDataLock()) {
+            int count = getMetricsData().getEgressMessageCount();
+            count += 1;
+            getMetricsData().setEgressMessageCount(count);
+        }
+    }
+
+    @JsonIgnore
+    public void incrementInternalMessageDistributionCount(){
+        synchronized (getMetricsDataLock()) {
+            int count = getMetricsData().getInternalDistributedMessageCount();
+            count += 1;
+            getMetricsData().setInternalDistributedMessageCount(count);
+        }
+    }
+
+    @JsonIgnore
+    public void incrementInternalReceivedMessageCount(){
+        synchronized (getMetricsData()){
+            int count = getMetricsData().getInternalReceivedMessageCount();
+            count += 1;
+            getMetricsData().setInternalReceivedMessageCount(count);
+        }
+    }
+
+    @JsonIgnore
+    public void incrementInternalMessageDistributionCount(String targetParticipantName){
+        if(StringUtils.isNotEmpty(targetParticipantName)){
+            synchronized (getMetricsDataLock()){
+                if(!getMetricsData().getInternalDistributionCountMap().containsKey(targetParticipantName)){
+                    getMetricsData().getInternalDistributionCountMap().put(targetParticipantName, 0);
+                }
+                Integer count = getMetricsData().getInternalDistributionCountMap().get(targetParticipantName);
+                Integer newValue = count + 1;
+                getMetricsData().getInternalDistributionCountMap().replace(targetParticipantName, newValue);
+            }
+        }
+    }
+
 
     //
     // To String

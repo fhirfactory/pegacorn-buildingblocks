@@ -56,6 +56,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTa
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
@@ -90,6 +91,9 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
 
     @Inject
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
+
+    @Inject
+    private ProcessingPlantMetricsAgentAccessor processingPlantMetricAgentAccessor;
 
     public InterProcessingPlantHandoverRegistrationBean() {
     }
@@ -137,10 +141,12 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
 
 
         LOG.trace(".ipcReceiverActivityStart(): Capture some metrics: Start");
-        metricsAgent.incrementIngresMessageCount();
+        metricsAgent.incrementInternalReceivedMessageCount();
         metricsAgent.incrementRegisteredTasks();
         metricsAgent.incrementStartedTasks();
         metricsAgent.getWUPMetricsData().setEventProcessingStartInstant(handoverPacket.getEventProcessingStartTime());
+        processingPlantMetricAgentAccessor.getMetricsAgent().incrementInternalReceivedMessageCount();
+        processingPlantMetricAgentAccessor.getMetricsAgent().touchLastActivityInstant();
         LOG.trace(".ipcReceiverActivityStart(): Capture some metrics: Finish");
 
         LOG.trace(".ipcReceiverActivityStart(): Injecting Fulfillment Task into Exchange for extraction by the WUP Egress Conduit");

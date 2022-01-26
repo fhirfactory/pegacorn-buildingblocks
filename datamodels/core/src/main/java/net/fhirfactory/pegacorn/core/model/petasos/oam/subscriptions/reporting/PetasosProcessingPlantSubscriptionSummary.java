@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ import java.util.Map;
 
 public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
     private Map<ComponentIdType, PetasosSubscriberSubscriptionSummary> asSubscriber;
-    private Map<ComponentIdType, PetasosPublisherSubscriptionSummary> asPublisher;
+    private Map<String, PetasosPublisherSubscriptionSummary> asPublisher;
     private ComponentIdType componentID;
     private String participantName;
 
@@ -58,11 +59,11 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
         this.asSubscriber = asSubscriber;
     }
 
-    public Map<ComponentIdType, PetasosPublisherSubscriptionSummary> getAsPublisher() {
+    public Map<String, PetasosPublisherSubscriptionSummary> getAsPublisher() {
         return asPublisher;
     }
 
-    public void setAsPublisher(Map<ComponentIdType, PetasosPublisherSubscriptionSummary> asPublisher) {
+    public void setAsPublisher(Map<String, PetasosPublisherSubscriptionSummary> asPublisher) {
         this.asPublisher = asPublisher;
     }
 
@@ -87,20 +88,20 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
     //
 
     public void addPublisherSummary(PetasosPublisherSubscriptionSummary publisherSubscriptionSummary){
-        if(asPublisher.containsKey(publisherSubscriptionSummary.getSubscriber())){
-            asPublisher.remove(publisherSubscriptionSummary.getSubscriber());
+        if(asPublisher.containsKey(publisherSubscriptionSummary.getSubscriberParticipantName())){
+            asPublisher.remove(publisherSubscriptionSummary.getSubscriberComponentId());
         }
-        asPublisher.put(publisherSubscriptionSummary.getSubscriber(), publisherSubscriptionSummary);
+        asPublisher.put(publisherSubscriptionSummary.getSubscriberParticipantName(), publisherSubscriptionSummary);
     }
 
     public void addSubscriberSummary(PetasosSubscriberSubscriptionSummary subscriberSubscriptionSummary){
-        if(asSubscriber.containsKey(subscriberSubscriptionSummary.getPublisher())){
-            asSubscriber.remove(subscriberSubscriptionSummary.getPublisher());
+        if(asSubscriber.containsKey(subscriberSubscriptionSummary.getPublisherComponentId())){
+            asSubscriber.remove(subscriberSubscriptionSummary.getPublisherComponentId());
         }
-        asSubscriber.put(subscriberSubscriptionSummary.getPublisher(), subscriberSubscriptionSummary);
+        asSubscriber.put(subscriberSubscriptionSummary.getPublisherComponentId(), subscriberSubscriptionSummary);
     }
 
-    public boolean addSubscriptionForExistingSubscriber(ComponentIdType componentID, String topic){
+    public boolean addSubscriptionForExistingSubscriber(ComponentIdType componentID, TaskWorkItemSubscriptionType topic){
         if(asPublisher.containsKey(componentID)){
             asPublisher.get(componentID).addTopic(topic);
             return(true);

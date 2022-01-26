@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.oam.metrics.agents;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.EndpointMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
@@ -29,6 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComp
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +48,9 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
     // Constructors
     //
 
-    public EndpointMetricsAgent(PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName, String connectedSystemName, String endpointDescription){
+    public EndpointMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName, String connectedSystemName, String endpointDescription){
         super();
-        getLogger().info(".EndpointMetricsAgent(): Initialising Endpoint Metrics Agent");
+        getLogger().debug(".EndpointMetricsAgent(): Initialising Endpoint Metrics Agent");
         this.metricsData = new EndpointMetricsData();
         setLocalMetricsDM(localMetricsDM);
         this.metricsData.setParticipantName(participantName);
@@ -56,7 +58,8 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
         this.metricsData.setComponentStartupInstant(Instant.now());
         this.connectedSystemName = connectedSystemName;
         this.endpointDescription = endpointDescription;
-        getLogger().info(".EndpointMetricsAgent(): Initialising Endpoint Metrics Agent ->{}", participantName);
+        setProcessingPlantCapabilityStatement(processingPlantFunction);
+        getLogger().debug(".EndpointMetricsAgent(): Initialising Endpoint Metrics Agent ->{}", participantName);
     }
 
     //
@@ -99,14 +102,18 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
 
     @Override
     public void sendITOpsNotification(String message) {
-        PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
-        notification.setComponentId(getMetricsData().getComponentID());
-        notification.setParticipantName(getEndpointMetricsData().getParticipantName());
-        notification.setContent(message);
-        notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
-        getNotificationAgent().sendNotification(notification);
-        if(getLogger().isInfoEnabled()){
-            getLogger().info(".sendITOpsNotification(): Send Notification->{}", notification);
+        try {
+            PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+            notification.setComponentId(getMetricsData().getComponentID());
+            notification.setParticipantName(getEndpointMetricsData().getParticipantName());
+            notification.setContent(message);
+            notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
+            getNotificationAgent().sendNotification(notification);
+            if (getLogger().isInfoEnabled()) {
+                getLogger().info(".sendITOpsNotification(): Send Notification->{}", notification);
+            }
+        } catch(Exception ex){
+            getLogger().warn(".sendITOpsNotification(): Can't send notifications, message->{}, stacktrace->{}", ExceptionUtils.getMessage(ex), ExceptionUtils.getStackTrace(ex));
         }
     }
 
@@ -147,33 +154,6 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
             int count = getEndpointMetricsData().getEgressSendAttemptCount();
             count += 1;
             getEndpointMetricsData().setEgressSendAttemptCount(count);
-        }
-    }
-
-    @JsonIgnore
-    public void incrementIngresMessageCount(){
-        synchronized (getMetricsDataLock()) {
-            int count = getEndpointMetricsData().getIngresMessageCount();
-            count += 1;
-            getEndpointMetricsData().setIngresMessageCount(count);
-        }
-    }
-
-    @JsonIgnore
-    public void incrementEgressMessageCount(){
-        synchronized (getMetricsDataLock()) {
-            int count = getEndpointMetricsData().getEgressMessageCount();
-            count += 1;
-            getEndpointMetricsData().setEgressMessageCount(count);
-        }
-    }
-
-    @JsonIgnore
-    public void incrementDistributedMessageCount(){
-        synchronized (getMetricsDataLock()) {
-            int count = getEndpointMetricsData().getDistributedMessageCount();
-            count += 1;
-            getEndpointMetricsData().setDistributedMessageCount(count);
         }
     }
 

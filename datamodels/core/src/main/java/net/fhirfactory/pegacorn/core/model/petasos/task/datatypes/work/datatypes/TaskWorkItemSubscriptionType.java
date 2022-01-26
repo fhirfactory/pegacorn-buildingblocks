@@ -413,5 +413,44 @@ public class TaskWorkItemSubscriptionType implements Serializable {
                 '}';
     }
 
+    //
+    // To Simple String
+    //
+
+    public String toDotString(){
+        StringBuilder descriptionBuilder = new StringBuilder();
+
+        if(hasContentDescriptor()){
+            descriptionBuilder.append("Content->"+ getContentDescriptor().toDotString() + "\n");
+        }
+        if(hasContainerDescriptor()){
+            descriptionBuilder.append("Container->"+ getContainerDescriptor().toDotString() + "\n");
+        }
+        if(hasNormalisationStatus()){
+            descriptionBuilder.append("<"+getNormalisationStatus().getToken()+">");
+        }
+        if(hasValidationStatus()){
+            descriptionBuilder.append("<"+getValidationStatus().getToken()+">");
+        }
+        if(hasExternalSourceSystem()){
+            descriptionBuilder.append("<From:"+getExternalSourceSystem()+">");
+        }
+        if(hasExternalTargetSystem()){
+            descriptionBuilder.append("<To:"+getExternalTargetSystem()+">");
+        }
+        if(hasSourceProcessingPlantParticipantName()){
+            descriptionBuilder.append("<InternalFrom:"+getSourceProcessingPlantParticipantName()+">");
+        }
+        if(hasTargetProcessingPlantParticipantName()){
+            descriptionBuilder.append("<InternalTo:"+getTargetProcessingPlantParticipantName()+">");
+        }
+        if(hasEnforcementPointApprovalStatus()){
+            descriptionBuilder.append("<"+getEnforcementPointApprovalStatus().getToken()+">");
+        }
+        descriptionBuilder.append("<Distributable:"+isInterSubsystemDistributable()+">");
+
+        String description = descriptionBuilder.toString();
+        return(description);
+    }
 
 }

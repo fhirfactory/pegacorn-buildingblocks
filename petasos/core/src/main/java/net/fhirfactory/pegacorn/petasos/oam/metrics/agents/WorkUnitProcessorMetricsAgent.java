@@ -22,11 +22,13 @@
 package net.fhirfactory.pegacorn.petasos.oam.metrics.agents;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.WorkUnitProcessorMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import org.slf4j.Logger;
@@ -44,15 +46,16 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
     // Constructor(s)
     //
 
-    public WorkUnitProcessorMetricsAgent(PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName){
+    public WorkUnitProcessorMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName){
         super();
-        getLogger().info(".WorkUnitProcessorMetricsAgent(): Initialising Working Unit Processor Metrics");
+        getLogger().debug(".WorkUnitProcessorMetricsAgent(): Initialising Working Unit Processor Metrics");
         this.metricsData = new WorkUnitProcessorMetricsData();
         setLocalMetricsDM(localMetricsDM);
         this.metricsData.setParticipantName(participantName);
         this.metricsData.setComponentID(componentId);
         this.metricsData.setComponentStartupInstant(Instant.now());
-        getLogger().info(".WorkUnitProcessorMetricsAgent(): Initialising Working Unit Processor Metrics Agent ->{}", participantName);
+        setProcessingPlantCapabilityStatement(processingPlantFunction);
+        getLogger().debug(".WorkUnitProcessorMetricsAgent(): Initialising Working Unit Processor Metrics Agent ->{}", participantName);
     }
 
     //
@@ -74,6 +77,9 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
 
     @Override
     public void sendITOpsNotification(String message) {
+        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
+            return;
+        }
         PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
         notification.setComponentId(getMetricsData().getComponentID());
         notification.setParticipantName(getWUPMetricsData().getParticipantName());
@@ -89,19 +95,7 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
     // Some Helper Methods
     //
 
-    @JsonIgnore
-    public void incrementDistributedMessageEndpointCount(String targetName){
-        synchronized (getMetricsDataLock()) {
-            if (!getWUPMetricsData().getDistributionCountMap().containsKey(targetName)) {
-                getWUPMetricsData().getDistributionCountMap().put(targetName, 1);
-            } else {
-                Integer currentValue = getWUPMetricsData().getDistributionCountMap().get(targetName);
-                currentValue += 1;
-                getWUPMetricsData().getDistributionCountMap().remove(targetName);
-                getWUPMetricsData().getDistributionCountMap().put(targetName, currentValue);
-            }
-        }
-    }
+
 
     @JsonIgnore
     public void incrementIngresMessageCount(){
@@ -118,15 +112,6 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
             int count = getWUPMetricsData().getEgressMessageCount();
             count += 1;
             getWUPMetricsData().setEgressMessageCount(count);
-        }
-    }
-
-    @JsonIgnore
-    public void incrementDistributedMessageCount(){
-        synchronized (getMetricsDataLock()) {
-            int count = getWUPMetricsData().getDistributedMessageCount();
-            count += 1;
-            getWUPMetricsData().setDistributedMessageCount(count);
         }
     }
 
@@ -257,7 +242,7 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
     public void updateAverageEventDistributionDuration(double newDuration){
         synchronized (getMetricsDataLock()) {
             double currentAverage = getWUPMetricsData().getAverageEventDistributionDuration();
-            double currentDistributionCount = (double) getWUPMetricsData().getDistributedMessageCount();
+            double currentDistributionCount = (double) getWUPMetricsData().getInternalDistributedMessageCount();
             if ((currentDistributionCount <= 0) || (currentAverage == 0)) {
                 getWUPMetricsData().setAverageEventDistributionDuration(newDuration);
             } else {

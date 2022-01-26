@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.factor
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.EndpointMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.ProcessingPlantMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.WorkUnitProcessorMetricsData;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetric;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.datatypes.PetasosComponentMetricValue;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.Set;
 
 @ApplicationScoped
 public class PetasosComponentMetricSetFactory {
@@ -59,6 +61,12 @@ public class PetasosComponentMetricSetFactory {
         metricSet.setMetricSourceComponentId(plantMetricsData.getComponentID());
         metricSet.setSourceParticipantName(plantMetricsData.getParticipantName());
         metricSet.setComponentType(plantMetricsData.getComponentType());
+
+        PetasosComponentMetricSet commonMetrics = convertCommonMetrics(plantMetricsData);
+        Set<String> commonMetricsKeys = commonMetrics.getMetrics().keySet();
+        for(String currentMetric: commonMetricsKeys) {
+            metricSet.addMetric(commonMetrics.getMetric(currentMetric));
+        }
 
         if(plantMetricsData.getComponentStatus() != null){
             PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
@@ -139,49 +147,6 @@ public class PetasosComponentMetricSetFactory {
             }
         }
 
-        if(plantMetricsData.getIngresMessageCount() > 0){
-            PetasosComponentMetric ingresMessageCount = new PetasosComponentMetric();
-            ingresMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-            ingresMessageCount.setMetricSource(plantMetricsData.getComponentID());
-            ingresMessageCount.setMetricName("Ingres-Messages");
-            ingresMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_RECEIVED);
-            ingresMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
-            ingresMessageCount.setMetricValue(new PetasosComponentMetricValue(plantMetricsData.getIngresMessageCount()));
-            metricSet.addMetric(ingresMessageCount);
-        }
-
-        getLogger().info(".convertProcessingPlantMetricsData(): [EgressMessageCount] Check");
-        if(plantMetricsData.getEgressMessageCount() > 0){
-            PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
-            egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-            egressMessageCount.setMetricSource(plantMetricsData.getComponentID());
-            egressMessageCount.setMetricName("Egress-Messages");
-            egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED);
-            egressMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
-            egressMessageCount.setMetricValue(new PetasosComponentMetricValue(plantMetricsData.getEgressMessageCount()));
-            metricSet.addMetric(egressMessageCount);
-        }
-        getLogger().info(".convertProcessingPlantMetricsData(): [EgressMessageCount] Done...");
-        getLogger().info(".convertProcessingPlantMetricsData(): [DistributionCountMap] Check");
-        if(!plantMetricsData.getDistributionCountMap().isEmpty()){
-            getLogger().info(".convertProcessingPlantMetricsData(): [Processing DistributionCountMap] Start");
-            int counter = 0;
-            for(String currentTargetName: plantMetricsData.getDistributionCountMap().keySet()){
-                PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
-                egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-                egressMessageCount.setMetricSource(plantMetricsData.getComponentID());
-                egressMessageCount.setMetricName("Messages-Forwarded["+currentTargetName+"]");
-                egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED);
-                egressMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
-                Integer forwardedMessageCount = plantMetricsData.getDistributionCountMap().get(currentTargetName);
-                egressMessageCount.setMetricValue(new PetasosComponentMetricValue(forwardedMessageCount));
-                metricSet.addMetric(egressMessageCount);
-                counter += 1;
-            }
-            getLogger().info(".convertProcessingPlantMetricsData(): [Processing DistributionCountMap] Finish (entries={})", counter);
-        }
-        getLogger().info(".convertProcessingPlantMetricsData(): [DistributionCountMap] Done...");
-
         getLogger().debug(".convertProcessingPlantMetricsData(): Exit, metricSet->{}", metricSet);
         return(metricSet);
     }
@@ -209,17 +174,10 @@ public class PetasosComponentMetricSetFactory {
         metricSet.setSourceParticipantName(wupMetricsData.getParticipantName());
         metricSet.setComponentType(wupMetricsData.getComponentType());metricSet.setSourceParticipantName(wupMetricsData.getParticipantName());
 
-        if(!wupMetricsData.getDistributionCountMap().isEmpty()){
-            for(String currentTarget: wupMetricsData.getDistributionCountMap().keySet()){
-                PetasosComponentMetric forwardedMessageToParticipantCount = new PetasosComponentMetric();
-                forwardedMessageToParticipantCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-                forwardedMessageToParticipantCount.setMetricSource(wupMetricsData.getComponentID());
-                forwardedMessageToParticipantCount.setMetricName("Forwarded-Tasks-To:"+currentTarget);
-                forwardedMessageToParticipantCount.setMetricType(PetasosComponentMetricTypeEnum.TASK_COUNT);
-                forwardedMessageToParticipantCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
-                forwardedMessageToParticipantCount.setMetricValue(new PetasosComponentMetricValue(wupMetricsData.getDistributionCountMap().get(currentTarget)));
-                metricSet.addMetric(forwardedMessageToParticipantCount);
-            }
+        PetasosComponentMetricSet commonMetrics = convertCommonMetrics(wupMetricsData);
+        Set<String> commonMetricsKeys = commonMetrics.getMetrics().keySet();
+        for(String currentMetric: commonMetricsKeys) {
+            metricSet.addMetric(commonMetrics.getMetric(currentMetric));
         }
 
         if(wupMetricsData.getRegisteredTasks() >= 0){
@@ -254,28 +212,6 @@ public class PetasosComponentMetricSetFactory {
             String roundedValue = String.format("%.3f", (wupMetricsData.getRollingEventProcessingDuration() + 0.005D)) +  " sec";
             rollingEventProcessingDuration.setMetricValue(new PetasosComponentMetricValue(roundedValue));
             metricSet.addMetric(rollingEventProcessingDuration);
-        }
-
-        if(wupMetricsData.getIngresMessageCount() > 0){
-            PetasosComponentMetric ingresMessageCount = new PetasosComponentMetric();
-            ingresMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-            ingresMessageCount.setMetricSource(wupMetricsData.getComponentID());
-            ingresMessageCount.setMetricName(PetasosComponentMetricTypeEnum.MESSAGES_RECEIVED.getDisplayName());
-            ingresMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_RECEIVED);
-            ingresMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
-            ingresMessageCount.setMetricValue(new PetasosComponentMetricValue(wupMetricsData.getIngresMessageCount()));
-            metricSet.addMetric(ingresMessageCount);
-        }
-
-        if(wupMetricsData.getEgressMessageCount() > 0){
-            PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
-            egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-            egressMessageCount.setMetricSource(wupMetricsData.getComponentID());
-            egressMessageCount.setMetricName(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED.getDisplayName());
-            egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED);
-            egressMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
-            egressMessageCount.setMetricValue(new PetasosComponentMetricValue(wupMetricsData.getEgressMessageCount()));
-            metricSet.addMetric(egressMessageCount);
         }
 
         if(wupMetricsData.getEventProcessingStartInstant() != null){
@@ -417,6 +353,12 @@ public class PetasosComponentMetricSetFactory {
         metricSet.setSourceParticipantName(endpointMetricsData.getParticipantName());
         metricSet.setComponentType(endpointMetricsData.getComponentType());
 
+        PetasosComponentMetricSet commonMetrics = convertCommonMetrics(endpointMetricsData);
+        Set<String> commonMetricsKeys = commonMetrics.getMetrics().keySet();
+        for(String currentMetric: commonMetricsKeys) {
+            metricSet.addMetric(commonMetrics.getMetric(currentMetric));
+        }
+
         if (endpointMetricsData.getEgressSendAttemptCount() > 0) {
             PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
             componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
@@ -450,41 +392,103 @@ public class PetasosComponentMetricSetFactory {
             metricSet.addMetric(activityInstant);
         }
 
-        if(endpointMetricsData.getComponentStartupInstant() != null){
+        getLogger().debug(".convertEndpointMetricsData(): Exit, metricSet->{}", metricSet);
+        return(metricSet);
+    }
+
+    protected PetasosComponentMetricSet convertCommonMetrics(CommonComponentMetricsData metricsData){
+        getLogger().debug(".convertCommonMetrics(): Entry, metricsData->{}", metricsData);
+
+        if(metricsData.getComponentID() == null){
+            getLogger().debug(".convertCommonMetrics(): Exit, endpointMetricsData is null, returning -null-");
+            return(null);
+        }
+
+        PetasosComponentMetricSet metricSet = new PetasosComponentMetricSet();
+        metricSet.setMetricSourceComponentId(metricsData.getComponentID());
+        metricSet.setSourceParticipantName(metricsData.getParticipantName());
+        metricSet.setComponentType(metricsData.getComponentType());
+
+
+        if(metricsData.getComponentStatus() != null){
+            PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
+            componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            componentStatusMetric.setMetricSource(metricsData.getComponentID());
+            componentStatusMetric.setMetricName("ProcessingPlant-Status");
+            componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.COMPONENT_GENERAL_STATUS);
+            componentStatusMetric.setMetricUnit(PetasosComponentMetricUnitEnum.STRING_DESCRIPTION);
+            componentStatusMetric.setMetricValue(new PetasosComponentMetricValue(metricsData.getComponentStatus()));
+            metricSet.addMetric(componentStatusMetric);
+        }
+
+        if(metricsData.getLastActivityInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
             activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-            activityInstant.setMetricSource(endpointMetricsData.getComponentID());
-            activityInstant.setMetricName("Component-Startup-Instant");
+            activityInstant.setMetricSource(metricsData.getComponentID());
+            activityInstant.setMetricName("Last-Activity-Instant");
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
             activityInstant.setMetricUnit(PetasosComponentMetricUnitEnum.TIME_INSTANT);
-            activityInstant.setMetricValue(new PetasosComponentMetricValue(endpointMetricsData.getComponentStartupInstant()));
+            activityInstant.setMetricValue(new PetasosComponentMetricValue(metricsData.getLastActivityInstant()));
             metricSet.addMetric(activityInstant);
         }
 
-        if(endpointMetricsData.getIngresMessageCount() > 0){
+        if(metricsData.getComponentStartupInstant() != null){
+            PetasosComponentMetric activityInstant = new PetasosComponentMetric();
+            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricSource(metricsData.getComponentID());
+            activityInstant.setMetricName("Component-Startup-Instant");
+            activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
+            activityInstant.setMetricUnit(PetasosComponentMetricUnitEnum.TIME_INSTANT);
+            activityInstant.setMetricValue(new PetasosComponentMetricValue(metricsData.getComponentStartupInstant()));
+            metricSet.addMetric(activityInstant);
+        }
+
+        if(metricsData.getIngresMessageCount() > 0){
             PetasosComponentMetric ingresMessageCount = new PetasosComponentMetric();
             ingresMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-            ingresMessageCount.setMetricSource(endpointMetricsData.getComponentID());
+            ingresMessageCount.setMetricSource(metricsData.getComponentID());
             ingresMessageCount.setMetricName(PetasosComponentMetricTypeEnum.MESSAGES_RECEIVED.getDisplayName());
             ingresMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_RECEIVED);
             ingresMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
-            ingresMessageCount.setMetricValue(new PetasosComponentMetricValue(endpointMetricsData.getIngresMessageCount()));
+            ingresMessageCount.setMetricValue(new PetasosComponentMetricValue(metricsData.getIngresMessageCount()));
             metricSet.addMetric(ingresMessageCount);
         }
 
-        if(endpointMetricsData.getEgressMessageCount() > 0){
+        if(metricsData.getEgressMessageCount() > 0){
             PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
             egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
-            egressMessageCount.setMetricSource(endpointMetricsData.getComponentID());
+            egressMessageCount.setMetricSource(metricsData.getComponentID());
             egressMessageCount.setMetricName(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED.getDisplayName());
             egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED);
             egressMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
-            egressMessageCount.setMetricValue(new PetasosComponentMetricValue(endpointMetricsData.getEgressMessageCount()));
+            egressMessageCount.setMetricValue(new PetasosComponentMetricValue(metricsData.getEgressMessageCount()));
             metricSet.addMetric(egressMessageCount);
         }
 
-        getLogger().debug(".convertEndpointMetricsData(): Exit, metricSet->{}", metricSet);
+        getLogger().info(".convertCommonMetrics(): [DistributionCountMap] Check");
+        if(!metricsData.getInternalDistributionCountMap().isEmpty()){
+            getLogger().info(".convertCommonMetrics(): [Processing DistributionCountMap] Start");
+            int counter = 0;
+            for(String currentTargetName: metricsData.getInternalDistributionCountMap().keySet()){
+                PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
+                egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                egressMessageCount.setMetricSource(metricsData.getComponentID());
+                egressMessageCount.setMetricName("Messages-Forwarded["+currentTargetName+"]");
+                egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED);
+                egressMessageCount.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+                Integer forwardedMessageCount = metricsData.getInternalDistributionCountMap().get(currentTargetName);
+                egressMessageCount.setMetricValue(new PetasosComponentMetricValue(forwardedMessageCount));
+                metricSet.addMetric(egressMessageCount);
+                counter += 1;
+            }
+            getLogger().info(".convertCommonMetrics(): [Processing DistributionCountMap] Finish (entries={})", counter);
+        }
+        getLogger().info(".convertCommonMetrics(): [DistributionCountMap] Done...");
+
+        getLogger().debug(".convertCommonMetrics(): Exit, metricSet->{}", metricSet);
         return(metricSet);
+
+
     }
 
     //

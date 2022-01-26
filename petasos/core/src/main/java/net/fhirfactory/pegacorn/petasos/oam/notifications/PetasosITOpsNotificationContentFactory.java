@@ -335,4 +335,26 @@ public class PetasosITOpsNotificationContentFactory {
         return(segmentList);
     }
 
+    public List<String> getGeneralHeaderDetail(UoWPayload payload){
+        List<String> headerInfo = new ArrayList<>();
+        if(payload.getPayloadManifest().hasContainerDescriptor()){
+            StringBuilder containerBuilder = new StringBuilder();
+            String containerMessageDefiner = payload.getPayloadManifest().getContainerDescriptor().getDataParcelDefiner();
+            String containerMessageCategory= payload.getPayloadManifest().getContainerDescriptor().getDataParcelCategory();
+            String containerMessageSubcategory = payload.getPayloadManifest().getContainerDescriptor().getDataParcelSubCategory();
+            String containerMessageResource= payload.getPayloadManifest().getContainerDescriptor().getDataParcelResource();
+            String containerMessageVersion = payload.getPayloadManifest().getContainerDescriptor().getVersion();
+            containerBuilder.append("Container Payload: "+containerMessageDefiner+"::"+containerMessageCategory+"::"+containerMessageSubcategory+"::"+ containerMessageResource+"("+containerMessageVersion+")");
+            headerInfo.add(containerBuilder.toString());
+        }
+        StringBuilder contentBuilder = new StringBuilder();
+        String contentDescriptor = payload.getPayloadManifest().getContentDescriptor().getDataParcelDefiner();
+        String contentMessageCategory= payload.getPayloadManifest().getContentDescriptor().getDataParcelCategory();
+        String contentMessageSubcategory = payload.getPayloadManifest().getContentDescriptor().getDataParcelSubCategory();
+        String contentMessageResource= payload.getPayloadManifest().getContentDescriptor().getDataParcelResource();
+        String contentMessageVersion = payload.getPayloadManifest().getContentDescriptor().getVersion();
+        contentBuilder.append("Content Payload: "+contentDescriptor+"::"+contentMessageCategory+"::"+contentMessageSubcategory+"::"+ contentMessageResource+"("+contentMessageVersion+")");
+        headerInfo.add(contentBuilder.toString());
+        return(headerInfo);
+    }
 }

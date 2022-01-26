@@ -405,4 +405,150 @@ public class DataParcelTypeDescriptor implements Serializable {
         }
         return(true);
     }
+
+    //
+    // Nice and Simple toString variant
+    //
+
+    public String toDotString(){
+        String definer = getDataParcelDefiner();
+        String category = getDataParcelCategory();
+        String subcategory = getDataParcelSubCategory();
+        String resource = getDataParcelResource();
+        String segment = getDataParcelSegment();
+        String attribute = getDataParcelAttribute();
+        String version = getVersion();
+        String discriminatorType = getDataParcelDiscriminatorType();
+        String discriminatorValue = getDataParcelDiscriminatorValue();
+
+        boolean definerExists = StringUtils.isNotEmpty(definer);
+        boolean categoryExists = StringUtils.isNotEmpty(category);
+        boolean subcategoryExists = StringUtils.isNotEmpty(subcategory);
+        boolean resourceExists = StringUtils.isNotEmpty(resource);
+        boolean segmentExists = StringUtils.isNotEmpty(segment);
+        boolean attributeExists = StringUtils.isNotEmpty(attribute);
+        boolean versionExists = StringUtils.isNotEmpty(version);
+        boolean discriminatorTypeExists = StringUtils.isNotEmpty(discriminatorType);
+        boolean discriminatorValueExists = StringUtils.isNotEmpty(discriminatorValue);
+
+        StringBuilder descriptionBuilder = new StringBuilder();
+
+        if(definerExists){
+            descriptionBuilder.append(definer);
+            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_DEFINER)){
+                descriptionBuilder.append(".");
+            }
+        }
+        if(categoryExists){
+            descriptionBuilder.append(category);
+            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_CATEGORY)){
+                descriptionBuilder.append(".");
+            }
+        }
+        if(subcategoryExists){
+            descriptionBuilder.append(subcategory);
+            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_SUBCATEGORY)){
+                descriptionBuilder.append(".");
+            }
+        }
+        if(resourceExists){
+            descriptionBuilder.append(resource);
+            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_RESOURCE)){
+                descriptionBuilder.append(".");
+            }
+        }
+        if(segmentExists){
+            descriptionBuilder.append(segment);
+            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_SEGMENT)){
+                descriptionBuilder.append(".");
+            }
+        }
+        if (attributeExists) {
+            descriptionBuilder.append(attribute);
+            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_ATTRIBUTE)){
+                descriptionBuilder.append(".");
+            }
+        }
+        if(discriminatorTypeExists){
+            descriptionBuilder.append(discriminatorType);
+            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_DISCRIMINATOR_TYPE)){
+                descriptionBuilder.append(".");
+            }
+        }
+        if(discriminatorValueExists){
+            descriptionBuilder.append(discriminatorValue);
+            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_DISCRIMINATOR_VALUE)){
+                descriptionBuilder.append(".");
+            }
+        }
+        if(versionExists){
+            descriptionBuilder.append(version);
+        }
+        String description = descriptionBuilder.toString();
+        return(description);
+    }
+
+    private boolean subElementExists( DataParcelDescriptorKeyEnum key){
+        String definer = getDataParcelDefiner();
+        String category = getDataParcelCategory();
+        String subcategory = getDataParcelSubCategory();
+        String resource = getDataParcelResource();
+        String segment = getDataParcelSegment();
+        String attribute = getDataParcelAttribute();
+        String version = getVersion();
+        String discriminatorType = getDataParcelDiscriminatorType();
+        String discriminatorValue = getDataParcelDiscriminatorValue();
+
+        boolean definerExists = StringUtils.isNotEmpty(definer);
+        boolean categoryExists = StringUtils.isNotEmpty(category);
+        boolean subcategoryExists = StringUtils.isNotEmpty(subcategory);
+        boolean resourceExists = StringUtils.isNotEmpty(resource);
+        boolean segmentExists = StringUtils.isNotEmpty(segment);
+        boolean attributeExists = StringUtils.isNotEmpty(attribute);
+        boolean versionExists = StringUtils.isNotEmpty(version);
+        boolean discriminatorTypeExists = StringUtils.isNotEmpty(discriminatorType);
+        boolean discriminatorValueExists = StringUtils.isNotEmpty(discriminatorValue);
+
+        switch(key){
+            case DATASET_DEFINER:
+                if(categoryExists || subcategoryExists || resourceExists || segmentExists || attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
+                    return(true);
+                }
+                break;
+            case DATASET_CATEGORY:
+                if(subcategoryExists || resourceExists || segmentExists || attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
+                    return(true);
+                }
+                break;
+            case DATASET_SUBCATEGORY:
+                if(resourceExists || segmentExists || attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
+                    return(true);
+                }
+                break;
+            case DATASET_RESOURCE:
+                if(segmentExists || attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
+                    return(true);
+                }
+                break;
+            case DATASET_SEGMENT:
+                if(attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
+                    return(true);
+                }
+                break;
+            case DATASET_ATTRIBUTE:
+                if(discriminatorTypeExists || discriminatorValueExists){
+                    return(true);
+                }
+                break;
+            case DATASET_DISCRIMINATOR_TYPE:
+                if(discriminatorValueExists){
+                    return(true);
+                }
+                break;
+        }
+        if(versionExists){
+            return(true);
+        }
+        return(false);
+    }
 }

@@ -22,23 +22,29 @@
 package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
 
 public enum DataParcelNormalisationStatusEnum {
-    DATA_PARCEL_CONTENT_NORMALISATION_TRUE("data-parcel-content-normalisation-true"),
-    DATA_PARCEL_CONTENT_NORMALISATION_FALSE("data-parcel-content-normalisation-false"),
-    DATA_PARCEL_CONTENT_NORMALISATION_ANY("data-parcel-content-normalisation-any");
+    DATA_PARCEL_CONTENT_NORMALISATION_TRUE("Normalised.True", "pegacorn.data-parcel.normalisation-status.true"),
+    DATA_PARCEL_CONTENT_NORMALISATION_FALSE("Normalised.False", "pegacorn.data-parcel.normalisation-status.false"),
+    DATA_PARCEL_CONTENT_NORMALISATION_ANY("Normalised.Any", "pegacorn.data-parcel.normalisation-status.any");
 
-    private String normalisationStatus;
+    private String token;
+    private String displayName;
 
-    private DataParcelNormalisationStatusEnum(String normalisation){
-        this.normalisationStatus = normalisation;
+    private DataParcelNormalisationStatusEnum(String displayName, String normalisation){
+        this.token = normalisation;
+        this.displayName = displayName;
     }
 
-    public String getNormalisationStatusValue(){
-        return(this.normalisationStatus);
+    public String getToken(){
+        return(this.token);
+    }
+
+    public String getDisplayName(){
+        return(this.displayName);
     }
 
     public static DataParcelNormalisationStatusEnum fromNormalisationStatusString(String theString){
         for (DataParcelNormalisationStatusEnum b : DataParcelNormalisationStatusEnum.values()) {
-            if (b.getNormalisationStatusValue().equalsIgnoreCase(theString)) {
+            if (b.getToken().equalsIgnoreCase(theString)) {
                 return b;
             }
         }

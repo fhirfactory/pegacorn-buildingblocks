@@ -94,12 +94,9 @@ public class PetasosSubscriptionReportWorker extends AgentWorkerBase {
         //
         // Build Map
         //
-        LOG.trace(".forwardPubSubReports(): [Build ProcessingPlant PubSub Summary] Start");
-        pubSubCollectionAgent.refreshLocalProcessingPlantPubSubMap();
-        LOG.trace(".forwardPubSubReports(): [Build ProcessingPlant PubSub Summary] Finish");
-        LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Summaries] Start");
-        pubSubCollectionAgent.refreshWorkUnitProcessorPubSubMap();
-        LOG.trace(".forwardPubSubReports(): [Build WorkUnitProcessor PubSub Summaries] Finish");
+        LOG.trace(".forwardPubSubReports(): [Build PubSub Summaries] Start");
+        pubSubCollectionAgent.refreshLocalPubSubReportingMap();
+        LOG.trace(".forwardPubSubReports(): [Build PubSub Summaries] Finish");
         //
         // Get Data to be Reported ON
         //

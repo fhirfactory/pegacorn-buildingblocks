@@ -25,22 +25,52 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.common.PetasosSubscriptionSummaryBase;
 
 public class PetasosPublisherSubscriptionSummary extends PetasosSubscriptionSummaryBase {
-    private ComponentIdType subscriber;
-    private String subscriberServiceName;
+    private ComponentIdType subscriberComponentId;
+    private String subscriberParticipantName;
 
-    public ComponentIdType getSubscriber() {
-        return subscriber;
+    //
+    // Constructor(s)
+    //
+
+    public PetasosPublisherSubscriptionSummary(){
+        this.subscriberComponentId = null;
+        this.subscriberParticipantName = null;
     }
 
-    public void setSubscriber(ComponentIdType subscriber) {
-        this.subscriber = subscriber;
+    //
+    // Getters and Setters
+    //
+
+    public ComponentIdType getSubscriberComponentId() {
+        return subscriberComponentId;
     }
 
-    public String getSubscriberServiceName() {
-        return subscriberServiceName;
+    public void setSubscriberComponentId(ComponentIdType subscriberComponentId) {
+        this.subscriberComponentId = subscriberComponentId;
     }
 
-    public void setSubscriberServiceName(String subscriberServiceName) {
-        this.subscriberServiceName = subscriberServiceName;
+    public String getSubscriberParticipantName() {
+        return subscriberParticipantName;
+    }
+
+    public void setSubscriberParticipantName(String subscriberParticipantName) {
+        this.subscriberParticipantName = subscriberParticipantName;
+    }
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "PetasosPublisherSubscriptionSummary{" +
+                "participantName='" + getParticipantName() + '\'' +
+                ", componentID=" + getComponentID() +
+                ", subscribedTaskWorkItems=" + getSubscribedTaskWorkItems() +
+                ", summaryType=" + getSummaryType() +
+                ", timestamp=" + getTimestamp() +
+                ", subscriberComponentId=" + subscriberComponentId +
+                ", subscriberParticipantName='" + subscriberParticipantName + '\'' +
+                '}';
     }
 }

@@ -117,11 +117,6 @@ public abstract class TaskReportAgentBase {
 
     public void sendITOpsTaskReport(PetasosActionableTask task){
         getLogger().debug(".sendITOpsTaskReport(): Entry");
-        if(getProcessingPlantFunctionStatement().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)) {
-            getLogger().info(".sendITOpsTaskReport(): Am the ITOps Node --> so report NOTHING!");
-            // do nothing
-            return;
-        }
         try {
             PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task);
             notification.setComponentType(specifyComponentType());
@@ -137,11 +132,6 @@ public abstract class TaskReportAgentBase {
 
     public void sendITOpsTaskReport(PetasosActionableTask task, List<PetasosActionableTask> newTasks){
         getLogger().info(".sendITOpsTaskReport(): Entry");
-        if(getProcessingPlantFunctionStatement().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)) {
-            getLogger().info(".sendITOpsTaskReport(): Am the ITOps Node --> so report NOTHING!");
-            // do nothing
-            return;
-        }
         try {
             PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task, newTasks);
             notification.setComponentType(specifyComponentType());

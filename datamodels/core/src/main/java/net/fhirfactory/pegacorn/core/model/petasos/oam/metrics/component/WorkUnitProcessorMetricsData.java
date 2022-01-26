@@ -258,8 +258,8 @@ public class WorkUnitProcessorMetricsData extends CommonComponentMetricsData {
         return "WorkUnitProcessorMetricsData{" +
                 "ingresMessageCount=" + getIngresMessageCount() +
                 ", egressMessageCount=" + getEgressMessageCount() +
-                ", distributedMessageCount=" + getDistributedMessageCount() +
-                ", distributionCountMap=" + getDistributionCountMap() +
+                ", distributedMessageCount=" + getInternalDistributedMessageCount() +
+                ", distributionCountMap=" + getInternalDistributionCountMap() +
                 ", averageEventProcessingDuration=" + averageEventProcessingDuration +
                 ", rollingEventProcessingDuration=" + rollingEventProcessingDuration +
                 ", lastEventProcessingDuration=" + lastEventProcessingDuration +

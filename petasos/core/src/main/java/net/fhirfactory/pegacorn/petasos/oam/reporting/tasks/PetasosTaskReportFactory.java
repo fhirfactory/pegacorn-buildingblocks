@@ -133,6 +133,12 @@ public class PetasosTaskReportFactory {
                     notOutputMetadataList.add("Metadata Not Available");
                     outputMetadata.put(outputPayloadCounter, notOutputMetadataList);
                 }
+            } else {
+                List<String> currentHeaderList = contentFactory.getGeneralHeaderDetail(currentEgressPayload);
+                outputHeaders.put(outputPayloadCounter, currentHeaderList);
+                List<String> notOutputMetadataList = new ArrayList<>();
+                notOutputMetadataList.add("Metadata Not Available");
+                outputMetadata.put(outputPayloadCounter, notOutputMetadataList);
             }
             outputPayloadCounter += 1;
         }

@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.valuesets.PetasosSubscriptionSummaryTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -36,12 +37,34 @@ import java.util.List;
 public class PetasosSubscriptionSummaryBase implements Serializable {
     private PetasosSubscriptionSummaryTypeEnum summaryType;
     private ComponentIdType componentID;
+    private String participantName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant timestamp;
-    private List<String> subscribedTopics;
+    private List<TaskWorkItemSubscriptionType> subscribedTaskWorkItems;
+
+    //
+    // Constructor(s)
+    //
 
     public PetasosSubscriptionSummaryBase(){
-        subscribedTopics = new ArrayList<>();
+        this.summaryType = null;
+        this.componentID = null;
+        this.participantName = null;
+        this.timestamp = null;
+        this.subscribedTaskWorkItems = new ArrayList<>();
+    }
+
+    //
+    // Getters and Setters
+    //
+
+
+    public String getParticipantName() {
+        return participantName;
+    }
+
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
     }
 
     public ComponentIdType getComponentID() {
@@ -52,19 +75,19 @@ public class PetasosSubscriptionSummaryBase implements Serializable {
         this.componentID = componentID;
     }
 
-    public List<String> getSubscribedTopics() {
-        return subscribedTopics;
+    public List<TaskWorkItemSubscriptionType> getSubscribedTaskWorkItems() {
+        return subscribedTaskWorkItems;
     }
 
-    public void setSubscribedTopics(List<String> subscribedTopics) {
-        this.subscribedTopics = subscribedTopics;
+    public void setSubscribedTaskWorkItems(List<TaskWorkItemSubscriptionType> subscribedTaskWorkItems) {
+        this.subscribedTaskWorkItems = subscribedTaskWorkItems;
     }
 
     @JsonIgnore
-    public void addTopic(String topic){
+    public void addTopic(TaskWorkItemSubscriptionType topic){
         boolean topicExists = false;
-        if(!subscribedTopics.contains(topic)){
-            subscribedTopics.add(topic);
+        if(!subscribedTaskWorkItems.contains(topic)){
+            subscribedTaskWorkItems.add(topic);
         }
     }
 
@@ -82,5 +105,20 @@ public class PetasosSubscriptionSummaryBase implements Serializable {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "PetasosSubscriptionSummaryBase{" +
+                "summaryType=" + summaryType +
+                ", componentID=" + componentID +
+                ", participantName='" + participantName + '\'' +
+                ", timestamp=" + timestamp +
+                ", subscribedTaskWorkItems=" + subscribedTaskWorkItems +
+                '}';
     }
 }

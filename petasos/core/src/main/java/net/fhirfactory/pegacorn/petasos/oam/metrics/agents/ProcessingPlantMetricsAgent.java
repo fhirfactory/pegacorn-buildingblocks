@@ -22,11 +22,13 @@
 package net.fhirfactory.pegacorn.petasos.oam.metrics.agents;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.ProcessingPlantMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import org.apache.commons.lang3.StringUtils;
@@ -46,14 +48,15 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     // Constructors
     //
 
-    public ProcessingPlantMetricsAgent(PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName){
+    public ProcessingPlantMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName){
         super();
         this.metricsData = new ProcessingPlantMetricsData();
         setLocalMetricsDM(localMetricsDM);
         this.metricsData.setParticipantName(participantName);
         this.metricsData.setComponentID(componentId);
         this.metricsData.setComponentStartupInstant(Instant.now());
-        getLogger().info(".WorkUnitProcessorMetricsAgent(): Initialising Processing Plant Metrics Agent ->{}", participantName);
+        setProcessingPlantCapabilityStatement(processingPlantFunction);
+        getLogger().debug(".WorkUnitProcessorMetricsAgent(): Initialising Processing Plant Metrics Agent ->{}", participantName);
     }
 
     //
@@ -75,6 +78,9 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
 
     @Override
     public void sendITOpsNotification(String message) {
+        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
+            return;
+        }
         PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
         notification.setComponentId(getMetricsData().getComponentID());
         notification.setParticipantName(getProcessingPlantMetricsData().getParticipantName());
@@ -86,19 +92,6 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     //
     // Helpers
     //
-
-    public void incrementForwardedMessageCount(String targetParticipantName){
-        if(StringUtils.isNotEmpty(targetParticipantName)){
-            synchronized (getMetricsDataLock()){
-                if(!getMetricsData().getDistributionCountMap().containsKey(targetParticipantName)){
-                    getMetricsData().getDistributionCountMap().put(targetParticipantName, 0);
-                }
-                Integer count = getMetricsData().getDistributionCountMap().get(targetParticipantName);
-                count += 1;
-                getMetricsData().getDistributionCountMap().replace(targetParticipantName, count);
-            }
-        }
-    }
 
     public void updateLocalCacheStatus(String cacheName, String cacheStatus){
         if(StringUtils.isEmpty(cacheName) || StringUtils.isEmpty(cacheStatus)){
@@ -131,33 +124,6 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     public void touchAsynchronousAuditEventWrite(){
         synchronized (getMetricsDataLock()) {
             getProcessingPlantMetricsData().setLastAsynchronousAuditEventWrite(Instant.now());
-        }
-    }
-
-    @JsonIgnore
-    public void incrementIngresMessageCount(){
-        synchronized (getMetricsDataLock()) {
-            int count = getProcessingPlantMetricsData().getIngresMessageCount();
-            count += 1;
-            getProcessingPlantMetricsData().setIngresMessageCount(count);
-        }
-    }
-
-    @JsonIgnore
-    public void incrementEgressMessageCount(){
-        synchronized (getMetricsDataLock()) {
-            int count = getProcessingPlantMetricsData().getEgressMessageCount();
-            count += 1;
-            getProcessingPlantMetricsData().setEgressMessageCount(count);
-        }
-    }
-
-    @JsonIgnore
-    public void incrementDistributedMessageCount(){
-        synchronized (getMetricsDataLock()) {
-            int count = getProcessingPlantMetricsData().getDistributedMessageCount();
-            count += 1;
-            getProcessingPlantMetricsData().setDistributedMessageCount(count);
         }
     }
 

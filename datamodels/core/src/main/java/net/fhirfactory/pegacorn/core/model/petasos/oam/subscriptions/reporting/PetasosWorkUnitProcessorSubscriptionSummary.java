@@ -21,15 +21,30 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting;
 
-public class PetasosWorkUnitProcessorSubscriptionSummary extends PetasosPublisherSubscriptionSummary {
+import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.common.PetasosSubscriptionSummaryBase;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.valuesets.PetasosSubscriptionSummaryTypeEnum;
+
+public class PetasosWorkUnitProcessorSubscriptionSummary extends PetasosSubscriptionSummaryBase {
+
+    //
+    // Constructor(s)
+    //
+
+    public PetasosWorkUnitProcessorSubscriptionSummary(){
+        super();
+        setSummaryType(PetasosSubscriptionSummaryTypeEnum.WORK_UNIT_PROCESSOR_SUMMARY);
+    }
+
+    //
+    // To String
+    //
 
     @Override
     public String toString() {
         return "PetasosWorkUnitProcessorSubscriptionSummary{" +
-                "subscriber=" + getSubscriber() +
-                ", subscriberServiceName=" + getSubscriberServiceName() +
+                "participantName='" + getParticipantName() + '\'' +
                 ", componentID=" + getComponentID() +
-                ", subscribedTopics=" + getSubscribedTopics() +
+                ", subscribedTaskWorkItems=" + getSubscribedTaskWorkItems() +
                 ", summaryType=" + getSummaryType() +
                 ", timestamp=" + getTimestamp() +
                 '}';

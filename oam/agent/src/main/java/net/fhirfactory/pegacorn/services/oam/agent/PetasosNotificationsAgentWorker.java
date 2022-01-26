@@ -27,7 +27,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.CapabilityUtilisationBrokerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityUtilisationBrokerInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.factories.PetasosComponentMetricSetFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
@@ -128,19 +128,19 @@ public class PetasosNotificationsAgentWorker extends AgentWorkerBase implements 
     //
 
     protected void forwardLocalNotificationsToServer(){
-        LOG.info(".forwardLocalNotificationsToServer(): Entry");
+        LOG.debug(".forwardLocalNotificationsToServer(): Entry");
         while(hasMoreNotifications()) {
             PetasosComponentITOpsNotification nextNotification = null;
             synchronized (notificationQueueLock) {
                 nextNotification = getNextNotification();
             }
             if(nextNotification != null) {
-                LOG.info(".forwardLocalNotificationsToServer(): Loaded metrics form local cache, forwarding");
-                LOG.info(".forwardLocalMetricsToServer(): Sending notification for Participant->{}", nextNotification.getParticipantName());
+                LOG.debug(".forwardLocalNotificationsToServer(): Loaded metrics form local cache, forwarding");
+                LOG.debug(".forwardLocalMetricsToServer(): Sending notification for Participant->{}", nextNotification.getParticipantName());
                 notificationBroker.sendNotification(nextNotification);
             }
         }
-        LOG.info(".forwardLocalNotificationsToServer(): Exit");
+        LOG.debug(".forwardLocalNotificationsToServer(): Exit");
     }
 
     //

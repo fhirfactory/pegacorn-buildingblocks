@@ -154,6 +154,7 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
     public InterProcessingPlantHandoverResponsePacket receiveIPCMessage(InterProcessingPlantHandoverPacket handoverPacket){
         getLogger().debug(".receiveIPCMessage(): Entry, handoverPacket->{}",handoverPacket);
         InterProcessingPlantHandoverResponsePacket response = injectMessageIntoRoute(handoverPacket);
+        getMetricsAgent().incrementInternalReceivedMessageCount();
         getLogger().debug(".receiveIPCMessage(): Exit, response->{}",response);
         return(response);
     }
@@ -166,6 +167,8 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
         Address targetServiceAddress = getCandidateIPCTargetAddress(targetParticipantServiceName);
         getLogger().debug(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
         InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = sendIPCMessage(targetServiceAddress, handoverPacket);
+        getMetricsAgent().incrementInternalMessageDistributionCount();
+        getMetricsAgent().incrementInternalMessageDistributionCount(targetParticipantServiceName);
         getLogger().debug(".sendIPCMessage(): Exit, interProcessingPlantHandoverResponsePacket->{}", interProcessingPlantHandoverResponsePacket);
         return(interProcessingPlantHandoverResponsePacket);
     }

@@ -112,8 +112,8 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
                 ", remoteProcedureCallFailureCount=" + remoteProcedureCallFailureCount +
                 ", ingresMessageCount=" + getIngresMessageCount() +
                 ", egressMessageCount=" + getEgressMessageCount() +
-                ", distributedMessageCount=" + getDistributedMessageCount() +
-                ", distributionCountMap=" + getDistributionCountMap() +
+                ", distributedMessageCount=" + getInternalDistributedMessageCount() +
+                ", distributionCountMap=" + getInternalDistributionCountMap() +
                 ", componentID=" + getComponentID() +
                 ", componentType=" + getComponentType() +
                 ", lastActivityInstant=" + getLastActivityInstant() +

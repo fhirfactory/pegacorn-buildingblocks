@@ -22,13 +22,21 @@
 package net.fhirfactory.pegacorn.petasos.oam.subscriptions.factories;
 
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class PetasosTopicSummaryFactory {
+public class PetasosSubscriptionSummaryFactory {
 
     public String transformToSimpleTopicName(DataParcelManifest manifest){
+        if(manifest == null){
+            return(null);
+        }
+        return(manifest.toString());
+    }
+
+    public String transformToSimpleTopicName(TaskWorkItemSubscriptionType manifest){
         if(manifest == null){
             return(null);
         }

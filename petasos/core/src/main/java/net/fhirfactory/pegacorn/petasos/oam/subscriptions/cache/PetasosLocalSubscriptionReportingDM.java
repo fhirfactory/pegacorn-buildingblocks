@@ -36,12 +36,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PetasosLocalSubscriptionReportingDM extends LocalOAMCacheBase {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosLocalSubscriptionReportingDM.class);
 
-    // ConcurrentHashMap<componentID, PetasosProcessingPlantSubscriptionSummary>
-    private ConcurrentHashMap<ComponentIdType, PetasosProcessingPlantSubscriptionSummary> processingPlantSubscriptionSummarySet;
+    // ConcurrentHashMap<participantName, PetasosProcessingPlantSubscriptionSummary>
+    private ConcurrentHashMap<String, PetasosProcessingPlantSubscriptionSummary> processingPlantSubscriptionSummarySet;
     private Object processingPlantMapLock;
     // ConcurrentHashMap<componentID, PetasosWorkUnitProcessorSubscriptionSummary>
     private ConcurrentHashMap<ComponentIdType, PetasosWorkUnitProcessorSubscriptionSummary> workUnitProcessorSubscriptionSummarySet;
     private Object wupMapLock;
+
+    //
+    // Constructor(s)
+    //
 
     public PetasosLocalSubscriptionReportingDM(){
         this.processingPlantSubscriptionSummarySet = new ConcurrentHashMap<>();
@@ -51,39 +55,51 @@ public class PetasosLocalSubscriptionReportingDM extends LocalOAMCacheBase {
     }
 
     //
+    // Getters (and Setters)
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
+    //
     // Publisher Subscription Traceability
     //
 
     public void addProcessingPlantSubscriptionSummary(PetasosProcessingPlantSubscriptionSummary summary){
-        LOG.debug(".addProcessingPlantSubscriptionSummary(): Entry");
+        getLogger().debug(".addProcessingPlantSubscriptionSummary(): Entry");
         synchronized (processingPlantMapLock) {
-            if (processingPlantSubscriptionSummarySet.containsKey(summary.getComponentID())) {
-                processingPlantSubscriptionSummarySet.remove(summary.getComponentID());
+            if (processingPlantSubscriptionSummarySet.containsKey(summary.getParticipantName())) {
+                processingPlantSubscriptionSummarySet.remove(summary.getParticipantName());
             }
-            processingPlantSubscriptionSummarySet.put(summary.getComponentID(), summary);
+            processingPlantSubscriptionSummarySet.put(summary.getParticipantName(), summary);
         }
         refreshCurrentStateUpdateInstant();
-        LOG.debug(".addProcessingPlantSubscriptionSummary(): Exit");
+        getLogger().debug(".addProcessingPlantSubscriptionSummary(): Exit");
     }
 
     public void addWorkUnitProcessorSubscriptionSummary(PetasosWorkUnitProcessorSubscriptionSummary summary){
-        LOG.debug(".addWorkUnitProcessorSubscriptionSummary(): Entry");
+        getLogger().debug(".addWorkUnitProcessorSubscriptionSummary(): Entry");
+        if(summary.getComponentID() == null){
+            getLogger().warn(".addWorkUnitProcessorSubscriptionSummary(): Exit, malformed summary->{}", summary);
+            return;
+        }
         synchronized (wupMapLock) {
-            if (workUnitProcessorSubscriptionSummarySet.containsKey(summary.getSubscriber())) {
-                workUnitProcessorSubscriptionSummarySet.remove(summary.getSubscriber());
+            if (workUnitProcessorSubscriptionSummarySet.containsKey(summary.getComponentID())) {
+                workUnitProcessorSubscriptionSummarySet.remove(summary.getComponentID());
             }
-            workUnitProcessorSubscriptionSummarySet.put(summary.getSubscriber(), summary);
+            workUnitProcessorSubscriptionSummarySet.put(summary.getComponentID(), summary);
         }
         refreshCurrentStateUpdateInstant();
-        LOG.debug(".addWorkUnitProcessorSubscriptionSummary(): Exit");
+        getLogger().debug(".addWorkUnitProcessorSubscriptionSummary(): Exit");
     }
 
     public PetasosSubscriptionSummaryReport getPubSubReport(){
-        LOG.debug(".getPubSubReport(): Entry");
+        getLogger().debug(".getPubSubReport(): Entry");
         PetasosSubscriptionSummaryReport report = new PetasosSubscriptionSummaryReport();
         synchronized (wupMapLock) {
             for (PetasosWorkUnitProcessorSubscriptionSummary currentSummary : this.workUnitProcessorSubscriptionSummarySet.values()) {
-                LOG.trace(".getPubSubReport(): Adding summary->{}", currentSummary);
+                getLogger().trace(".getPubSubReport(): Adding summary->{}", currentSummary);
                 report.addWorkUnitProcessorSubscriptionSummary(currentSummary);
             }
         }
@@ -93,7 +109,7 @@ public class PetasosLocalSubscriptionReportingDM extends LocalOAMCacheBase {
             }
         }
         report.setTimestamp(getCurrentStateUpdateInstant());
-        LOG.debug(".getPubSubReport(): Eixt");
+        getLogger().debug(".getPubSubReport(): Eixt");
         return(report);
     }
 }

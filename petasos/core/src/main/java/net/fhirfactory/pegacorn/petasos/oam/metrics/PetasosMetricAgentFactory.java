@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.metrics;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
@@ -41,23 +42,23 @@ public class PetasosMetricAgentFactory {
     @Inject
     private PetasosITOpsNotificationAgentInterface notificationAgent;
 
-    public WorkUnitProcessorMetricsAgent newWorkUnitProcessingMetricsAgent(ComponentIdType componentId, String participantName){
-        WorkUnitProcessorMetricsAgent wupMetricsAgent = new WorkUnitProcessorMetricsAgent(localMetricsDM, componentId, participantName);
+    public WorkUnitProcessorMetricsAgent newWorkUnitProcessingMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, ComponentIdType componentId, String participantName){
+        WorkUnitProcessorMetricsAgent wupMetricsAgent = new WorkUnitProcessorMetricsAgent(processingPlantFunction, localMetricsDM, componentId, participantName);
         wupMetricsAgent.getWUPMetricsData().setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR);
         wupMetricsAgent.setNotificationAgent(notificationAgent);
         wupMetricsAgent.registerWithCache();
         return(wupMetricsAgent);
     }
 
-    public ProcessingPlantMetricsAgent newProcessingPlantMetricsAgent(ComponentIdType componentId, String participantName){
-        ProcessingPlantMetricsAgent plantMetricsAgent = new ProcessingPlantMetricsAgent(localMetricsDM, componentId, participantName);
+    public ProcessingPlantMetricsAgent newProcessingPlantMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, ComponentIdType componentId, String participantName){
+        ProcessingPlantMetricsAgent plantMetricsAgent = new ProcessingPlantMetricsAgent(processingPlantFunction, localMetricsDM, componentId, participantName);
         plantMetricsAgent.getProcessingPlantMetricsData().setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_PROCESSING_PLANT);
         plantMetricsAgent.registerWithCache();
         plantMetricsAgent.setNotificationAgent(notificationAgent);
         return(plantMetricsAgent);
     }
-    public EndpointMetricsAgent newEndpointMetricsAgent(ComponentIdType componentId, String participantName, String connectedSystemName, String endpointDescription){
-        EndpointMetricsAgent wupMetricsAgent = new EndpointMetricsAgent(localMetricsDM, componentId, participantName, connectedSystemName, endpointDescription);
+    public EndpointMetricsAgent newEndpointMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, ComponentIdType componentId, String participantName, String connectedSystemName, String endpointDescription){
+        EndpointMetricsAgent wupMetricsAgent = new EndpointMetricsAgent(processingPlantFunction, localMetricsDM, componentId, participantName, connectedSystemName, endpointDescription);
         wupMetricsAgent.getEndpointMetricsData().setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
         wupMetricsAgent.setNotificationAgent(notificationAgent);
         wupMetricsAgent.registerWithCache();

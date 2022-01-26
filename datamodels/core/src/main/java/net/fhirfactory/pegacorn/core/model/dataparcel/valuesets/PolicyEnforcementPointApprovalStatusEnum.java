@@ -22,23 +22,29 @@
 package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
 
 public enum PolicyEnforcementPointApprovalStatusEnum {
-    POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE("policy-enforcement-point.approval.positive"),
-    POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE("policy-enforcement-point.approval.negative"),
-    POLICY_ENFORCEMENT_POINT_APPROVAL_ANY("policy-enforcement-point.approval.any");
+    POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE("PEP-Approval.Positive","policy-enforcement-point.approval.positive"),
+    POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE("PEP-Approval.Negative","policy-enforcement-point.approval.negative"),
+    POLICY_ENFORCEMENT_POINT_APPROVAL_ANY("PEP-Approval.Any","policy-enforcement-point.approval.any");
 
-    private String approvalStatus;
+    private String token;
+    private String displayName;
 
-    private PolicyEnforcementPointApprovalStatusEnum(String compliance){
-        this.approvalStatus = compliance;
+    private PolicyEnforcementPointApprovalStatusEnum(String displayName, String compliance){
+        this.token = compliance;
+        this.displayName = displayName;
     }
 
-    public String getApprovalStatus(){
-        return(this.approvalStatus);
+    public String getToken(){
+        return(this.token);
+    }
+
+    public String getDisplayName(){
+        return(this.displayName);
     }
 
     public static PolicyEnforcementPointApprovalStatusEnum fromApprovalStatusString(String theString){
         for (PolicyEnforcementPointApprovalStatusEnum b : PolicyEnforcementPointApprovalStatusEnum.values()) {
-            if (b.getApprovalStatus().equalsIgnoreCase(theString)) {
+            if (b.getToken().equalsIgnoreCase(theString)) {
                 return b;
             }
         }

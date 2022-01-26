@@ -231,7 +231,7 @@ public class LocalTaskDistributionBean {
         //
         // Get out metricsAgent & do add some metrics
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
-        metricsAgent.incrementDistributedMessageCount();
+        metricsAgent.incrementInternalMessageDistributionCount();
         metricsAgent.touchLastActivityInstant();
         StringBuilder distributionMessageBuilder = new StringBuilder();
         distributionMessageBuilder.append("--- Distributing new PetasosFulfillmentTask ---");

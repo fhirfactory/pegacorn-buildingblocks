@@ -43,8 +43,9 @@ public class CommonComponentMetricsData implements Serializable {
 
     private int ingresMessageCount;
     private int egressMessageCount;
-    private int distributedMessageCount;
-    private Map<String, Integer> distributionCountMap;
+    private int internalDistributedMessageCount;
+    private int internalReceivedMessageCount;
+    private Map<String, Integer> internalDistributionCountMap;
 
     //
     // Constructor(s)
@@ -53,27 +54,29 @@ public class CommonComponentMetricsData implements Serializable {
     public CommonComponentMetricsData(){
         this.ingresMessageCount = 0;
         this.egressMessageCount = 0;
-        this.distributedMessageCount = 0;
-        this.distributionCountMap = new HashMap<>();
+        this.internalDistributedMessageCount = 0;
+        this.internalDistributionCountMap = new HashMap<>();
         this.componentID = null;
         this.componentType = null;
         this.lastActivityInstant = null;
         this.componentStartupInstant = null;
         this.componentStatus = null;
         this.participantName = null;
+        this.internalReceivedMessageCount = 0;
     }
 
     public CommonComponentMetricsData(ComponentIdType componentId){
         this.ingresMessageCount = 0;
         this.egressMessageCount = 0;
-        this.distributedMessageCount = 0;
-        this.distributionCountMap = new HashMap<>();
+        this.internalDistributedMessageCount = 0;
+        this.internalDistributionCountMap = new HashMap<>();
         this.componentID = componentId;
         this.componentType = null;
         this.lastActivityInstant = null;
         this.componentStartupInstant = null;
         this.componentStatus = null;
         this.participantName = null;
+        this.internalReceivedMessageCount = 0;
     }
 
     //
@@ -96,20 +99,20 @@ public class CommonComponentMetricsData implements Serializable {
         this.egressMessageCount = egressMessageCount;
     }
 
-    public int getDistributedMessageCount() {
-        return distributedMessageCount;
+    public int getInternalDistributedMessageCount() {
+        return internalDistributedMessageCount;
     }
 
-    public void setDistributedMessageCount(int distributedMessageCount) {
-        this.distributedMessageCount = distributedMessageCount;
+    public void setInternalDistributedMessageCount(int internalDistributedMessageCount) {
+        this.internalDistributedMessageCount = internalDistributedMessageCount;
     }
 
-    public Map<String, Integer> getDistributionCountMap() {
-        return distributionCountMap;
+    public Map<String, Integer> getInternalDistributionCountMap() {
+        return internalDistributionCountMap;
     }
 
-    public void setDistributionCountMap(Map<String, Integer> distributionCountMap) {
-        this.distributionCountMap = distributionCountMap;
+    public void setInternalDistributionCountMap(Map<String, Integer> internalDistributionCountMap) {
+        this.internalDistributionCountMap = internalDistributionCountMap;
     }
 
     public ComponentIdType getComponentID() {
@@ -160,6 +163,14 @@ public class CommonComponentMetricsData implements Serializable {
         this.participantName = participantName;
     }
 
+    public int getInternalReceivedMessageCount() {
+        return internalReceivedMessageCount;
+    }
+
+    public void setInternalReceivedMessageCount(int internalReceivedMessageCount) {
+        this.internalReceivedMessageCount = internalReceivedMessageCount;
+    }
+
     //
     // To String
     //
@@ -175,8 +186,8 @@ public class CommonComponentMetricsData implements Serializable {
                 ", componentStatus='" + componentStatus + '\'' +
                 ", ingresMessageCount=" + ingresMessageCount +
                 ", egressMessageCount=" + egressMessageCount +
-                ", distributedMessageCount=" + distributedMessageCount +
-                ", distributionCountMap=" + distributionCountMap +
+                ", distributedMessageCount=" + internalDistributedMessageCount +
+                ", distributionCountMap=" + internalDistributionCountMap +
                 '}';
     }
 }

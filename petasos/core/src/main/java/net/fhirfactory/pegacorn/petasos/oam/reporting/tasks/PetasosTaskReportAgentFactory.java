@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.reporting.tasks;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.tasks.PetasosITOpsTaskReportingAgentInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.ProcessingPlantTaskReportAgent;
@@ -38,13 +39,13 @@ public class PetasosTaskReportAgentFactory {
     @Inject
     private PetasosITOpsTaskReportingAgentInterface taskReportingAgent;
 
-    public WorkUnitProcessorTaskReportAgent newWorkUnitProcessorTaskReportingAgent(ComponentIdType componentId, String participantName){
-        WorkUnitProcessorTaskReportAgent wupTaskReport = new WorkUnitProcessorTaskReportAgent(participantName, componentId, taskReportFactory, taskReportingAgent);
+    public WorkUnitProcessorTaskReportAgent newWorkUnitProcessorTaskReportingAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, ComponentIdType componentId, String participantName){
+        WorkUnitProcessorTaskReportAgent wupTaskReport = new WorkUnitProcessorTaskReportAgent(processingPlantFunction, participantName, componentId, taskReportFactory, taskReportingAgent);
         return(wupTaskReport);
     }
 
-    public ProcessingPlantTaskReportAgent newProcessingPlantTaskReportingAgent(ComponentIdType componentId, String participantName){
-        ProcessingPlantTaskReportAgent plantMetricsAgent = new ProcessingPlantTaskReportAgent(participantName, componentId, taskReportFactory, taskReportingAgent);
+    public ProcessingPlantTaskReportAgent newProcessingPlantTaskReportingAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, ComponentIdType componentId, String participantName){
+        ProcessingPlantTaskReportAgent plantMetricsAgent = new ProcessingPlantTaskReportAgent(processingPlantFunction, participantName, componentId, taskReportFactory, taskReportingAgent);
         return(plantMetricsAgent);
     }
 }

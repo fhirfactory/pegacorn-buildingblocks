@@ -25,8 +25,8 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.common.PetasosSubscriptionSummaryBase;
 
 public class PetasosSubscriberSubscriptionSummary extends PetasosSubscriptionSummaryBase {
-    private ComponentIdType publisher;
-    private String publisherServiceName;
+    private ComponentIdType publisherComponentId;
+    private String publisherParticipantName;
 
     //
     // Constructor(s)
@@ -40,20 +40,20 @@ public class PetasosSubscriberSubscriptionSummary extends PetasosSubscriptionSum
     // Getters and Setters
     //
 
-    public ComponentIdType getPublisher() {
-        return publisher;
+    public ComponentIdType getPublisherComponentId() {
+        return publisherComponentId;
     }
 
-    public void setPublisher(ComponentIdType publisher) {
-        this.publisher = publisher;
+    public void setPublisherComponentId(ComponentIdType publisherComponentId) {
+        this.publisherComponentId = publisherComponentId;
     }
 
-    public String getPublisherServiceName() {
-        return publisherServiceName;
+    public String getPublisherParticipantName() {
+        return publisherParticipantName;
     }
 
-    public void setPublisherServiceName(String publisherServiceName) {
-        this.publisherServiceName = publisherServiceName;
+    public void setPublisherParticipantName(String publisherParticipantName) {
+        this.publisherParticipantName = publisherParticipantName;
     }
 
     //
@@ -63,12 +63,13 @@ public class PetasosSubscriberSubscriptionSummary extends PetasosSubscriptionSum
     @Override
     public String toString() {
         return "PetasosSubscriberSubscriptionSummary{" +
-                "componentID=" + getComponentID() +
-                ", subscribedTopics=" + getSubscribedTopics() +
+                "participantName='" + getParticipantName() + '\'' +
+                ", componentID=" + getComponentID() +
+                ", subscribedTaskWorkItems=" + getSubscribedTaskWorkItems() +
                 ", summaryType=" + getSummaryType() +
                 ", timestamp=" + getTimestamp() +
-                ", publisher=" + publisher +
-                ", publisherServiceName='" + publisherServiceName + '\'' +
+                ", publisherComponentId=" + publisherComponentId +
+                ", publisherParticipantName='" + publisherParticipantName + '\'' +
                 '}';
     }
 }

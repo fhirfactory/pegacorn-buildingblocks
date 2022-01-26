@@ -147,9 +147,9 @@ public class DataParcelToken extends DataParcelTypeDescriptor implements Seriali
         if(hasDataParcelAttribute()){
             fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_ATTRIBUTE.getTopicKey(), getDataParcelAttribute()));
         }
-        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_TYPE.getTopicKey(), getDataParcelType().getDataParcelTypeValue()));
-        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_NORMALISATION_STATUS.getTopicKey(), getNormalisationStatus().getNormalisationStatusValue()));
-        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_VALIDATION_STATUS.getTopicKey(), getValidationStatus().getValidationStatusValue()));
+        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_TYPE.getTopicKey(), getDataParcelType().getToken()));
+        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_NORMALISATION_STATUS.getTopicKey(), getNormalisationStatus().getToken()));
+        fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_VALIDATION_STATUS.getTopicKey(), getValidationStatus().getToken()));
         if(hasVersion()) {
             fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_VERSION.getTopicKey(), getVersion()));
         }
