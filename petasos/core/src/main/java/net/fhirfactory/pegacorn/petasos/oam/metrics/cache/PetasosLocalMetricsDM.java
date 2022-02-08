@@ -79,7 +79,7 @@ public class PetasosLocalMetricsDM extends LocalOAMCacheBase {
     //
 
     public void addNodeMetrics(CommonComponentMetricsData metrics, Object lockObject){
-        getLogger().info(".addNodeMetrics(): Entry, metrics->{}", metrics);
+        getLogger().debug(".addNodeMetrics(): Entry, metrics->{}", metrics);
         synchronized (getMetricsSetMapLock()) {
             if (getNodeMetricsLockMap().containsKey(metrics.getComponentID())) {
                 getNodeMetricsLockMap().remove(metrics.getComponentID());
@@ -91,7 +91,7 @@ public class PetasosLocalMetricsDM extends LocalOAMCacheBase {
             getNodeMetricsLockMap().put(metrics.getComponentID(), lockObject);
             refreshCurrentStateUpdateInstant();
         }
-        getLogger().info(".addNodeMetrics(): Exit");
+        getLogger().debug(".addNodeMetrics(): Exit");
     }
 
     public List<CommonComponentMetricsData> getAllMetricsSets(){

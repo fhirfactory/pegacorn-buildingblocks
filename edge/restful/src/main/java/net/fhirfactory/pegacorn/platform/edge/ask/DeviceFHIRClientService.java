@@ -60,14 +60,14 @@ public class DeviceFHIRClientService extends ResourceFHIRClientService {
         getLogger().debug(".createDevice(): Entry, deviceJSONString->{}", deviceJSONString);
         Device device = getFHIRParser().parseResource(Device.class, deviceJSONString);
         MethodOutcome outcome = createResource(device);
-        getLogger().info(".createDevice(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createDevice(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome createDevice(Device device){
         getLogger().debug(".createDevice(): Entry, device->{}", device);
         MethodOutcome outcome = createResource(device);
-        getLogger().info(".createDevice(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createDevice(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 }

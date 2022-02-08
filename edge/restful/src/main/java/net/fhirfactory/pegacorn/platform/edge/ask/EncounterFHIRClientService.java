@@ -58,14 +58,14 @@ public class EncounterFHIRClientService extends ResourceFHIRClientService {
         getLogger().debug(".createEncounter(): Entry, encounterJSONString->{}", encounterJSONString);
         Encounter encounter = getFHIRParser().parseResource(Encounter.class, encounterJSONString);
         MethodOutcome outcome = createResource(encounter);
-        getLogger().info(".createEncounter(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createEncounter(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome createEncounter(Encounter encounter){
         getLogger().debug(".createEncounter(): Entry, encounter->{}", encounter);
         MethodOutcome outcome = createResource(encounter);
-        getLogger().info(".createEncounter(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createEncounter(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 }

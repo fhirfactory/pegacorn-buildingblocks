@@ -32,6 +32,10 @@ public enum PetasosComponentMetricTypeEnum {
     CONTEXTUAL("ContextualMetric", "ContextualMetric", "petasos.component.metric.type.contextual-metric"),
     COMPONENT_GENERAL_STATUS("ComponentStatus", "ComponentStatus", "petasos.component.metric.type.status-general"),
 
+    INTER_SUBSYSTEM_RPC_REQUEST("RPC-Request", "Transaction", "petasos.component.metric.type.rpc-transaction-request"),
+    INTER_SUBSYSTEM_RPC_RESPONSE("RPC-Response", "Transaction", "petasos.component.metric.type.rpc-transaction-response"),
+    INTER_SUBSYSTEM_RPC_FAILURE("RPC-Failure", "Transaction", "petasos.component.metric.type.rpc-transaction-failure"),
+
     REGISTERED_TASK_COUNT("Registered", "TaskCount", "petasos.component.metric.type.finished-task-count"),
     FINISHED_TASK_COUNT("Finished", "TaskCount", "petasos.component.metric.type.finished-task-count"),
     FINALISED_TASK_COUNT("Finalised", "TaskCount", "petasos.component.metric.type.finalised-task-count"),

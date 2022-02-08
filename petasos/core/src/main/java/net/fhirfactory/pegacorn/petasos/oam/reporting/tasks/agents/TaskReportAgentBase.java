@@ -127,11 +127,11 @@ public abstract class TaskReportAgentBase {
         } catch (Exception generalException) {
             getLogger().warn(".sendITOpsTaskReport(): Problem Sending ITOps TaskReport, message->{}, stackTrace->{}", ExceptionUtils.getMessage(generalException), ExceptionUtils.getStackTrace(generalException));
         }
-        getLogger().info(".sendITOpsTaskReport(): Exit");
+        getLogger().debug(".sendITOpsTaskReport(): Exit");
     }
 
     public void sendITOpsTaskReport(PetasosActionableTask task, List<PetasosActionableTask> newTasks){
-        getLogger().info(".sendITOpsTaskReport(): Entry");
+        getLogger().debug(".sendITOpsTaskReport(): Entry");
         try {
             PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task, newTasks);
             notification.setComponentType(specifyComponentType());
@@ -141,7 +141,7 @@ public abstract class TaskReportAgentBase {
         } catch (Exception generalException){
             getLogger().warn(".sendITOpsTaskReport(): Problem Sending ITOps TaskReport, message->{}, stackTrace->{}", ExceptionUtils.getMessage(generalException), ExceptionUtils.getStackTrace(generalException));
         }
-        getLogger().info(".sendITOpsTaskReport(): Exit");
+        getLogger().debug(".sendITOpsTaskReport(): Exit");
     }
 }
 

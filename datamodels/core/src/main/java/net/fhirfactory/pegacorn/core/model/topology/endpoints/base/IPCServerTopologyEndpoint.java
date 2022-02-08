@@ -100,8 +100,13 @@ public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
     @Override
     public String toString() {
         return "IPCServerTopologyEndpoint{" +
-                "componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
+                "participantDisplayName='" + getParticipantDisplayName() + '\'' +
+                ", participantName='" + getParticipantName() + '\'' +
+                ", deploymentSite='" + getDeploymentSite() + '\'' +
+                ", lastActivityInstant=" + getLastActivityInstant() +
+                ", lastReportingInstant=" + getLastReportingInstant() +
+                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
+                ", componentFDN=" + getComponentFDN() +
                 ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
                 ", concurrencyMode=" + getConcurrencyMode() +
                 ", resilienceMode=" + getResilienceMode() +
@@ -110,15 +115,25 @@ public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
                 ", nodeFunctionFDN=" + getNodeFunctionFDN() +
                 ", componentType=" + getComponentType() +
                 ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", assignedDNSName='" + getAssignedDNSName() + '\'' +
                 ", componentRDN=" + getComponentRDN() +
                 ", metrics=" + getMetrics() +
                 ", componentSystemRole=" + getComponentSystemRole() +
+                ", componentStatus=" + getComponentStatus() +
+                ", componentExecutionControl=" + getComponentExecutionControl() +
+                ", endpointType=" + getEndpointType() +
+                ", enablingProcessingPlantId=" + getEnablingProcessingPlantId() +
+                ", interfaceFunction=" + getInterfaceFunction() +
+                ", endpointStatus=" + getEndpointStatus() +
+                ", endpointDescription='" + getEndpointDescription() + '\'' +
+                ", assignedDNSName='" + assignedDNSName + '\'' +
+                ", actualHostIP='" + actualHostIP + '\'' +
+                ", hasAssignedDNSName=" + hasAssignedDNSName() +
+                ", hasActualHostIP=" + hasActualHostIP() +
+                ", endpointConfigurationName='" + getEndpointConfigurationName() + '\'' +
                 ", server=" + isServer() +
                 ", implementingWUP=" + getImplementingWUP() +
                 ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", endpointType=" + getEndpointType() +
+                ", adapterList=" + getAdapterList() +
                 '}';
     }
 }

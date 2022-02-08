@@ -26,13 +26,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -54,6 +55,9 @@ public class TaskOutcomeCaptureBean {
     @Inject
     private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
 
+    @Inject
+    private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceAccessorFactory;
+
     //
     // Constructor
     //
@@ -73,12 +77,12 @@ public class TaskOutcomeCaptureBean {
     // Business Logic
     //
 
-    public PetasosActionableTask captureAndRegisterOutcome(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange){
+    public PetasosActionableTaskSharedInstance captureAndRegisterOutcome(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange){
         if(getLogger().isDebugEnabled()) {
-            getLogger().debug(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", convertToString(fulfillmentTask));
+            getLogger().debug(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", convertToString(fulfillmentTask.getInstance()));
         }
         TaskIdType actionableTaskId = fulfillmentTask.getActionableTaskId();
-        PetasosActionableTask actionableTask = null;
+        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus = null;
         switch(fulfillmentTask.getTaskFulfillment().getStatus()){
             case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
             case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
@@ -88,30 +92,32 @@ public class TaskOutcomeCaptureBean {
             case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
             case FULFILLMENT_EXECUTION_STATUS_FAILED:
                 getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies failure...");
-                actionableTask = actionableTaskActivityController.notifyActionableTaskExecutionFailure(actionableTaskId, fulfillmentTask);
+                petasosTaskExecutionStatus = actionableTaskActivityController.notifyTaskFailure(actionableTaskId, fulfillmentTask.getInstance());
                 break;
             case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
                 getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies cancellation...");
-                actionableTask = actionableTaskActivityController.notifyActionableTaskExecutionCancellation(actionableTaskId, fulfillmentTask);
+                petasosTaskExecutionStatus = actionableTaskActivityController.notifyTaskCancellation(actionableTaskId, fulfillmentTask.getInstance());
                 break;
             case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
             case FULFILLMENT_EXECUTION_STATUS_FINISHED:
                 getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies (good) finish...");
-                actionableTask = actionableTaskActivityController.notifyActionableTaskExecutionFinish(actionableTaskId, fulfillmentTask);
+                petasosTaskExecutionStatus = actionableTaskActivityController.notifyTaskFinish(actionableTaskId, fulfillmentTask.getInstance());
                 break;
         }
+
+        PetasosActionableTaskSharedInstance actionableTaskSharedInstance = getActionableTaskSharedInstanceFactory().getActionableTaskSharedInstance(actionableTaskId);
 
         //
         // Get out metricsAgent for the WUP that sent the task & do add some metrics
         WorkUnitProcessorTaskReportAgent taskReportAgent = camelExchange.getProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorTaskReportAgent.class);
         if(taskReportAgent != null){
-            taskReportAgent.sendITOpsTaskReport(actionableTask);
+            taskReportAgent.sendITOpsTaskReport(actionableTaskSharedInstance.getInstance());
         }
 
         if(getLogger().isDebugEnabled()) {
-            getLogger().debug(".captureAndRegisterOutcome(): Exit, actionableTask->{}", convertToString(actionableTask));
+            getLogger().debug(".captureAndRegisterOutcome(): Exit, actionableTask->{}", convertToString(actionableTaskSharedInstance.getLocalInstance()));
         }
-        return(actionableTask);
+        return(actionableTaskSharedInstance);
     }
 
 
@@ -139,5 +145,9 @@ public class TaskOutcomeCaptureBean {
 
     protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController(){
         return(this.actionableTaskActivityController);
+    }
+
+    protected PetasosActionableTaskSharedInstanceAccessorFactory getActionableTaskSharedInstanceFactory(){
+        return(this.actionableTaskSharedInstanceAccessorFactory);
     }
 }

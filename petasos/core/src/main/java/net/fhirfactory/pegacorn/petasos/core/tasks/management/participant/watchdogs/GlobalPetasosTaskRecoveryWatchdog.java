@@ -19,11 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.global.watchdogs;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs;
 
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedTaskJobCardDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -40,10 +40,10 @@ public class GlobalPetasosTaskRecoveryWatchdog {
     private PetasosTaskBrokerInterface taskBroker;
 
     @Inject
-    private SharedActionableTaskDM actionableTaskDM;
+    private ParticipantSharedActionableTaskCache actionableTaskDM;
 
     @Inject
-    private SharedTaskJobCardDM taskJobCardDM;
+    private ParticipantSharedTaskJobCardCache taskJobCardDM;
 
     //
     // Constructor(s)
@@ -100,11 +100,11 @@ public class GlobalPetasosTaskRecoveryWatchdog {
         return taskBroker;
     }
 
-    protected SharedActionableTaskDM getActionableTaskDM() {
+    protected ParticipantSharedActionableTaskCache getActionableTaskDM() {
         return actionableTaskDM;
     }
 
-    protected SharedTaskJobCardDM getTaskJobCardDM() {
+    protected ParticipantSharedTaskJobCardCache getTaskJobCardDM() {
         return taskJobCardDM;
     }
 }

@@ -92,13 +92,14 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
     }
 
     public void logMLLPTransactions(PetasosFulfillmentTask fulfillmentTask, String filteredState, boolean requiresSynchronousWrite){
+        getLogger().info(".logMLLPTransactions(): Entry, fulfillmentTask->{}, filteredState->{}, requiresSynchronousWrite->{}",fulfillmentTask, filteredState, requiresSynchronousWrite);
         boolean isInteractEgressActivity = false;
         boolean isInteractIngresActivity = false;
         if(fulfillmentTask.hasTaskFulfillment()){
-            if(fulfillmentTask.getTaskFulfillment().hasFulfillerComponent()) {
-                if (fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole() != null) {
-                    isInteractEgressActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
-                    isInteractIngresActivity = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES);
+            if(fulfillmentTask.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
+                if (fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole() != null) {
+                    isInteractEgressActivity = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
+                    isInteractIngresActivity = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES);
                 }
             }
         }
@@ -124,7 +125,7 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
 
     protected boolean shouldLogAuditEventForTask(PetasosFulfillmentTask fulfillmentTask){
         if(fulfillmentTask.hasTaskFulfillment()){
-            switch(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentSystemRole()){
+            switch(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole()){
                 case COMPONENT_ROLE_INTERACT_EGRESS:
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
@@ -188,5 +189,13 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
             }
         }
         return(false);
+    }
+
+    //
+    // Getters (and Setters)
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
     }
 }

@@ -24,6 +24,9 @@ package net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class EndpointMetricsData extends CommonComponentMetricsData {
 
     private Integer nodeIngresQueueSize;
@@ -31,6 +34,9 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
     private Integer remoteProcedureCallCount;
     private Integer remoteProcedureCallHandledCount;
     private Integer remoteProcedureCallFailureCount;
+    private Map<String, Integer> remoteProcedureCallRequestsMap;
+    private Map<String, Integer> remoteProcedureCallFailuresMap;
+    private Map<String, Integer> remoteProcedureCallResponsesMap;
 
     //
     // Constructor(s)
@@ -43,6 +49,9 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
         this.remoteProcedureCallCount = 0;
         this.remoteProcedureCallHandledCount = 0;
         this.remoteProcedureCallFailureCount = 0;
+        this.remoteProcedureCallRequestsMap = new ConcurrentHashMap<>();
+        this.remoteProcedureCallFailuresMap = new ConcurrentHashMap<>();
+        this.remoteProcedureCallResponsesMap = new ConcurrentHashMap<>();
     }
 
     public EndpointMetricsData(ComponentIdType componentId){
@@ -52,6 +61,9 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
         this.remoteProcedureCallCount = 0;
         this.remoteProcedureCallHandledCount = 0;
         this.remoteProcedureCallFailureCount = 0;
+        this.remoteProcedureCallRequestsMap = new ConcurrentHashMap<>();
+        this.remoteProcedureCallFailuresMap = new ConcurrentHashMap<>();
+        this.remoteProcedureCallResponsesMap = new ConcurrentHashMap<>();
     }
 
     //
@@ -98,6 +110,30 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
         this.nodeIngresQueueSize = nodeIngresQueueSize;
     }
 
+    public Map<String, Integer> getRemoteProcedureCallRequestsMap() {
+        return remoteProcedureCallRequestsMap;
+    }
+
+    public void setRemoteProcedureCallRequestsMap(Map<String, Integer> remoteProcedureCallRequestsMap) {
+        this.remoteProcedureCallRequestsMap = remoteProcedureCallRequestsMap;
+    }
+
+    public Map<String, Integer> getRemoteProcedureCallFailuresMap() {
+        return remoteProcedureCallFailuresMap;
+    }
+
+    public void setRemoteProcedureCallFailuresMap(Map<String, Integer> remoteProcedureCallFailuresMap) {
+        this.remoteProcedureCallFailuresMap = remoteProcedureCallFailuresMap;
+    }
+
+    public Map<String, Integer> getRemoteProcedureCallResponsesMap() {
+        return remoteProcedureCallResponsesMap;
+    }
+
+    public void setRemoteProcedureCallResponsesMap(Map<String, Integer> remoteProcedureCallResponsesMap) {
+        this.remoteProcedureCallResponsesMap = remoteProcedureCallResponsesMap;
+    }
+
     //
     // To String
     //
@@ -110,16 +146,20 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
                 ", remoteProcedureCallCount=" + remoteProcedureCallCount +
                 ", remoteProcedureCallHandledCount=" + remoteProcedureCallHandledCount +
                 ", remoteProcedureCallFailureCount=" + remoteProcedureCallFailureCount +
+                ", remoteProcedureCallRequestsMap=" + remoteProcedureCallRequestsMap +
+                ", remoteProcedureCallFailuresMap=" + remoteProcedureCallFailuresMap +
+                ", remoteProcedureCallResponsesMap=" + remoteProcedureCallResponsesMap +
                 ", ingresMessageCount=" + getIngresMessageCount() +
                 ", egressMessageCount=" + getEgressMessageCount() +
-                ", distributedMessageCount=" + getInternalDistributedMessageCount() +
-                ", distributionCountMap=" + getInternalDistributionCountMap() +
+                ", internalDistributedMessageCount=" + getInternalDistributedMessageCount() +
+                ", internalDistributionCountMap=" + getInternalDistributionCountMap() +
                 ", componentID=" + getComponentID() +
                 ", componentType=" + getComponentType() +
                 ", lastActivityInstant=" + getLastActivityInstant() +
                 ", componentStartupInstant=" + getComponentStartupInstant() +
                 ", componentStatus='" + getComponentStatus() + '\'' +
                 ", participantName='" + getParticipantName() + '\'' +
+                ", internalReceivedMessageCount=" + getInternalReceivedMessageCount() +
                 '}';
     }
 }

@@ -104,6 +104,7 @@ public class UoWPayload implements Serializable {
         return "UoWPayload{" +
                 "payloadManifest=" + payloadManifest +
                 ", payload=" + payload +
+                ", payloadQuality=" + getPayloadQuality() +
                 '}';
     }
 

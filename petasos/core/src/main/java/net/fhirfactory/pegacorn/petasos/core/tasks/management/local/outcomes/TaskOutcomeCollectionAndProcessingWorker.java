@@ -41,9 +41,6 @@ public class TaskOutcomeCollectionAndProcessingWorker extends BaseRouteBuilder {
     private TaskOutcome2NewTasksBean outcome2NewTasksBean;
 
     @Inject
-    private ActionableTaskRegistrationBean actionableTaskRegistrationBean;
-
-    @Inject
     private TaskOutcomeCaptureBean taskOutcomeCapture;
 
     @Override
@@ -55,7 +52,6 @@ public class TaskOutcomeCollectionAndProcessingWorker extends BaseRouteBuilder {
                 .routeId(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE)
                 .bean(taskOutcomeCapture, "captureAndRegisterOutcome(*, Exchange)")
                 .split().method(outcome2NewTasksBean, "collectOutcomesAndCreateNewTasks(*, Exchange)")
-                .bean(actionableTaskRegistrationBean, "registerActionableTask(*, Exchange)")
                 .to(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE);
 
     }

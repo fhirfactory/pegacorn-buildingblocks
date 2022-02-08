@@ -89,6 +89,20 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
         getNotificationAgent().sendNotification(notification);
     }
 
+    @Override
+    public void sendITOpsNotification(String unformattedMessage, String formattedMessage) {
+        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
+            return;
+        }
+        PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+        notification.setComponentId(getMetricsData().getComponentID());
+        notification.setParticipantName(getProcessingPlantMetricsData().getParticipantName());
+        notification.setContent(unformattedMessage);
+        notification.setFormattedContent(formattedMessage);
+        notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_SUBSYSTEM);
+        getNotificationAgent().sendNotification(notification);
+    }
+
     //
     // Helpers
     //

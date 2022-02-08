@@ -24,13 +24,12 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import org.apache.camel.Exchange;
@@ -50,7 +49,8 @@ import java.time.Instant;
         private ProcessingPlantInterface processingPlant;
 
         @Inject
-        private SharedActionableTaskDM actionableTaskDM;
+        private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceFactory;
+
 
         /**
          * This method constructs the handover packet (forwarding packet) to be used to transport a "Task" from one
@@ -78,17 +78,17 @@ import java.time.Instant;
             LOG.debug(".constructInterProcessingPlantHandoverPacket(): Entry, theUoW (UoW) --> {}, wupInstanceKey (String) --> {}", theUoW);
 
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Retrieving the PetasosFulfillmentTask from the Exchange object");
-            PetasosFulfillmentTask fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTask.class);
+            PetasosFulfillmentTaskSharedInstance fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTaskSharedInstance.class);
 
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Retrieving the associated PetasosActionableTask from the Exchange object");
-            PetasosActionableTask actionableTask = actionableTaskDM.getActionableTask(fulfillmentTask.getActionableTaskId());
+            PetasosActionableTaskSharedInstance actionableTask = actionableTaskSharedInstanceFactory.getActionableTaskSharedInstance(fulfillmentTask.getActionableTaskId());
 
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Retrieving the associated Metrics Agent");
             WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
 
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Create TaskFullment Traceability element");
             TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
-            traceabilityElement.setFulfillerId(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID());
+            traceabilityElement.setFulfillerId(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
             traceabilityElement.setActionableTaskId(actionableTask.getTaskId());
             traceabilityElement.setFulfillerTaskId(fulfillmentTask.getTaskId());
             traceabilityElement.setStartInstant(fulfillmentTask.getTaskFulfillment().getStartInstant());
@@ -96,9 +96,9 @@ import java.time.Instant;
 
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Creating the Handover message");
             InterProcessingPlantHandoverPacket forwardingPacket = new InterProcessingPlantHandoverPacket();
-            forwardingPacket.setActionableTask(actionableTask);
+            forwardingPacket.setActionableTask(actionableTask.getInstance());
             forwardingPacket.setUpstreamFulfillmentTaskDetails(traceabilityElement);
-            String processingPlantName = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID().getDisplayName();
+            String processingPlantName = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID().getDisplayName();
             forwardingPacket.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
             forwardingPacket.setMessageSendStartInstant(Instant.now());
 
@@ -113,9 +113,9 @@ import java.time.Instant;
                     forwardingPacket.setEventProcessingStartTime(messageProcessingStartInstant);
                 }
             }
-            synchronized (fulfillmentTask.getTaskWorkItemLock()){
-                fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL);
-            }
+
+            fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL);
+            fulfillmentTask.update();
             forwardingPacket.setTarget(theUoW.getPayloadTopicID().getTargetProcessingPlantParticipantName());
             forwardingPacket.setSource(processingPlant.getSubsystemParticipantName());
             LOG.debug(".constructInterProcessingPlantHandoverPacket(): Exit, forwardingPacket (InterProcessingPlantHandoverPacket) --> {}", forwardingPacket);

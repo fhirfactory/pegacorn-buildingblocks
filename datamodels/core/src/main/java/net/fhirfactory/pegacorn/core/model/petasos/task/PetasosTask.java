@@ -37,13 +37,17 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatyp
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
 
 public class PetasosTask implements Serializable {
+    private final static Logger LOG = LoggerFactory.getLogger(PetasosTask.class);
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant creationInstant;
@@ -52,37 +56,28 @@ public class PetasosTask implements Serializable {
     private Instant updateInstant;
 
     private DatagridElementSourceResourceIdType sourceResourceId;
-    private SerializableObject sourceResourceIdLock;
 
     private TaskContextType taskContext;
-    private SerializableObject taskContextLock;
 
     private TaskIdType taskId;
-    private SerializableObject taskIdLock;
 
     private TaskTypeType taskType;
-    private SerializableObject taskTypeLock;
 
     private TaskWorkItemType taskWorkItem;
-    private SerializableObject taskWorkItemLock;
 
     private TaskTraceabilityType taskTraceability;
-    private SerializableObject taskTraceabilityLock;
 
     private TaskOutcomeStatusType taskOutcomeStatus;
-    private SerializableObject taskOutcomeStatusLock;
 
     private List<TaskPerformerTypeType> taskPerformerTypes;
-    private SerializableObject taskPerformerTypesLock;
 
     private TaskReasonType taskReason;
-    private SerializableObject taskReasonLock;
 
     private ComponentIdType taskNodeAffinity;
-    private SerializableObject taskNodeAffinityLock;
 
     private Set<TaskIdType> aggregateTaskMembership;
-    private SerializableObject aggregateTaskMembershipLock;
+
+    private PetasosTaskExecutionStatusEnum executionStatus;
 
     private boolean registered;
 
@@ -93,35 +88,39 @@ public class PetasosTask implements Serializable {
 
     public PetasosTask(){
         this.taskId = null;
-        this.taskIdLock = new SerializableObject();
         this.sourceResourceId = null;
-        this.sourceResourceIdLock = new SerializableObject();
         this.creationInstant = Instant.now();
         this.updateInstant = Instant.now();
         this.taskWorkItem = new TaskWorkItemType();
-        this.taskWorkItemLock = new SerializableObject();
         this.taskTraceability = new TaskTraceabilityType();
-        this.taskTraceabilityLock = new SerializableObject();
         this.aggregateTaskMembership = new HashSet<>();
-        this.aggregateTaskMembershipLock = new SerializableObject();
         this.taskOutcomeStatus = null;
-        this.taskOutcomeStatusLock = new SerializableObject();
         this.registered = false;
         this.taskPerformerTypes = new ArrayList<>();
-        this.taskPerformerTypesLock = new SerializableObject();
         this.taskType = null;
-        this.taskTypeLock = new SerializableObject();
         this.taskReason = null;
-        this.taskReasonLock = new SerializableObject();
         this.taskNodeAffinity = null;
-        this.taskNodeAffinityLock = new SerializableObject();
         this.taskContext = null;
-        this.taskContextLock = new SerializableObject();
+        this.executionStatus = null;
     }
 
     //
     // Getters and Setters (Bean Methods)
     //
+
+    @JsonIgnore
+    public boolean hasExecutionStatus(){
+        boolean hasValue = this.executionStatus != null;
+        return(hasValue);
+    }
+
+    public PetasosTaskExecutionStatusEnum getExecutionStatus() {
+        return executionStatus;
+    }
+
+    public void setExecutionStatus(PetasosTaskExecutionStatusEnum executionStatus) {
+        this.executionStatus = executionStatus;
+    }
 
     @JsonIgnore
     public boolean hasSourceResourceId(){
@@ -135,14 +134,6 @@ public class PetasosTask implements Serializable {
 
     public void setSourceResourceId(DatagridElementSourceResourceIdType sourceResourceId) {
         this.sourceResourceId = sourceResourceId;
-    }
-
-    public SerializableObject getSourceResourceIdLock() {
-        return sourceResourceIdLock;
-    }
-
-    public void setSourceResourceIdLock(SerializableObject sourceResourceIdLock) {
-        this.sourceResourceIdLock = sourceResourceIdLock;
     }
 
     public Instant getCreationInstant() {
@@ -175,13 +166,6 @@ public class PetasosTask implements Serializable {
         this.taskId = taskId;
     }
 
-    public SerializableObject getTaskIdLock() {
-        return taskIdLock;
-    }
-
-    public void setTaskIdLock(SerializableObject taskIdLock) {
-        this.taskIdLock = taskIdLock;
-    }
 
     @JsonIgnore
     public boolean hasTaskType(){
@@ -197,13 +181,6 @@ public class PetasosTask implements Serializable {
         this.taskType = taskType;
     }
 
-    public SerializableObject getTaskTypeLock() {
-        return taskTypeLock;
-    }
-
-    public void setTaskTypeLock(SerializableObject taskTypeLock) {
-        this.taskTypeLock = taskTypeLock;
-    }
 
     @JsonIgnore
     public boolean hasTaskWorkItem(){
@@ -217,14 +194,6 @@ public class PetasosTask implements Serializable {
 
     public void setTaskWorkItem(TaskWorkItemType taskWorkItem) {
         this.taskWorkItem = taskWorkItem;
-    }
-
-    public SerializableObject getTaskWorkItemLock() {
-        return taskWorkItemLock;
-    }
-
-    public void setTaskWorkItemLock(SerializableObject taskWorkItemLock) {
-        this.taskWorkItemLock = taskWorkItemLock;
     }
 
     @JsonIgnore
@@ -241,13 +210,6 @@ public class PetasosTask implements Serializable {
         this.taskTraceability = taskTraceability;
     }
 
-    public SerializableObject getTaskTraceabilityLock() {
-        return taskTraceabilityLock;
-    }
-
-    public void setTaskTraceabilityLock(SerializableObject taskTraceabilityLock) {
-        this.taskTraceabilityLock = taskTraceabilityLock;
-    }
 
     @JsonIgnore
     public boolean hasTaskOutcomeStatus(){
@@ -261,14 +223,6 @@ public class PetasosTask implements Serializable {
 
     public void setTaskOutcomeStatus(TaskOutcomeStatusType taskOutcomeStatus) {
         this.taskOutcomeStatus = taskOutcomeStatus;
-    }
-
-    public SerializableObject getTaskOutcomeStatusLock() {
-        return taskOutcomeStatusLock;
-    }
-
-    public void setTaskOutcomeStatusLock(SerializableObject taskOutcomeStatusLock) {
-        this.taskOutcomeStatusLock = taskOutcomeStatusLock;
     }
 
     public boolean isRegistered() {
@@ -293,14 +247,6 @@ public class PetasosTask implements Serializable {
         this.taskPerformerTypes = taskPerformerTypes;
     }
 
-    public SerializableObject getTaskPerformerTypesLock() {
-        return taskPerformerTypesLock;
-    }
-
-    public void setTaskPerformerTypesLock(SerializableObject taskPerformerTypesLock) {
-        this.taskPerformerTypesLock = taskPerformerTypesLock;
-    }
-
     @JsonIgnore
     public boolean hasTaskReason(){
         boolean hasValue = this.taskReason != null;
@@ -313,14 +259,6 @@ public class PetasosTask implements Serializable {
 
     public void setTaskReason(TaskReasonType taskReason) {
         this.taskReason = taskReason;
-    }
-
-    public SerializableObject getTaskReasonLock() {
-        return taskReasonLock;
-    }
-
-    public void setTaskReasonLock(SerializableObject taskReasonLock) {
-        this.taskReasonLock = taskReasonLock;
     }
 
     @JsonIgnore
@@ -337,14 +275,6 @@ public class PetasosTask implements Serializable {
         this.taskNodeAffinity = taskNodeAffinity;
     }
 
-    public SerializableObject getTaskNodeAffinityLock() {
-        return taskNodeAffinityLock;
-    }
-
-    public void setTaskNodeAffinityLock(SerializableObject taskNodeAffinityLock) {
-        this.taskNodeAffinityLock = taskNodeAffinityLock;
-    }
-
     @JsonIgnore
     public boolean hasAggregateTaskMembership(){
         boolean hasValue = this.aggregateTaskMembership != null;
@@ -357,14 +287,6 @@ public class PetasosTask implements Serializable {
 
     public void setAggregateTaskMembership(Set<TaskIdType> aggregateTaskMembership) {
         this.aggregateTaskMembership = aggregateTaskMembership;
-    }
-
-    public SerializableObject getAggregateTaskMembershipLock() {
-        return aggregateTaskMembershipLock;
-    }
-
-    public void setAggregateTaskMembershipLock(SerializableObject aggregateTaskMembershipLock) {
-        this.aggregateTaskMembershipLock = aggregateTaskMembershipLock;
     }
 
     @JsonIgnore
@@ -381,13 +303,6 @@ public class PetasosTask implements Serializable {
         this.taskContext = taskContext;
     }
 
-    public SerializableObject getTaskContextLock() {
-        return taskContextLock;
-    }
-
-    public void setTaskContextLock(SerializableObject taskContextLock) {
-        this.taskContextLock = taskContextLock;
-    }
 
     //
     // Hashcode and Equals
@@ -411,7 +326,8 @@ public class PetasosTask implements Serializable {
                 && Objects.equals(getTaskPerformerTypes(), that.getTaskPerformerTypes())
                 && Objects.equals(getTaskReason(), that.getTaskReason())
                 && Objects.equals(getTaskNodeAffinity(), that.getTaskNodeAffinity())
-                && Objects.equals(getAggregateTaskMembership(), that.getAggregateTaskMembership());
+                && Objects.equals(getAggregateTaskMembership(), that.getAggregateTaskMembership())
+                && Objects.equals(getExecutionStatus(), that.getExecutionStatus());
         return(theyAreEqual);
     }
 
@@ -430,6 +346,7 @@ public class PetasosTask implements Serializable {
                 getTaskReason(),
                 getTaskNodeAffinity(),
                 getAggregateTaskMembership(),
+                getExecutionStatus(),
                 isRegistered());
     }
 
@@ -455,6 +372,7 @@ public class PetasosTask implements Serializable {
                 ", taskNodeAffinity=" + taskNodeAffinity +
                 ", aggregateTaskMembership=" + aggregateTaskMembership +
                 ", registered=" + registered +
+                ", executionStatus=" + getExecutionStatus() +
                 '}';
     }
 
@@ -468,146 +386,147 @@ public class PetasosTask implements Serializable {
     }
 
     protected PetasosTask updatePetasosTask(PetasosTask update){
+        LOG.debug(".updatePetasosTask(): Entry, petasosTask->{}", update);
         if(update == null){
             return(this);
         }
         // sourceResourceId
-        synchronized (sourceResourceIdLock){
-            if(update.hasSourceResourceId()){
-                this.setSourceResourceId(update.getSourceResourceId());
-            }
+        if(update.hasSourceResourceId()){
+            this.setSourceResourceId(update.getSourceResourceId());
         }
         // taskContext
-        synchronized(taskContextLock){
-            if(update.hasTaskContext()){
-                if(!this.hasTaskContext()){
-                    this.setTaskContext(update.getTaskContext());
-                } else {
-                    if(update.getTaskContext().hasTaskEncounter()) {
-                        this.getTaskContext().setTaskEncounter(update.getTaskContext().getTaskEncounter());
-                    }
-                    if(update.getTaskContext().hasTaskBeneficiary()){
-                        this.getTaskContext().setTaskBeneficiary(update.getTaskContext().getTaskBeneficiary());
-                    }
-                    if(update.getTaskContext().hasTaskTriggerSummary()){
-                        this.getTaskContext().setTaskTriggerSummary(update.getTaskContext().getTaskTriggerSummary());
-                    }
+        if(update.hasTaskContext()){
+            LOG.trace(".updatePetasosTask(): Updating TaskContext");
+            if(!this.hasTaskContext()){
+                LOG.trace(".updatePetasosTask(): Updating TaskContext: Copying Whole TaskContext");
+                this.setTaskContext(update.getTaskContext());
+            } else {
+                LOG.trace(".updatePetasosTask(): Updating TaskContext: Performing TaskContext per-attribute update ");
+                if(update.getTaskContext().hasTaskEncounter()) {
+                    LOG.trace(".updatePetasosTask(): Updating TaskContext: updating TaskEncounter attribute");
+                    this.getTaskContext().setTaskEncounter(update.getTaskContext().getTaskEncounter());
+                }
+                if(update.getTaskContext().hasTaskBeneficiary()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskContext: updating TaskBeneficiary attribute");
+                    this.getTaskContext().setTaskBeneficiary(update.getTaskContext().getTaskBeneficiary());
+                }
+                if(update.getTaskContext().hasTaskTriggerSummary()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskContext: updating TaskTriggerSummary attribute");
+                    this.getTaskContext().setTaskTriggerSummary(update.getTaskContext().getTaskTriggerSummary());
                 }
             }
         }
         // taskType
-        synchronized (taskTypeLock){
-            if(update.hasTaskType()){
-                if(!this.hasTaskType()){
-                    this.setTaskType(update.getTaskType());
-                } else {
-                    if(update.getTaskType().hasTaskSubType()) {
-                        this.getTaskType().setTaskSubType(update.getTaskType().getTaskSubType());
-                    }
-                    if(update.getTaskType().hasTaskType()){
-                        this.getTaskType().setTaskType(update.getTaskType().getTaskType());
-                    }
+        if(update.hasTaskType()){
+            LOG.trace(".updatePetasosTask(): Updating TaskType");
+            if(!this.hasTaskType()){
+                LOG.trace(".updatePetasosTask(): Updating TaskType: Copying Whole TaskType");
+                this.setTaskType(update.getTaskType());
+            } else {
+                LOG.trace(".updatePetasosTask(): Updating TaskType: Performing TaskType per-attribute update ");
+                if(update.getTaskType().hasTaskSubType()) {
+                    LOG.trace(".updatePetasosTask(): Updating TaskType: updating TaskSubType attribute");
+                    this.getTaskType().setTaskSubType(update.getTaskType().getTaskSubType());
+                }
+                if(update.getTaskType().hasTaskType()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskType: updating TaskType attribute");
+                    this.getTaskType().setTaskType(update.getTaskType().getTaskType());
                 }
             }
         }
         // taskWorkItem
-        synchronized(taskWorkItemLock){
-            if(update.hasTaskWorkItem()){
-                if(!this.hasTaskWorkItem()){
-                    this.setTaskWorkItem(update.getTaskWorkItem());
-                } else {
-                    if(update.getTaskWorkItem().hasIngresContent()){
-                        this.getTaskWorkItem().setIngresContent(update.getTaskWorkItem().getIngresContent());
-                    }
-                    if(update.getTaskWorkItem().hasEgressContent()){
-                        this.getTaskWorkItem().setEgressContent(update.getTaskWorkItem().getEgressContent());
-                    }
-                    if(update.getTaskWorkItem().hasFailureDescription()){
-                        this.getTaskWorkItem().setFailureDescription(update.getTaskWorkItem().getFailureDescription());
-                    }
-                    if(update.getTaskWorkItem().hasInstanceID()){
-                        this.getTaskWorkItem().setInstanceID(update.getTaskWorkItem().getInstanceID());
-                    }
-                    if(update.getTaskWorkItem().hasPayloadTopicID()){
-                        this.getTaskWorkItem().setUoWTypeID(update.getTaskWorkItem().getTypeID());
-                    }
-                    if(update.getTaskWorkItem().hasProcessingOutcome()){
-                        this.getTaskWorkItem().setProcessingOutcome(update.getTaskWorkItem().getProcessingOutcome());
-                    }
+        if(update.hasTaskWorkItem()){
+            LOG.trace(".updatePetasosTask(): Updating TaskWorkItem");
+            if(!this.hasTaskWorkItem()){
+                LOG.trace(".updatePetasosTask(): Updating TaskWorkItem: Copying Whole TaskWorkItem");
+                this.setTaskWorkItem(update.getTaskWorkItem());
+            } else {
+                LOG.trace(".updatePetasosTask(): Updating TaskWorkItem: Performing TaskWorkItem per-attribute update");
+                if(update.getTaskWorkItem().hasIngresContent()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskWorkItem: Updating IngresContent attribute");
+                    this.getTaskWorkItem().setIngresContent(update.getTaskWorkItem().getIngresContent());
+                }
+                if(update.getTaskWorkItem().hasEgressContent()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskWorkItem: Updating EgressContent attribute");
+                    this.getTaskWorkItem().setEgressContent(update.getTaskWorkItem().getEgressContent());
+                }
+                if(update.getTaskWorkItem().hasFailureDescription()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskWorkItem: Updating FailureDescription attribute");
+                    this.getTaskWorkItem().setFailureDescription(update.getTaskWorkItem().getFailureDescription());
+                }
+                if(update.getTaskWorkItem().hasInstanceID()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskWorkItem: Updating InstanceId attribute");
+                    this.getTaskWorkItem().setInstanceID(update.getTaskWorkItem().getInstanceID());
+                }
+                if(update.getTaskWorkItem().hasPayloadTopicID()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskWorkItem: Updating TypeId attribute");
+                    this.getTaskWorkItem().setUoWTypeID(update.getTaskWorkItem().getTypeID());
+                }
+                if(update.getTaskWorkItem().hasProcessingOutcome()){
+                    LOG.trace(".updatePetasosTask(): Updating TaskWorkItem: Updating ProcessingOutcome attribute");
+                    this.getTaskWorkItem().setProcessingOutcome(update.getTaskWorkItem().getProcessingOutcome());
                 }
             }
         }
         // taskTraceability
-        synchronized (taskTraceabilityLock){
-            if(update.hasTaskTraceability()){
-                if(!this.hasTaskTraceability()){
-                    this.setTaskTraceability(update.getTaskTraceability());
-                } else {
-                    if(update.getTaskTraceability().getTaskJourney() != null){
-                        this.getTaskTraceability().setTaskJourney(update.getTaskTraceability().getTaskJourney());
-                    }
+        if(update.hasTaskTraceability()){
+            if(!this.hasTaskTraceability()){
+                this.setTaskTraceability(update.getTaskTraceability());
+            } else {
+                if(update.getTaskTraceability().getTaskJourney() != null){
+                    this.getTaskTraceability().setTaskJourney(update.getTaskTraceability().getTaskJourney());
                 }
             }
         }
         // taskOutcomeStatus
-        synchronized (taskOutcomeStatusLock){
-            if(update.hasTaskOutcomeStatus()){
-                if(!this.hasTaskOutcomeStatus()){
-                    this.setTaskOutcomeStatus(update.getTaskOutcomeStatus());
-                } else {
-                    if(update.getTaskOutcomeStatus().getOutcomeStatus() != null){
-                        this.getTaskOutcomeStatus().setOutcomeStatus(update.getTaskOutcomeStatus().getOutcomeStatus());
-                    }
-                    if(update.getTaskOutcomeStatus().getEntryInstant() != null){
-                        this.getTaskOutcomeStatus().setEntryInstant(update.getTaskOutcomeStatus().getEntryInstant());
-                    }
+        if(update.hasTaskOutcomeStatus()){
+            if(!this.hasTaskOutcomeStatus()){
+                this.setTaskOutcomeStatus(update.getTaskOutcomeStatus());
+            } else {
+                if(update.getTaskOutcomeStatus().getOutcomeStatus() != null){
+                    this.getTaskOutcomeStatus().setOutcomeStatus(update.getTaskOutcomeStatus().getOutcomeStatus());
+                }
+                if(update.getTaskOutcomeStatus().getEntryInstant() != null){
+                    this.getTaskOutcomeStatus().setEntryInstant(update.getTaskOutcomeStatus().getEntryInstant());
                 }
             }
         }
         // taskPerformerTypes
-        synchronized (taskPerformerTypesLock){
-            if(update.hasTaskPerformerTypes()){
-                if(!this.hasTaskPerformerTypes()){
-                    this.setTaskPerformerTypes(update.getTaskPerformerTypes());
-                }
+        if(update.hasTaskPerformerTypes()){
+            if(!this.hasTaskPerformerTypes()){
+                this.setTaskPerformerTypes(update.getTaskPerformerTypes());
             }
         }
         // taskReason
-        synchronized (taskReasonLock){
-            if(update.hasTaskReason()){
-                this.setTaskReason(update.getTaskReason());
-            }
+        if(update.hasTaskReason()){
+            this.setTaskReason(update.getTaskReason());
         }
         // taskNodeAffinity
-        synchronized(taskNodeAffinityLock){
-            if(update.hasTaskNodeAffinity()){
-                if(!this.hasTaskNodeAffinity()){
-                    this.setTaskNodeAffinity(update.getTaskNodeAffinity());
-                } else {
-                    if(update.getTaskNodeAffinity().hasIdValidityEndInstant()){
-                        this.getTaskNodeAffinity().setIdValidityEndInstant(update.getTaskNodeAffinity().getIdValidityEndInstant());
-                    }
-                    if(update.getTaskNodeAffinity().hasIdValidityStartInstant()){
-                        this.getTaskNodeAffinity().setIdValidityStartInstant(update.getTaskNodeAffinity().getIdValidityStartInstant());
-                    }
-                    if(update.getTaskNodeAffinity().hasId()){
-                        this.getTaskNodeAffinity().setId(update.getTaskNodeAffinity().getId());
-                    }
-                    if(update.getTaskNodeAffinity().hasDisplayName()){
-                        this.getTaskNodeAffinity().setDisplayName(this.getTaskNodeAffinity().getDisplayName());
-                    }
+        if(update.hasTaskNodeAffinity()){
+            if(!this.hasTaskNodeAffinity()){
+                this.setTaskNodeAffinity(update.getTaskNodeAffinity());
+            } else {
+                if(update.getTaskNodeAffinity().hasIdValidityEndInstant()){
+                    this.getTaskNodeAffinity().setIdValidityEndInstant(update.getTaskNodeAffinity().getIdValidityEndInstant());
+                }
+                if(update.getTaskNodeAffinity().hasIdValidityStartInstant()){
+                    this.getTaskNodeAffinity().setIdValidityStartInstant(update.getTaskNodeAffinity().getIdValidityStartInstant());
+                }
+                if(update.getTaskNodeAffinity().hasId()){
+                    this.getTaskNodeAffinity().setId(update.getTaskNodeAffinity().getId());
+                }
+                if(update.getTaskNodeAffinity().hasDisplayName()){
+                    this.getTaskNodeAffinity().setDisplayName(this.getTaskNodeAffinity().getDisplayName());
                 }
             }
         }
         // aggregateTaskMembership
-        synchronized(aggregateTaskMembershipLock){
-            if(update.hasAggregateTaskMembership()){
-                if(!this.hasAggregateTaskMembership()){
-                    this.setAggregateTaskMembership(update.getAggregateTaskMembership());
-                } else {
-                    this.getAggregateTaskMembership().clear();
-                    this.getAggregateTaskMembership().addAll(update.getAggregateTaskMembership());
-                }
+        if(update.hasAggregateTaskMembership()){
+            if(!this.hasAggregateTaskMembership()){
+                this.setAggregateTaskMembership(update.getAggregateTaskMembership());
+            } else {
+                this.getAggregateTaskMembership().clear();
+                this.getAggregateTaskMembership().addAll(update.getAggregateTaskMembership());
             }
         }
         // registered

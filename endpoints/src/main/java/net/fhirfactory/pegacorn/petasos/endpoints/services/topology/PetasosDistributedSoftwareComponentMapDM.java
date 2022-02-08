@@ -21,15 +21,17 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.topology;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,19 +40,30 @@ public class PetasosDistributedSoftwareComponentMapDM {
 
     private static final Logger LOG = LoggerFactory.getLogger(PetasosDistributedSoftwareComponentMapDM.class);
 
-    private ConcurrentHashMap<TopologyNodeFDN, JGroupsIntegrationPointSummary> nodeOriginatingPoint;
-    private ConcurrentHashMap<TopologyNodeFDN, SoftwareComponent> nodeSet;
-    private ConcurrentHashMap<String, TopologyNodeFDN> simpleNameMap;
+    private ConcurrentHashMap<ComponentIdType, JGroupsIntegrationPointSummary> nodeOriginatingPoint;
+    private ConcurrentHashMap<ComponentIdType, SoftwareComponent> nodeSet;
+    private ConcurrentHashMap<ComponentIdType, String> participantMap;
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
+
+    //
+    // Constructor(s)
+    //
 
     public PetasosDistributedSoftwareComponentMapDM() {
         LOG.debug(".ITOpsCollatedNodesDM(): Constructor initialisation");
-        this.nodeSet = new ConcurrentHashMap<TopologyNodeFDN, SoftwareComponent>();
+        this.nodeSet = new ConcurrentHashMap<>();
         this.nodeOriginatingPoint = new ConcurrentHashMap<>();
-        this.simpleNameMap = new ConcurrentHashMap<>();
+        this.participantMap = new ConcurrentHashMap<>();
     }
 
+    //
+    // Business Functions
+    //
+
     public void addTopologyNode(JGroupsIntegrationPointSummary endpointID, SoftwareComponent newElement) {
-        LOG.debug(".addTopologyNode(): Entry, newElement --> {}", newElement);
+        LOG.info(".addTopologyNode(): Entry, newElement --> {}", newElement);
         if (newElement == null) {
             throw (new IllegalArgumentException(".addTopologyNode(): newElement is null"));
         }
@@ -71,53 +84,51 @@ public class PetasosDistributedSoftwareComponentMapDM {
             }
         }
         boolean elementFound = false;
-        Enumeration<TopologyNodeFDN> elementIdentifiers = this.nodeSet.keys();
-        TopologyNodeFDN currentNodeID = null;
+        Enumeration<ComponentIdType> elementIdentifiers = this.nodeSet.keys();
+        ComponentIdType currentNodeID = null;
         while (elementIdentifiers.hasMoreElements()) {
             currentNodeID = elementIdentifiers.nextElement();
             if (LOG.isTraceEnabled()) {
-                LOG.trace(".addTopologyNode(): Cache Entry --> {}", currentNodeID.toTag());
+                LOG.trace(".addTopologyNode(): Cache Entry --> {}", currentNodeID);
             }
-            if (currentNodeID.equals(newElement.getComponentFDN())){
+            if (currentNodeID.equals(newElement.getComponentID())){
                 LOG.trace(".addTopologyNode(): Element already in Cache");
                 elementFound = true;
                 break;
             }
         }
-        String simpleName = newElement.getComponentID().getId();
+        if(StringUtils.isEmpty(newElement.getParticipantName())){
+            if(StringUtils.isNotEmpty(newElement.getComponentID().getDisplayName())){
+                newElement.setParticipantName(newElement.getComponentID().getDisplayName());
+            } else {
+                newElement.setParticipantName(newElement.getComponentID().getId());
+            }
+        }
+        if(StringUtils.isEmpty(newElement.getSubsystemParticipantName())){
+            newElement.setSubsystemParticipantName(processingPlant.getSubsystemParticipantName());
+        }
+        String participantName = newElement.getParticipantName();
         if (elementFound) {
             this.nodeSet.remove(currentNodeID);
             this.nodeSet.put(currentNodeID, newElement);
             this.nodeOriginatingPoint.put(currentNodeID, endpointID);
-            this.simpleNameMap.put(simpleName, currentNodeID);
+            this.participantMap.put(currentNodeID, participantName);
         } else {
-            this.nodeSet.put(newElement.getComponentFDN(), newElement);
-            this.nodeOriginatingPoint.put(newElement.getComponentFDN(), endpointID);
-            this.simpleNameMap.put(simpleName, newElement.getComponentFDN());
+            this.nodeSet.put(newElement.getComponentID(), newElement);
+            this.nodeOriginatingPoint.put(newElement.getComponentID(), endpointID);
+            this.participantMap.put(newElement.getComponentID(), participantName);
         }
         LOG.debug(".addTopologyNode(): Exit");
     }
 
-    public void deleteTopologyNode(TopologyNodeFDN elementID) {
+    public void deleteTopologyNode(ComponentIdType elementID) {
         LOG.debug(".deleteTopologyNode(): Entry, elementID --> {}", elementID);
         if (elementID == null) {
             throw (new IllegalArgumentException(".removeNode(): elementID is null"));
         }
         this.nodeSet.remove(elementID);
         this.nodeOriginatingPoint.remove(elementID);
-        String simpleName = null;
-        Enumeration<String> nameEnumeration = this.simpleNameMap.keys();
-        while(nameEnumeration.hasMoreElements()){
-            String currentName = nameEnumeration.nextElement();
-            TopologyNodeFDN currentNodeFDN = this.simpleNameMap.get(currentName);
-            if(currentNodeFDN.equals(elementID)){
-                simpleName = currentName;
-                break;
-            }
-        }
-        if(simpleName != null){
-            this.simpleNameMap.remove(simpleName);
-        }
+        this.participantMap.remove(elementID);
         LOG.debug(".deleteTopologyNode(): Exit");
     }
 
@@ -135,15 +146,15 @@ public class PetasosDistributedSoftwareComponentMapDM {
         return (elementSet);
     }
 
-    public SoftwareComponent getTopologyNode(TopologyNodeFDN nodeID) {
+    public SoftwareComponent getTopologyNode(ComponentIdType nodeID) {
         LOG.info(".getTopologyNode(): Entry, nodeID --> {}", nodeID);
         if (nodeID == null) {
             LOG.debug(".getTopologyNode(): Exit, provided a null nodeID , so returning null");
             return (null);
         }
-        Enumeration<TopologyNodeFDN> list = this.nodeSet.keys();
+        Enumeration<ComponentIdType> list = this.nodeSet.keys();
         while (list.hasMoreElements()) {
-            TopologyNodeFDN currentNodeID = list.nextElement();
+            ComponentIdType currentNodeID = list.nextElement();
             LOG.info(".getTopologyNode(): Cache Entry --> {}", currentNodeID);
             if (currentNodeID.equals(nodeID)) {
                 LOG.info(".getTopologyNode(): Node found!!! WooHoo!");
@@ -180,30 +191,19 @@ public class PetasosDistributedSoftwareComponentMapDM {
 
     public void removeDiscoveredProcessingPlant(JGroupsIntegrationPointSummary discoveredProcessingPlant){
         LOG.debug(".removeDiscoveredProcessingPlant(): Entry, discoveredProcessingPlant->{}", discoveredProcessingPlant);
-        List<TopologyNodeFDN> associatedNodes = new ArrayList<>();
-        Enumeration<TopologyNodeFDN> nodeFDNs = this.nodeOriginatingPoint.keys();
+        List<ComponentIdType> associatedNodes = new ArrayList<>();
+        Enumeration<ComponentIdType> nodeFDNs = this.nodeOriginatingPoint.keys();
         while (nodeFDNs.hasMoreElements()) {
-            TopologyNodeFDN currentFDN = nodeFDNs.nextElement();
-            JGroupsIntegrationPointSummary currentIP= this.nodeOriginatingPoint.get(currentFDN);
+            ComponentIdType currentId = nodeFDNs.nextElement();
+            JGroupsIntegrationPointSummary currentIP = this.nodeOriginatingPoint.get(currentId);
             if(currentIP.getChannelName().equals(discoveredProcessingPlant.getChannelName())){
-                associatedNodes.add(currentFDN);
+                associatedNodes.add(currentId);
             }
         }
-        for(TopologyNodeFDN currentFDN: associatedNodes){
-            this.nodeOriginatingPoint.remove(currentFDN);
-            this.nodeSet.remove(currentFDN);
-        }
-        List<String> associatedNameSet = new ArrayList<>();
-        Enumeration<String> currentMappedNameSet = this.simpleNameMap.keys();
-        while (currentMappedNameSet.hasMoreElements()) {
-            String currentMappedName = currentMappedNameSet.nextElement();
-            TopologyNodeFDN currentMappedFDN = this.simpleNameMap.get(currentMappedName);
-            if(associatedNodes.contains(currentMappedFDN)){
-                associatedNameSet.add(currentMappedName);
-            }
-        }
-        for(String currentMappedName: associatedNameSet){
-            this.simpleNameMap.remove(currentMappedName);
+        for(ComponentIdType currentId: associatedNodes){
+            this.nodeOriginatingPoint.remove(currentId);
+            this.nodeSet.remove(currentId);
+            this.participantMap.remove(currentId);
         }
     }
 
@@ -211,15 +211,27 @@ public class PetasosDistributedSoftwareComponentMapDM {
     // Get Node
     //
 
-    public SoftwareComponent getNode(String simpleName){
-        if(StringUtils.isEmpty(simpleName)){
+    public SoftwareComponent getNode(String participantName){
+        if(StringUtils.isEmpty(participantName)){
             return(null);
         }
-        TopologyNodeFDN foundNodeFDN = this.simpleNameMap.get(simpleName);
-        if(foundNodeFDN == null){
+        if(this.participantMap.isEmpty()){
             return(null);
         }
-        SoftwareComponent foundNode = this.nodeSet.get(foundNodeFDN);
+        Enumeration<ComponentIdType> nodeIdEnumerator = this.participantMap.keys();
+        ComponentIdType foundId = null;
+        while(nodeIdEnumerator.hasMoreElements()) {
+            ComponentIdType currentComponentId = nodeIdEnumerator.nextElement();
+            String currentParticipantName = this.participantMap.get(currentComponentId);
+            if(currentComponentId.equals(participantName)){
+                foundId = currentComponentId;
+                break;
+            }
+        }
+        if(foundId == null){
+            return(null);
+        }
+        SoftwareComponent foundNode = this.nodeSet.get(foundId);
         return(foundNode);
     }
 

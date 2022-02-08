@@ -87,7 +87,24 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
         notification.setContent(message);
         getNotificationAgent().sendNotification(notification);
         if(getLogger().isInfoEnabled()){
-            getLogger().info(".sendITOpsNotification(): Send Notification->{}", notification);
+            getLogger().debug(".sendITOpsNotification(): Send Notification->{}", notification);
+        }
+    }
+
+    @Override
+    public void sendITOpsNotification(String unformattedMessage, String formattedMessage) {
+        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
+            return;
+        }
+        PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+        notification.setComponentId(getMetricsData().getComponentID());
+        notification.setParticipantName(getWUPMetricsData().getParticipantName());
+        notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR);
+        notification.setContent(unformattedMessage);
+        notification.setFormattedContent(formattedMessage);
+        getNotificationAgent().sendNotification(notification);
+        if(getLogger().isInfoEnabled()){
+            getLogger().debug(".sendITOpsNotification(): Send Notification->{}", notification);
         }
     }
 

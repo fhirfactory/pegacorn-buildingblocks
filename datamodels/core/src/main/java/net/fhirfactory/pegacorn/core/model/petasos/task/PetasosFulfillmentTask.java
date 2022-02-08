@@ -38,13 +38,10 @@ import java.util.Objects;
 public class PetasosFulfillmentTask extends PetasosTask{
 
     private TaskFulfillmentType taskFulfillment;
-    private SerializableObject taskFulfillmentLock;
 
     private PetasosTaskJobCard taskJobCard;
-    private SerializableObject taskJobCardLock;
 
     private TaskIdType actionableTaskId;
-    private SerializableObject actionableTaskIdLock;
 
     private boolean aRetry;
 
@@ -55,11 +52,8 @@ public class PetasosFulfillmentTask extends PetasosTask{
     public PetasosFulfillmentTask(){
         super();
         this.actionableTaskId = null;
-        this.actionableTaskIdLock = new SerializableObject();
         this.taskFulfillment = new TaskFulfillmentType();
-        this.taskFulfillmentLock = new SerializableObject();
         this.taskJobCard = null;
-        this.taskJobCardLock = new SerializableObject();
         this.aRetry = false;
         setTaskType(new TaskTypeType(TaskTypeTypeEnum.PETASOS_FULFILLMENT_TASK_TYPE));
     }
@@ -82,14 +76,6 @@ public class PetasosFulfillmentTask extends PetasosTask{
         this.taskFulfillment = taskFulfillment;
     }
 
-    public SerializableObject getTaskFulfillmentLock() {
-        return taskFulfillmentLock;
-    }
-
-    public void setTaskFulfillmentLock(SerializableObject taskFulfillmentLock) {
-        this.taskFulfillmentLock = taskFulfillmentLock;
-    }
-
     @JsonIgnore
     public boolean hasActionableTaskId(){
         boolean hasValue = this.actionableTaskId != null;
@@ -102,14 +88,6 @@ public class PetasosFulfillmentTask extends PetasosTask{
 
     public void setActionableTaskId(TaskIdType fulfilledTaskPetasosTaskIdentity) {
         this.actionableTaskId = fulfilledTaskPetasosTaskIdentity;
-    }
-
-    public SerializableObject getActionableTaskIdLock() {
-        return actionableTaskIdLock;
-    }
-
-    public void setActionableTaskIdLock(SerializableObject actionableTaskIdLock) {
-        this.actionableTaskIdLock = actionableTaskIdLock;
     }
 
     @JsonIgnore
@@ -126,13 +104,6 @@ public class PetasosFulfillmentTask extends PetasosTask{
         this.taskJobCard = taskJobCard;
     }
 
-    public SerializableObject getTaskJobCardLock() {
-        return taskJobCardLock;
-    }
-
-    public void setTaskJobCardLock(SerializableObject taskJobCardLock) {
-        this.taskJobCardLock = taskJobCardLock;
-    }
 
     public boolean isaRetry() {
         return aRetry;
@@ -166,21 +137,22 @@ public class PetasosFulfillmentTask extends PetasosTask{
 
     @Override
     public String toString() {
-        return "PetasosFulfillmentTask{" + "\n" +
-                "  taskFulfillment=" + taskFulfillment + ",\n" +
-                "  taskJobCard=" + taskJobCard + ",\n" +
-                "  actionableTaskId=" + actionableTaskId + ",\n" +
-                "  sourceResourceId=" + getSourceResourceId() + ",\n" +
-                "  taskId=" + getTaskId() + ",\n" +
-                "  hasTaskType=" + hasTaskType() + ",\n" +
-                "  taskType=" + getTaskType() + ",\n" +
-                "  taskWorkItem=" + getTaskWorkItem() + ",\n" +
-                "  taskTraceability=" + getTaskTraceability() + ",\n" +
-                "  taskOutcomeStatus=" + getTaskOutcomeStatus() + ",\n" +
-                "  registered=" + isRegistered() + ",\n" +
-                "  taskPerformerTypes=" + getTaskPerformerTypes() + ",\n" +
-                "  isARetry=" + isaRetry() + ",\n" +
+        return "PetasosFulfillmentTask{" +
+                "  taskFulfillment=" + taskFulfillment +
+                "  taskJobCard=" + taskJobCard +
+                "  actionableTaskId=" + actionableTaskId +
+                "  sourceResourceId=" + getSourceResourceId() +
+                "  taskId=" + getTaskId() +
+                "  hasTaskType=" + hasTaskType() +
+                "  taskType=" + getTaskType() +
+                "  taskWorkItem=" + getTaskWorkItem() +
+                "  taskTraceability=" + getTaskTraceability() +
+                "  taskOutcomeStatus=" + getTaskOutcomeStatus() +
+                "  registered=" + isRegistered() +
+                "  taskPerformerTypes=" + getTaskPerformerTypes() +
+                "  isARetry=" + isaRetry() +
                 "  taskMetadata=" + getTaskContext() +
+                ", executionStatus=" + getExecutionStatus() +
                 '}';
     }
 }

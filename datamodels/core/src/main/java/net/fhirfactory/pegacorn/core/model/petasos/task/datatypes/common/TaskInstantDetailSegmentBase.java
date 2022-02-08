@@ -177,7 +177,7 @@ public class TaskInstantDetailSegmentBase implements Serializable {
 
     @Override
     public String toString() {
-        return "net.fhirfactory.pegacorn.petasos.model.task.segments.common.TaskInstantDetailSegmentBase{" +
+        return "TaskInstantDetailSegmentBase{" +
                 "registrationInstant=" + registrationInstant +
                 ", readyInstant=" + readyInstant +
                 ", startInstant=" + startInstant +

@@ -142,8 +142,8 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         if(fulfillmentTask == null){
             return(null);
         }
-        if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(PegacornSystemComponentTypeTypeEnum.WUP)) {
-            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
+        if(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentType().equals(PegacornSystemComponentTypeTypeEnum.WUP)) {
+            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor();
             switch (wup.getComponentSystemRole()) {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {
@@ -187,8 +187,8 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         if(fulfillmentTask == null){
             return(null);
         }
-        if(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentType().equals(PegacornSystemComponentTypeTypeEnum.WUP)) {
-            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerComponent();
+        if(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentType().equals(PegacornSystemComponentTypeTypeEnum.WUP)) {
+            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor();
             switch (wup.getComponentSystemRole()) {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {

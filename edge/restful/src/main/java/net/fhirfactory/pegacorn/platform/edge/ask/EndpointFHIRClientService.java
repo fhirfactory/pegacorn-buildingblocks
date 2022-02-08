@@ -60,14 +60,14 @@ public class EndpointFHIRClientService extends ResourceFHIRClientService {
         getLogger().debug(".createEndpoint(): Entry, endpointJSONString->{}", endpointJSONString);
         Endpoint endpoint = getFHIRParser().parseResource(Endpoint.class, endpointJSONString);
         MethodOutcome outcome = createResource(endpoint);
-        getLogger().info(".createEndpoint(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createEndpoint(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome createEndpoint(Endpoint endpoint){
         getLogger().debug(".createEndpoint(): Entry, endpoint->{}", endpoint);
         MethodOutcome outcome = createResource(endpoint);
-        getLogger().info(".createEndpoint(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createEndpoint(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 }

@@ -58,28 +58,28 @@ public abstract class PetasosTaskServicesManagerHandler extends PetasosTasksDist
 
     @Override
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary integrationPoint) {
-        getLogger().info(".registerActionableTask(): Entry, actionableTask->{}, integrationPoint->{}", actionableTask, integrationPoint);
+        getLogger().debug(".registerActionableTask(): Entry, actionableTask->{}, integrationPoint->{}", actionableTask, integrationPoint);
         PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().registerPetasosActionableTask(actionableTask, integrationPoint);
         actionableTask.setRegistered(petasosActionableTaskRegistration.getRegistrationInstant()!= null);
-        getLogger().info(".registerActionableTask(): Exit, actionableTask->{}", actionableTask);
+        getLogger().debug(".registerActionableTask(): Exit, actionableTask->{}", actionableTask);
         return(actionableTask);
     }
 
     @Override
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary integrationPoint) {
-        getLogger().info(".updateActionableTask(): Entry, actionableTask->{}, integrationPoint->{}", actionableTask, integrationPoint);
+        getLogger().debug(".updateActionableTask(): Entry, actionableTask->{}, integrationPoint->{}", actionableTask, integrationPoint);
         PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().updatePetasosActionableTask(actionableTask, integrationPoint);
         PetasosActionableTask updatedActionableTask = getActionableTaskDM().getPetasosActionableTask(actionableTask.getTaskId());
-        getLogger().info(".updateActionableTask(): Exit, updatedActionableTask->{}", updatedActionableTask);
+        getLogger().debug(".updateActionableTask(): Exit, updatedActionableTask->{}", updatedActionableTask);
         return(updatedActionableTask);
     }
 
     @Override
     public List<PetasosActionableTask> retrievePendingActionableTasks(JGroupsIntegrationPointSummary integrationPoint) {
-        getLogger().info(".retrievePendingActionableTasks(): Entry, integrationPoint->{}", integrationPoint);
+        getLogger().debug(".retrievePendingActionableTasks(): Entry, integrationPoint->{}", integrationPoint);
         List<PetasosActionableTask> taskList = new ArrayList<>();
         if (integrationPoint == null) {
-            getLogger().info(".retrievePendingActionableTasks(): Exit, integrationPoint is null, returning empty list");
+            getLogger().debug(".retrievePendingActionableTasks(): Exit, integrationPoint is null, returning empty list");
             return (taskList);
         }
         List<PetasosActionableTask> waitingActionableTasksForComponent = getActionableTaskDM().getWaitingActionableTasksForComponent(integrationPoint.getProcessingPlantInstanceId());

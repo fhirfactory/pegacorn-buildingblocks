@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.tasking;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.interfaces.rmi.common.PetasosTaskResourceManagementInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskHandlerInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
@@ -33,8 +35,10 @@ import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEnd
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
+import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
+import net.fhirfactory.pegacorn.referencevalues.PegacornSystemReference;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -48,6 +52,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase implements PetasosTaskBrokerInterface {
@@ -61,6 +66,9 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
 
     @Inject
     private RemoteProcedureCallRequestFactory rpcRequestFactory;
+
+    @Inject
+    private SubsystemNames subsystemNames;
 
     //
     // Constructor(s)
@@ -189,10 +197,14 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
 
     //
     // Register a PetasosActionableTask
-    public PetasosActionableTask registerActionableTask(String taskFulfiller, PetasosActionableTask actionableTask){
-        getLogger().trace(".registerActionableTask(): Entry, taskFulfiller->{}, task->{}", taskFulfiller, actionableTask);
+    @Override
+    public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask){
+        getLogger().debug(".registerActionableTask(): Entry, task->{}", actionableTask);
         JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
-        Address targetAddress = getCandidateTargetServiceAddress(taskFulfiller);
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".registerActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+        }
         RemoteProcedureCallRequest remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, jgroupsIPSummary);
         try {
             Object objectSet[] = new Object[1];
@@ -223,7 +235,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     }
 
     public RemoteProcedureCallResponse registerActionableTaskHandler(RemoteProcedureCallRequest rpcRequest){
-        getLogger().trace(".registerActionableTaskHandler(): Entry, rpcRequest->{}", rpcRequest);
+        getLogger().debug(".registerActionableTaskHandler(): Entry, rpcRequest->{}", rpcRequest);
         PetasosActionableTask taskToRegister = null;
         JGroupsIntegrationPointSummary endpointIdentifier = null;
         if(rpcRequest != null){
@@ -260,10 +272,14 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     //
     // Execute/Fulfill A PetasosActionableTask
 
-    public PetasosActionableTask fulfillActionableTask(String taskFulfiller, PetasosActionableTask actionableTask){
-        getLogger().trace(".fulfillActionableTask(): Entry, taskFulfiller->{}, task->{}", taskFulfiller, actionableTask);
+    @Override
+    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask){
+        getLogger().trace(".fulfillActionableTask(): Entry, task->{}", actionableTask);
         JGroupsIntegrationPointSummary endpointIdentifier = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
-        Address targetAddress = getCandidateTargetServiceAddress(taskFulfiller);
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".fulfillActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+        }
         RemoteProcedureCallRequest remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, endpointIdentifier);
         try {
             Object objectSet[] = new Object[1];
@@ -331,10 +347,14 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     //
     // Update a PetasosActionableTask
 
-    public PetasosActionableTask updateActionableTask(String taskFulfiller, PetasosActionableTask actionableTask){
-        getLogger().trace(".updateActionableTask(): Entry, taskFulfiller->{}, task->{}", taskFulfiller, actionableTask);
+    @Override
+    public PetasosActionableTask updateActionableTask( PetasosActionableTask actionableTask){
+        getLogger().debug(".updateActionableTask(): Entry, task->{}",  actionableTask);
         JGroupsIntegrationPointSummary endpointIdentifier = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
-        Address targetAddress = getCandidateTargetServiceAddress(taskFulfiller);
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".updateActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+        }
         RemoteProcedureCallRequest remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, endpointIdentifier);
 
         try {
@@ -352,7 +372,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
                 PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
                 return(registeredTask);
             } else {
-                getLogger().error(".updateActionableTask(): Could not register task, response->{}", response);
+                getLogger().error(".updateActionableTask(): Could not update task, response->{}", response);
                 return(null);
             }
         } catch (NoSuchMethodException e) {
@@ -401,7 +421,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     }
 
     @Override
-    public List<PetasosActionableTask> retrievePendingActionableTasks(JGroupsIntegrationPointIdentifier requestorEndpointIdentifier) {
+    public Map<Integer, PetasosActionableTask> retrievePendingActionableTasks(String participantName) {
         return null;
     }
 }

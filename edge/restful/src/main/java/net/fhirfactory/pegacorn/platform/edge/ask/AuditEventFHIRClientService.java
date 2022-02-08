@@ -61,7 +61,7 @@ public class AuditEventFHIRClientService extends ResourceFHIRClientService {
         getLogger().debug(".writeAuditEvent(): Entry, auditEventJSONString->{}", auditEventJSONString);
         AuditEvent auditEvent = getFHIRParser().parseResource(AuditEvent.class, auditEventJSONString);
         MethodOutcome outcome = createResource(auditEvent);
-        getLogger().info(".writeAuditEvent(): Exit, outcome->{}", outcome);
+        getLogger().debug(".writeAuditEvent(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 

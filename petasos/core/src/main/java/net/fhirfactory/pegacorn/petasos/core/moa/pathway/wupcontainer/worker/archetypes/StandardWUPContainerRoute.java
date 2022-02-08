@@ -95,7 +95,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresProcessorIngres())
 				.routeId(nameSet.getRouteWUPContainerIngressProcessor())
-				.log(LoggingLevel.INFO, "Processing Task->${body}")
+				.log(LoggingLevel.DEBUG, "Processing Task->${body}")
 				.process(nodeDetailInjector)
 				.bean(WUPContainerIngresProcessor.class, "ingresContentProcessor(*, Exchange)")
 				.to(nameSet.getEndPointWUPContainerIngresProcessorEgress());

@@ -58,14 +58,14 @@ public class PatientFHIRClientService extends ResourceFHIRClientService {
         getLogger().debug(".createPatient(): Entry, patientJSONString->{}", patientJSONString);
         Patient patient = getFHIRParser().parseResource(Patient.class, patientJSONString);
         MethodOutcome outcome = createResource(patient);
-        getLogger().info(".createPatient(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createPatient(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome createPatient(Patient patient){
         getLogger().debug(".createPatient(): Entry, patient->{}", patient);
         MethodOutcome outcome = createResource(patient);
-        getLogger().info(".createPatient(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createPatient(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 }

@@ -102,13 +102,15 @@ public class JGroupsIntegrationPointSharedMap {
     // ServiceMap Methods
     //
 
-    private void addServiceMembership(String endpointServiceName, String endpointName){
-        if(StringUtils.isEmpty(endpointServiceName) || StringUtils.isEmpty(endpointName)){
+    private void addParticipantMembership(String participantName, String endpointName){
+        getLogger().debug(".addParticipantMembership(): Entry, participantName->{}, endpointName->{}", participantName, endpointName);
+        if(StringUtils.isEmpty(participantName) || StringUtils.isEmpty(endpointName)){
+            getLogger().debug(".addParticipantMembership(): Exit, either participantName or endpointName are null, doing nothing");
             return;
         }
         synchronized(this.integrationPointProcessingPlantServiceMapLock) {
-            if (this.integrationPointSubsystemMap.containsKey(endpointServiceName)) {
-                List<String> endpointNames = this.integrationPointSubsystemMap.get(endpointServiceName);
+            if (this.integrationPointSubsystemMap.containsKey(participantName)) {
+                List<String> endpointNames = this.integrationPointSubsystemMap.get(participantName);
                 if(endpointNames.contains(endpointName)){
                     // do nothing
                 } else {
@@ -117,33 +119,40 @@ public class JGroupsIntegrationPointSharedMap {
             } else {
                 List<String> endpointNames = new ArrayList<>();
                 endpointNames.add(endpointName);
-                this.integrationPointSubsystemMap.put(endpointServiceName, endpointNames);
+                this.integrationPointSubsystemMap.put(participantName, endpointNames);
             }
         }
+        getLogger().debug(".addParticipantMembership(): Exit, map updated");
     }
 
-    private void removeServiceNameMembership(String endpointServiceName, String endpointName) {
-        if (StringUtils.isEmpty(endpointServiceName) || StringUtils.isEmpty(endpointName)) {
+    private void removeServiceNameMembership(String participantName, String endpointName) {
+        getLogger().debug(".removeServiceNameMembership(): Entry, participantName->{}, endpointName->{}", participantName, endpointName);
+        if (StringUtils.isEmpty(participantName) || StringUtils.isEmpty(endpointName)) {
+            getLogger().debug(".removeServiceNameMembership(): Exit, either participantName or endpointName are null, doing nothing");
             return;
         }
         synchronized (this.integrationPointProcessingPlantServiceMapLock) {
-            if (this.integrationPointSubsystemMap.containsKey(endpointServiceName)) {
-                List<String> endpointNames = this.integrationPointSubsystemMap.get(endpointServiceName);
+            if (this.integrationPointSubsystemMap.containsKey(participantName)) {
+                List<String> endpointNames = this.integrationPointSubsystemMap.get(participantName);
                 if (endpointNames.contains(endpointName)) {
                     endpointNames.remove(endpointName);
                 }
                 if (endpointNames.isEmpty()) {
-                    this.integrationPointSubsystemMap.remove(endpointServiceName);
+                    this.integrationPointSubsystemMap.remove(participantName);
                 }
             }
         }
+        getLogger().debug(".removeServiceNameMembership(): Exit, map updated");
     }
 
     private void removeServiceNameMembership(String endpointName){
+        getLogger().debug(".removeServiceNameMembership(): Entry, endpointName->{}", endpointName);
         if(StringUtils.isEmpty(endpointName)){
+            getLogger().debug(".removeServiceNameMembership(): Exit, endpointName is empty, doing nothing");
             return;
         }
         if(this.integrationPointSubsystemMap.isEmpty()){
+            getLogger().debug(".removeServiceNameMembership(): Exit, the map is empty, doing nothing");
             return;
         }
         synchronized (this.integrationPointProcessingPlantServiceMapLock){
@@ -159,37 +168,44 @@ public class JGroupsIntegrationPointSharedMap {
                 }
             }
         }
+        getLogger().debug(".removeServiceNameMembership(): Exit, map updated");
     }
 
-    public List<String> getServiceNameMembership(String endpointServiceName){
-        List<String> serviceMembership = new ArrayList<>();
-        if (StringUtils.isEmpty(endpointServiceName)) {
-            return(serviceMembership);
+    public List<String> getParticipantFulfillers(String participantName){
+        getLogger().debug(".getParticipantFulfillers(): Entry, participantName->{}", participantName);
+        List<String> fulfillerList = new ArrayList<>();
+        if (StringUtils.isEmpty(participantName)) {
+            getLogger().debug(".getParticipantFulfillers(): Exit, participantName is empty, returning empty list");
+            return(fulfillerList);
         }
         synchronized (this.integrationPointProcessingPlantServiceMapLock) {
-            if (this.integrationPointSubsystemMap.containsKey(endpointServiceName)) {
-                serviceMembership.addAll(this.integrationPointSubsystemMap.get(endpointServiceName));
+            if (this.integrationPointSubsystemMap.containsKey(participantName)) {
+                fulfillerList.addAll(this.integrationPointSubsystemMap.get(participantName));
             }
         }
-        return(serviceMembership);
+        getLogger().debug(".getParticipantFulfillers(): Exit, fulfillerList->{}", fulfillerList);
+        return(fulfillerList);
     }
 
-    public void updateSubsystemIntegrationPointMembership(String subsystemName, String petasosEndpointName){
-        if (StringUtils.isEmpty(petasosEndpointName) || StringUtils.isEmpty(subsystemName)) {
+    public void updateParticipantIntegrationPointMembership(String participantName, String petasosEndpointName){
+        getLogger().debug(".updateParticipantIntegrationPointMembership(): Entry, participantName->{}, petasosEndpointName->{}", participantName, petasosEndpointName);
+        if (StringUtils.isEmpty(petasosEndpointName) || StringUtils.isEmpty(participantName)) {
+            getLogger().debug(".updateParticipantIntegrationPointMembership(): Exit, either participantName or endpointName are null, doing nothing");
             return;
         }
         boolean alreadyMappedAsRequested = false;
         boolean serviceEntryExists = false;
         synchronized(this.integrationPointProcessingPlantServiceMapLock) {
-            if (this.integrationPointSubsystemMap.containsKey(subsystemName)) {
+            if (this.integrationPointSubsystemMap.containsKey(participantName)) {
                 serviceEntryExists = true;
-                List<String> endpointNames = this.integrationPointSubsystemMap.get(subsystemName);
+                List<String> endpointNames = this.integrationPointSubsystemMap.get(participantName);
                 if (endpointNames.contains(petasosEndpointName)) {
                     alreadyMappedAsRequested = true;
                 }
             }
         }
         if(alreadyMappedAsRequested) {
+            getLogger().debug(".updateParticipantIntegrationPointMembership(): Exit, already in map, no update required");
             return;
         }
         boolean wasMappedElsewhere = false;
@@ -215,7 +231,8 @@ public class JGroupsIntegrationPointSharedMap {
                 }
             }
         }
-        addServiceMembership(subsystemName, petasosEndpointName);
+        addParticipantMembership(participantName, petasosEndpointName);
+        getLogger().debug(".updateParticipantIntegrationPointMembership(): Exit, update completed");
     }
 
     //
@@ -240,30 +257,30 @@ public class JGroupsIntegrationPointSharedMap {
      * @return a PetasosEndpoint representing the IPC/OAM interface.
      */
     public JGroupsIntegrationPointSummary addJGroupsIntegrationPoint(JGroupsIntegrationPointSummary jgroupsIP){
-        getLogger().debug(".addEndpoint(): Entry, jgroupsIP->{}", jgroupsIP);
+        getLogger().debug(".addJGroupsIntegrationPoint(): Entry, jgroupsIP->{}", jgroupsIP);
 
         if(jgroupsIP == null){
-            getLogger().debug(".addEndpoint(): Exit, jgroupsIP is null, return(null)");
+            getLogger().debug(".addJGroupsIntegrationPoint(): Exit, jgroupsIP is null, return(null)");
             return(null);
         }
 
         String endpointName = jgroupsIP.getComponentId().getDisplayName();
-        String subsystemName = jgroupsIP.getSubsystemParticipantName();
+        String participantName = jgroupsIP.getSubsystemParticipantName();
         if(integrationPoints.containsKey(endpointName)){
             JGroupsIntegrationPointSummary retrievedEndpoint = integrationPoints.get(endpointName);
-            getLogger().debug(".newEndpoint(): Exit, jgroupsIP already registered, jgroupsIP->{}", jgroupsIP);
+            getLogger().debug(".addJGroupsIntegrationPoint(): Exit, jgroupsIP already registered, jgroupsIP->{}", jgroupsIP);
             return(retrievedEndpoint);
         } else {
             integrationPoints.put(endpointName, jgroupsIP);
             integrationPointLocks.put(endpointName, new Object());
-            addServiceMembership(subsystemName, endpointName);
+            addParticipantMembership(participantName, endpointName);
             //
             //
             // TODO add an audit event here (detailing the addition of a new Endpoint).
             //
             //
             printMap();
-            getLogger().debug(".addEndpoint(): Exit, jgroupsIP added, jgroupsIP->{}", jgroupsIP);
+            getLogger().debug(".addJGroupsIntegrationPoint(): Exit, jgroupsIP added, jgroupsIP->{}", jgroupsIP);
             return(jgroupsIP);
         }
     }

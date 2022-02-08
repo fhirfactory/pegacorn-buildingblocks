@@ -60,14 +60,14 @@ public class LocationFHIRClientService extends ResourceFHIRClientService {
         getLogger().debug(".createLocation(): Entry, locationJSONString->{}", locationJSONString);
         Location location = getFHIRParser().parseResource(Location.class, locationJSONString);
         MethodOutcome outcome = createResource(location);
-        getLogger().info(".createLocation(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createLocation(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome createLocation(Location location){
         getLogger().debug(".createLocation(): Entry, location->{}", location);
         MethodOutcome outcome = createResource(location);
-        getLogger().info(".createLocation(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createLocation(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 }

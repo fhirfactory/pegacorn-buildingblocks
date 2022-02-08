@@ -55,12 +55,12 @@ public class PetasosTaskJobCardSet implements Serializable {
         if(card == null){
             return;
         }
-        if(!card.hasActionableTaskIdentifier() || !card.hasFulfillmentTaskIdentifier()){
+        if(!card.hasActionableTaskId() || !card.hasExecutingFulfillmentTaskId()){
             return;
         }
         //
         // Now add
-        TaskIdType fulfillmentTaskIdentifier = card.getFulfillmentTaskIdentifier();
+        TaskIdType fulfillmentTaskIdentifier = card.getExecutingFulfillmentTaskId();
         synchronized (getJobCardSetLock()){
             if(jobCardSet.containsKey(fulfillmentTaskIdentifier)){
                 jobCardSet.remove(fulfillmentTaskIdentifier);
@@ -78,12 +78,12 @@ public class PetasosTaskJobCardSet implements Serializable {
         if(card == null){
             return;
         }
-        if(!card.hasFulfillmentTaskIdentifier()){
+        if(!card.hasExecutingFulfillmentTaskId()){
             return;
         }
         //
         // Now remove
-        TaskIdType fulfillmentTaskIdentifier = card.getFulfillmentTaskIdentifier();
+        TaskIdType fulfillmentTaskIdentifier = card.getExecutingFulfillmentTaskId();
         synchronized (getJobCardSetLock()){
             if(jobCardSet.containsKey(fulfillmentTaskIdentifier)){
                 jobCardSet.remove(fulfillmentTaskIdentifier);

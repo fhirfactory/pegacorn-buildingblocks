@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
@@ -51,7 +51,7 @@ public class PetasosActionableTaskFactory {
     private TaskIdTypeFactory taskIdFactory;
 
     @Inject
-    private SharedActionableTaskDM actionableTaskIM;
+    private ParticipantSharedActionableTaskCache actionableTaskIM;
 
     @Inject
     private TaskTraceabilityTypeFactory traceabilityTypeFactory;

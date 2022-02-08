@@ -76,8 +76,15 @@ public class PegacornResourceKeyring implements Serializable {
     public PegacornResourceKeyring(PegacornResourceKeyring ori){
         this.sourceSystemKeyMap = new HashMap<>();
         this.sourceSystemKeyMap.putAll(ori.getSourceSystemKeyMap());
-        setPrimaryBusinessIdentifier(ori.getPrimaryBusinessIdentifier());
-        setLocalId(ori.getLocalId());
+        if(ori.getPrimaryBusinessIdentifier() != null) {
+            setPrimaryBusinessIdentifier(ori.getPrimaryBusinessIdentifier());
+        }
+        if(ori.getLocalId() != null) {
+            setLocalId(ori.getLocalId());
+        }
+        if(ori.getResourceType() != null){
+            setResourceType(ori.getResourceType());
+        }
     }
 
     //
@@ -185,11 +192,12 @@ public class PegacornResourceKeyring implements Serializable {
 
     @Override
     public String toString() {
-        return "ResourceKey{" +
-                "businessIdentifier=" + primaryBusinessIdentifier +
-                ", localId=" + localId +
+        return "PegacornResourceKeyring{" +
+                "primaryBusinessIdentifier=" + primaryBusinessIdentifier +
+                ", localId='" + localId + '\'' +
+                ", businessIdentifiersMap=" + businessIdentifiersMap +
                 ", sourceSystemKeyMap=" + sourceSystemKeyMap +
-                ", hasIdentifierTypeKey=" + hasIdentifierTypeKey() +
+                ", resourceType='" + resourceType + '\'' +
                 '}';
     }
 }

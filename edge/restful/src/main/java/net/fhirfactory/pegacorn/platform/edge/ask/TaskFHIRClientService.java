@@ -60,21 +60,21 @@ public class TaskFHIRClientService extends ResourceFHIRClientService {
         getLogger().debug(".postTask(): Entry, taskJSONString->{}", taskJSONString);
         Task task = getFHIRParser().parseResource(Task.class, taskJSONString);
         MethodOutcome outcome = createResource(task);
-        getLogger().info(".postTask(): Exit, outcome->{}", outcome);
+        getLogger().debug(".postTask(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome createTask(Task task){
         getLogger().debug(".postTask(): Entry, task->{}", task);
         MethodOutcome outcome = createResource(task);
-        getLogger().info(".postTask(): Exit, outcome->{}", outcome);
+        getLogger().debug(".postTask(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome updateTask(Task task){
         getLogger().debug(".updateTask(): Entry, task->{}", task);
         MethodOutcome outcome = updateResource(task);
-        getLogger().info(".updateTask(): Exit, outcome->{}", outcome);
+        getLogger().debug(".updateTask(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 }

@@ -24,8 +24,8 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
@@ -57,10 +57,10 @@ public class WUPContainerIngresGatekeeper {
      * @return Should either return the ingres point into the associated WUP Ingres Conduit or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> ingresGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+    public List<String> ingresGatekeeper(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
         getLogger().debug(".ingresGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask);
         // Get Route Names
-        TopologyNodeFunctionFDNToken wupToken = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getNodeFunctionFDN().getFunctionToken();
+        TopologyNodeFunctionFDNToken wupToken = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
         //
         // Get out metricsAgent & do add some metrics
@@ -69,7 +69,7 @@ public class WUPContainerIngresGatekeeper {
         RouteElementNames nameSet = new RouteElementNames(wupToken);
         ArrayList<String> targetList = new ArrayList<String>();
         getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
-        if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
+        if (fulfillmentTask.getTaskFulfillment().isToBeDiscarded()) {
             getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             metricsAgent.touchLastActivityFinishInstant();
             targetList.add(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);

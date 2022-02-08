@@ -23,18 +23,17 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalPetasosFulfillmentTaskDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalFulfillmentTaskCache;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedTaskJobCardDM;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.global.GlobalPetasosTaskExecutionController;
-import org.apache.commons.lang3.SerializationUtils;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.ParticipantTaskExecutionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +49,10 @@ public class LocalPetasosFulfilmentTaskActivityController {
     private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosFulfilmentTaskActivityController.class);
 
     @Inject
-    private LocalPetasosFulfillmentTaskDM fulfillmentTaskDM;
+    private LocalFulfillmentTaskCache fulfillmentTaskDM;
 
     @Inject
-    private SharedTaskJobCardDM sharedTaskJobCardDM;
+    private ParticipantSharedTaskJobCardCache sharedTaskJobCardDM;
 
     @Inject
     private PetasosFulfillmentTaskAuditServicesBroker auditServicesBroker;
@@ -62,107 +61,104 @@ public class LocalPetasosFulfilmentTaskActivityController {
     private ProcessingPlantInterface processingPlant;
 
     @Inject
-    private GlobalPetasosTaskExecutionController taskExecutionController;
+    private ParticipantTaskExecutionController taskExecutionController;
 
     @Inject
     private PetasosTaskJobCardFactory jobCardFactory;
+
+    @Inject
+    private PetasosFulfillmentTaskSharedInstanceAccessorFactory fulfillmentTaskSharedInstanceAccessorFactory;
 
     //
     // PetasosFulfillmentTask Registration
     //
 
-    public PetasosFulfillmentTask registerFulfillmentTask(PetasosFulfillmentTask task, boolean synchronousWriteToAudit){
+    public PetasosFulfillmentTaskSharedInstance registerFulfillmentTask(PetasosFulfillmentTask task, boolean synchronousWriteToAudit){
         getLogger().debug(".registerFulfillmentTask(): Entry, fulfillmentTask->{}", task);
         PetasosTaskJobCard petasosTaskJobCard = null;
         if(task.hasTaskJobCard()) {
             petasosTaskJobCard = task.getTaskJobCard();
         } else {
             petasosTaskJobCard = jobCardFactory.newPetasosTaskJobCard(task);
-            petasosTaskJobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING);
-            petasosTaskJobCard.setGrantedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING);
-            petasosTaskJobCard.setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
-            petasosTaskJobCard.setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING);
-            petasosTaskJobCard.setToBeDiscarded(false);
-            petasosTaskJobCard.setLocalUpdateInstant(Instant.now());
-            synchronized (task.getTaskJobCardLock()) {
-                task.setTaskJobCard(petasosTaskJobCard);
-            }
+            petasosTaskJobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+            petasosTaskJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+            petasosTaskJobCard.setExecutingFulfillmentTaskId(null);
+            petasosTaskJobCard.setLastRequestedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+            petasosTaskJobCard.setExecutingFulfillmentTaskIdAssignmentInstant(null);
+            task.setTaskJobCard(petasosTaskJobCard);
         }
         //
-        // Register the Fulfillment Task
-        fulfillmentTaskDM.registerFulfillmentTask(task);
-        //
-        // Register the Task Job Card
-        PetasosTaskJobCard sharedJobCard = SerializationUtils.clone(petasosTaskJobCard);
-        sharedTaskJobCardDM.registerJobCard(sharedJobCard);
-        //
-        // Request Execution Privileges
-        taskExecutionController.requestTaskExecutionPrivilege(task.getTaskJobCard());
-        getLogger().debug(".registerFulfillmentTask(): Exit, fulfillmentTask->{}", task);
-        return(task);
+        // Register and Create a SharedInstance Accessor for the Fulfillment Task
+        PetasosFulfillmentTaskSharedInstance fulfillmentTaskSharedInstance = getFulfillmentTaskSharedInstanceAccessorFactory().newFulfillmentTaskSharedAccessor(task);
+
+        getLogger().debug(".registerFulfillmentTask(): Exit, fulfillmentTaskSharedInstance->{}", fulfillmentTaskSharedInstance);
+        return(fulfillmentTaskSharedInstance);
     }
 
     public void deregisterFulfillmentTask(PetasosFulfillmentTask task){
         getLogger().debug(".deregisterFulfillmentTask(): Entry, task->{}", task);
-        fulfillmentTaskDM.removeFulfillmentTask(task.getTaskId());
+        fulfillmentTaskDM.removeTask(task.getTaskId());
         getLogger().debug(".deregisterFulfillmentTask(): Exit");
     }
 
     public void deregisterFulfillmentTask(TaskIdType taskId){
-        fulfillmentTaskDM.removeFulfillmentTask(taskId);
+        fulfillmentTaskDM.removeTask(taskId);
     }
 
     //
     // Requests
     //
 
-    public Instant requestFulfillmentTaskExecutionPrivilege(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Entry, localJobCard->{}", localJobCard);
-        if(getLogger().isInfoEnabled()){
-            getLogger().info(".requestFulfillmentTaskExecutionPrivilege(): Entry, WUP Component Id->{}", localJobCard.getWorkUnitProcessor().getDisplayName());
+    public PetasosTaskExecutionStatusEnum requestFulfillmentTaskExecutionPrivilege(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
+        getLogger().trace(".requestFulfillmentTaskExecutionPrivilege(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Entry, WUP Component Id->{}", fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
         }
-        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.requestTaskExecutionPrivilege(localJobCard);
-        Instant updateInstant = Instant.now();
-        return(updateInstant);
+        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.requestTaskExecutionPrivilege(fulfillmentTask.getInstance());
+        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
+        fulfillmentTask.update();
+        getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
+        return(petasosTaskExecutionStatus);
     }
 
     //
     // Notifications
     //
 
-    public Instant notifyFulfillmentTaskExecutionStart(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Entry, localJobCard->{}", localJobCard);
-        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskExecutionStart(localJobCard);
-        Instant updateInstant = Instant.now();
-        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Exit, localJobCard->{}", localJobCard);
-        return(updateInstant);
+    public PetasosTaskExecutionStatusEnum notifyFulfillmentTaskExecutionStart(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
+        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionStart(fulfillmentTask.getInstance());
+        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
+        fulfillmentTask.update();
+        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
+        return(petasosTaskExecutionStatus);
     }
 
-    public Instant notifyFulfillmentTaskExecutionFinish(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Entry, localJobCard->{}", localJobCard);
-        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskExecutionFinish(localJobCard);
-        Instant updateInstant = Instant.now();
-        getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Exit, localJobCard->{}", localJobCard);
-        return(updateInstant);
+    public PetasosTaskExecutionStatusEnum notifyFulfillmentTaskExecutionFinish(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
+        getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionFinish(fulfillmentTask.getInstance());
+        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
+        getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
+        return(petasosTaskExecutionStatus);
     }
 
-    public Instant notifyFulfillmentTaskExecutionFailure(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Entry, localJobCard->{}", localJobCard);
-        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskExecutionFailure(localJobCard);
-        Instant updateInstant = Instant.now();
-        getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Exit, localJobCard->{}", localJobCard);
-        return(updateInstant);
+    public PetasosTaskExecutionStatusEnum notifyFulfillmentTaskExecutionFailure(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
+        getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionFailure(fulfillmentTask.getInstance());
+        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
+        getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
+        return(petasosTaskExecutionStatus);
     }
 
-    public Instant notifyFulfillmentTaskExecutionCancellation(PetasosTaskJobCard localJobCard){
-        getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Entry, localJobCard->{}", localJobCard);
-        PetasosTaskJobCard petasosTaskJobCard = taskExecutionController.reportTaskCancellation(localJobCard);
-        Instant updateInstant = Instant.now();
-        getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Exit, localJobCard->{}", localJobCard);
-        return(updateInstant);
+    public PetasosTaskExecutionStatusEnum notifyFulfillmentTaskExecutionCancellation(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
+        getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskCancellation(fulfillmentTask.getInstance());
+        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
+        getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
+        return(petasosTaskExecutionStatus);
     }
 
-    public Instant notifyFulfillmentTaskExecutionNoActionRequired(PetasosTaskJobCard localJobCard){
+    public Instant notifyFulfillmentTaskExecutionNoActionRequired(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
 
         Instant updateInstant = Instant.now();
         return(updateInstant);
@@ -174,5 +170,9 @@ public class LocalPetasosFulfilmentTaskActivityController {
 
     protected Logger getLogger(){
         return(LOG);
+    }
+
+    protected PetasosFulfillmentTaskSharedInstanceAccessorFactory getFulfillmentTaskSharedInstanceAccessorFactory(){
+        return(this.fulfillmentTaskSharedInstanceAccessorFactory);
     }
 }

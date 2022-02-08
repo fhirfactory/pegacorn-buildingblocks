@@ -19,12 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.global.watchdogs;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedTaskJobCardDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +49,10 @@ public class GlobalPetasosTaskContinuityWatchdog {
     private boolean initialised;
 
     @Inject
-    private SharedActionableTaskDM actionableTaskDM;
+    private ParticipantSharedActionableTaskCache actionableTaskDM;
 
     @Inject
-    private SharedTaskJobCardDM taskJobCardDM;
+    private ParticipantSharedTaskJobCardCache taskJobCardDM;
 
     //
     // Constructor(s)
@@ -114,8 +114,8 @@ public class GlobalPetasosTaskContinuityWatchdog {
                 getLogger().debug(".taskContinuityWatchdog(): Checking task {}", currentTaskId);
             }
             boolean unregisterTask = false;
-            synchronized (actionableTaskDM.getActionableTaskLock(currentTaskId)){
-                PetasosActionableTask currentActionableTask = actionableTaskDM.getActionableTask(currentTaskId);
+            synchronized (actionableTaskDM.getTaskLock(currentTaskId)){
+                PetasosActionableTask currentActionableTask = actionableTaskDM.getTask(currentTaskId);
                 if(currentActionableTask.hasTaskCompletionSummary()){
                     if (currentActionableTask.getTaskCompletionSummary().isFinalised()) {
                         unregisterTask = true;
@@ -153,7 +153,7 @@ public class GlobalPetasosTaskContinuityWatchdog {
             }
             if(unregisterTask){
                 getLogger().debug(".taskContinuityWatchdog(): Task {} is finalised, removing from shared cache... start", currentTaskId);
-                PetasosActionableTask unregisteredActionableTask = actionableTaskDM.removeActionableTask(currentTaskId);
+                PetasosActionableTask unregisteredActionableTask = actionableTaskDM.removeTask(currentTaskId);
                 getLogger().debug(".taskContinuityWatchdog(): Task {} is finalised, removing from shared cache... done...");
             }
             if(getLogger().isDebugEnabled()){
@@ -199,11 +199,11 @@ public class GlobalPetasosTaskContinuityWatchdog {
         this.initialised = initialised;
     }
 
-    public SharedActionableTaskDM getActionableTaskDM() {
+    public ParticipantSharedActionableTaskCache getActionableTaskDM() {
         return actionableTaskDM;
     }
 
-    public SharedTaskJobCardDM getTaskJobCardDM() {
+    public ParticipantSharedTaskJobCardCache getTaskJobCardDM() {
         return taskJobCardDM;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2020 MAHun
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,45 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes;
+package net.fhirfactory.pegacorn.petasos.core.tasks.accessors;
 
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
-import org.apache.camel.Exchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class ActionableTaskRegistrationBean {
-    private static final Logger LOG = LoggerFactory.getLogger(ActionableTaskRegistrationBean.class);
-
+public class PetasosTaskJobCardSharedInstanceAccessorFactory {
 
     @Inject
-    private LocalPetasosActionableTaskActivityController actionableTaskBroker;
+    private ParticipantSharedTaskJobCardCache jobCardCache;
 
-    //
-    // Constructor
-    //
-
-
-    //
-    // Post Construct
-    //
-
-    public PetasosActionableTask registerActionableTask(PetasosActionableTask task, Exchange camelExchange){
-        PetasosActionableTask registeredTask = actionableTaskBroker.registerActionableTask(task);
-        return(registeredTask);
+    public PetasosTaskJobCardSharedInstance newTaskJobCardSharedInstanceAccessor(TaskIdType taskId){
+        PetasosTaskJobCardSharedInstance jobCard = new PetasosTaskJobCardSharedInstance(taskId, jobCardCache);
+        return(jobCard);
     }
 
-    //
-    // Getters (and Setters)
-    //
-
-    protected Logger getLogger(){
-        return(LOG);
+    public PetasosTaskJobCardSharedInstance newTaskJobCardSharedInstanceAccessor(PetasosTaskJobCard taskJobCard){
+        PetasosTaskJobCardSharedInstance jobCard = new PetasosTaskJobCardSharedInstance(taskJobCard, jobCardCache);
+        return(jobCard);
     }
-
 }

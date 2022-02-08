@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComp
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +111,25 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
             notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
             getNotificationAgent().sendNotification(notification);
             if (getLogger().isInfoEnabled()) {
-                getLogger().info(".sendITOpsNotification(): Send Notification->{}", notification);
+                getLogger().debug(".sendITOpsNotification(): Send Notification->{}", notification);
+            }
+        } catch(Exception ex){
+            getLogger().warn(".sendITOpsNotification(): Can't send notifications, message->{}, stacktrace->{}", ExceptionUtils.getMessage(ex), ExceptionUtils.getStackTrace(ex));
+        }
+    }
+
+    @Override
+    public void sendITOpsNotification(String unformattedMessage, String formattedMessage) {
+        try {
+            PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+            notification.setComponentId(getMetricsData().getComponentID());
+            notification.setParticipantName(getEndpointMetricsData().getParticipantName());
+            notification.setContent(unformattedMessage);
+            notification.setFormattedContent(formattedMessage);
+            notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
+            getNotificationAgent().sendNotification(notification);
+            if (getLogger().isInfoEnabled()) {
+                getLogger().debug(".sendITOpsNotification(): Send Notification->{}", notification);
             }
         } catch(Exception ex){
             getLogger().warn(".sendITOpsNotification(): Can't send notifications, message->{}, stacktrace->{}", ExceptionUtils.getMessage(ex), ExceptionUtils.getStackTrace(ex));
@@ -123,29 +142,35 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
 
     @JsonIgnore
     public void incrementRemoteProcedureCallCount(){
+        getLogger().debug(".incrementRemoteProcedureCallCount(): Entry");
         synchronized (getMetricsDataLock()){
             int count = getEndpointMetricsData().getRemoteProcedureCallCount();
             count += 1;
             getEndpointMetricsData().setRemoteProcedureCallCount(count);
         }
+        getLogger().debug(".incrementRemoteProcedureCallCount(): Exit");
     }
 
     @JsonIgnore
     public void incrementRemoteProcedureCallFailureCount(){
+        getLogger().debug(".incrementRemoteProcedureCallFailureCount(): Entry");
         synchronized (getMetricsDataLock()){
             int count = getEndpointMetricsData().getRemoteProcedureCallFailureCount();
             count += 1;
             getEndpointMetricsData().setRemoteProcedureCallCount(count);
         }
+        getLogger().debug(".incrementRemoteProcedureCallFailureCount(): Exit");
     }
 
     @JsonIgnore
     public void incrementRemoteProcedureCallHandledCount(){
+        getLogger().debug(".incrementRemoteProcedureCallHandledCount(): Entry");
         synchronized (getMetricsDataLock()){
             int count = getEndpointMetricsData().getRemoteProcedureCallCount();
             count += 1;
             getEndpointMetricsData().setRemoteProcedureCallCount(count);
         }
+        getLogger().debug(".incrementRemoteProcedureCallHandledCount(): Exit");
     }
 
     @JsonIgnore
@@ -154,6 +179,48 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
             int count = getEndpointMetricsData().getEgressSendAttemptCount();
             count += 1;
             getEndpointMetricsData().setEgressSendAttemptCount(count);
+        }
+    }
+
+    @JsonIgnore
+    public void incrementRPCRequestCount(String targetParticipantName){
+        if(StringUtils.isNotEmpty(targetParticipantName)){
+            synchronized (getMetricsDataLock()){
+                if(!getEndpointMetricsData().getRemoteProcedureCallRequestsMap().containsKey(targetParticipantName)){
+                    getEndpointMetricsData().getRemoteProcedureCallRequestsMap().put(targetParticipantName, 0);
+                }
+                Integer count = getEndpointMetricsData().getRemoteProcedureCallRequestsMap().get(targetParticipantName);
+                Integer newValue = count + 1;
+                getEndpointMetricsData().getRemoteProcedureCallRequestsMap().replace(targetParticipantName, newValue);
+            }
+        }
+    }
+
+    @JsonIgnore
+    public void incrementRPCResponseCount(String targetParticipantName){
+        if(StringUtils.isNotEmpty(targetParticipantName)){
+            synchronized (getMetricsDataLock()){
+                if(!getEndpointMetricsData().getRemoteProcedureCallResponsesMap().containsKey(targetParticipantName)){
+                    getEndpointMetricsData().getRemoteProcedureCallResponsesMap().put(targetParticipantName, 0);
+                }
+                Integer count = getEndpointMetricsData().getRemoteProcedureCallResponsesMap().get(targetParticipantName);
+                Integer newValue = count + 1;
+                getEndpointMetricsData().getRemoteProcedureCallResponsesMap().replace(targetParticipantName, newValue);
+            }
+        }
+    }
+
+    @JsonIgnore
+    public void incrementRPCFailureCount(String targetParticipantName){
+        if(StringUtils.isNotEmpty(targetParticipantName)){
+            synchronized (getMetricsDataLock()){
+                if(!getEndpointMetricsData().getRemoteProcedureCallFailuresMap().containsKey(targetParticipantName)){
+                    getEndpointMetricsData().getRemoteProcedureCallFailuresMap().put(targetParticipantName, 0);
+                }
+                Integer count = getEndpointMetricsData().getRemoteProcedureCallFailuresMap().get(targetParticipantName);
+                Integer newValue = count + 1;
+                getEndpointMetricsData().getRemoteProcedureCallFailuresMap().replace(targetParticipantName, newValue);
+            }
         }
     }
 

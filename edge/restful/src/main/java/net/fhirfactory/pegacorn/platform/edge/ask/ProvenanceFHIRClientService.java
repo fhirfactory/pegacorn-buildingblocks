@@ -63,21 +63,21 @@ public class ProvenanceFHIRClientService extends ResourceFHIRClientService {
         getLogger().debug(".createProvenance(): Entry, provenanceJSONString->{}", provenanceJSONString);
         Provenance provenance = getFHIRParser().parseResource(Provenance.class, provenanceJSONString);
         MethodOutcome outcome = createResource(provenance);
-        getLogger().info(".createProvenance(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createProvenance(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome createProvenance(Provenance provenance){
         getLogger().debug(".createProvenance(): Entry, provenance->{}", provenance);
         MethodOutcome outcome = createResource(provenance);
-        getLogger().info(".createProvenance(): Exit, outcome->{}", outcome);
+        getLogger().debug(".createProvenance(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 
     public MethodOutcome updateProvenance(Provenance provenance){
         getLogger().debug(".updateProvenance(): Entry, provenance->{}", provenance);
         MethodOutcome outcome = updateResource(provenance);
-        getLogger().info(".updateProvenance(): Exit, outcome->{}", outcome);
+        getLogger().debug(".updateProvenance(): Exit, outcome->{}", outcome);
         return(outcome);
     }
 

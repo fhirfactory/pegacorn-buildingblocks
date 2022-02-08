@@ -122,19 +122,19 @@ public class PetasosTaskReportAgentWorker extends AgentWorkerBase implements Pet
     //
 
     protected void forwardLocalTaskReportsToServer(){
-        LOG.info(".forwardLocalTaskReportsToServer(): Entry");
+        LOG.debug(".forwardLocalTaskReportsToServer(): Entry");
         while(hasMoreNotifications()) {
             PetasosComponentITOpsNotification nextTaskReport = null;
             synchronized (notificationQueueLock) {
                 nextTaskReport = getNextNotification();
             }
             if(nextTaskReport != null) {
-                LOG.info(".forwardLocalTaskReportsToServer(): Loaded TaskReports form local cache, forwarding");
-                LOG.info(".forwardLocalTaskReportsToServer(): Sending TaskReports for Participant->{}", nextTaskReport.getParticipantName());
+                LOG.debug(".forwardLocalTaskReportsToServer(): Loaded TaskReports form local cache, forwarding");
+                LOG.debug(".forwardLocalTaskReportsToServer(): Sending TaskReports for Participant->{}", nextTaskReport.getParticipantName());
                 brokerInterface.sendTaskReport(nextTaskReport);
             }
         }
-        LOG.info(".forwardLocalTaskReportsToServer(): Exit");
+        LOG.debug(".forwardLocalTaskReportsToServer(): Exit");
     }
 
     //

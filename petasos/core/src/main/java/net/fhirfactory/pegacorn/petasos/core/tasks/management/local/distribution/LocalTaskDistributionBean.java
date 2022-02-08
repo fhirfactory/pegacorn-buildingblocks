@@ -30,10 +30,15 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
@@ -85,6 +90,15 @@ public class LocalTaskDistributionBean {
     @Inject
     private LocalTaskDistributionDecisionEngine taskDistributionDecisionEngine;
 
+    @Inject
+    private PetasosFulfillmentTaskSharedInstanceAccessorFactory fulfillmentTaskSharedInstanceFactory;
+
+    @Inject
+    private PetasosTaskJobCardSharedInstanceAccessorFactory taskJobCardInstanceFactory;
+
+    @Inject
+    private PetasosTaskJobCardFactory taskJobCardFactory;
+
     //
     // Constructor(s)
     //
@@ -107,6 +121,10 @@ public class LocalTaskDistributionBean {
 
     protected LocalTaskDistributionDecisionEngine getTaskDistributionDecisionEngine(){
         return(taskDistributionDecisionEngine);
+    }
+
+    protected PetasosFulfillmentTaskSharedInstanceAccessorFactory getFulfillmentTaskSharedInstanceFactory(){
+        return(this.fulfillmentTaskSharedInstanceFactory);
     }
 
     //
@@ -223,11 +241,15 @@ public class LocalTaskDistributionBean {
         //
         // Register The FulfillmentTask
         getLogger().debug(".forwardTask(): Register PetasosFulfillmentTask: Start");
-        fulfilmentTaskBroker.registerFulfillmentTask(petasosFulfillmentTask, false);
+        PetasosFulfillmentTaskSharedInstance petasosFulfillmentSharedInstance = fulfilmentTaskBroker.registerFulfillmentTask(petasosFulfillmentTask, false);
         getLogger().debug(".forwardTask(): Register PetasosFulfillmentTask: Finish");
         getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Start");
         String targetCamelEndpoint = routeName.getEndPointWUPContainerIngresProcessorIngres();
         getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: targetCamelEndpoint->{}", targetCamelEndpoint);
+        //
+        // Create The TaskJobCard
+        PetasosTaskJobCard petasosTaskJobCard = taskJobCardFactory.newPetasosTaskJobCard(petasosFulfillmentSharedInstance.getInstance());
+        taskJobCardInstanceFactory.newTaskJobCardSharedInstanceAccessor(petasosTaskJobCard);
         //
         // Get out metricsAgent & do add some metrics
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
@@ -242,7 +264,7 @@ public class LocalTaskDistributionBean {
         metricsAgent.sendITOpsNotification(distributionMessageBuilder.toString());
         //
         // Forward the Task
-        camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentTask);
+        camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentSharedInstance);
         getLogger().debug(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
     }
 
