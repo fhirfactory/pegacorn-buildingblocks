@@ -90,7 +90,7 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
                 null,
                 processingPlant.getSimpleInstanceName(),
                 processingPlant.getHostName(),
-                fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID().getDisplayName(),
+                fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID().getDisplayName(),
                 null,
                 AuditEventSourceTypeEnum.HL7_APPLICATION_SERVER,
                 extractAuditEventType(fulfillmentTask),

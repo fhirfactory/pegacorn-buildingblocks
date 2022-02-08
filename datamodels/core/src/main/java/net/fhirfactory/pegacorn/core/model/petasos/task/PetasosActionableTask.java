@@ -22,21 +22,20 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
-import net.fhirfactory.pegacorn.internals.SerializableObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
 public class PetasosActionableTask extends PetasosTask{
+    private final static Logger LOG = LoggerFactory.getLogger(PetasosActionableTask.class);
 
     private TaskFulfillmentType taskFulfillment;
-    private SerializableObject taskFulfillmentLock;
     private TaskCompletionSummaryType taskCompletionSummary;
-    private SerializableObject taskCompletionLock;
 
     //
     // Constructor(s)
@@ -45,9 +44,7 @@ public class PetasosActionableTask extends PetasosTask{
     public PetasosActionableTask(){
         super();
         this.taskFulfillment = null;
-        this.taskFulfillmentLock = new SerializableObject();
         this.taskCompletionSummary = null;
-        this.taskCompletionLock = new SerializableObject();
         setTaskType(new TaskTypeType(TaskTypeTypeEnum.PETASOS_ACTIONABLE_TASK_TYPE));
     }
 
@@ -69,14 +66,6 @@ public class PetasosActionableTask extends PetasosTask{
         this.taskFulfillment = taskFulfillment;
     }
 
-    public SerializableObject getTaskFulfillmentLock() {
-        return taskFulfillmentLock;
-    }
-
-    public void setTaskFulfillmentLock(SerializableObject taskFulfillmentLock) {
-        this.taskFulfillmentLock = taskFulfillmentLock;
-    }
-
     @JsonIgnore
     public boolean hasTaskCompletionSummary(){
         boolean hasValue = this.taskCompletionSummary != null;
@@ -89,14 +78,6 @@ public class PetasosActionableTask extends PetasosTask{
 
     public void setTaskCompletionSummary(TaskCompletionSummaryType taskCompletion) {
         this.taskCompletionSummary = taskCompletion;
-    }
-
-    public SerializableObject getTaskCompletionLock() {
-        return taskCompletionLock;
-    }
-
-    public void setTaskCompletionLock(SerializableObject taskCompletionLock) {
-        this.taskCompletionLock = taskCompletionLock;
     }
 
     //
@@ -155,19 +136,20 @@ public class PetasosActionableTask extends PetasosTask{
     @Override
     public String toString() {
         return "PetasosActionableTask{" +
-                "  taskFulfillment=" + taskFulfillment + ",\n" +
-                "  sourceResourceId=" + getSourceResourceId() + ",\n" +
-                "  taskCompletionSummary=" + taskCompletionSummary + ",\n" +
-                "  taskId=" + getTaskId() + ",\n" +
-                "  taskType=" + getTaskType() + ",\n" +
-                "  taskWorkItem=" + getTaskWorkItem() + ",\n" +
-                "  taskTraceability=" + getTaskTraceability() + ",\n" +
-                "  taskOutcomeStatus=" + getTaskOutcomeStatus() + ",\n" +
-                "  registered=" + isRegistered() + ",\n" +
-                "  taskPerformerTypes=" + getTaskPerformerTypes() + ",\n" +
-                "  taskReason=" + getTaskReason() + ",\n" +
-                "  taskNodeAffinity=" + getTaskNodeAffinity() + ",\n" +
-                "  taskMetadata=" + getTaskContext() + ",\n" +
+                "  taskFulfillment=" + taskFulfillment +
+                "  sourceResourceId=" + getSourceResourceId() +
+                "  taskCompletionSummary=" + taskCompletionSummary +
+                "  taskId=" + getTaskId() +
+                "  taskType=" + getTaskType() +
+                "  taskWorkItem=" + getTaskWorkItem() +
+                "  taskTraceability=" + getTaskTraceability() +
+                "  taskOutcomeStatus=" + getTaskOutcomeStatus() +
+                "  registered=" + isRegistered() +
+                "  taskPerformerTypes=" + getTaskPerformerTypes() +
+                "  taskReason=" + getTaskReason() +
+                "  taskNodeAffinity=" + getTaskNodeAffinity() +
+                "  taskMetadata=" + getTaskContext() +
+                ", executionStatus=" + getExecutionStatus() +
                 '}';
     }
 
@@ -177,11 +159,17 @@ public class PetasosActionableTask extends PetasosTask{
 
     @JsonIgnore
     public PetasosTask update(PetasosActionableTask update){
-
-        PetasosActionableTask petasosTaskUpdate = (PetasosActionableTask)updatePetasosTask(update);
-        PetasosActionableTask petasosActionableTaskUpdate = updatePetasosActionableTask(petasosTaskUpdate);
-
-        return(petasosActionableTaskUpdate);
+        LOG.debug(".update(): Entry, update->{}", update);
+        //
+        // 1st, update the super-class attributes
+        PetasosActionableTask updatedPetasosTask = (PetasosActionableTask)updatePetasosTask(update);
+        LOG.trace(".update(): After PetasosTask update, updatedPetasosTask->{}", updatedPetasosTask);
+        LOG.trace(".update(): After PetasosTask update, this->{}", this);
+        //
+        // 2nd, update the PetasosActionableTask specific attributes
+        PetasosActionableTask updatedTask = updatePetasosActionableTask(update);
+        LOG.debug(".update(): Exit, updatedTask->{}", updatedTask);
+        return(updatedTask);
     }
 
     @JsonIgnore
@@ -189,46 +177,51 @@ public class PetasosActionableTask extends PetasosTask{
         if(update == null){
             return(this);
         }
-        synchronized (getTaskCompletionLock()) {
-            if (update.hasTaskCompletionSummary()) {
-                if (!this.hasTaskCompletionSummary()){
-                    this.setTaskCompletionSummary(update.getTaskCompletionSummary());
-                }else {
-                    this.getTaskCompletionSummary().setLastInChain(update.getTaskCompletionSummary().isLastInChain());
-                    this.getTaskCompletionSummary().setFinalised(update.getTaskCompletionSummary().isFinalised());
-                    this.getTaskCompletionSummary().setDownstreamTaskMap(update.getTaskCompletionSummary().getDownstreamTaskMap());
+        if (update.hasTaskCompletionSummary()) {
+            if (!this.hasTaskCompletionSummary()){
+                this.setTaskCompletionSummary(update.getTaskCompletionSummary());
+            }else {
+                this.getTaskCompletionSummary().setLastInChain(update.getTaskCompletionSummary().isLastInChain());
+                this.getTaskCompletionSummary().setFinalised(update.getTaskCompletionSummary().isFinalised());
+                this.getTaskCompletionSummary().setDownstreamTaskMap(update.getTaskCompletionSummary().getDownstreamTaskMap());
+            }
+        }
+        LOG.trace(".updatePetasosActionableTask(): About to Update: update->getTaskFulfillment()->{}",update.getTaskFulfillment());
+        LOG.trace(".updatePetasosActionableTask(): About to Update: this->getTaskFulfillment()->{}",this.getTaskFulfillment());
+        if(update.hasTaskFulfillment()){
+            if(!this.hasTaskFulfillment()){
+                this.setTaskFulfillment(update.getTaskFulfillment());
+            } else {
+                if(update.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
+                    this.getTaskFulfillment().setFulfillerWorkUnitProcessor(update.getTaskFulfillment().getFulfillerWorkUnitProcessor());
+                }
+                if(update.getTaskFulfillment().hasFinalisationInstant()){
+                    this.getTaskFulfillment().setFinalisationInstant(update.getTaskFulfillment().getFinalisationInstant());
+                }
+                if(update.getTaskFulfillment().hasFinishInstant()){
+                    this.getTaskFulfillment().setFinishInstant(update.getTaskFulfillment().getFinishInstant());
+                }
+                if(update.getTaskFulfillment().hasLastCheckedInstant()){
+                    this.getTaskFulfillment().setLastCheckedInstant(update.getTaskFulfillment().getLastCheckedInstant());
+                }
+                if(update.getTaskFulfillment().hasReadyInstant()){
+                    this.getTaskFulfillment().setReadyInstant(update.getTaskFulfillment().getReadyInstant());
+                }
+                if(update.getTaskFulfillment().hasRegistrationInstant()){
+                    this.getTaskFulfillment().setRegistrationInstant(update.getTaskFulfillment().getRegistrationInstant());
+                }
+                if(update.getTaskFulfillment().hasStartInstant()){
+                    this.getTaskFulfillment().setStartInstant(update.getTaskFulfillment().getStartInstant());
+                }
+                if(update.getTaskFulfillment().hasStatus()){
+                    this.getTaskFulfillment().setStatus(update.getTaskFulfillment().getStatus());
+                }
+                if(update.getTaskFulfillment().hasTrackingID()){
+                    this.getTaskFulfillment().setTrackingID(update.getTaskFulfillment().getTrackingID());
                 }
             }
         }
-        synchronized (getTaskFulfillmentLock()){
-            if(update.hasTaskFulfillment()){
-                if(!this.hasTaskFulfillment()){
-                    this.setTaskFulfillment(update.getTaskFulfillment());
-                } else {
-                    if(update.getTaskFulfillment().hasFulfillerComponent()) {
-                        this.getTaskFulfillment().setFulfillerComponent(update.getTaskFulfillment().getFulfillerComponent());
-                    }
-                    if(update.getTaskFulfillment().hasFinalisationInstant()){
-                        this.getTaskFulfillment().setFinishInstant(update.getTaskFulfillment().getFinishInstant());
-                    }
-                    if(update.getTaskFulfillment().hasLastCheckedInstant()){
-                        this.getTaskFulfillment().setLastCheckedInstant(update.getTaskFulfillment().getLastCheckedInstant());
-                    }
-                    if(update.getTaskFulfillment().hasReadyInstant()){
-                        this.getTaskFulfillment().setReadyInstant(update.getTaskFulfillment().getReadyInstant());
-                    }
-                    if(update.getTaskFulfillment().hasRegistrationInstant()){
-                        this.getTaskFulfillment().setRegistrationInstant(update.getTaskFulfillment().getRegistrationInstant());
-                    }
-                    if(update.getTaskFulfillment().hasStartInstant()){
-                        this.getTaskFulfillment().setStartInstant(update.getTaskFulfillment().getStartInstant());
-                    }
-                    if(update.getTaskFulfillment().hasStatus()){
-                        this.getTaskFulfillment().setStatus(update.getTaskFulfillment().getStatus());
-                    }
-                }
-            }
-        }
+        LOG.debug(".updatePetasosActionableTask(): After Update: this->getTaskFulfillment()->{}",this.getTaskFulfillment());
         return(this);
     }
 }

@@ -32,6 +32,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
@@ -74,7 +75,7 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
     public UoW processResponse(InterProcessingPlantHandoverResponsePacket responsePacket, Exchange camelExchange) throws JsonProcessingException {
         LOG.debug(".ipcSenderNotifyActivityFinished(): Entry, responsePacket->{}", responsePacket);
         LOG.trace(".ipcSenderNotifyActivityFinished(): Get Job Card and Status Element from Exchange for extraction by the WUP Egress Conduit");
-        PetasosFulfillmentTask fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTask.class);
+        PetasosFulfillmentTaskSharedInstance fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTaskSharedInstance.class);
 
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): check the response");
         boolean responseOK = false;
@@ -106,7 +107,7 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
             responseOK = false;
             responseReason = "Mismatch Message Flows (Passed PetasosFullmentTask id differs)";
         }
-        metricsAgent.getWorkUnitProcessingMetricsData(fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
+        metricsAgent.getWorkUnitProcessingMetricsData(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
 
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): formulate the processing outcome");
         UoW uow = SerializationUtils.clone(fulfillmentTask.getTaskWorkItem());

@@ -56,6 +56,7 @@ public abstract class ComponentMetricsAgentBase  {
 
     abstract protected CommonComponentMetricsData getMetricsData();
     abstract public void sendITOpsNotification(String message);
+    abstract public void sendITOpsNotification(String unformatedMessage, String formattedMessage);
 
     //
     // Some Helper Methods

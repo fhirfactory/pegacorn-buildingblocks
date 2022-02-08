@@ -24,9 +24,7 @@ package net.fhirfactory.pegacorn.services.tasks.transforms.tofhir;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskFulfillmenExecutionStatusType;
@@ -393,10 +391,10 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
         Reference owner = null;
         if(actionableTask.hasTaskFulfillment()) {
-            if(actionableTask.getTaskFulfillment().hasFulfillerComponent()) {
+            if(actionableTask.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
                 //
                 // Create the Identifier
-                ComponentIdType nodeId = actionableTask.getTaskFulfillment().getFulfillerComponent().getComponentID();
+                ComponentIdType nodeId = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID();
                 Period period = new Period();
                 if (nodeId.hasIdValidityStartInstant()) {
                     Date startDate = Date.from(nodeId.getIdValidityStartInstant());

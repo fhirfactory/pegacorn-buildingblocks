@@ -27,9 +27,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskFulfillmenExecutionStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.transformers.FHIRProvenanceToPetasosTaskJourneyTransformer;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
@@ -123,7 +121,7 @@ public class PetasosActionableTaskFromFHIRTask extends PetasosTaskFromFHIRTask {
                 }
             }
             SoftwareComponent node = topologyIM.getNode(componentId);
-            taskFulfillmentReport.setFulfillerComponent(node);
+            taskFulfillmentReport.setFulfillerWorkUnitProcessor(node);
         }
         if(fhirTask.hasExecutionPeriod()){
             if(fhirTask.getExecutionPeriod().hasStart()){

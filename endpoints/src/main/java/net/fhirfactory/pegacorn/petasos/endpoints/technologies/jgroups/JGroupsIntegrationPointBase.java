@@ -190,7 +190,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         // Create my Metrics Agent
         //
         getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
-        String participantName = getProcessingPlant().getSubsystemParticipantName()+"."+specifyPetasosEndpointFunctionType().getEndpointParticipantName();
+        String participantName = getJGroupsIntegrationPoint().getParticipantName();
         getLogger().info(".initialise(): Step 8: participantName->{}", participantName);
         this.metricsAgent = metricsFactory.newEndpointMetricsAgent(processingPlantCapabilityStatement, getJGroupsIntegrationPoint().getComponentID(),participantName, "Internal", specifyJGroupsChannelName());
         getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
@@ -599,7 +599,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         if(synchronisedJGroupsIP != null){
             switch(synchronisedJGroupsIP.getIntegrationPointStatus()){
                 case PETASOS_ENDPOINT_STATUS_OPERATIONAL:{
-                    getIntegrationPointMap().updateSubsystemIntegrationPointMembership(synchronisedJGroupsIP.getSubsystemParticipantName(), currentScheduleElement.getJgroupsIPSummary().getChannelName());
+                    getIntegrationPointMap().updateParticipantIntegrationPointMembership(synchronisedJGroupsIP.getSubsystemParticipantName(), currentScheduleElement.getJgroupsIPSummary().getChannelName());
                     doIntegrationPointBusinessFunctionCheck(synchronisedJGroupsIP, false, true);
                     getLogger().debug(".checkEndpointAddition(): Does not need re-checking, returning -true- (was processed)");
                     return(true);
@@ -690,7 +690,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
                         cachedEndpoint = report;
                         getLogger().trace(".synchroniseEndpointCache(): addedPetasosEndpoint->{}", cachedEndpoint);
                         if (!StringUtils.isEmpty(report.getSubsystemParticipantName())) {
-                            getIntegrationPointMap().updateSubsystemIntegrationPointMembership(report.getSubsystemParticipantName(), currentScheduleElement.getJgroupsIPSummary().getSubsystemParticipantName());
+                            getIntegrationPointMap().updateParticipantIntegrationPointMembership(report.getSubsystemParticipantName(), currentScheduleElement.getJgroupsIPSummary().getSubsystemParticipantName());
                         }
                     } else {
                         cachedEndpoint.setParticipantStatus(report.getParticipantStatus());

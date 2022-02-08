@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitioner.factor
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.valuesets.InformationCompartmentSecurityCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.valuesets.InformationConfidentialitySecurityCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.SecurityLabelFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.factories.SecurityLabelFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.datatypes.ContactPointFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.datatypes.HumanNameFactory;
 import org.hl7.fhir.r4.model.*;

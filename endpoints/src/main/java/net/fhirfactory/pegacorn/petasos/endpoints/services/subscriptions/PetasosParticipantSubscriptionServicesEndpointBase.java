@@ -207,7 +207,7 @@ public abstract class PetasosParticipantSubscriptionServicesEndpointBase extends
         if(StringUtils.isEmpty(publisherServiceName)){
             return(candidateSet);
         }
-        List<String> serviceNameMembership = getIntegrationPointMap().getServiceNameMembership(publisherServiceName);
+        List<String> serviceNameMembership = getIntegrationPointMap().getParticipantFulfillers(publisherServiceName);
         if(serviceNameMembership.isEmpty()){
             return(candidateSet);
         }

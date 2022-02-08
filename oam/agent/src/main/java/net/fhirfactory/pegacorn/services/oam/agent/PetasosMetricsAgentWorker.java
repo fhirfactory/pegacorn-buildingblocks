@@ -53,6 +53,8 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosMetricsAgentWorker.class);
 
     private ConcurrentHashMap<ComponentIdType, PetasosComponentMetricSet> metricsQueue;
+    private ConcurrentHashMap<ComponentIdType, PetasosComponentMetricSet> publishedMetricQueue;
+
     private SerializableObject metricQueueLock = new SerializableObject();
 
     private static long SYNCHRONIZATION_CHECK_PERIOD = 15000;
@@ -86,6 +88,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
     public PetasosMetricsAgentWorker(){
         this.initialised = false;
         this.metricsQueue = new ConcurrentHashMap<>();
+        this.publishedMetricQueue = new ConcurrentHashMap<>();
         this.backgroundCheckInitiated = false;
         this.jsonMapper = new ObjectMapper();
         JavaTimeModule module = new JavaTimeModule();
@@ -158,16 +161,39 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
 
     protected void forwardLocalMetricsToServer(){
         LOG.debug(".forwardLocalMetricsToServer(): Entry");
-        List<PetasosComponentMetricSet> allMetrics = new ArrayList<>();
+
+
         LOG.trace(".forwardLocalMetricsToServer(): Number of MetricSets to processing->{}", metricsQueue.size());
+
+        List<PetasosComponentMetricSet> updatedMetrics = new ArrayList<>();
         synchronized (metricQueueLock) {
-            allMetrics.addAll(metricsQueue.values());
-            metricsQueue.clear();
+            Enumeration<ComponentIdType> keys = metricsQueue.keys();
+            while (keys.hasMoreElements()) {
+                ComponentIdType currentComponentId = keys.nextElement();
+                PetasosComponentMetricSet metricSetInQueue = metricsQueue.get(currentComponentId);
+                PetasosComponentMetricSet publishedMetricSet = publishedMetricQueue.get(currentComponentId);
+                boolean publishCurrentMetricSet = false;
+                if (publishedMetricSet == null) {
+                    publishCurrentMetricSet = true;
+                } else {
+                    if (!publishedMetricSet.equals(metricSetInQueue)) {
+                        publishCurrentMetricSet = true;
+                    }
+                }
+                if (publishCurrentMetricSet) {
+                    updatedMetrics.add(metricSetInQueue);
+                    if (publishedMetricQueue.contains(currentComponentId)) {
+                        publishedMetricQueue.remove(currentComponentId);
+                    }
+                    publishedMetricQueue.put(currentComponentId, metricSetInQueue);
+                }
+            }
         }
+
         LOG.trace(".forwardLocalMetricsToServer(): Loaded metrics form local cache, forwarding");
         boolean metricsUpdateFailed = false;
-        for(PetasosComponentMetricSet currentMetric: allMetrics){
-            LOG.trace(".forwardLocalMetricsToServer(): Sending metrics for component->{}", currentMetric.getMetricSourceComponentId());
+        for(PetasosComponentMetricSet currentMetric: updatedMetrics){
+            LOG.debug(".forwardLocalMetricsToServer(): Sending metrics for component->{}", currentMetric.getMetricSourceComponentId());
             Instant captureInstant = metricsServicesBroker.replicateMetricSetToServer(subsystemNames.getITOpsIMParticipantName(), currentMetric);
             if(captureInstant == null){
                 metricsUpdateFailed = true;
@@ -179,7 +205,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
             }
         }
         if(metricsUpdateFailed){
-            LOG.info(".forwardLocalMetricsToServer(): Exit, failed to update");
+            LOG.debug(".forwardLocalMetricsToServer(): Exit, failed to update");
         } else {
             LOG.debug(".forwardLocalMetricsToServer(): Exit, Update successful");
         }

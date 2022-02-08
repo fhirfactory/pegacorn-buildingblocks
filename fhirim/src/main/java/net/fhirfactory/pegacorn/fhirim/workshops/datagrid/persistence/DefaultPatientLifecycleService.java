@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 MAHun
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,26 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets;
+package net.fhirfactory.pegacorn.fhirim.workshops.datagrid.persistence;
 
-/**
- *
- * @author ACT Health (Mark A. Hunter)
- */
-public enum PetasosJobActivityStatusEnum {
-    WUP_ACTIVITY_STATUS_WAITING("pegacorn.petasos.wup.action.waiting"),
-    WUP_ACTIVITY_STATUS_CANCELED( "pegacorn.pegasos.wup.action.cancelled"),
-    WUP_ACTIVITY_STATUS_FAILED("pegacorn.pegasos.wup.action.failed"),
-    WUP_ACTIVITY_STATUS_FINISHED("pegacorn.pegasos.wup.action.finished"),
-    WUP_ACTIVITY_STATUS_EXECUTING("pegacorn.petasos.agent.wup.action.executing");
-    
-    private String wupActionSuggestion;
-    
-    private PetasosJobActivityStatusEnum(String newWUPAgentSuggestion ){
-        this.wupActionSuggestion = newWUPAgentSuggestion;
-    }
-    
-    public String getPetasosWUPActionSuggestion(){
-        return(this.wupActionSuggestion);
-    }    
+public abstract class DefaultPatientLifecycleService {
 }

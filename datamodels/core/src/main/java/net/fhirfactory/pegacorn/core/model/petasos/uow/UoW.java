@@ -152,7 +152,7 @@ public class UoW implements Serializable {
     public UoWIdentifier getInstanceID() {
         return instanceID;
     }
-    
+
     public void setInstanceID(UoWIdentifier uowID) {
     	this.instanceID = uowID;
     }
@@ -223,8 +223,10 @@ public class UoW implements Serializable {
     }
 
     public void setEgressContent(UoWPayloadSet egressContent) {
+        getLogger().trace(".setEgressContent(): Entry, egressCount->{}", egressContent);
         this.egressContent.getPayloadElements().clear();
         this.egressContent.getPayloadElements().addAll(egressContent.getPayloadElements());
+        getLogger().trace(".setEgressContent(): Exit");
     }
 
     // processingOutcome Bean/Helper methods
@@ -249,42 +251,28 @@ public class UoW implements Serializable {
         this.processingOutcome = processingOutcome;
     }
 
+    //
+    // To String
+    //
+
     @Override
     public String toString() {
-        getLogger().debug("toString(): Entry");
-
-        String uowToString = "UoW={";
-        if (hasInstanceID()) {
-            uowToString = uowToString + "(instanceID:" + instanceID.toString() + "),";
-        } else {
-            uowToString = uowToString + "(instanceID:null),";
-        }
-        if (hasTypeID()) {
-            uowToString = uowToString + "(typeID:" + typeID.toString() + "),";
-        } else {
-            uowToString = uowToString + "(typeID:null),";
-        }
-        if (hasIngresContent()) {
-            if (ingresContent.getPayloadManifest() != null) {
-                uowToString = uowToString + "(payloadTopic:" + getPayloadTopicID().toString() + "),";
-            } else {
-                uowToString = uowToString + "(payloadTopic:null),";
-            }
-            uowToString = uowToString + "(ingresContent:" + ingresContent.toString() + "),";
-        } else {
-            uowToString = uowToString + "(ingresContent:null),";
-        }
-        if (hasEgressContent()) {
-            uowToString = uowToString + "(egressContent:" + egressContent.toString() + "),";
-        } else {
-            uowToString = uowToString + "(egressContent:null),";
-        }
-        if (hasProcessingOutcome()) {
-            uowToString = uowToString + "(processingOutcome:" + processingOutcome.toString() + ")}";
-        } else {
-            uowToString = uowToString + "(processingOutcome:null)}";
-        }
-        return (uowToString);
+        return "UoW{" +
+                "typeID=" + typeID +
+                ", instanceID=" + instanceID +
+                ", ingresContent=" + ingresContent +
+                ", egressContent=" + egressContent +
+                ", processingOutcome=" + processingOutcome +
+                ", failureDescription='" + failureDescription +
+                ", hasInstanceID=" + hasInstanceID() +
+                ", hasTypeID=" + hasTypeID() +
+                ", hasIngresContent=" + hasIngresContent() +
+                ", hasEgressContent=" + hasEgressContent() +
+                ", hasProcessingOutcome=" + hasProcessingOutcome() +
+                ", hasPayloadTopicID=" + hasPayloadTopicID() +
+                ", payloadTopicID=" + getPayloadTopicID() +
+                ", hasFailureDescription=" + hasFailureDescription() +
+                '}';
     }
 
     public String toJSONString() {

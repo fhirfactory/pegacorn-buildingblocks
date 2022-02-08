@@ -25,11 +25,13 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PetasosTaskBrokerInterface {
-    public PetasosActionableTask registerActionableTask(String serviceProviderName, PetasosActionableTask actionableTask);
-    public PetasosActionableTask fulfillActionableTask(String serviceProviderName, PetasosActionableTask actionableTask);
-    public PetasosActionableTask updateActionableTask(String serviceProviderName, PetasosActionableTask actionableTask);
-    public List<PetasosActionableTask> retrievePendingActionableTasks(JGroupsIntegrationPointIdentifier requestorEndpointIdentifier);
+    public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask);
+    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask);
+    public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask);
+
+    public Map<Integer, PetasosActionableTask> retrievePendingActionableTasks(String participantName);
 
 }

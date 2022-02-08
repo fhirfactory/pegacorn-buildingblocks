@@ -25,35 +25,42 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.services.tasks.distribution.PetasosTasksDistributionHandler;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
 public class PetasosTasksAgentHandler extends PetasosTasksDistributionHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosTasksAgentHandler.class);
+
     @Override
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier) {
+        getLogger().debug(".registerActionableTask(): Entry (Agent), actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
         return null;
     }
 
     @Override
     public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier) {
+        getLogger().debug(".fulfillActionableTask(): Entry (Agent), actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
         return null;
     }
 
     @Override
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier) {
+        getLogger().debug(".updateActionableTask(): Entry (Agent), actionableTask->{}, requesterEndpointIdentifier->{}", actionableTask, requesterEndpointIdentifier);
         return null;
     }
 
     @Override
     public List<PetasosActionableTask> retrievePendingActionableTasks(JGroupsIntegrationPointSummary requestorEndpointIdentifier) {
+        getLogger().debug(".retrievePendingActionableTasks(): Entry (Agent), requesterEndpointIdentifier->{}", requestorEndpointIdentifier);
         return null;
     }
 
     @Override
     protected Logger specifyLogger() {
-        return null;
+        return (LOG);
     }
 
 }

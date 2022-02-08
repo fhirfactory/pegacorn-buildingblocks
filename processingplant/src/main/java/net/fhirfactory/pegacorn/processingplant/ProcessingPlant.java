@@ -53,8 +53,8 @@ import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfa
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.global.watchdogs.GlobalPetasosTaskContinuityWatchdog;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.global.watchdogs.GlobalPetasosTaskRecoveryWatchdog;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.GlobalPetasosTaskContinuityWatchdog;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.GlobalPetasosTaskRecoveryWatchdog;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;

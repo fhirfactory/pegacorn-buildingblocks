@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.factories;
 
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitioner.factories.PractitionerResourceHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitionerrole.factories.PractitionerRoleResourceHelper;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.SecurityLabelFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.factories.SecurityLabelFactory;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

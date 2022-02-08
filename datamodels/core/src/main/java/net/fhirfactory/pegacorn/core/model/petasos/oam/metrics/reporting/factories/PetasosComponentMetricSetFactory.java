@@ -364,7 +364,7 @@ public class PetasosComponentMetricSetFactory {
             componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
             componentStatusMetric.setMetricSource(endpointMetricsData.getComponentID());
             componentStatusMetric.setMetricName("Egress-Send-Attempt-Count");
-            componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.TASK_COUNT);
+            componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.MESSAGES_FORWARDED);
             componentStatusMetric.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
             componentStatusMetric.setMetricValue(new PetasosComponentMetricValue(endpointMetricsData.getEgressSendAttemptCount()));
             metricSet.addMetric(componentStatusMetric);
@@ -391,6 +391,99 @@ public class PetasosComponentMetricSetFactory {
             activityInstant.setMetricValue(new PetasosComponentMetricValue(endpointMetricsData.getLastActivityInstant()));
             metricSet.addMetric(activityInstant);
         }
+
+        if(endpointMetricsData.getRemoteProcedureCallCount() > 0){
+            PetasosComponentMetric activityInstant = new PetasosComponentMetric();
+            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricSource(endpointMetricsData.getComponentID());
+            activityInstant.setMetricName(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_REQUEST.getDisplayName());
+            activityInstant.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_REQUEST);
+            activityInstant.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+            activityInstant.setMetricValue(new PetasosComponentMetricValue(endpointMetricsData.getRemoteProcedureCallCount()));
+            metricSet.addMetric(activityInstant);
+        }
+
+        if(endpointMetricsData.getRemoteProcedureCallFailureCount() > 0){
+            PetasosComponentMetric activityInstant = new PetasosComponentMetric();
+            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricSource(endpointMetricsData.getComponentID());
+            activityInstant.setMetricName(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_FAILURE.getDisplayName());
+            activityInstant.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_FAILURE);
+            activityInstant.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+            activityInstant.setMetricValue(new PetasosComponentMetricValue(endpointMetricsData.getRemoteProcedureCallFailureCount()));
+            metricSet.addMetric(activityInstant);
+        }
+
+        if(endpointMetricsData.getRemoteProcedureCallHandledCount() > 0){
+            PetasosComponentMetric activityInstant = new PetasosComponentMetric();
+            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricSource(endpointMetricsData.getComponentID());
+            activityInstant.setMetricName(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_RESPONSE.getDisplayName());
+            activityInstant.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_RESPONSE);
+            activityInstant.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+            activityInstant.setMetricValue(new PetasosComponentMetricValue(endpointMetricsData.getRemoteProcedureCallHandledCount()));
+            metricSet.addMetric(activityInstant);
+        }
+
+        getLogger().trace(".convertEndpointMetricsData(): [RemoteProcedureCallResponseMap] Check");
+        if(!endpointMetricsData.getRemoteProcedureCallResponsesMap().isEmpty()){
+            getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteProcedureCallResponseMap] Start");
+            int counter = 0;
+            for(String currentTargetName: endpointMetricsData.getInternalDistributionCountMap().keySet()){
+                PetasosComponentMetric rpcHandledMetric = new PetasosComponentMetric();
+                rpcHandledMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                rpcHandledMetric.setMetricSource(endpointMetricsData.getComponentID());
+                rpcHandledMetric.setMetricName("RPC-HandledFrom["+currentTargetName+"]");
+                rpcHandledMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_RESPONSE);
+                rpcHandledMetric.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+                Integer rpcRequestsHandled = endpointMetricsData.getRemoteProcedureCallResponsesMap().get(currentTargetName);
+                rpcHandledMetric.setMetricValue(new PetasosComponentMetricValue(rpcRequestsHandled));
+                metricSet.addMetric(rpcHandledMetric);
+                counter += 1;
+            }
+            getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteProcedureCallResponseMap] Finish (entries={})", counter);
+        }
+        getLogger().trace(".convertEndpointMetricsData(): [RemoteProcedureCallResponseMap] Done...");
+
+        getLogger().trace(".convertEndpointMetricsData(): [RemoteProcedureCallRequestMap] Check");
+        if(!endpointMetricsData.getRemoteProcedureCallRequestsMap().isEmpty()){
+            getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteProcedureCallRequestMap] Start");
+            int counter = 0;
+            for(String currentTargetName: endpointMetricsData.getRemoteProcedureCallRequestsMap().keySet()){
+                PetasosComponentMetric rpcHandledMetric = new PetasosComponentMetric();
+                rpcHandledMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                rpcHandledMetric.setMetricSource(endpointMetricsData.getComponentID());
+                rpcHandledMetric.setMetricName("RPC-RequestsTo["+currentTargetName+"]");
+                rpcHandledMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_REQUEST);
+                rpcHandledMetric.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+                Integer rpcRequestsHandled = endpointMetricsData.getRemoteProcedureCallRequestsMap().get(currentTargetName);
+                rpcHandledMetric.setMetricValue(new PetasosComponentMetricValue(rpcRequestsHandled));
+                metricSet.addMetric(rpcHandledMetric);
+                counter += 1;
+            }
+            getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteProcedureCallRequestMap] Finish (entries={})", counter);
+        }
+        getLogger().trace(".convertEndpointMetricsData(): [RemoteProcedureCallRequestMap] Done...");
+
+        getLogger().trace(".convertEndpointMetricsData(): [RemoteProcedureCallFailuresMap] Check");
+        if(!endpointMetricsData.getRemoteProcedureCallFailuresMap().isEmpty()){
+            getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteProcedureCallFailuresMap] Start");
+            int counter = 0;
+            for(String currentTargetName: endpointMetricsData.getRemoteProcedureCallFailuresMap().keySet()){
+                PetasosComponentMetric rpcHandledMetric = new PetasosComponentMetric();
+                rpcHandledMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                rpcHandledMetric.setMetricSource(endpointMetricsData.getComponentID());
+                rpcHandledMetric.setMetricName("RPC-Failures["+currentTargetName+"]");
+                rpcHandledMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_FAILURE);
+                rpcHandledMetric.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+                Integer rpcRequestsHandled = endpointMetricsData.getRemoteProcedureCallFailuresMap().get(currentTargetName);
+                rpcHandledMetric.setMetricValue(new PetasosComponentMetricValue(rpcRequestsHandled));
+                metricSet.addMetric(rpcHandledMetric);
+                counter += 1;
+            }
+            getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteProcedureCallFailuresMap] Finish (entries={})", counter);
+        }
+        getLogger().trace(".convertEndpointMetricsData(): [RemoteProcedureCallFailuresMap] Done...");
 
         getLogger().debug(".convertEndpointMetricsData(): Exit, metricSet->{}", metricSet);
         return(metricSet);
@@ -465,9 +558,9 @@ public class PetasosComponentMetricSetFactory {
             metricSet.addMetric(egressMessageCount);
         }
 
-        getLogger().info(".convertCommonMetrics(): [DistributionCountMap] Check");
+        getLogger().trace(".convertCommonMetrics(): [DistributionCountMap] Check");
         if(!metricsData.getInternalDistributionCountMap().isEmpty()){
-            getLogger().info(".convertCommonMetrics(): [Processing DistributionCountMap] Start");
+            getLogger().trace(".convertCommonMetrics(): [Processing DistributionCountMap] Start");
             int counter = 0;
             for(String currentTargetName: metricsData.getInternalDistributionCountMap().keySet()){
                 PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
@@ -481,9 +574,9 @@ public class PetasosComponentMetricSetFactory {
                 metricSet.addMetric(egressMessageCount);
                 counter += 1;
             }
-            getLogger().info(".convertCommonMetrics(): [Processing DistributionCountMap] Finish (entries={})", counter);
+            getLogger().trace(".convertCommonMetrics(): [Processing DistributionCountMap] Finish (entries={})", counter);
         }
-        getLogger().info(".convertCommonMetrics(): [DistributionCountMap] Done...");
+        getLogger().trace(".convertCommonMetrics(): [DistributionCountMap] Done...");
 
         getLogger().debug(".convertCommonMetrics(): Exit, metricSet->{}", metricSet);
         return(metricSet);

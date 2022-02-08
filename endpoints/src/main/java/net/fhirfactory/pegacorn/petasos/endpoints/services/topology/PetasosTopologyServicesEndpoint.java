@@ -159,7 +159,7 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
     //
 
     protected SoftwareComponentSet probeProcessingPlantTopologyDetail(JGroupsIntegrationPointSummary targetJGroupsIntegrationPoint){
-        getLogger().info(".probeEndpointTopologyDetail(): Entry, targetJGroupsIntegrationPoint->{}",targetJGroupsIntegrationPoint.getChannelName());
+        getLogger().debug(".probeEndpointTopologyDetail(): Entry, targetJGroupsIntegrationPoint->{}",targetJGroupsIntegrationPoint.getChannelName());
         getLogger().debug(".probeEndpointTopologyDetail(): Entry, targetJGroupsIntegrationPoint->{}", targetJGroupsIntegrationPoint);
         try {
             Object objectSet[] = new Object[1];

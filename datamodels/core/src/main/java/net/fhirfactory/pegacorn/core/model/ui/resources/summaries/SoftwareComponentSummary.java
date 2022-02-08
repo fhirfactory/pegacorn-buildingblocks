@@ -21,16 +21,11 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
-
-import java.time.Instant;
 
 public class SoftwareComponentSummary extends ResourceSummaryBase {
     private ComponentIdType componentID;

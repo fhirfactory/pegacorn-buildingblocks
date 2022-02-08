@@ -37,16 +37,12 @@ import java.util.Set;
 public class PetasosAggregateTask extends PetasosTask{
 
     private TaskReportingType taskReporting;
-    private SerializableObject taskReportingLock;
 
     private AggregateTaskStatusType aggregateTaskStatus;
-    private SerializableObject aggregateTaskStatusLock;
 
     private TaskIdType actionableTaskId;
-    private SerializableObject actionableTaskIdLock;
 
     private Set<TaskIdType> subTasks;
-    private SerializableObject subTasksLock;
 
     //
     // Constructor(s)
@@ -55,13 +51,9 @@ public class PetasosAggregateTask extends PetasosTask{
     public PetasosAggregateTask(){
         super();
         this.taskReporting = null;
-        this.taskReportingLock = new SerializableObject();
         this.aggregateTaskStatus = null;
-        this.aggregateTaskStatusLock =  new SerializableObject();
         this.actionableTaskId = null;
-        this.actionableTaskIdLock = new SerializableObject();
         this.subTasks = new HashSet<>();
-        this.subTasksLock = new SerializableObject();
         setTaskType(new TaskTypeType(TaskTypeTypeEnum.PETASOS_AGGREGATE_TASK_TYPE));
     }
 
@@ -111,30 +103,6 @@ public class PetasosAggregateTask extends PetasosTask{
         this.aggregateTaskStatus = aggregateTaskStatus;
     }
 
-    public SerializableObject getTaskReportingLock() {
-        return taskReportingLock;
-    }
-
-    public void setTaskReportingLock(SerializableObject taskReportingLock) {
-        this.taskReportingLock = taskReportingLock;
-    }
-
-    public SerializableObject getAggregateTaskStatusLock() {
-        return aggregateTaskStatusLock;
-    }
-
-    public void setAggregateTaskStatusLock(SerializableObject aggregateTaskStatusLock) {
-        this.aggregateTaskStatusLock = aggregateTaskStatusLock;
-    }
-
-    public SerializableObject getActionableTaskIdLock() {
-        return actionableTaskIdLock;
-    }
-
-    public void setActionableTaskIdLock(SerializableObject actionableTaskIdLock) {
-        this.actionableTaskIdLock = actionableTaskIdLock;
-    }
-
     @JsonIgnore
     public boolean hasSubTasks(){
         boolean hasValue = this.subTasks != null;
@@ -147,14 +115,6 @@ public class PetasosAggregateTask extends PetasosTask{
 
     public void setSubTasks(Set<TaskIdType> subTasks) {
         this.subTasks = subTasks;
-    }
-
-    public SerializableObject getSubTasksLock() {
-        return subTasksLock;
-    }
-
-    public void setSubTasksLock(SerializableObject subTasksLock) {
-        this.subTasksLock = subTasksLock;
     }
 
     //
@@ -199,6 +159,7 @@ public class PetasosAggregateTask extends PetasosTask{
                 ", taskNodeAffinity=" + getTaskNodeAffinity() +
                 ", taskMetadata=" + getTaskContext() +
                 ", subTasks=" + getSubTasks() +
+                ", executionStatus=" + getExecutionStatus() +
                 '}';
     }
 }

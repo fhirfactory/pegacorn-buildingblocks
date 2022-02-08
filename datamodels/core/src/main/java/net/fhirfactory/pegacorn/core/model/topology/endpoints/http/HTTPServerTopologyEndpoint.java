@@ -40,13 +40,13 @@ public class HTTPServerTopologyEndpoint extends StandardInteractServerTopologyEn
 
     @JsonIgnore
     public HTTPServerAdapter getHTTPServerAdapter(){
-        getLogger().info(".getHTTPServerAdapter(): Entry");
+        getLogger().debug(".getHTTPServerAdapter(): Entry");
         if(getAdapterList().isEmpty()){
-            getLogger().info(".getHTTPServerAdapter(): Exit, Adapter list is empty, returning null");
+            getLogger().debug(".getHTTPServerAdapter(): Exit, Adapter list is empty, returning null");
             return(null);
         }
         HTTPServerAdapter httpServer = (HTTPServerAdapter) getAdapterList().get(0);
-        getLogger().info(".getHTTPServerAdapter(): Exit, httpServer->{}", httpServer);
+        getLogger().debug(".getHTTPServerAdapter(): Exit, httpServer->{}", httpServer);
         return(httpServer);
     }
 

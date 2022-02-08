@@ -25,12 +25,12 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
@@ -47,7 +47,6 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @ApplicationScoped
 public class WUPContainerIngresProcessor {
@@ -97,7 +96,7 @@ public class WUPContainerIngresProcessor {
     //
     // Business Methods
     //
-    
+
     /**
      * This class/method is used as the injection point into the WUP Processing Framework for the specific WUP Type/Instance in question.
      * It registers the following:
@@ -121,22 +120,26 @@ public class WUPContainerIngresProcessor {
      * @param camelExchange The Apache Camel Exchange object, used to store a Semaphors and Attributes
      * @return Should return a WorkUnitTransportPacket that is forwarding onto the WUP Ingres Gatekeeper.
      */
-    public PetasosFulfillmentTask ingresContentProcessor(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+    public PetasosFulfillmentTaskSharedInstance ingresContentProcessor(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
         getLogger().debug(".ingresContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask );
+
         //
         // Now, set out wait-loop sleep period
         long waitTime = PetasosPropertyConstants.WUP_SLEEP_INTERVAL_MILLISECONDS;
+
         //
         // Set our wait-loop check state
         boolean waitState = true;
 
-        TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getNodeFunctionFDN().getFunctionToken();
+        TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+
         //
         // Now, continue with business logic
         RouteElementNames elementNames = new RouteElementNames(wupFunctionToken);
         SedaEndpoint seda = (SedaEndpoint) camelctx.getEndpoint(elementNames.getEndPointWUPContainerIngresProcessorIngres());
         int currentQueueSize = seda.getCurrentQueueSize();
+
         //
         // Get out metricsAgent & do add some metrics
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
@@ -167,7 +170,7 @@ public class WUPContainerIngresProcessor {
 
         //
         // Write an AuditEvent
-        auditServicesBroker.logActivity(fulfillmentTask);
+        auditServicesBroker.logActivity(fulfillmentTask.getInstance());
         //
         // Now check status
         boolean willExecute = false;
@@ -176,72 +179,37 @@ public class WUPContainerIngresProcessor {
             if(getLogger().isDebugEnabled()){
                 getLogger().debug(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}",fulfillmentTask.getTaskJobCard().getCurrentStatus());
             }
-            switch (fulfillmentTask.getTaskJobCard().getCurrentStatus()) {
-                case WUP_ACTIVITY_STATUS_WAITING:
-                    synchronized (fulfillmentTask.getTaskJobCardLock()) {
-                        fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
-                    }
-                    fulfillmentActivityController.requestFulfillmentTaskExecutionPrivilege(fulfillmentTask.getTaskJobCard());
-                    if (fulfillmentTask.getTaskJobCard().getGrantedStatus() == PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) {
-                        synchronized (fulfillmentTask.getTaskJobCardLock()) {
-                            fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
-                            fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-                            fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
-                        }
-                        synchronized (fulfillmentTask.getTaskFulfillmentLock()){
-                            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-                            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-                        }
-                        fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
-                        waitState = false;
-                        willExecute = true;
-                        break;
-                    }
-                    if(getLogger().isDebugEnabled()) {
-                        getLogger().debug(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
-                    }
-                    break;
-                case WUP_ACTIVITY_STATUS_EXECUTING:
-                    if (fulfillmentTask.getTaskJobCard().getGrantedStatus() == PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) {
-                        // If my status says I should be doing it, and I've been granted execution status --> then I should actually be doing it.
-                        // Se let everyone know and move one.
-                        synchronized (fulfillmentTask.getTaskJobCardLock()) {
-                            fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
-                            fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-                            fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
-                        }
-                        synchronized (fulfillmentTask.getTaskFulfillmentLock()){
-                            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-                            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-                        }
-                        fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask.getTaskJobCard());
-                        waitState = false;
-                        willExecute = true;
-                        break;
-                    } else {
-                        // If my status says I should be doing it, but i haven't been granted execution status --> then something has gone wrong.
-                        // So i should just fail out (by falling into the failed scenario below)
-                    }
-                case WUP_ACTIVITY_STATUS_FINISHED:
-                case WUP_ACTIVITY_STATUS_FAILED:
-                case WUP_ACTIVITY_STATUS_CANCELED:
-                default:
-                    synchronized(fulfillmentTask.getTaskJobCardLock()) {
-                        fulfillmentTask.getTaskJobCard().setToBeDiscarded(true);
-                        fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
-                        fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
-                        fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
-                    }
-                    synchronized (fulfillmentTask.getTaskFulfillmentLock()){
-                        fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
-                        fulfillmentTask.getTaskFulfillment().setCancellationDate(Date.from(Instant.now()));
-                    }
-                    fulfillmentActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask.getTaskJobCard());
-                    if(getLogger().isDebugEnabled()) {
-                        getLogger().debug(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
-                    }
+            //
+            // A bit of defensive programming //TODO Find out why this is needed
+            if(fulfillmentTask.getExecutionStatus() == null){
+                fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+            }
+            if(fulfillmentTask.getExecutionStatus().equals(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING)){
+                PetasosTaskExecutionStatusEnum petasosTaskExecutionStatusEnum = fulfillmentActivityController.requestFulfillmentTaskExecutionPrivilege(fulfillmentTask);
+                if (petasosTaskExecutionStatusEnum == PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING) {
+                    fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
+                    fulfillmentTask.setUpdateInstant(Instant.now());
+                    fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+                    fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+                    fulfillmentTask.getTaskFulfillment().setToBeDiscarded(false);
+                    fulfillmentTask.update();
+                    fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask);
                     waitState = false;
-                    willBeCancelled = true;
+                    willExecute = true;
+                    break;
+                }
+            } else {
+                fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
+                fulfillmentTask.setUpdateInstant(Instant.now());
+                fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+                fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
+                fulfillmentActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask);
+                fulfillmentTask.getTaskFulfillment().setToBeDiscarded(true);
+                if(getLogger().isDebugEnabled()) {
+                    getLogger().debug(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
+                }
+                waitState = false;
+                willBeCancelled = true;
             }
             if (waitState) {
                 try {

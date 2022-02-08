@@ -124,7 +124,7 @@ public class PetasosFulfillmentTaskFactory {
         //
         // Now to add Fulfillment details
         TaskFulfillmentType fulfillment = new TaskFulfillmentType();
-        fulfillment.setFulfillerComponent(wupNode);
+        fulfillment.setFulfillerWorkUnitProcessor(wupNode);
         fulfillment.setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
         fulfillment.setResilientActivity(true);
         FulfillmentTrackingIdType trackingId = new FulfillmentTrackingIdType(fulfillmentTask.getTaskId());

@@ -36,14 +36,16 @@ import java.util.Date;
  * @author Mark A. Hunter
  */
 public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements Serializable {
-    private SoftwareComponent fulfillerComponent;
+    private SoftwareComponent fulfillerWorkUnitProcessor;
     private FulfillmentTrackingIdType trackingID;
     private FulfillmentExecutionStatusEnum status;
     private boolean resilientActivity;
+    private boolean toBeDiscarded;
+    private String currentStateReason;
 
     public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, SoftwareComponent fulfillerCommponent, Instant registrationInstant) {
         super();
-        this.fulfillerComponent = fulfillerComponent;
+        this.fulfillerWorkUnitProcessor = fulfillerWorkUnitProcessor;
         this.trackingID = SerializationUtils.clone(trackingID);
         setRegistrationInstant(SerializationUtils.clone(registrationInstant));
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED;
@@ -52,7 +54,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, SoftwareComponent fulfillerComponent) {
         super();
-        this.fulfillerComponent = this.fulfillerComponent;
+        this.fulfillerWorkUnitProcessor = this.fulfillerWorkUnitProcessor;
         this.trackingID = SerializationUtils.clone(trackingID);
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
@@ -60,7 +62,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType() {
         super();
-        this.fulfillerComponent = null;
+        this.fulfillerWorkUnitProcessor = null;
         this.trackingID = null;
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
@@ -68,14 +70,14 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType(TaskFulfillmentType ori) {
         super(ori);
-        this.fulfillerComponent = null;
+        this.fulfillerWorkUnitProcessor = null;
         this.trackingID = null;
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
 
         // Set Values
-        if (ori.hasFulfillerComponent()) {
-            this.fulfillerComponent = ori.getFulfillerComponent();
+        if (ori.hasFulfillerWorkUnitProcessor()) {
+            this.fulfillerWorkUnitProcessor = SerializationUtils.clone(ori.getFulfillerWorkUnitProcessor());
         }
         if (ori.hasTrackingID()) {
             this.trackingID = SerializationUtils.clone(ori.getTrackingID());
@@ -88,22 +90,44 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
     // Getters and Setters (Bean Methods)
     //
 
+    public boolean isToBeDiscarded() {
+        return toBeDiscarded;
+    }
+
+    public void setToBeDiscarded(boolean toBeDiscarded) {
+        this.toBeDiscarded = toBeDiscarded;
+    }
+
     @JsonIgnore
-    public boolean hasFulfillerComponent(){
-        boolean hasValue = this.fulfillerComponent != null;
+    public boolean hasCurrentStateReason(){
+        boolean hasValue = this.currentStateReason != null;
         return(hasValue);
     }
 
-    public SoftwareComponent getFulfillerComponent() {
-        return fulfillerComponent;
+    public String getCurrentStateReason() {
+        return currentStateReason;
     }
 
-    public void setFulfillerComponent(SoftwareComponent fulfillerComponent) {
-        this.fulfillerComponent = fulfillerComponent;
+    public void setCurrentStateReason(String currentStateReason) {
+        this.currentStateReason = currentStateReason;
     }
 
     @JsonIgnore
-    boolean hasTrackingID(){
+    public boolean hasFulfillerWorkUnitProcessor(){
+        boolean hasValue = this.fulfillerWorkUnitProcessor != null;
+        return(hasValue);
+    }
+
+    public SoftwareComponent getFulfillerWorkUnitProcessor() {
+        return fulfillerWorkUnitProcessor;
+    }
+
+    public void setFulfillerWorkUnitProcessor(SoftwareComponent fulfillerWorkUnitProcessor) {
+        this.fulfillerWorkUnitProcessor = fulfillerWorkUnitProcessor;
+    }
+
+    @JsonIgnore
+    public boolean hasTrackingID(){
         boolean hasValue = this.trackingID != null;
         return(hasValue);
     }
@@ -142,20 +166,21 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
     // To String
     //
 
-
     @Override
     public String toString() {
-        return "FulfillmentSegment{" +
+        return "TaskFulfillmentType{" +
                 "registrationInstant=" + getRegistrationInstant() +
                 ", readyInstant=" + getReadyInstant() +
                 ", startInstant=" + getStartInstant() +
                 ", finishInstant=" + getFinishInstant() +
                 ", finalisationInstant=" + getFinalisationInstant() +
                 ", lastCheckedInstant=" + getLastCheckedInstant() +
-                ", fulfillerComponent=" + fulfillerComponent +
+                ", fulfillerComponent=" + fulfillerWorkUnitProcessor +
                 ", trackingID=" + trackingID +
                 ", status=" + status +
                 ", resilientActivity=" + resilientActivity +
+                ", toBeDiscarded=" + toBeDiscarded +
+                ", currentStateReason='" + currentStateReason + '\'' +
                 '}';
     }
 

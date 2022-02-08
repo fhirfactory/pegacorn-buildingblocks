@@ -191,11 +191,11 @@ public class LocalTaskDistributionDecisionEngine {
         Set<PetasosParticipant> participants = getLocalPetasosParticipantCacheDM().getAllPetasosParticipants();
 
         for(PetasosParticipant currentParticipant: participants){
-            getLogger().info(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
+            getLogger().trace(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
             for(TaskWorkItemSubscriptionType currentSubscription: currentParticipant.getSubscriptions()){
                 if(applySubscriptionFilter(currentSubscription, parcelManifest)){
                     subscriberList.add(currentParticipant);
-                    getLogger().info(".deriveSubscriberList(): Adding.... ");
+                    getLogger().trace(".deriveSubscriberList(): Adding.... ");
                     break;
                 }
             }

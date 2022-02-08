@@ -25,13 +25,19 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.SharedActionableTaskDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution.LocalTaskDistributionDecisionEngine;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
@@ -56,7 +62,7 @@ public class TaskOutcome2NewTasksBean {
     TopologyIM topologyProxy;
 
     @Inject
-    private SharedActionableTaskDM actionableTaskCache;
+    private ParticipantSharedActionableTaskCache actionableTaskCache;
 
     @Inject
     private PetasosActionableTaskFactory actionableTaskFactory;
@@ -66,82 +72,98 @@ public class TaskOutcome2NewTasksBean {
 
     @Inject
     private LocalTaskDistributionDecisionEngine distributionDecisionEngine;
-    
+
+    @Inject
+    private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceFactory;
+
+    @Inject
+    private PetasosTaskJobCardSharedInstanceAccessorFactory jobCardInstanceFactory;
+
+    @Inject
+    private PetasosTaskJobCardFactory jobCardFactory;
+
     /**
      * This method performs tree key tasks:
-     * 
-     * 1. It extracts each UoWPayload from the egressPayloadSet within the incomingUoW and creates a 
-     * new UoW (and, subsequently, a new WorkUnitTransportPacket) based on the content of those egress 
-     * UoWPayload elements. 
+     *
+     * 1. It extracts each UoWPayload from the egressPayloadSet within the incomingUoW and creates a
+     * new UoW (and, subsequently, a new WorkUnitTransportPacket) based on the content of those egress
+     * UoWPayload elements.
      * 2. As part of the WorkUnitTransportPacket creation, it embeds the current ActivityID.
      * 3. It then returns a List<> of these new WorkUnitTransportPackets for distribution.
-     * 
-     * It generates the 
+     *
+     * It generates the
      * @param actionableTask
      * @param camelExchange
      * @return A List<> of WorkUnitTransportPackets - one for each egress UoWPayload element within the incoming UoW.
      */
 
-    public List<PetasosActionableTask> collectOutcomesAndCreateNewTasks(PetasosActionableTask actionableTask, Exchange camelExchange) {
-        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, actionableTask (WorkUnitTransportPacket)->{}", actionableTask);
+    public List<PetasosActionableTask> collectOutcomesAndCreateNewTasks(PetasosActionableTaskSharedInstance actionableTask, Exchange camelExchange) {
+        getLogger().debug(".collectOutcomesAndCreateNewTasks(): Entry, actionableTask->{}", actionableTask);
         TaskWorkItemType incomingUoW = actionableTask.getTaskWorkItem();
         UoWPayloadSet egressContent = incomingUoW.getEgressContent();
         Set<UoWPayload> egressPayloadList = egressContent.getPayloadElements();
         if (getLogger().isDebugEnabled()) {
             int counter = 0;
             for(UoWPayload currentPayload: egressPayloadList){
-                getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).PayloadTopic --> [{}] {}", counter, currentPayload.getPayloadManifest());
-                getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).Payload --> [{}] {}", counter, currentPayload.getPayload());
+                getLogger().debug(".collectOutcomesAndCreateNewTasks(): payload (UoWPayload).PayloadTopic --> [{}] {}", counter, currentPayload.getPayloadManifest());
+                getLogger().debug(".collectOutcomesAndCreateNewTasks(): payload (UoWPayload).Payload --> [{}] {}", counter, currentPayload.getPayload());
                 counter++;
             }
         }
 
-        //
-        // We need to establish whether this actionableTask has any successor (downstream) tasks (subscribed), cause if
-        // it doesn't, then we need to tag the message as being the "last-in-chain" and also "finalised". If it does
-        // have
-        synchronized (actionableTask.getTaskCompletionLock()) {
+        ArrayList<PetasosActionableTask> newActionableTaskList = new ArrayList<>();
+        synchronized (actionableTask.getLockObject(actionableTask.getTaskId())) {
+            //
+            // We need to establish whether this actionableTask has any successor (downstream) tasks (subscribed), cause if
+            // it doesn't, then we need to tag the message as being the "last-in-chain" and also "finalised". If it does
+            // have
             if (!actionableTask.hasTaskCompletionSummary()) {
                 actionableTask.setTaskCompletionSummary(new TaskCompletionSummaryType());
                 actionableTask.getTaskCompletionSummary().setLastInChain(false);
                 actionableTask.getTaskCompletionSummary().setFinalised(false);
             }
-        }
 
-        ArrayList<PetasosActionableTask> newActionableTaskList = new ArrayList<>();
-        for(UoWPayload currentPayload: egressPayloadList) {
-            DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
-            if(distributionDecisionEngine.hasAtLeastOneSubscriber(payloadManifest)) {
-                TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
-                getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): newWorkItem->{}", newWorkItem);
+            Boolean hasADownstreamTask = false;
+            for (UoWPayload currentPayload : egressPayloadList) {
+                DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
+                if (distributionDecisionEngine.hasAtLeastOneSubscriber(payloadManifest)) {
+                    TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
+                    getLogger().trace(".collectOutcomesAndCreateNewTasks(): newWorkItem->{}", newWorkItem);
 
-                PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask, newWorkItem);
-                newActionableTaskList.add(newDownstreamTask);
+                    PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask.getInstance(), newWorkItem);
+                    newActionableTaskList.add(newDownstreamTask);
 
-                synchronized (actionableTask.getTaskCompletionLock()) {
+                    hasADownstreamTask = true;
+
                     actionableTask.getTaskCompletionSummary().addDownstreamTask(newDownstreamTask.getTaskId());
                 }
-            } else {
-                synchronized (actionableTask.getTaskCompletionLock()) {
-                    if (actionableTask.getTaskCompletionSummary().getDownstreamTaskMap().isEmpty()){
-                        actionableTask.getTaskCompletionSummary().setLastInChain(true);
-                        actionableTask.getTaskCompletionSummary().setFinalised(true);
-                    }
+            }
+            if (!hasADownstreamTask) {
+                if (actionableTask.getTaskCompletionSummary().getDownstreamTaskMap().isEmpty()) {
+                    actionableTask.getTaskCompletionSummary().setLastInChain(true);
+                    actionableTask.getTaskCompletionSummary().setFinalised(true);
                 }
             }
+            actionableTask.update();
         }
 
-        getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): Updating actionableTask with task completion details");
-        actionableTaskActivityController.updateActionableTask(actionableTask);
+        for(PetasosActionableTask currentNewActionableTask: newActionableTaskList){
+            PetasosActionableTaskSharedInstance petasosActionableTaskSharedInstance = actionableTaskSharedInstanceFactory.newActionableTaskSharedInstance(currentNewActionableTask);
+            PetasosTaskExecutionStatusEnum petasosTaskExecutionStatusEnum = actionableTaskActivityController.notifyTaskWaiting(petasosActionableTaskSharedInstance.getTaskId());
+        }
+
+        actionableTaskActivityController.notifyTaskFinalisation(actionableTask.getTaskId());
+
+        getLogger().trace(".collectOutcomesAndCreateNewTasks(): Updating actionableTask with task completion details");
 
         //
         // Get out metricsAgent for the WUP that sent the task & do add some metrics
         WorkUnitProcessorTaskReportAgent taskReportAgent = camelExchange.getProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorTaskReportAgent.class);
         if(taskReportAgent != null){
-            taskReportAgent.sendITOpsTaskReport(actionableTask, newActionableTaskList);
+            taskReportAgent.sendITOpsTaskReport(actionableTask.getInstance(), newActionableTaskList);
         }
 
-        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newActionableTaskList.size());
+        getLogger().debug(".collectOutcomesAndCreateNewTasks(): Exit, new PetasosActionableTasks created, number --> {} ", newActionableTaskList.size());
         return (newActionableTaskList);
     }
 

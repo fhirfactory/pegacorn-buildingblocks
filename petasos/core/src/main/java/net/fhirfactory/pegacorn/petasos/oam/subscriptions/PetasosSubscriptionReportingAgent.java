@@ -99,7 +99,7 @@ public class PetasosSubscriptionReportingAgent {
         getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): There are subscriptions, so processing them.");
         for(PetasosParticipant currentParticipant: allParticipants) {
             if(getLogger().isInfoEnabled()) {
-                getLogger().info(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Processing Participant->{}", currentParticipant.getParticipantName());
+                getLogger().debug(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Processing Participant->{}", currentParticipant.getParticipantName());
             }
             if(currentParticipant.getComponentType().equals(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT)) {
                 if(currentParticipant.getParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
@@ -120,7 +120,7 @@ public class PetasosSubscriptionReportingAgent {
                 } else {
                     for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
                         if (currentSubscription.getSourceProcessingPlantParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
-                            getLogger().info(".refreshLocalPubSubReportingMap(): Processing me as a Publisher/Producer");
+                            getLogger().trace(".refreshLocalPubSubReportingMap(): Processing me as a Publisher/Producer");
                             //
                             // My ProcessingPlant as a Publisher
                             PetasosPublisherSubscriptionSummary publisherSubscriptionSummary = new PetasosPublisherSubscriptionSummary();
@@ -129,9 +129,9 @@ public class PetasosSubscriptionReportingAgent {
                             publisherSubscriptionSummary.setParticipantName(processingPlant.getSubsystemParticipantName());
                             publisherSubscriptionSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.PROCESSING_PLANT_SUBSCRIPTION_SUMMARY);
                             publisherSubscriptionSummary.setTimestamp(Instant.now());
-                            getLogger().info(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For currentSubscription->{}", currentSubscription);
+                            getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For currentSubscription->{}", currentSubscription);
                             publisherSubscriptionSummary.addTopic(currentSubscription);
-                            getLogger().info(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding to PublisherSummary List");
+                            getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding to PublisherSummary List");
                             processingPlantSubscriptionSummary.addPublisherSummary(publisherSubscriptionSummary);
                         }
                     }
@@ -139,7 +139,7 @@ public class PetasosSubscriptionReportingAgent {
             } else {
                 //
                 // A WorkUnitProcessor as a Subscriber
-                getLogger().info(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Processing WUP Subscription");
+                getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Processing WUP Subscription");
                 PetasosWorkUnitProcessorSubscriptionSummary publisherSubscriptionSummary = new PetasosWorkUnitProcessorSubscriptionSummary();
                 publisherSubscriptionSummary.setComponentID(currentParticipant.getComponentID());
                 publisherSubscriptionSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.WORK_UNIT_PROCESSOR_SUMMARY);

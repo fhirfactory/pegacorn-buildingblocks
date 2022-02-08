@@ -22,30 +22,21 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelValidationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
-import net.fhirfactory.pegacorn.core.model.generalid.FDN;
-import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import org.apache.camel.Exchange;
-import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Mark A. Hunter
@@ -73,10 +64,10 @@ public class WUPContainerEgressGatekeeper {
      * @return Returns a PetasosFulfillmentTask with the egress payload containing the DiscardedTask value set
      */
 
-    public PetasosFulfillmentTask egressGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+    public PetasosFulfillmentTaskSharedInstance egressGatekeeper(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
         getLogger().debug(".egressGatekeeper(): Enter, fulfillmentTask ->{}", fulfillmentTask );
         ArrayList<String> targetList = new ArrayList<String>();
-        if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
+        if (fulfillmentTask.getTaskFulfillment().isToBeDiscarded()) {
             DataParcelManifest discardedParcelManifest = new DataParcelManifest();
             DataParcelTypeDescriptor discardedParcelDescriptor = new DataParcelTypeDescriptor();
             discardedParcelDescriptor.setDataParcelDefiner("FHIRFactory");
@@ -113,8 +104,9 @@ public class WUPContainerEgressGatekeeper {
             discardedItemPayload.setPayloadManifest(discardedParcelManifest);
             fulfillmentTask.getTaskWorkItem().getEgressContent().getPayloadElements().clear();
             fulfillmentTask.getTaskWorkItem().getEgressContent().addPayloadElement(discardedItemPayload);
+            fulfillmentTask.update();
         }
-        auditServicesBroker.logActivity(fulfillmentTask);
+        auditServicesBroker.logActivity(fulfillmentTask.getInstance());
         getLogger().debug(".egressGatekeeper(): Exit, fulfillmentTask ->{}", fulfillmentTask );
         return(fulfillmentTask);
     }

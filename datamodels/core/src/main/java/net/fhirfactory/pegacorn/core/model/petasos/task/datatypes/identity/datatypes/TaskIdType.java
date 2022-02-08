@@ -69,14 +69,15 @@ public class TaskIdType extends PegacornResourceKeyring {
     //
     // To String
     //
-
-
     @Override
     public String toString() {
-        return "TaskIdType{" +
-                "businessIdentifier=" + getPrimaryBusinessIdentifier() +
-                ", localId=" + getLocalId() +
+        return "PegacornResourceKeyring{" +
+                "primaryBusinessIdentifier=" + getPrimaryBusinessIdentifier() +
+                ", localId=" + getLocalId()  +
+                ", businessIdentifiersMap=" + getBusinessIdentifiersMap() +
                 ", sourceSystemKeyMap=" + getSourceSystemKeyMap() +
+                ", resourceType=" + getResourceType() +
                 '}';
     }
+
 }

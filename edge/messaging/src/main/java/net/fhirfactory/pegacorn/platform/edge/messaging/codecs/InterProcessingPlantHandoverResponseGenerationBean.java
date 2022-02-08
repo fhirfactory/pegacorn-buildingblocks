@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
@@ -63,7 +64,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", node);
 
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Retrieve new PetasosFulfillmentTask from Camel exchange: Start");
-        PetasosFulfillmentTask fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTask.class);
+        PetasosFulfillmentTaskSharedInstance fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTaskSharedInstance.class);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Retrieve new PetasosFulfillmentTask from Camel exchange: Finish");
 
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message: Start");

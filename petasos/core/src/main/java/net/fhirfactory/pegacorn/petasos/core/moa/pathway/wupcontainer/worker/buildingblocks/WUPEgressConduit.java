@@ -22,24 +22,29 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.Date;
 
 /**
  * @author Mark A. Hunter
@@ -48,16 +53,33 @@ import java.util.Date;
 @ApplicationScoped
 public class WUPEgressConduit {
     private static final Logger LOG = LoggerFactory.getLogger(WUPEgressConduit.class);
-    protected Logger getLogger(){
-        return(LOG);
-    }
 
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
     @Inject
     private ProcessingPlantPetasosParticipantNameHolder participantNameHolder;
-    
+
+    //
+    // Constructor(s)
+    //
+
+    public WUPEgressConduit() {
+
+    }
+
+    //
+    // Getters (and Setters)
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
+    //
+    // Business Logic
+    //
+
     /**
      * This function reconstitutes the WorkUnitTransportPacket by extracting the WUPJobCard and ParcelStatusElement
      * from the Camel Exchange, and injecting them plus the UoW into it.
@@ -66,11 +88,11 @@ public class WUPEgressConduit {
      * @param camelExchange The Apache Camel Exchange object, for extracting the WUPJobCard & ParcelStatusElement from
      * @return A WorkUnitTransportPacket object for relay to the other
      */
-    public PetasosFulfillmentTask receiveFromWUP(UoW incomingUoW, Exchange camelExchange) {
+    public PetasosFulfillmentTaskSharedInstance receiveFromWUP(UoW incomingUoW, Exchange camelExchange) {
         getLogger().debug(".receiveFromWUP(): Entry, incomingUoW->{}", incomingUoW);
         // Get my PetasosFulfillmentTask
-        PetasosFulfillmentTask fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTask.class);
-        TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerComponent().getNodeFunctionFDN().getFunctionToken();
+        PetasosFulfillmentTaskSharedInstance fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTaskSharedInstance.class);
+        TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         //
         // Now, continue with business logic
@@ -92,74 +114,45 @@ public class WUPEgressConduit {
         }
         //
         // Merge the content
-        synchronized(fulfillmentTask.getTaskWorkItemLock()) {
-            fulfillmentTask.getTaskWorkItem().setProcessingOutcome(incomingUoW.getProcessingOutcome());
-            if(incomingUoW.hasFailureDescription()) {
-                fulfillmentTask.getTaskWorkItem().setFailureDescription(incomingUoW.getFailureDescription());
-            }
-            fulfillmentTask.getTaskWorkItem().setEgressContent(incomingUoW.getEgressContent());
+        fulfillmentTask.getTaskWorkItem().setProcessingOutcome(incomingUoW.getProcessingOutcome());
+        if(incomingUoW.hasFailureDescription()) {
+            fulfillmentTask.getTaskWorkItem().setFailureDescription(incomingUoW.getFailureDescription());
         }
+        fulfillmentTask.getTaskWorkItem().setEgressContent(incomingUoW.getEgressContent());
         switch (incomingUoW.getProcessingOutcome()) {
             case UOW_OUTCOME_SUCCESS:
                 getLogger().trace(".receiveFromWUP(): UoW was processed successfully - updating JobCard/StatusElement to FINISHED!");
-                synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
+                    fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FINISHED);
                     fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
                     fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
-                }
-                synchronized (fulfillmentTask.getTaskJobCardLock()) {
-                    fulfillmentTask.getTaskJobCard().setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
-                    fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
-                    fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
-                    fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
-                }
                 break;
             case UOW_OUTCOME_NO_PROCESSING_REQUIRED:
                 getLogger().trace(".receiveFromWUP(): UoW was processed with no actions required - updating JobCard/StatusElement to FINISHED!");
-                synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
-                    fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED);
-                    fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
-                }
-                synchronized (fulfillmentTask.getTaskJobCardLock()) {
-                    fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED);
-                    fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
-                    fulfillmentTask.getTaskJobCard().setToBeDiscarded(true);
-                    fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
-                }
+                fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FINISHED);
+                fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED);
+                fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
                 break;
             case UOW_OUTCOME_DISCARD:
             case UOW_OUTCOME_FILTERED:
                 getLogger().trace(".receiveFromWUP(): UoW was processed with task to be discarded/filtered!");
-               synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
-                    fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
-                    fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
-                }
-                synchronized (fulfillmentTask.getTaskJobCardLock()) {
-                    fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
-                    fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
-                    fulfillmentTask.getTaskJobCard().setToBeDiscarded(true);
-                    fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
-                }
+                fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FINISHED);
+                fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);
+                fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
                 break;
             case UOW_OUTCOME_NOTSTARTED:
             case UOW_OUTCOME_INCOMPLETE:
             case UOW_OUTCOME_FAILED:
             default:
                 getLogger().trace(".receiveFromWUP(): UoW was not processed or processing failed - updating JobCard/StatusElement to FAILED!");
-                synchronized (fulfillmentTask.getTaskFulfillmentLock()) {
-                    fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
-                    fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
-                }
-                synchronized (fulfillmentTask.getTaskJobCardLock()) {
-                    fulfillmentTask.getTaskJobCard().setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
-                    fulfillmentTask.getTaskJobCard().setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
-                    fulfillmentTask.getTaskJobCard().setToBeDiscarded(true);
-                    fulfillmentTask.getTaskJobCard().setLocalUpdateInstant(Instant.now());
-                }
+                fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FAILED);
+                fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
+                fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
                 break;
         }
-        if(getLogger().isDebugEnabled()) {
-            getLogger().debug(".receiveFromWUP(): jobcard->{}, taskFulfillment->{}", fulfillmentTask.getTaskJobCard(), fulfillmentTask.getTaskFulfillment());
-        }
+
+        fulfillmentTask.update();
+
+        getLogger().debug(".receiveFromWUP(): fulfillmentTask->{}", fulfillmentTask);
         return (fulfillmentTask);
     }
 }

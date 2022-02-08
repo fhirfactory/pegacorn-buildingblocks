@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 public class TaskPerformerTypeType implements Serializable {
     private TopologyNodeFunctionFDN requiredPerformerType;
+    private String requiredParticipantName;
     private String requiredPerformerTypeDescription;
 
     //
@@ -36,6 +37,7 @@ public class TaskPerformerTypeType implements Serializable {
     public TaskPerformerTypeType(){
         this.requiredPerformerType = null;
         this.requiredPerformerTypeDescription = null;
+        this.requiredParticipantName = null;
     }
 
     //
@@ -58,6 +60,14 @@ public class TaskPerformerTypeType implements Serializable {
         this.requiredPerformerTypeDescription = requiredPerformerTypeDescription;
     }
 
+    public String getRequiredParticipantName() {
+        return requiredParticipantName;
+    }
+
+    public void setRequiredParticipantName(String requiredParticipantName) {
+        this.requiredParticipantName = requiredParticipantName;
+    }
+
     //
     // To String
     //
@@ -66,6 +76,7 @@ public class TaskPerformerTypeType implements Serializable {
     public String toString() {
         return "TaskPerformerType{" +
                 "requiredPerformerType=" + requiredPerformerType +
+                "requiredParticipantName=" + requiredParticipantName +
                 "requiredPerformerTypeDescription=" + requiredPerformerTypeDescription +
                 '}';
     }

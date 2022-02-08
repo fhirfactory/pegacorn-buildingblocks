@@ -23,19 +23,13 @@ package net.fhirfactory.pegacorn.core.model.petasos.wup;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosJobActivityStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.internals.SerializableObject;
 import org.apache.commons.lang3.SerializationUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,127 +43,113 @@ public class PetasosTaskJobCard implements Serializable {
         return(LOG);
     }
 
-    private TaskIdType fulfillmentTaskIdentifier;
-    private TaskIdType actionableTaskIdentifier;
+    private TaskIdType actionableTaskId;
+    private ComponentIdType actionableTaskAffinityNode;
+
+    private TaskIdType executingFulfillmentTaskId;
+    private ComponentIdType executingProcessingPlant;
+    private String processingPlantParticipantName;
+    private ComponentIdType executingWorkUnitProcessor;
+    private String workUnitProcessorParticipantName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant localUpdateInstant;
+    private Instant executingFulfillmentTaskIdAssignmentInstant;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant coordinatorUpdateInstant;
-    private ComponentIdType processingPlant;
-    private ComponentIdType workUnitProcessor;
-    private PetasosJobActivityStatusEnum currentStatus;
-    private PetasosJobActivityStatusEnum requestedStatus;
-    private PetasosJobActivityStatusEnum grantedStatus;
-    private FulfillmentExecutionStatusEnum localFulfillmentStatus;
-    private FulfillmentExecutionStatusEnum globalFulfillmentStatus;
-    private SerializableObject updateLock;
+    private Instant lastActivityCheckInstant;
+
+    private PetasosTaskExecutionStatusEnum currentStatus;
+    private PetasosTaskExecutionStatusEnum lastRequestedStatus;
+    private PetasosTaskExecutionStatusEnum grantedStatus;
+
     private ConcurrencyModeEnum clusterMode;
     private ResilienceModeEnum systemMode;
-    private boolean isToBeDiscarded;
-    private String currentStateReason;
-
 
     //
     // Constructor(s)
     //
 
     public PetasosTaskJobCard(){
-        this.fulfillmentTaskIdentifier = null;
-        this.actionableTaskIdentifier = null;
-        this.localUpdateInstant = null;
-        this.coordinatorUpdateInstant = null;
+        this.executingFulfillmentTaskId = null;
+        this.actionableTaskId = null;
+        this.executingFulfillmentTaskIdAssignmentInstant = null;
+        this.lastActivityCheckInstant = null;
         this.currentStatus = null;
-        this.requestedStatus = null;
+        this.lastRequestedStatus = null;
         this.clusterMode = null;
         this.systemMode = null;
         this.grantedStatus = null;
-        this.isToBeDiscarded = false;
-        this.currentStateReason = null;
-        this.localFulfillmentStatus = null;
-        this.globalFulfillmentStatus = null;
-        this.processingPlant = null;
-        this.workUnitProcessor = null;
-
-        this.updateLock = new SerializableObject();
-
+        this.executingProcessingPlant = null;
+        this.executingWorkUnitProcessor = null;
+        this.workUnitProcessorParticipantName = null;
+        this.actionableTaskAffinityNode = null;
     }
 
     public PetasosTaskJobCard(
-            TaskIdType fulfillmentTaskIdentifier,
-            TaskIdType actionableTaskIdentifier,
-            PetasosJobActivityStatusEnum currentStatus,
-            PetasosJobActivityStatusEnum requestedStatus,
-            ConcurrencyModeEnum clusterMode, 
-            ResilienceModeEnum systemMode, 
-            Instant localUpdateInstant) {
+            TaskIdType executingFulfillmentTaskId,
+            TaskIdType actionableTaskId,
+            PetasosTaskExecutionStatusEnum currentStatus,
+            PetasosTaskExecutionStatusEnum lastRequestedStatus,
+            ConcurrencyModeEnum clusterMode,
+            ResilienceModeEnum systemMode,
+            Instant executingFulfillmentTaskIdAssignmentInstant) {
         //
         // Clear the deck
-        this.fulfillmentTaskIdentifier = null;
-        this.actionableTaskIdentifier = null;
-        this.localUpdateInstant = null;
-        this.coordinatorUpdateInstant = null;
+        this.executingFulfillmentTaskId = null;
+        this.actionableTaskId = null;
+        this.executingFulfillmentTaskIdAssignmentInstant = null;
+        this.lastActivityCheckInstant = null;
         this.currentStatus = null;
-        this.requestedStatus = null;
+        this.lastRequestedStatus = null;
         this.clusterMode = null;
         this.systemMode = null;
         this.grantedStatus = null;
-        this.isToBeDiscarded = false;
-        this.currentStateReason = null;
-        this.localFulfillmentStatus = null;
-        this.globalFulfillmentStatus = null;
-        this.processingPlant = null;
-        this.workUnitProcessor = null;
-
-        this.updateLock = new SerializableObject();
+        this.executingProcessingPlant = null;
+        this.executingWorkUnitProcessor = null;
+        this.workUnitProcessorParticipantName = null;
+        this.actionableTaskAffinityNode = null;
 
         //
         // Assign provided values
-        if ((fulfillmentTaskIdentifier == null)) {
+        if ((executingFulfillmentTaskId == null)) {
             throw (new IllegalArgumentException("fulfillmentTaskIdentifier is null in Constructor"));
         } else {
-            setFulfillmentTaskIdentifier(fulfillmentTaskIdentifier);
+            setExecutingFulfillmentTaskId(executingFulfillmentTaskId);
         }
 
-        if ((actionableTaskIdentifier == null)) {
+        if ((actionableTaskId == null)) {
             throw (new IllegalArgumentException("actionableTaskIdentifier is null Constructor"));
         } else {
-            setActionableTaskIdentifier(actionableTaskIdentifier);
+            setActionableTaskId(actionableTaskId);
         }
-        setLocalUpdateInstant(localUpdateInstant);
+        setExecutingFulfillmentTaskIdAssignmentInstant(executingFulfillmentTaskIdAssignmentInstant);
         setCurrentStatus(currentStatus);
         setClusterMode(clusterMode);
-        setRequestedStatus(requestedStatus);
+        setLastRequestedStatus(lastRequestedStatus);
         setSystemMode(systemMode);
-        setToBeDiscarded(false);
     }
 
     public PetasosTaskJobCard(PetasosTaskJobCard ori) {
         //
         // Clear the deck
-        this.fulfillmentTaskIdentifier = null;
-        this.actionableTaskIdentifier = null;
-        this.localUpdateInstant = null;
-        this.coordinatorUpdateInstant = null;
+        this.executingFulfillmentTaskId = null;
+        this.actionableTaskId = null;
+        this.executingFulfillmentTaskIdAssignmentInstant = null;
+        this.lastActivityCheckInstant = null;
         this.currentStatus = null;
-        this.requestedStatus = null;
+        this.lastRequestedStatus = null;
         this.clusterMode = null;
         this.systemMode = null;
         this.grantedStatus = null;
-        this.isToBeDiscarded = false;
-        this.currentStateReason = null;
-        this.processingPlant = null;
-        this.workUnitProcessor = null;
-        this.localFulfillmentStatus = null;
-        this.globalFulfillmentStatus = null;
-
-        this.updateLock = new SerializableObject();
+        this.executingProcessingPlant = null;
+        this.executingWorkUnitProcessor = null;
+        this.workUnitProcessorParticipantName = null;
         //
         // Assign provided values
-        if(ori.hasActionableTaskIdentifier()){
-            setActionableTaskIdentifier(SerializationUtils.clone(ori.getActionableTaskIdentifier()));
+        if(ori.hasActionableTaskId()){
+            setActionableTaskId(SerializationUtils.clone(ori.getActionableTaskId()));
         }
-        if(ori.hasFulfillmentTaskIdentifier()){
-            setFulfillmentTaskIdentifier(SerializationUtils.clone(ori.getFulfillmentTaskIdentifier()));
+        if(ori.hasExecutingFulfillmentTaskId()){
+            setExecutingFulfillmentTaskId(SerializationUtils.clone(ori.getExecutingFulfillmentTaskId()));
         }
         if(ori.hasClusterMode()){
             setClusterMode(ori.getClusterMode());
@@ -180,33 +160,75 @@ public class PetasosTaskJobCard implements Serializable {
         if(ori.hasGrantedStatus()){
             setGrantedStatus(ori.getGrantedStatus());
         }
-        if(ori.hasRequestedStatus()){
-            setRequestedStatus(ori.getRequestedStatus());
+        if(ori.hasLastRequestedStatus()){
+            setLastRequestedStatus(ori.getLastRequestedStatus());
         }
         if(ori.hasSystemMode()){
             setSystemMode(ori.getSystemMode());
         }
-        if(ori.hasWorkUnitProcessor()){
-            setWorkUnitProcessor(SerializationUtils.clone(ori.getWorkUnitProcessor()));
+        if(ori.hasExecutingWorkUnitProcessor()){
+            setExecutingWorkUnitProcessor(SerializationUtils.clone(ori.getExecutingWorkUnitProcessor()));
         }
-        if(ori.hasProcessingPlant()){
-            setProcessingPlant(SerializationUtils.clone(ori.getProcessingPlant()));
+        if(ori.hasExecutingProcessingPlant()){
+            setExecutingProcessingPlant(SerializationUtils.clone(ori.getExecutingProcessingPlant()));
         }
-        setToBeDiscarded(ori.isToBeDiscarded);
-        if(ori.hasLocalUpdateInstant()){
-            setLocalUpdateInstant(SerializationUtils.clone(ori.getLocalUpdateInstant()));
+        if(ori.hasLastActivityCheckInstant()){
+            setLastActivityCheckInstant(SerializationUtils.clone(ori.getLastActivityCheckInstant()));
         }
-        if(ori.hasCoordinatorUpdateInstant()){
-            setCoordinatorUpdateInstant(SerializationUtils.clone(ori.getCoordinatorUpdateInstant()));
+        if(ori.hasWorkUnitProcessorParticipantName()){
+            setWorkUnitProcessorParticipantName(ori.getWorkUnitProcessorParticipantName());
         }
-        if(ori.hasLocalFulfillmentStatus()){
-            setLocalFulfillmentStatus(ori.getLocalFulfillmentStatus());
+    }
+
+    //
+    // Update
+    //
+
+    public void update(PetasosTaskJobCard other){
+        if(other == null){
+            return;
         }
-        if(ori.hasGlobalFulfillmentStatus()){
-            setGlobalFulfillmentStatus(ori.getGlobalFulfillmentStatus());
+        if(other.hasActionableTaskAffinityNode()){
+            setActionableTaskAffinityNode(other.getActionableTaskAffinityNode());
         }
-        if(ori.hasCurrentStateReason()){
-            setCurrentStateReason(ori.getCurrentStateReason());
+        if(other.hasClusterMode()){
+            setClusterMode(other.getClusterMode());
+        }
+        if(other.hasCurrentStatus()){
+            setCurrentStatus(other.getCurrentStatus());
+        }
+        if(other.hasActionableTaskId()){
+            setActionableTaskId(other.getActionableTaskId());
+        }
+        if(other.hasExecutingFulfillmentTaskIdAssignmentInstant()){
+            setExecutingFulfillmentTaskIdAssignmentInstant(other.getExecutingFulfillmentTaskIdAssignmentInstant());
+        }
+        if(other.hasExecutingProcessingPlant()){
+            setExecutingProcessingPlant(other.getExecutingProcessingPlant());
+        }
+        if(other.hasExecutingWorkUnitProcessor()){
+            setExecutingWorkUnitProcessor(other.getExecutingWorkUnitProcessor());
+        }
+        if(other.hasGrantedStatus()){
+            setGrantedStatus(other.getGrantedStatus());
+        }
+        if(other.hasLastRequestedStatus()){
+            setLastRequestedStatus(other.getLastRequestedStatus());
+        }
+        if(other.hasProcessingPlantParticipantName()){
+            setProcessingPlantParticipantName(other.getProcessingPlantParticipantName());
+        }
+        if(other.hasWorkUnitProcessorParticipantName()){
+            setWorkUnitProcessorParticipantName(other.getWorkUnitProcessorParticipantName());
+        }
+        if(other.hasExecutingFulfillmentTaskId()){
+            setExecutingFulfillmentTaskId(other.getExecutingFulfillmentTaskId());
+        }
+        if(other.hasSystemMode()){
+            setSystemMode(other.getSystemMode());
+        }
+        if(other.hasLastActivityCheckInstant()){
+            setLastActivityCheckInstant(other.getLastActivityCheckInstant());
         }
     }
 
@@ -215,71 +237,100 @@ public class PetasosTaskJobCard implements Serializable {
     //
 
     @JsonIgnore
-    public boolean hasFulfillmentTaskIdentifier(){
-        boolean hasValue = this.fulfillmentTaskIdentifier != null;
+    public boolean hasActionableTaskAffinityNode(){
+        boolean hasValue = this.actionableTaskAffinityNode != null;
         return(hasValue);
     }
 
-    public TaskIdType getFulfillmentTaskIdentifier() {
-        return fulfillmentTaskIdentifier;
+    public ComponentIdType getActionableTaskAffinityNode() {
+        return actionableTaskAffinityNode;
     }
 
-    public void setFulfillmentTaskIdentifier(TaskIdType fulfillmentTaskIdentifier) {
-        this.fulfillmentTaskIdentifier = fulfillmentTaskIdentifier;
+    public void setActionableTaskAffinityNode(ComponentIdType actionableTaskAffinityNode) {
+        this.actionableTaskAffinityNode = actionableTaskAffinityNode;
     }
 
     @JsonIgnore
-    public boolean hasActionableTaskIdentifier(){
-        boolean hasValue = this.actionableTaskIdentifier != null;
+    public boolean hasProcessingPlantParticipantName(){
+        boolean hasValue = this.processingPlantParticipantName != null;
         return(hasValue);
     }
 
-    public TaskIdType getActionableTaskIdentifier() {
-        return actionableTaskIdentifier;
+    public String getProcessingPlantParticipantName() {
+        return processingPlantParticipantName;
     }
 
-    public void setActionableTaskIdentifier(TaskIdType actionableTaskIdentifier) {
-        this.actionableTaskIdentifier = actionableTaskIdentifier;
+    public void setProcessingPlantParticipantName(String processingPlantParticipantName) {
+        this.processingPlantParticipantName = processingPlantParticipantName;
+    }
+
+    public boolean hasWorkUnitProcessorParticipantName(){
+        boolean hasValue = this.workUnitProcessorParticipantName != null;
+        return(hasValue);
+    }
+
+    public String getWorkUnitProcessorParticipantName() {
+        return workUnitProcessorParticipantName;
+    }
+
+    public void setWorkUnitProcessorParticipantName(String workUnitProcessorParticipantName) {
+        this.workUnitProcessorParticipantName = workUnitProcessorParticipantName;
     }
 
     @JsonIgnore
-    public boolean hasLocalUpdateInstant(){
-        boolean hasValue = this.localUpdateInstant != null;
+    public boolean hasExecutingFulfillmentTaskId(){
+        boolean hasValue = this.executingFulfillmentTaskId != null;
         return(hasValue);
     }
 
-    public Instant getLocalUpdateInstant() {
-        Instant instant = null;
-        synchronized (this.updateLock) {
-            instant = this.localUpdateInstant;
-        }
-        return (instant);
+    public TaskIdType getExecutingFulfillmentTaskId() {
+        return executingFulfillmentTaskId;
     }
 
-    public void setLocalUpdateInstant(Instant localUpdateInstant) {
-        synchronized (this.updateLock) {
-            this.localUpdateInstant = localUpdateInstant;
-        }
+    public void setExecutingFulfillmentTaskId(TaskIdType executingFulfillmentTaskId) {
+        this.executingFulfillmentTaskId = executingFulfillmentTaskId;
     }
 
     @JsonIgnore
-    public boolean hasCoordinatorUpdateInstant(){
-        boolean hasValue = this.coordinatorUpdateInstant != null;
+    public boolean hasActionableTaskId(){
+        boolean hasValue = this.actionableTaskId != null;
         return(hasValue);
     }
 
-    public Instant getCoordinatorUpdateInstant() {
-        Instant instant = null;
-        synchronized(this.updateLock){
-            instant = this.coordinatorUpdateInstant;
-        }
-        return(instant);
+    public TaskIdType getActionableTaskId() {
+        return actionableTaskId;
     }
 
-    public void setCoordinatorUpdateInstant(Instant coordinatorUpdateInstant) {
-        synchronized (this.updateLock) {
-            this.coordinatorUpdateInstant = coordinatorUpdateInstant;
-        }
+    public void setActionableTaskId(TaskIdType actionableTaskId) {
+        this.actionableTaskId = actionableTaskId;
+    }
+
+    @JsonIgnore
+    public boolean hasExecutingFulfillmentTaskIdAssignmentInstant(){
+        boolean hasValue = this.executingFulfillmentTaskIdAssignmentInstant != null;
+        return(hasValue);
+    }
+
+    public Instant getExecutingFulfillmentTaskIdAssignmentInstant() {
+        return (this.executingFulfillmentTaskIdAssignmentInstant);
+    }
+
+    public void setExecutingFulfillmentTaskIdAssignmentInstant(Instant executingFulfillmentTaskIdAssignmentInstant) {
+        this.executingFulfillmentTaskIdAssignmentInstant = executingFulfillmentTaskIdAssignmentInstant;
+    }
+
+    @JsonIgnore
+    public boolean hasLastActivityCheckInstant(){
+        boolean hasValue = this.lastActivityCheckInstant != null;
+        return(hasValue);
+    }
+
+    public Instant getLastActivityCheckInstant() {
+        return(this.lastActivityCheckInstant);
+    }
+
+    public void setLastActivityCheckInstant(Instant lastActivityCheckInstant) {
+        this.lastActivityCheckInstant = lastActivityCheckInstant;
     }
 
     @JsonIgnore
@@ -288,38 +339,26 @@ public class PetasosTaskJobCard implements Serializable {
         return(hasValue);
     }
 
-    public PetasosJobActivityStatusEnum getCurrentStatus() {
-        PetasosJobActivityStatusEnum status = null;
-        synchronized (this.getUpdateLock()){
-            status = this.currentStatus;
-        }
-        return (status);
+    public PetasosTaskExecutionStatusEnum getCurrentStatus() {
+        return (this.currentStatus);
     }
 
-    public void setCurrentStatus(PetasosJobActivityStatusEnum currentStatus) {
-        synchronized(this.getUpdateLock()) {
-            this.currentStatus = currentStatus;
-        }
+    public void setCurrentStatus(PetasosTaskExecutionStatusEnum currentStatus) {
+        this.currentStatus = currentStatus;
     }
 
     @JsonIgnore
-    public boolean hasRequestedStatus(){
-        boolean hasValue = this.requestedStatus != null;
+    public boolean hasLastRequestedStatus(){
+        boolean hasValue = this.lastRequestedStatus != null;
         return(hasValue);
     }
 
-    public PetasosJobActivityStatusEnum getRequestedStatus() {
-        PetasosJobActivityStatusEnum status = null;
-        synchronized (this.getUpdateLock()){
-            status = this.requestedStatus;
-        }
-        return (status);
+    public PetasosTaskExecutionStatusEnum getLastRequestedStatus() {
+        return (this.lastRequestedStatus);
     }
 
-    public void setRequestedStatus(PetasosJobActivityStatusEnum requestedStatus) {
-        synchronized (this.getUpdateLock()) {
-            this.requestedStatus = requestedStatus;
-        }
+    public void setLastRequestedStatus(PetasosTaskExecutionStatusEnum lastRequestedStatus) {
+        this.lastRequestedStatus = lastRequestedStatus;
     }
 
     @JsonIgnore
@@ -328,18 +367,12 @@ public class PetasosTaskJobCard implements Serializable {
         return(hasValue);
     }
 
-    public PetasosJobActivityStatusEnum getGrantedStatus() {
-        PetasosJobActivityStatusEnum status = null;
-        synchronized(this.getUpdateLock()){
-            status = this.grantedStatus;
-        }
-        return (status);
+    public PetasosTaskExecutionStatusEnum getGrantedStatus() {
+        return (this.grantedStatus);
     }
 
-    public void setGrantedStatus(PetasosJobActivityStatusEnum grantedStatus) {
-        synchronized (this.getUpdateLock()) {
-            this.grantedStatus = grantedStatus;
-        }
+    public void setGrantedStatus(PetasosTaskExecutionStatusEnum grantedStatus) {
+        this.grantedStatus = grantedStatus;
     }
 
     @JsonIgnore
@@ -370,102 +403,32 @@ public class PetasosTaskJobCard implements Serializable {
         this.systemMode = systemMode;
     }
 
-    public boolean isToBeDiscarded() {
-        return isToBeDiscarded;
-    }
-
-    public void setToBeDiscarded(boolean toBeDiscarded) {
-        isToBeDiscarded = toBeDiscarded;
-    }
-
     @JsonIgnore
-    public boolean hasCurrentStateReason(){
-        boolean hasValue = this.currentStateReason != null;
+    public boolean hasExecutingProcessingPlant(){
+        boolean hasValue = this.executingProcessingPlant != null;
         return(hasValue);
     }
 
-    public String getCurrentStateReason() {
-        return currentStateReason;
+    public ComponentIdType getExecutingProcessingPlant() {
+        return executingProcessingPlant;
     }
 
-    public void setCurrentStateReason(String currentStateReason) {
-        this.currentStateReason = currentStateReason;
-    }
-
-    @JsonIgnore
-    public boolean  hasLocalFulfillmentStatus(){
-        boolean hasValue = this.localFulfillmentStatus != null;
-        return(hasValue);
-    }
-
-    public FulfillmentExecutionStatusEnum getLocalFulfillmentStatus() {
-        FulfillmentExecutionStatusEnum status = null;
-        synchronized (this.getUpdateLock()){
-            status = this.localFulfillmentStatus;
-        }
-        return (status);
-    }
-
-    public void setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum localFulfillmentStatus) {
-        synchronized (this.getUpdateLock()) {
-            this.localFulfillmentStatus = localFulfillmentStatus;
-        }
+    public void setExecutingProcessingPlant(ComponentIdType executingProcessingPlant) {
+        this.executingProcessingPlant = executingProcessingPlant;
     }
 
     @JsonIgnore
-    public boolean  hasGlobalFulfillmentStatus(){
-        boolean hasValue = this.globalFulfillmentStatus != null;
+    public boolean hasExecutingWorkUnitProcessor(){
+        boolean hasValue = this.executingWorkUnitProcessor != null;
         return(hasValue);
     }
 
-    public FulfillmentExecutionStatusEnum getGlobalFulfillmentStatus() {
-        FulfillmentExecutionStatusEnum status = null;
-        synchronized (this.updateLock){
-            status = this.globalFulfillmentStatus;
-        }
-        return (status);
+    public ComponentIdType getExecutingWorkUnitProcessor() {
+        return executingWorkUnitProcessor;
     }
 
-    public void setGlobalFulfillmentStatus(FulfillmentExecutionStatusEnum localFulfillmentStatus) {
-        synchronized (this.updateLock) {
-            this.globalFulfillmentStatus = localFulfillmentStatus;
-        }
-    }
-
-    @JsonIgnore
-    public boolean hasProcessingPlant(){
-        boolean hasValue = this.processingPlant != null;
-        return(hasValue);
-    }
-
-    public ComponentIdType getProcessingPlant() {
-        return processingPlant;
-    }
-
-    public void setProcessingPlant(ComponentIdType processingPlant) {
-        this.processingPlant = processingPlant;
-    }
-
-    @JsonIgnore
-    public boolean hasWorkUnitProcessor(){
-        boolean hasValue = this.workUnitProcessor != null;
-        return(hasValue);
-    }
-
-    public ComponentIdType getWorkUnitProcessor() {
-        return workUnitProcessor;
-    }
-
-    public void setWorkUnitProcessor(ComponentIdType workUnitProcessor) {
-        this.workUnitProcessor = workUnitProcessor;
-    }
-    
-    public SerializableObject getUpdateLock() {
-        return updateLock;
-    }
-
-    public void setUpdateLock(SerializableObject updateLock) {
-        this.updateLock = updateLock;
+    public void setExecutingWorkUnitProcessor(ComponentIdType executingWorkUnitProcessor) {
+        this.executingWorkUnitProcessor = executingWorkUnitProcessor;
     }
 
     //
@@ -474,22 +437,21 @@ public class PetasosTaskJobCard implements Serializable {
 
     @Override
     public String toString() {
-
         return "PetasosTaskJobCard{" +
-                "  fulfillmentTaskIdentifier=" + fulfillmentTaskIdentifier + "," +
-                "  actionableTaskIdentifier=" + actionableTaskIdentifier + "," +
-                "  updateInstant=" + localUpdateInstant + "," +
-                "  currentStatus=" + currentStatus + "," +
-                "  requestedStatus=" + requestedStatus + "," +
-                "  grantedStatus=" + grantedStatus + "," +
-                "  localFulfillmentStatus=" + localFulfillmentStatus + "," +
-                "  globalFulfillmentStatus=" + globalFulfillmentStatus + "," +
-                "  clusterMode=" + clusterMode + "," +
-                "  systemMode=" + systemMode + "," +
-                "  isToBeDiscarded=" + isToBeDiscarded + "," +
-                "  currentStateReason=" + currentStateReason + "," +
-                "  workUnitProcessor=" + getWorkUnitProcessor() + "," +
-                "  processingPlant=" + getProcessingPlant() +
+                "actionableTaskId=" + actionableTaskId +
+                ", actionableTaskAffinityNode=" + actionableTaskAffinityNode +
+                ", executingFulfillmentTaskId=" + executingFulfillmentTaskId +
+                ", executingProcessingPlant=" + executingProcessingPlant +
+                ", processingPlantParticipantName='" + processingPlantParticipantName + '\'' +
+                ", executingWorkUnitProcessor=" + executingWorkUnitProcessor +
+                ", workUnitProcessorParticipantName='" + workUnitProcessorParticipantName + '\'' +
+                ", executingFulfillmentTaskIdAssignmentInstant=" + executingFulfillmentTaskIdAssignmentInstant +
+                ", lastActivityCheckInstant=" + lastActivityCheckInstant +
+                ", currentStatus=" + currentStatus +
+                ", lastRequestedStatus=" + lastRequestedStatus +
+                ", grantedStatus=" + grantedStatus +
+                ", clusterMode=" + clusterMode +
+                ", systemMode=" + systemMode +
                 '}';
     }
 }
