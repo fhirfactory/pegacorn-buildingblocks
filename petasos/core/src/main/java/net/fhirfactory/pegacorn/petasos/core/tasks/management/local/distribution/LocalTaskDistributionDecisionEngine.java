@@ -146,13 +146,15 @@ public class LocalTaskDistributionDecisionEngine {
     }
 
     public boolean hasRemoteServiceName(PetasosParticipant subscriber){
+        getLogger().debug(".hasRemoteServiceName(): Entry, subscriber->{}", subscriber.getSubsystemParticipantName());
         if(subscriber == null){
             return(false);
         }
-        if(subscriber.getSubsystemParticipantName() == null){
+        if(StringUtils.isEmpty(subscriber.getSubsystemParticipantName())){
             return(false);
         }
-        if(subscriber.getSubsystemParticipantName().equals(processingPlant.getSubsystemParticipantName())){
+        getLogger().debug(".hasRemoteServiceName(): Entry, processingPlant.getSubsystemParticipantName()->{}", processingPlant.getSubsystemParticipantName());
+        if(subscriber.getSubsystemParticipantName().contentEquals(processingPlant.getSubsystemParticipantName())){
             return(false);
         }
         return(true);

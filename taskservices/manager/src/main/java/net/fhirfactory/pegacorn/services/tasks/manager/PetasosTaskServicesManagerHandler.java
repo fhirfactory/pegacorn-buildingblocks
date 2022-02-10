@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.services.tasks.manager;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.services.tasks.cache.PetasosActionableTaskDM;
 import net.fhirfactory.pegacorn.services.tasks.datatypes.PetasosActionableTaskRegistrationType;
@@ -42,14 +41,14 @@ public abstract class PetasosTaskServicesManagerHandler extends PetasosTasksDist
     // Abstract Methods
     //
 
-    abstract protected PetasosActionableTaskDM specifyActionableTaskDM();
+    abstract protected PetasosActionableTaskDM specifyActionableTaskCache();
 
     //
     // Getters and Setters
     //
 
-   protected PetasosActionableTaskDM getActionableTaskDM(){
-       return(specifyActionableTaskDM());
+   protected PetasosActionableTaskDM getActionableTaskCache(){
+       return(specifyActionableTaskCache());
    }
 
     //
@@ -59,7 +58,7 @@ public abstract class PetasosTaskServicesManagerHandler extends PetasosTasksDist
     @Override
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary integrationPoint) {
         getLogger().debug(".registerActionableTask(): Entry, actionableTask->{}, integrationPoint->{}", actionableTask, integrationPoint);
-        PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().registerPetasosActionableTask(actionableTask, integrationPoint);
+        PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskCache().registerPetasosActionableTask(actionableTask, integrationPoint);
         actionableTask.setRegistered(petasosActionableTaskRegistration.getRegistrationInstant()!= null);
         getLogger().debug(".registerActionableTask(): Exit, actionableTask->{}", actionableTask);
         return(actionableTask);
@@ -68,8 +67,8 @@ public abstract class PetasosTaskServicesManagerHandler extends PetasosTasksDist
     @Override
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary integrationPoint) {
         getLogger().debug(".updateActionableTask(): Entry, actionableTask->{}, integrationPoint->{}", actionableTask, integrationPoint);
-        PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskDM().updatePetasosActionableTask(actionableTask, integrationPoint);
-        PetasosActionableTask updatedActionableTask = getActionableTaskDM().getPetasosActionableTask(actionableTask.getTaskId());
+        PetasosActionableTaskRegistrationType petasosActionableTaskRegistration = getActionableTaskCache().updatePetasosActionableTask(actionableTask, integrationPoint);
+        PetasosActionableTask updatedActionableTask = getActionableTaskCache().getPetasosActionableTask(actionableTask.getTaskId());
         getLogger().debug(".updateActionableTask(): Exit, updatedActionableTask->{}", updatedActionableTask);
         return(updatedActionableTask);
     }
@@ -82,7 +81,7 @@ public abstract class PetasosTaskServicesManagerHandler extends PetasosTasksDist
             getLogger().debug(".retrievePendingActionableTasks(): Exit, integrationPoint is null, returning empty list");
             return (taskList);
         }
-        List<PetasosActionableTask> waitingActionableTasksForComponent = getActionableTaskDM().getWaitingActionableTasksForComponent(integrationPoint.getProcessingPlantInstanceId());
+        List<PetasosActionableTask> waitingActionableTasksForComponent = getActionableTaskCache().getWaitingActionableTasksForComponent(integrationPoint.getProcessingPlantInstanceId());
         taskList.addAll(waitingActionableTasksForComponent);
         getLogger().info(".retrievePendingActionableTasks(): Exit");
         return(taskList);
