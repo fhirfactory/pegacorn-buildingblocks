@@ -367,7 +367,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
     }
 
     @Override
-    public Set<PetasosParticipantRegistration> getParticipantRegistrationSetForService(String participantSeviceName) {
+    public Set<PetasosParticipantRegistration> getParticipantRegistrationSetForParticipantName(String participantSeviceName) {
         getLogger().debug(".getParticipantRegistrationSetForService(): Entry, performerServiceName->{}", participantSeviceName);
         if(StringUtils.isEmpty(participantSeviceName)){
             return(new HashSet<>());

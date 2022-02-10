@@ -40,7 +40,7 @@ public interface TaskPathwayManagementServiceInterface {
 
     // Performer Maps
     public PetasosParticipantRegistration getPetasosParticipantRegistration(ComponentIdType participantId);
-    public Set<PetasosParticipantRegistration> getParticipantRegistrationSetForService(String participantSeviceName);
+    public Set<PetasosParticipantRegistration> getParticipantRegistrationSetForParticipantName(String participantSeviceName);
 
     // Macro
     public Set<PetasosParticipantRegistration> getAllRegistrations();

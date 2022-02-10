@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -49,6 +50,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.time.Instant;
@@ -62,7 +64,7 @@ import java.util.Set;
  * @author Mark A. Hunter
  */
 
-@Dependent
+@ApplicationScoped
 public class LocalTaskDistributionBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalTaskDistributionBean.class);
@@ -193,30 +195,29 @@ public class LocalTaskDistributionBean {
         boolean isRemoteTarget = false;
         String intendedTargetName = null;
         DataParcelManifest payloadTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();
-        if(getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)){
-            if(!payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER)){
-                if(!payloadTopicID.getIntendedTargetSystem().equals(myProcessingPlant.getSubsystemParticipantName())){
-                    isRemoteTarget = true;
-                }
+//        if(getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)){
+//            if(!payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER)){
+//                if(!payloadTopicID.getIntendedTargetSystem().equals(myProcessingPlant.getSubsystemParticipantName())){
+//                    isRemoteTarget = true;
+//                }
+//            }
+//        }
+        if (getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber)) {
+            getLogger().debug(".forwardTask(): Has Remote Service as Target");
+            boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
+            boolean hasWildcardTarget = false;
+            if (getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)) {
+                hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
+            }
+            boolean hasRemoteElement = getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber);
+            getLogger().debug(".forwardTask(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
+            if ((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement) {
+                intendedTargetName = subscriber.getSubsystemParticipantName();
+                getLogger().trace(".forwardTask(): Setting the intendedTargetSystem->{}", subscriber.getSubsystemParticipantName());
+                isRemoteTarget = true;
             }
         }
-        if(!isRemoteTarget) {
-            if (getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber)) {
-                getLogger().trace(".forwardTask(): Has Remote Service as Target");
-                boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
-                boolean hasWildcardTarget = false;
-                if (getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)) {
-                    hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
-                }
-                boolean hasRemoteElement = getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber);
-                getLogger().trace(".forwardTask(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
-                if ((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement) {
-                    intendedTargetName = subscriber.getSubsystemParticipantName();
-                    getLogger().trace(".forwardTask(): Setting the intendedTargetSystem->{}", subscriber.getSubsystemParticipantName());
-                    isRemoteTarget = true;
-                }
-            }
-        }
+
         ComponentIdType actualSubscriberId = null;
         getLogger().debug(".forwardTask(): Assigning target component id, based on whether it is a remote component or local");
         if(isRemoteTarget){

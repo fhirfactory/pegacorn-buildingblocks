@@ -32,11 +32,13 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPe
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscriptionRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -46,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @ApplicationScoped
 public class LocalPetasosParticipantSubscriptionMapDM {
 	private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosParticipantSubscriptionMapDM.class);
-	
+
 	private ConcurrentHashMap<DataParcelTypeDescriptor, List<TaskWorkItemSubscriptionRegistration>> dataParcelSubscriptionMap;
 	private Object dataParcelSubscriptionMapLock;
 
@@ -59,7 +61,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 	//
 	// Constructor(s)
 	//
-	
+
     public LocalPetasosParticipantSubscriptionMapDM(){
         this.dataParcelSubscriptionMap = new ConcurrentHashMap<DataParcelTypeDescriptor, List<TaskWorkItemSubscriptionRegistration>>();
         this.dataParcelSubscriptionMapLock = new Object();
@@ -86,7 +88,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 	//
 
     /**
-     * This function retrieves the list (FDNTokenSet) of WUPs that are interested in
+     * This function retrieves the list (TaskWorkItemSubscriptionRegistration) of WUPs that are interested in
      * receiving the identified parcelDescriptor (DataParcelTypeDescriptor).
      *
      * @param parcelDescriptor The FDNToken representing the UoW (Ingres) Payload Topic that we want to know which WUPs are interested in
@@ -131,6 +133,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
     	}
 		DataParcelTypeDescriptor contentDescriptor = workItemSubscription.getContentDescriptor();
     	DataParcelTypeDescriptor containerDescriptor = workItemSubscription.getContainerDescriptor();
+		PetasosParticipant clonedSubscriber = SerializationUtils.clone(subscriber);
     	DataParcelTypeDescriptor descriptorToRegister = null;
     	if(contentDescriptor != null) {
 			getLogger().trace(".addSubscriber(): contentDescriptor is not null");
@@ -150,37 +153,37 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 				getLogger().trace(".addSubscriber(): Topic Subscription Map: Adding subscriber to existing map for workItemSubscription --> {}", workItemSubscription);
 				TaskWorkItemSubscriptionRegistration existingSubscription = null;
 				for(TaskWorkItemSubscriptionRegistration currentSubscription: subscriptionList){
-					if(currentSubscription.getParticipant().getComponentID().equals(subscriber.getComponentID())){
-						if(isSameRemoteEndpointSubscriber(currentSubscription.getParticipant(), subscriber)){
+					if(currentSubscription.getParticipant().getComponentID().equals(clonedSubscriber.getComponentID())){
+						if(isSameRemoteEndpointSubscriber(currentSubscription.getParticipant(), clonedSubscriber)){
 							existingSubscription = currentSubscription;
 							break;
 						}
 					}
 				}
 				if(existingSubscription == null) {
-					TaskWorkItemSubscriptionRegistration newSubscription = new TaskWorkItemSubscriptionRegistration(workItemSubscription, subscriber);
+					TaskWorkItemSubscriptionRegistration newSubscription = new TaskWorkItemSubscriptionRegistration(workItemSubscription, clonedSubscriber);
 					getDataParcelSubscriptionMap().get(descriptorToRegister).add(newSubscription);
 					newSubscriberAdded = true;
 				}
-				if(subscriber.hasSubsystemParticipantName()) {
-					if(!subscriber.getSubsystemParticipantName().equals(participantNameHolder.getSubsystemParticipantName())) {
-						subscriber.setParticipantStatus(subscriber.getParticipantStatus());
-					}
-				}
+//				if(clonedSubscriber.hasSubsystemParticipantName()) {
+//					if(!clonedSubscriber.getSubsystemParticipantName().equals(participantNameHolder.getSubsystemParticipantName())) {
+//						clonedSubscriber.setParticipantStatus(subscriber.getParticipantStatus());
+//					}
+//				}
 			} else {
 				getLogger().trace(".addSubscriber(): Topic Subscription Map: Create a new Distribution List and Add Subscriber");
-				TaskWorkItemSubscriptionRegistration newSubscription = new TaskWorkItemSubscriptionRegistration(workItemSubscription, subscriber);
+				TaskWorkItemSubscriptionRegistration newSubscription = new TaskWorkItemSubscriptionRegistration(workItemSubscription, clonedSubscriber);
 				getLogger().trace(".addSubscriber(): Topic Subscription Map: Created new PubSubSubscription, adding to a newly created List");
 				subscriptionList = new ArrayList<TaskWorkItemSubscriptionRegistration>();
 				subscriptionList.add(newSubscription);
 				getLogger().trace(".addSubscriber(): Topic Subscription Map: PubSubSubscription List created, adding it to the distribution map");
 				this.dataParcelSubscriptionMap.put(descriptorToRegister, subscriptionList);
 				getLogger().trace(".addSubscriber(): Topic Subscription Map: Added PubSubSubscription List to the distribution map");
-				if(subscriber.hasSubsystemParticipantName()) {
-					if(!subscriber.getSubsystemParticipantName().equals(participantNameHolder.getSubsystemParticipantName())) {
-						subscriber.setParticipantStatus(subscriber.getParticipantStatus());
-					}
-				}
+//				if(subscriber.hasSubsystemParticipantName()) {
+//					if(!subscriber.getSubsystemParticipantName().equals(participantNameHolder.getSubsystemParticipantName())) {
+//						subscriber.setParticipantStatus(subscriber.getParticipantStatus());
+//					}
+//				}
 				newSubscriberAdded = true;
 			}
 		}
