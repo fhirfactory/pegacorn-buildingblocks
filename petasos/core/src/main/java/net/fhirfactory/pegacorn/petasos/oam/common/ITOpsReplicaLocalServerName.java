@@ -23,15 +23,17 @@ package net.fhirfactory.pegacorn.petasos.oam.common;
 
 import javax.enterprise.context.ApplicationScoped;
 
+@Deprecated
 @ApplicationScoped
 public class ITOpsReplicaLocalServerName {
+
     private String serverName;
 
     public String getServerName() {
-        return serverName;
+        throw(new UnsupportedOperationException("Use the MatrixAccessToken.getHomeServer() method instead"));
     }
 
     public void setServerName(String serverName) {
-        this.serverName = serverName;
+        new UnsupportedOperationException("This is now set at startup when logging-on to the server access via MatrixAccessToken.getHomeServer() method");
     }
 }

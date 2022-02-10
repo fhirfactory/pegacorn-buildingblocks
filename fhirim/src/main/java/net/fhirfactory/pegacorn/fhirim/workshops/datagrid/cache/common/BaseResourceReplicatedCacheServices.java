@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.fhirim.workshops.datagrid.cache.common;
 
-import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.PetasosEnabledSubsystemPropertyFile;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -31,6 +31,7 @@ import org.infinispan.manager.DefaultCacheManager;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 
 public abstract class BaseResourceReplicatedCacheServices {
@@ -40,6 +41,9 @@ public abstract class BaseResourceReplicatedCacheServices {
     private DefaultCacheManager cacheManager;
     private ConfigurationBuilder cacheConfigurationBuilder;
     private Configuration cacheConfigurationBuild;
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
 
     //
     // Constructor(s)
@@ -54,8 +58,8 @@ public abstract class BaseResourceReplicatedCacheServices {
     //
 
     abstract protected Logger getLogger();
-    abstract protected PetasosEnabledSubsystemPropertyFile getPropertyFile();
     abstract protected String specifyInfinispanClusterName();
+    abstract protected String specifyInfinispanConfigFileName();
 
     //
     // Post Construct
@@ -69,7 +73,7 @@ public abstract class BaseResourceReplicatedCacheServices {
             //
             // Get the Infinispan-Task-JGroups-Configuration-File
             getLogger().info(".initialise(): [Retrieve JGroups Configuration File Name] Start");
-            String configurationFileName = getPropertyFile().getDeploymentMode().getMultiuseInfinispanStackConfigFile();
+            String configurationFileName = specifyInfinispanConfigFileName();
             getLogger().debug(".initialise(): [Retrieve JGroups Configuration File Name] configurationFileName->{}", configurationFileName);
             getLogger().info(".initialise(): [Retrieve JGroups Configuration File Name] End");
 
@@ -102,5 +106,9 @@ public abstract class BaseResourceReplicatedCacheServices {
 
     public Configuration getCacheConfigurationBuild(){
         return(cacheConfigurationBuild);
+    }
+
+    protected ProcessingPlantInterface getProcessingPlant(){
+        return(this.processingPlant);
     }
 }
