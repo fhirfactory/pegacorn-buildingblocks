@@ -28,8 +28,10 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.datatyp
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.valuesets.PetasosComponentMetricTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.valuesets.PetasosComponentMetricUnitEnum;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class PetasosComponentMetric implements Serializable {
     private String metricName;
@@ -189,6 +191,7 @@ public class PetasosComponentMetric implements Serializable {
         this.metricAgent = metricAgent;
     }
 
+
     //
     // To String
     //
@@ -204,5 +207,46 @@ public class PetasosComponentMetric implements Serializable {
                 ", metricSource=" + metricSource +
                 ", metricAgent=" + metricAgent +
                 '}';
+    }
+    
+    //
+    // equals
+    //
+    @Override
+    public boolean equals(Object o) {
+    	if(o == null) {
+    		 return false;
+    	}
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof PetasosComponentMetric)) {
+            return false;
+        }
+        PetasosComponentMetric pcm = (PetasosComponentMetric) o;
+         
+        // Compare the data members and return accordingly
+        return (this.metricName == null ? pcm.getMetricName() == null : this.metricName.equals(pcm.getMetricName())
+        		&& (this.metricType == null ? pcm.getMetricType() == null : this.metricType.equals(pcm.getMetricType())))
+        		&& (this.metricUnit == null ? pcm.getMetricUnit() == null : this.metricUnit.equals(pcm.getMetricUnit()))
+        		&& (this.metricValue == null ? pcm.getMetricValue() == null : this.metricValue.equals(pcm.getMetricValue()))
+        		&& (this.metricSource == null ? pcm.getMetricSource() == null : this.metricSource.equals(pcm.getMetricSource()))
+        		&& (this.metricAgent == null ? pcm.getMetricAgent() == null : this.metricAgent.equals(pcm.getMetricAgent()));
+    }
+    
+    //
+    // hashcode
+    //
+    @Override 
+    public int hashCode() {
+    	return new HashCodeBuilder(19, 37).
+    		       append(metricName).
+    		       append(metricType).
+    		       append(metricUnit).
+    		       append(metricValue).
+    		       append(metricSource).
+    		       append(metricAgent).
+    		       toHashCode();
+
     }
 }
