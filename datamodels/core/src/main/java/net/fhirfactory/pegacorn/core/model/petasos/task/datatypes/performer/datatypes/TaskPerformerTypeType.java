@@ -21,12 +21,14 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes;
 
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 
 import java.io.Serializable;
 
 public class TaskPerformerTypeType implements Serializable {
     private TopologyNodeFunctionFDN requiredPerformerType;
+    private ComponentIdType knownFulfillerInstance;
     private String requiredParticipantName;
     private String requiredPerformerTypeDescription;
 
@@ -38,11 +40,20 @@ public class TaskPerformerTypeType implements Serializable {
         this.requiredPerformerType = null;
         this.requiredPerformerTypeDescription = null;
         this.requiredParticipantName = null;
+        this.knownFulfillerInstance = null;
     }
 
     //
     // Getters and Setters
     //
+
+    public ComponentIdType getKnownFulfillerInstance() {
+        return knownFulfillerInstance;
+    }
+
+    public void setKnownFulfillerInstance(ComponentIdType knownFulfillerInstance) {
+        this.knownFulfillerInstance = knownFulfillerInstance;
+    }
 
     public TopologyNodeFunctionFDN getRequiredPerformerType() {
         return requiredPerformerType;
@@ -74,10 +85,11 @@ public class TaskPerformerTypeType implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskPerformerType{" +
+        return "TaskPerformerTypeType{" +
                 "requiredPerformerType=" + requiredPerformerType +
-                "requiredParticipantName=" + requiredParticipantName +
-                "requiredPerformerTypeDescription=" + requiredPerformerTypeDescription +
+                ", knownFulfillerInstance=" + knownFulfillerInstance +
+                ", requiredParticipantName='" + requiredParticipantName + '\'' +
+                ", requiredPerformerTypeDescription='" + requiredPerformerTypeDescription + '\'' +
                 '}';
     }
 }

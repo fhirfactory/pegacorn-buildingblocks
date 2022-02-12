@@ -54,6 +54,9 @@ public class WUPContainerEgressProcessor {
 
 
     public PetasosFulfillmentTaskSharedInstance egressContentProcessor(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".egressContentProcessor(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+        }
       	getLogger().debug(".egressContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask);
 
         //
@@ -97,6 +100,11 @@ public class WUPContainerEgressProcessor {
                 }
             }
         }
+
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".egressContentProcessor(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
+        }
+
         //
         // And we're done!
         return (fulfillmentTask);

@@ -65,6 +65,9 @@ public class WUPContainerEgressGatekeeper {
      */
 
     public PetasosFulfillmentTaskSharedInstance egressGatekeeper(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".egressGatekeeper(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+        }
         getLogger().debug(".egressGatekeeper(): Enter, fulfillmentTask ->{}", fulfillmentTask );
         ArrayList<String> targetList = new ArrayList<String>();
         if (fulfillmentTask.getTaskFulfillment().isToBeDiscarded()) {
@@ -107,6 +110,11 @@ public class WUPContainerEgressGatekeeper {
             fulfillmentTask.update();
         }
         auditServicesBroker.logActivity(fulfillmentTask.getInstance());
+
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".egressGatekeeper(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
+        }
+
         getLogger().debug(".egressGatekeeper(): Exit, fulfillmentTask ->{}", fulfillmentTask );
         return(fulfillmentTask);
     }

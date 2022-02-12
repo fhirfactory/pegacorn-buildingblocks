@@ -42,6 +42,6 @@ public class LocalTaskDistributionWorker extends BaseRouteBuilder {
 
         fromWithStandardExceptionHandling(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE)
                 .routeId(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE)
-                .bean(LocalTaskDistributionBean.class, "distributeNewFulfillmentTasks(*, Exchange)");
+                .bean(LocalTaskDistributionBean.class, "distributeNewActionableTasks(*, Exchange)");
     }
 }

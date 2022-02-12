@@ -60,7 +60,10 @@ public class WUPIngresConduit {
      * @return A UoW (Unit of Work) object for injection into the WUP for processing by the Business Logic
      */
     public UoW forwardIntoWUP(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange){
-        getLogger().debug(".forwardIntoWUP(): Entry, ingresParcel->{}", fulfillmentTask);
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".forwardIntoWUP(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+        }
+        getLogger().debug(".forwardIntoWUP(): Entry, fulfillmentTask->{}", fulfillmentTask);
         //
         // Extract and Clone the UoW
         UoW theUoW = SerializationUtils.clone(fulfillmentTask.getTaskWorkItem());

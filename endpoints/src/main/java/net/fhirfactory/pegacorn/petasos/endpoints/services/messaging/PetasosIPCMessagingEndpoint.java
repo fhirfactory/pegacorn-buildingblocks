@@ -163,13 +163,17 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
     // Send Messages (via RPC invocations)
     //
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket){
-        getLogger().debug(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
+        if(getLogger().isInfoEnabled()) {
+            getLogger().info(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket.getActionableTask().getTaskId()->{}", targetParticipantServiceName, handoverPacket.getActionableTask().getTaskId());
+        }
         Address targetServiceAddress = getCandidateIPCTargetAddress(targetParticipantServiceName);
-        getLogger().debug(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
+        getLogger().info(".sendIPCMessage(): Got an address, targetServiceAddress->{}", targetServiceAddress);
         InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = sendIPCMessage(targetServiceAddress, handoverPacket);
         getMetricsAgent().incrementInternalMessageDistributionCount();
         getMetricsAgent().incrementInternalMessageDistributionCount(targetParticipantServiceName);
-        getLogger().debug(".sendIPCMessage(): Exit, interProcessingPlantHandoverResponsePacket->{}", interProcessingPlantHandoverResponsePacket);
+        if(getLogger().isInfoEnabled()) {
+            getLogger().info(".sendIPCMessage(): Exit, interProcessingPlantHandoverResponsePacket->{}", interProcessingPlantHandoverResponsePacket.getStatus());
+        }
         return(interProcessingPlantHandoverResponsePacket);
     }
 

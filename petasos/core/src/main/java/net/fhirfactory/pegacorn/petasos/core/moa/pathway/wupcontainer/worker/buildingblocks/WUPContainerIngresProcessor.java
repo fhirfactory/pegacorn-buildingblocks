@@ -121,7 +121,9 @@ public class WUPContainerIngresProcessor {
      * @return Should return a WorkUnitTransportPacket that is forwarding onto the WUP Ingres Gatekeeper.
      */
     public PetasosFulfillmentTaskSharedInstance ingresContentProcessor(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
-        getLogger().debug(".ingresContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask );
+        if(getLogger().isInfoEnabled()) {
+            getLogger().info(".ingresContentProcessor(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+        }
 
         //
         // Now, set out wait-loop sleep period
@@ -234,8 +236,8 @@ public class WUPContainerIngresProcessor {
         }
         //
         // Do some Logging
-        if(getLogger().isDebugEnabled()){
-            getLogger().debug(".ingresContentProcessor(): Exit, fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".ingresContentProcessor(): Exit, fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
         }
         getLogger().debug(".ingresContentProcessor(): Exit, newTransportPacket --> {}", fulfillmentTask);
         //

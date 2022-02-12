@@ -170,7 +170,7 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
                     public void process(Exchange exchange) throws Exception {
                         InterProcessingPlantHandoverPacket packet = exchange.getIn().getBody(InterProcessingPlantHandoverPacket.class);
                         if(getLogger().isInfoEnabled()) {
-                            getLogger().info(".forwardingProcessing(): sending packet to->{}", packet.getTarget());
+                            getLogger().info("Calling JGroups IPC Forwarder: Target->{}", packet.getTarget());
                         }
                         InterProcessingPlantHandoverResponsePacket response = getPetasosMessagingEndpoint().sendIPCMessage(packet.getTarget(), packet);
                         exchange.getIn().setBody(response);

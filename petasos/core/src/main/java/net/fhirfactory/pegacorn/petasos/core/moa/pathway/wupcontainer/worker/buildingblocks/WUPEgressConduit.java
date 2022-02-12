@@ -152,6 +152,10 @@ public class WUPEgressConduit {
 
         fulfillmentTask.update();
 
+        if(getLogger().isInfoEnabled()){
+            getLogger().info(".receiveFromWUP(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
+        }
+
         getLogger().debug(".receiveFromWUP(): fulfillmentTask->{}", fulfillmentTask);
         return (fulfillmentTask);
     }

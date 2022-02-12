@@ -24,12 +24,13 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
@@ -97,7 +98,7 @@ public class TaskOutcome2NewTasksBean {
      * @return A List<> of WorkUnitTransportPackets - one for each egress UoWPayload element within the incoming UoW.
      */
 
-    public List<PetasosActionableTask> collectOutcomesAndCreateNewTasks(PetasosActionableTaskSharedInstance actionableTask, Exchange camelExchange) {
+    public List<PetasosActionableTaskSharedInstance> collectOutcomesAndCreateNewTasks(PetasosActionableTaskSharedInstance actionableTask, Exchange camelExchange) {
         getLogger().debug(".collectOutcomesAndCreateNewTasks(): Entry, actionableTask->{}", actionableTask);
         TaskWorkItemType incomingUoW = actionableTask.getTaskWorkItem();
         UoWPayloadSet egressContent = incomingUoW.getEgressContent();
@@ -126,16 +127,25 @@ public class TaskOutcome2NewTasksBean {
             Boolean hasADownstreamTask = false;
             for (UoWPayload currentPayload : egressPayloadList) {
                 DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
-                if (distributionDecisionEngine.hasAtLeastOneSubscriber(payloadManifest)) {
-                    TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
-                    getLogger().trace(".collectOutcomesAndCreateNewTasks(): newWorkItem->{}", newWorkItem);
-
-                    PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask.getInstance(), newWorkItem);
-                    newActionableTaskList.add(newDownstreamTask);
-
+                List<PetasosParticipant> subscriberList = distributionDecisionEngine.deriveSubscriberList(payloadManifest);
+                if (!subscriberList.isEmpty()) {
+                    for(PetasosParticipant currentSubscriber: subscriberList) {
+                        TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
+                        getLogger().trace(".collectOutcomesAndCreateNewTasks(): newWorkItem->{}", newWorkItem);
+                        PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask.getInstance(), newWorkItem);
+                        TaskPerformerTypeType downstreamPerformerType = new TaskPerformerTypeType();
+                        downstreamPerformerType.setKnownFulfillerInstance(currentSubscriber.getComponentID());
+                        downstreamPerformerType.setRequiredPerformerType(currentSubscriber.getNodeFunctionFDN());
+                        downstreamPerformerType.setRequiredParticipantName(currentSubscriber.getParticipantName());
+                        downstreamPerformerType.setRequiredPerformerTypeDescription(currentSubscriber.getParticipantDisplayName());
+                        if(!newDownstreamTask.hasTaskPerformerTypes()){
+                            newDownstreamTask.setTaskPerformerTypes(new ArrayList<>());
+                        }
+                        newDownstreamTask.getTaskPerformerTypes().add(downstreamPerformerType);
+                        newActionableTaskList.add(newDownstreamTask);
+                        actionableTask.getTaskCompletionSummary().addDownstreamTask(newDownstreamTask.getTaskId());
+                    }
                     hasADownstreamTask = true;
-
-                    actionableTask.getTaskCompletionSummary().addDownstreamTask(newDownstreamTask.getTaskId());
                 }
             }
             if (!hasADownstreamTask) {
@@ -147,14 +157,17 @@ public class TaskOutcome2NewTasksBean {
             actionableTask.update();
         }
 
+        //
+        // Now we are going to create a new ActionableTaskSharedInstance and register it. This will allow us to "finalise"
+        // the upstream task.
+        List<PetasosActionableTaskSharedInstance> newTaskList = new ArrayList<>();
         for(PetasosActionableTask currentNewActionableTask: newActionableTaskList){
             PetasosActionableTaskSharedInstance petasosActionableTaskSharedInstance = actionableTaskSharedInstanceFactory.newActionableTaskSharedInstance(currentNewActionableTask);
+            newTaskList.add(petasosActionableTaskSharedInstance);
             PetasosTaskExecutionStatusEnum petasosTaskExecutionStatusEnum = actionableTaskActivityController.notifyTaskWaiting(petasosActionableTaskSharedInstance.getTaskId());
         }
-
-        actionableTaskActivityController.notifyTaskFinalisation(actionableTask.getTaskId());
-
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): Updating actionableTask with task completion details");
+        actionableTaskActivityController.notifyTaskFinalisation(actionableTask.getTaskId());
 
         //
         // Get out metricsAgent for the WUP that sent the task & do add some metrics
@@ -163,8 +176,8 @@ public class TaskOutcome2NewTasksBean {
             taskReportAgent.sendITOpsTaskReport(actionableTask.getInstance(), newActionableTaskList);
         }
 
-        getLogger().debug(".collectOutcomesAndCreateNewTasks(): Exit, new PetasosActionableTasks created, number --> {} ", newActionableTaskList.size());
-        return (newActionableTaskList);
+        getLogger().debug(".collectOutcomesAndCreateNewTasks(): Exit, new PetasosActionableTasks created, number --> {} ", newTaskList.size());
+        return (newTaskList);
     }
 
     private PetasosActionableTask newActionableTask(PetasosActionableTask previousActionableTask, TaskWorkItemType work){
