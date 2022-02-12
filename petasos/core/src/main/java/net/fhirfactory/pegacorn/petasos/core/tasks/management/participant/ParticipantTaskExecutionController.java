@@ -87,7 +87,7 @@ public class ParticipantTaskExecutionController {
         if(fulfillmentTask == null){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
-        PetasosActionableTaskSharedInstance actionableTask = getActionableTaskSharedInstanceAccessorFactory().newActionableTaskSharedInstance(fulfillmentTask.getActionableTaskId());
+        PetasosActionableTaskSharedInstance actionableTask = getActionableTaskSharedInstanceAccessorFactory().getActionableTaskSharedInstance(fulfillmentTask.getActionableTaskId());
         if(actionableTask == null){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }

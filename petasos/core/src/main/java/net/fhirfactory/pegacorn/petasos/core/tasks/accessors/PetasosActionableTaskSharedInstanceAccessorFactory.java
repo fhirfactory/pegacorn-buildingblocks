@@ -62,6 +62,7 @@ public class PetasosActionableTaskSharedInstanceAccessorFactory {
         PetasosActionableTaskSharedInstance actionableTaskSharedInstance = null;
         if(task == null){
             PetasosActionableTask newActionableTask = new PetasosActionableTask();
+            newActionableTask.setTaskId(taskId);
             actionableTaskSharedInstance = new PetasosActionableTaskSharedInstance(newActionableTask, taskCache);
         }
         PetasosActionableTaskSharedInstance actionableTaskAccessor = new PetasosActionableTaskSharedInstance(taskId, taskCache);

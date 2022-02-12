@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftw
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.EndpointSummary;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.WorkUnitProcessorSummary;
 import net.fhirfactory.pegacorn.petasos.oam.topology.factories.common.PetasosMonitoredComponentFactory;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,19 +53,31 @@ public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredCo
         wup.setWorkshopParticipantName(workshopParticipantName);
         if(wupTopologyNode.getEgressEndpoint() != null){
             IPCTopologyEndpoint egressEndpoint = wupTopologyNode.getEgressEndpoint();
-            EndpointSummary egressMonitoredEndpoint = (EndpointSummary)endpointFactory.newEndpoint(wup.getParticipantName(), egressEndpoint);
-            wup.addEndpoint(egressMonitoredEndpoint);
+            try {
+                EndpointSummary egressMonitoredEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantName(), egressEndpoint);
+                wup.addEndpoint(egressMonitoredEndpoint);
+            } catch (Exception ex){
+                getLogger().warn(".newWorkUnitProcessor(): Unable to create EndpointSummary for ->{}, error->{} ", egressEndpoint, ExceptionUtils.getMessage(ex));
+            }
 
         }
         if(wupTopologyNode.getIngresEndpoint() != null){
             IPCTopologyEndpoint ingresEndpoint = wupTopologyNode.getIngresEndpoint();
-            EndpointSummary ingresMonitoredEndpoint = (EndpointSummary)endpointFactory.newEndpoint(wup.getParticipantName(), ingresEndpoint);
-            wup.addEndpoint(ingresMonitoredEndpoint);
+            try {
+                EndpointSummary ingresMonitoredEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantName(), ingresEndpoint);
+                wup.addEndpoint(ingresMonitoredEndpoint);
+            } catch (Exception ex){
+                getLogger().warn(".newWorkUnitProcessor(): Unable to create EndpointSummary for ->{}, error->{} ", ingresEndpoint, ExceptionUtils.getMessage(ex));
+            }
         }
         if(!wupTopologyNode.getServiceEndpoints().isEmpty()){
             for(PetasosEndpoint currentEndpoint: wupTopologyNode.getServiceEndpoints().values()){
-                EndpointSummary jgroupsEndpoint = (EndpointSummary)endpointFactory.newEndpoint(wup.getParticipantName(), currentEndpoint);
-                wup.addEndpoint(jgroupsEndpoint);
+                try {
+                    EndpointSummary jgroupsEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantName(), currentEndpoint);
+                    wup.addEndpoint(jgroupsEndpoint);
+                } catch (Exception ex){
+                    getLogger().warn(".newWorkUnitProcessor(): Unable to create EndpointSummary for ->{}, error->{} ", currentEndpoint, ExceptionUtils.getMessage(ex));
+                }
             }
         }
         getLogger().debug(".newWorkUnitProcessor(): wup->{}", wup);

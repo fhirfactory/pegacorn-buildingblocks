@@ -174,7 +174,7 @@ public class LocalTaskDistributionDecisionEngine {
         if(parcelManifest == null){
             return(false);
         }
-        if(getSubscriberSet(parcelManifest).isEmpty()){
+        if(deriveSubscriberList(parcelManifest).isEmpty()){
             return(false);
         }
         return(true);
@@ -196,8 +196,10 @@ public class LocalTaskDistributionDecisionEngine {
             getLogger().trace(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
             for(TaskWorkItemSubscriptionType currentSubscription: currentParticipant.getSubscriptions()){
                 if(applySubscriptionFilter(currentSubscription, parcelManifest)){
-                    subscriberList.add(currentParticipant);
-                    getLogger().trace(".deriveSubscriberList(): Adding.... ");
+                    if(!subscriberList.contains(currentParticipant)) {
+                        subscriberList.add(currentParticipant);
+                        getLogger().trace(".deriveSubscriberList(): Adding.... ");
+                    }
                     break;
                 }
             }

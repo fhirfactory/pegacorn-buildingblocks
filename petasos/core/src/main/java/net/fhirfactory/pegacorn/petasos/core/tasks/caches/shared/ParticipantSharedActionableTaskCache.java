@@ -168,6 +168,16 @@ public class ParticipantSharedActionableTaskCache implements PetasosTaskCacheSer
         }
     }
 
+    @Override
+    public void addTaskLock(TaskIdType taskId){
+        if(taskId != null){
+            Object lockObject = getTaskSpecificLockMap().get(taskId);
+            if(lockObject == null){
+                getTaskSpecificLockMap().put(taskId, new Object());
+            }
+        }
+    }
+
     public Set<TaskIdType> getAllTaskIds(){
         getLogger().debug(".getAllTaskIds(): Entry");
         HashSet<TaskIdType> idSet = new HashSet<>();

@@ -119,20 +119,22 @@ public class PetasosSubscriptionReportingAgent {
                     }
                 } else {
                     for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
-                        if (currentSubscription.getSourceProcessingPlantParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
-                            getLogger().trace(".refreshLocalPubSubReportingMap(): Processing me as a Publisher/Producer");
-                            //
-                            // My ProcessingPlant as a Publisher
-                            PetasosPublisherSubscriptionSummary publisherSubscriptionSummary = new PetasosPublisherSubscriptionSummary();
-                            publisherSubscriptionSummary.setSubscriberParticipantName(currentParticipant.getParticipantName());
-                            publisherSubscriptionSummary.setComponentID(currentParticipant.getComponentID());
-                            publisherSubscriptionSummary.setParticipantName(processingPlant.getSubsystemParticipantName());
-                            publisherSubscriptionSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.PROCESSING_PLANT_SUBSCRIPTION_SUMMARY);
-                            publisherSubscriptionSummary.setTimestamp(Instant.now());
-                            getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For currentSubscription->{}", currentSubscription);
-                            publisherSubscriptionSummary.addTopic(currentSubscription);
-                            getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding to PublisherSummary List");
-                            processingPlantSubscriptionSummary.addPublisherSummary(publisherSubscriptionSummary);
+                        if(currentSubscription.hasSourceProcessingPlantParticipantName()) {
+                            if (currentSubscription.getSourceProcessingPlantParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
+                                getLogger().trace(".refreshLocalPubSubReportingMap(): Processing me as a Publisher/Producer");
+                                //
+                                // My ProcessingPlant as a Publisher
+                                PetasosPublisherSubscriptionSummary publisherSubscriptionSummary = new PetasosPublisherSubscriptionSummary();
+                                publisherSubscriptionSummary.setSubscriberParticipantName(currentParticipant.getParticipantName());
+                                publisherSubscriptionSummary.setComponentID(currentParticipant.getComponentID());
+                                publisherSubscriptionSummary.setParticipantName(processingPlant.getSubsystemParticipantName());
+                                publisherSubscriptionSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.PROCESSING_PLANT_SUBSCRIPTION_SUMMARY);
+                                publisherSubscriptionSummary.setTimestamp(Instant.now());
+                                getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For currentSubscription->{}", currentSubscription);
+                                publisherSubscriptionSummary.addTopic(currentSubscription);
+                                getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding to PublisherSummary List");
+                                processingPlantSubscriptionSummary.addPublisherSummary(publisherSubscriptionSummary);
+                            }
                         }
                     }
                 }

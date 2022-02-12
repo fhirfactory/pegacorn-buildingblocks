@@ -128,6 +128,16 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
     }
 
     @Override
+    public void addTaskLock(TaskIdType taskId){
+        if(taskId != null){
+            Object lockObject = getFulfillmentTaskCacheLockMap().get(taskId);
+            if(lockObject == null){
+                getFulfillmentTaskCacheLockMap().put(taskId, new Object());
+            }
+        }
+    }
+
+    @Override
     public PetasosTask removeTask(TaskIdType taskId) {
         getLogger().debug(".removeTask(): Entry, taskId->{}", taskId);
         if (taskId == null) {
