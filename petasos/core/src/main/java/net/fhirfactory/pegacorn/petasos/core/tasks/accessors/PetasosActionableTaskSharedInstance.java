@@ -68,12 +68,21 @@ public class PetasosActionableTaskSharedInstance extends PetasosTaskSharedInstan
     @Override
     public void update(){
         getLogger().debug(".update(): getInstance()->{}", getInstance());
-        if(getTaskCache().getTaskLock(getInstance().getTaskId()) == null){
-            getLogger().error("WARNING WARNING WARNING --> Cannot obtain an object lock for ActionableTask instance");
-        }
-        synchronized (getTaskCache().getTaskLock(getInstance().getTaskId())) {
-            PetasosActionableTask clonedCacheInstance = (PetasosActionableTask) getTaskCache().synchroniseTask(getInstance());
-            setLocalInstance(clonedCacheInstance);
+        if(getInstance() == null){
+            getLogger().error("WARNING WARNING WARNING --> Cannot update ActionableTask instance, it is null");
+        } else {
+            if (getInstance().hasTaskId()) {
+                if (getTaskCache().getTaskLock(getInstance().getTaskId()) == null) {
+                    getLogger().error("WARNING WARNING WARNING --> Cannot obtain an object lock for ActionableTask instance");
+                    if (getTaskCache().getTask(getInstance().getTaskId()) != null) {
+                        getTaskCache().addTaskLock(getInstance().getTaskId());
+                    }
+                }
+                synchronized (getTaskCache().getTaskLock(getInstance().getTaskId())) {
+                    PetasosActionableTask clonedCacheInstance = (PetasosActionableTask) getTaskCache().synchroniseTask(getInstance());
+                    setLocalInstance(clonedCacheInstance);
+                }
+            }
         }
     }
 
