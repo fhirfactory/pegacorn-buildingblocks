@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.Petaso
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class PetasosComponentMetricSet implements Serializable {
     private HashMap<String, PetasosComponentMetric> metrics;
@@ -136,5 +137,37 @@ public class PetasosComponentMetricSet implements Serializable {
                 ", componentType=" + componentType +
                 ", sourceWorkUnitProcessorParticipantName='" + sourceParticipantName + '\'' +
                 '}';
+    }
+
+     public String businessToString() {
+        return "PetasosComponentMetricSet{" +
+                "metrics=" + metrics +
+                ", metricSourceComponentId=" + metricSourceComponentId +
+                ", componentType=" + componentType +
+                ", sourceWorkUnitProcessorParticipantName='" + sourceParticipantName + '\'' +
+                '}';
+    }
+
+    public boolean businessEquals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PetasosComponentMetricSet other = (PetasosComponentMetricSet) obj;
+        if (!Objects.equals(this.sourceParticipantName, other.sourceParticipantName)) {
+            return false;
+        }
+        if (!Objects.equals(this.metrics, other.metrics)) {
+            return false;
+        }
+        if (!Objects.equals(this.metricSourceComponentId, other.metricSourceComponentId)) {
+            return false;
+        }
+        return this.componentType == other.componentType;
     }
 }

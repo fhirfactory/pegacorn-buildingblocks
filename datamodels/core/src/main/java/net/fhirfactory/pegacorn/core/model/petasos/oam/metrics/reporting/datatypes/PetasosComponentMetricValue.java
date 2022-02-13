@@ -28,244 +28,243 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.Petasos
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PetasosComponentMetricValue implements Serializable {
-	private Object object;
-	private Class objectType;
 
-	//
-	// Constructor(s)
-	//
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosComponentMetricValue.class);
 
-	public PetasosComponentMetricValue() {
-		this.object = null;
-		this.objectType = null;
-	}
+    private Object object;
+    private Class objectType;
 
-	public PetasosComponentMetricValue(String value) {
-		this.object = value;
-		this.objectType = String.class;
-	}
+    //
+    // Constructor(s)
+    //
 
-	public PetasosComponentMetricValue(Integer value) {
-		this.object = value;
-		this.objectType = Integer.class;
-	}
+    public PetasosComponentMetricValue(){
+        this.object = null;
+        this.objectType = null;
+    }
 
-	public PetasosComponentMetricValue(Instant value) {
-		this.object = value;
-		this.objectType = Instant.class;
-	}
+    public PetasosComponentMetricValue(String value){
+        this.object = value;
+        this.objectType = String.class;
+    }
 
-	public PetasosComponentMetricValue(Long value) {
-		this.object = value;
-		this.objectType = Long.class;
-	}
+    public PetasosComponentMetricValue(Integer value){
+        this.object = value;
+        this.objectType = Integer.class;
+    }
 
-	public PetasosComponentMetricValue(Float value) {
-		this.object = value;
-		this.objectType = Float.class;
-	}
+    public PetasosComponentMetricValue(Instant value){
+        this.object = value;
+        this.objectType = Instant.class;
+    }
 
-	public PetasosComponentMetricValue(Double value) {
-		this.object = value;
-		this.objectType = Double.class;
-	}
+    public PetasosComponentMetricValue(Long value){
+        this.object = value;
+        this.objectType = Long.class;
+    }
 
-	//
-	// Getters and Setters
-	//
+    public PetasosComponentMetricValue(Float value){
+        this.object = value;
+        this.objectType = Float.class;
+    }
 
-	@JsonIgnore
-	public boolean hasObject() {
-		boolean hasValue = this.object != null;
-		return (hasValue);
-	}
+    public PetasosComponentMetricValue(Double value){
+        this.object = value;
+        this.objectType = Double.class;
+    }
 
-	@JsonIgnore
-	public boolean hasObjectType() {
-		boolean hasValue = this.objectType != null;
-		return (hasValue);
-	}
+    //
+    // Getters and Setters
+    //
 
-	public Object getObject() {
-		return object;
-	}
+    @JsonIgnore
+    public boolean hasObject(){
+        boolean hasValue = this.object != null;
+        return(hasValue);
+    }
 
-	public void setObject(Object object) {
-		this.object = object;
-	}
+    @JsonIgnore
+    public boolean hasObjectType(){
+        boolean hasValue = this.objectType != null;
+        return(hasValue);
+    }
 
-	public Class getObjectType() {
-		return objectType;
-	}
+    public Object getObject() {
+        return object;
+    }
 
-	public void setObjectType(Class objectType) {
-		this.objectType = objectType;
-	}
+    public void setObject(Object object) {
+        this.object = object;
+    }
 
-	//
-	// Type Based Accessors
-	//
+    public Class getObjectType() {
+        return objectType;
+    }
 
-	@JsonIgnore
-	public String getStringValue() {
-		if (hasObject()) {
-			if (objectType.equals(String.class)) {
-				String stringValue = (String) (this.object);
-				return (stringValue);
-			}
-		}
-		return (null);
-	}
+    public void setObjectType(Class objectType) {
+        this.objectType = objectType;
+    }
 
-	@JsonIgnore
-	public void setStringValue(String stringValue) {
-		this.object = stringValue;
-		this.objectType = String.class;
-	}
+    //
+    // Type Based Accessors
+    //
 
-	@JsonIgnore
-	public Integer getIntegerValue() {
-		if (hasObject()) {
-			if (objectType.equals(Integer.class)) {
-				Integer integerValue = (Integer) (this.object);
-				return (integerValue);
-			}
-		}
-		return (null);
-	}
+    @JsonIgnore
+    public String getStringValue(){
+        if(hasObject()) {
+            if (objectType.equals(String.class)) {
+                String stringValue = (String) (this.object);
+                return (stringValue);
+            }
+        }
+        return(null);
+    }
 
-	@JsonIgnore
-	public void setIntegerValue(Integer integerValue) {
-		this.object = integerValue;
-		this.objectType = Integer.class;
-	}
+    @JsonIgnore
+    public void setStringValue(String stringValue){
+        this.object = stringValue;
+        this.objectType = String.class;
+    }
 
-	@JsonIgnore
-	public Long getLongValue() {
-		if (hasObject()) {
-			if (objectType.equals(Long.class)) {
-				Long longValue = (Long) (this.object);
-				return (longValue);
-			}
-		}
-		return (null);
-	}
+    @JsonIgnore
+    public Integer getIntegerValue(){
+        if(hasObject()) {
+            if (objectType.equals(Integer.class)) {
+                Integer integerValue = (Integer) (this.object);
+                return (integerValue);
+            }
+        }
+        return(null);
+    }
 
-	@JsonIgnore
-	public Float getFloatValue() {
-		if (hasObject()) {
-			if (objectType.equals(Float.class)) {
-				Float floatValue = (Float) (this.object);
-				return (floatValue);
-			}
-		}
-		return (null);
-	}
+    @JsonIgnore
+    public void setIntegerValue(Integer integerValue){
+        this.object = integerValue;
+        this.objectType = Integer.class;
+    }
 
-	@JsonIgnore
-	public void setLongValue(Long longValue) {
-		this.object = longValue;
-		this.objectType = Long.class;
-	}
+    @JsonIgnore
+    public Long getLongValue(){
+        if(hasObject()) {
+            if (objectType.equals(Long.class)) {
+                Long longValue = (Long) (this.object);
+                return (longValue);
+            }
+        }
+        return(null);
+    }
 
-	@JsonIgnore
-	public Instant getInstantValue() {
-		if (hasObject()) {
-			if (objectType.equals(Instant.class)) {
-				Instant instantValue = (Instant) (this.object);
-				return (instantValue);
-			}
-		}
-		return (null);
-	}
+    @JsonIgnore
+    public Float getFloatValue(){
+        if(hasObject()){
+            if(objectType.equals(Float.class)){
+                Float floatValue = (Float) (this.object);
+                return(floatValue);
+            }
+        }
+        return(null);
+    }
 
-	@JsonIgnore
-	public void setInstantValue(Instant instantValue) {
-		this.object = instantValue;
-		this.objectType = Instant.class;
-	}
+    @JsonIgnore
+    public void setLongValue(Long longValue){
+        this.object = longValue;
+        this.objectType = Long.class;
+    }
 
-	@JsonIgnore
-	public Date getDateValue() {
-		if (hasObject()) {
-			if (objectType.equals(Date.class)) {
-				Date dateValue = (Date) (this.object);
-				return (dateValue);
-			}
-		}
-		return (null);
-	}
+    @JsonIgnore
+    public Instant getInstantValue(){
+        if(hasObject()) {
+            if (objectType.equals(Instant.class)) {
+                Instant instantValue = (Instant) (this.object);
+                return (instantValue);
+            }
+        }
+        return(null);
+    }
 
-	@JsonIgnore
-	public Double getDoubleValue() {
-		if (hasObject()) {
-			if (objectType.equals(Double.class)) {
-				Double doubleValue = (Double) (this.object);
-				return (doubleValue);
-			}
-		}
-		return (null);
-	}
+    @JsonIgnore
+    public void setInstantValue(Instant instantValue){
+        this.object = instantValue;
+        this.objectType = Instant.class;
+    }
 
-	@JsonIgnore
-	public void setDoubleValue(Double doubleValue) {
-		this.object = doubleValue;
-		this.objectType = Double.class;
-	}
+    @JsonIgnore
+    public Date getDateValue(){
+        if(hasObject()) {
+            if (objectType.equals(Date.class)) {
+                Date dateValue = (Date)(this.object);
+                return(dateValue);
+            }
+        }
+        return(null);
+    }
 
-	@JsonIgnore
-	public Boolean getBooleanValue() {
-		if (hasObject()) {
-			if (objectType.equals(Boolean.class)) {
-				Boolean booleanValue = (Boolean) (this.object);
-				return (booleanValue);
-			}
-		}
-		return (null);
-	}
+    @JsonIgnore
+    public Double getDoubleValue(){
+        if(hasObject()){
+            if(objectType.equals(Double.class)){
+                Double doubleValue = (Double)(this.object);
+                return(doubleValue);
+            }
+        }
+        return(null);
+    }
 
-	@JsonIgnore
-	public void setBooleanValue(Boolean booleanValue) {
-		this.object = booleanValue;
-		this.objectType = Boolean.class;
-	}
+    @JsonIgnore
+    public void setDoubleValue(Double doubleValue){
+        this.object = doubleValue;
+        this.objectType = Double.class;
+    }
 
-	//
-	// To String
-	//
+    @JsonIgnore
+    public Boolean getBooleanValue(){
+        if(hasObject()){
+            if(objectType.equals(Boolean.class)){
+                Boolean booleanValue = (Boolean)(this.object);
+                return(booleanValue);
+            }
+        }
+        return(null);
+    }
 
-	@Override
-	public String toString() {
-		return "PetasosComponentMetricValue{" + "object=" + object + ", objectType=" + objectType + '}';
-	}
+    @JsonIgnore
+    public void setBooleanValue(Boolean booleanValue){
+        this.object = booleanValue;
+        this.objectType = Boolean.class;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o == null) {
-			return false;
-		}
-		if (o == this) {
-			return true;
-		}
-		if (!(o instanceof PetasosComponentMetric)) {
-			return false;
-		}
-		PetasosComponentMetricValue pcmv = (PetasosComponentMetricValue) o;
-		return (this.object == null ? pcmv.object == null : this.object.equals(pcmv.object))
-				&& (this.objectType == null ? pcmv.objectType == null : this.objectType.equals(pcmv.objectType));
-	}
-	
-	   @Override 
-	   public int hashCode() {
-	    	return new HashCodeBuilder(23, 53).
-	    		       append(object).
-	    		       append(objectType).
-	    		       toHashCode();
+    //
+    // To String
+    //
 
-	    }
-	
-	
+    @Override
+    public String toString() {
+        return "PetasosComponentMetricValue{" +
+                "object=" + object +
+                ", objectType=" + objectType +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PetasosComponentMetricValue other = (PetasosComponentMetricValue) obj;
+        if (!Objects.equals(this.object, other.object)) {
+            return false;
+        }
+        return Objects.equals(this.objectType, other.objectType);
+    }
 }
