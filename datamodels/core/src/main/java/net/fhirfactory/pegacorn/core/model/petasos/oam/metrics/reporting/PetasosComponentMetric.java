@@ -28,12 +28,15 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.datatyp
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.valuesets.PetasosComponentMetricTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.valuesets.PetasosComponentMetricUnitEnum;
 import org.apache.commons.lang3.SerializationUtils;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PetasosComponentMetric implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosComponentMetric.class);
+
     private String metricName;
     private PetasosComponentMetricTypeEnum metricType;
     private PetasosComponentMetricUnitEnum metricUnit;
@@ -208,45 +211,34 @@ public class PetasosComponentMetric implements Serializable {
                 ", metricAgent=" + metricAgent +
                 '}';
     }
-    
-    //
-    // equals
-    //
+
     @Override
-    public boolean equals(Object o) {
-    	if(o == null) {
-    		 return false;
-    	}
-        if (o == this) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof PetasosComponentMetric)) {
+        if (obj == null) {
             return false;
         }
-        PetasosComponentMetric pcm = (PetasosComponentMetric) o;
-         
-        // Compare the data members and return accordingly
-        return (this.metricName == null ? pcm.getMetricName() == null : this.metricName.equals(pcm.getMetricName())
-        		&& (this.metricType == null ? pcm.getMetricType() == null : this.metricType.equals(pcm.getMetricType())))
-        		&& (this.metricUnit == null ? pcm.getMetricUnit() == null : this.metricUnit.equals(pcm.getMetricUnit()))
-        		&& (this.metricValue == null ? pcm.getMetricValue() == null : this.metricValue.equals(pcm.getMetricValue()))
-        		&& (this.metricSource == null ? pcm.getMetricSource() == null : this.metricSource.equals(pcm.getMetricSource()))
-        		&& (this.metricAgent == null ? pcm.getMetricAgent() == null : this.metricAgent.equals(pcm.getMetricAgent()));
-    }
-    
-    //
-    // hashcode
-    //
-    @Override 
-    public int hashCode() {
-    	return new HashCodeBuilder(19, 37).
-    		       append(metricName).
-    		       append(metricType).
-    		       append(metricUnit).
-    		       append(metricValue).
-    		       append(metricSource).
-    		       append(metricAgent).
-    		       toHashCode();
-
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PetasosComponentMetric other = (PetasosComponentMetric) obj;
+        if (!Objects.equals(this.metricName, other.metricName)) {
+            return false;
+        }
+        if (this.metricType != other.metricType) {
+            return false;
+        }
+        if (this.metricUnit != other.metricUnit) {
+            return false;
+        }
+        if (!Objects.equals(this.metricValue, other.metricValue)) {
+            return false;
+        }
+        if (!Objects.equals(this.metricSource, other.metricSource)) {
+            return false;
+        }
+        return Objects.equals(this.metricAgent, other.metricAgent);
     }
 }

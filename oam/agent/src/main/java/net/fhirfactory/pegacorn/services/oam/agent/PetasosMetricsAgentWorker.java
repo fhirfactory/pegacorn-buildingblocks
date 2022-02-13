@@ -128,6 +128,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
         // Get Metrics from the Cache
         List<CommonComponentMetricsData> allLocalMetricsSets = getMetricsDM().getAllMetricsSets();
         getLogger().trace(".captureLocalMetrics(): Iterating through Metrics retrieved from local cache");
+        getLogger().trace(".captureLocalMetrics(): Iterating through Metrics retrieved from local cache, set size -> {}", allLocalMetricsSets.size());
         for(CommonComponentMetricsData currentMetrics: allLocalMetricsSets){
             PetasosComponentMetricSet metricSet = null;
             ComponentIdType componentId = currentMetrics.getComponentID();
@@ -176,10 +177,11 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
                 if (publishedMetricSet == null) {
                     publishCurrentMetricSet = true;
                 } else {
-                    if (!publishedMetricSet.equals(metricSetInQueue)) {
+                    if (!publishedMetricSet.businessEquals(metricSetInQueue)) {
                         publishCurrentMetricSet = true;
                     }
                 }
+
                 if (publishCurrentMetricSet) {
                     updatedMetrics.add(metricSetInQueue);
                     if (publishedMetricQueue.contains(currentComponentId)) {
@@ -188,6 +190,8 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
                     publishedMetricQueue.put(currentComponentId, metricSetInQueue);
                 }
             }
+
+            LOG.trace(".forwardLocalMetricsToServer(): new unique metrics to send to server-> {}", updatedMetrics.size());
         }
 
         LOG.trace(".forwardLocalMetricsToServer(): Loaded metrics form local cache, forwarding");
