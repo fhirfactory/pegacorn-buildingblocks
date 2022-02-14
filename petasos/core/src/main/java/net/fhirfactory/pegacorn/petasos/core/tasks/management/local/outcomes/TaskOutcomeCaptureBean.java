@@ -105,6 +105,12 @@ public class TaskOutcomeCaptureBean {
                 break;
         }
 
+        //
+        // We can retire the FulfillmentTask now
+        getFulfilmentTaskActivityController().deregisterFulfillmentTask(fulfillmentTask.getTaskId());
+
+        //
+        // Get the updated the ActionableTaskSharedInstance so we can do some metrics
         PetasosActionableTaskSharedInstance actionableTaskSharedInstance = getActionableTaskSharedInstanceFactory().getActionableTaskSharedInstance(actionableTaskId);
 
         //

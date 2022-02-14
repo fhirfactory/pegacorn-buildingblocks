@@ -71,6 +71,11 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
     // Business Methods
     //
 
+    public Integer getTaskCacheSize(){
+        int size = fulfillmentTaskCache.size();
+        return(size);
+    }
+
 
     @Override
     public PetasosTask registerTask(PetasosTask task) {

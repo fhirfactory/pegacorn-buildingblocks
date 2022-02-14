@@ -21,7 +21,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.metrics.agents;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.ProcessingPlantMetricsData;
@@ -107,15 +106,15 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     // Helpers
     //
 
-    public void updateLocalCacheStatus(String cacheName, String cacheStatus){
-        if(StringUtils.isEmpty(cacheName) || StringUtils.isEmpty(cacheStatus)){
+    public void updateLocalCacheStatus(String cacheName, Integer cacheSize){
+        if(StringUtils.isEmpty(cacheName) || cacheSize != null){
             return;
         }
         synchronized (getMetricsDataLock()) {
-            if (getProcessingPlantMetricsData().getLocalCacheStatusMap().containsKey(cacheName)) {
-                getProcessingPlantMetricsData().getLocalCacheStatusMap().remove(cacheName);
+            if (getProcessingPlantMetricsData().getLocalCacheSize().containsKey(cacheName)) {
+                getProcessingPlantMetricsData().getLocalCacheSize().replace(cacheName, cacheSize);
             }
-            getProcessingPlantMetricsData().getLocalCacheStatusMap().put(cacheName, cacheStatus);
+            getProcessingPlantMetricsData().getLocalCacheSize().put(cacheName, cacheSize);
         }
     }
 

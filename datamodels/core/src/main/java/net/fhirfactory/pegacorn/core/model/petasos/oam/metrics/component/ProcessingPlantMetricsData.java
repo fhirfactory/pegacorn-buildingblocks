@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
-    private Map<String, String> localCacheStatusMap;
+    private Map<String, Integer> localCacheSize;
     private int synchronousAuditEventsWritten;
     private int asynchronousAuditEventsWritten;
     private int asynchronousAuditEventsQueued;
@@ -44,7 +44,7 @@ public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
 
     public ProcessingPlantMetricsData(){
         super();
-        this.localCacheStatusMap = new HashMap<>();
+        this.localCacheSize = new HashMap<>();
         this.synchronousAuditEventsWritten = 0;
         this.asynchronousAuditEventsWritten = 0;
         this.asynchronousAuditEventsQueued = 0;
@@ -53,7 +53,7 @@ public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
 
     public ProcessingPlantMetricsData(ComponentIdType componentId){
         super(componentId);
-        this.localCacheStatusMap = new HashMap<>();
+        this.localCacheSize = new HashMap<>();
         this.synchronousAuditEventsWritten = 0;
         this.asynchronousAuditEventsWritten = 0;
         this.asynchronousAuditEventsQueued = 0;
@@ -64,12 +64,12 @@ public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
     // Getters and Setters
     //
 
-    public Map<String, String> getLocalCacheStatusMap() {
-        return localCacheStatusMap;
+    public Map<String, Integer> getLocalCacheSize() {
+        return localCacheSize;
     }
 
-    public void setLocalCacheStatusMap(Map<String, String> localCacheStatusMap) {
-        this.localCacheStatusMap = localCacheStatusMap;
+    public void setLocalCacheSize(Map<String, Integer> localCacheSize) {
+        this.localCacheSize = localCacheSize;
     }
 
     public int getSynchronousAuditEventsWritten() {
@@ -111,7 +111,7 @@ public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
     @Override
     public String toString() {
         return "ProcessingPlantMetricsData{" +
-                "localCacheStatusMap=" + localCacheStatusMap +
+                "localCacheStatusMap=" + localCacheSize +
                 ", synchronousAuditEventsWritten=" + synchronousAuditEventsWritten +
                 ", asynchronousAuditEventsWritten=" + asynchronousAuditEventsWritten +
                 ", asynchronousAuditEventsQueued=" + asynchronousAuditEventsQueued +

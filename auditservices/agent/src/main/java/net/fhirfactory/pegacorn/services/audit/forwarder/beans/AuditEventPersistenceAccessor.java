@@ -31,6 +31,7 @@ import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisati
 import net.fhirfactory.pegacorn.core.model.capabilities.base.factories.MethodOutcomeFactory;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.tasking.CapabilityUtilisationBroker;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,21 +79,18 @@ public class AuditEventPersistenceAccessor {
             getLogger().debug(".logAuditEventAsynchronously(): Exit, auditEvent is null");
             return(null);
         }
-        //
-        // TODO Remove this, it is a temporary fix to Reduce AuditTrail Load
-        //
-        /*
+
         MethodOutcome outcome = utiliseAuditEventPersistenceCapability(auditEvent);
 
         IIdType id = outcome.getId();
         if(id != null){
             auditEvent.setId(id);
         }
-         */
-        UUID uuid = UUID.randomUUID();
-        String id = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
-        auditEvent.setId(id);
-//        getLogger().debug(".logAuditEventAsynchronously(): Exit, outcome->{}", outcome);
+
+ //       UUID uuid = UUID.randomUUID();
+ //       String id = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
+ //       auditEvent.setId(id);
+        getLogger().debug(".logAuditEventAsynchronously(): Exit, outcome->{}", outcome);
         return(auditEvent);
     }
 

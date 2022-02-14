@@ -213,6 +213,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             classSet[0] = RemoteProcedureCallRequest.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             RemoteProcedureCallResponse response = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
             synchronized (getIPCChannelLock()) {
                 response = getRPCDispatcher().callRemoteMethod(targetAddress, "registerActionableTaskHandler", objectSet, classSet, requestOptions);
             }
@@ -221,13 +222,16 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
                 PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
                 return(registeredTask);
             } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
                 getLogger().error(".registerActionableTask(): Could not register task, response->{}", response);
                 return(null);
             }
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".registerActionableTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".registerActionableTask: Error (GeneralException) ->{}", e.getMessage());
             return(null);
@@ -237,6 +241,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     public RemoteProcedureCallResponse registerActionableTaskHandler(RemoteProcedureCallRequest rpcRequest){
         getLogger().debug(".registerActionableTaskHandler(): Entry, rpcRequest->{}", rpcRequest);
         PetasosActionableTask taskToRegister = null;
+        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
         JGroupsIntegrationPointSummary endpointIdentifier = null;
         if(rpcRequest != null){
             if(rpcRequest.hasRequestContent()){

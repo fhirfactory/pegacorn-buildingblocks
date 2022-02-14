@@ -134,15 +134,15 @@ public class PetasosComponentMetricSetFactory {
             metricSet.addMetric(activityInstant);
         }
 
-        if(!plantMetricsData.getLocalCacheStatusMap().isEmpty()){
-            for(String currentCacheMetricName: plantMetricsData.getLocalCacheStatusMap().keySet()){
+        if(!plantMetricsData.getLocalCacheSize().isEmpty()){
+            for(String currentCacheMetricName: plantMetricsData.getLocalCacheSize().keySet()){
                 PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
                 componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
                 componentStatusMetric.setMetricSource(plantMetricsData.getComponentID());
                 componentStatusMetric.setMetricName(currentCacheMetricName);
-                componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.CONTEXTUAL);
+                componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.CACHE_SIZE);
                 componentStatusMetric.setMetricUnit(PetasosComponentMetricUnitEnum.STRING_DESCRIPTION);
-                componentStatusMetric.setMetricValue(new PetasosComponentMetricValue(plantMetricsData.getLocalCacheStatusMap().get(currentCacheMetricName)));
+                componentStatusMetric.setMetricValue(new PetasosComponentMetricValue(plantMetricsData.getLocalCacheSize().get(currentCacheMetricName)));
                 metricSet.addMetric(componentStatusMetric);
             }
         }
