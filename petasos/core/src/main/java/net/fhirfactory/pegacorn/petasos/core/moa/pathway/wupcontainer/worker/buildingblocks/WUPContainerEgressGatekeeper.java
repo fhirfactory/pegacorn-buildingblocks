@@ -112,7 +112,7 @@ public class WUPContainerEgressGatekeeper {
         auditServicesBroker.logActivity(fulfillmentTask.getInstance());
 
         if(getLogger().isInfoEnabled()){
-            getLogger().info(".egressGatekeeper(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
+            getLogger().info(".egressGatekeeper(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
         }
 
         getLogger().debug(".egressGatekeeper(): Exit, fulfillmentTask ->{}", fulfillmentTask );

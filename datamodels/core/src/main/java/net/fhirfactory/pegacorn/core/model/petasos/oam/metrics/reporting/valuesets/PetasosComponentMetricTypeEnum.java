@@ -23,8 +23,15 @@ package net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.values
 
 public enum PetasosComponentMetricTypeEnum {
     CACHE_SIZE("CacheSize", "CacheSize", "petasos.component.metric.type.cache-size"),
-    MESSAGES_RECEIVED("Received", "MessagesReceived", "petasos.component.metric.type.messages-sent"),
-    MESSAGES_FORWARDED("Forwarded", "MessagesForwarded", "petasos.component.metric.type.message-received"),
+
+    INGRES_MESSAGES("IngresMessages", "MessageCount", "petasos.component.metric.type.messages-received"),
+    EGRESS_MESSAGES_FORWARD_ATTEMPTS("EgressMessages-Attempts", "MessageCount", "petasos.component.metric.type.message-forward-attempts"),
+    EGRESS_MESSAGES_FORWARD_FAILURES("EgressMessages-Failures", "MessageCount", "petasos.component.metric.type.message-forward-failures"),
+    EGRESS_MESSAGES_FORWARD_SUCCESSFUL("EgressMessages-Successful", "MessageCount", "petasos.component.metric.type.message-forward-success"),
+
+    INTERNAL_MESSAGE_FORWARDING("Internal-Forwarded-Message", "MessageCount", "petasos.component.metric.type.internal_message_forward"),
+    INTERNAL_MESSAGE_RECEPTION("Internal-Received-Message", "MessageCount", "petasos.component.metric.type.internal_message_receive"),
+
     TASK_PROCESSING_TIME("TaskProcessingTime", "TaskProcessingTime", "petasos.component.metric.type.task-processing-time"),
     ACTIVITY_TIMESTAMP("ActivityTimestamp", "ActivityTimestamp", "petasos.component.metric.type.activity-timestamp"),
     TASK_COUNT("TaskCount", "TaskCount", "petasos.component.metric.type.task-count"),

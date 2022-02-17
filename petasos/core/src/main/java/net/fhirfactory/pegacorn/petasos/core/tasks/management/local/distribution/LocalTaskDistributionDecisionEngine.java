@@ -74,6 +74,7 @@ public class LocalTaskDistributionDecisionEngine {
     // More sophisticated SubscriberList derivation
     //
 
+    /*
     @Deprecated
     public List<PetasosParticipant> getSubscriberSet(DataParcelManifest parcelManifest){
         getLogger().debug(".getSubscriberSet(): Entry, parcelManifest->{}", parcelManifest);
@@ -144,6 +145,7 @@ public class LocalTaskDistributionDecisionEngine {
         getLogger().debug(".getSubscriberSet(): Exit, number of subscribers data parcel->{}", subscriberSet.size());
         return(subscriberSet);
     }
+     */
 
     public boolean hasRemoteServiceName(PetasosParticipant subscriber){
         getLogger().debug(".hasRemoteServiceName(): Entry, subscriber->{}", subscriber.getSubsystemParticipantName());
@@ -194,24 +196,49 @@ public class LocalTaskDistributionDecisionEngine {
 
         List<String> alreadySubscribedSubsystemParticipants = new ArrayList<>();
 
-        for(PetasosParticipant currentParticipant: participants){
-            getLogger().trace(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
-            for(TaskWorkItemSubscriptionType currentSubscription: currentParticipant.getSubscriptions()){
-                if(applySubscriptionFilter(currentSubscription, parcelManifest)){
-                    if(!alreadySubscribedSubsystemParticipants.contains(currentParticipant.getSubsystemParticipantName())) {
+        for(PetasosParticipant currentParticipant: participants) {
+            boolean passFirstPhaseTest = false;
+            if(isRemoteParticipant(currentParticipant)){
+                if(alreadySubscribedSubsystemParticipants.contains(currentParticipant.getSubsystemParticipantName())){
+                    passFirstPhaseTest = false;
+                } else {
+                    passFirstPhaseTest = true;
+                }
+            } else {
+                passFirstPhaseTest = true;
+            }
+            if (passFirstPhaseTest) {
+                getLogger().info(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
+                for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
+                    if (applySubscriptionFilter(currentSubscription, parcelManifest)) {
                         if (!subscriberList.contains(currentParticipant)) {
                             subscriberList.add(currentParticipant);
-                            getLogger().trace(".deriveSubscriberList(): Adding.... ");
+                            getLogger().info(".deriveSubscriberList(): Adding.... ");
                         }
-                        alreadySubscribedSubsystemParticipants.add(currentParticipant.getSubsystemParticipantName());
+                        if(StringUtils.isNotEmpty(currentParticipant.getSubsystemParticipantName())) {
+                            alreadySubscribedSubsystemParticipants.add(currentParticipant.getSubsystemParticipantName());
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
 
         getLogger().debug(".getSubscriberList(): Exit!");
         return(subscriberList);
+    }
+
+    protected boolean isRemoteParticipant(PetasosParticipant participant){
+        if(participant == null){
+            return(false);
+        }
+        if(StringUtils.isEmpty(participant.getSubsystemParticipantName())){
+            return(false);
+        }
+        if(processingPlant.getSubsystemParticipantName().contentEquals(participant.getSubsystemParticipantName())){
+            return(false);
+        }
+        return(true);
     }
 
     //

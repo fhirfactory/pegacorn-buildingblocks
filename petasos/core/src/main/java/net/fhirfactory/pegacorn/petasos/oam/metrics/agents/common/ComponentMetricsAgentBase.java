@@ -124,6 +124,15 @@ public abstract class ComponentMetricsAgentBase  {
     //
 
     @JsonIgnore
+    public void incrementEgressMessageFailureCount(){
+        synchronized (getMetricsDataLock()){
+            int count = getMetricsData().getEgressMessageFailureCount();
+            count += 1;
+            getMetricsData().setEgressMessageFailureCount(count);
+        }
+    }
+
+    @JsonIgnore
     public void incrementIngresMessageCount(){
         synchronized (getMetricsDataLock()) {
             int count = getMetricsData().getIngresMessageCount();
@@ -133,11 +142,20 @@ public abstract class ComponentMetricsAgentBase  {
     }
 
     @JsonIgnore
-    public void incrementEgressMessageCount(){
+    public void incrementEgressMessageAttemptCount(){
         synchronized (getMetricsDataLock()) {
-            int count = getMetricsData().getEgressMessageCount();
+            int count = getMetricsData().getEgressMessageAttemptCount();
             count += 1;
-            getMetricsData().setEgressMessageCount(count);
+            getMetricsData().setEgressMessageAttemptCount(count);
+        }
+    }
+
+    @JsonIgnore
+    public void incrementEgressMessageSuccessCount(){
+        synchronized (getMetricsDataLock()) {
+            int count = getMetricsData().getEgressMessageSuccessCount();
+            count += 1;
+            getMetricsData().setEgressMessageSuccessCount(count);
         }
     }
 
@@ -173,17 +191,19 @@ public abstract class ComponentMetricsAgentBase  {
         }
     }
 
-
     //
     // To String
     //
+
 
     @Override
     public String toString() {
         return "ComponentMetricsAgentBase{" +
                 "metricsDataLock=" + metricsDataLock +
                 ", initialised=" + initialised +
+                ", processingPlantCapabilityStatement=" + processingPlantCapabilityStatement +
                 ", localMetricsDM=" + localMetricsDM +
+                ", notificationAgent=" + notificationAgent +
                 ", rollingAverageCount=" + getRollingAverageCount() +
                 '}';
     }

@@ -257,7 +257,7 @@ public class WorkUnitProcessorMetricsData extends CommonComponentMetricsData {
     public String toString() {
         return "WorkUnitProcessorMetricsData{" +
                 "ingresMessageCount=" + getIngresMessageCount() +
-                ", egressMessageCount=" + getEgressMessageCount() +
+                ", egressMessageCount=" + getEgressMessageAttemptCount() +
                 ", distributedMessageCount=" + getInternalDistributedMessageCount() +
                 ", distributionCountMap=" + getInternalDistributionCountMap() +
                 ", averageEventProcessingDuration=" + averageEventProcessingDuration +

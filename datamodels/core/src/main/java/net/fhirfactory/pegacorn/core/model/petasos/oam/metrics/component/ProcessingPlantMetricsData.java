@@ -117,7 +117,7 @@ public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
                 ", asynchronousAuditEventsQueued=" + asynchronousAuditEventsQueued +
                 ", lastAsynchronousAuditEventWrite=" + lastAsynchronousAuditEventWrite +
                 ", ingresMessageCount=" + getIngresMessageCount() +
-                ", egressMessageCount=" + getEgressMessageCount() +
+                ", egressMessageCount=" + getEgressMessageAttemptCount() +
                 ", distributedMessageCount=" + getInternalDistributedMessageCount() +
                 ", distributionCountMap=" + getInternalDistributionCountMap() +
                 ", componentID=" + getComponentID() +

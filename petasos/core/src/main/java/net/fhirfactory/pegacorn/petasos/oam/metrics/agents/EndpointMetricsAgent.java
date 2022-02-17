@@ -43,13 +43,13 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
 
     private EndpointMetricsData metricsData;
     private String connectedSystemName;
-    private String endpointDescription;
+    private String endpointDisplayName;
 
     //
     // Constructors
     //
 
-    public EndpointMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName, String connectedSystemName, String endpointDescription){
+    public EndpointMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, PetasosLocalMetricsDM localMetricsDM, ComponentIdType componentId, String participantName, String connectedSystemName, String endpointDisplayName){
         super();
         getLogger().debug(".EndpointMetricsAgent(): Initialising Endpoint Metrics Agent");
         this.metricsData = new EndpointMetricsData();
@@ -58,7 +58,7 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
         this.metricsData.setComponentID(componentId);
         this.metricsData.setComponentStartupInstant(Instant.now());
         this.connectedSystemName = connectedSystemName;
-        this.endpointDescription = endpointDescription;
+        this.endpointDisplayName = endpointDisplayName;
         setProcessingPlantCapabilityStatement(processingPlantFunction);
         getLogger().debug(".EndpointMetricsAgent(): Initialising Endpoint Metrics Agent ->{}", participantName);
     }
@@ -88,12 +88,12 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
         this.connectedSystemName = connectedSystemName;
     }
 
-    public String getEndpointDescription() {
-        return endpointDescription;
+    public String getEndpointDisplayName() {
+        return endpointDisplayName;
     }
 
-    public void setEndpointDescription(String endpointDescription) {
-        this.endpointDescription = endpointDescription;
+    public void setEndpointDisplayName(String endpointDisplayName) {
+        this.endpointDisplayName = endpointDisplayName;
     }
 
 

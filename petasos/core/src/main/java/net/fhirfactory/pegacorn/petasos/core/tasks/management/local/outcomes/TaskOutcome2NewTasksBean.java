@@ -128,6 +128,9 @@ public class TaskOutcome2NewTasksBean {
             for (UoWPayload currentPayload : egressPayloadList) {
                 DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
                 List<PetasosParticipant> subscriberList = distributionDecisionEngine.deriveSubscriberList(payloadManifest);
+                if(getLogger().isInfoEnabled()){
+                    getLogger().info(".collectOutcomesAndCreateNewTasks(): number of subscribers for egressPayload->{} is count->{}", payloadManifest, subscriberList.size());
+                }
                 if (!subscriberList.isEmpty()) {
                     for(PetasosParticipant currentSubscriber: subscriberList) {
                         TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);

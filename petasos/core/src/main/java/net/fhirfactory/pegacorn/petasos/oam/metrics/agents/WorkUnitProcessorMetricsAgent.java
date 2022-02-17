@@ -124,11 +124,11 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
     }
 
     @JsonIgnore
-    public void incrementEgressMessageCount(){
+    public void incrementEgressMessageAttemptCount(){
         synchronized (getMetricsDataLock()) {
-            int count = getWUPMetricsData().getEgressMessageCount();
+            int count = getWUPMetricsData().getEgressMessageAttemptCount();
             count += 1;
-            getWUPMetricsData().setEgressMessageCount(count);
+            getWUPMetricsData().setEgressMessageAttemptCount(count);
         }
     }
 

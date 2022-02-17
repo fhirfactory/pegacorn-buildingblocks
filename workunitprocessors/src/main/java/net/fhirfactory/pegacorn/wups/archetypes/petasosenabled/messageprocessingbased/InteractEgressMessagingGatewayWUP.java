@@ -128,7 +128,6 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
                         // Do nothing
                     }
                 }
-
             }
         }
     }

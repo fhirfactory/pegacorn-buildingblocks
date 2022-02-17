@@ -42,7 +42,9 @@ public class CommonComponentMetricsData implements Serializable {
     private String componentStatus;
 
     private int ingresMessageCount;
-    private int egressMessageCount;
+    private int egressMessageAttemptCount;
+    private int egressMessageSuccessCount;
+    private int egressMessageFailureCount;
     private int internalDistributedMessageCount;
     private int internalReceivedMessageCount;
     private Map<String, Integer> internalDistributionCountMap;
@@ -53,7 +55,7 @@ public class CommonComponentMetricsData implements Serializable {
 
     public CommonComponentMetricsData(){
         this.ingresMessageCount = 0;
-        this.egressMessageCount = 0;
+        this.egressMessageAttemptCount = 0;
         this.internalDistributedMessageCount = 0;
         this.internalDistributionCountMap = new HashMap<>();
         this.componentID = null;
@@ -63,11 +65,13 @@ public class CommonComponentMetricsData implements Serializable {
         this.componentStatus = null;
         this.participantName = null;
         this.internalReceivedMessageCount = 0;
+        this.egressMessageFailureCount = 0;
+        this.egressMessageSuccessCount = 0;
     }
 
     public CommonComponentMetricsData(ComponentIdType componentId){
         this.ingresMessageCount = 0;
-        this.egressMessageCount = 0;
+        this.egressMessageAttemptCount = 0;
         this.internalDistributedMessageCount = 0;
         this.internalDistributionCountMap = new HashMap<>();
         this.componentID = componentId;
@@ -77,11 +81,30 @@ public class CommonComponentMetricsData implements Serializable {
         this.componentStatus = null;
         this.participantName = null;
         this.internalReceivedMessageCount = 0;
+        this.egressMessageFailureCount = 0;
+        this.egressMessageSuccessCount = 0;
     }
 
     //
     // Getters and Setters
     //
+
+
+    public int getEgressMessageSuccessCount() {
+        return egressMessageSuccessCount;
+    }
+
+    public void setEgressMessageSuccessCount(int egressMessageSuccessCount) {
+        this.egressMessageSuccessCount = egressMessageSuccessCount;
+    }
+
+    public int getEgressMessageFailureCount() {
+        return egressMessageFailureCount;
+    }
+
+    public void setEgressMessageFailureCount(int egressMessageFailureCount) {
+        this.egressMessageFailureCount = egressMessageFailureCount;
+    }
 
     public int getIngresMessageCount() {
         return ingresMessageCount;
@@ -91,12 +114,12 @@ public class CommonComponentMetricsData implements Serializable {
         this.ingresMessageCount = ingresMessageCount;
     }
 
-    public int getEgressMessageCount() {
-        return egressMessageCount;
+    public int getEgressMessageAttemptCount() {
+        return egressMessageAttemptCount;
     }
 
-    public void setEgressMessageCount(int egressMessageCount) {
-        this.egressMessageCount = egressMessageCount;
+    public void setEgressMessageAttemptCount(int egressMessageAttemptCount) {
+        this.egressMessageAttemptCount = egressMessageAttemptCount;
     }
 
     public int getInternalDistributedMessageCount() {
@@ -177,17 +200,20 @@ public class CommonComponentMetricsData implements Serializable {
 
     @Override
     public String toString() {
-        return "CommonMetricsData{" +
+        return "CommonComponentMetricsData{" +
                 "componentID=" + componentID +
-                ", participantName=" + participantName +
-                ", componentType='" + componentType + '\'' +
+                ", participantName='" + participantName + '\'' +
+                ", componentType=" + componentType +
                 ", lastActivityInstant=" + lastActivityInstant +
                 ", componentStartupInstant=" + componentStartupInstant +
                 ", componentStatus='" + componentStatus + '\'' +
                 ", ingresMessageCount=" + ingresMessageCount +
-                ", egressMessageCount=" + egressMessageCount +
-                ", distributedMessageCount=" + internalDistributedMessageCount +
-                ", distributionCountMap=" + internalDistributionCountMap +
+                ", egressMessageAttemptCount=" + egressMessageAttemptCount +
+                ", egressMessageSuccessCount=" + egressMessageSuccessCount +
+                ", egressMessageFailureCount=" + egressMessageFailureCount +
+                ", internalDistributedMessageCount=" + internalDistributedMessageCount +
+                ", internalReceivedMessageCount=" + internalReceivedMessageCount +
+                ", internalDistributionCountMap=" + internalDistributionCountMap +
                 '}';
     }
 }

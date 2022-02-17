@@ -107,7 +107,7 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     //
 
     public void updateLocalCacheStatus(String cacheName, Integer cacheSize){
-        if(StringUtils.isEmpty(cacheName) || cacheSize != null){
+        if(StringUtils.isEmpty(cacheName) || cacheSize == null){
             return;
         }
         synchronized (getMetricsDataLock()) {
