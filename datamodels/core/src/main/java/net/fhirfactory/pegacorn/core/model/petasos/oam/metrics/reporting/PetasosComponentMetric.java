@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.datatyp
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.valuesets.PetasosComponentMetricTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.valuesets.PetasosComponentMetricUnitEnum;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -240,5 +241,22 @@ public class PetasosComponentMetric implements Serializable {
             return false;
         }
         return Objects.equals(this.metricAgent, other.metricAgent);
+    }
+    
+    
+    //
+    // hashcode
+    //
+    @Override 
+    public int hashCode() {
+    	return new HashCodeBuilder(19, 37).
+    		       append(metricName).
+    		       append(metricType).
+    		       append(metricUnit).
+    		       append(metricValue).
+    		       append(metricSource).
+    		       append(metricAgent).
+    		       toHashCode();
+
     }
 }
