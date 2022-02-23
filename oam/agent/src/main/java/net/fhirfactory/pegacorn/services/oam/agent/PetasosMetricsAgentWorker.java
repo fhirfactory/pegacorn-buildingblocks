@@ -177,7 +177,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
                 if (publishedMetricSet == null) {
                     publishCurrentMetricSet = true;
                 } else {
-                    if (!publishedMetricSet.businessEquals(metricSetInQueue)) {
+                    if (!publishedMetricSet.equals(metricSetInQueue)) {
                         publishCurrentMetricSet = true;
                     }
                 }

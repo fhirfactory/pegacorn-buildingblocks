@@ -22,6 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 
@@ -148,7 +150,8 @@ public class PetasosComponentMetricSet implements Serializable {
                 '}';
     }
 
-    public boolean businessEquals(Object obj) {
+    @Override
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -169,5 +172,19 @@ public class PetasosComponentMetricSet implements Serializable {
             return false;
         }
         return this.componentType == other.componentType;
+    }
+    
+    //
+    // hashcode
+    //
+    @Override 
+    public int hashCode() {
+    	return new HashCodeBuilder(29, 41).
+    		       append(sourceParticipantName).
+    		       append(metrics).
+    		       append(metricSourceComponentId).
+    		       append(componentType).
+    		       toHashCode();
+
     }
 }

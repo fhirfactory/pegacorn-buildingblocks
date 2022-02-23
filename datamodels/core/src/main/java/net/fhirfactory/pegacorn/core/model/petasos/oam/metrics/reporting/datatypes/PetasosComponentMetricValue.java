@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.datatypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetric;
 
@@ -267,4 +268,13 @@ public class PetasosComponentMetricValue implements Serializable {
         }
         return Objects.equals(this.objectType, other.objectType);
     }
+    
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(23, 53)
+				.append(object)
+				.append(objectType)
+				.toHashCode();
+
+	}
 }
