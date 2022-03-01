@@ -28,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
 
-import java.time.chrono.IsoEra;
-
 
 /**
  * 
@@ -143,9 +141,21 @@ public class RouteElementNames {
         return(endpointName);
     }
 
-    public String getEndPointWUPContainerEgressGatekeeperIngres() {
-        getLogger().debug(".getEndPointWUPContainerEgressGatekeeperIngres(): Entry");
-        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.EgressGatekeeper.Ingres";
+    public String getEndPointWUPContainerInterceptionRedirectPointIngres() {
+        getLogger().debug(".getEndPointWUPContainerInterceptionRedirectPointIngres(): Entry");
+        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.InterceptionRedirectPoint.Ingres";
+        return(endpointName);
+    }
+
+    public String getEndPointWUPContainerEgressMetadataProcessorIngres() {
+        getLogger().debug(".getEndPointWUPContainerEgressMetadataProcessorIngres(): Entry");
+        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.MetadataProcessor.Ingres";
+        return(endpointName);
+    }
+
+    public String getEndPointWUPContainerInterceptionReturnPointIngres() {
+        getLogger().debug(".getEndPointWUPContainerInterceptionReturnPointIngres(): Entry");
+        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.InterceptionReturnPoint.Ingres";
         return(endpointName);
     }
 

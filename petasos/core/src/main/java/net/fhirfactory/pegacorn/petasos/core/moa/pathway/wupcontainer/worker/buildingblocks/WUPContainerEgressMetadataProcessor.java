@@ -43,8 +43,8 @@ import java.util.ArrayList;
  * @since 2020-07-01
  */
 @ApplicationScoped
-public class WUPContainerEgressGatekeeper {
-    private static final Logger LOG = LoggerFactory.getLogger(WUPContainerEgressGatekeeper.class);
+public class WUPContainerEgressMetadataProcessor {
+    private static final Logger LOG = LoggerFactory.getLogger(WUPContainerEgressMetadataProcessor.class);
 
     protected Logger getLogger(){
         return(LOG);
@@ -54,21 +54,21 @@ public class WUPContainerEgressGatekeeper {
     private PetasosFulfillmentTaskAuditServicesBroker auditServicesBroker;
 
     /**
-     * This class/method checks the status of the WUPJobCard for the parcel, and ascertains if it is to be
-     * discarded (because of some processing error or due to the fact that the processing has occurred already
-     * within another WUP). At the moment, it reaches the "discard" decisions purely by checking the
-     * WUPJobCard.isToBeDiscarded boolean.
+     * The WUP-Egress-Metadata-Processor updates the details of the TaskWorkItem within the FulfillmentTask to better
+     * reflect the operational outcome of the task.
      *
-     * @param fulfillmentTask The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * It is also the point at which an AuditEvent for the PetasosFulfillmentTask is created/reported.
+     *
+     * @param fulfillmentTask The PetasosFulfillmentTaskSharedInstance that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange   The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
-     * @return Returns a PetasosFulfillmentTask with the egress payload containing the DiscardedTask value set
+     * @return Returns a PetasosFulfillmentTaskSharedInstance with the egress payload containing the DiscardedTask value set
      */
 
-    public PetasosFulfillmentTaskSharedInstance egressGatekeeper(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
+    public PetasosFulfillmentTaskSharedInstance alterTaskWorkItemMetadata(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
         if(getLogger().isInfoEnabled()){
-            getLogger().info(".egressGatekeeper(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+            getLogger().info(".alterTaskWorkItemMetadata(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
         }
-        getLogger().debug(".egressGatekeeper(): Enter, fulfillmentTask ->{}", fulfillmentTask );
+        getLogger().debug(".alterTaskWorkItemMetadata(): Enter, fulfillmentTask ->{}", fulfillmentTask );
         ArrayList<String> targetList = new ArrayList<String>();
         if (fulfillmentTask.getTaskFulfillment().isToBeDiscarded()) {
             DataParcelManifest discardedParcelManifest = new DataParcelManifest();
@@ -112,10 +112,10 @@ public class WUPContainerEgressGatekeeper {
         auditServicesBroker.logActivity(fulfillmentTask.getInstance());
 
         if(getLogger().isInfoEnabled()){
-            getLogger().info(".egressGatekeeper(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
+            getLogger().info(".alterTaskWorkItemMetadata(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
         }
 
-        getLogger().debug(".egressGatekeeper(): Exit, fulfillmentTask ->{}", fulfillmentTask );
+        getLogger().debug(".alterTaskWorkItemMetadata(): Exit, fulfillmentTask ->{}", fulfillmentTask );
         return(fulfillmentTask);
     }
 }

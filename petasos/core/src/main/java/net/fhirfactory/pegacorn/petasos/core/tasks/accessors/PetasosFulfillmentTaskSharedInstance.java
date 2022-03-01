@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskCacheServiceInt
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.interception.TaskInterceptionType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.common.PetasosTaskSharedInstance;
 import org.apache.commons.lang3.SerializationUtils;
@@ -128,6 +129,21 @@ public class PetasosFulfillmentTaskSharedInstance extends PetasosTaskSharedInsta
         getInstance().setaRetry(aRetry);
     }
 
+    @JsonIgnore
+    public boolean hasTaskInterception(){
+        boolean hasValue = getInstance().hasTaskInterception();
+        return(hasValue);
+    }
+
+    public TaskInterceptionType getTaskInterception() {
+        return (getTaskInterception());
+    }
+
+    public void setTaskInterception(TaskInterceptionType taskInterception) {
+        getInstance().setTaskInterception(taskInterception);
+    }
+
+
 
     //
     // Getters and Setters
@@ -169,6 +185,7 @@ public class PetasosFulfillmentTaskSharedInstance extends PetasosTaskSharedInsta
                 ", taskNodeAffinity=" + getTaskNodeAffinity() +
                 ", aggregateTaskMembership=" + getAggregateTaskMembership() +
                 ", taskContext=" + getTaskContext() +
+                ", taskInterception=" + getTaskInterception() +
                 '}';
     }
 }

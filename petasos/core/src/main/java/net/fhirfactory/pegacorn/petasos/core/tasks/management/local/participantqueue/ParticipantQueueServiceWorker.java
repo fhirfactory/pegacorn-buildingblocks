@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,54 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.ask.base.http;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.participantqueue;
 
-import ca.uhn.fhir.parser.IParser;
+import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution.LocalTaskDistributionWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 
-public abstract class InternalFHIRClientProxy extends HAPIServerSecureProxy {
-
-    private boolean initialised;
-
-    private IParser fhirParser;
-
-
-    //
-    // Constructor(s)
-    //
-
-    public InternalFHIRClientProxy(){
-        super();
-        this.initialised = false;
+@ApplicationScoped
+public class ParticipantQueueServiceWorker extends BaseRouteBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(LocalTaskDistributionWorker.class);
+    protected Logger getLogger(){
+        return(LOG);
     }
 
-    //
-    // Post Construct
-    //
+    @Override
+    public void configure() {
+        getLogger().debug(".configure(): Entry");
 
-    @PostConstruct
-    public void initialise(){
-        if(!initialised) {
-            newRestfulGenericClient(deriveTargetEndpointDetails());
-            this.fhirParser = getFHIRContextUtility().getJsonParser().setPrettyPrint(true);
-            this.initialised = true;
-        }
+        fromWithStandardExceptionHandling(PetasosPropertyConstants.PARTICIPANT_TASK_QUEUE)
+                .routeId(PetasosPropertyConstants.PARTICIPANT_TASK_QUEUE)
+                .bean(ParticipantQueueServiceBean.class, "queueTask(*, Exchange)");
     }
-
-    //
-    // Abstract Methods
-    //
-
-    protected abstract String deriveTargetEndpointDetails();
-    protected abstract void postConstructActivities();
-
-    //
-    // Getters and Setters
-    //
-
-    protected IParser getFHIRParser(){
-        return(fhirParser);
-    }
-
 }

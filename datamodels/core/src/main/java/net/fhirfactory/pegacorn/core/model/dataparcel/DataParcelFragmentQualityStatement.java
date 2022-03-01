@@ -29,6 +29,31 @@ import java.util.Objects;
 public class DataParcelFragmentQualityStatement extends DataParcelTypeDescriptor implements Serializable {
     private DataParcelFragmentQualityEnum fragmentQuality;
 
+    //
+    // Constructor(s)
+    //
+
+    public DataParcelFragmentQualityStatement(){
+        super();
+        fragmentQuality = null;
+    }
+
+    public DataParcelFragmentQualityStatement(DataParcelTypeDescriptor ori){
+        super(ori);
+        fragmentQuality = null;
+    }
+
+    public DataParcelFragmentQualityStatement(DataParcelFragmentQualityStatement ori){
+        super(ori);
+        if(ori.getFragmentQuality() != null){
+            setFragmentQuality(ori.getFragmentQuality());
+        }
+    }
+
+    //
+    // Getters and Setters
+    //
+
     public DataParcelFragmentQualityEnum getFragmentQuality() {
         return fragmentQuality;
     }
@@ -36,6 +61,10 @@ public class DataParcelFragmentQualityStatement extends DataParcelTypeDescriptor
     public void setFragmentQuality(DataParcelFragmentQualityEnum fragmentQuality) {
         this.fragmentQuality = fragmentQuality;
     }
+
+    //
+    // Equals and Hashcode
+    //
 
     @Override
     public boolean equals(Object o) {
@@ -50,6 +79,10 @@ public class DataParcelFragmentQualityStatement extends DataParcelTypeDescriptor
     public int hashCode() {
         return Objects.hash(super.hashCode(), getFragmentQuality());
     }
+
+    //
+    // toString
+    //
 
     @Override
     public String toString() {

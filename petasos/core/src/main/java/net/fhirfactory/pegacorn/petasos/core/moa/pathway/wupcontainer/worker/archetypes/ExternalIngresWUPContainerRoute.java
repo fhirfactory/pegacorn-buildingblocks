@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftw
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressGatekeeper;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressMetadataProcessor;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressProcessor;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPEgressConduit;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
@@ -73,26 +73,18 @@ public class ExternalIngresWUPContainerRoute extends BasePetasosContainerRoute {
                 .process(nodeDetailInjector)
                 .routeId(nameSet.getRouteWUPEgress2WUPEgressConduitEgress())
                 .bean(WUPEgressConduit.class, "receiveFromWUP(*, Exchange)")
-                .to(nameSet.getEndPointWUPEgressConduitEgress());
-
-        fromWithStandardExceptionHandling(nameSet.getEndPointWUPEgressConduitEgress())
-                .routeId(nameSet.getRouteWUPEgressConduitEgress2WUPEgressProcessorIngres())
                 .to(nameSet.getEndPointWUPContainerEgressProcessorIngres());
 
         fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressProcessorIngres())
                 .routeId(nameSet.getRouteWUPContainerEgressProcessor())
                 .process(nodeDetailInjector)
                 .bean(WUPContainerEgressProcessor.class, "egressContentProcessor(*, Exchange)")
-                .to(nameSet.getEndPointWUPContainerEgressProcessorEgress());
+                .to(nameSet.getEndPointWUPContainerEgressMetadataProcessorIngres());
 
-        fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressProcessorEgress())
-                .routeId(nameSet.getRouteWUPEgressProcessorEgress2WUPEgressGatekeeperIngres())
-                .to(nameSet.getEndPointWUPContainerEgressGatekeeperIngres());
-
-        fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressGatekeeperIngres())
+        fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressMetadataProcessorIngres())
                 .routeId(nameSet.getRouteWUPContainerEgressGateway())
                 .process(nodeDetailInjector)
-                .bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange)")
+                .bean(WUPContainerEgressMetadataProcessor.class, "alterTaskWorkItemMetadata(*, Exchange)")
                 .to(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);
 
     }

@@ -22,14 +22,23 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
 public class TaskPerformerTypeFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(TaskPerformerTypeFactory.class);
 
     @Inject
     private PegacornReferenceProperties systemWideProperties;
@@ -37,25 +46,97 @@ public class TaskPerformerTypeFactory {
     private static final String PEGACORN_TASK_PERFORMER_TYPE = "/task-performer-type";
 
     //
+    // Constructor
+    //
+
+    //
     // Business Methods
     //
 
-    public String getPegacornTaskPerformerType(){
+    //
+    // FromFHIR
+
+    public TaskPerformerTypeType mapTaskPerformerType(CodeableConcept taskPerformerCC){
+        getLogger().debug(".mapTaskPerformerType(): Entry, taskPerformerCC->{}", taskPerformerCC);
+        TaskPerformerTypeType taskPerformer = new TaskPerformerTypeType();
+        // Extract Node Participant Name
+
+        // Extract Node Participant Description
+
+        // Extract Node Function
+        TopologyNodeFunctionFDNToken functionToken = new TopologyNodeFunctionFDNToken();
+
+        // Extract Node Implementation Component Id (if Exists)
+
+        getLogger().debug(".mapTaskPerformerType(): Exit, taskPerformer->{}", taskPerformer);
+        return(taskPerformer);
+    }
+
+    //
+    // ToFHIR
+
+    public CodeableConcept mapTaskPerformerType(TaskPerformerTypeType taskPerformer){
+        getLogger().debug(".newTaskPerformerType(): Entry, taskPerformer->{}", taskPerformer);
+
+        // Let's be defensive
+        if(taskPerformer == null){
+            getLogger().debug(".newTaskPerformerType(): Exit, taskPerformer is null, returning -null-");
+            return(null);
+        }
+        if(StringUtils.isEmpty(taskPerformer.getRequiredParticipantName())){
+            getLogger().debug(".newTaskPerformerType(): Exit, taskPerformer.getRequiredParticipantName is empty, returning -null-");
+            return(null);
+        }
+
+        // Get the PerformerParticipantName
+        String performerParticipantName = taskPerformer.getRequiredParticipantName();
+
+        // Get the PerformerDescription
+        String performerParticipantDescription = performerParticipantName;
+        if(StringUtils.isNotEmpty(taskPerformer.getRequiredPerformerTypeDescription())){
+            performerParticipantDescription = taskPerformer.getRequiredPerformerTypeDescription();
+        }
+
+        // Create the base CodeableConcept
+        CodeableConcept performerType = mapTaskPerformerType(performerParticipantName, performerParticipantDescription);
+
+        // Add the FunctionFDN Extension if a FunctionFDN is defined
+        if(taskPerformer.getRequiredPerformerType() != null){
+            Extension functionFDNExtension = mapPerformerFunctionFDNToExtension(taskPerformer.getRequiredPerformerType());
+            if(functionFDNExtension != null){
+                performerType.addExtension(functionFDNExtension);
+            }
+        }
+
+        // Add the ComponentId Extension if a knownFullerInstance is defined
+        if(taskPerformer.getKnownFulfillerInstance() != null){
+            Extension knownFulfiller = mapPerformerComponentIdToExtension(taskPerformer.getKnownFulfillerInstance());
+            if(knownFulfiller != null){
+                performerType.addExtension(knownFulfiller);
+            }
+        }
+
+        // All Done!
+        getLogger().debug(".newTaskPerformerType(): Exit, codeableConcept->{}",performerType );
+        return(performerType);
+    }
+
+    protected String getPegacornTaskPerformerType(){
         String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_PERFORMER_TYPE;
         return (codeSystem);
     }
 
-    public CodeableConcept newTaskPerformerType(String wupFunctionID, String wupDescription){
+    protected CodeableConcept mapTaskPerformerType(String participantName, String participantDescription){
         CodeableConcept performerTypeCC = new CodeableConcept();
         Coding performerTypeCoding = new Coding();
         performerTypeCoding.setSystem(getPegacornTaskPerformerType());
-        performerTypeCoding.setCode(wupFunctionID);
+        performerTypeCoding.setCode(participantName);
         performerTypeCC.addCoding(performerTypeCoding);
-        performerTypeCC.setText(wupDescription);
+        performerTypeCC.setText(participantDescription);
         return(performerTypeCC);
     }
 
-    public String extractCodeFromCodeableConceptForTaskPerformerType(CodeableConcept performerType){
+    protected String extractCodeFromCodeableConceptForTaskPerformerType(CodeableConcept performerType){
         if(performerType == null){
             return(null);
         }
@@ -69,4 +150,27 @@ public class TaskPerformerTypeFactory {
         }
         return(null);
     }
+
+    protected Extension mapPerformerFunctionFDNToExtension(TopologyNodeFunctionFDN performerFunctionFDN){
+        Extension performerFunctionExtension = new Extension();
+
+
+
+        return(performerFunctionExtension);
+    }
+
+    protected Extension mapPerformerComponentIdToExtension(ComponentIdType componentId){
+        Extension performerDescriptionExtension = new Extension();
+
+        return(performerDescriptionExtension);
+    }
+
+    //
+    // Getters (and Setters)
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
 }

@@ -30,6 +30,7 @@ public class TaskPerformerTypeType implements Serializable {
     private TopologyNodeFunctionFDN requiredPerformerType;
     private ComponentIdType knownFulfillerInstance;
     private String requiredParticipantName;
+    private String requiredSubsystemParticipantName;
     private String requiredPerformerTypeDescription;
 
     //
@@ -41,11 +42,21 @@ public class TaskPerformerTypeType implements Serializable {
         this.requiredPerformerTypeDescription = null;
         this.requiredParticipantName = null;
         this.knownFulfillerInstance = null;
+        this.requiredSubsystemParticipantName = null;
     }
 
     //
     // Getters and Setters
     //
+
+
+    public String getRequiredSubsystemParticipantName() {
+        return requiredSubsystemParticipantName;
+    }
+
+    public void setRequiredSubsystemParticipantName(String requiredSubsystemParticipantName) {
+        this.requiredSubsystemParticipantName = requiredSubsystemParticipantName;
+    }
 
     public ComponentIdType getKnownFulfillerInstance() {
         return knownFulfillerInstance;
@@ -89,6 +100,7 @@ public class TaskPerformerTypeType implements Serializable {
                 "requiredPerformerType=" + requiredPerformerType +
                 ", knownFulfillerInstance=" + knownFulfillerInstance +
                 ", requiredParticipantName='" + requiredParticipantName + '\'' +
+                ", requiredSubsystemParticipantName=" + requiredSubsystemParticipantName +
                 ", requiredPerformerTypeDescription='" + requiredPerformerTypeDescription + '\'' +
                 '}';
     }

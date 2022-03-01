@@ -22,19 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
-import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @ApplicationScoped
@@ -47,42 +40,22 @@ public class WUPContainerInterceptionReturnPoint {
 
 
     /**
-     * This class/method checks the status of the WUPJobCard for the parcel, and ascertains if it is to be
-     * discarded (because of some processing error or due to the fact that the processing has occurred already
-     * within another WUP). At the moment, it reaches the "discard" decisions purely by checking the
-     * WUPJobCard.isToBeDiscarded boolean.
+     * The return point for redirected tasks (if redirection is active) - otherwise just a passthrough!
      *
-     * @param fulfillmentTask     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * @param fulfillmentTask     The PetasosFulfillmentTaskSharedInstance that is relevant for this thread
      * @param camelExchange    The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
-     * @return Should either return the ingres point into the associated WUP Ingres Conduit or null (if the packet is to be discarded)
+     * @return A PetasosFulfillmentTaskSharedInstance to be passed on
      */
-    @RecipientList
-    public List<String> ingresGatekeeper(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
+    public PetasosFulfillmentTaskSharedInstance returnRedirectedTask(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
         if(getLogger().isInfoEnabled()){
-            getLogger().info(".ingresGatekeeper(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+            getLogger().info(".returnRedirectedTask(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
         }
-        getLogger().debug(".ingresGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask);
-        // Get Route Names
-        TopologyNodeFunctionFDNToken wupToken = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getNodeFunctionFDN().getFunctionToken();
-        getLogger().trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
+        getLogger().debug(".returnRedirectedTask(): Entry, fulfillmentTask->{}", fulfillmentTask);
         //
-        // Get out metricsAgent & do add some metrics
-        WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
-        // Now, continue with business logic
-        RouteElementNames nameSet = new RouteElementNames(wupToken);
-        ArrayList<String> targetList = new ArrayList<String>();
-        getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
-        if (fulfillmentTask.getTaskFulfillment().isToBeDiscarded()) {
-            getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
-            metricsAgent.touchLastActivityFinishInstant();
-            targetList.add(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);
-            return (targetList);
-        } else {
-            getLogger().trace(".ingresGatekeeper(): We return the channel name of the associated WUP Ingres Conduit");
-            String targetEndpoint = nameSet.getEndPointWUPIngresConduitIngres();
-            targetList.add(targetEndpoint);
-            getLogger().debug(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
-            return (targetList);
-        }
+        // I am a nothing bean - merely a "point" to "point to". I may, at a later date, have some logic and
+        // reporting in me --> but for now --> nothing :( I feel like such a disappointment.
+        //
+        getLogger().debug(".returnRedirectedTask(): Exit, fulfillmentTask->{}", fulfillmentTask);
+        return(fulfillmentTask);
     }
 }

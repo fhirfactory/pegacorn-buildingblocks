@@ -24,16 +24,17 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.interception.TaskInterceptionType;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
-import org.apache.camel.Exchange;
-import org.apache.camel.RecipientList;
+import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,24 +47,59 @@ public class WUPContainerInterceptionRedirectPoint {
         return(LOG);
     }
 
+    @Produce
+    private ProducerTemplate routeInjector;
+
 
     /**
-     * This class/method checks the status of the WUPJobCard for the parcel, and ascertains if it is to be
-     * discarded (because of some processing error or due to the fact that the processing has occurred already
-     * within another WUP). At the moment, it reaches the "discard" decisions purely by checking the
-     * WUPJobCard.isToBeDiscarded boolean.
+     * The WUP-Interception-Redirect-Point is the point at which traffic may be re-directed to another Participant
+     * (either within the same ProcessingPlant or another one). The corresponding WUP-Interception-Return-Point
+     * is the point at which traffic is re-injected into the MOA-WUP route.
      *
-     * @param fulfillmentTask     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
-     * @param camelExchange    The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
+     * When interception is active, it is important to note that the MOA-WUP instance is still subject to the
+     * standard processing timeouts, retries, etc. processes that are defined/configured for the MOA-WUP type.
+     * The implementation of the interception function merely re-routes the content from the standard WUP-User-Space
+     * processing activity to an alternative.
+     *
+     * @param fulfillmentTask     The PetasosFulfillmentTask that "may or may not" be intercepted
+     * @param camelExchange    The Apache Camel Exchange object
      * @return Should either return the ingres point into the associated WUP Ingres Conduit or null (if the packet is to be discarded)
      */
-    public List<String> ingresGatekeeper(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
+
+    public void interceptionRedirectDecisionPoint(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
         if(getLogger().isInfoEnabled()){
-            getLogger().info(".ingresGatekeeper(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+            getLogger().info(".interceptionRedirectDecisionPoint(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
         }
-        getLogger().debug(".ingresGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask);
+        getLogger().debug(".interceptionRedirectDecisionPoint(): Enter, fulfillmentTask->{}", fulfillmentTask);
         WorkUnitProcessorSoftwareComponent wupSoftwareComponent = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorSoftwareComponent.class);
 
+        //
+        // Should we redirect the Task?
+        boolean isBeingRedirected = false;
+        String redirectionTarget = null;
+        if(wupSoftwareComponent.hasRedirectionControl()){
+            boolean redirectionFlagSet = wupSoftwareComponent.getRedirectionControl().getRedirectionActive();
+            boolean isInRedirectionWindow = false;
+            if(wupSoftwareComponent.getRedirectionControl().hasRedirectionStart()){
+                if(Instant.now().isAfter(wupSoftwareComponent.getRedirectionControl().getRedirectionStart())){
+                    if(wupSoftwareComponent.getRedirectionControl().hasRedirectionFinish()){
+                        if(Instant.now().isBefore(wupSoftwareComponent.getRedirectionControl().getRedirectionFinish())){
+                            isInRedirectionWindow = true;
+                        } else {
+                            isInRedirectionWindow = false;
+                        }
+                    } else {
+                        isInRedirectionWindow = true;
+                    }
+                }
+            }
+            if(redirectionFlagSet || isInRedirectionWindow){
+                if(wupSoftwareComponent.getRedirectionControl().hasRedirectionTargetParticipantName()){
+                    isBeingRedirected = true;
+                    redirectionTarget = wupSoftwareComponent.getRedirectionControl().getRedirectionTargetParticipantName();
+                }
+            }
+        }
 
         //
         // Get out metricsAgent & do add some metrics
@@ -71,21 +107,34 @@ public class WUPContainerInterceptionRedirectPoint {
         // Now, continue with business logic
         // Get Route Names
         TopologyNodeFunctionFDNToken wupToken = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getNodeFunctionFDN().getFunctionToken();
-        getLogger().trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
+        getLogger().trace(".interceptionRedirectDecisionPoint(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
         RouteElementNames nameSet = new RouteElementNames(wupToken);
-        ArrayList<String> targetList = new ArrayList<String>();
-        getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
-        if (fulfillmentTask.getTaskFulfillment().isToBeDiscarded()) {
-            getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
+        getLogger().trace(".interceptionRedirectDecisionPoint(): So, we will now determine if the Packet should be forwarded or discarded");
+        if (isBeingRedirected) {
+            getLogger().debug(".interceptionRedirectDecisionPoint(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             metricsAgent.touchLastActivityFinishInstant();
-            targetList.add(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);
-            return (targetList);
+            //
+            // 1st Redirect and get Result
+            PetasosFulfillmentTaskSharedInstance petasosFulfillmentTaskSharedInstance = redirectTask(redirectionTarget, fulfillmentTask);
+            TaskInterceptionType interception = new TaskInterceptionType();
+            interception.setTargetParticipant(redirectionTarget);
+            interception.setInterceptionRedirectInstant(Instant.now());
+            fulfillmentTask.setTaskInterception(interception);
+            PetasosFulfillmentTaskSharedInstance postRedirectionFulfillmentTask = redirectTask(redirectionTarget, fulfillmentTask);
+            postRedirectionFulfillmentTask.getTaskInterception().setInterceptionReturnInstant(Instant.now());
+            //
+            // Then forward to return-point
+            String targetEndpoint = nameSet.getEndPointWUPContainerInterceptionReturnPointIngres();
+            routeInjector.sendBody(targetEndpoint, ExchangePattern.InOnly, postRedirectionFulfillmentTask);
         } else {
-            getLogger().trace(".ingresGatekeeper(): We return the channel name of the associated WUP Ingres Conduit");
+            getLogger().trace(".interceptionRedirectDecisionPoint(): We return the channel name of the associated WUP Ingres Conduit");
             String targetEndpoint = nameSet.getEndPointWUPIngresConduitIngres();
-            targetList.add(targetEndpoint);
-            getLogger().debug(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
-            return (targetList);
+            getLogger().debug(".interceptionRedirectDecisionPoint(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
+            routeInjector.sendBody(targetEndpoint, ExchangePattern.InOnly, fulfillmentTask);
         }
+    }
+
+    public PetasosFulfillmentTaskSharedInstance redirectTask(String targetParticipantName, PetasosFulfillmentTaskSharedInstance fulfillmentTask){
+        return(fulfillmentTask);
     }
 }

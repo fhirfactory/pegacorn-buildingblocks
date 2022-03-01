@@ -98,27 +98,16 @@ public class WUPContainerIngresProcessor {
     //
 
     /**
-     * This class/method is used as the injection point into the WUP Processing Framework for the specific WUP Type/Instance in question.
-     * It registers the following:
-     *      - A ResilienceParcel for the UoW (registered with the SystemModule Parcel Cache: via the PetasosServiceBroker)
-     *      - A WUPJobCard for the associated Work Unit Activity (registered into the SystemModule Activity Matrix: via the PetasosServiceBroker)
-     *      - A ParcelStatusElement for the ResilienceParcel (again, register into the SystemModule Activity Matrix: via the PetasosServiceBroker)
+     * The WUP-Ingres-Processor performs three core functions:
+     * 1.	It captures a set of metric events pertaining to the task;
+     * 2.	It requests/awaits execution privilege for the fulfillment task; and
+     * 3.	It flags whether the fulfillment task is being executed elsewhere (and thus should be cancelled here).
+     * As part of awaiting execution privilege, it loops an indefinite number of times and remains in a wait-state.
+     * It is up to an external watchdog framework to either grant execution privilege or “cancel” the activity.
      *
-     * The function handles both new UoW or UoW instances that are being re-tried.
-     *
-     * It performs checks on the Status (WUPJobCard.currentStatus & ParcelStatusElement.hasClusterFocus) to determine if this WUP-Thread should
-     * actually perform the Processing of the UoW via the WUP.
-     *
-     * It also checks on / assigns values to the Status (ParcelStatusElement.parcelStatus) if there are issues with the parcel. If there are, it may also
-     * assign a "failed" status to both the WUPJobCard and ParcelStatusElement, and trigger a discard of this Parcel (for a retry) via setting the
-     * WUPJobCard.isToBeDiscarded attribute to true.
-     *
-     * Finally, if all is going OK, but this WUP-Thread does not have the Cluster Focus (or SystemWide Focus), it waits in a sleep/loop until a condition
-     * changes.
-     *
-     * @param fulfillmentTask The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * @param fulfillmentTask The PetasosFulfillmentTask that is to be processed by the "Business Logic"
      * @param camelExchange The Apache Camel Exchange object, used to store a Semaphors and Attributes
-     * @return Should return a WorkUnitTransportPacket that is forwarding onto the WUP Ingres Gatekeeper.
+     * @return A PetasosFulfillmentTask that is either assigned an "Execution Privilege" or a "Cancel/Failed".
      */
     public PetasosFulfillmentTaskSharedInstance ingresContentProcessor(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
         if(getLogger().isInfoEnabled()) {

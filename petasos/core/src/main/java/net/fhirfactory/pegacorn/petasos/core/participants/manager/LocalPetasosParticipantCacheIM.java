@@ -164,7 +164,10 @@ public class LocalPetasosParticipantCacheIM {
 				boolean doSubscribe = true;
 				if(currentSubscribedManifest.hasSourceProcessingPlantParticipantName()) {
 					boolean sourceTaskProducerIsMe = currentSubscribedManifest.getSourceProcessingPlantParticipantName().equals(participantNameHolder.getSubsystemParticipantName());
-					boolean sourceSystemIsWildcard = currentSubscribedManifest.getExternalSourceSystem().equals(DataParcelManifest.WILDCARD_CHARACTER);
+					boolean sourceSystemIsWildcard = false;
+					if(currentSubscribedManifest.hasExternalSourceSystem()){
+						sourceSystemIsWildcard = currentSubscribedManifest.getExternalSourceSystem().equals(DataParcelManifest.WILDCARD_CHARACTER);
+					}
 					if(sourceTaskProducerIsMe || sourceSystemIsWildcard){
 						doSubscribe = true;
 					} else {

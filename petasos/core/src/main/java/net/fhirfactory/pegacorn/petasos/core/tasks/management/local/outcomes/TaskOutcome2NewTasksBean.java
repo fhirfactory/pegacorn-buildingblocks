@@ -140,6 +140,7 @@ public class TaskOutcome2NewTasksBean {
                         downstreamPerformerType.setKnownFulfillerInstance(currentSubscriber.getComponentID());
                         downstreamPerformerType.setRequiredPerformerType(currentSubscriber.getNodeFunctionFDN());
                         downstreamPerformerType.setRequiredParticipantName(currentSubscriber.getParticipantName());
+                        downstreamPerformerType.setRequiredSubsystemParticipantName(currentSubscriber.getSubsystemParticipantName());
                         downstreamPerformerType.setRequiredPerformerTypeDescription(currentSubscriber.getParticipantDisplayName());
                         if(!newDownstreamTask.hasTaskPerformerTypes()){
                             newDownstreamTask.setTaskPerformerTypes(new ArrayList<>());

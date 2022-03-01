@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.core.model.topology.role;
 
 public enum ProcessingPlantRoleEnum {
     PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT("Petasos.ServiceProvider.ITOps"),
+    PETASOS_SERVICE_PROVIDER_DIGITAL_TWIN_WORKFLOW("Petasos.ServiceProvider.DigitalTwin"),
     PETASOS_SERVICE_PROVIDER_TASK_MANAGEMENT("Petasos.ServiceProvider.Task-Management"),
     PETASOS_SERVICE_PROVIDER_AUDIT_MANAGEMENT("Petasos.ServiceProvider.Audit-Management"),
     PETASOS_SERVICE_PROVIDER_AUDIT_STORAGE("Petasos.ServiceProvider.Audit-Storage"),

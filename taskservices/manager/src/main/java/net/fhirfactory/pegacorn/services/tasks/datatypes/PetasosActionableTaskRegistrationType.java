@@ -25,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.datagrid.valuesets.DatagridPersistenceResourceStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import org.apache.commons.lang3.StringUtils;
@@ -39,10 +38,11 @@ public class PetasosActionableTaskRegistrationType implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant registrationInstant;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant persistenceInstant;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant checkInstant;
     private DatagridPersistenceResourceStatusEnum resourceStatus;
     private Set<ComponentIdType> fulfillmentProcessingPlants;
-    private Set<String> fulfillmentServiceNames;
     private Set<TaskPerformerTypeType> performerType;
 
     //
@@ -55,14 +55,22 @@ public class PetasosActionableTaskRegistrationType implements Serializable {
         this.checkInstant = null;
         this.fulfillmentProcessingPlants = new HashSet<>();
         this.performerType = new HashSet<>();
-        this.fulfillmentServiceNames = new HashSet<>();
         this.resourceStatus = null;
+        this.persistenceInstant = null;
     }
 
     //
     // Getters and Setters
     //
 
+
+    public Instant getPersistenceInstant() {
+        return persistenceInstant;
+    }
+
+    public void setPersistenceInstant(Instant persistenceInstant) {
+        this.persistenceInstant = persistenceInstant;
+    }
 
     public DatagridPersistenceResourceStatusEnum getResourceStatus() {
         return resourceStatus;
@@ -105,15 +113,6 @@ public class PetasosActionableTaskRegistrationType implements Serializable {
         this.fulfillmentProcessingPlants.addAll(fulfillmentProcessingPlants);
     }
 
-    public Set<String> getFulfillmentServiceNames() {
-        return fulfillmentServiceNames;
-    }
-
-    public void setFulfillmentServiceNames(Set<String> fulfillmentServiceNames) {
-        this.fulfillmentServiceNames.clear();
-        this.fulfillmentServiceNames.addAll(fulfillmentServiceNames);
-    }
-
     public Set<TaskPerformerTypeType> getPerformerType() {
         return performerType;
     }
@@ -148,27 +147,6 @@ public class PetasosActionableTaskRegistrationType implements Serializable {
         }
     }
 
-    public void addFulfillmentServiceName(String serviceName){
-        if(StringUtils.isEmpty(serviceName)){
-            return;
-        }
-        if(!getFulfillmentServiceNames().contains(serviceName)){
-            getFulfillmentServiceNames().add(serviceName);
-        }
-    }
-
-    public void addServiceFulfillmentNames(Collection<String> serviceNames){
-        if(serviceNames == null){
-            return;
-        }
-        if(serviceNames.isEmpty()){
-            return;
-        }
-        for(String currentServiceName: serviceNames){
-            addFulfillmentServiceName(currentServiceName);
-        }
-    }
-
     public void addFulfillmentProcessingPlant(ComponentIdType processingPlantId){
         if(processingPlantId == null){
             return;
@@ -200,8 +178,8 @@ public class PetasosActionableTaskRegistrationType implements Serializable {
                 "actionableTaskId=" + actionableTaskId +
                 ", registrationInstant=" + registrationInstant +
                 ", checkInstant=" + checkInstant +
+                ", persistenceInstant=" + persistenceInstant +
                 ", fulfillmentProcessingPlants=" + fulfillmentProcessingPlants +
-                ", fulfillmentServiceNames=" + fulfillmentServiceNames +
                 ", performerType=" + performerType +
                 ", resourceStatus=" + resourceStatus +
                 '}';

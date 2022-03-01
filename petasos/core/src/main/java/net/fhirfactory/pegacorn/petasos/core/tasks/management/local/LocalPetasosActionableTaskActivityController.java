@@ -361,7 +361,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
             getLogger().debug(".notifyTaskWaiting(): Exit, taskId is null");
             return(null);
         }
-        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.newActionableTaskSharedInstance(taskId);
+        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.getActionableTaskSharedInstance(taskId);
 
         //
         // Update Fulfillment Status

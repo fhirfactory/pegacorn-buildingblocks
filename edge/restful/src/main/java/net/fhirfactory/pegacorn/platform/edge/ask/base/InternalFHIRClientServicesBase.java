@@ -21,27 +21,22 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.ask.base;
 
-import java.util.ArrayList;
-
-import javax.inject.Inject;
-
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ExternalSystemIPCAdapter;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPClientTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.external.ConnectedExternalSystemTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.platform.edge.ask.base.http.InternalFHIRClientProxy;
 
-import ca.uhn.fhir.parser.IParser;
+import javax.inject.Inject;
+import java.util.ArrayList;
 
 public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientProxy {
-
-    private IParser fhirParser;
 
     @Inject
     private TopologyIM topologyIM;
@@ -68,54 +63,49 @@ public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientP
     //
 
     protected void postConstructActivities(){
-        fhirParser = getFHIRContextUtility().getJsonParser().setPrettyPrint(true);
+
     }
 
     //
     // Getters (and Setters)
     //
 
-    protected IParser getFHIRParser(){
-        return(fhirParser);
-    }
 
     //
     // Business Methods
     //
 
-
-
     @Override
     protected String deriveTargetEndpointDetails(){
         getLogger().debug(".deriveTargetEndpointDetails(): Entry");
         MessageBasedWUPEndpointContainer endpoint = new MessageBasedWUPEndpointContainer();
-        StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getTopologyEndpoint(interfaceNames.getEdgeAskEndpointName());
+        HTTPClientTopologyEndpoint clientTopologyEndpoint = (HTTPClientTopologyEndpoint) getTopologyEndpoint(interfaceNames.getEdgeAskEndpointName());
         ConnectedExternalSystemTopologyNode targetSystem = clientTopologyEndpoint.getTargetSystem();
-        ExternalSystemIPCAdapter externalSystemIPCAdapter = (ExternalSystemIPCAdapter)targetSystem.getTargetPorts().get(0);
+        HTTPClientAdapter httpAdapter = (HTTPClientAdapter)targetSystem.getTargetPorts().get(0);
         String http_type = null;
-        if(externalSystemIPCAdapter.isEncrypted()) {
+        if(httpAdapter.isEncrypted()) {
             http_type = "https";
         } else {
             http_type = "http";
         }
-        String dnsName = externalSystemIPCAdapter.getTargetPortDNSName();
-        String portNumber = Integer.toString(externalSystemIPCAdapter.getTargetPortValue());
+        String dnsName = httpAdapter.getHostName();
+        String portNumber = Integer.toString(httpAdapter.getPortNumber());
         String endpointDetails = http_type + "://" + dnsName + ":" + portNumber + systemWideProperties.getPegacornInternalFhirResourceR4Path();
         getLogger().info(".deriveTargetEndpointDetails(): Exit, endpointDetails --> {}", endpointDetails);
         return(endpointDetails);
     }
 
     protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
-        getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
+        getLogger().info(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
         ArrayList<TopologyNodeFDN> endpointFDNs = processingPlant.getMeAsASoftwareComponent().getEndpoints();
         for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)topologyIM.getNode(currentEndpointFDN);
             if(endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)){
-                getLogger().debug(".getTopologyEndpoint(): Exit, node found -->{}", endpointTopologyNode);
+                getLogger().info(".getTopologyEndpoint(): Exit, node found -->{}", endpointTopologyNode);
                 return(endpointTopologyNode);
             }
         }
-        getLogger().debug(".getTopologyEndpoint(): Exit, Could not find node!");
+        getLogger().info(".getTopologyEndpoint(): Exit, Could not find node!");
         return(null);
     }
 }

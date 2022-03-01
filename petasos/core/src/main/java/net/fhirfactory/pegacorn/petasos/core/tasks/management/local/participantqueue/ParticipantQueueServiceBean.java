@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,23 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.wup.datatypes;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.participantqueue;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
+import org.apache.camel.Exchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.time.Instant;
-
-public class PetasosRedirectionStatus implements Serializable {
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant redirectionStart;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant redirectionFinish;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant redirectionUpdate;
-    private Boolean redirectionActive;
-    private String redirectionTargetParticipantName;
+public class ParticipantQueueServiceBean {
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipantQueueServiceBean.class);
 
 
+    public PetasosActionableTaskSharedInstance queueTask(PetasosActionableTaskSharedInstance task, Exchange camelExchange){
+        return(task);
+    }
+
+
+    public PetasosActionableTaskSharedInstance getNextTask(PetasosActionableTaskSharedInstance task, Exchange camelExchange){
+        return(task);
+    }
+
+    public PetasosActionableTaskSharedInstance resumptionEntryPoint(PetasosActionableTaskSharedInstance task, Exchange camelExchange){
+        return(task);
+
+    }
 }

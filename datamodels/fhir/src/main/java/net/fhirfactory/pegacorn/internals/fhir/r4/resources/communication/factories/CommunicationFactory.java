@@ -45,7 +45,11 @@ public class CommunicationFactory {
         LOG.debug(".newCommunicationResource(): Entry, idValue->{}, date->{}", idValue, date);
         Communication communicationResource = new Communication();
         Period newPeriod = new Period();
-        newPeriod.setStart(date);
+        if(date != null) {
+            newPeriod.setStart(date);
+        } else {
+            newPeriod.setStart(Date.from(Instant.now()));
+        }
         Identifier baseIdentifier = identifierFactory.newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER,idValue,newPeriod);
         communicationResource.addIdentifier(baseIdentifier);
 

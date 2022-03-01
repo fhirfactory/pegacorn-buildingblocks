@@ -77,8 +77,12 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
 
     @Override
     public void sendITOpsNotification(String message) {
-        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
-            return;
+        if(getProcessingPlantCapabilityStatement() != null) {
+            if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability() != null) {
+                if (getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)) {
+                    return;
+                }
+            }
         }
         PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
         notification.setComponentId(getMetricsData().getComponentID());

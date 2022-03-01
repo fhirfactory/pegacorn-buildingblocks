@@ -26,8 +26,6 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterfac
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressPostProcessingContainerRoute;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalIngresWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.StandardWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
@@ -83,7 +81,7 @@ public class WorkUnitProcessorFrameworkManager {
                 case WUP_NATURE_LADON_BEHAVIOUR_WRAPPER:
                 case WUP_NATURE_LADON_STANDARD_MOA: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_LADON_STANDARD_MOA route");
-                    StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, true, getSedaParameters(), metricsAgent);
+                    StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker,  metricsAgent);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
                     camelctx.addRoutes(standardWUPRoute);
                     break;
@@ -108,7 +106,7 @@ public class WorkUnitProcessorFrameworkManager {
                     break;
                 case WUP_NATURE_API_CLIENT:
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT route");
-                    ExternalEgressWUPContainerRoute egressRoute = new ExternalEgressWUPContainerRoute(camelctx, wupNode, auditBroker, metricsAgent);
+                    StandardWUPContainerRoute egressRoute = new StandardWUPContainerRoute(camelctx, wupNode, auditBroker, metricsAgent);
                     camelctx.addRoutes(egressRoute);
                     break;
                 case WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT: {

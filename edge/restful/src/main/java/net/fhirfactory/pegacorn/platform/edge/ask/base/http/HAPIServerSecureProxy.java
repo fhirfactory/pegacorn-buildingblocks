@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.platform.edge.ask.base.http;
 
 import javax.inject.Inject;
 
+import ca.uhn.fhir.parser.IParser;
 import org.slf4j.Logger;
 
 import ca.uhn.fhir.context.FhirContext;

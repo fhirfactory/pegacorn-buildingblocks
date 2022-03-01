@@ -202,15 +202,11 @@ public abstract class PetasosTaskFromFHIRTask {
             return(new ArrayList<>());
         }
         List<TaskPerformerTypeType> taskPerformers = new ArrayList<>();
-        for(CodeableConcept currentPerformer: performers){
-            String taskPerformerTypeName = taskPerformerTypeFactory.extractCodeFromCodeableConceptForTaskPerformerType(currentPerformer);
-            TaskPerformerTypeType taskPerformerType = new TaskPerformerTypeType();
-            TopologyNodeFunctionFDNToken functionToken = new TopologyNodeFunctionFDNToken();
-            functionToken.setToken(taskPerformerTypeName);
-            TopologyNodeFunctionFDN functionFDN = new TopologyNodeFunctionFDN(functionToken);
-            taskPerformerType.setRequiredPerformerType(functionFDN);
-            taskPerformerType.setRequiredPerformerTypeDescription(currentPerformer.getText());
-            taskPerformers.add(taskPerformerType);
+        for(CodeableConcept currentPerformerCC: performers){
+            TaskPerformerTypeType currentPerformerType = taskPerformerTypeFactory.mapTaskPerformerType(currentPerformerCC);
+            if(currentPerformerType != null) {
+                taskPerformers.add(currentPerformerType);
+            }
         }
         getLogger().debug(".transformPerformerCodeableConceptIntoTaskPerformerType(): Exit, taskPerformers->{}", taskPerformers);
         return(taskPerformers);

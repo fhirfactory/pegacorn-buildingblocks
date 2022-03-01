@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.interception.TaskInterceptionType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
@@ -42,6 +43,8 @@ public class PetasosFulfillmentTask extends PetasosTask{
     private PetasosTaskJobCard taskJobCard;
 
     private TaskIdType actionableTaskId;
+
+    private TaskInterceptionType taskInterception;
 
     private boolean aRetry;
 
@@ -113,6 +116,20 @@ public class PetasosFulfillmentTask extends PetasosTask{
         this.aRetry = aRetry;
     }
 
+    @JsonIgnore
+    public boolean hasTaskInterception(){
+        boolean hasValue = this.taskInterception != null;
+        return(hasValue);
+    }
+
+    public TaskInterceptionType getTaskInterception() {
+        return taskInterception;
+    }
+
+    public void setTaskInterception(TaskInterceptionType taskInterception) {
+        this.taskInterception = taskInterception;
+    }
+
     //
     // Hash and Equals
     //
@@ -153,6 +170,7 @@ public class PetasosFulfillmentTask extends PetasosTask{
                 "  isARetry=" + isaRetry() +
                 "  taskMetadata=" + getTaskContext() +
                 ", executionStatus=" + getExecutionStatus() +
+                ", taskInterception=" + getTaskInterception() +
                 '}';
     }
 }

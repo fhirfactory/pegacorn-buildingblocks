@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.datatypes.PetasosRedirectionControl;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
     private IPCTopologyEndpoint egressEndpoint;
     private Map<PetasosEndpointFunctionTypeEnum, PetasosEndpoint> serviceEndpoints;
     private Integer replicationCount;
+    private PetasosRedirectionControl redirectionControl;
 
     //
     // Constructor(s)
@@ -53,11 +55,26 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
         this.egressEndpoint = null;
         this.replicationCount = null;
         this.serviceEndpoints = new HashMap<>();
+        this.redirectionControl = null;
     }
 
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasRedirectionControl(){
+        boolean hasValue = this.redirectionControl != null;
+        return(hasValue);
+    }
+
+    public PetasosRedirectionControl getRedirectionControl() {
+        return redirectionControl;
+    }
+
+    public void setRedirectionControl(PetasosRedirectionControl redirectionControl) {
+        this.redirectionControl = redirectionControl;
+    }
 
     @JsonIgnore
     public boolean hasServiceEndpoints(){
@@ -163,6 +180,7 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
                 ", ingresEndpoint=" + ingresEndpoint +
                 ", egressEndpoint=" + egressEndpoint +
                 ", replicationCount=" + replicationCount +
+                ", redirectionStatus=" + getRedirectionControl() +
                 '}';
     }
 }

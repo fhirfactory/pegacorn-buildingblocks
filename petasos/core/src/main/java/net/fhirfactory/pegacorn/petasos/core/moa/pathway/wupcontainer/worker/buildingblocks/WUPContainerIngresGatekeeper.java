@@ -47,14 +47,14 @@ public class WUPContainerIngresGatekeeper {
 
 
     /**
-     * This class/method checks the status of the WUPJobCard for the parcel, and ascertains if it is to be
-     * discarded (because of some processing error or due to the fact that the processing has occurred already
-     * within another WUP). At the moment, it reaches the "discard" decisions purely by checking the
-     * WUPJobCard.isToBeDiscarded boolean.
+     * The WUP-Ingres-Gatekeeper  is the decision point about whether to actually process the PetasosFulfillmentTask
+     * or directly forward it to the TASK_OUTCOME_COLLECTION_QUEUE. The later scenario typically signifies that another
+     * MOA-WUP has successfully (or otherwise) completed processing the PetasosFulfillmentTask and, as such, this
+     * instance should be discarded.
      *
-     * @param fulfillmentTask     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * @param fulfillmentTask     The PetasosFulfillmentTask that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange    The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
-     * @return Should either return the ingres point into the associated WUP Ingres Conduit or null (if the packet is to be discarded)
+     * @return Should either return the ingres point into the associated WUP Ingres Conduit or PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE
      */
     @RecipientList
     public List<String> ingresGatekeeper(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
@@ -78,8 +78,8 @@ public class WUPContainerIngresGatekeeper {
             targetList.add(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);
             return (targetList);
         } else {
-            getLogger().trace(".ingresGatekeeper(): We return the channel name of the associated WUP Ingres Conduit");
-            String targetEndpoint = nameSet.getEndPointWUPIngresConduitIngres();
+            getLogger().trace(".ingresGatekeeper(): We return the channel name of the associated WUP Interception Redirect Point");
+            String targetEndpoint = nameSet.getEndPointWUPContainerInterceptionRedirectPointIngres();
             targetList.add(targetEndpoint);
             getLogger().debug(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
             return (targetList);

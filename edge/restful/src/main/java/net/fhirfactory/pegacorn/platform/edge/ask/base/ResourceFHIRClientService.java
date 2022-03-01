@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.platform.edge.ask.base;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle.BundleContentHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hl7.fhir.r4.model.*;
 
@@ -121,6 +122,7 @@ public abstract class ResourceFHIRClientService extends InternalFHIRClientServic
      * @return
      */
     public Resource findResourceByIdentifier(ResourceType resourceType, Identifier identifier){
+        getLogger().info(".findResourceByIdentifier(): Entry, resourceType->{}, identifier->{}", resourceType, identifier);
         CodeableConcept identifierType = identifier.getType();
         Coding identifierCode = identifierType.getCodingFirstRep();
         String identifierCodeValue = identifierCode.getCode();
@@ -128,6 +130,7 @@ public abstract class ResourceFHIRClientService extends InternalFHIRClientServic
         String identifierValue = identifier.getValue();
 
         Resource response = findResourceByIdentifier(resourceType.toString(), identifierSystem, identifierCodeValue, identifierValue);
+        getLogger().info(".findResourceByIdentifier(): Exit, response->{}", response);
         return (response);
     }
 
@@ -138,7 +141,7 @@ public abstract class ResourceFHIRClientService extends InternalFHIRClientServic
      * @return
      */
     public Resource findResourceByIdentifier(String resourceType, Identifier identifier){
-        getLogger().debug(".findResourceByIdentifier(): Entry, resourceType --> {}", resourceType);
+        getLogger().info(".findResourceByIdentifier(): Entry, resourceType->{}, identifier->{}", resourceType, identifier);
         String identifierValue = identifier.getValue();
         String identifierSystem = identifier.getSystem();
         String identifierCode = null;
@@ -148,7 +151,7 @@ public abstract class ResourceFHIRClientService extends InternalFHIRClientServic
             identifierCode = identifierTypeCode.getCode();
         }
         Resource response = findResourceByIdentifier(resourceType, identifierSystem, identifierCode, identifierValue);
-        getLogger().debug(".findResourceByIdentifier(): Exit");
+        getLogger().info(".findResourceByIdentifier(): Exit, response->{}", response);
         return (response);
     }
 
@@ -174,29 +177,42 @@ public abstract class ResourceFHIRClientService extends InternalFHIRClientServic
      * @return
      */
     public Resource findResourceByIdentifier(String resourceType, String identifierSystem, String identifierCode, String identifierValue){
-        getLogger().debug(".findResourceByIdentifier(): Entry, resourceType --> {}, identfierSystem --> {}, identifierCode --> {}, identifierValue -->{}", resourceType, identifierSystem, identifierCode, identifierValue);
+        getLogger().info(".findResourceByIdentifier(): Entry, resourceType->{}, identfierSystem->{}, identifierCode->{}, identifierValue->{}", resourceType, identifierSystem, identifierCode, identifierValue);
         String urlEncodedString = null;
-        if(identifierCode == null ) {
-            String rawSearchString = identifierSystem + /* "|" + identifierCode + */ "|" + identifierValue;
+        boolean noSystem = StringUtils.isEmpty(identifierSystem);
+        boolean noCode = StringUtils.isEmpty(identifierCode);
+        if(noSystem && noCode) {
+            String rawSearchString = identifierValue;
             urlEncodedString = "identifier=" + URLEncoder.encode(rawSearchString, StandardCharsets.UTF_8);
-        } else {
+        }
+        if(noCode && !noSystem){
+            String rawSearchString = identifierSystem + "|" + identifierValue;
+            urlEncodedString = "identifier=" + URLEncoder.encode(rawSearchString, StandardCharsets.UTF_8);
+        }
+        if(!noCode && !noSystem){
             String rawSearchString = identifierSystem + "|" + identifierCode + "|" + identifierValue;
             urlEncodedString = "identifier:of_type=" + URLEncoder.encode(rawSearchString, StandardCharsets.UTF_8);
         }
-        String searchURL = resourceType + "?" + urlEncodedString;
-        getLogger().debug(".findResourceByIdentifier(): URL --> {}", searchURL);
-        Bundle response = getClient().search()
-                .byUrl(searchURL)
-                .returnBundle(Bundle.class)
-                .execute();
-        IParser r4Parser = getFHIRParser().setPrettyPrint(true);
-        if(getLogger().isInfoEnabled()) {
-            if(response != null) {
-                getLogger().debug(".findResourceByIdentifier(): Retrieved Bundle --> {}", r4Parser.encodeResourceToString(response));
+        Bundle response = null;
+        if(StringUtils.isNotEmpty(urlEncodedString)) {
+            String searchURL = resourceType + "?" + urlEncodedString;
+            getLogger().debug(".findResourceByIdentifier(): URL --> {}", searchURL);
+            response = getClient().search()
+                    .byUrl(searchURL)
+                    .returnBundle(Bundle.class)
+                    .execute();
+            IParser r4Parser = getFHIRParser().setPrettyPrint(true);
+            if (getLogger().isInfoEnabled()) {
+                if (response != null) {
+                    getLogger().info(".findResourceByIdentifier(): Retrieved Bundle --> {}", r4Parser.encodeResourceToString(response));
+                }
             }
         }
-        Resource resource = bundleContentHelper.extractFirstRepOfType(response, resourceType);
-        getLogger().debug(".findResourceByIdentifier(): Retrieved Resource --> {}", resource);
+        Resource resource = null;
+        if(response != null) {
+            resource = bundleContentHelper.extractFirstRepOfType(response, resourceType);
+        }
+        getLogger().info(".findResourceByIdentifier(): Retrieved Resource --> {}", resource);
         return (resource);
     }
 }
