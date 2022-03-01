@@ -25,12 +25,14 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
 
 public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
@@ -64,6 +66,43 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
 
     protected void setEndpointMetricsAgent(EndpointMetricsAgent agent){
         this.endpointMetricsAgent = agent;
+    }
+
+    protected RouteDefinition fromInteractEgressService(String uri) {
+        SourceSystemDetailInjector sourceSystemDetailInjector = new SourceSystemDetailInjector();
+        PortDetailInjector portDetailInjector = new PortDetailInjector();
+        RouteDefinition route = fromIncludingPetasosServices(uri);
+        route
+                .process(sourceSystemDetailInjector)
+                .process(portDetailInjector);
+        return route;
+    }
+
+    protected String getSourceSystemName() {
+        getLogger().debug(".getSourceSystemName(): Entry, ingresEndpoint->{}", getEgressEndpoint());
+        IPCTopologyEndpoint endpointTopologyNode = getEgressEndpoint().getEndpointTopologyNode();
+        getLogger().trace(".getSourceSystemName(): endpointTopologyNode->{}", endpointTopologyNode);
+        String sourceSystemName = endpointTopologyNode.getConnectedSystemName();
+        getLogger().debug(".getSourceSystemName(): Exit, sourceSystemName->{}", sourceSystemName);
+        return (sourceSystemName);
+    }
+
+    protected class SourceSystemDetailInjector implements Processor {
+
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            getLogger().debug("SourceSystemDetailInjector.process(): Entry");
+            boolean alreadyInPlace = false;
+            if (exchange.hasProperties()) {
+                String sourceSystem = exchange.getProperty(PetasosPropertyConstants.WUP_INTERACT_EGRESS_SOURCE_SYSTEM_NAME, String.class);
+                if (sourceSystem != null) {
+                    alreadyInPlace = true;
+                }
+            }
+            if (!alreadyInPlace) {
+                exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_EGRESS_SOURCE_SYSTEM_NAME, getSourceSystemName());
+            }
+        }
     }
 
     //
@@ -116,7 +155,8 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
             }
             if (!alreadyInPlace) {
                 switch(getEgressEndpoint().getEndpointTopologyNode().getEndpointType()) {
-                    case MLLP_CLIENT:{
+                    case MLLP_CLIENT:
+                    case HTTP_API_CLIENT: {
                         StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getEgressEndpoint().getEndpointTopologyNode();
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getToken());
                         exchange.setProperty(PetasosPropertyConstants.ENDPOINT_PORT_VALUE, getEgressEndpoint().getEndpointSpecification());
