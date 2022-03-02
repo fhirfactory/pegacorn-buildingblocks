@@ -47,11 +47,18 @@ public abstract class InternalFHIRClientProxy extends HAPIServerSecureProxy {
 
     @PostConstruct
     public void initialise(){
-        if(!initialised) {
+        getLogger().info(".initialise(): Entry");
+        if(initialised) {
+            getLogger().info(".initialise(): Nothing to do, already initialised!");
+        } else {
+            getLogger().info(".initialise(): Initialising....Start");
             newRestfulGenericClient(deriveTargetEndpointDetails());
             this.fhirParser = getFHIRContextUtility().getJsonParser().setPrettyPrint(true);
             this.initialised = true;
+            postConstructActivities();
+            getLogger().info(".initialise(): Initialising....Finish");
         }
+        getLogger().info(".initialise(): Exit");
     }
 
     //

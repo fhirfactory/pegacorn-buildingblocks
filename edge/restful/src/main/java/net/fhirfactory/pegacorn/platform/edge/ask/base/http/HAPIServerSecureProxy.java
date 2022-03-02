@@ -87,26 +87,26 @@ public abstract class HAPIServerSecureProxy {
     //
 
     protected IGenericClient newRestfulGenericClient(String theServerBase) {
-        getLogger().debug(".newRestfulGenericClient(): Entry, theServerBase --> {}", theServerBase);
-        getLogger().trace(".newRestfulGenericClient(): Get the FHIRContext!");
+        getLogger().info(".newRestfulGenericClient(): Entry, theServerBase --> {}", theServerBase);
+        getLogger().info(".newRestfulGenericClient(): Get the FHIRContext!");
         FhirContext contextR4 = fhirContextUtility.getFhirContext();
-        getLogger().trace(".newRestfulGenericClient(): Set the ValidationMode to -NEVER-");
+        getLogger().info(".newRestfulGenericClient(): Set the ValidationMode to -NEVER-");
         contextR4.getRestfulClientFactory().setServerValidationMode(ServerValidationModeEnum.NEVER);
         contextR4.getRestfulClientFactory().setSocketTimeout(getSocketTimeoutInSecs() * 1000);
-        getLogger().trace(".newRestfulGenericClient(): Get the Client");
+        getLogger().info(".newRestfulGenericClient(): Get the Client");
         client = contextR4.newRestfulGenericClient(theServerBase);
         if(theServerBase.startsWith("https")) {
-            getLogger().trace(".newRestfulGenericClient(): Grab the API Key from the Properties");
+            getLogger().info(".newRestfulGenericClient(): Grab the API Key from the Properties");
             String apiKey = pegacornProperties.getMandatoryProperty(getApiKeyPropertyName());
                 // From https://hapifhir.io/hapi-fhir/docs/interceptors/built_in_client_interceptors.html#misc-add-headers-to-request
-            getLogger().trace(".newRestfulGenericClient(): Create a new Interceptor");
+            getLogger().info(".newRestfulGenericClient(): Create a new Interceptor");
             AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
-            getLogger().trace(".newRestfulGenericClient(): Add the API Key to the Interceptor");
+            getLogger().info(".newRestfulGenericClient(): Add the API Key to the Interceptor");
             interceptor.addHeaderValue(API_KEY_HEADER_NAME, apiKey);
-            getLogger().trace(".newRestfulGenericClient(): Register the Interceptor with the Client");
+            getLogger().info(".newRestfulGenericClient(): Register the Interceptor with the Client");
             client.registerInterceptor(interceptor);
         }
-        getLogger().debug(".newRestfulGenericClient(): Exit, client created!");
+        getLogger().info(".newRestfulGenericClient(): Exit, client created!");
         return client;
     }
 

@@ -29,6 +29,7 @@ import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServic
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.factories.MethodOutcomeFactory;
+import net.fhirfactory.pegacorn.core.model.capabilities.valuesets.WorkUnitProcessorCapabilityEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.tasking.CapabilityUtilisationBroker;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -100,7 +101,7 @@ public class AuditEventPersistenceAccessor {
     }
 
     public synchronized MethodOutcome utiliseAuditEventPersistenceCapability(AuditEvent auditEvent) {
-        getLogger().debug(".utiliseAuditEventPersistenceCapability(): Entry, auditEvent --> {}", auditEvent);
+        getLogger().info(".utiliseAuditEventPersistenceCapability(): Entry, auditEvent --> {}", auditEvent);
         //
         // Build Write
         //
@@ -108,7 +109,7 @@ public class AuditEventPersistenceAccessor {
         CapabilityUtilisationRequest task = new CapabilityUtilisationRequest();
         task.setRequestID(UUID.randomUUID().toString());
         task.setRequestContent(auditEventString);
-        task.setRequiredCapabilityName("FHIR-AuditEvent-Persistence");
+        task.setRequiredCapabilityName(WorkUnitProcessorCapabilityEnum.CAPABILITY_INFORMATION_MANAGEMENT_AUDIT_EVENTS.getDisplayName());
         task.setRequestInstant(Instant.now());
         //
         // Do Write
@@ -119,7 +120,7 @@ public class AuditEventPersistenceAccessor {
         //
         String resultString = auditEventWriteOutcome.getResponseStringContent();
         MethodOutcome methodOutcome = outcomeFactory.convertToMethodOutcome(resultString);
-        getLogger().debug(".utiliseAuditEventPersistenceCapability(): Entry, methodOutcome --> {}", methodOutcome);
+        getLogger().info(".utiliseAuditEventPersistenceCapability(): Entry, methodOutcome --> {}", methodOutcome);
         return (methodOutcome);
     }
 

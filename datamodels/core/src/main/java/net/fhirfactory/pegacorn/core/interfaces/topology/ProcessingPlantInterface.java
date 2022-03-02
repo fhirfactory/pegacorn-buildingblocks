@@ -21,14 +21,13 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.topology;
 
-import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentManagementInterface;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 
-public interface ProcessingPlantInterface extends CapabilityFulfillmentManagementInterface, CapabilityFulfillmentInterface {
+public interface ProcessingPlantInterface extends CapabilityFulfillmentManagementInterface {
     public void initialisePlant();
     public SolutionTopologyNode getSolutionNode();
     public String getSimpleFunctionName();

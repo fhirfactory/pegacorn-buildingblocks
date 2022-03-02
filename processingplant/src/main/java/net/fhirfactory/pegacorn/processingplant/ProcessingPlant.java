@@ -24,11 +24,11 @@ package net.fhirfactory.pegacorn.processingplant;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
@@ -416,30 +416,6 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         getLogger().debug(".registerCapabilityFulfillmentService(): Exit, Capability Fulillment Interface registered");
     }
 
-    @Override
-    public CapabilityUtilisationResponse executeTask(CapabilityUtilisationRequest request) {
-        getLogger().debug(".executeTask(): Entry, request->{}", request);
-        if(request == null){
-            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setInstantCompleted(Instant.now());
-            response.setSuccessful(false);
-            getLogger().debug(".executeTask(): Exit, request is null, response->{}", response);
-            return(response);
-        }
-        String capabilityName = request.getRequiredCapabilityName();
-        CapabilityFulfillmentInterface interfaceToUse = this.capabilityDeliveryServices.get(capabilityName);
-        if(interfaceToUse == null){
-            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setInstantCompleted(Instant.now());
-            response.setSuccessful(false);
-            response.setInScope(false);
-            getLogger().debug(".executeTask(): Exit, not registered capability, response->{}", response);
-            return(response);
-        }
-        CapabilityUtilisationResponse capabilityUtilisationResponse = interfaceToUse.executeTask(request);
-        getLogger().debug(".executeTask(): Exit, capabilityUtilisationResponse->{}", capabilityUtilisationResponse);
-        return(capabilityUtilisationResponse);
-    }
 
     @Override
     public boolean isITOpsNode() {

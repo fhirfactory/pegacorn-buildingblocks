@@ -90,7 +90,11 @@ public class LocalPetasosFulfilmentTaskActivityController {
         //
         // Register and Create a SharedInstance Accessor for the Fulfillment Task
         PetasosFulfillmentTaskSharedInstance fulfillmentTaskSharedInstance = getFulfillmentTaskSharedInstanceAccessorFactory().newFulfillmentTaskSharedAccessor(task);
-
+        //
+        // Create an audit event
+        auditServicesBroker.logActivity(fulfillmentTaskSharedInstance.getInstance());
+        //
+        // We're done
         getLogger().debug(".registerFulfillmentTask(): Exit, fulfillmentTaskSharedInstance->{}", fulfillmentTaskSharedInstance);
         return(fulfillmentTaskSharedInstance);
     }
@@ -130,6 +134,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
         PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionStart(fulfillmentTask.getInstance());
         fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
         fulfillmentTask.update();
+        auditServicesBroker.logActivity(fulfillmentTask.getInstance());
         getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
         return(petasosTaskExecutionStatus);
     }
@@ -138,6 +143,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
         getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Entry, fulfillmentTask->{}", fulfillmentTask);
         PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionFinish(fulfillmentTask.getInstance());
         fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
+        auditServicesBroker.logActivity(fulfillmentTask.getInstance());
         getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
         return(petasosTaskExecutionStatus);
     }
@@ -146,6 +152,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
         getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Entry, fulfillmentTask->{}", fulfillmentTask);
         PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionFailure(fulfillmentTask.getInstance());
         fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
+        auditServicesBroker.logActivity(fulfillmentTask.getInstance());
         getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
         return(petasosTaskExecutionStatus);
     }
@@ -154,6 +161,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
         getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Entry, fulfillmentTask->{}", fulfillmentTask);
         PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskCancellation(fulfillmentTask.getInstance());
         fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
+        auditServicesBroker.logActivity(fulfillmentTask.getInstance());
         getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
         return(petasosTaskExecutionStatus);
     }

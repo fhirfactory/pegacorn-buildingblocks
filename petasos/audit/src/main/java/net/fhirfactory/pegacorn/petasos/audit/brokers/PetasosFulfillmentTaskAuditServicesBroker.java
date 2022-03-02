@@ -22,9 +22,10 @@
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
-import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceClientWriterInterface;
+import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceAgentInterface;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.Exception2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.PetasosFulfillmentTask2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.UoWPayload2FHIRAuditEvent;
@@ -42,7 +43,7 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
     private static final Logger LOG = LoggerFactory.getLogger(STAServicesAuditBroker.class);
 
     @Inject
-    private PetasosAuditEventServiceClientWriterInterface auditWriter;
+    private PetasosAuditEventServiceAgentInterface auditWriter;
 
     @Inject
     private PetasosFulfillmentTask2FHIRAuditEvent parcefulfillmentTask2FHIRAuditEvent2auditevent;
@@ -70,57 +71,84 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
     // Business Methods
     //
 
-    public AuditEvent logActivity(PetasosFulfillmentTask fulfillmentTask) {
-        AuditEvent entry = null;
+    public Boolean logActivity(PetasosFulfillmentTask fulfillmentTask) {
+        getLogger().info(".logActivity(): Entry, fulfillmentTask->{}",fulfillmentTask);
+        boolean success = false;
         if(shouldLogAuditEventForTask(fulfillmentTask)) {
-            entry = logActivity(fulfillmentTask, false);
+            success = logActivity(fulfillmentTask, false);
         }
-        return(entry);
+        getLogger().info(".logActivity(): Exit, success->{}",success);
+        return(success);
     }
 
-    public AuditEvent logActivity(PetasosFulfillmentTask fulfillmentTask, boolean requiresSynchronousWrite){
+    public Boolean logActivity(PetasosFulfillmentTask fulfillmentTask, boolean requiresSynchronousWrite){
+        getLogger().info(".logActivity(): Entry, fulfillmentTask->{}, requiresSynchronousWrite->{}",fulfillmentTask, requiresSynchronousWrite);
         AuditEvent fulfillmentTaskAuditEntry = null;
+        boolean success = false;
         if(shouldLogAuditEventForTask(fulfillmentTask)) {
             AuditEvent auditEntry = parcefulfillmentTask2FHIRAuditEvent2auditevent.transform(fulfillmentTask);
-            if (requiresSynchronousWrite) {
-                fulfillmentTaskAuditEntry = auditWriter.logAuditEventSynchronously(fulfillmentTaskAuditEntry);
-            } else {
-                fulfillmentTaskAuditEntry = auditWriter.logAuditEventAsynchronously(fulfillmentTaskAuditEntry);
-            }
+            success = auditWriter.captureAuditEvent(fulfillmentTaskAuditEntry, requiresSynchronousWrite);
         }
-        return(fulfillmentTaskAuditEntry);
+        getLogger().info(".logActivity(): Exit, success->{}",success);
+        return(success);
     }
 
     public void logMLLPTransactions(PetasosFulfillmentTask fulfillmentTask, String filteredState, boolean requiresSynchronousWrite){
         getLogger().info(".logMLLPTransactions(): Entry, fulfillmentTask->{}, filteredState->{}, requiresSynchronousWrite->{}",fulfillmentTask, filteredState, requiresSynchronousWrite);
         boolean isInteractEgressActivity = false;
         boolean isInteractIngresActivity = false;
+        getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] Start...");
         if(fulfillmentTask.hasTaskFulfillment()){
+            getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask has TaskFulfillmentType element");
             if(fulfillmentTask.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
-                if (fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole() != null) {
-                    isInteractEgressActivity = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
-                    isInteractIngresActivity = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES);
+                getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType has FulfillmentWorkUnitProcessor");
+                WorkUnitProcessorSoftwareComponent wupSoftwareComponent = (WorkUnitProcessorSoftwareComponent)fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor();
+                if(wupSoftwareComponent.getIngresEndpoint() != null){
+                    getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor has ingresEndpoint");
+                    if(wupSoftwareComponent.getIngresEndpoint().getComponentSystemRole() != null){
+                        getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor().getIngresEndpoint has ComponentSystemRole");
+                        if(wupSoftwareComponent.getIngresEndpoint().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES)){
+                            isInteractIngresActivity = true;
+                        }
+                    }
+                }
+                if(wupSoftwareComponent.getEgressEndpoint() != null){
+                    getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor has egressEndpoint");
+                    if(wupSoftwareComponent.getEgressEndpoint().getComponentSystemRole() != null){
+                        getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor().getEgressEndpoint has ComponentSystemRole");
+                        if(wupSoftwareComponent.getEgressEndpoint().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS)){
+                            isInteractEgressActivity = true;
+                        }
+                    }
                 }
             }
         }
+        getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] isInteractEgressActivity->{}", isInteractEgressActivity);
+        getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] isInteractIngresActivity->{}", isInteractIngresActivity);
+        getLogger().info(".logMLLPTransactions(): [Derive Endpoint Role] Finish...");
+
         if(!(isInteractEgressActivity || isInteractIngresActivity)){
+            getLogger().info(".logMLLPTransactions(): Not an endpoint (Ingres/Egress)!");
             return;
         }
-        AuditEvent uowEntry = uow2auditevent.transform(fulfillmentTask, filteredState, true);
-        AuditEvent resultUoWEntry;
-        if (requiresSynchronousWrite) {
-            resultUoWEntry = auditWriter.logAuditEventSynchronously(uowEntry);
-        } else {
-            resultUoWEntry = auditWriter.logAuditEventAsynchronously(uowEntry);
-        }
+        getLogger().info(".logMLLPTransactions(): [Capture Audit Event] Start...");
+        getLogger().info(".logMLLPTransactions(): [Capture Audit Event][Converting from PetasosFulfillmentTask to AuditEvent] Start...");
+        AuditEvent auditEvent = uow2auditevent.transform(fulfillmentTask, filteredState, true);
+        getLogger().info(".logMLLPTransactions(): [Capture Audit Event][Converting from PetasosFulfillmentTask to AuditEvent] Finish..., auditEvent->{}", auditEvent);
+        getLogger().info(".logMLLPTransactions(): [Capture Audit Event][Calling auditWriter service] Start...");
+        Boolean success =  auditWriter.captureAuditEvent(auditEvent, requiresSynchronousWrite);
+        getLogger().info(".logMLLPTransactions(): [Capture Audit Event][Calling auditWriter service] Finish..., success->{}", success);
+        getLogger().info(".logMLLPTransactions(): [Capture Audit Event] Finish...");
     }
 
     public void logCamelExecutionException(Object object, Exchange camelExchange){
+        getLogger().info(".logCamelExecutionException(): Entry, object->{}",object);
         CamelExecutionException camelExecutionException = camelExchange.getProperty(Exchange.EXCEPTION_CAUGHT, CamelExecutionException.class);
         if(camelExecutionException != null) {
             AuditEvent auditEvent = exception2FHIRAuditEvent.transformCamelExecutionException(camelExecutionException);
-            AuditEvent resultAuditEvent = auditWriter.logAuditEventSynchronously(auditEvent);
+            Boolean success =  auditWriter.captureAuditEvent(auditEvent, true);
         }
+        getLogger().info(".logCamelExecutionException(): Entry, object->{}",object);
     }
 
     protected boolean shouldLogAuditEventForTask(PetasosFulfillmentTask fulfillmentTask){
