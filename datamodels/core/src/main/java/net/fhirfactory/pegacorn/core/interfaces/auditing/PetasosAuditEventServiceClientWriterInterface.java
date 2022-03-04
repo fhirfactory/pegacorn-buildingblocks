@@ -21,9 +21,11 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.auditing;
 
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import org.hl7.fhir.r4.model.AuditEvent;
 
 public interface PetasosAuditEventServiceClientWriterInterface {
-    public AuditEvent logAuditEventAsynchronously(AuditEvent auditEvent);
-    public AuditEvent logAuditEventSynchronously(AuditEvent auditEvent);
+    public MethodOutcome writeAuditEventAsynchronously(AuditEvent auditEvent);
+    public MethodOutcome writeAuditEventSynchronously(AuditEvent auditEvent);
+    public MethodOutcome writeAuditEventJSONStringSynchronously(String auditEventJSONString);
 }

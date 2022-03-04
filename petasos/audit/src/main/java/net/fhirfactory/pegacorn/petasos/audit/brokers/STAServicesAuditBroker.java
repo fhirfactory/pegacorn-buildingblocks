@@ -21,7 +21,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
-import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceClientWriterInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
@@ -37,9 +36,6 @@ import javax.inject.Inject;
 public class STAServicesAuditBroker {
 
     private static final Logger LOG = LoggerFactory.getLogger(STAServicesAuditBroker.class);
-
-    @Inject
-    PetasosAuditEventServiceClientWriterInterface auditWriter;
 
     @Inject
     PetasosFulfillmentTask2FHIRAuditEvent parcel2auditevent;

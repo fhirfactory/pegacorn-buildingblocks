@@ -19,28 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes;
+package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.media.datatypes.CommunicateMediaContent;
-import net.fhirfactory.pegacorn.internals.communicate.entities.media.datatypes.CommunicateMediaDetail;
+public class CommunicateTextMessageContent extends CommunicateMessageContentBase{
+    private String textMessage;
 
-public class CommunicateMediaMessageContent {
-    private CommunicateMediaDetail mediaDetail;
-    private CommunicateMediaContent mediaContent;
-
-    public CommunicateMediaDetail getMediaDetail() {
-        return mediaDetail;
+    public String getTextMessage() {
+        return textMessage;
     }
 
-    public void setMediaDetail(CommunicateMediaDetail mediaDetail) {
-        this.mediaDetail = mediaDetail;
-    }
-
-    public CommunicateMediaContent getMediaContent() {
-        return mediaContent;
-    }
-
-    public void setMediaContent(CommunicateMediaContent mediaContent) {
-        this.mediaContent = mediaContent;
+    public void setTextMessage(String textMessage) {
+        this.textMessage = textMessage;
     }
 }

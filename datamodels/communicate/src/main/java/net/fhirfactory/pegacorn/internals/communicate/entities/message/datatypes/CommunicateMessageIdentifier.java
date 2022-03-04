@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes;
+package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes;
 
 import java.util.Date;
 

@@ -415,7 +415,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         this.capabilityDeliveryServices.put(capabilityName, fulfillmentInterface);
         getLogger().debug(".registerCapabilityFulfillmentService(): Exit, Capability Fulillment Interface registered");
     }
-
+/*
     @Override
     public CapabilityUtilisationResponse executeTask(CapabilityUtilisationRequest request) {
         getLogger().debug(".executeTask(): Entry, request->{}", request);
@@ -441,6 +441,8 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return(capabilityUtilisationResponse);
     }
 
+ */
+
     @Override
     public boolean isITOpsNode() {
         return (false);
@@ -463,6 +465,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
                     String parameterValue = currentNameValuePair.getParameterValue();
                     PetasosAuditEventGranularityLevelEnum petasosAuditEventGranularityLevelEnum = PetasosAuditEventGranularityLevelEnum.fromDisplayName(parameterValue);
                     if(petasosAuditEventGranularityLevelEnum == null){
+                        getLogger().warn(".deriveAuditEventGranularityLevel(): Unable to derive PetasosAuditEventGranularityLevelEnum, setting to AUDIT_LEVEL_COARSE");
                         return(PetasosAuditEventGranularityLevelEnum.AUDIT_LEVEL_COARSE);
                     } else {
                         return (petasosAuditEventGranularityLevelEnum);
@@ -470,6 +473,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
                 }
             }
         }
+        getLogger().warn(".deriveAuditEventGranularityLevel(): Unable to derive PetasosAuditEventGranularityLevelEnum, setting to AUDIT_LEVEL_COARSE");
         return (PetasosAuditEventGranularityLevelEnum.AUDIT_LEVEL_COARSE);
     }
 

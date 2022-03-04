@@ -21,14 +21,13 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.auditing;
 
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import org.hl7.fhir.r4.model.AuditEvent;
 
 import java.util.List;
 
 public interface PetasosAuditEventServiceHandlerInterface {
-    PegacornTransactionMethodOutcome logAuditEvent(AuditEvent event, JGroupsIntegrationPointSummary jgroupsIP);
-    PegacornTransactionMethodOutcome logAuditEvent(List<AuditEvent> eventList, JGroupsIntegrationPointSummary jgroupsIP);
+    Boolean logAuditEventHandler(AuditEvent event, JGroupsIntegrationPointSummary jgroupsIP);
+    Boolean logAuditEventAsynchronouslyHandler(AuditEvent event, JGroupsIntegrationPointSummary jgroupsIP);
+    Boolean logMultipleAuditEventHandler(List<AuditEvent> eventList, JGroupsIntegrationPointSummary jgroupsIP);
 }

@@ -21,16 +21,10 @@
  */
 package net.fhirfactory.pegacorn.services.audit;
 
-import ca.uhn.fhir.rest.api.MethodOutcome;
+import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceAgentInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceBrokerInterface;
-import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceClientWriterInterface;
-import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceHandlerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceProviderNameInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import net.fhirfactory.pegacorn.services.audit.cache.AsynchronousWriterAuditEventCache;
-import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +32,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class LocalAuditEventServiceClientEventManager implements PetasosAuditEventServiceClientWriterInterface, PetasosAuditEventServiceHandlerInterface {
+public class LocalAuditEventServiceClientEventManager implements PetasosAuditEventServiceAgentInterface {
     private static final Logger LOG = LoggerFactory.getLogger(LocalAuditEventServiceClientEventManager.class);
 
     private boolean initialised;
@@ -51,9 +46,10 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
 
     private static Long AUDIT_EVENT_ASYNCHRONOUS_WRITER_CHECK_PERIOD = 5000L;
     private static Long AUDIT_EVENT_ASYNCHRONOUS_WRITER_INITIALISE_WAIT = 30000L;
+    private static int MAX_ASYNCHRONOUS_LIST_SIZE = 500;
 
     @Inject
-    PetasosAuditEventServiceBrokerInterface auditEventService;
+    private PetasosAuditEventServiceBrokerInterface auditEventService;
 
     @Inject
     private AsynchronousWriterAuditEventCache eventCache;
@@ -62,7 +58,7 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
     private PetasosAuditEventServiceProviderNameInterface auditEventServiceProvider;
 
     //
-    // Constructure
+    // ConstructorPetasosAuditEventServiceClientWriterInterface
     //
 
     public LocalAuditEventServiceClientEventManager(){
@@ -113,33 +109,28 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
         return AUDIT_EVENT_ASYNCHRONOUS_WRITER_INITIALISE_WAIT;
     }
 
-    @Override
-    public AuditEvent logAuditEventAsynchronously(AuditEvent auditEvent) {
-        getLogger().debug(".logAuditEventAsynchronously(): Entry, auditEvent->{}", auditEvent);
-        if(auditEvent == null){
-            getLogger().debug(".logAuditEventAsynchronously(): Exit, auditEvent is null");
-            return(null);
-        }
-        eventCache.addAuditEvent(auditEvent);
-        getLogger().debug(".logAuditEventAsynchronously(): Exit, event cached for writing");
-        return(auditEvent);
-    }
+    //
+    // Audit Event Service
+    //
 
     @Override
-    public AuditEvent logAuditEventSynchronously(AuditEvent auditEvent) {
-        getLogger().debug(".logAuditEventSynchronously(): Entry, auditEvent->{}", auditEvent);
+    public Boolean captureAuditEvent(AuditEvent auditEvent, boolean synchronous) {
+        getLogger().info(".captureAuditEvent(): Entry, auditEvent->{}, synchronous->{}", auditEvent, synchronous);
         if(auditEvent == null){
-            getLogger().debug(".logAuditEventSynchronously(): Exit, auditEvent is null");
-            return(null);
+            getLogger().debug(".captureAuditEvent(): Exit, auditEvent is null");
+            return(false);
         }
-        MethodOutcome outcome = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), auditEvent);
-        IIdType id = outcome.getId();
-        if(id != null){
-            auditEvent.setId(id);
+        Boolean success = false;
+        if(synchronous){
+            success = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), auditEvent);
+        } else {
+            eventCache.addAuditEvent(auditEvent);
+            success = true;
         }
-        getLogger().debug(".logAuditEventSynchronously(): Exit, outcome->{}", outcome);
-        return(auditEvent);
+        getLogger().info(".captureAuditEvent(): Exit, success->{}", success);
+        return(success);
     }
+
 
     //
     // Asynchronous Writer Task
@@ -167,23 +158,29 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
 
     // TODO We should batch up the writing of the events (i.e. support "n" events at a time)
     protected void writeQueuedAuditEvents(){
+        getLogger().debug(".writeQueuedAuditEvents(): Entry");
         while(eventCache.hasEntries()){
-            AuditEvent currentAuditEvent = eventCache.peekAuditEvent();
-            MethodOutcome outcome = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), currentAuditEvent);
-            //
-            // TODO This next bit makes a wild assumption about the success of the writing action!
-            //
-            eventCache.pollAuditEvent();
+            List<AuditEvent> auditEventList = new ArrayList<>();
+            int count = 0;
+            while(eventCache.hasEntries()) {
+                AuditEvent currentAuditEvent = eventCache.pollAuditEvent();
+                auditEventList.add(currentAuditEvent);
+                count += 1;
+                if (count >= MAX_ASYNCHRONOUS_LIST_SIZE) {
+                    break;
+                }
+            }
+            Boolean success = false;
+            if(!auditEventList.isEmpty()){
+                success = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), auditEventList);
+            }
+            if(!success){
+                for(AuditEvent currentAuditEvent: auditEventList){
+                    eventCache.addAuditEvent(currentAuditEvent);
+                }
+                break;
+            }
         }
-    }
-
-    @Override
-    public PegacornTransactionMethodOutcome logAuditEvent(AuditEvent event, JGroupsIntegrationPointSummary endpointIdentifier) {
-        return(null);
-    }
-
-    @Override
-    public PegacornTransactionMethodOutcome logAuditEvent(List<AuditEvent> eventList, JGroupsIntegrationPointSummary endpointIdentifier) {
-        return null;
+        getLogger().debug(".writeQueuedAuditEvents(): Exit");
     }
 }

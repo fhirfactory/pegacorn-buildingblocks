@@ -19,16 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes;
+package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes;
 
-public class CommunicateTextMessageContent extends CommunicateMessageContentBase{
-    private String textMessage;
+public class CommunicateMessageContentBase {
 
-    public String getTextMessage() {
-        return textMessage;
-    }
-
-    public void setTextMessage(String textMessage) {
-        this.textMessage = textMessage;
-    }
 }

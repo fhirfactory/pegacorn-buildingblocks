@@ -21,12 +21,11 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.auditing;
 
-import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import org.hl7.fhir.r4.model.AuditEvent;
 
 import java.util.List;
 
 public interface PetasosAuditEventServiceBrokerInterface {
-    PegacornTransactionMethodOutcome logAuditEvent(String serviceProviderName, AuditEvent event);
-    PegacornTransactionMethodOutcome logAuditEvent(String serviceProviderName, List<AuditEvent> eventList);
+    Boolean logAuditEvent(String serviceProviderName, AuditEvent event);
+    Boolean logAuditEvent(String serviceProviderName, List<AuditEvent> eventList);
 }

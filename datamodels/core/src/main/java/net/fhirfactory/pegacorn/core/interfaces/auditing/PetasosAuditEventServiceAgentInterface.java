@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,8 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes;
+package net.fhirfactory.pegacorn.core.interfaces.auditing;
 
-public class CommunicateMessageContentBase {
+import org.hl7.fhir.r4.model.AuditEvent;
 
+public interface PetasosAuditEventServiceAgentInterface {
+    Boolean captureAuditEvent(AuditEvent event, boolean synchronous);
 }

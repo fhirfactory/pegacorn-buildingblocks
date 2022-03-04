@@ -19,38 +19,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.entities.message;
+package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes.CommunicateMessageReadTag;
+import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
-public class CommunicateTrackedMessage extends CommunicateMessage{
-    private List<CommunicateMessageReadTag> messageReadTags;
+public class CommunicateMessageReadTag {
+    private CommunicateUserReference communicateUser;
+    private Date readDate;
 
-    public CommunicateTrackedMessage(){
-        messageReadTags = new ArrayList<>();
+    public CommunicateUserReference getCommunicateUser() {
+        return communicateUser;
     }
 
-    public List<CommunicateMessageReadTag> getMessageReadTags() {
-        return messageReadTags;
+    public void setCommunicateUser(CommunicateUserReference communicateUser) {
+        this.communicateUser = communicateUser;
     }
 
-    public void setMessageReadTags(List<CommunicateMessageReadTag> messageReadTags) {
-        this.messageReadTags = messageReadTags;
+    public Date getReadDate() {
+        return readDate;
+    }
+
+    public void setReadDate(Date readDate) {
+        this.readDate = readDate;
     }
 
     @Override
     public String toString() {
-        return "CommunicateMessage{" +
-                "messageIdentifier=" + getMessageIdentifier() +
-                ", sourceRoom=" + getSourceRoom() +
-                ", sourceUser=" + getSourceUser() +
-                ", messageType=" + getMessageType() +
-                ", messageContent=" + getMessageContent() +
-                ", inResponseTo=" + getInResponseTo() +
-                ", messageReadTags=" + messageReadTags +
+        return "CommunicateMessageReadReceipt{" +
+                "communicateUser=" + communicateUser +
+                ", readDate=" + readDate +
                 '}';
     }
 }

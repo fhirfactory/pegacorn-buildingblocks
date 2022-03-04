@@ -31,10 +31,11 @@ import net.fhirfactory.pegacorn.core.model.ui.resources.simple.valuesets.Identif
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public abstract class  ExtremelySimplifiedResource {
+public abstract class  ExtremelySimplifiedResource implements Serializable {
     private String simplifiedID;
     private CacheIDMetadata simplifiedIDMetadata;
     private ArrayList<IdentifierESDT> identifiers;

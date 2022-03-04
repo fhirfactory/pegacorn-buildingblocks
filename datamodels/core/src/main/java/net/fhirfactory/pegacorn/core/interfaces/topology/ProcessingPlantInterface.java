@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwar
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 
-public interface ProcessingPlantInterface extends CapabilityFulfillmentManagementInterface, CapabilityFulfillmentInterface {
+public interface ProcessingPlantInterface extends CapabilityFulfillmentManagementInterface {
     public void initialisePlant();
     public SolutionTopologyNode getSolutionNode();
     public String getSimpleFunctionName();
