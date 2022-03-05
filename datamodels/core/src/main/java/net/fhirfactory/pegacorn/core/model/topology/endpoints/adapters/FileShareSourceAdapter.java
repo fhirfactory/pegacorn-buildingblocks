@@ -21,11 +21,12 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCClusteredSocketBasedAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 
-public class FileShareSourceAdapter extends IPCClusteredSocketBasedAdapter {
+public class FileShareSourceAdapter extends IPCAdapter {
 
-    private String contextPath;
+    private String filePath;
+    private String filePathAlias;
 
     //
     // Constructor(s)
@@ -33,20 +34,30 @@ public class FileShareSourceAdapter extends IPCClusteredSocketBasedAdapter {
 
     public FileShareSourceAdapter(){
         super();
-        contextPath = null;
+        this.filePath = null;
+        this.filePathAlias = null;
     }
 
     //
     // Getters and Setters
     //
 
-    public String getContextPath() {
-        return contextPath;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
+
+    public String getFilePathAlias() {
+        return filePathAlias;
+    }
+
+    public void setFilePathAlias(String filePathAlias) {
+        this.filePathAlias = filePathAlias;
+    }
+
 
     //
     // To String
@@ -54,8 +65,9 @@ public class FileShareSourceAdapter extends IPCClusteredSocketBasedAdapter {
 
     @Override
     public String toString() {
-        return "HTTPServerAdapter{" +
-                "contextPath='" + contextPath + '\'' +
+        return "FileShareSourceAdapter{" +
+                "filePath='" + filePath + '\'' +
+                "filePathAlias='" + filePathAlias + '\'' +
                 ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
                 ", targetNameInstant='" + getTargetSystemName() + '\'' +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
@@ -65,11 +77,7 @@ public class FileShareSourceAdapter extends IPCClusteredSocketBasedAdapter {
                 ", groupName='" + getGroupName() + '\'' +
                 ", active=" + isActive() +
                 ", additionalParameters=" + getAdditionalParameters() +
-                ", lastActivity=" + getLastActivity() +
-                ", servicePortValue=" + getServicePortValue() +
-                ", serviceDNSName='" + getServiceDNSName() + '\'' +
-                ", portNumber=" + getPortNumber() +
-                ", hostName='" + getHostName() + '\'' +
+                ", lastActivity=" + getLastActivity() + '\'' +
                 '}';
     }
 }
