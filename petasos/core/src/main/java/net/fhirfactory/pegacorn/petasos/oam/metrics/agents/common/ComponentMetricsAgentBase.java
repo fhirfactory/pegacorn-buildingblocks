@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.valuesets.PetasosComponentITOpsNotificationTypeEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import org.apache.commons.lang3.StringUtils;
 
@@ -57,6 +58,7 @@ public abstract class ComponentMetricsAgentBase  {
     abstract protected CommonComponentMetricsData getMetricsData();
     abstract public void sendITOpsNotification(String message);
     abstract public void sendITOpsNotification(String unformatedMessage, String formattedMessage);
+    abstract public void sendITOpsNotification(String unformatedMessage, String formattedMessage, PetasosComponentITOpsNotificationTypeEnum notificationType, String notificationHeader);
 
     //
     // Some Helper Methods
