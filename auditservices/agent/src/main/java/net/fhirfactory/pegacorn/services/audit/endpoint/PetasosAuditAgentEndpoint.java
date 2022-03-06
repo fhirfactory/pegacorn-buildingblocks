@@ -97,23 +97,22 @@ public class PetasosAuditAgentEndpoint extends PetasosAuditServicesEndpoint
             objectSet[1] = myJGroupsIP;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PegacornTransactionMethodOutcome response = null;
+            Boolean response = null;
             synchronized (getIPCChannelLock()){
                 response = getRPCDispatcher().callRemoteMethod(targetAddress, "logAuditEventHandler", objectSet, classSet, requestOptions);
             }
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            Boolean created = response.getCreated();
             getLogger().info(".logAuditEvent(): Exit, response->{}", response);
-            return(created);
+            return(response);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".logAuditEvent(): Error (NoSuchMethodException) ->{}", e.getMessage());
-            return(null);
+            return(false);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".logAuditEvent: Error (GeneralException) ->{}", e.getMessage());
-            return(null);
+            return(false);
         }
     }
 
@@ -130,23 +129,22 @@ public class PetasosAuditAgentEndpoint extends PetasosAuditServicesEndpoint
             objectSet[1] = jgroupsIP;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PegacornTransactionMethodOutcome response = null;
+            Boolean response = null;
             synchronized (getIPCChannelLock()){
                 response = getRPCDispatcher().callRemoteMethod(targetAddress, "logMultipleAuditEventHandler", objectSet, classSet, requestOptions);
             }
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            Boolean created = response.getCreated();
             getLogger().debug(".logAuditEvent(): Exit, response->{}", response);
-            return(created);
+            return(response);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".logAuditEvent(): Error (NoSuchMethodException) ->{}", e.getMessage());
-            return(null);
+            return(false);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
             getLogger().error(".logAuditEvent: Error (GeneralException) ->{}", e.getMessage());
-            return(null);
+            return(false);
         }
     }
 }
