@@ -2,7 +2,7 @@ package net.fhirfactory.pegacorn.internals.communicate.entities.message.valueset
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public enum CommunicateSMSStatus {
+public enum CommunicateSMSStatusEnum {
     CREATED,          // initial state.
     GATEWAY_FAILED,   // failed sending from ModicaClient.sendSMS.
                       // This state includes failures that did not result in an actual connection to the Modica SMS Gateway.
@@ -19,8 +19,8 @@ public enum CommunicateSMSStatus {
     EXPIRED;          // The carrier was unable to deliver the message in a specified amount of time. For instance when the phone was turned off.
     
     @JsonCreator
-    public static CommunicateSMSStatus fromString(String smsStatusName) {
-        return CommunicateSMSStatus.valueOf(smsStatusName.toUpperCase());
+    public static CommunicateSMSStatusEnum fromString(String smsStatusName) {
+        return CommunicateSMSStatusEnum.valueOf(smsStatusName.toUpperCase());
     }
     
     public boolean isDLRStatus() {

@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.communicate.entities.message;
 
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.CommunicateMessageESR;
-import net.fhirfactory.pegacorn.internals.communicate.entities.message.valuesets.CommunicateSMSStatus;
+import net.fhirfactory.pegacorn.internals.communicate.entities.message.valuesets.CommunicateSMSStatusEnum;
 
 import java.time.Instant;
 
@@ -33,7 +33,7 @@ public class CommunicateSMSMessage extends CommunicateMessageESR {
     private String phoneNumber;
     private String message;
     private Instant sendDate;
-    private CommunicateSMSStatus status;
+    private CommunicateSMSStatusEnum status;
     
     //
     // Constructor(s)
@@ -41,7 +41,7 @@ public class CommunicateSMSMessage extends CommunicateMessageESR {
 
     public CommunicateSMSMessage(){
         super();
-        status = CommunicateSMSStatus.CREATED;
+        status = CommunicateSMSStatusEnum.CREATED;
         this.message = null;
         this.messageId = null;
         this.phoneNumber = null;
@@ -80,10 +80,10 @@ public class CommunicateSMSMessage extends CommunicateMessageESR {
         this.sendDate = sendDate;
     }
 
-    public CommunicateSMSStatus getStatus() {
+    public CommunicateSMSStatusEnum getStatus() {
         return status;
     }
-    public void setStatus(CommunicateSMSStatus status) {
+    public void setStatus(CommunicateSMSStatusEnum status) {
         this.status = status;
     }
     
