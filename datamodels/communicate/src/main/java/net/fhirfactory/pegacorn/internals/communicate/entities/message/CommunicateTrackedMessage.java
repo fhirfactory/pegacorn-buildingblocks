@@ -21,14 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.message;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes.CommunicateMessageContentBase;
-import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes.CommunicateMessageReadTag;
-import net.fhirfactory.pegacorn.internals.communicate.entities.message.valuesets.CommunicateMessageTypeEnum;
-import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
-import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
+import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes.CommunicateMessageReadTag;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CommunicateTrackedMessage extends CommunicateMessage{

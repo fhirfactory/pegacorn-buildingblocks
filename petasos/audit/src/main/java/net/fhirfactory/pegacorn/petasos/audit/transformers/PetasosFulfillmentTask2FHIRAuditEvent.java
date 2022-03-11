@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.audit.transformers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
@@ -54,8 +55,10 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
     private ProcessingPlantInterface processingPlant;
 
     public PetasosFulfillmentTask2FHIRAuditEvent(){
-        jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-//        jsonMapper = new ObjectMapper();
+        this.jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        JavaTimeModule module = new JavaTimeModule();
+        this.jsonMapper.registerModule(module);
+        this.jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
 

@@ -27,7 +27,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPo
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionMethodOutcome;
 import net.fhirfactory.pegacorn.services.audit.cache.AsynchronousWriterAuditEventCache;
-import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.ProcessingPlantMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.valuesets.PetasosComponentITOpsNotificationTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
@@ -84,6 +85,8 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
         notification.setComponentId(getMetricsData().getComponentID());
         notification.setParticipantName(getProcessingPlantMetricsData().getParticipantName());
         notification.setContent(message);
+        notification.setNotificationType(PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE);
+        notification.setContentHeading("ITOpsNotification("+getProcessingPlantMetricsData().getParticipantName()+")");
         notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_SUBSYSTEM);
         getNotificationAgent().sendNotification(notification);
     }
@@ -97,6 +100,24 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
         notification.setComponentId(getMetricsData().getComponentID());
         notification.setParticipantName(getProcessingPlantMetricsData().getParticipantName());
         notification.setContent(unformattedMessage);
+        notification.setNotificationType(PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE);
+        notification.setContentHeading("ITOpsNotification("+getProcessingPlantMetricsData().getParticipantName()+")");
+        notification.setFormattedContent(formattedMessage);
+        notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_SUBSYSTEM);
+        getNotificationAgent().sendNotification(notification);
+    }
+
+    @Override
+    public void sendITOpsNotification(String unformatedMessage, String formattedMessage, PetasosComponentITOpsNotificationTypeEnum notificationType, String notificationHeader) {
+        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
+            return;
+        }
+        PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+        notification.setComponentId(getMetricsData().getComponentID());
+        notification.setParticipantName(getProcessingPlantMetricsData().getParticipantName());
+        notification.setContent(unformatedMessage);
+        notification.setNotificationType(notificationType);
+        notification.setContentHeading(notificationHeader);
         notification.setFormattedContent(formattedMessage);
         notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_SUBSYSTEM);
         getNotificationAgent().sendNotification(notification);

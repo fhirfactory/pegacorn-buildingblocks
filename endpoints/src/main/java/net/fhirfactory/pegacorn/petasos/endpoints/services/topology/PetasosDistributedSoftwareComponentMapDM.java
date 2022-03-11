@@ -63,7 +63,7 @@ public class PetasosDistributedSoftwareComponentMapDM {
     //
 
     public void addTopologyNode(JGroupsIntegrationPointSummary endpointID, SoftwareComponent newElement) {
-        LOG.info(".addTopologyNode(): Entry, newElement --> {}", newElement);
+        LOG.debug(".addTopologyNode(): Entry, newElement --> {}", newElement);
         if (newElement == null) {
             throw (new IllegalArgumentException(".addTopologyNode(): newElement is null"));
         }
@@ -147,7 +147,7 @@ public class PetasosDistributedSoftwareComponentMapDM {
     }
 
     public SoftwareComponent getTopologyNode(ComponentIdType nodeID) {
-        LOG.info(".getTopologyNode(): Entry, nodeID --> {}", nodeID);
+        LOG.debug(".getTopologyNode(): Entry, nodeID --> {}", nodeID);
         if (nodeID == null) {
             LOG.debug(".getTopologyNode(): Exit, provided a null nodeID , so returning null");
             return (null);
@@ -155,15 +155,15 @@ public class PetasosDistributedSoftwareComponentMapDM {
         Enumeration<ComponentIdType> list = this.nodeSet.keys();
         while (list.hasMoreElements()) {
             ComponentIdType currentNodeID = list.nextElement();
-            LOG.info(".getTopologyNode(): Cache Entry --> {}", currentNodeID);
+            LOG.debug(".getTopologyNode(): Cache Entry --> {}", currentNodeID);
             if (currentNodeID.equals(nodeID)) {
-                LOG.info(".getTopologyNode(): Node found!!! WooHoo!");
+                LOG.debug(".getTopologyNode(): Node found!!! WooHoo!");
                 SoftwareComponent retrievedNode = this.nodeSet.get(currentNodeID);
-                LOG.info(".getTopologyNode(): Exit, returning Endpoint --> {}", retrievedNode);
+                LOG.debug(".getTopologyNode(): Exit, returning Endpoint --> {}", retrievedNode);
                 return (retrievedNode);
             }
         }
-        LOG.info(".getTopologyNode(): Exit, returning null as an element with the specified ID was not in the map");
+        LOG.debug(".getTopologyNode(): Exit, returning null as an element with the specified ID was not in the map");
         return (null);
     }
 

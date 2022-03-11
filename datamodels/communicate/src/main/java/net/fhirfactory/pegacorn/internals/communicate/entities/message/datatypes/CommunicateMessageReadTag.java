@@ -19,8 +19,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes;
+package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes;
 
-public class CommunicateMessageContentBase {
+import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
 
+import java.util.Date;
+
+public class CommunicateMessageReadTag {
+    private CommunicateUserReference communicateUser;
+    private Date readDate;
+
+    public CommunicateUserReference getCommunicateUser() {
+        return communicateUser;
+    }
+
+    public void setCommunicateUser(CommunicateUserReference communicateUser) {
+        this.communicateUser = communicateUser;
+    }
+
+    public Date getReadDate() {
+        return readDate;
+    }
+
+    public void setReadDate(Date readDate) {
+        this.readDate = readDate;
+    }
+
+    @Override
+    public String toString() {
+        return "CommunicateMessageReadReceipt{" +
+                "communicateUser=" + communicateUser +
+                ", readDate=" + readDate +
+                '}';
+    }
 }

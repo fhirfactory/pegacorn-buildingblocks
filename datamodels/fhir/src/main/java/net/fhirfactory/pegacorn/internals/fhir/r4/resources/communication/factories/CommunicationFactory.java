@@ -23,9 +23,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.communication.facto
 
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
-import org.hl7.fhir.r4.model.Communication;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Period;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,5 +54,4 @@ public class CommunicationFactory {
         LOG.debug(".newCommunicationResource(): Exit, communicationResource->{}", communicationResource);
         return(communicationResource);
     }
-
 }

@@ -19,37 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes;
+package net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
+import net.fhirfactory.pegacorn.internals.communicate.entities.media.datatypes.CommunicateMediaContent;
+import net.fhirfactory.pegacorn.internals.communicate.entities.media.datatypes.CommunicateMediaDetail;
 
-import java.util.Date;
+public class CommunicateMediaMessageContent {
+    private CommunicateMediaDetail mediaDetail;
+    private CommunicateMediaContent mediaContent;
 
-public class CommunicateMessageReadTag {
-    private CommunicateUserReference communicateUser;
-    private Date readDate;
-
-    public CommunicateUserReference getCommunicateUser() {
-        return communicateUser;
+    public CommunicateMediaDetail getMediaDetail() {
+        return mediaDetail;
     }
 
-    public void setCommunicateUser(CommunicateUserReference communicateUser) {
-        this.communicateUser = communicateUser;
+    public void setMediaDetail(CommunicateMediaDetail mediaDetail) {
+        this.mediaDetail = mediaDetail;
     }
 
-    public Date getReadDate() {
-        return readDate;
+    public CommunicateMediaContent getMediaContent() {
+        return mediaContent;
     }
 
-    public void setReadDate(Date readDate) {
-        this.readDate = readDate;
-    }
-
-    @Override
-    public String toString() {
-        return "CommunicateMessageReadReceipt{" +
-                "communicateUser=" + communicateUser +
-                ", readDate=" + readDate +
-                '}';
+    public void setMediaContent(CommunicateMediaContent mediaContent) {
+        this.mediaContent = mediaContent;
     }
 }

@@ -66,7 +66,8 @@ public class FileShareSinkAdapter extends IPCAdapter {
     @Override
     public String toString() {
         return "FileShareSinkAdapter{" +
-                "contextPath='" + filePath + '\'' +
+                "filePath='" + filePath + '\'' +
+                "filePathAlias='" + filePathAlias + '\'' +
                 ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
                 ", targetNameInstant='" + getTargetSystemName() + '\'' +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +

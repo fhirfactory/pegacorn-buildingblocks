@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.EndpointMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.valuesets.PetasosComponentITOpsNotificationTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
@@ -108,6 +109,8 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
             notification.setComponentId(getMetricsData().getComponentID());
             notification.setParticipantName(getEndpointMetricsData().getParticipantName());
             notification.setContent(message);
+            notification.setNotificationType(PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE);
+            notification.setContentHeading("ITOpsNotification("+getEndpointMetricsData().getParticipantName()+")");
             notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
             getNotificationAgent().sendNotification(notification);
             if (getLogger().isInfoEnabled()) {
@@ -124,12 +127,34 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
             PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
             notification.setComponentId(getMetricsData().getComponentID());
             notification.setParticipantName(getEndpointMetricsData().getParticipantName());
+            notification.setNotificationType(PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE);
+            notification.setContentHeading("ITOpsNotification("+getEndpointMetricsData().getParticipantName()+")");
             notification.setContent(unformattedMessage);
             notification.setFormattedContent(formattedMessage);
             notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
             getNotificationAgent().sendNotification(notification);
             if (getLogger().isInfoEnabled()) {
                 getLogger().debug(".sendITOpsNotification(): Send Notification->{}", notification);
+            }
+        } catch(Exception ex){
+            getLogger().warn(".sendITOpsNotification(): Can't send notifications, message->{}, stacktrace->{}", ExceptionUtils.getMessage(ex), ExceptionUtils.getStackTrace(ex));
+        }
+    }
+
+    @Override
+    public void sendITOpsNotification(String unformattedMessage, String formattedMessage, PetasosComponentITOpsNotificationTypeEnum notificationType, String notificationHeader) {
+        try {
+            PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+            notification.setComponentId(getMetricsData().getComponentID());
+            notification.setParticipantName(getEndpointMetricsData().getParticipantName());
+            notification.setContent(unformattedMessage);
+            notification.setFormattedContent(formattedMessage);
+            notification.setNotificationType(notificationType);
+            notification.setContentHeading(notificationHeader);
+            notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
+            getNotificationAgent().sendNotification(notification);
+            if (getLogger().isInfoEnabled()) {
+                getLogger().info(".sendITOpsNotification(): Send Notification->{}", notification);
             }
         } catch(Exception ex){
             getLogger().warn(".sendITOpsNotification(): Can't send notifications, message->{}, stacktrace->{}", ExceptionUtils.getMessage(ex), ExceptionUtils.getStackTrace(ex));

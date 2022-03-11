@@ -40,7 +40,7 @@ import javax.inject.Inject;
 
 @ApplicationScoped
 public class PetasosFulfillmentTaskAuditServicesBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(STAServicesAuditBroker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosFulfillmentTaskAuditServicesBroker.class);
 
     @Inject
     private PetasosAuditEventServiceAgentInterface auditWriter;
@@ -152,6 +152,20 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
     }
 
     protected boolean shouldLogAuditEventForTask(PetasosFulfillmentTask fulfillmentTask){
+        if(fulfillmentTask.getTaskFulfillment().getStatus().equals(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED)) {
+            return(true);
+        }
+        if(fulfillmentTask.getTaskFulfillment().getStatus().equals(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED)) {
+            switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
+                case AUDIT_LEVEL_BLACK_BOX:
+                case AUDIT_LEVEL_COARSE:
+                    break;
+                case AUDIT_LEVEL_FINE:
+                case AUDIT_LEVEL_VERY_FINE:
+                case AUDIT_LEVEL_EXTREME:
+                    return(true);
+            }
+        }
         if(fulfillmentTask.hasTaskFulfillment()){
             switch(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole()){
                 case COMPONENT_ROLE_INTERACT_EGRESS:

@@ -187,17 +187,17 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 				newSubscriberAdded = true;
 			}
 		}
-		if (getLogger().isInfoEnabled()) {
+		if (getLogger().isDebugEnabled()) {
 			if(newSubscriberAdded) {
 				List<TaskWorkItemSubscriptionRegistration> subscriptionList = new ArrayList<>();
 				synchronized (getDataParcelSubscriptionMapLock()){
 					subscriptionList.addAll(getDataParcelSubscriptionMap().get(descriptorToRegister));
 				}
 				int count = 0;
-				getLogger().info(".addSubscriber(): New Subscriber Added for Topic->{}", workItemSubscription);
+				getLogger().debug(".addSubscriber(): New Subscriber Added for Topic->{}", workItemSubscription);
 				for (TaskWorkItemSubscriptionRegistration currentSubscription : subscriptionList) {
 					PetasosParticipant currentSubscriber = currentSubscription.getParticipant();
-					getLogger().info(".addSubscriber(): Subscriber[{}]->{}", count, currentSubscriber.getComponentID() + "\n");
+					getLogger().debug(".addSubscriber(): Subscriber[{}]->{}", count, currentSubscriber.getComponentID() + "\n");
 					count++;
 				}
 			}

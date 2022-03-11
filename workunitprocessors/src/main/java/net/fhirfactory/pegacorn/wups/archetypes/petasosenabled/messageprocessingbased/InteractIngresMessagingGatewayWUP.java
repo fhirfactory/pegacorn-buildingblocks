@@ -39,6 +39,7 @@ import org.apache.camel.model.RouteDefinition;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSourceTopologyEndpoint;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
@@ -196,6 +197,16 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
                         exchange.setProperty(PetasosPropertyConstants.ENDPOINT_TOPOLOGY_NODE_EXCHANGE_PROPERTY, serverTopologyEndpoint);
                         exchange.setProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, getMetricsAgent());
                         exchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getEndpointMetricsAgent());
+                        break;
+                    }
+                    case FILE_SHARE_SOURCE:{
+                        FileShareSourceTopologyEndpoint serverTopologyEndpoint = (FileShareSourceTopologyEndpoint) getIngresEndpoint().getEndpointTopologyNode();
+                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, serverTopologyEndpoint.getEndpointType().getToken());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_PORT_VALUE, serverTopologyEndpoint.getFileShareSourceAdapter().getFilePathAlias());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_TOPOLOGY_NODE_EXCHANGE_PROPERTY, serverTopologyEndpoint);
+                        exchange.setProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, getMetricsAgent());
+                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getEndpointMetricsAgent());
+                        break;
                     }
                     default:{
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, "Undisclosed");

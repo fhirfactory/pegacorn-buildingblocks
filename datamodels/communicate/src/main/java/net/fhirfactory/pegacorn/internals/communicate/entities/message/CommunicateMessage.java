@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.message;
 
-import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes.CommunicateMessageContentBase;
-import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatyoes.CommunicateMessageIdentifier;
+import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes.CommunicateMessageContentBase;
+import net.fhirfactory.pegacorn.internals.communicate.entities.message.datatypes.CommunicateMessageIdentifier;
 import net.fhirfactory.pegacorn.internals.communicate.entities.message.valuesets.CommunicateMessageTypeEnum;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
