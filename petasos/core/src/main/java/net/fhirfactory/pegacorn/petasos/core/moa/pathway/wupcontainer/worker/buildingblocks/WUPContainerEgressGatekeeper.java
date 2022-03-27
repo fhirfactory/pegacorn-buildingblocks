@@ -65,10 +65,10 @@ public class WUPContainerEgressGatekeeper {
      */
 
     public PetasosFulfillmentTaskSharedInstance egressGatekeeper(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
-        if(getLogger().isInfoEnabled()){
-            getLogger().info(".egressGatekeeper(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".egressGatekeeper(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
         }
-        getLogger().debug(".egressGatekeeper(): Enter, fulfillmentTask ->{}", fulfillmentTask );
+        getLogger().trace(".egressGatekeeper(): Enter, fulfillmentTask ->{}", fulfillmentTask );
         ArrayList<String> targetList = new ArrayList<String>();
         if (fulfillmentTask.getTaskFulfillment().isToBeDiscarded()) {
             DataParcelManifest discardedParcelManifest = new DataParcelManifest();
@@ -111,11 +111,11 @@ public class WUPContainerEgressGatekeeper {
         }
         auditServicesBroker.logActivity(fulfillmentTask.getInstance());
 
-        if(getLogger().isInfoEnabled()){
-            getLogger().info(".egressGatekeeper(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".egressGatekeeper(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
         }
 
-        getLogger().debug(".egressGatekeeper(): Exit, fulfillmentTask ->{}", fulfillmentTask );
+        getLogger().trace(".egressGatekeeper(): Exit, fulfillmentTask ->{}", fulfillmentTask );
         return(fulfillmentTask);
     }
 }

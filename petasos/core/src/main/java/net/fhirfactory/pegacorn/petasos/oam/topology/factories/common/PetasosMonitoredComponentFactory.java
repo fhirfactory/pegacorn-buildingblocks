@@ -37,6 +37,13 @@ public abstract class PetasosMonitoredComponentFactory {
     @Inject
     private ProcessingPlantPetasosParticipantNameHolder participantNameHolder;
 
+    /**
+     * Creates the "base" MonitoredComponentSummary object
+     *
+     * @param monitoredNode The SoftwareComponentSummary shell object to be populated
+     * @param topologyNode The SoftwareComponent on which the SoftwareCOmponentSummary is to be Based
+     * @return
+     */
     protected SoftwareComponentSummary newPetasosMonitoredComponent(SoftwareComponentSummary monitoredNode, SoftwareComponent topologyNode){
         getLogger().debug(".newITOpsMonitoredNode(): Entry, monitoredNode->{}, topologyNode->{}", monitoredNode, topologyNode);
         monitoredNode.setComponentID(topologyNode.getComponentID());

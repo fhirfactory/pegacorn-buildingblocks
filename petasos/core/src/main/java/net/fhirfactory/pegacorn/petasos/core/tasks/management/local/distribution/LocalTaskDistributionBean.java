@@ -196,8 +196,8 @@ public class LocalTaskDistributionBean {
 
         //
         // Now we can forward the task!
-        if(getLogger().isInfoEnabled()){
-            getLogger().info(".distributeNewFulfillmentTasks(): Sending Task To->{}", targetComponent.getKnownFulfillerInstance());
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".distributeNewFulfillmentTasks(): Sending Task To->{}", targetComponent.getKnownFulfillerInstance());
         }
         forwardTask(targetParticipant, actionableTask, camelExchange);
 
@@ -277,9 +277,9 @@ public class LocalTaskDistributionBean {
         metricsAgent.sendITOpsNotification(distributionMessageBuilder.toString());
         //
         // Forward the Task
-        if(getLogger().isInfoEnabled())
+        if(getLogger().isDebugEnabled())
         {
-            getLogger().info(".forwardTask(): Forwarding To->{}, Task->{}",subscriber.getParticipantName(), petasosFulfillmentTask.getActionableTaskId().getId() );
+            getLogger().debug(".forwardTask(): Forwarding To->{}, Task->{}",subscriber.getParticipantName(), petasosFulfillmentTask.getActionableTaskId().getId() );
         }
         camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentSharedInstance);
         getLogger().trace(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
