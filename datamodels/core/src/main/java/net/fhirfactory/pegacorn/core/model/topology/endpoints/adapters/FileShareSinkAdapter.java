@@ -25,6 +25,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCA
 
 public class FileShareSinkAdapter extends IPCAdapter {
 
+    private String hostName;
     private String filePath;
     private String filePathAlias;
 
@@ -35,12 +36,22 @@ public class FileShareSinkAdapter extends IPCAdapter {
     public FileShareSinkAdapter(){
         super();
         this.filePath = null;
+        this.hostName = null;
         this.filePathAlias = null;
     }
 
     //
     // Getters and Setters
     //
+
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
 
     public String getFilePath() {
         return filePath;
@@ -67,7 +78,8 @@ public class FileShareSinkAdapter extends IPCAdapter {
     public String toString() {
         return "FileShareSinkAdapter{" +
                 "filePath='" + filePath + '\'' +
-                "filePathAlias='" + filePathAlias + '\'' +
+                ", filePathAlias='" + filePathAlias + '\'' +
+                ", hostName=" + getHostName() +
                 ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
                 ", targetNameInstant='" + getTargetSystemName() + '\'' +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +

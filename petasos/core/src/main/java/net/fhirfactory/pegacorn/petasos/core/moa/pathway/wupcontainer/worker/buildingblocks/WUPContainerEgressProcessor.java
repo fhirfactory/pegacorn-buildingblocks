@@ -54,10 +54,10 @@ public class WUPContainerEgressProcessor {
 
 
     public PetasosFulfillmentTaskSharedInstance egressContentProcessor(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
-        if(getLogger().isInfoEnabled()){
-            getLogger().info(".egressContentProcessor(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".egressContentProcessor(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
         }
-      	getLogger().debug(".egressContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask);
+      	getLogger().trace(".egressContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask);
 
         //
         // Get out metricsAgent & do add some metrics
@@ -101,8 +101,8 @@ public class WUPContainerEgressProcessor {
             }
         }
 
-        if(getLogger().isInfoEnabled()){
-            getLogger().info(".egressContentProcessor(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".egressContentProcessor(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
         }
 
         //

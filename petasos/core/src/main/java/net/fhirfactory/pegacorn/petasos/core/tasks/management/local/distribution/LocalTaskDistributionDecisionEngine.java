@@ -208,12 +208,12 @@ public class LocalTaskDistributionDecisionEngine {
                 passFirstPhaseTest = true;
             }
             if (passFirstPhaseTest) {
-                getLogger().info(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
+                getLogger().debug(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
                 for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
                     if (applySubscriptionFilter(currentSubscription, parcelManifest)) {
                         if (!subscriberList.contains(currentParticipant)) {
                             subscriberList.add(currentParticipant);
-                            getLogger().info(".deriveSubscriberList(): Adding.... ");
+                            getLogger().debug(".deriveSubscriberList(): Adding.... ");
                         }
                         if(StringUtils.isNotEmpty(currentParticipant.getSubsystemParticipantName())) {
                             alreadySubscribedSubsystemParticipants.add(currentParticipant.getSubsystemParticipantName());

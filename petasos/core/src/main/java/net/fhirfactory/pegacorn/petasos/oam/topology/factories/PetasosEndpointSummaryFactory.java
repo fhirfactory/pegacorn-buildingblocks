@@ -25,11 +25,15 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.FileShareSinkAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.FileShareSourceAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.datatypes.JGroupsAdapter;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSinkTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSourceTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPClientTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPClientEndpoint;
@@ -71,7 +75,11 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 petasosEndpoint.getEndpointType().equals(PetasosEndpointTopologyTypeEnum.OTHER_SERVER);
         endpoint.setServer(isServer);
         endpoint.setWupParticipantName(wupParticipantName);
-
+        if(StringUtils.isNotEmpty(petasosEndpoint.getParticipantDisplayName())) {
+            endpoint.setParticipantDisplayName(petasosEndpoint.getParticipantDisplayName());
+        } else {
+            endpoint.setParticipantDisplayName(endpoint.getWupParticipantName());
+        }
         getLogger().debug(".newEndpoint(): Exit, endpoint->{}", endpoint);
         return(endpoint);
     }
@@ -86,6 +94,11 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
         endpoint = (EndpointSummary) newPetasosMonitoredComponent(endpoint, endpointTopologyNode);
         endpoint.setEndpointType(endpointTopologyNode.getEndpointType());
         endpoint.setWupParticipantName(wupParticipantName);
+        if(StringUtils.isNotEmpty(endpointTopologyNode.getParticipantDisplayName())) {
+            endpoint.setParticipantDisplayName(endpointTopologyNode.getParticipantDisplayName());
+        } else {
+            endpoint.setParticipantDisplayName(endpoint.getWupParticipantName());
+        }
         boolean isEncrypted = false;
         for(IPCAdapter currentAdapter: endpointTopologyNode.getAdapterList()){
             if(currentAdapter.isEncrypted()){
@@ -244,6 +257,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 }
                 break;
             }
+
             case SQL_SERVER:
                 break;
             case SQL_CLIENT:
@@ -252,6 +266,64 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 break;
             case LDAP_CLIENT:
                 break;
+            case FILE_SHARE_SOURCE: {
+                FileShareSourceTopologyEndpoint fileSourceEndpoint = (FileShareSourceTopologyEndpoint) endpointTopologyNode;
+                if (fileSourceEndpoint.getAdapterList() != null) {
+                    if (!fileSourceEndpoint.getAdapterList().isEmpty()) {
+                        for (IPCAdapter currentIPCAdapter : fileSourceEndpoint.getAdapterList()) {
+                            FileShareSourceAdapter currentAdapter = (FileShareSourceAdapter) currentIPCAdapter;
+                            PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
+                            portSummary.setParticipantName(fileSourceEndpoint.getParticipantName());
+                            portSummary.setParticipantDisplayName(fileSourceEndpoint.getParticipantDisplayName());
+                            portSummary.setEncrypted(currentAdapter.isEncrypted());
+                            portSummary.setPortType(PetasosEndpointTopologyTypeEnum.FILE_SHARE_SOURCE.getDisplayName());
+                            if (fileSourceEndpoint.hasConnectedSystemName()) {
+                                endpoint.setConnectedSystemName(fileSourceEndpoint.getConnectedSystemName());
+                            } else {
+                                endpoint.setConnectedSystemName("Not Specified In Configuration");
+                            }
+                            portSummary.setParticipantDisplayName(currentAdapter.getFilePathAlias());
+                            portSummary.setBasePath(currentAdapter.getFilePath());
+                            portSummary.setHostDNSName(currentAdapter.getHostName());
+                            ComponentIdType componentId = new ComponentIdType();
+                            componentId.setId(fileSourceEndpoint.getSubsystemParticipantName() + "-" + portSummary.getHostDNSName());
+                            componentId.setDisplayName(fileSourceEndpoint.getSubsystemParticipantName() + "-" + portSummary.getHostDNSName());
+                            portSummary.setComponentID(componentId);
+                            endpoint.getServerPorts().add(portSummary);
+                        }
+                    }
+                }
+                break;
+            }
+            case FILE_SHARE_SINK: {
+                FileShareSinkTopologyEndpoint fileSinkEndpoint = (FileShareSinkTopologyEndpoint) endpointTopologyNode;
+                if (fileSinkEndpoint.getAdapterList() != null) {
+                    if (!fileSinkEndpoint.getAdapterList().isEmpty()) {
+                        for (IPCAdapter currentIPCAdapter : fileSinkEndpoint.getAdapterList()) {
+                            FileShareSinkAdapter currentAdapter = (FileShareSinkAdapter) currentIPCAdapter;
+                            PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
+                            portSummary.setParticipantName(fileSinkEndpoint.getParticipantName());
+                            portSummary.setParticipantDisplayName(fileSinkEndpoint.getParticipantDisplayName());
+                            portSummary.setEncrypted(currentAdapter.isEncrypted());
+                            portSummary.setPortType(PetasosEndpointTopologyTypeEnum.FILE_SHARE_SINK.getDisplayName());
+                            if (fileSinkEndpoint.hasConnectedSystemName()) {
+                                endpoint.setConnectedSystemName(fileSinkEndpoint.getConnectedSystemName());
+                            } else {
+                                endpoint.setConnectedSystemName("Not Specified In Configuration");
+                            }
+                            portSummary.setHostDNSName(currentAdapter.getHostName());
+                            portSummary.setBasePath(currentAdapter.getFilePath());
+                            portSummary.setParticipantDisplayName(currentAdapter.getFilePathAlias());
+                            ComponentIdType componentId = new ComponentIdType();
+                            componentId.setId(fileSinkEndpoint.getSubsystemParticipantName() + "-" + portSummary.getHostDNSName());
+                            componentId.setDisplayName(fileSinkEndpoint.getSubsystemParticipantName() + "-" + portSummary.getHostDNSName());
+                            portSummary.setComponentID(componentId);
+                            endpoint.getServerPorts().add(portSummary);
+                        }
+                    }
+                }
+                break;
+            }
             case OTHER_API_SERVER:
                 break;
             case OTHER_API_CLIENT:
