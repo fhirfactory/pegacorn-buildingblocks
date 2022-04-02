@@ -113,7 +113,7 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
             notification.setContentHeading("ITOpsNotification("+getEndpointMetricsData().getParticipantName()+")");
             notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
             getNotificationAgent().sendNotification(notification);
-            if (getLogger().isInfoEnabled()) {
+            if (getLogger().isDebugEnabled()) {
                 getLogger().debug(".sendITOpsNotification(): Send Notification->{}", notification);
             }
         } catch(Exception ex){
@@ -133,7 +133,7 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
             notification.setFormattedContent(formattedMessage);
             notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
             getNotificationAgent().sendNotification(notification);
-            if (getLogger().isInfoEnabled()) {
+            if (getLogger().isDebugEnabled()) {
                 getLogger().debug(".sendITOpsNotification(): Send Notification->{}", notification);
             }
         } catch(Exception ex){
@@ -153,8 +153,8 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
             notification.setContentHeading(notificationHeader);
             notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_ENDPOINT);
             getNotificationAgent().sendNotification(notification);
-            if (getLogger().isInfoEnabled()) {
-                getLogger().info(".sendITOpsNotification(): Send Notification->{}", notification);
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debug(".sendITOpsNotification(): Send Notification->{}", notification);
             }
         } catch(Exception ex){
             getLogger().warn(".sendITOpsNotification(): Can't send notifications, message->{}, stacktrace->{}", ExceptionUtils.getMessage(ex), ExceptionUtils.getStackTrace(ex));

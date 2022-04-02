@@ -213,7 +213,6 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, "Undisclosed");
                     }
                 }
-
             }
         }
     }
