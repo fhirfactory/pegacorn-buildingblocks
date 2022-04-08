@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2022 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,30 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.uow;
+package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
 
-/**
- *
- * @author ACT Health (Mark A. Hunter)
- */
-public enum UoWProcessingOutcomeEnum {
-    UOW_OUTCOME_SUCCESS("ProcessingOutcome.Success", "pegacorn.uow.processingoutcome.success"),
-    UOT_OUTCOME_SOFT_FAIL("ProcessingOutcom.SoftFailure", "pegacorn.uow.processingoutcome.soft_failure"),
-    UOW_OUTCOME_FAILED("ProcessingOutcome.Failed","pegacorn.uow.processingoutcome.failed"),
-    UOW_OUTCOME_INCOMPLETE("ProcessingOutcome.Incomplete","pegacorn.uow.processingoutcome.incomplete"),
-    UOW_OUTCOME_NO_PROCESSING_REQUIRED("ProcessingOutcome.NoneRequired","pegacorn.uow.processingoutcome.nonerequired"),
-    UOW_OUTCOME_FILTERED("ProcessingOutcome.Filtered","pegacorn.uow.processingoutcome.filtered"),
-    UOW_OUTCOME_DISCARD("ProcessingOutcome.Discarded","pegacorn.uow.processingoutcome.discard"),
-    UOW_OUTCOME_NOTSTARTED("ProcessingOutcome.NotStarted","pegacorn.uow.processingoutcome.not_started");
-    
+public enum DataParcelExternallyDistributableStatusEnum {
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_TRUE("ExternallyDistributable.True", "pegacorn.data-parcel.externally-distributable-status.true"),
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE("ExternallyDistributable.False", "pegacorn.data-parcel.externally-distributable-status.false"),
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY("ExternallyDistributable.Any", "pegacorn.data-parcel.externally-distributable-status.any");
+
     private String token;
     private String displayName;
-    
-    private UoWProcessingOutcomeEnum(String display, String token ){
-        this.token = token;
-        this.displayName = display;
+
+    private DataParcelExternallyDistributableStatusEnum(String displayName, String normalisation){
+        this.token = normalisation;
+        this.displayName = displayName;
     }
-    
+
     public String getToken(){
         return(this.token);
     }
@@ -50,5 +41,13 @@ public enum UoWProcessingOutcomeEnum {
     public String getDisplayName(){
         return(this.displayName);
     }
-    
+
+    public static DataParcelExternallyDistributableStatusEnum fromNormalisationStatusString(String theString){
+        for (DataParcelExternallyDistributableStatusEnum b : DataParcelExternallyDistributableStatusEnum.values()) {
+            if (b.getToken().equalsIgnoreCase(theString)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

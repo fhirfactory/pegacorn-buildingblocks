@@ -64,7 +64,7 @@ public class ExternalEgressPostProcessingContainerRoute extends BasePetasosConta
         getLogger().debug("ExternalIngresWUPContainerRoute :: EndPointWUPEgressConduitEgress --> {}", nameSet.getEndPointWUPEgressConduitEgress());
         getLogger().debug("ExternalIngresWUPContainerRoute :: EndPointWUPContainerEgressProcessorEgress --> {}", nameSet.getEndPointWUPContainerEgressProcessorEgress());
 
-        specifyCamelExecutionExceptionHandler();
+        specifyPetasosExceptionHandling();
 
         ExternalEgressPostProcessingContainerRoute.NodeDetailInjector nodeDetailInjector = new ExternalEgressPostProcessingContainerRoute.NodeDetailInjector();
       

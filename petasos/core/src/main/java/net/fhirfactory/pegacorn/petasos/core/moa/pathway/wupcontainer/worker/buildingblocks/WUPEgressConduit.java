@@ -121,6 +121,7 @@ public class WUPEgressConduit {
         fulfillmentTask.getTaskWorkItem().setEgressContent(incomingUoW.getEgressContent());
         switch (incomingUoW.getProcessingOutcome()) {
             case UOW_OUTCOME_SUCCESS:
+            case UOT_OUTCOME_SOFT_FAIL:
                 getLogger().trace(".receiveFromWUP(): UoW was processed successfully - updating JobCard/StatusElement to FINISHED!");
                     fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FINISHED);
                     fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FINISHED);

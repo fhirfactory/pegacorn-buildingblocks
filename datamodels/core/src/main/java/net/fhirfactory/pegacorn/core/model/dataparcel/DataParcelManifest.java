@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.dataparcel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.*;
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -41,9 +42,12 @@ public class DataParcelManifest implements Serializable {
     private String intendedTargetSystem;
     private PolicyEnforcementPointApprovalStatusEnum enforcementPointApprovalStatus;
     private boolean interSubsystemDistributable;
+    private DataParcelExternallyDistributableStatusEnum externallyDistributable;
     private DataParcelDirectionEnum dataParcelFlowDirection;
     private String sourceProcessingPlantParticipantName;
+    private String sourceProcessingPlantInterfaceName;
     private String targetProcessingPlantParticipantName;
+    private String targetProcessingPlantInterfaceName;
 
     public DataParcelManifest(){
         this.contentDescriptor = null;
@@ -58,6 +62,9 @@ public class DataParcelManifest implements Serializable {
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
         this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
+        this.externallyDistributable = DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE;
+        this.sourceProcessingPlantInterfaceName = null;
+        this.targetProcessingPlantInterfaceName = null;
     }
 
     public DataParcelManifest(DataParcelTypeDescriptor contentDescriptor){
@@ -73,6 +80,9 @@ public class DataParcelManifest implements Serializable {
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
         this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
+        this.externallyDistributable = DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE;
+        this.sourceProcessingPlantInterfaceName = null;
+        this.targetProcessingPlantInterfaceName = null;
     }
 
     public DataParcelManifest(DataParcelManifest ori){
@@ -107,6 +117,11 @@ public class DataParcelManifest implements Serializable {
             this.setIntendedTargetSystem(null);
         }
         this.setInterSubsystemDistributable(ori.isInterSubsystemDistributable());
+        if(ori.hasExternallyDistributable()) {
+            this.setExternallyDistributable(ori.getExternallyDistributable());
+        } else {
+            this.setExternallyDistributable(DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE);
+        }
         if(ori.hasDataParcelFlowDirection()) {
             this.setDataParcelFlowDirection(ori.getDataParcelFlowDirection());
         } else {
@@ -132,12 +147,61 @@ public class DataParcelManifest implements Serializable {
         } else {
             this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
         }
+        if(ori.hasSourceProcessingPlantInterfaceName()){
+            setSourceProcessingPlantInterfaceName(ori.getSourceProcessingPlantInterfaceName());
+        }
+        if(ori.hasTargetProcessingPlantInterfaceName()){
+            setTargetProcessingPlantInterfaceName(ori.getTargetProcessingPlantInterfaceName());
+        }
     }
 
     //
     // Getters and Setters (and Has's)
     //
 
+    @JsonIgnore
+    public boolean hasSourceProcessingPlantInterfaceName(){
+        boolean hasValue = this.sourceProcessingPlantInterfaceName != null;
+        return(hasValue);
+    }
+
+    public String getSourceProcessingPlantInterfaceName() {
+        return sourceProcessingPlantInterfaceName;
+    }
+
+    public void setSourceProcessingPlantInterfaceName(String sourceProcessingPlantInterfaceName) {
+        this.sourceProcessingPlantInterfaceName = sourceProcessingPlantInterfaceName;
+    }
+
+    @JsonIgnore
+    public boolean hasTargetProcessingPlantInterfaceName(){
+        boolean hasValue = this.targetProcessingPlantInterfaceName != null;
+        return(hasValue);
+    }
+
+    public String getTargetProcessingPlantInterfaceName() {
+        return targetProcessingPlantInterfaceName;
+    }
+
+    public void setTargetProcessingPlantInterfaceName(String targetProcessingPlantInterfaceName) {
+        this.targetProcessingPlantInterfaceName = targetProcessingPlantInterfaceName;
+    }
+
+    @JsonIgnore
+    public boolean hasExternallyDistributable(){
+        boolean hasValue = this.externallyDistributable != null;
+        return(hasValue);
+    }
+
+    public DataParcelExternallyDistributableStatusEnum getExternallyDistributable() {
+        return externallyDistributable;
+    }
+
+    public void setExternallyDistributable(DataParcelExternallyDistributableStatusEnum externallyDistributable) {
+        this.externallyDistributable = externallyDistributable;
+    }
+
+    @JsonIgnore
     public boolean hasTargetProcessingPlantParticipantName(){
         boolean hasValue = this.targetProcessingPlantParticipantName != null;
         return(hasValue);
@@ -151,6 +215,7 @@ public class DataParcelManifest implements Serializable {
         this.targetProcessingPlantParticipantName = targetProcessingPlantParticipantName;
     }
 
+    @JsonIgnore
     public boolean hasSourceProcessingPlantParticipantName(){
         boolean hasValue = this.sourceProcessingPlantParticipantName != null;
         return(hasValue);
@@ -164,6 +229,7 @@ public class DataParcelManifest implements Serializable {
         this.sourceProcessingPlantParticipantName = taskProducerProcessingPlantParticipantName;
     }
 
+    @JsonIgnore
     public boolean hasDataParcelType(){
         boolean has = this.dataParcelType != null;
         return(has);
@@ -174,6 +240,7 @@ public class DataParcelManifest implements Serializable {
         return(has);
     }
 
+    @JsonIgnore
     public boolean hasNormalisationStatus(){
         boolean has = this.normalisationStatus != null;
         return(has);
@@ -184,31 +251,37 @@ public class DataParcelManifest implements Serializable {
         return(has);
     }
 
+    @JsonIgnore
     public boolean hasDataParcelFlowDirection(){
         boolean has = this.dataParcelFlowDirection != null;
         return(has);
     }
 
+    @JsonIgnore
     public boolean hasContentDescriptor(){
         boolean hasCT = this.contentDescriptor != null;
         return(hasCT);
     }
 
+    @JsonIgnore
     public boolean hasContainerDescriptor(){
         boolean hasCT = this.containerDescriptor != null;
         return(hasCT);
     }
 
+    @JsonIgnore
     public boolean hasSourceSystem(){
         boolean hasSS = this.sourceSystem != null;
         return(hasSS);
     }
 
+    @JsonIgnore
     public boolean hasIntendedTargetSystem(){
         boolean hasITS = this.intendedTargetSystem != null;
         return(hasITS);
     }
 
+    @JsonIgnore
     public boolean hasDataParcelQualityStatement(){
         boolean hasDPQS = this.payloadQuality != null;
         return(hasDPQS);
@@ -319,9 +392,12 @@ public class DataParcelManifest implements Serializable {
                 ", intendedTargetSystem='" + intendedTargetSystem + '\'' +
                 ", enforcementPointApprovalStatus=" + enforcementPointApprovalStatus +
                 ", interSubsystemDistributable=" + interSubsystemDistributable +
+                ", externallyDistributable=" + externallyDistributable +
                 ", dataParcelFlowDirection=" + dataParcelFlowDirection +
                 ", sourceProcessingPlantParticipantName='" + sourceProcessingPlantParticipantName + '\'' +
+                ", sourceProcessingPlantInterfaceName=" + sourceProcessingPlantInterfaceName +
                 ", targetProcessingPlantParticipantName='" + targetProcessingPlantParticipantName + '\'' +
+                ", targetProcessingPlantInterfaceName=" + targetProcessingPlantInterfaceName +
                 '}';
     }
 

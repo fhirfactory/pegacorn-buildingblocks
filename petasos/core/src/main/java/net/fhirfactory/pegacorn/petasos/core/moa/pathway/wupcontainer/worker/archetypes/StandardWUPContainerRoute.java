@@ -89,7 +89,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressProcessorEgress --> {}", nameSet.getEndPointWUPContainerEgressProcessorEgress());
 		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressGatekeeperIngres --> {}", nameSet.getEndPointWUPContainerEgressGatekeeperIngres());
 
-		specifyCamelExecutionExceptionHandler();
+		specifyPetasosExceptionHandling();
 
 		NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
 

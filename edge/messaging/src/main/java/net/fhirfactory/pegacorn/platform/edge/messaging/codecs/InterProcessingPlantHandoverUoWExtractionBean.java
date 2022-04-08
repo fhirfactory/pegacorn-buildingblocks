@@ -61,9 +61,28 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
         String clonedPayload = SerializationUtils.clone(theUoW.getIngresContent().getPayload());
         outputPayload.setPayload(clonedPayload);
         DataParcelManifest parcelManifest = SerializationUtils.clone(theUoW.getPayloadTopicID());
-        parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
-        parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
-        parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
+        if(processingPlant.getMeAsASoftwareComponent().getComponentSystemRole() != null) {
+            switch (processingPlant.getMeAsASoftwareComponent().getComponentSystemRole()) {
+                case COMPONENT_ROLE_INTERACT_INGRES:
+                case COMPONENT_ROLE_INTERACT_EGRESS:
+                case COMPONENT_ROLE_SUBSYSTEM_EDGE:
+                    parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
+                    parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
+                    break;
+                case COMPONENT_ROLE_SUBSYSTEM_INTERNAL:
+                    parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_WORKFLOW_TRANSIENT);
+                    parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
+                    break;
+                case COMPONENT_ROLE_SUBSYSTEM_TASK_DISTRIBUTION:
+                    parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_WORKFLOW_OUTPUT);
+                    parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
+                    break;
+            }
+        } else {
+            parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
+            parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
+        }
+        parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE);
         parcelManifest.setInterSubsystemDistributable(false);
         if(parcelManifest.hasIntendedTargetSystem()){
             if(parcelManifest.getIntendedTargetSystem().contentEquals(processingPlant.getSubsystemParticipantName())){
