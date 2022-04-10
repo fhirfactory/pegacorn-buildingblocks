@@ -1,6 +1,7 @@
-package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
+package net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets;
 
-public enum DataParcelTypeEnum {
+public enum DataParcelTypeSubscriptionMaskEnum {
+    PARCEL_TYPE_ANY("Parcel.AnyType","dataparcel-type.any"),
     IPC_DATA_PARCEL_TYPE("Parcel.IPC","dataparcel-type.ipc"),
     SEARCH_QUERY_DATA_PARCEL_TYPE("Parcel.Search-Query", "dataparcel-type.search-query"),
     SEARCH_RESULT_DATA_PARCEL_TYPE("Parcel.Search-Result", "dataparcel-type.search-result"),
@@ -9,7 +10,7 @@ public enum DataParcelTypeEnum {
     private String token;
     private String displayName;
 
-    private DataParcelTypeEnum(String displayName, String discriminatorType){
+    private DataParcelTypeSubscriptionMaskEnum(String displayName, String discriminatorType){
         this.token = discriminatorType;
         this.displayName = displayName;
     }
@@ -22,8 +23,8 @@ public enum DataParcelTypeEnum {
         return(this.displayName);
     }
 
-    public static DataParcelTypeEnum fromTypeValue(String typeValueString){
-        for (DataParcelTypeEnum b : DataParcelTypeEnum.values()) {
+    public static DataParcelTypeSubscriptionMaskEnum fromTypeValue(String typeValueString){
+        for (DataParcelTypeSubscriptionMaskEnum b : DataParcelTypeSubscriptionMaskEnum.values()) {
             if (b.getToken().equalsIgnoreCase(typeValueString)) {
                 return b;
             }

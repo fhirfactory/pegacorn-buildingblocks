@@ -1,7 +1,7 @@
 package net.fhirfactory.pegacorn.core.model.datagrid.datatypes;
 
 import net.fhirfactory.pegacorn.core.model.datagrid.valuesets.DatagridPersistenceResourceStatusEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 
 import java.io.Serializable;
 import java.util.Objects;

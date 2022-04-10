@@ -19,24 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel;
+package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class DataParcelQualityStatement implements Serializable {
-    private List<DataParcelFragmentQualityStatement> fragmentQualityStatementList;
+public class ParcelOfWorkType extends UoW {
+    private static final Logger LOG = LoggerFactory.getLogger(UoW.class);
 
-    public DataParcelQualityStatement(){
-        this.fragmentQualityStatementList = new ArrayList<>();
+    @Override
+    protected Logger getLogger(){
+        return(LOG);
     }
 
-    public List<DataParcelFragmentQualityStatement> getFragmentQualityStatementList() {
-        return fragmentQualityStatementList;
+    public ParcelOfWorkType(){
+        super();
     }
 
-    public void setFragmentQualityStatementList(List<DataParcelFragmentQualityStatement> fragmentQualityStatementList) {
-        this.fragmentQualityStatementList = fragmentQualityStatementList;
+    public ParcelOfWorkType(UoWPayload inputPayload) {
+        super(inputPayload);
+    }
+
+    public ParcelOfWorkType(UoW originalUoW) {
+        super(originalUoW);
     }
 }

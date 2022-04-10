@@ -19,14 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel;
+package net.fhirfactory.pegacorn.core.model.petasos.dataparcel;
 
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelValidationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelValidationStatusEnum;
 
 import java.io.Serializable;
 import java.util.Objects;

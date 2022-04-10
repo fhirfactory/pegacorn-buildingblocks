@@ -19,9 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
+package net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets;
 
-public enum DataParcelValidationStatusEnum {
+public enum DataParcelValidationStatusSubscriptionMaskEnum {
     DATA_PARCEL_CONTENT_VALIDATED_TRUE("Validated.True","pegacorn.data-parcel.validation-status.true"),
     DATA_PARCEL_CONTENT_VALIDATED_FALSE("Validated.False", "pegacorn.data-parcel.validation-status.false"),
     DATA_PARCEL_CONTENT_VALIDATION_ANY("Validated.Any", "pegacorn.data-parcel.validation-status.any");
@@ -29,7 +29,7 @@ public enum DataParcelValidationStatusEnum {
     private String token;
     private String displayName;
 
-    private DataParcelValidationStatusEnum(String displayName, String token){
+    private DataParcelValidationStatusSubscriptionMaskEnum(String displayName, String token){
         this.token = token;
         this.displayName = displayName;
     }
@@ -42,8 +42,8 @@ public enum DataParcelValidationStatusEnum {
         return(this.displayName);
     }
 
-    public static DataParcelValidationStatusEnum fromValidationStatusString(String statusString){
-        for (DataParcelValidationStatusEnum b : DataParcelValidationStatusEnum.values()) {
+    public static DataParcelValidationStatusSubscriptionMaskEnum fromValidationStatusString(String statusString){
+        for (DataParcelValidationStatusSubscriptionMaskEnum b : DataParcelValidationStatusSubscriptionMaskEnum.values()) {
             if (b.getToken().equalsIgnoreCase(statusString)) {
                 return b;
             }

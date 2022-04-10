@@ -19,37 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
+package net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets;
 
-public enum DataParcelDescriptorKeyEnum {
-    DATASET_DEFINER("definer"),
-    DATASET_CATEGORY("category"),
-    DATASET_SUBCATEGORY("subcategory"),
-    DATASET_RESOURCE("resource"),
-    DATASET_SEGMENT("segment"),
-    DATASET_ATTRIBUTE("attribute"),
-    DATASET_DISCRIMINATOR_TYPE("discrimintor_type"),
-    DATASET_DISCRIMINATOR_VALUE("discriminator_value"),
-    DATASET_NORMALISATION_STATUS("normalisation_status"),
-    DATASET_VALIDATION_STATUS("validation_status"),
-    DATASET_TYPE("type"),
-    DATASET_SOURCE("source"),
-    DATASET_INTENDED_TARGET("target"),
-    DATASET_VERSION("version");
-   
-    private String topicKey;
+public enum DataParcelNormalisationStatusSubscriptionMaskEnum {
+    DATA_PARCEL_CONTENT_NORMALISATION_TRUE("Normalised.True", "pegacorn.data-parcel.normalisation-status.true"),
+    DATA_PARCEL_CONTENT_NORMALISATION_FALSE("Normalised.False", "pegacorn.data-parcel.normalisation-status.false"),
+    DATA_PARCEL_CONTENT_NORMALISATION_ANY("Normalised.Any", "pegacorn.data-parcel.normalisation-status.any");
 
-    private DataParcelDescriptorKeyEnum(String mapElementType){
-        this.topicKey = mapElementType;
+    private String token;
+    private String displayName;
+
+    private DataParcelNormalisationStatusSubscriptionMaskEnum(String displayName, String normalisation){
+        this.token = normalisation;
+        this.displayName = displayName;
     }
 
-    public String getTopicKey(){
-        return(this.topicKey);
+    public String getToken(){
+        return(this.token);
     }
 
-    public static DataParcelDescriptorKeyEnum fromTopicKeyString(String keyString){
-        for (DataParcelDescriptorKeyEnum b : DataParcelDescriptorKeyEnum.values()) {
-            if (b.getTopicKey().equalsIgnoreCase(keyString)) {
+    public String getDisplayName(){
+        return(this.displayName);
+    }
+
+    public static DataParcelNormalisationStatusSubscriptionMaskEnum fromNormalisationStatusString(String theString){
+        for (DataParcelNormalisationStatusSubscriptionMaskEnum b : DataParcelNormalisationStatusSubscriptionMaskEnum.values()) {
+            if (b.getToken().equalsIgnoreCase(theString)) {
                 return b;
             }
         }

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.factories;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.valuesets.TaskReasonTypeEnum;
 import org.hl7.fhir.r4.model.IdType;

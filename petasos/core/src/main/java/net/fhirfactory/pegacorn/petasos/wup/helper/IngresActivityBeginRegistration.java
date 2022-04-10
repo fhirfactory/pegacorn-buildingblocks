@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskCo
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskTriggerSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
@@ -108,7 +108,7 @@ public class IngresActivityBeginRegistration {
         metricsAgent.touchLastActivityInstant();
 
         getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Start");
-        TaskWorkItemType workItem = new TaskWorkItemType(theUoW.getIngresContent());
+        ParcelOfWorkType workItem = new ParcelOfWorkType(theUoW.getIngresContent());
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
         TaskContextType taskContext = new TaskContextType();
         TaskTriggerSummaryType taskTriggerSummary = new TaskTriggerSummaryType();

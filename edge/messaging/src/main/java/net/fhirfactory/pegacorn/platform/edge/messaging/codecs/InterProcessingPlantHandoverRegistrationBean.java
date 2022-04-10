@@ -46,10 +46,9 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -113,7 +112,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
 
         getLogger().trace(".ipcReceiverActivityStart(): Create and register a new ActionableTask: Start");
-        TaskWorkItemType taskWorkItem = SerializationUtils.clone(handoverPacket.getActionableTask().getTaskWorkItem());
+        ParcelOfWorkType taskWorkItem = SerializationUtils.clone(handoverPacket.getActionableTask().getTaskWorkItem());
         PetasosActionableTask incomingActionableTask = handoverPacket.getActionableTask();
         TaskTraceabilityElementType upstreamTaskTraceability = handoverPacket.getUpstreamFulfillmentTaskDetails();
         PetasosActionableTask newActionableTask = actionableTaskFactory.newMessageBasedActionableTask(incomingActionableTask, upstreamTaskTraceability, taskWorkItem);

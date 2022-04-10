@@ -19,29 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
+package net.fhirfactory.pegacorn.core.model.petasos.dataparcel;
 
-public enum DataParcelFragmentQualityEnum {
-    AUTHORITATIVE_QUALITY_DATA_PARCEL_FRAGMENT("dataparcel.fragment-quality.authoritative"),
-    INFORMATIONAL_QUALITY_DATA_PARCEL_FRAGMENT("dataparcel.fragment-quality.informational"),
-    ANECDOTAL_QUALITY_DATA_PARCEL_FRAGMENT("dataparcel.fragment-quality.anecdotal");
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-    private String dataParcelFragmentQualityValue;
+public class DataParcelManifestSet implements Serializable {
+    ArrayList<DataParcelManifest> manifestSet;
 
-    private DataParcelFragmentQualityEnum(String qualityValue){
-        this.dataParcelFragmentQualityValue = qualityValue;
+    public DataParcelManifestSet(){
+        this.manifestSet = new ArrayList<>();
     }
 
-    public String getDataParcelFragmentQualityValue() {
-        return dataParcelFragmentQualityValue;
+    public DataParcelManifestSet(List<DataParcelManifest> oriList){
+        this.manifestSet = new ArrayList<>();
+        this.manifestSet.addAll(oriList);
     }
 
-    public static DataParcelFragmentQualityEnum fromDataParcelFragmentQualityValueString(String dataQualityValue){
-        for (DataParcelFragmentQualityEnum b : DataParcelFragmentQualityEnum.values()) {
-            if (b.getDataParcelFragmentQualityValue().equalsIgnoreCase(dataQualityValue)) {
-                return b;
-            }
-        }
-        return null;
+    public List<DataParcelManifest> getManifestSet() {
+        return manifestSet;
+    }
+
+    public void setManifestSet(List<DataParcelManifest> manifestSet) {
+        this.manifestSet.clear();
+        this.manifestSet.addAll(manifestSet);
     }
 }

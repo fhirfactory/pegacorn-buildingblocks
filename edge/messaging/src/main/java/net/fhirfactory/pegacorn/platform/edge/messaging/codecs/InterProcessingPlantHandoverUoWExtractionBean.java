@@ -22,10 +22,10 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDirectionEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.helpers;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.valuesets.ExtremelySimplifiedResourceTypeEnum;
 
 import javax.enterprise.context.ApplicationScoped;

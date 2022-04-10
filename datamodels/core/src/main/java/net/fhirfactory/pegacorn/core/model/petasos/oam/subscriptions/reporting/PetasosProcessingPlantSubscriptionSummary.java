@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -101,7 +101,7 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
         asSubscriber.put(subscriberSubscriptionSummary.getPublisherComponentId(), subscriberSubscriptionSummary);
     }
 
-    public boolean addSubscriptionForExistingSubscriber(ComponentIdType componentID, TaskWorkItemSubscriptionType topic){
+    public boolean addSubscriptionForExistingSubscriber(ComponentIdType componentID, DataParcelManifestSubscriptionMaskType topic){
         if(asPublisher.containsKey(componentID)){
             asPublisher.get(componentID).addTopic(topic);
             return(true);

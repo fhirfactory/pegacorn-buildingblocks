@@ -33,7 +33,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatyp
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
@@ -159,11 +159,11 @@ public abstract class PetasosTaskSharedInstance {
         return(hasValue);
     }
 
-    public TaskWorkItemType getTaskWorkItem() {
+    public ParcelOfWorkType getTaskWorkItem() {
         return (getLocalInstance().getTaskWorkItem());
     }
 
-    public void setTaskWorkItem(TaskWorkItemType taskWorkItem) {
+    public void setTaskWorkItem(ParcelOfWorkType taskWorkItem) {
         setTaskWorkItem(taskWorkItem);
     }
 

@@ -29,16 +29,14 @@ import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementSer
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDirectionEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditEventGranularityLevelEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
@@ -66,7 +64,6 @@ import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

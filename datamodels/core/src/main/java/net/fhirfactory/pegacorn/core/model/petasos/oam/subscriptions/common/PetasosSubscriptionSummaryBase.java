@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.valuesets.PetasosSubscriptionSummaryTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -40,7 +40,7 @@ public class PetasosSubscriptionSummaryBase implements Serializable {
     private String participantName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant timestamp;
-    private List<TaskWorkItemSubscriptionType> subscribedTaskWorkItems;
+    private List<DataParcelManifestSubscriptionMaskType> subscribedTaskWorkItems;
 
     //
     // Constructor(s)
@@ -75,16 +75,16 @@ public class PetasosSubscriptionSummaryBase implements Serializable {
         this.componentID = componentID;
     }
 
-    public List<TaskWorkItemSubscriptionType> getSubscribedTaskWorkItems() {
+    public List<DataParcelManifestSubscriptionMaskType> getSubscribedTaskWorkItems() {
         return subscribedTaskWorkItems;
     }
 
-    public void setSubscribedTaskWorkItems(List<TaskWorkItemSubscriptionType> subscribedTaskWorkItems) {
+    public void setSubscribedTaskWorkItems(List<DataParcelManifestSubscriptionMaskType> subscribedTaskWorkItems) {
         this.subscribedTaskWorkItems = subscribedTaskWorkItems;
     }
 
     @JsonIgnore
-    public void addTopic(TaskWorkItemSubscriptionType topic){
+    public void addTopic(DataParcelManifestSubscriptionMaskType topic){
         boolean topicExists = false;
         if(!subscribedTaskWorkItems.contains(topic)){
             subscribedTaskWorkItems.add(topic);

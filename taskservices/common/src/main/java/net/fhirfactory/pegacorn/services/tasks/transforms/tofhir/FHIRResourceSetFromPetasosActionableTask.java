@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.services.tasks.transforms.tofhir;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.services.tasks.metadata.fromhl7v2x.FHIRTaskMetadataResourceSetFromHL7v2x;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -90,7 +90,7 @@ public class FHIRResourceSetFromPetasosActionableTask {
         }
         if(!hasBeneficiary || !hasEncounter || !hasCompleteTaskTrigger){
             if(actionableTask.hasTaskWorkItem()) {
-                TaskWorkItemType taskWorkItem = actionableTask.getTaskWorkItem();
+                ParcelOfWorkType taskWorkItem = actionableTask.getTaskWorkItem();
                 if(metadataResourceSetFromHL7v2x.containsHL7v2xMessage(taskWorkItem)) {
                     TaskContextType updatedTaskContext = metadataResourceSetFromHL7v2x.newTaskContextType(actionableTask);
                     actionableTask.setTaskContext(updatedTaskContext);

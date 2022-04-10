@@ -34,7 +34,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.d
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityElementTypeFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityTypeFactory;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +76,7 @@ public class PetasosActionableTaskFactory {
     // Business Methods
     //
 
-    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskWorkItemType payload ){
+    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, ParcelOfWorkType payload ){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, fulfillmentTaskSummary->{}, payload->{}", upstreamTask, payload);
 
         //
@@ -94,7 +94,7 @@ public class PetasosActionableTaskFactory {
         return(newTask);
     }
 
-    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskTraceabilityElementType fulfillmentTaskSummary, TaskWorkItemType payload ){
+    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskTraceabilityElementType fulfillmentTaskSummary, ParcelOfWorkType payload ){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, fulfillmentTaskSummary->{}, payload->{}", upstreamTask, fulfillmentTaskSummary, payload);
 
         //
@@ -112,7 +112,7 @@ public class PetasosActionableTaskFactory {
         return(newTask);
     }
 
-    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskFulfillmentType fulfillment, TaskWorkItemType payload ){
+    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskFulfillmentType fulfillment, ParcelOfWorkType payload ){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, fulfillment->{}, payload->{}", upstreamTask, fulfillment, payload);
 
         TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(upstreamTask.getTaskId(), fulfillment);
@@ -121,7 +121,7 @@ public class PetasosActionableTaskFactory {
         return(petasosActionableTask);
     }
 
-    public PetasosActionableTask newMessageBasedActionableTask(TaskWorkItemType payload){
+    public PetasosActionableTask newMessageBasedActionableTask(ParcelOfWorkType payload){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, payload->{}", payload);
         //
         // Create an empty task

@@ -19,11 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel;
+package net.fhirfactory.pegacorn.core.model.petasos.dataparcel;
 
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -48,13 +49,13 @@ public class DataParcelReference implements Serializable {
     }
 
     public DataParcelReference(DataParcelReference ori){
-        this.dataParcelDefiner = ori.getDataParcelDefiner();
-        this.dataParcelCategory = ori.getDataParcelCategory();
-        this.dataParcelSubCategory = ori.getDataParcelSubCategory();
-        this.dataParcelResource = ori.getDataParcelResource();
-        this.dataParcelSegment = ori.getDataParcelSegment();
-        this.dataParcelAttribute = ori.getDataParcelAttribute();
-        this.version = new String(ori.getVersion());
+        this.dataParcelDefiner = SerializationUtils.clone(ori.getDataParcelDefiner());
+        this.dataParcelCategory = SerializationUtils.clone(ori.getDataParcelCategory());
+        this.dataParcelSubCategory = SerializationUtils.clone(ori.getDataParcelSubCategory());
+        this.dataParcelResource = SerializationUtils.clone(ori.getDataParcelResource());
+        this.dataParcelSegment = SerializationUtils.clone(ori.getDataParcelSegment());
+        this.dataParcelAttribute = SerializationUtils.clone(ori.getDataParcelAttribute());
+        this.version = SerializationUtils.clone(ori.getVersion());
     }
 
     public boolean hasVersion(){

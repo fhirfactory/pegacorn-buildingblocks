@@ -23,9 +23,9 @@ package net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit;
 
 import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.core.constants.systemwide.DeploymentSystemIdentificationInterface;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;

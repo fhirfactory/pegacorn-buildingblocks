@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.workflow.model.behaviours;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.internals.communicate.workflow.model.CDTIdentifier;
 import net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus.CDTStimulus;
 

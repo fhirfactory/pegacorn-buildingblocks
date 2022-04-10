@@ -19,19 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel;
+package net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class DataParcelTypeDescriptor implements Serializable {
+public class DataParcelTypeDescriptorSubscriptionMaskType implements Serializable {
     private String dataParcelDefiner;
     private String dataParcelCategory;
     private String dataParcelSubCategory;
@@ -46,7 +47,7 @@ public class DataParcelTypeDescriptor implements Serializable {
     // Constructor(s)
     //
 
-    public DataParcelTypeDescriptor(){
+    public DataParcelTypeDescriptorSubscriptionMaskType(){
         this.dataParcelCategory = null;
         this.dataParcelDefiner = null;
         this.dataParcelSubCategory = null;
@@ -58,7 +59,7 @@ public class DataParcelTypeDescriptor implements Serializable {
         this.dataParcelDiscriminatorValue = null;
     }
 
-    public DataParcelTypeDescriptor(DataParcelTypeDescriptor ori){
+    public DataParcelTypeDescriptorSubscriptionMaskType(DataParcelTypeDescriptorSubscriptionMaskType ori){
         if(ori.hasDataParcelDefiner()) {
             this.dataParcelDefiner = SerializationUtils.clone(ori.getDataParcelDefiner());
         }
@@ -339,8 +340,8 @@ public class DataParcelTypeDescriptor implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DataParcelTypeDescriptor)) return false;
-        DataParcelTypeDescriptor that = (DataParcelTypeDescriptor) o;
+        if (!(o instanceof DataParcelTypeDescriptorSubscriptionMaskType)) return false;
+        DataParcelTypeDescriptorSubscriptionMaskType that = (DataParcelTypeDescriptorSubscriptionMaskType) o;
         return Objects.equals(getDataParcelDefiner(), that.getDataParcelDefiner()) && Objects.equals(getDataParcelCategory(), that.getDataParcelCategory()) && Objects.equals(getDataParcelSubCategory(), that.getDataParcelSubCategory()) && Objects.equals(getDataParcelResource(), that.getDataParcelResource()) && Objects.equals(getDataParcelSegment(), that.getDataParcelSegment()) && Objects.equals(getDataParcelAttribute(), that.getDataParcelAttribute()) && Objects.equals(getDataParcelDiscriminatorType(), that.getDataParcelDiscriminatorType()) && Objects.equals(getDataParcelDiscriminatorValue(), that.getDataParcelDiscriminatorValue()) && Objects.equals(getVersion(), that.getVersion());
     }
 
@@ -353,10 +354,10 @@ public class DataParcelTypeDescriptor implements Serializable {
     // Equals with Wildcards (in testObject)
     //
 
-    public boolean isEqualWithWildcardsInOther(DataParcelTypeDescriptor otherDescriptor){
+    public boolean isEqualWithWildcardsInOther(DataParcelTypeDescriptorSubscriptionMaskType otherDescriptor){
 
         boolean parcelDefinerIsEqual = StringUtils.equals(this.getDataParcelDefiner(),otherDescriptor.getDataParcelDefiner());
-        boolean parcelDefinedHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDefiner(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDefinedHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDefiner(), DataParcelManifest.WILDCARD_CHARACTER);
         boolean parcelDefinerIsGoodEnoughMatch = parcelDefinerIsEqual || parcelDefinedHasWildcard;
         if (!parcelDefinerIsGoodEnoughMatch) {
             return (false);

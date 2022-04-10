@@ -29,13 +29,13 @@ import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponent
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantSubscriptionMapDM;
 import org.apache.commons.lang3.StringUtils;
@@ -123,7 +123,7 @@ public class LocalPetasosParticipantCacheIM {
 		if(!subscribedTopics.isEmpty()) {
 			getLogger().trace(".registerPetasosParticipant(): Has topics to subscribe to!");
 			for (TaskWorkItemManifestType currentParcelManifest : subscribedTopics) {
-				TaskWorkItemSubscriptionType currentFilter = new TaskWorkItemSubscriptionType(currentParcelManifest);
+				DataParcelManifestSubscriptionMaskType currentFilter = new DataParcelManifestSubscriptionMaskType(currentParcelManifest);
 				participant.getSubscriptions().add(currentFilter);
 			}
 		}
@@ -159,7 +159,7 @@ public class LocalPetasosParticipantCacheIM {
 		if(!registeredParticipant.getSubscriptions().isEmpty()){
 			getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] Has subscription requirements");
 			getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] Subscribing to Topics");
-			for (TaskWorkItemSubscriptionType currentSubscribedManifest : registeredParticipant.getSubscriptions()) {
+			for (DataParcelManifestSubscriptionMaskType currentSubscribedManifest : registeredParticipant.getSubscriptions()) {
 				getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] adding topic->{}", currentSubscribedManifest);
 				boolean doSubscribe = true;
 				if(currentSubscribedManifest.hasSourceProcessingPlantParticipantName()) {
@@ -290,7 +290,7 @@ public class LocalPetasosParticipantCacheIM {
 				getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] is processing plant...");
 				if (!participant.getSubscriptions().isEmpty()) {
 					getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] subscribed manifest set is NOT empty");
-					for (TaskWorkItemSubscriptionType currentSubscribedManifest : participant.getSubscriptions()) {
+					for (DataParcelManifestSubscriptionMaskType currentSubscribedManifest : participant.getSubscriptions()) {
 						getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] currentSubscribedManifest->{}", currentSubscribedManifest);
 						getParticipantSubscriptionMapDM().addSubscriber(currentSubscribedManifest, participant);
 					}

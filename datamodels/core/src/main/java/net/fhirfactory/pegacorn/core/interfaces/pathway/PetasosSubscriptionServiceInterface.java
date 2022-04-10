@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.pathway;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 
 import java.util.List;

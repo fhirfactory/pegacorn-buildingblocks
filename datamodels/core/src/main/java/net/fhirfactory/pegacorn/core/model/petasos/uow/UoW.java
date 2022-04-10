@@ -26,14 +26,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

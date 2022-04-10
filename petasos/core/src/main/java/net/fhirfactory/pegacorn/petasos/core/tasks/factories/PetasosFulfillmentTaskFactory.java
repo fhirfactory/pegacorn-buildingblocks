@@ -35,7 +35,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.data
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +94,7 @@ public class PetasosFulfillmentTaskFactory {
         fulfillmentTask.setTaskType(taskType);
         //
         // Get the TaskWorkItem from the actionableTask, clone it and add it to our Task.
-        TaskWorkItemType taskWorkItem = SerializationUtils.clone(actionableTask.getTaskWorkItem());
+        ParcelOfWorkType taskWorkItem = SerializationUtils.clone(actionableTask.getTaskWorkItem());
         fulfillmentTask.setTaskWorkItem(taskWorkItem);
         //
         // Get the TaskTraceability Detail from the actionableTask, clone it and add it to our Task

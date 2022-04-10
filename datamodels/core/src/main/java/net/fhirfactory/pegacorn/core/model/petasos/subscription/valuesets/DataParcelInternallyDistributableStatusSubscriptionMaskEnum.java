@@ -19,17 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
+package net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets;
 
-public enum DataParcelExternallyDistributableStatusEnum {
-    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_TRUE("ExternallyDistributable.True", "pegacorn.data-parcel.externally-distributable-status.true"),
-    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE("ExternallyDistributable.False", "pegacorn.data-parcel.externally-distributable-status.false"),
-    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY("ExternallyDistributable.Any", "pegacorn.data-parcel.externally-distributable-status.any");
+public enum DataParcelInternallyDistributableStatusSubscriptionMaskEnum {
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_TRUE("InternallyDistributable.True", "pegacorn.data-parcel.internally-distributable-status.true"),
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE("InternallyDistributable.False", "pegacorn.data-parcel.internally-distributable-status.false"),
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY("InternallyDistributable.Any", "pegacorn.data-parcel.internally-distributable-status.any");
 
     private String token;
     private String displayName;
 
-    private DataParcelExternallyDistributableStatusEnum(String displayName, String normalisation){
+    private DataParcelInternallyDistributableStatusSubscriptionMaskEnum(String displayName, String normalisation){
         this.token = normalisation;
         this.displayName = displayName;
     }
@@ -42,8 +42,8 @@ public enum DataParcelExternallyDistributableStatusEnum {
         return(this.displayName);
     }
 
-    public static DataParcelExternallyDistributableStatusEnum fromNormalisationStatusString(String theString){
-        for (DataParcelExternallyDistributableStatusEnum b : DataParcelExternallyDistributableStatusEnum.values()) {
+    public static DataParcelInternallyDistributableStatusSubscriptionMaskEnum fromNormalisationStatusString(String theString){
+        for (DataParcelInternallyDistributableStatusSubscriptionMaskEnum b : DataParcelInternallyDistributableStatusSubscriptionMaskEnum.values()) {
             if (b.getToken().equalsIgnoreCase(theString)) {
                 return b;
             }

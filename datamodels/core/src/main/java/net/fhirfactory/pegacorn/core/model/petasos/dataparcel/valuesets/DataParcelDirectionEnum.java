@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
+package net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets;
 
 public enum DataParcelDirectionEnum {
     INFORMATION_FLOW_INBOUND_DATA_PARCEL("Message.Inbound", "petasos.information_flow.message.direction.inbound"),

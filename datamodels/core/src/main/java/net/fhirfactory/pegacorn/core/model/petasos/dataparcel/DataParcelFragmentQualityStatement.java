@@ -19,9 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel;
+package net.fhirfactory.pegacorn.core.model.petasos.dataparcel;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelFragmentQualityEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelFragmentQualityEnum;
 
 import java.io.Serializable;
 import java.util.Objects;

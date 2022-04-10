@@ -22,11 +22,11 @@
 package net.fhirfactory.pegacorn.petasos.core.participants.manager;
 
 import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscriptionRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantSubscriptionMapDM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution.LocalTaskDistributionDecisionEngine;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ public class LocalPetasosParticipantSubscriptionMapIM {
             LOG.debug(".addTopicSubscriber(): Exit, Either contentTopicID or subscriber is null!");
             return;
         }
-        TaskWorkItemSubscriptionType newFilter = new TaskWorkItemSubscriptionType(contentTopicID);
+        DataParcelManifestSubscriptionMaskType newFilter = new DataParcelManifestSubscriptionMaskType(contentTopicID);
         subscriptionCache.addSubscriber(newFilter, subscriber);
         LOG.debug(".addTopicSubscriber(): Exit");
     }

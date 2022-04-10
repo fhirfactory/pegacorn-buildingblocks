@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter
+ * Copyright (c) 2022 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,18 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.dataparcel.valuesets;
+package net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets;
 
-public enum PolicyEnforcementPointApprovalStatusEnum {
-    POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE("PEP-Approval.Positive","policy-enforcement-point.approval.positive"),
-    POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE("PEP-Approval.Negative","policy-enforcement-point.approval.negative"),
-    POLICY_ENFORCEMENT_POINT_APPROVAL_ANY("PEP-Approval.Any","policy-enforcement-point.approval.any");
+public enum DataParcelExternallyDistributableStatusSubscriptionMaskEnum {
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_TRUE("ExternallyDistributable.True", "pegacorn.data-parcel.externally-distributable-status.true"),
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE("ExternallyDistributable.False", "pegacorn.data-parcel.externally-distributable-status.false"),
+    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY("ExternallyDistributable.Any", "pegacorn.data-parcel.externally-distributable-status.any");
 
     private String token;
     private String displayName;
 
-    private PolicyEnforcementPointApprovalStatusEnum(String displayName, String compliance){
-        this.token = compliance;
+    private DataParcelExternallyDistributableStatusSubscriptionMaskEnum(String displayName, String normalisation){
+        this.token = normalisation;
         this.displayName = displayName;
     }
 
@@ -42,8 +42,8 @@ public enum PolicyEnforcementPointApprovalStatusEnum {
         return(this.displayName);
     }
 
-    public static PolicyEnforcementPointApprovalStatusEnum fromApprovalStatusString(String theString){
-        for (PolicyEnforcementPointApprovalStatusEnum b : PolicyEnforcementPointApprovalStatusEnum.values()) {
+    public static DataParcelExternallyDistributableStatusSubscriptionMaskEnum fromNormalisationStatusString(String theString){
+        for (DataParcelExternallyDistributableStatusSubscriptionMaskEnum b : DataParcelExternallyDistributableStatusSubscriptionMaskEnum.values()) {
             if (b.getToken().equalsIgnoreCase(theString)) {
                 return b;
             }

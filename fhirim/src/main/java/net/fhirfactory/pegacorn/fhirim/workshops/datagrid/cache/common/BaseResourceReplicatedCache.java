@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.fhirim.workshops.datagrid.cache.common;
 import net.fhirfactory.pegacorn.core.model.datagrid.datatypes.DataGridResourceIdType;
 import net.fhirfactory.pegacorn.core.model.datagrid.datatypes.DataGridResourceType;
 import net.fhirfactory.pegacorn.core.model.datagrid.datatypes.DatagridPersistenceServiceRegistrationType;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 import org.infinispan.Cache;
 
 public abstract class BaseResourceReplicatedCache {

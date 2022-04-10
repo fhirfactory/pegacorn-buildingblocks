@@ -22,8 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.petasos.uow;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelQualityStatement;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelQualityStatement;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,8 +91,8 @@ public class UoWPayload implements Serializable {
     public DataParcelQualityStatement getPayloadQuality() {
         getLogger().debug(".getPayloadQuality(): Entry");
         if(hasDataParcelQualityStatement()){
-            getLogger().debug(".getPayloadQuality(): Exit, returning payloadQuality->{}", this.getPayloadManifest().getPayloadQuality());
-            return(this.getPayloadManifest().getPayloadQuality());
+            getLogger().debug(".getPayloadQuality(): Exit, returning payloadQuality->{}", this.getPayloadManifest().getContentQuality());
+            return(this.getPayloadManifest().getContentQuality());
         } else {
             getLogger().debug(".getPayloadQuality(): Exit, no payloadQuality statement available");
             return (null);

@@ -27,14 +27,14 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterfac
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDirectionEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
@@ -252,7 +252,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         payloadManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_API_ACTIVITY_REQUEST);
         payload.setPayload("Query");
         payload.setPayloadManifest(payloadManifest);
-        TaskWorkItemType workItem = new TaskWorkItemType(payload);
+        ParcelOfWorkType workItem = new ParcelOfWorkType(payload);
         //
         // Build and register a Petasos Actionable Task
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
@@ -270,7 +270,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         getLogger().debug(".initialiseActivity(): Entry, uow->{}, resilientActivity->{}", uow, resilientActivity);
         //
         // Build a UoW for the activity
-        TaskWorkItemType workItem = new TaskWorkItemType(uow.getIngresContent());
+        ParcelOfWorkType workItem = new ParcelOfWorkType(uow.getIngresContent());
         //
         // Build and register a Petasos Actionable Task
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);

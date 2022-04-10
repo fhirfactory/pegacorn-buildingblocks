@@ -19,30 +19,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes;
+package net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets;
 
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public enum DataParcelValidationStatusEnum {
+    DATA_PARCEL_CONTENT_VALIDATED_TRUE("Validated.True","pegacorn.data-parcel.validation-status.true"),
+    DATA_PARCEL_CONTENT_VALIDATED_FALSE("Validated.False", "pegacorn.data-parcel.validation-status.false");
 
-public class TaskWorkItemType extends UoW {
-    private static final Logger LOG = LoggerFactory.getLogger(UoW.class);
+    private String token;
+    private String displayName;
 
-    @Override
-    protected Logger getLogger(){
-        return(LOG);
+    private DataParcelValidationStatusEnum(String displayName, String token){
+        this.token = token;
+        this.displayName = displayName;
     }
 
-    public TaskWorkItemType(){
-        super();
+    public String getToken(){
+        return(this.token);
     }
 
-    public TaskWorkItemType(UoWPayload inputPayload) {
-        super(inputPayload);
+    public String getDisplayName(){
+        return(this.displayName);
     }
 
-    public TaskWorkItemType(UoW originalUoW) {
-        super(originalUoW);
+    public static DataParcelValidationStatusEnum fromValidationStatusString(String statusString){
+        for (DataParcelValidationStatusEnum b : DataParcelValidationStatusEnum.values()) {
+            if (b.getToken().equalsIgnoreCase(statusString)) {
+                return b;
+            }
+        }
+        return null;
     }
 }
