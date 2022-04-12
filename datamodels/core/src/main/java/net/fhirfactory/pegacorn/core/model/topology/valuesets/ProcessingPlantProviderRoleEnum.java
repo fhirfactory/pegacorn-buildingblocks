@@ -19,9 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.topology.role;
+package net.fhirfactory.pegacorn.core.model.topology.valuesets;
 
-public enum ProcessingPlantRoleEnum {
+public enum ProcessingPlantProviderRoleEnum {
     PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT("Petasos.ServiceProvider.ITOps"),
     PETASOS_SERVICE_PROVIDER_TASK_MANAGEMENT("Petasos.ServiceProvider.Task-Management"),
     PETASOS_SERVICE_PROVIDER_AUDIT_MANAGEMENT("Petasos.ServiceProvider.Audit-Management"),
@@ -32,11 +32,12 @@ public enum ProcessingPlantRoleEnum {
     PETASOS_SERVICE_PROVIDER_GATEWAY_SMS("Petasos.ServiceProvider.SMS-Gateway"),
     PETASOS_SERVICE_PROVIDER_FHIR_DATAGRID("Petasos.ServiceProvider.FHIR-Datagrid"),
     PETASOS_SERVICE_PROVIDER_MITAF_GENERAL("Petasos.ServiceProvider.MITaF-General"),
-    PETASOS_SERVICE_PROVIDER_FHIRBREAK_GENERAL("Petasos.ServiceProvider.FHIRBreak-General");
+    PETASOS_SERVICE_PROVIDER_FHIRBREAK_GENERAL("Petasos.ServiceProvider.FHIRBreak-General"),
+    PETASOS_SERVICE_PROVIDER_NONE("Petasos.ServiceProvider.None");
 
     private String token;
 
-    private ProcessingPlantRoleEnum(String token){
+    private ProcessingPlantProviderRoleEnum(String token){
         this.token = token;
     }
 

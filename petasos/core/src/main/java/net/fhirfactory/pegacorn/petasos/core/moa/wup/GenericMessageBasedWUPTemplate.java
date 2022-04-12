@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupp
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
@@ -209,6 +210,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             registerCapabilities();
             getLogger().info(".initialise(): [Register any Capabilities this Work Unit Processor supports] Finish");
 
+            getLogger().info(".initialise(): [Set my IPC Context Role] Start");
+            this.getMeAsATopologyComponent().setComponentSystemRole(specifyConnectivityContext());
+            getLogger().info(".initialise(): [Set my IPC Context Role] Finish");
+
             getLogger().info(".initialise(): [Set my component status!] Start");
             this.getMeAsATopologyComponent().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
             getLogger().info(".initialise(): [Set my component status!] Finish");
@@ -362,6 +367,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     protected String specifyParticipantDisplayName(){
         return(specifyWUPInstanceName());
+    }
+
+    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
+        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL);
     }
 
     //

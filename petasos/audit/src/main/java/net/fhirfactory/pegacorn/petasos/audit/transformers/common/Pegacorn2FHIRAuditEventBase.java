@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.core.model.topology.valuesets.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSubTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
 import org.hl7.fhir.r4.model.AuditEvent;

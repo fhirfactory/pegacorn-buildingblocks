@@ -85,8 +85,10 @@ public class EgressActivityFinalisationRegistration {
 
     public String registerActivityFinishAndFinalisation(UoW theUoW, Exchange camelExchange, String wupInstanceKey){
         getLogger().debug(".registerActivityFinishAndFinalisation(): Entry, payload --> {}, wupInstanceKey --> {}", theUoW, wupInstanceKey);
+
         getLogger().trace(".registerActivityFinishAndFinalisation(): Retrieve the Fulfillment Task from the Camel Exchange object");
         PetasosFulfillmentTaskSharedInstance fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTaskSharedInstance.class);
+
         getLogger().trace(".registerActivityFinishAndFinalisation(): Merge the UoW Egress Content into the PetasosFulfillmentTask object & process");
         TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);

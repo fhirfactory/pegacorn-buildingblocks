@@ -25,9 +25,8 @@ package net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.tasks.PetasosITOpsTaskReportingAgentInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportFactory;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -118,7 +117,7 @@ public abstract class TaskReportAgentBase {
     public void sendITOpsTaskReport(PetasosActionableTask task){
         getLogger().debug(".sendITOpsTaskReport(): Entry");
         try {
-            PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task);
+            ITOpsNotification notification = getReportFactory().newTaskSummaryReport(task);
             notification.setComponentType(specifyComponentType());
             notification.setComponentId(getComponentId());
             notification.setParticipantName(getParticipantName());
@@ -133,7 +132,7 @@ public abstract class TaskReportAgentBase {
     public void sendITOpsTaskReport(PetasosActionableTask task, List<PetasosActionableTask> newTasks){
         getLogger().debug(".sendITOpsTaskReport(): Entry");
         try {
-            PetasosComponentITOpsNotification notification = getReportFactory().newTaskSummaryReport(task, newTasks);
+            ITOpsNotification notification = getReportFactory().newTaskSummaryReport(task, newTasks);
             notification.setComponentType(specifyComponentType());
             notification.setComponentId(getComponentId());
             notification.setParticipantName(getParticipantName());
