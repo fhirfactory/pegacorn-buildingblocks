@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
@@ -55,5 +56,10 @@ public abstract class InteractEgressAPIClientGatewayWUP extends GenericMessageBa
         ingressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPIngres());
         getLogger().debug(".specifyIngresTopologyEndpoint(): Exit");
         return(ingressEndpoint);
+    }
+
+    @Override
+    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
+        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
     }
 }

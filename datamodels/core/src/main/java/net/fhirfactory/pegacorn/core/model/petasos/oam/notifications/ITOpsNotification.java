@@ -27,44 +27,40 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.Petaso
 import java.io.Serializable;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.valuesets.PetasosComponentITOpsNotificationTypeEnum;
 
-public class PetasosComponentITOpsNotification implements Serializable {
+public class ITOpsNotification extends ITOpsNotificationContent implements Serializable {
     private ComponentIdType componentId;
     private String participantName;
     private PetasosMonitoredComponentTypeEnum componentType;
     private String contentHeading;
     private PetasosComponentITOpsNotificationTypeEnum notificationType;
-    private String content;
-    private String formattedContent;
 
     //
     // Constructor
     //
 
-    public PetasosComponentITOpsNotification(){
+    public ITOpsNotification(){
+        super();
         this.componentId = null;
         this.participantName = null;
         this.componentType = null;
-        this.content = null;
-        this.formattedContent = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
     }
 
-    public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content){
+    public ITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content){
         this.componentType = componentType;
         this.participantName = name;
         this.componentId = componentId;
-        this.content = content;
-        this.formattedContent = null;
+        setContent(content);
         this.contentHeading = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
     }
 
-    public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content, String formattedContent){
+    public ITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content, String formattedContent){
         this.componentType = componentType;
         this.participantName = name;
         this.componentId = componentId;
-        this.content = content;
-        this.formattedContent = formattedContent;
+        setContent(content);
+        setFormattedContent(formattedContent);
         this.contentHeading = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
     }
@@ -87,14 +83,6 @@ public class PetasosComponentITOpsNotification implements Serializable {
 
     public void setNotificationType(PetasosComponentITOpsNotificationTypeEnum notificationType) {
         this.notificationType = notificationType;
-    }
-
-    public String getFormattedContent() {
-        return formattedContent;
-    }
-
-    public void setFormattedContent(String formattedContent) {
-        this.formattedContent = formattedContent;
     }
 
     public ComponentIdType getComponentId() {
@@ -121,14 +109,6 @@ public class PetasosComponentITOpsNotification implements Serializable {
         this.componentType = componentType;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     //
     // To String
     //
@@ -139,8 +119,8 @@ public class PetasosComponentITOpsNotification implements Serializable {
                 "componentId=" + componentId +
                 ", participantName='" + participantName + '\'' +
                 ", componentType=" + componentType +
-                ", content='" + content + '\'' +
-                ", formattedContent='" + formattedContent + '\'' +
+                ", content='" + getContent() + '\'' +
+                ", formattedContent='" + getFormattedContent() + '\'' +
                 ", contentHeading=" + contentHeading +
                 ", notificationType=" + notificationType +
                 '}';

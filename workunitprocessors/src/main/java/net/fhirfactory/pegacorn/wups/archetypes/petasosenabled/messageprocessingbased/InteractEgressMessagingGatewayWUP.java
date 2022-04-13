@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
@@ -112,6 +113,11 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT);
+    }
+
+    @Override
+    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
+        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
     }
 
     @Override

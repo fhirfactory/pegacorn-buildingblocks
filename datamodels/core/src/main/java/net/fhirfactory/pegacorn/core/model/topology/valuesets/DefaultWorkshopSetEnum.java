@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2020 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,10 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.interfaces.capabilities;
+package net.fhirfactory.pegacorn.core.model.topology.valuesets;
 
-import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantProviderRoleEnum;
+public enum DefaultWorkshopSetEnum {
+    DATA_GRID_WORKSHOP("DataGrid"),
+    INTER_SUBSYSTEM_INTEGRATION_WORKSHOP("ISSI"),
+    BEHAVIOUR_WORKSHOP("Behaviour"),
+    INTERACT_WORKSHOP("ExternalIPC"),
+    TRANSFORM_WORKSHOP("Transform"),
+    WORKFLOW_WORKSHOP("Workflow"),
+    POLICY_ENFORCEMENT_WORKSHOP("PolicyEnforcement"),
+    AUDIT_SERVICES_WORKSHOP("Audit"),
+    EDGE_WORKSHOP("InternalIPC");
 
-public interface CapabilityProviderNameServiceInterface {
-    public String resolveCapabilityServiceProvider(ProcessingPlantProviderRoleEnum title);
+    private String workshop;
+
+    private DefaultWorkshopSetEnum(String newWorkshop){
+        this.workshop = newWorkshop;
+    }
+
+    public String getWorkshop(){
+        return(this.workshop);
+    }
 }

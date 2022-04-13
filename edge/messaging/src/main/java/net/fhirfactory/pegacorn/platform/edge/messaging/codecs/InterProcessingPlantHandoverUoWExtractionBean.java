@@ -45,6 +45,8 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
     @Inject
     private ProcessingPlantInterface processingPlant;
 
+
+
     public InterProcessingPlantHandoverUoWExtractionBean() {
     }
 
@@ -61,20 +63,17 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
         String clonedPayload = SerializationUtils.clone(theUoW.getIngresContent().getPayload());
         outputPayload.setPayload(clonedPayload);
         DataParcelManifest parcelManifest = SerializationUtils.clone(theUoW.getPayloadTopicID());
-        if(processingPlant.getMeAsASoftwareComponent().getComponentSystemRole() != null) {
-            switch (processingPlant.getMeAsASoftwareComponent().getComponentSystemRole()) {
-                case COMPONENT_ROLE_INTERACT_INGRES:
-                case COMPONENT_ROLE_INTERACT_EGRESS:
-                case COMPONENT_ROLE_SUBSYSTEM_EDGE:
-                    parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
-                    parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
-                    break;
-                case COMPONENT_ROLE_SUBSYSTEM_INTERNAL:
+        if(processingPlant.getProcessingPlantType() != null) {
+            switch (processingPlant.getProcessingPlantType()) {
+                case PROCESSING_PLANT_TYPE_DATA_MANAGER:
+                case PROCESSING_PLANT_TYPE_DATAGRID_PROVIDER:
+                case PROCESSING_PLANT_TYPE_INFORMATION_MANAGER:
                     parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_WORKFLOW_TRANSIENT);
                     parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
                     break;
-                case COMPONENT_ROLE_SUBSYSTEM_TASK_DISTRIBUTION:
-                    parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_WORKFLOW_OUTPUT);
+                case PROCESSING_PLANT_TYPE_FHIRBREAK:
+                case PROCESSING_PLANT_TYPE_MITAF:
+                    parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
                     parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
                     break;
             }
@@ -89,6 +88,8 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
                 parcelManifest.setIntendedTargetSystem(null);
             }
         }
+        parcelManifest.setValidationStatus(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_FALSE);
+        parcelManifest.setNormalisationStatus(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_TRUE);
         outputPayload.setPayloadManifest(parcelManifest);
         theUoW.getEgressContent().addPayloadElement(outputPayload);
         theUoW.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_SUCCESS);

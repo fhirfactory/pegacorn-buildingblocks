@@ -218,6 +218,12 @@ public class LocalTaskDistributionDecisionEngine {
         boolean matchedTargetInterfaceName = targetParticipantInterfaceNameMatches(testManifest, subscription);
         getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedTargetInterfaceName->{}",matchedTargetInterfaceName);
 
+        boolean matchedSourceParticipantName = sourceParticipantNameMatches(testManifest, subscription);
+        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedSourceParticipantName->{}",matchedSourceParticipantName);
+
+        boolean matchedTargetParticipantName = targetParticipantNameMatches(testManifest, subscription);
+        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedTargetParticipantName->{}",matchedTargetParticipantName);
+
         boolean goodEnoughMatch = containerIsEqual
                 && contentIsEqual
                 && matchedNormalisation
@@ -229,6 +235,8 @@ public class LocalTaskDistributionDecisionEngine {
                 && matchedDirection
                 && matchedDistributionStatus
                 && matchedExternalDistributable
+                && matchedSourceParticipantName
+                && matchedTargetParticipantName
                 && matchedSourceInterfaceName
                 && matchedTargetInterfaceName;
         getLogger().info(".filter(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
@@ -404,7 +412,51 @@ public class LocalTaskDistributionDecisionEngine {
         return(manifestTypeMatches);
     }
 
-    private boolean sourceParticipantInterfaceNameMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
+    private boolean sourceParticipantNameMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest) {
+        if (testManifest == null && subscribedManifest == null) {
+            return (false);
+        }
+        if (testManifest == null || subscribedManifest == null) {
+            return (false);
+        }
+        if(subscribedManifest.hasSourceProcessingPlantParticipantName()){
+            if(subscribedManifest.getSourceProcessingPlantParticipantName().contentEquals("*")){
+                return(true);
+            }
+        }
+        if(!testManifest.hasSourceProcessingPlantParticipantName() && !subscribedManifest.hasSourceProcessingPlantParticipantName()){
+            return(true);
+        }
+        if (testManifest.hasSourceProcessingPlantParticipantName() && subscribedManifest.hasSourceProcessingPlantParticipantName()) {
+            boolean sourceIsSame = testManifest.getSourceProcessingPlantParticipantName().contentEquals(subscribedManifest.getSourceProcessingPlantParticipantName());
+            return (sourceIsSame);
+        }
+        return(false);
+    }
+
+    private boolean targetParticipantNameMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest) {
+        if (testManifest == null && subscribedManifest == null) {
+            return (false);
+        }
+        if (testManifest == null || subscribedManifest == null) {
+            return (false);
+        }
+        if(subscribedManifest.hasTargetProcessingPlantParticipantName()){
+            if(subscribedManifest.getTargetProcessingPlantParticipantName().contentEquals("*")){
+                return(true);
+            }
+        }
+        if(!testManifest.hasTargetProcessingPlantParticipantName() && !subscribedManifest.hasTargetProcessingPlantParticipantName()){
+            return(true);
+        }
+        if (testManifest.hasTargetProcessingPlantParticipantName() && subscribedManifest.hasTargetProcessingPlantParticipantName()) {
+            boolean targetIsSame = testManifest.getTargetProcessingPlantParticipantName().contentEquals(subscribedManifest.getTargetProcessingPlantParticipantName());
+            return (targetIsSame);
+        }
+        return(false);
+    }
+
+    private boolean sourceParticipantInterfaceNameMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest) {
         if (testManifest == null && subscribedManifest == null) {
             return (false);
         }

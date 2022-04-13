@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,26 +19,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.topology.nodes;
+package net.fhirfactory.pegacorn.core.model.petasos.oam.notifications;
 
-public enum DefaultWorkshopSetEnum {
-    DATA_GRID_WORKSHOP("DataGrid"),
-    INTER_SUBSYSTEM_INTEGRATION_WORKSHOP("ISSI"),
-    BEHAVIOUR_WORKSHOP("Behaviour"),
-    INTERACT_WORKSHOP("ExternalIPC"),
-    TRANSFORM_WORKSHOP("Transform"),
-    WORKFLOW_WORKSHOP("Workflow"),
-    POLICY_ENFORCEMENT_WORKSHOP("PolicyEnforcement"),
-    AUDIT_SERVICES_WORKSHOP("Audit"),
-    EDGE_WORKSHOP("InternalIPC");
+import java.io.Serializable;
 
-    private String workshop;
+public class ITOpsNotificationContent implements Serializable {
+    private String content;
+    private String formattedContent;
 
-    private DefaultWorkshopSetEnum(String newWorkshop){
-        this.workshop = newWorkshop;
+    //
+    // Constructor(s)
+    //
+
+    public ITOpsNotificationContent(){
+        this.content = null;
+        this.formattedContent = null;
     }
 
-    public String getWorkshop(){
-        return(this.workshop);
+    //
+    // Getters and Setters
+    //
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getFormattedContent() {
+        return formattedContent;
+    }
+
+    public void setFormattedContent(String formattedContent) {
+        this.formattedContent = formattedContent;
+    }
+
+    //
+    // toString
+    //
+
+    @Override
+    public String toString() {
+        return "ITOpsNotificationContent{" +
+                "content='" + content + '\'' +
+                ", formattedContent='" + formattedContent + '\'' +
+                '}';
     }
 }

@@ -19,10 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.interfaces.capabilities;
+package net.fhirfactory.pegacorn.core.model.topology.valuesets;
 
-import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantProviderRoleEnum;
+public enum ProcessingPlantTypeEnum {
+    PROCESSING_PLANT_TYPE_INFORMATION_MANAGER("Petasos.ServiceProvider.ITOps"),
+    PROCESSING_PLANT_TYPE_DATA_MANAGER("Petasos.ServiceProvider.Task-Management"),
+    PROCESSING_PLANT_TYPE_DATAGRID_PROVIDER("Petasos.ServiceProvider.Audit-Management"),
+    PROCESSING_PLANT_TYPE_MITAF("Petasos.ServiceProvider.Audit-Storage"),
+    PROCESSING_PLANT_TYPE_FHIRBREAK("Petasos.ServiceProvider.Media-Management");
 
-public interface CapabilityProviderNameServiceInterface {
-    public String resolveCapabilityServiceProvider(ProcessingPlantProviderRoleEnum title);
+    private String token;
+
+    private ProcessingPlantTypeEnum(String token){
+        this.token = token;
+    }
+
+    public String getToken(){
+        return(this.token);
+    }
 }

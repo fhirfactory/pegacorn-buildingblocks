@@ -23,7 +23,8 @@
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericTriggerBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
@@ -50,6 +51,13 @@ public abstract class InteractIngresAPIClientGatewayWUP extends GenericTriggerBa
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT);
     }
+
+    /*
+    @Override
+    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
+        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES);
+    }
+     */
 
     @Override
     protected MessageBasedWUPEndpointContainer specifyEgressEndpoint(){
