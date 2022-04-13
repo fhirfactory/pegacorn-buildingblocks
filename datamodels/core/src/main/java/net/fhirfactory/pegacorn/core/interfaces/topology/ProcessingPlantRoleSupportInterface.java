@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.topology;
 
-import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
+import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantProviderRoleEnum;
 
 public interface ProcessingPlantRoleSupportInterface {
-    public ProcessingPlantRoleEnum getProcessingPlantCapability();
+    public ProcessingPlantProviderRoleEnum getPlantProviderRole();
 }

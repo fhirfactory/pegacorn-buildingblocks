@@ -28,17 +28,15 @@ import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillme
 import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDirectionEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditEventGranularityLevelEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
@@ -47,6 +45,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantProviderRoleEnum;
+import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantTypeEnum;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.segments.datatypes.ParameterNameValuePairType;
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfaces.SolutionNodeFactoryInterface;
@@ -66,7 +66,6 @@ import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -141,6 +140,8 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     abstract protected PegacornTopologyFactoryInterface specifyTopologyFactory();
     abstract protected SolutionNodeFactoryInterface specifySolutionNodeFactory();
     abstract protected void executePostConstructActivities();
+    abstract protected ProcessingPlantProviderRoleEnum specifyPlantProviderRole();
+    abstract protected ProcessingPlantTypeEnum specifyProcessingPlantType();
 
     //
     // Getters (and Setters)
@@ -226,6 +227,17 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             resolveProcessingPlant();
             getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Resolution] softwareComponet->{}", meAsASoftwareComponent);
             getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Resolution] Finish");
+
+            getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Provider Role] Start");
+            getMeAsASoftwareComponent().setProcessingPlantProviderRole(specifyPlantProviderRole());
+            getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Provider Role] processingPlantProviderRole->{}", meAsASoftwareComponent.getProcessingPlantProviderRole());
+            getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Provider Role] Finish");
+
+            getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Type] Start");
+            getMeAsASoftwareComponent().setProcessingPlantType(specifyProcessingPlantType());
+            getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Type] processingPlantType->{}", meAsASoftwareComponent.getProcessingPlantType());
+            getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Type] Finish");
+
             getLogger().info("ProcessingPlant::initialise(): [Capability Delivery Services Map Initialisation] Start");
             getLogger().info("ProcessingPlant::initialise(): [POD Name Resolution and Assignment] Start");
             String myPodName = environmentProperties.getMandatoryProperty("MY_POD_NAME");
@@ -415,33 +427,23 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         this.capabilityDeliveryServices.put(capabilityName, fulfillmentInterface);
         getLogger().debug(".registerCapabilityFulfillmentService(): Exit, Capability Fulillment Interface registered");
     }
-/*
+
     @Override
-    public CapabilityUtilisationResponse executeTask(CapabilityUtilisationRequest request) {
-        getLogger().debug(".executeTask(): Entry, request->{}", request);
-        if(request == null){
-            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setInstantCompleted(Instant.now());
-            response.setSuccessful(false);
-            getLogger().debug(".executeTask(): Exit, request is null, response->{}", response);
-            return(response);
+    public ProcessingPlantProviderRoleEnum getPlantProviderRole(){
+        if(this.getMeAsASoftwareComponent() != null){
+            return(this.getMeAsASoftwareComponent().getProcessingPlantProviderRole());
         }
-        String capabilityName = request.getRequiredCapabilityName();
-        CapabilityFulfillmentInterface interfaceToUse = this.capabilityDeliveryServices.get(capabilityName);
-        if(interfaceToUse == null){
-            CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
-            response.setInstantCompleted(Instant.now());
-            response.setSuccessful(false);
-            response.setInScope(false);
-            getLogger().debug(".executeTask(): Exit, not registered capability, response->{}", response);
-            return(response);
-        }
-        CapabilityUtilisationResponse capabilityUtilisationResponse = interfaceToUse.executeTask(request);
-        getLogger().debug(".executeTask(): Exit, capabilityUtilisationResponse->{}", capabilityUtilisationResponse);
-        return(capabilityUtilisationResponse);
+        return(ProcessingPlantProviderRoleEnum.PETASOS_SERVICE_PROVIDER_NONE);
     }
 
- */
+    @Override
+    public ProcessingPlantTypeEnum getProcessingPlantType(){
+        if(this.getMeAsASoftwareComponent() != null){
+            return(this.getMeAsASoftwareComponent().getProcessingPlantType());
+        }
+        return(ProcessingPlantTypeEnum.PROCESSING_PLANT_TYPE_INFORMATION_MANAGER);
+    }
+
 
     @Override
     public boolean isITOpsNode() {

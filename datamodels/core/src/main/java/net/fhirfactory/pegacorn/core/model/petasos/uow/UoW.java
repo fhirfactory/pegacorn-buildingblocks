@@ -26,13 +26,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +128,10 @@ public class UoW implements Serializable {
     private void generateInstanceID() {
         getLogger().debug(".generateInstanceID(): Entry");
         getLogger().trace(".generateInstanceID(): generating an instance id based on Timestamp");
-        String generatedInstanceValue = Long.toString(Instant.now().getNano());
+        UUID key = UUID.randomUUID();
+        String upperString = Long.toHexString(key.getMostSignificantBits());
+        String lowerString = Long.toHexString(key.getLeastSignificantBits());
+        String generatedInstanceValue = upperString + lowerString;
         FDN instanceFDN = new FDN(this.typeID);
         RDN newRDN = new RDN(HASH_ATTRIBUTE, generatedInstanceValue);
         instanceFDN.appendRDN(newRDN);

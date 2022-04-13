@@ -2,8 +2,8 @@ package net.fhirfactory.pegacorn.services.tasks.metadata.fromhl7v2x;
 
 import ca.uhn.fhir.parser.IParser;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskBeneficiaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
@@ -11,7 +11,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskEn
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskTriggerSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.valuesets.TaskBeneficiaryTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.valuesets.TaskTriggerSummaryTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.HL7V2XTopicFactory;
@@ -204,7 +204,7 @@ public class FHIRTaskMetadataResourceSetFromHL7v2x {
         return(null);
     }
 
-    public String extractHL7Message(TaskWorkItemType taskWorkItem){
+    public String extractHL7Message(ParcelOfWorkType taskWorkItem){
         if(containsHL7v2xMessage(taskWorkItem)){
             if(taskWorkItem.hasIngresContent()){
                 DataParcelManifest payloadManifest = taskWorkItem.getIngresContent().getPayloadManifest();
@@ -237,7 +237,7 @@ public class FHIRTaskMetadataResourceSetFromHL7v2x {
         return(null);
     }
 
-    public boolean containsHL7v2xMessage(TaskWorkItemType taskWorkItem){
+    public boolean containsHL7v2xMessage(ParcelOfWorkType taskWorkItem){
         if(taskWorkItem.hasIngresContent()){
             DataParcelManifest payloadManifest = taskWorkItem.getIngresContent().getPayloadManifest();
             DataParcelTypeDescriptor parcelTypeDescriptor = payloadManifest.getContainerDescriptor();
@@ -268,7 +268,7 @@ public class FHIRTaskMetadataResourceSetFromHL7v2x {
         return(false);
     }
 
-    public String extractHL7TriggerName(TaskWorkItemType taskWorkItem){
+    public String extractHL7TriggerName(ParcelOfWorkType taskWorkItem){
         if(taskWorkItem.hasIngresContent()){
             DataParcelManifest payloadManifest = taskWorkItem.getIngresContent().getPayloadManifest();
             DataParcelTypeDescriptor parcelTypeDescriptor = payloadManifest.getContainerDescriptor();

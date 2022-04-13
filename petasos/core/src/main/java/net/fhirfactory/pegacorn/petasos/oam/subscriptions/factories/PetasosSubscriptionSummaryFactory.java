@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.subscriptions.factories;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -36,7 +36,7 @@ public class PetasosSubscriptionSummaryFactory {
         return(manifest.toString());
     }
 
-    public String transformToSimpleTopicName(TaskWorkItemSubscriptionType manifest){
+    public String transformToSimpleTopicName(DataParcelManifestSubscriptionMaskType manifest){
         if(manifest == null){
             return(null);
         }

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 
 import java.io.Serializable;
 import java.util.HashSet;

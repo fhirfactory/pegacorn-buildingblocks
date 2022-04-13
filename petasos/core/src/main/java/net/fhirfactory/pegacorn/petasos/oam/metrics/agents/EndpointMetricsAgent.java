@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupp
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.EndpointMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.valuesets.PetasosComponentITOpsNotificationTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
@@ -105,7 +105,7 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
     @Override
     public void sendITOpsNotification(String message) {
         try {
-            PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+            ITOpsNotification notification = new ITOpsNotification();
             notification.setComponentId(getMetricsData().getComponentID());
             notification.setParticipantName(getEndpointMetricsData().getParticipantName());
             notification.setContent(message);
@@ -124,7 +124,7 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
     @Override
     public void sendITOpsNotification(String unformattedMessage, String formattedMessage) {
         try {
-            PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+            ITOpsNotification notification = new ITOpsNotification();
             notification.setComponentId(getMetricsData().getComponentID());
             notification.setParticipantName(getEndpointMetricsData().getParticipantName());
             notification.setNotificationType(PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE);
@@ -144,7 +144,7 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
     @Override
     public void sendITOpsNotification(String unformattedMessage, String formattedMessage, PetasosComponentITOpsNotificationTypeEnum notificationType, String notificationHeader) {
         try {
-            PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
+            ITOpsNotification notification = new ITOpsNotification();
             notification.setComponentId(getMetricsData().getComponentID());
             notification.setParticipantName(getEndpointMetricsData().getParticipantName());
             notification.setContent(unformattedMessage);

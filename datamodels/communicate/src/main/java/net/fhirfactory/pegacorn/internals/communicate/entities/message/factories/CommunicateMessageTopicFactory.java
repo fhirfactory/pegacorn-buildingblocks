@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.message.factories;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 
 import javax.enterprise.context.ApplicationScoped;
 

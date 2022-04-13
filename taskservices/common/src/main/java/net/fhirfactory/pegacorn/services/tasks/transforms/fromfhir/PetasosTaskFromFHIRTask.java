@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskBeneficiaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
@@ -40,7 +40,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuese
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
@@ -131,7 +131,7 @@ public abstract class PetasosTaskFromFHIRTask {
 
         //
         // Set the Task Work Item
-        TaskWorkItemType taskWorkItem = new TaskWorkItemType();
+        ParcelOfWorkType taskWorkItem = new ParcelOfWorkType();
         UoWPayload inputPayload = new UoWPayload();
         Task.ParameterComponent currentInputComponent = fhirTask.getInputFirstRep();
         String parcelManifestAsString = currentInputComponent.getType().getCodingFirstRep().getCode();

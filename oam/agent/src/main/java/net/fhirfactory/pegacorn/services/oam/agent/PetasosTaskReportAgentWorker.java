@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.interfaces.oam.tasks.PetasosITOpsTaskReport
 import net.fhirfactory.pegacorn.core.interfaces.oam.tasks.PetasosITOpsTaskReportingBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityUtilisationBrokerInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotification;
 import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
 import net.fhirfactory.pegacorn.services.oam.agent.common.AgentWorkerBase;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class PetasosTaskReportAgentWorker extends AgentWorkerBase implements PetasosITOpsTaskReportingAgentInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosTaskReportAgentWorker.class);
 
-    Queue<PetasosComponentITOpsNotification> taskReportQueue;
+    Queue<ITOpsNotification> taskReportQueue;
     private Object notificationQueueLock;
 
     private static long SYNCHRONIZATION_CHECK_PERIOD = 10000L;
@@ -113,7 +113,7 @@ public class PetasosTaskReportAgentWorker extends AgentWorkerBase implements Pet
     //
 
     @Override
-    public void sendTaskReport(PetasosComponentITOpsNotification notification) {
+    public void sendTaskReport(ITOpsNotification notification) {
         addTaskReport(notification);
     }
 
@@ -124,7 +124,7 @@ public class PetasosTaskReportAgentWorker extends AgentWorkerBase implements Pet
     protected void forwardLocalTaskReportsToServer(){
         LOG.debug(".forwardLocalTaskReportsToServer(): Entry");
         while(hasMoreNotifications()) {
-            PetasosComponentITOpsNotification nextTaskReport = null;
+            ITOpsNotification nextTaskReport = null;
             synchronized (notificationQueueLock) {
                 nextTaskReport = getNextNotification();
             }
@@ -216,7 +216,7 @@ public class PetasosTaskReportAgentWorker extends AgentWorkerBase implements Pet
         return notificationQueueLock;
     }
 
-    public Queue<PetasosComponentITOpsNotification> getTaskReportQueue() {
+    public Queue<ITOpsNotification> getTaskReportQueue() {
         return taskReportQueue;
     }
 
@@ -236,7 +236,7 @@ public class PetasosTaskReportAgentWorker extends AgentWorkerBase implements Pet
     // Helpers
     //
 
-    public void addTaskReport(PetasosComponentITOpsNotification notification){
+    public void addTaskReport(ITOpsNotification notification){
         getLogger().debug(".addTaskReport(): Entry, notification->{}", notification);
         if(notification == null){
             return;
@@ -244,12 +244,12 @@ public class PetasosTaskReportAgentWorker extends AgentWorkerBase implements Pet
         getTaskReportQueue().add(notification);
     }
 
-    public PetasosComponentITOpsNotification getNextNotification(){
+    public ITOpsNotification getNextNotification(){
         getLogger().debug(".getNextNotification(): Entry");
         if(getTaskReportQueue().isEmpty()){
             return(null);
         }
-        PetasosComponentITOpsNotification nextNotification = getTaskReportQueue().poll();
+        ITOpsNotification nextNotification = getTaskReportQueue().poll();
         return(nextNotification);
     }
 

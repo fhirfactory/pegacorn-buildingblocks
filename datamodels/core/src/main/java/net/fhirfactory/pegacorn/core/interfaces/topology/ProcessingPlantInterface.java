@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantTypeEnum;
 
 public interface ProcessingPlantInterface extends CapabilityFulfillmentManagementInterface {
     public void initialisePlant();
@@ -42,4 +43,5 @@ public interface ProcessingPlantInterface extends CapabilityFulfillmentManagemen
     public WorkshopSoftwareComponent getWorkshop(String workshopName, String version);
     public WorkshopSoftwareComponent getWorkshop(String workshopName);
     public boolean isITOpsNode();
+    public ProcessingPlantTypeEnum getProcessingPlantType();
 }

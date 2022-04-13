@@ -25,20 +25,19 @@ package net.fhirfactory.pegacorn.petasos.core.participants.cache;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscriptionRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -126,7 +125,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
      * @param workItemSubscription The contentTopicID (FDNToken) of the payload we have received from a WUP
      * @param subscriber The NodeElement of the WUP that is interested in the payload type.
      */
-    public void addSubscriber(TaskWorkItemSubscriptionType workItemSubscription, PetasosParticipant subscriber) {
+    public void addSubscriber(DataParcelManifestSubscriptionMaskType workItemSubscription, PetasosParticipant subscriber) {
     	getLogger().debug(".addSubscriber(): Entry, workItemSubscription->{}, subscriber->{}", workItemSubscription, subscriber);
     	if((workItemSubscription==null) || (subscriber==null)) {
     		throw(new IllegalArgumentException(".addSubscriber(): workItemSubscription or subscriberInstanceID is null"));
@@ -221,12 +220,12 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 		return(sameServiceName);
 	}
 
-    public void addSubscriber(TaskWorkItemSubscriptionType contentDescriptor, SoftwareComponent localSubscriberWUP){
+    public void addSubscriber(DataParcelManifestSubscriptionMaskType contentDescriptor, SoftwareComponent localSubscriberWUP){
 		getLogger().debug(".addSubscriber(): Entry, contentDescriptor->{}, localSubscriberWUP->{}", contentDescriptor, localSubscriberWUP);
 		if((contentDescriptor==null) || (localSubscriberWUP==null)) {
 			throw(new IllegalArgumentException(".addSubscriber(): payloadTopic or localSubscriberWUP is null"));
 		}
-		TaskWorkItemSubscriptionType descriptor = new TaskWorkItemSubscriptionType(contentDescriptor);
+		DataParcelManifestSubscriptionMaskType descriptor = new DataParcelManifestSubscriptionMaskType(contentDescriptor);
 		PetasosParticipant participant = new PetasosParticipant(localSubscriberWUP);
 		addSubscriber(descriptor, participant);
 	}

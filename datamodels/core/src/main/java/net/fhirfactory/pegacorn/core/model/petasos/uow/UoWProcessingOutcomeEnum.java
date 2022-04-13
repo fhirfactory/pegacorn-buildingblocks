@@ -27,6 +27,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.uow;
  */
 public enum UoWProcessingOutcomeEnum {
     UOW_OUTCOME_SUCCESS("ProcessingOutcome.Success", "pegacorn.uow.processingoutcome.success"),
+    UOT_OUTCOME_SOFT_FAIL("ProcessingOutcom.SoftFailure", "pegacorn.uow.processingoutcome.soft_failure"),
     UOW_OUTCOME_FAILED("ProcessingOutcome.Failed","pegacorn.uow.processingoutcome.failed"),
     UOW_OUTCOME_INCOMPLETE("ProcessingOutcome.Incomplete","pegacorn.uow.processingoutcome.incomplete"),
     UOW_OUTCOME_NO_PROCESSING_REQUIRED("ProcessingOutcome.NoneRequired","pegacorn.uow.processingoutcome.nonerequired"),

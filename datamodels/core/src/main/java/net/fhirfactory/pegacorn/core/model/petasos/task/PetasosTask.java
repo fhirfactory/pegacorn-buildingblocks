@@ -23,9 +23,6 @@ package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.datagrid.datatypes.DatagridElementSourceResourceIdType;
@@ -36,9 +33,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatyp
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
-import net.fhirfactory.pegacorn.internals.SerializableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +59,7 @@ public class PetasosTask implements Serializable {
 
     private TaskTypeType taskType;
 
-    private TaskWorkItemType taskWorkItem;
+    private ParcelOfWorkType taskWorkItem;
 
     private TaskTraceabilityType taskTraceability;
 
@@ -91,7 +87,7 @@ public class PetasosTask implements Serializable {
         this.sourceResourceId = null;
         this.creationInstant = Instant.now();
         this.updateInstant = Instant.now();
-        this.taskWorkItem = new TaskWorkItemType();
+        this.taskWorkItem = new ParcelOfWorkType();
         this.taskTraceability = new TaskTraceabilityType();
         this.aggregateTaskMembership = new HashSet<>();
         this.taskOutcomeStatus = null;
@@ -188,11 +184,11 @@ public class PetasosTask implements Serializable {
         return(hasValue);
     }
 
-    public TaskWorkItemType getTaskWorkItem() {
+    public ParcelOfWorkType getTaskWorkItem() {
         return taskWorkItem;
     }
 
-    public void setTaskWorkItem(TaskWorkItemType taskWorkItem) {
+    public void setTaskWorkItem(ParcelOfWorkType taskWorkItem) {
         this.taskWorkItem = taskWorkItem;
     }
 

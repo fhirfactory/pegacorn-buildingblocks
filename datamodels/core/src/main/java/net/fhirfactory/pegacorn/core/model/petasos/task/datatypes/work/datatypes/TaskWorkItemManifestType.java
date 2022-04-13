@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes;
 
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 
 public class TaskWorkItemManifestType extends DataParcelManifest {
 
@@ -58,7 +58,7 @@ public class TaskWorkItemManifestType extends DataParcelManifest {
                 ", sourceSystem='" + getSourceSystem() + '\'' +
                 ", intendedTargetSystem='" + getIntendedTargetSystem() + '\'' +
                 ", interSubsystemDistributable=" + isInterSubsystemDistributable() +
-                ", payloadQuality=" + getPayloadQuality() +
+                ", payloadQuality=" + getContentQuality() +
                 ", normalisationStatus=" + getNormalisationStatus() +
                 ", validationStatus=" + getValidationStatus() +
                 ", dataParcelType=" + getDataParcelType() +

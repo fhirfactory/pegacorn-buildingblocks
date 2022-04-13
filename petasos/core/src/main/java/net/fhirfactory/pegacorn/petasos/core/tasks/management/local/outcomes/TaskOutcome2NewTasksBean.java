@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
@@ -35,7 +35,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardS
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
@@ -100,7 +100,7 @@ public class TaskOutcome2NewTasksBean {
 
     public List<PetasosActionableTaskSharedInstance> collectOutcomesAndCreateNewTasks(PetasosActionableTaskSharedInstance actionableTask, Exchange camelExchange) {
         getLogger().debug(".collectOutcomesAndCreateNewTasks(): Entry, actionableTask->{}", actionableTask);
-        TaskWorkItemType incomingUoW = actionableTask.getTaskWorkItem();
+        ParcelOfWorkType incomingUoW = actionableTask.getTaskWorkItem();
         UoWPayloadSet egressContent = incomingUoW.getEgressContent();
         Set<UoWPayload> egressPayloadList = egressContent.getPayloadElements();
         if (getLogger().isDebugEnabled()) {
@@ -133,7 +133,7 @@ public class TaskOutcome2NewTasksBean {
                 }
                 if (!subscriberList.isEmpty()) {
                     for(PetasosParticipant currentSubscriber: subscriberList) {
-                        TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
+                        ParcelOfWorkType newWorkItem = new ParcelOfWorkType(currentPayload);
                         getLogger().trace(".collectOutcomesAndCreateNewTasks(): newWorkItem->{}", newWorkItem);
                         PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask.getInstance(), newWorkItem);
                         TaskPerformerTypeType downstreamPerformerType = new TaskPerformerTypeType();
@@ -184,7 +184,7 @@ public class TaskOutcome2NewTasksBean {
         return (newTaskList);
     }
 
-    private PetasosActionableTask newActionableTask(PetasosActionableTask previousActionableTask, TaskWorkItemType work){
+    private PetasosActionableTask newActionableTask(PetasosActionableTask previousActionableTask, ParcelOfWorkType work){
         getLogger().debug(".newActionableTask(): Entry, previousActionableTask->{}, work->{}", previousActionableTask,  work);
         if(previousActionableTask == null){
             getLogger().debug(".newActionableTask(): Exit, previousTaskFulfillmentDetail is null, returning null");

@@ -210,9 +210,6 @@ public class ParticipantTaskExecutionController {
             getLogger().debug(".reportTaskExecutionFinish(): Entry, fulfillmentTask is empty, returning null");
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED) ;
         }
-        if(fulfillmentTask == null){
-            return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
-        }
         PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().newTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
         if(taskJobCard == null){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);

@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.P
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosWorkUnitProcessorSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.valuesets.PetasosSubscriptionSummaryTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
@@ -105,7 +105,7 @@ public class PetasosSubscriptionReportingAgent {
                 if(currentParticipant.getParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
                     //
                     // My ProcessingPlant as a Subscriber
-                    for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
+                    for (DataParcelManifestSubscriptionMaskType currentSubscription : currentParticipant.getSubscriptions()) {
                         PetasosSubscriberSubscriptionSummary publisherSubscriptionSummary = new PetasosSubscriberSubscriptionSummary();
                         getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For currentSubscription->{}", currentSubscription);
                         publisherSubscriptionSummary.addTopic(currentSubscription);
@@ -118,7 +118,7 @@ public class PetasosSubscriptionReportingAgent {
                         processingPlantSubscriptionSummary.addSubscriberSummary(publisherSubscriptionSummary);
                     }
                 } else {
-                    for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
+                    for (DataParcelManifestSubscriptionMaskType currentSubscription : currentParticipant.getSubscriptions()) {
                         if(currentSubscription.hasSourceProcessingPlantParticipantName()) {
                             if (currentSubscription.getSourceProcessingPlantParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
                                 getLogger().trace(".refreshLocalPubSubReportingMap(): Processing me as a Publisher/Producer");
@@ -147,7 +147,7 @@ public class PetasosSubscriptionReportingAgent {
                 publisherSubscriptionSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.WORK_UNIT_PROCESSOR_SUMMARY);
                 publisherSubscriptionSummary.setParticipantName(currentParticipant.getParticipantName());
                 publisherSubscriptionSummary.setTimestamp(Instant.now());
-                for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
+                for (DataParcelManifestSubscriptionMaskType currentSubscription : currentParticipant.getSubscriptions()) {
                     getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For currentSubscription->{}", currentSubscription);
                     publisherSubscriptionSummary.addTopic(currentSubscription);
                     getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding to SubscriberSummary List");

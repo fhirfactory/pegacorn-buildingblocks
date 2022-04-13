@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTy
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistrationStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -204,7 +204,7 @@ public class LocalPetasosParticipantCacheDM {
 				PetasosParticipant currentParticipant = getParticipantCache().get(participantKeys.nextElement()).getParticipant();
 				if(!currentParticipant.getSubscriptions().isEmpty()){
 					if(!currentParticipant.getSubsystemParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
-						for(TaskWorkItemSubscriptionType currentParticipantSubscription: currentParticipant.getSubscriptions()){
+						for(DataParcelManifestSubscriptionMaskType currentParticipantSubscription: currentParticipant.getSubscriptions()){
 							if(currentParticipantSubscription.getSourceProcessingPlantParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
 								if(!downstreamParticipants.contains(currentParticipant)){
 									downstreamParticipants.add(currentParticipant);
