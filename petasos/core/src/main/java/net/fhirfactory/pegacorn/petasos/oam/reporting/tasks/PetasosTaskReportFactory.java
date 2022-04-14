@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.oam.reporting.tasks;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
@@ -71,7 +71,7 @@ public class PetasosTaskReportFactory {
     // Business Method
     //
 
-    public ITOpsNotification newTaskSummaryReport(PetasosActionableTask actionableTask){
+    public PetasosComponentITOpsNotification newTaskSummaryReport(PetasosActionableTask actionableTask){
         getLogger().debug(".newTaskSummaryReport(): Entry");
 
         //
@@ -233,7 +233,7 @@ public class PetasosTaskReportFactory {
         }
         formattedReportBuilder.append("</table>");
 
-        ITOpsNotification taskReport = new ITOpsNotification();
+        PetasosComponentITOpsNotification taskReport = new PetasosComponentITOpsNotification();
 
         taskReport.setContent(reportBuilder.toString());
         taskReport.setFormattedContent(formattedReportBuilder.toString());
@@ -248,7 +248,7 @@ public class PetasosTaskReportFactory {
         return(null);
     }
 
-    public ITOpsNotification newTaskSummaryReport(PetasosActionableTask actionableTask, List<PetasosActionableTask> newActionableTasks){
+    public PetasosComponentITOpsNotification newTaskSummaryReport(PetasosActionableTask actionableTask, List<PetasosActionableTask> newActionableTasks){
         getLogger().debug(".newTaskSummaryReport(): Entry");
         if(actionableTask == null){
             getLogger().debug(".newTaskSummaryReport(): Exit, actionableTask is null");
@@ -311,7 +311,7 @@ public class PetasosTaskReportFactory {
         }
         formattedReportBuilder.append("</table>");
 
-        ITOpsNotification taskReport = new ITOpsNotification();
+        PetasosComponentITOpsNotification taskReport = new PetasosComponentITOpsNotification();
 
         taskReport.setContent(reportBuilder.toString());
         taskReport.setFormattedContent(formattedReportBuilder.toString());

@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distributio
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelExternallyDistributableStatusEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelValidationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
@@ -75,7 +74,80 @@ public class LocalTaskDistributionDecisionEngine {
     // More sophisticated SubscriberList derivation
     //
 
-   public boolean hasRemoteServiceName(PetasosParticipant subscriber){
+    /*
+    @Deprecated
+    public List<PetasosParticipant> getSubscriberSet(DataParcelManifest parcelManifest){
+        getLogger().debug(".getSubscriberSet(): Entry, parcelManifest->{}", parcelManifest);
+
+        List<PetasosParticipant> subscriberSet = deriveSubscriberList(parcelManifest);
+        getLogger().trace(".getSubscriberSet(): Before we do a general routing attempt, let's see if the message is directed somewhere specific");
+        //
+        // Because auditing is not running yet
+        // Remove once Auditing is in place
+        //
+        if(getLogger().isInfoEnabled()) {
+            int subscriberSetSize = 0;
+            if (subscriberSet != null) {
+                subscriberSetSize = subscriberSet.size();
+            }
+            if(getLogger().isInfoEnabled()) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(".getSubscriberSet(): Number of Subscribers->"+subscriberSetSize);
+                for(PetasosParticipant currentParticipant: subscriberSet) {
+                    builder.append(", participant->"+currentParticipant.getParticipantName());
+                }
+                getLogger().warn(builder.toString());
+            }
+        }
+        if(subscriberSet == null){
+            getLogger().debug(".subscriberSet(): Exit, number of subscribers is 0");
+            return(subscriberSet);
+        }
+        if(subscriberSet.isEmpty()){
+            getLogger().debug(".subscriberSet(): Exit, number of subscribers is 0");
+            return(subscriberSet);
+        }
+        //
+        // Check to see if the message has a Target defined in the ParcelManifest: This ONLY works if the target
+        // system has actually registered interest in getting the message anyhow, so a bit redundant from that
+        // sense. It is mainly used a mechanism for restricting OTHER subscribers from getting the message.
+        //
+        if(hasIntendedTarget(parcelManifest)){
+            getLogger().trace(".getSubscriberSet(): It's not empty, so let's see if the appropriate downstream system is registered");
+            for(PetasosParticipant currentSubscriber: subscriberSet){
+                if(hasRemoteServiceName(currentSubscriber)) {
+                    String subscriberName = currentSubscriber.getSubsystemParticipantName();
+                    if (subscriberName.contentEquals(parcelManifest.getIntendedTargetSystem())) {
+                        subscriberSet.add(currentSubscriber);
+                    }
+                }
+            }
+        }
+        //
+        // TODO Need to add ability to look up remote participant for parcels that explicitly define an intended target
+        // that isn't in the system
+        //
+
+        getLogger().trace(".getSubscriberSet(): Iterate through the subscribers");
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".getSubscriberSet(): number of subscribers to this UoW->{}", subscriberSet.size());
+        }
+
+        if (subscriberSet != null) {
+            getLogger().trace(".getSubscriberSet(): Iterating through....");
+            for (PetasosParticipant currentSubscriber : subscriberSet) {
+                getLogger().trace(".distributeNewFulfillmentTasks(): Iterating, currentSubscriber->{}", currentSubscriber);
+                if (!subscriberSet.contains(currentSubscriber)) {
+                    subscriberSet.add(currentSubscriber);
+                }
+            }
+        }
+        getLogger().debug(".getSubscriberSet(): Exit, number of subscribers data parcel->{}", subscriberSet.size());
+        return(subscriberSet);
+    }
+     */
+
+    public boolean hasRemoteServiceName(PetasosParticipant subscriber){
         getLogger().debug(".hasRemoteServiceName(): Entry, subscriber->{}", subscriber.getSubsystemParticipantName());
         if(subscriber == null){
             return(false);
@@ -136,7 +208,7 @@ public class LocalTaskDistributionDecisionEngine {
                 passFirstPhaseTest = true;
             }
             if (passFirstPhaseTest) {
-                getLogger().info(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
+                getLogger().debug(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
                 for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
                     if (applySubscriptionFilter(currentSubscription, parcelManifest)) {
                         if (!subscriberList.contains(currentParticipant)) {
@@ -174,55 +246,40 @@ public class LocalTaskDistributionDecisionEngine {
     //
 
     public boolean applySubscriptionFilter(TaskWorkItemSubscriptionType subscription, DataParcelManifest testManifest){
-        getLogger().info(".applySubscriptionFilter(): Entry, testManifest->{}", testManifest);
+        getLogger().debug(".applySubscriptionFilter(): Entry, testManifest->{}", testManifest);
 
         boolean containerIsEqual = containerDescriptorIsEqual(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
 
         boolean contentIsEqual = contentDescriptorIsEqual(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
 
         boolean containerOnlyIsEqual = containerDescriptorOnlyEqual(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
 
         boolean matchedNormalisation = normalisationMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedNormalisation->{}",matchedNormalisation);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedNormalisation->{}",matchedNormalisation);
 
         boolean matchedValidation = validationMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedValidation->{}",matchedValidation);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedValidation->{}",matchedValidation);
 
         boolean matchedManifestType = manifestTypeMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
 
         boolean matchedSource = sourceSystemMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedSource->{}",matchedSource);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedSource->{}",matchedSource);
 
         boolean matchedTarget = targetSystemMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
 
         boolean matchedPEPStatus = enforcementPointApprovalStatusMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedPEPStatus->{}",matchedPEPStatus);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedPEPStatus->{}",matchedPEPStatus);
 
         boolean matchedDistributionStatus = isDistributableMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedDistributionStatus->{}",matchedDistributionStatus);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedDistributionStatus->{}",matchedDistributionStatus);
 
         boolean matchedDirection = parcelFlowDirectionMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedDirection->{}",matchedDirection);
-
-        boolean matchedExternalDistributable = externallyDistributableMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedExternallyDistributable->{}",matchedExternalDistributable);
-
-        boolean matchedSourceInterfaceName = sourceParticipantInterfaceNameMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedSourceInterfaceName->{}",matchedSourceInterfaceName);
-
-        boolean matchedTargetInterfaceName = targetParticipantInterfaceNameMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedTargetInterfaceName->{}",matchedTargetInterfaceName);
-
-        boolean matchedSourceParticipantName = sourceParticipantNameMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedSourceParticipantName->{}",matchedSourceParticipantName);
-
-        boolean matchedTargetParticipantName = targetParticipantNameMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedTargetParticipantName->{}",matchedTargetParticipantName);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedDirection->{}",matchedDirection);
 
         boolean goodEnoughMatch = containerIsEqual
                 && contentIsEqual
@@ -233,13 +290,8 @@ public class LocalTaskDistributionDecisionEngine {
                 && matchedTarget
                 && matchedPEPStatus
                 && matchedDirection
-                && matchedDistributionStatus
-                && matchedExternalDistributable
-                && matchedSourceParticipantName
-                && matchedTargetParticipantName
-                && matchedSourceInterfaceName
-                && matchedTargetInterfaceName;
-        getLogger().info(".filter(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
+                && matchedDistributionStatus;
+        getLogger().trace(".filter(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
 
         boolean containerBasedOKMatch = containerOnlyIsEqual
                 && matchedNormalisation
@@ -249,14 +301,11 @@ public class LocalTaskDistributionDecisionEngine {
                 && matchedTarget
                 && matchedPEPStatus
                 && matchedDirection
-                && matchedDistributionStatus
-                && matchedExternalDistributable
-                && matchedSourceInterfaceName
-                && matchedTargetInterfaceName;
-        getLogger().info(".filter(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
+                && matchedDistributionStatus;
+        getLogger().trace(".filter(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 
         boolean passesFilter = goodEnoughMatch || containerBasedOKMatch;
-        getLogger().info(".filter(): Exit, passesFilter->{}", passesFilter);
+        getLogger().debug(".filter(): Exit, passesFilter->{}", passesFilter);
         return(passesFilter);
     }
 
@@ -350,22 +399,6 @@ public class LocalTaskDistributionDecisionEngine {
         return(false);
     }
 
-    private boolean externallyDistributableMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest){
-        getLogger().debug(".externallyDistributableMatches(): Entry");
-        if(testManifest == null || subscribedManifest == null){
-            getLogger().debug(".externallyDistributableMatches(): Exit, either testManifest or subscribedManifest are null, returning -false-");
-            return(false);
-        }
-        getLogger().trace(".externallyDistributableMatches(): subscribedManifest.getNormalisationStatus()->{}", subscribedManifest.getNormalisationStatus());
-        if(subscribedManifest.getExternallyDistributable().equals(DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY)){
-            getLogger().debug(".externallyDistributableMatches(): Exit, subscribedManifest has requested 'ANY', returning -true-");
-            return(true);
-        }
-        boolean externallyDistributableIsEqual = subscribedManifest.getExternallyDistributable().equals(testManifest.getExternallyDistributable());
-        getLogger().debug(".externallyDistributableMatches(): Exit, returning comparison result->{}", externallyDistributableIsEqual);
-        return(externallyDistributableIsEqual);
-    }
-
     private boolean normalisationMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest){
         getLogger().debug(".normalisationMatches(): Entry");
         if(testManifest == null || subscribedManifest == null){
@@ -410,94 +443,6 @@ public class LocalTaskDistributionDecisionEngine {
         }
         boolean manifestTypeMatches = subscribedManifest.getDataParcelType().equals(testManifest.getDataParcelType());
         return(manifestTypeMatches);
-    }
-
-    private boolean sourceParticipantNameMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest) {
-        if (testManifest == null && subscribedManifest == null) {
-            return (false);
-        }
-        if (testManifest == null || subscribedManifest == null) {
-            return (false);
-        }
-        if(subscribedManifest.hasSourceProcessingPlantParticipantName()){
-            if(subscribedManifest.getSourceProcessingPlantParticipantName().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasSourceProcessingPlantParticipantName() && !subscribedManifest.hasSourceProcessingPlantParticipantName()){
-            return(true);
-        }
-        if (testManifest.hasSourceProcessingPlantParticipantName() && subscribedManifest.hasSourceProcessingPlantParticipantName()) {
-            boolean sourceIsSame = testManifest.getSourceProcessingPlantParticipantName().contentEquals(subscribedManifest.getSourceProcessingPlantParticipantName());
-            return (sourceIsSame);
-        }
-        return(false);
-    }
-
-    private boolean targetParticipantNameMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest) {
-        if (testManifest == null && subscribedManifest == null) {
-            return (false);
-        }
-        if (testManifest == null || subscribedManifest == null) {
-            return (false);
-        }
-        if(subscribedManifest.hasTargetProcessingPlantParticipantName()){
-            if(subscribedManifest.getTargetProcessingPlantParticipantName().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasTargetProcessingPlantParticipantName() && !subscribedManifest.hasTargetProcessingPlantParticipantName()){
-            return(true);
-        }
-        if (testManifest.hasTargetProcessingPlantParticipantName() && subscribedManifest.hasTargetProcessingPlantParticipantName()) {
-            boolean targetIsSame = testManifest.getTargetProcessingPlantParticipantName().contentEquals(subscribedManifest.getTargetProcessingPlantParticipantName());
-            return (targetIsSame);
-        }
-        return(false);
-    }
-
-    private boolean sourceParticipantInterfaceNameMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest) {
-        if (testManifest == null && subscribedManifest == null) {
-            return (false);
-        }
-        if (testManifest == null || subscribedManifest == null) {
-            return (false);
-        }
-        if(subscribedManifest.hasSourceProcessingPlantInterfaceName()){
-            if(subscribedManifest.getSourceProcessingPlantInterfaceName().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasSourceProcessingPlantInterfaceName() && !subscribedManifest.hasSourceProcessingPlantInterfaceName()){
-            return(true);
-        }
-        if (testManifest.hasSourceProcessingPlantInterfaceName() && subscribedManifest.hasSourceProcessingPlantInterfaceName()) {
-            boolean sourceIsSame = testManifest.getSourceProcessingPlantInterfaceName().contentEquals(subscribedManifest.getSourceProcessingPlantInterfaceName());
-            return (sourceIsSame);
-        }
-        return(false);
-    }
-
-    private boolean targetParticipantInterfaceNameMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest) {
-        if (testManifest == null && subscribedManifest == null) {
-            return (false);
-        }
-        if (testManifest == null || subscribedManifest == null) {
-            return (false);
-        }
-        if(subscribedManifest.hasTargetProcessingPlantInterfaceName()){
-            if(subscribedManifest.getTargetProcessingPlantInterfaceName().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasTargetProcessingPlantInterfaceName() && !subscribedManifest.hasTargetProcessingPlantInterfaceName()){
-            return(true);
-        }
-        if (testManifest.hasTargetProcessingPlantInterfaceName() && subscribedManifest.hasTargetProcessingPlantInterfaceName()) {
-            boolean targetIsSame = testManifest.getTargetProcessingPlantInterfaceName().contentEquals(subscribedManifest.getTargetProcessingPlantInterfaceName());
-            return (targetIsSame);
-        }
-        return(false);
     }
 
     private boolean sourceSystemMatches(DataParcelManifest testManifest, TaskWorkItemSubscriptionType subscribedManifest) {

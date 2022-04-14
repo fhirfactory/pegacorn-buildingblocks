@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.oam.tasks;
 
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 
 public interface PetasosITOpsTaskReportingHandlerInterface {
-    public void processTaskReport(ITOpsNotification notification);
+    public void processTaskReport(PetasosComponentITOpsNotification notification);
 }

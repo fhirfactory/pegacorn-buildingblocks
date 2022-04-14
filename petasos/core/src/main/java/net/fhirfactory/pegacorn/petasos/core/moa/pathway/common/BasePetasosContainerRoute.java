@@ -45,7 +45,7 @@ public abstract class BasePetasosContainerRoute extends BaseRouteBuilder {
     // Exception Handlers
     //
 
-    protected OnExceptionDefinition specifyPetasosExceptionHandling() {
+    protected OnExceptionDefinition specifyCamelExecutionExceptionHandler() {
         OnExceptionDefinition exceptionDef = onException(CamelExecutionException.class)
                 .handled(true)
                 .log(LoggingLevel.INFO, "Camel Execution Handler...")

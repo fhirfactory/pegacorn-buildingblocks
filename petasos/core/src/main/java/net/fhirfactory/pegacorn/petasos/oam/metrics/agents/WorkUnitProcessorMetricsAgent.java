@@ -26,10 +26,10 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupp
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.WorkUnitProcessorMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.valuesets.PetasosComponentITOpsNotificationTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantProviderRoleEnum;
+import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.common.ComponentMetricsAgentBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
 import org.slf4j.Logger;
@@ -78,10 +78,10 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
 
     @Override
     public void sendITOpsNotification(String message) {
-        if(getProcessingPlantCapabilityStatement().getPlantProviderRole().equals(ProcessingPlantProviderRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
+        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
             return;
         }
-        ITOpsNotification notification = new ITOpsNotification();
+        PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
         notification.setComponentId(getMetricsData().getComponentID());
         notification.setParticipantName(getWUPMetricsData().getParticipantName());
         notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR);
@@ -96,10 +96,10 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
 
     @Override
     public void sendITOpsNotification(String unformattedMessage, String formattedMessage) {
-        if(getProcessingPlantCapabilityStatement().getPlantProviderRole().equals(ProcessingPlantProviderRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
+        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
             return;
         }
-        ITOpsNotification notification = new ITOpsNotification();
+        PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
         notification.setComponentId(getMetricsData().getComponentID());
         notification.setParticipantName(getWUPMetricsData().getParticipantName());
         notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR);
@@ -115,10 +115,10 @@ public class WorkUnitProcessorMetricsAgent extends ComponentMetricsAgentBase {
 
     @Override
     public void sendITOpsNotification(String unformatedMessage, String formattedMessage, PetasosComponentITOpsNotificationTypeEnum notificationType, String notificationHeader) {
-        if(getProcessingPlantCapabilityStatement().getPlantProviderRole().equals(ProcessingPlantProviderRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
+        if(getProcessingPlantCapabilityStatement().getProcessingPlantCapability().equals(ProcessingPlantRoleEnum.PETASOS_SERVICE_PROVIDER_ITOPS_MANAGEMENT)){
             return;
         }
-        ITOpsNotification notification = new ITOpsNotification();
+        PetasosComponentITOpsNotification notification = new PetasosComponentITOpsNotification();
         notification.setComponentId(getMetricsData().getComponentID());
         notification.setParticipantName(getWUPMetricsData().getParticipantName());
         notification.setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR);

@@ -23,7 +23,9 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.*;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
@@ -43,8 +45,6 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
     @Inject
     private ProcessingPlantInterface processingPlant;
 
-
-
     public InterProcessingPlantHandoverUoWExtractionBean() {
     }
 
@@ -61,33 +61,15 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
         String clonedPayload = SerializationUtils.clone(theUoW.getIngresContent().getPayload());
         outputPayload.setPayload(clonedPayload);
         DataParcelManifest parcelManifest = SerializationUtils.clone(theUoW.getPayloadTopicID());
-        if(processingPlant.getProcessingPlantType() != null) {
-            switch (processingPlant.getProcessingPlantType()) {
-                case PROCESSING_PLANT_TYPE_DATA_MANAGER:
-                case PROCESSING_PLANT_TYPE_DATAGRID_PROVIDER:
-                case PROCESSING_PLANT_TYPE_INFORMATION_MANAGER:
-                    parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_WORKFLOW_TRANSIENT);
-                    parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
-                    break;
-                case PROCESSING_PLANT_TYPE_FHIRBREAK:
-                case PROCESSING_PLANT_TYPE_MITAF:
-                    parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
-                    parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
-                    break;
-            }
-        } else {
-            parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
-            parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
-        }
-        parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE);
+        parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
+        parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
+        parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
         parcelManifest.setInterSubsystemDistributable(false);
         if(parcelManifest.hasIntendedTargetSystem()){
             if(parcelManifest.getIntendedTargetSystem().contentEquals(processingPlant.getSubsystemParticipantName())){
                 parcelManifest.setIntendedTargetSystem(null);
             }
         }
-        parcelManifest.setValidationStatus(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_FALSE);
-        parcelManifest.setNormalisationStatus(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_TRUE);
         outputPayload.setPayloadManifest(parcelManifest);
         theUoW.getEgressContent().addPayloadElement(outputPayload);
         theUoW.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_SUCCESS);

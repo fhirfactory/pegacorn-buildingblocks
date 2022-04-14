@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
-import net.fhirfactory.pegacorn.core.model.topology.valuesets.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.JGroupsIntegrationPointSharedMap;
 import org.apache.commons.lang3.SerializationUtils;

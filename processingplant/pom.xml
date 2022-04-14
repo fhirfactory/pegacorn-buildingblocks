@@ -179,6 +179,13 @@
             <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
 
+        <!-- This dependency is for the HAPI-FHIR Client -->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-server</artifactId>
+            <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+
         <!-- At least one "structures" JAR must also be included -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>

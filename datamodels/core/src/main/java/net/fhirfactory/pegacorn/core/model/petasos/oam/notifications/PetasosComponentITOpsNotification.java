@@ -27,40 +27,44 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.Petaso
 import java.io.Serializable;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.valuesets.PetasosComponentITOpsNotificationTypeEnum;
 
-public class ITOpsNotification extends ITOpsNotificationContent implements Serializable {
+public class PetasosComponentITOpsNotification implements Serializable {
     private ComponentIdType componentId;
     private String participantName;
     private PetasosMonitoredComponentTypeEnum componentType;
     private String contentHeading;
     private PetasosComponentITOpsNotificationTypeEnum notificationType;
+    private String content;
+    private String formattedContent;
 
     //
     // Constructor
     //
 
-    public ITOpsNotification(){
-        super();
+    public PetasosComponentITOpsNotification(){
         this.componentId = null;
         this.participantName = null;
         this.componentType = null;
+        this.content = null;
+        this.formattedContent = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
     }
 
-    public ITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content){
+    public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content){
         this.componentType = componentType;
         this.participantName = name;
         this.componentId = componentId;
-        setContent(content);
+        this.content = content;
+        this.formattedContent = null;
         this.contentHeading = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
     }
 
-    public ITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content, String formattedContent){
+    public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content, String formattedContent){
         this.componentType = componentType;
         this.participantName = name;
         this.componentId = componentId;
-        setContent(content);
-        setFormattedContent(formattedContent);
+        this.content = content;
+        this.formattedContent = formattedContent;
         this.contentHeading = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
     }
@@ -83,6 +87,14 @@ public class ITOpsNotification extends ITOpsNotificationContent implements Seria
 
     public void setNotificationType(PetasosComponentITOpsNotificationTypeEnum notificationType) {
         this.notificationType = notificationType;
+    }
+
+    public String getFormattedContent() {
+        return formattedContent;
+    }
+
+    public void setFormattedContent(String formattedContent) {
+        this.formattedContent = formattedContent;
     }
 
     public ComponentIdType getComponentId() {
@@ -109,6 +121,14 @@ public class ITOpsNotification extends ITOpsNotificationContent implements Seria
         this.componentType = componentType;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     //
     // To String
     //
@@ -119,8 +139,8 @@ public class ITOpsNotification extends ITOpsNotificationContent implements Seria
                 "componentId=" + componentId +
                 ", participantName='" + participantName + '\'' +
                 ", componentType=" + componentType +
-                ", content='" + getContent() + '\'' +
-                ", formattedContent='" + getFormattedContent() + '\'' +
+                ", content='" + content + '\'' +
+                ", formattedContent='" + formattedContent + '\'' +
                 ", contentHeading=" + contentHeading +
                 ", notificationType=" + notificationType +
                 '}';

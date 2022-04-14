@@ -47,10 +47,7 @@ public class TaskWorkItemSubscriptionType implements Serializable {
     private boolean interSubsystemDistributable;
     private DataParcelDirectionEnum dataParcelFlowDirection;
     private String sourceProcessingPlantParticipantName;
-    private String sourceProcessingPlantInterfaceName;
     private String targetProcessingPlantParticipantName;
-    private String targetProcessingPlantInterfaceName;
-    private DataParcelExternallyDistributableStatusEnum externallyDistributable;
 
     //
     // Constructor(s)
@@ -69,9 +66,6 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
         this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
-        this.externallyDistributable = DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY;
-        this.sourceProcessingPlantInterfaceName = null;
-        this.targetProcessingPlantInterfaceName = null;
     }
 
     public TaskWorkItemSubscriptionType(DataParcelTypeDescriptor contentDescriptor){
@@ -87,9 +81,6 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
         this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
-        this.externallyDistributable = DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY;
-        this.sourceProcessingPlantInterfaceName = null;
-        this.targetProcessingPlantInterfaceName = null;
     }
 
     public TaskWorkItemSubscriptionType(DataParcelManifest ori){
@@ -129,11 +120,6 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         } else {
             this.setDataParcelFlowDirection(null);
         }
-        if(ori.hasExternallyDistributable()){
-            this.setExternallyDistributable(ori.getExternallyDistributable());
-        } else {
-            this.setExternallyDistributable(DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY);
-        }
         if(ori.hasEnforcementPointApprovalStatus()) {
             this.setEnforcementPointApprovalStatus(ori.getEnforcementPointApprovalStatus());
         } else {
@@ -153,12 +139,6 @@ public class TaskWorkItemSubscriptionType implements Serializable {
             this.setDataParcelType(ori.getDataParcelType());
         } else {
             this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
-        }
-        if(ori.hasSourceProcessingPlantInterfaceName()){
-            setSourceProcessingPlantInterfaceName(ori.getSourceProcessingPlantInterfaceName());
-        }
-        if(ori.hasTargetProcessingPlantInterfaceName()){
-            setTargetProcessingPlantInterfaceName(ori.getTargetProcessingPlantInterfaceName());
         }
     }
 
@@ -182,11 +162,6 @@ public class TaskWorkItemSubscriptionType implements Serializable {
             this.contentDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContentDescriptor());
         } else {
             this.contentDescriptor = null;
-        }
-        if(ori.hasExternallyDistributable()){
-            this.setExternallyDistributable(ori.getExternallyDistributable());
-        } else {
-            this.setExternallyDistributable(DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY);
         }
         if(ori.hasExternalSourceSystem()) {
             this.setExternalSourceSystem(SerializationUtils.clone(ori.getExternalSourceSystem()));
@@ -224,35 +199,11 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         } else {
             this.dataParcelType = DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE;
         }
-        if(ori.hasSourceProcessingPlantInterfaceName()){
-            setSourceProcessingPlantInterfaceName(ori.getSourceProcessingPlantInterfaceName());
-        }
-        if(ori.hasTargetProcessingPlantInterfaceName()){
-            setTargetProcessingPlantInterfaceName(ori.getTargetProcessingPlantInterfaceName());
-        }
     }
 
     //
     // If Exists
     //
-
-    @JsonIgnore
-    public boolean hasSourceProcessingPlantInterfaceName(){
-        boolean hasValue = this.sourceProcessingPlantInterfaceName != null;
-        return(hasValue);
-    }
-
-    @JsonIgnore
-    public boolean hasTargetProcessingPlantInterfaceName(){
-        boolean hasValue = this.targetProcessingPlantInterfaceName != null;
-        return(hasValue);
-    }
-
-    @JsonIgnore
-    public boolean hasExternallyDistributable(){
-        boolean hasValue = this.externallyDistributable != null;
-        return(hasValue);
-    }
 
     @JsonIgnore
     public boolean hasTargetProcessingPlantParticipantName(){
@@ -329,30 +280,6 @@ public class TaskWorkItemSubscriptionType implements Serializable {
     //
     // Getters and Setters
     //
-
-    public String getSourceProcessingPlantInterfaceName() {
-        return sourceProcessingPlantInterfaceName;
-    }
-
-    public void setSourceProcessingPlantInterfaceName(String sourceProcessingPlantInterfaceName) {
-        this.sourceProcessingPlantInterfaceName = sourceProcessingPlantInterfaceName;
-    }
-
-    public String getTargetProcessingPlantInterfaceName() {
-        return targetProcessingPlantInterfaceName;
-    }
-
-    public void setTargetProcessingPlantInterfaceName(String targetProcessingPlantInterfaceName) {
-        this.targetProcessingPlantInterfaceName = targetProcessingPlantInterfaceName;
-    }
-
-    public DataParcelExternallyDistributableStatusEnum getExternallyDistributable() {
-        return externallyDistributable;
-    }
-
-    public void setExternallyDistributable(DataParcelExternallyDistributableStatusEnum externallyDistributable) {
-        this.externallyDistributable = externallyDistributable;
-    }
 
     @JsonIgnore
     protected Logger getLogger(){
@@ -482,9 +409,7 @@ public class TaskWorkItemSubscriptionType implements Serializable {
                 ", interSubsystemDistributable=" + interSubsystemDistributable +
                 ", dataParcelFlowDirection=" + dataParcelFlowDirection +
                 ", sourceProcessingPlantParticipantName='" + sourceProcessingPlantParticipantName + '\'' +
-                ", sourceProcessingPlantInterfaceName=" + sourceProcessingPlantInterfaceName +
                 ", targetProcessingPlantParticipantName='" + targetProcessingPlantParticipantName + '\'' +
-                ", targetProcessingPlantInterfaceName=" + targetProcessingPlantInterfaceName +
                 '}';
     }
 
