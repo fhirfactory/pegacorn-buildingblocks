@@ -215,7 +215,7 @@ public class LocalTaskDistributionBean {
             boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
             boolean hasWildcardTarget = false;
             if (getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)) {
-                hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
+                hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
             }
             boolean hasRemoteElement = getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber);
             getLogger().trace(".forwardTask(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);

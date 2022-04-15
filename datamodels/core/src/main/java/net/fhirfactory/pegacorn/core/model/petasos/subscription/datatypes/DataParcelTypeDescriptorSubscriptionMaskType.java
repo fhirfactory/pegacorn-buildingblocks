@@ -22,17 +22,19 @@
 package net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.generalid.FDN;
-import net.fhirfactory.pegacorn.core.model.generalid.RDN;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.common.SubscriptionMaskBase;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-public class DataParcelTypeDescriptorSubscriptionMaskType implements Serializable {
+public class DataParcelTypeDescriptorSubscriptionMaskType extends SubscriptionMaskBase {
+    private static final Logger LOG = LoggerFactory.getLogger(DataParcelTypeDescriptorSubscriptionMaskType.class);
+
     private String dataParcelDefiner;
     private String dataParcelCategory;
     private String dataParcelSubCategory;
@@ -48,6 +50,7 @@ public class DataParcelTypeDescriptorSubscriptionMaskType implements Serializabl
     //
 
     public DataParcelTypeDescriptorSubscriptionMaskType(){
+        super();
         this.dataParcelCategory = null;
         this.dataParcelDefiner = null;
         this.dataParcelSubCategory = null;
@@ -60,6 +63,56 @@ public class DataParcelTypeDescriptorSubscriptionMaskType implements Serializabl
     }
 
     public DataParcelTypeDescriptorSubscriptionMaskType(DataParcelTypeDescriptorSubscriptionMaskType ori){
+        super(ori);
+        this.dataParcelCategory = null;
+        this.dataParcelDefiner = null;
+        this.dataParcelSubCategory = null;
+        this.dataParcelResource = null;
+        this.dataParcelSegment = null;
+        this.dataParcelAttribute = null;
+        this.version = null;
+        this.dataParcelDiscriminatorType = null;
+        this.dataParcelDiscriminatorValue = null;
+        if(ori.hasDataParcelDefiner()) {
+            this.dataParcelDefiner = SerializationUtils.clone(ori.getDataParcelDefiner());
+        }
+        if(ori.hasDataParcelCategory()) {
+            this.dataParcelCategory = SerializationUtils.clone(ori.getDataParcelCategory());
+        }
+        if(ori.hasDataParcelSubCategory()) {
+            this.dataParcelSubCategory = SerializationUtils.clone(ori.getDataParcelSubCategory());
+        }
+        if(ori.hasDataParcelResource()) {
+            this.dataParcelResource = SerializationUtils.clone(ori.getDataParcelResource());
+        }
+        if(ori.hasDataParcelSegment()) {
+            this.dataParcelSegment = SerializationUtils.clone(ori.getDataParcelSegment());
+        }
+        if(ori.hasDataParcelAttribute()) {
+            this.dataParcelAttribute = SerializationUtils.clone(ori.getDataParcelAttribute());
+        }
+        if(ori.hasVersion()) {
+            this.version = SerializationUtils.clone(ori.getVersion());
+        }
+        if(ori.hasDataParcelDiscriminatorType()) {
+            this.dataParcelDiscriminatorType = SerializationUtils.clone(ori.getDataParcelDiscriminatorType());
+        }
+        if(ori.hasDataParcelDiscriminatorValue()) {
+            this.dataParcelDiscriminatorValue = SerializationUtils.clone(ori.getDataParcelDiscriminatorValue());
+        }
+    }
+
+    public DataParcelTypeDescriptorSubscriptionMaskType(DataParcelTypeDescriptor ori){
+        super();
+        this.dataParcelCategory = null;
+        this.dataParcelDefiner = null;
+        this.dataParcelSubCategory = null;
+        this.dataParcelResource = null;
+        this.dataParcelSegment = null;
+        this.dataParcelAttribute = null;
+        this.version = null;
+        this.dataParcelDiscriminatorType = null;
+        this.dataParcelDiscriminatorValue = null;
         if(ori.hasDataParcelDefiner()) {
             this.dataParcelDefiner = SerializationUtils.clone(ori.getDataParcelDefiner());
         }
@@ -240,78 +293,12 @@ public class DataParcelTypeDescriptorSubscriptionMaskType implements Serializabl
         this.dataParcelDiscriminatorValue = dataParcelDiscriminatorValue;
     }
 
-    //
-    // Helper Methods
-    //
+    // Logger
 
-    public FDN toFDN() {
-        FDN fdn = new FDN();
-        if (hasDataParcelDefiner()) {
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_DEFINER.getTopicKey(), getDataParcelDefiner()));
-        }
-        if (hasDataParcelCategory()) {
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_CATEGORY.getTopicKey(), getDataParcelCategory()));
-        }
-        if (hasDataParcelSubCategory()) {
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_SUBCATEGORY.getTopicKey(), getDataParcelSubCategory()));
-        }
-        if (hasDataParcelResource()) {
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_RESOURCE.getTopicKey(), getDataParcelResource()));
-        }
-        if (hasDataParcelSegment()) {
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_SEGMENT.getTopicKey(), getDataParcelSegment()));
-        }
-        if (hasDataParcelAttribute()) {
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_ATTRIBUTE.getTopicKey(), getDataParcelAttribute()));
-        }
-        if (hasDataParcelDiscriminatorType()){
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_DISCRIMINATOR_TYPE.getTopicKey(), getDataParcelDiscriminatorType()));
-        }
-        if (hasDataParcelDiscriminatorValue()){
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_DISCRIMINATOR_VALUE.getTopicKey(), getDataParcelDiscriminatorValue()));
-        }
-        if (hasVersion()) {
-            fdn.appendRDN(new RDN(DataParcelDescriptorKeyEnum.DATASET_VERSION.getTopicKey(), getVersion()));
-        }
-        return (fdn);
-    }
-
-    public void fromFDN(FDN fdn) {
-        if (fdn == null) {
-            return;
-        }
-        for (RDN rdn : fdn.getRDNSet()) {
-            DataParcelDescriptorKeyEnum keyEnum = DataParcelDescriptorKeyEnum.fromTopicKeyString(rdn.getQualifier());
-            switch (keyEnum) {
-                case DATASET_DEFINER:
-                    setDataParcelDefiner(rdn.getValue());
-                    break;
-                case DATASET_CATEGORY:
-                    setDataParcelCategory(rdn.getValue());
-                    break;
-                case DATASET_SUBCATEGORY:
-                    setDataParcelSubCategory(rdn.getValue());
-                    break;
-                case DATASET_RESOURCE:
-                    setDataParcelResource(rdn.getValue());
-                    break;
-                case DATASET_SEGMENT:
-                    setDataParcelSegment(rdn.getValue());
-                    break;
-                case DATASET_ATTRIBUTE:
-                    setDataParcelAttribute(rdn.getValue());
-                    break;
-                case DATASET_DISCRIMINATOR_TYPE:
-                    setDataParcelDiscriminatorType(rdn.getValue());
-                    break;
-                case DATASET_DISCRIMINATOR_VALUE:
-                    setDataParcelDiscriminatorValue(rdn.getValue());
-                    break;
-                case DATASET_VERSION:
-                    setVersion(rdn.getValue());
-                    break;
-            }
-        }
+    @JsonIgnore
+    @Override
+    protected Logger getLogger(){
+        return(LOG);
     }
 
     //
@@ -330,6 +317,7 @@ public class DataParcelTypeDescriptorSubscriptionMaskType implements Serializabl
                 ", dataParcelDiscriminatorType=" + dataParcelDiscriminatorType +
                 ", dataParcelDiscriminatorValue=" + dataParcelDiscriminatorValue +
                 ", version=" + version +
+                ", allowAll=" + getAllowAll() +
                 '}';
     }
 
@@ -354,202 +342,73 @@ public class DataParcelTypeDescriptorSubscriptionMaskType implements Serializabl
     // Equals with Wildcards (in testObject)
     //
 
-    public boolean isEqualWithWildcardsInOther(DataParcelTypeDescriptorSubscriptionMaskType otherDescriptor){
+    public boolean applyMask(DataParcelTypeDescriptor otherDescriptor){
+        getLogger().debug(".applyMask(): Entry, otherDescriptor->{}", otherDescriptor);
+
+        if(hasAllowAll()){
+            if(getAllowAll()){
+                getLogger().debug(".applyMask(): Exit, allowAll is true, returning -true-");
+                return(true);
+            }
+        }
 
         boolean parcelDefinerIsEqual = StringUtils.equals(this.getDataParcelDefiner(),otherDescriptor.getDataParcelDefiner());
-        boolean parcelDefinedHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDefiner(), DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDefinedHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDefiner(), DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelDefinerIsGoodEnoughMatch = parcelDefinerIsEqual || parcelDefinedHasWildcard;
         if (!parcelDefinerIsGoodEnoughMatch) {
+            getLogger().debug(".applyMask(): Exit, parcelDefinerIsGoodEnoughMatch is false, returning -false-");
             return (false);
         }
         boolean parcelCategoryIsEqual = StringUtils.equals(this.getDataParcelCategory(),otherDescriptor.getDataParcelCategory());
-        boolean parcelCategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelCategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelCategory(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelCategoryIsGoodEnoughMatch = parcelCategoryIsEqual || parcelCategoryHasWildcard;
         if(!parcelCategoryIsGoodEnoughMatch){
+            getLogger().debug(".applyMask(): Exit, parcelCategoryIsGoodEnoughMatch is false, returning -false-");
             return(false);
         }
         boolean parcelSubcategoryIsEqual = StringUtils.equals(this.getDataParcelSubCategory(),otherDescriptor.getDataParcelSubCategory());
-        boolean parcelSubcategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSubCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelSubcategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSubCategory(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelSubcategoryIsGoodEnoughMatch = parcelSubcategoryIsEqual || parcelSubcategoryHasWildcard;
         if(!parcelSubcategoryIsGoodEnoughMatch){
+            getLogger().debug(".applyMask(): Exit, parcelSubcategoryIsGoodEnoughMatch is false, returning -false-");
             return(false);
         }
         boolean parcelResourceIsEqual = StringUtils.equals(this.getDataParcelResource(),otherDescriptor.getDataParcelResource());
-        boolean parcelResourceHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelResource(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelResourceHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelResource(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelResourceIsGoodEnoughMatch = parcelResourceIsEqual || parcelResourceHasWildcard;
         if (!parcelResourceIsGoodEnoughMatch) {
+            getLogger().debug(".applyMask(): Exit, parcelResourceIsGoodEnoughMatch is false, returning -false-");
             return(false);
         }
         boolean parcelSegmentIsEqual = StringUtils.equals(this.getDataParcelSegment(),otherDescriptor.getDataParcelSegment());
-        boolean parcelSegmentHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSegment(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelSegmentHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSegment(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelSegmentIsGoodEnoughMatch = parcelSegmentIsEqual || parcelSegmentHasWildcard;
         if (!parcelSegmentIsGoodEnoughMatch) {
+            getLogger().debug(".applyMask(): Exit, parcelSegmentIsGoodEnoughMatch is false, returning -false-");
             return(false);
         }
         boolean parcelAttributeIsEqual = StringUtils.equals(this.getDataParcelAttribute(),otherDescriptor.getDataParcelAttribute());
-        boolean parcelAttributeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelAttribute(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelAttributeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelAttribute(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelAttributeIsGoodEnoughMatch = parcelAttributeIsEqual || parcelAttributeHasWildcard;
         if(!parcelAttributeIsGoodEnoughMatch){
+            getLogger().debug(".applyMask(): Exit, parcelAttributeIsGoodEnoughMatch is false, returning -false-");
             return(false);
         }
         boolean parcelDiscriminatorTypeIsEqual = StringUtils.equals(this.getDataParcelDiscriminatorType(),otherDescriptor.getDataParcelDiscriminatorType());
-        boolean parcelDiscriminatorTypeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorType(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDiscriminatorTypeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorType(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelDiscriminatorTypeIsGoodEnoughMatch = parcelDiscriminatorTypeIsEqual || parcelDiscriminatorTypeHasWildcard;
         if(!parcelDiscriminatorTypeIsGoodEnoughMatch){
+            getLogger().debug(".applyMask(): Exit, parcelDiscriminatorTypeIsGoodEnoughMatch is false, returning -false-");
             return(false);
         }
         boolean parcelDiscriminatorValueIsEqual = StringUtils.equals(this.getDataParcelDiscriminatorValue(),otherDescriptor.getDataParcelDiscriminatorValue());
-        boolean parcelDiscriminatorValueHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorValue(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDiscriminatorValueHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorValue(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelDiscriminatorValueIsGoodEnoughMatch = parcelDiscriminatorValueIsEqual || parcelDiscriminatorValueHasWildcard;
         if(!parcelDiscriminatorValueIsGoodEnoughMatch){
+            getLogger().debug(".applyMask(): Exit, parcelDiscriminatorValueIsGoodEnoughMatch is false, returning -false-");
             return(false);
         }
+        getLogger().debug(".applyMask(): Exit, returning -true-");
         return(true);
-    }
-
-    //
-    // Nice and Simple toString variant
-    //
-
-    public String toDotString(){
-        String definer = getDataParcelDefiner();
-        String category = getDataParcelCategory();
-        String subcategory = getDataParcelSubCategory();
-        String resource = getDataParcelResource();
-        String segment = getDataParcelSegment();
-        String attribute = getDataParcelAttribute();
-        String version = getVersion();
-        String discriminatorType = getDataParcelDiscriminatorType();
-        String discriminatorValue = getDataParcelDiscriminatorValue();
-
-        boolean definerExists = StringUtils.isNotEmpty(definer);
-        boolean categoryExists = StringUtils.isNotEmpty(category);
-        boolean subcategoryExists = StringUtils.isNotEmpty(subcategory);
-        boolean resourceExists = StringUtils.isNotEmpty(resource);
-        boolean segmentExists = StringUtils.isNotEmpty(segment);
-        boolean attributeExists = StringUtils.isNotEmpty(attribute);
-        boolean versionExists = StringUtils.isNotEmpty(version);
-        boolean discriminatorTypeExists = StringUtils.isNotEmpty(discriminatorType);
-        boolean discriminatorValueExists = StringUtils.isNotEmpty(discriminatorValue);
-
-        StringBuilder descriptionBuilder = new StringBuilder();
-
-        if(definerExists){
-            descriptionBuilder.append(definer);
-            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_DEFINER)){
-                descriptionBuilder.append(".");
-            }
-        }
-        if(categoryExists){
-            descriptionBuilder.append(category);
-            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_CATEGORY)){
-                descriptionBuilder.append(".");
-            }
-        }
-        if(subcategoryExists){
-            descriptionBuilder.append(subcategory);
-            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_SUBCATEGORY)){
-                descriptionBuilder.append(".");
-            }
-        }
-        if(resourceExists){
-            descriptionBuilder.append(resource);
-            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_RESOURCE)){
-                descriptionBuilder.append(".");
-            }
-        }
-        if(segmentExists){
-            descriptionBuilder.append(segment);
-            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_SEGMENT)){
-                descriptionBuilder.append(".");
-            }
-        }
-        if (attributeExists) {
-            descriptionBuilder.append(attribute);
-            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_ATTRIBUTE)){
-                descriptionBuilder.append(".");
-            }
-        }
-        if(discriminatorTypeExists){
-            descriptionBuilder.append(discriminatorType);
-            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_DISCRIMINATOR_TYPE)){
-                descriptionBuilder.append(".");
-            }
-        }
-        if(discriminatorValueExists){
-            descriptionBuilder.append(discriminatorValue);
-            if(subElementExists(DataParcelDescriptorKeyEnum.DATASET_DISCRIMINATOR_VALUE)){
-                descriptionBuilder.append(".");
-            }
-        }
-        if(versionExists){
-            descriptionBuilder.append(version);
-        }
-        String description = descriptionBuilder.toString();
-        return(description);
-    }
-
-    private boolean subElementExists( DataParcelDescriptorKeyEnum key){
-        String definer = getDataParcelDefiner();
-        String category = getDataParcelCategory();
-        String subcategory = getDataParcelSubCategory();
-        String resource = getDataParcelResource();
-        String segment = getDataParcelSegment();
-        String attribute = getDataParcelAttribute();
-        String version = getVersion();
-        String discriminatorType = getDataParcelDiscriminatorType();
-        String discriminatorValue = getDataParcelDiscriminatorValue();
-
-        boolean definerExists = StringUtils.isNotEmpty(definer);
-        boolean categoryExists = StringUtils.isNotEmpty(category);
-        boolean subcategoryExists = StringUtils.isNotEmpty(subcategory);
-        boolean resourceExists = StringUtils.isNotEmpty(resource);
-        boolean segmentExists = StringUtils.isNotEmpty(segment);
-        boolean attributeExists = StringUtils.isNotEmpty(attribute);
-        boolean versionExists = StringUtils.isNotEmpty(version);
-        boolean discriminatorTypeExists = StringUtils.isNotEmpty(discriminatorType);
-        boolean discriminatorValueExists = StringUtils.isNotEmpty(discriminatorValue);
-
-        switch(key){
-            case DATASET_DEFINER:
-                if(categoryExists || subcategoryExists || resourceExists || segmentExists || attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
-                    return(true);
-                }
-                break;
-            case DATASET_CATEGORY:
-                if(subcategoryExists || resourceExists || segmentExists || attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
-                    return(true);
-                }
-                break;
-            case DATASET_SUBCATEGORY:
-                if(resourceExists || segmentExists || attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
-                    return(true);
-                }
-                break;
-            case DATASET_RESOURCE:
-                if(segmentExists || attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
-                    return(true);
-                }
-                break;
-            case DATASET_SEGMENT:
-                if(attributeExists || versionExists || discriminatorTypeExists || discriminatorValueExists){
-                    return(true);
-                }
-                break;
-            case DATASET_ATTRIBUTE:
-                if(discriminatorTypeExists || discriminatorValueExists){
-                    return(true);
-                }
-                break;
-            case DATASET_DISCRIMINATOR_TYPE:
-                if(discriminatorValueExists){
-                    return(true);
-                }
-                break;
-        }
-        if(versionExists){
-            return(true);
-        }
-        return(false);
     }
 }

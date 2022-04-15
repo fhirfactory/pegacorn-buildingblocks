@@ -55,16 +55,12 @@ public class TaskWorkItemManifestType extends DataParcelManifest {
         return "TaskWorkItemManifestType{" +
                 "contentDescriptor=" + getContentDescriptor() +
                 ", containerDescriptor=" + getContainerDescriptor() +
-                ", sourceSystem='" + getSourceSystem() + '\'' +
-                ", intendedTargetSystem='" + getIntendedTargetSystem() + '\'' +
-                ", interSubsystemDistributable=" + isInterSubsystemDistributable() +
-                ", payloadQuality=" + getContentQuality() +
-                ", normalisationStatus=" + getNormalisationStatus() +
-                ", validationStatus=" + getValidationStatus() +
+                ", contentQuality=" + getContentQuality() +
                 ", dataParcelType=" + getDataParcelType() +
-                ", enforcementPointApprovalStatus=" + getEnforcementPointApprovalStatus() +
+                ", origin=" + getOrigin() +
+                ", destination=" + getDestination() +
+                ", lastActivityLocation=" + getLastActivityLocation() +
                 ", dataParcelFlowDirection=" + getDataParcelFlowDirection() +
-                ", taskProducerProcessingPlantParticipantName=" + getSourceProcessingPlantParticipantName() +
                 '}';
     }
 

@@ -30,8 +30,6 @@ import java.io.Serializable;
 
 public class DataParcelManifest implements Serializable {
 
-    public static String WILDCARD_CHARACTER = "*";
-
     private DataParcelTypeDescriptor contentDescriptor;
     private DataParcelTypeDescriptor containerDescriptor;
     private DataParcelQualityStatement contentQuality;
@@ -40,7 +38,7 @@ public class DataParcelManifest implements Serializable {
     private DataParcelBoundaryPointType origin;
     private DataParcelBoundaryPointType destination;
 
-    private DataParcelActivityPoint lastActivityLocation;
+    private DataParcelActivityLocation lastActivityLocation;
 
     private DataParcelDirectionEnum dataParcelFlowDirection;
 
@@ -224,11 +222,11 @@ public class DataParcelManifest implements Serializable {
         this.destination = destination;
     }
 
-    public DataParcelActivityPoint getLastActivityLocation() {
+    public DataParcelActivityLocation getLastActivityLocation() {
         return lastActivityLocation;
     }
 
-    public void setLastActivityLocation(DataParcelActivityPoint lastActivityLocation) {
+    public void setLastActivityLocation(DataParcelActivityLocation lastActivityLocation) {
         this.lastActivityLocation = lastActivityLocation;
     }
 

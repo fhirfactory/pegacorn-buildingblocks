@@ -25,11 +25,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelBoundaryPointType;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantName;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.common.SubscriptionMaskBase;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class DataParcelBoundaryPointSubscriptionMaskType implements Serializable {
+public class DataParcelBoundaryPointSubscriptionMaskType extends SubscriptionMaskBase {
+    private static final Logger LOG = LoggerFactory.getLogger(DataParcelBoundaryPointSubscriptionMaskType.class);
+
     private PetasosParticipantName boundaryPointProcessingPlantParticipantNameMask;
     private PetasosParticipantName boundaryPointWorkUnitProcessorParticipantNameMask;
     private PetasosParticipantName boundaryPointEndpointParticipantNameMask;
@@ -44,23 +50,25 @@ public class DataParcelBoundaryPointSubscriptionMaskType implements Serializable
     //
 
     public DataParcelBoundaryPointSubscriptionMaskType(){
-        this.boundaryPointEndpointParticipantNameMask = new PetasosParticipantName(DataParcelManifest.WILDCARD_CHARACTER);
-        this.boundaryPointExternalTypeMask = DataParcelManifest.WILDCARD_CHARACTER;
-        this.boundaryPointExternalSubsystemNameMask = DataParcelManifest.WILDCARD_CHARACTER;
-        this.boundaryPointInterfaceNameMask = DataParcelManifest.WILDCARD_CHARACTER;
-        this.boundaryPointExternalEndpointInterfaceNameMask = DataParcelManifest.WILDCARD_CHARACTER;
-        this.boundaryPointProcessingPlantParticipantNameMask = new PetasosParticipantName(DataParcelManifest.WILDCARD_CHARACTER);
-        this.boundaryPointWorkUnitProcessorParticipantNameMask = new PetasosParticipantName(DataParcelManifest.WILDCARD_CHARACTER);
+        super();
+        this.boundaryPointEndpointParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+        this.boundaryPointExternalTypeMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointExternalSubsystemNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointInterfaceNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointExternalEndpointInterfaceNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointProcessingPlantParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+        this.boundaryPointWorkUnitProcessorParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
     }
 
     public DataParcelBoundaryPointSubscriptionMaskType(DataParcelBoundaryPointType ori){
-        this.boundaryPointEndpointParticipantNameMask = new PetasosParticipantName(DataParcelManifest.WILDCARD_CHARACTER);
-        this.boundaryPointExternalTypeMask = DataParcelManifest.WILDCARD_CHARACTER;
-        this.boundaryPointExternalSubsystemNameMask = DataParcelManifest.WILDCARD_CHARACTER;
-        this.boundaryPointInterfaceNameMask = DataParcelManifest.WILDCARD_CHARACTER;
-        this.boundaryPointExternalEndpointInterfaceNameMask = DataParcelManifest.WILDCARD_CHARACTER;
-        this.boundaryPointProcessingPlantParticipantNameMask = new PetasosParticipantName(DataParcelManifest.WILDCARD_CHARACTER);
-        this.boundaryPointWorkUnitProcessorParticipantNameMask = new PetasosParticipantName(DataParcelManifest.WILDCARD_CHARACTER);
+        super();
+        this.boundaryPointEndpointParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+        this.boundaryPointExternalTypeMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointExternalSubsystemNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointInterfaceNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointExternalEndpointInterfaceNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointProcessingPlantParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+        this.boundaryPointWorkUnitProcessorParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
 
         if(ori.hasBoundaryPointExternalSubsystemName()){
             setBoundaryPointExternalSubsystemNameMask(ori.getBoundaryPointExternalSubsystemName());
@@ -91,6 +99,44 @@ public class DataParcelBoundaryPointSubscriptionMaskType implements Serializable
         }
     }
 
+    public DataParcelBoundaryPointSubscriptionMaskType(DataParcelBoundaryPointSubscriptionMaskType ori){
+        super(ori);
+        this.boundaryPointEndpointParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+        this.boundaryPointExternalTypeMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointExternalSubsystemNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointInterfaceNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointExternalEndpointInterfaceNameMask = DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER;
+        this.boundaryPointProcessingPlantParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+        this.boundaryPointWorkUnitProcessorParticipantNameMask = new PetasosParticipantName(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+
+        if(ori.hasBoundaryPointExternalSubsystemNameMask()){
+            setBoundaryPointExternalSubsystemNameMask(ori.getBoundaryPointExternalSubsystemNameMask());
+        }
+
+        if(ori.hasBoundaryPointProcessingPlantParticipantNameMask()){
+            setBoundaryPointProcessingPlantParticipantNameMask(SerializationUtils.clone(ori.getBoundaryPointProcessingPlantParticipantNameMask()));
+        }
+
+        if(ori.hasBoundaryPointExternalTypeMask()){
+            setBoundaryPointExternalTypeMask(SerializationUtils.clone(ori.getBoundaryPointExternalTypeMask()));
+        }
+
+        if(ori.hasBoundaryPointInterfaceNameMask()){
+            setBoundaryPointInterfaceNameMask(SerializationUtils.clone(ori.getBoundaryPointInterfaceNameMask()));
+        }
+
+        if(ori.hasBoundaryPointWorkUnitProcessorParticipantNameMask()){
+            setBoundaryPointWorkUnitProcessorParticipantNameMask(SerializationUtils.clone(ori.getBoundaryPointWorkUnitProcessorParticipantNameMask()));
+        }
+
+        if(ori.hasBoundaryPointEndpointParticipantNameMask()){
+            setBoundaryPointEndpointParticipantNameMask(SerializationUtils.clone(ori.getBoundaryPointEndpointParticipantNameMask()));
+        }
+
+        if(ori.hasBoundaryPointExternalEndpointInterfaceNameMask()){
+            setBoundaryPointExternalEndpointInterfaceNameMask(SerializationUtils.clone(ori.getBoundaryPointExternalEndpointInterfaceNameMask()));
+        }
+    }
 
     //
     // ifExists (has)
@@ -199,6 +245,15 @@ public class DataParcelBoundaryPointSubscriptionMaskType implements Serializable
     }
 
     //
+    // Logger Getter
+
+    @JsonIgnore
+    @Override
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
+    //
     // toString()
     //
 
@@ -212,7 +267,44 @@ public class DataParcelBoundaryPointSubscriptionMaskType implements Serializable
                 ", boundaryPointExternalEndpointInterfaceName='" + boundaryPointExternalEndpointInterfaceNameMask + '\'' +
                 ", boundaryPointExternalSubsystemName='" + boundaryPointExternalSubsystemNameMask + '\'' +
                 ", boundaryPointExternalType='" + boundaryPointExternalTypeMask + '\'' +
+                ", allowAll=" + getAllowAll()+
                 '}';
     }
+
+    //
+    // Mask Test
+    //
+
+    public boolean applyMask(DataParcelBoundaryPointType boundaryPoint){
+        getLogger().debug(".applyMask(): Entry, boundaryPoint->{}", boundaryPoint);
+
+        if(hasAllowAll()){
+            if(getAllowAll()){
+                getLogger().debug(".applyMask(): Exit, allowAll is true, returning -true-");
+                return(true);
+            }
+        }
+
+        boolean processingPlantNamePasses = participantNamePasses(getBoundaryPointProcessingPlantParticipantNameMask(), boundaryPoint.getBoundaryPointProcessingPlantParticipantName());
+        boolean workingUnitProcessorNamePasses = participantNamePasses(getBoundaryPointWorkUnitProcessorParticipantNameMask(), boundaryPoint.getBoundaryPointWorkUnitProcessorParticipantName());
+        boolean EndpointNamePasses = participantNamePasses(getBoundaryPointEndpointParticipantNameMask(), boundaryPoint.getBoundaryPointEndpointParticipantName());
+        boolean interfaceNamePasses = namePasses(getBoundaryPointInterfaceNameMask(), boundaryPoint.getBoundaryPointInterfaceName());
+        boolean externalSubsystemNamePasses = namePasses(getBoundaryPointExternalSubsystemNameMask(), boundaryPoint.getBoundaryPointExternalSubsystemName());
+        boolean externalInterfaceNamePasses = namePasses(getBoundaryPointExternalEndpointInterfaceNameMask(), boundaryPoint.getBoundaryPointExternalEndpointInterfaceName());
+        boolean externalInterfaceTypePasses = namePasses(getBoundaryPointExternalTypeMask(), boundaryPoint.getBoundaryPointExternalType());
+
+        boolean passesMask = processingPlantNamePasses
+                && workingUnitProcessorNamePasses
+                && EndpointNamePasses
+                && interfaceNamePasses
+                && externalSubsystemNamePasses
+                && externalInterfaceNamePasses
+                && externalInterfaceTypePasses;
+
+        getLogger().debug(".applyMask(): Exit, passesMask->{}", passesMask);
+        return(passesMask);
+    }
+
+
 
 }

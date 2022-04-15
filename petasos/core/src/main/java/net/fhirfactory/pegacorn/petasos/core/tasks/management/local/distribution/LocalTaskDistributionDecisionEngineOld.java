@@ -514,7 +514,7 @@ public class LocalTaskDistributionDecisionEngineOld {
         if(testManifest == null || subscribedManifest == null){
             return(false);
         }
-        boolean directionMatches = testManifest.getDataParcelFlowDirection() == subscribedManifest.getDataParcelFlowDirection();
+        boolean directionMatches = testManifest.getDataParcelFlowDirection() == subscribedManifest.getDataParcelFlowDirectionMask();
         return(directionMatches);
     }
 }

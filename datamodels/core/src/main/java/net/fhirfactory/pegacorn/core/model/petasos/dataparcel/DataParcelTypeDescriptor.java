@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.RDN;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -356,49 +357,49 @@ public class DataParcelTypeDescriptor implements Serializable {
     public boolean isEqualWithWildcardsInOther(DataParcelTypeDescriptor otherDescriptor){
 
         boolean parcelDefinerIsEqual = StringUtils.equals(this.getDataParcelDefiner(),otherDescriptor.getDataParcelDefiner());
-        boolean parcelDefinedHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDefiner(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDefinedHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDefiner(), DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelDefinerIsGoodEnoughMatch = parcelDefinerIsEqual || parcelDefinedHasWildcard;
         if (!parcelDefinerIsGoodEnoughMatch) {
             return (false);
         }
         boolean parcelCategoryIsEqual = StringUtils.equals(this.getDataParcelCategory(),otherDescriptor.getDataParcelCategory());
-        boolean parcelCategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelCategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelCategory(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelCategoryIsGoodEnoughMatch = parcelCategoryIsEqual || parcelCategoryHasWildcard;
         if(!parcelCategoryIsGoodEnoughMatch){
             return(false);
         }
         boolean parcelSubcategoryIsEqual = StringUtils.equals(this.getDataParcelSubCategory(),otherDescriptor.getDataParcelSubCategory());
-        boolean parcelSubcategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSubCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelSubcategoryHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSubCategory(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelSubcategoryIsGoodEnoughMatch = parcelSubcategoryIsEqual || parcelSubcategoryHasWildcard;
         if(!parcelSubcategoryIsGoodEnoughMatch){
             return(false);
         }
         boolean parcelResourceIsEqual = StringUtils.equals(this.getDataParcelResource(),otherDescriptor.getDataParcelResource());
-        boolean parcelResourceHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelResource(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelResourceHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelResource(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelResourceIsGoodEnoughMatch = parcelResourceIsEqual || parcelResourceHasWildcard;
         if (!parcelResourceIsGoodEnoughMatch) {
             return(false);
         }
         boolean parcelSegmentIsEqual = StringUtils.equals(this.getDataParcelSegment(),otherDescriptor.getDataParcelSegment());
-        boolean parcelSegmentHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSegment(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelSegmentHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelSegment(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelSegmentIsGoodEnoughMatch = parcelSegmentIsEqual || parcelSegmentHasWildcard;
         if (!parcelSegmentIsGoodEnoughMatch) {
             return(false);
         }
         boolean parcelAttributeIsEqual = StringUtils.equals(this.getDataParcelAttribute(),otherDescriptor.getDataParcelAttribute());
-        boolean parcelAttributeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelAttribute(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelAttributeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelAttribute(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelAttributeIsGoodEnoughMatch = parcelAttributeIsEqual || parcelAttributeHasWildcard;
         if(!parcelAttributeIsGoodEnoughMatch){
             return(false);
         }
         boolean parcelDiscriminatorTypeIsEqual = StringUtils.equals(this.getDataParcelDiscriminatorType(),otherDescriptor.getDataParcelDiscriminatorType());
-        boolean parcelDiscriminatorTypeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorType(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDiscriminatorTypeHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorType(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelDiscriminatorTypeIsGoodEnoughMatch = parcelDiscriminatorTypeIsEqual || parcelDiscriminatorTypeHasWildcard;
         if(!parcelDiscriminatorTypeIsGoodEnoughMatch){
             return(false);
         }
         boolean parcelDiscriminatorValueIsEqual = StringUtils.equals(this.getDataParcelDiscriminatorValue(),otherDescriptor.getDataParcelDiscriminatorValue());
-        boolean parcelDiscriminatorValueHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorValue(),DataParcelManifest.WILDCARD_CHARACTER);
+        boolean parcelDiscriminatorValueHasWildcard = StringUtils.equals(otherDescriptor.getDataParcelDiscriminatorValue(),DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
         boolean parcelDiscriminatorValueIsGoodEnoughMatch = parcelDiscriminatorValueIsEqual || parcelDiscriminatorValueHasWildcard;
         if(!parcelDiscriminatorValueIsGoodEnoughMatch){
             return(false);

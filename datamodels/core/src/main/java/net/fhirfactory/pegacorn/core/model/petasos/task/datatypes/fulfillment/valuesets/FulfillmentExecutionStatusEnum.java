@@ -21,7 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets;
 
-import org.thymeleaf.util.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *

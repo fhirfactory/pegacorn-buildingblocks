@@ -205,7 +205,7 @@ public class LocalPetasosParticipantCacheDM {
 				if(!currentParticipant.getSubscriptions().isEmpty()){
 					if(!currentParticipant.getSubsystemParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
 						for(DataParcelManifestSubscriptionMaskType currentParticipantSubscription: currentParticipant.getSubscriptions()){
-							if(currentParticipantSubscription.getSourceProcessingPlantParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
+							if(currentParticipantSubscription.getOriginMask().getBoundaryPointProcessingPlantParticipantNameMask().equals(myProcessingPlant.getSubsystemParticipantName())){
 								if(!downstreamParticipants.contains(currentParticipant)){
 									downstreamParticipants.add(currentParticipant);
 								}

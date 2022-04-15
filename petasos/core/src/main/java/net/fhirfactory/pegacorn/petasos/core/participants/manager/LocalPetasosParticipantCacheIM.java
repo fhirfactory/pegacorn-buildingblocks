@@ -166,7 +166,7 @@ public class LocalPetasosParticipantCacheIM {
 					boolean sourceTaskProducerIsMe = currentSubscribedManifest.getSourceProcessingPlantParticipantName().equals(participantNameHolder.getSubsystemParticipantName());
 					boolean sourceSystemIsWildcard = false;
 					if(currentSubscribedManifest.hasExternalSourceSystem()){
-						sourceSystemIsWildcard = currentSubscribedManifest.getExternalSourceSystem().equals(DataParcelManifest.WILDCARD_CHARACTER);
+						sourceSystemIsWildcard = currentSubscribedManifest.getExternalSourceSystem().equals(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
 					}
 					if(sourceTaskProducerIsMe || sourceSystemIsWildcard){
 						doSubscribe = true;

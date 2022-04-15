@@ -22,6 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.common.SubscriptionMaskBase;
 import net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets.DataParcelDirectionSubscriptionMaskEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets.DataParcelTypeSubscriptionMaskEnum;
 import org.slf4j.Logger;
@@ -29,57 +31,61 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class DataParcelManifestSubscriptionMaskType implements Serializable {
+public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase {
     private static final Logger LOG = LoggerFactory.getLogger(DataParcelManifestSubscriptionMaskType.class);
+
+    public static String WILDCARD_CHARACTER = "*";
 
     private DataParcelTypeDescriptorSubscriptionMaskType contentDescriptorMask;
     private DataParcelTypeDescriptorSubscriptionMaskType containerDescriptorMask;
-    private DataParcelQualitySubscriptionMaskType payloadQualityMask;
+    private DataParcelQualitySubscriptionMaskType contentQualityMask;
 
     private DataParcelTypeSubscriptionMaskEnum dataParcelTypeMask;
 
     private DataParcelBoundaryPointSubscriptionMaskType originMask;
     private DataParcelBoundaryPointSubscriptionMaskType destinationMask;
 
-    private DataParcelActivityPointMaskType lastActivityPointMask;
+    private DataParcelActivityLocationMaskType lastActivityLocationMask;
 
-    private DataParcelDirectionSubscriptionMaskEnum dataParcelFlowDirection;
+    private DataParcelDirectionSubscriptionMaskEnum dataParcelFlowDirectionMask;
 
     //
     // Constructor(s)
     //
 
     public DataParcelManifestSubscriptionMaskType(){
+        super();
         this.contentDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
         this.containerDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
-        this.payloadQualityMask = new DataParcelQualitySubscriptionMaskType();
+        this.contentQualityMask = new DataParcelQualitySubscriptionMaskType();
         this.dataParcelTypeMask = DataParcelTypeSubscriptionMaskEnum.PARCEL_TYPE_ANY;
         this.originMask = new DataParcelBoundaryPointSubscriptionMaskType();
         this.destinationMask = new DataParcelBoundaryPointSubscriptionMaskType();
-        this.lastActivityPointMask = new DataParcelActivityPointMaskType();
-        this.dataParcelFlowDirection = DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_DIRECTION_ANY;
+        this.lastActivityLocationMask = new DataParcelActivityLocationMaskType();
+        this.dataParcelFlowDirectionMask = DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_DIRECTION_ANY;
     }
 
     public DataParcelManifestSubscriptionMaskType(DataParcelManifestSubscriptionMaskType ori){
+        super(ori);
         this.contentDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
         this.containerDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
-        this.payloadQualityMask = new DataParcelQualitySubscriptionMaskType();
+        this.contentQualityMask = new DataParcelQualitySubscriptionMaskType();
         this.dataParcelTypeMask = DataParcelTypeSubscriptionMaskEnum.PARCEL_TYPE_ANY;
         this.originMask = new DataParcelBoundaryPointSubscriptionMaskType();
         this.destinationMask = new DataParcelBoundaryPointSubscriptionMaskType();
-        this.lastActivityPointMask = new DataParcelActivityPointMaskType();
-        this.dataParcelFlowDirection = DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_DIRECTION_ANY;
+        this.lastActivityLocationMask = new DataParcelActivityLocationMaskType();
+        this.dataParcelFlowDirectionMask = DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_DIRECTION_ANY;
 
         if(ori.hasDataParcelTypeMask()){
             setDataParcelTypeMask(ori.getDataParcelTypeMask());
         }
 
-        if(ori.hasPayloadQualityMask()){
-            setPayloadQualityMask(ori.getPayloadQualityMask());
+        if(ori.hasContentQualityMask()){
+            setContentQualityMask(ori.getContentQualityMask());
         }
 
-        if(ori.hasLastActivityPointMask()){
-            setLastActivityPointMask(ori.getLastActivityPointMask());
+        if(ori.hasLastActivityLocationMask()){
+            setLastActivityLocationMask(ori.getLastActivityLocationMask());
         }
 
         if(ori.hasOriginMask()){
@@ -90,8 +96,8 @@ public class DataParcelManifestSubscriptionMaskType implements Serializable {
             setDestinationMask(ori.getDestinationMask());
         }
 
-        if(ori.hasDataParcelFlowDirection()){
-            setDataParcelFlowDirection(ori.getDataParcelFlowDirection());
+        if(ori.hasDataParcelFlowDirectionMask()){
+            setDataParcelFlowDirectionMask(ori.getDataParcelFlowDirectionMask());
         }
 
         if(ori.hasContentDescriptorMask()){
@@ -103,19 +109,101 @@ public class DataParcelManifestSubscriptionMaskType implements Serializable {
         }
     }
 
+    public DataParcelManifestSubscriptionMaskType(DataParcelManifest ori){
+        super();
+        this.contentDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
+        this.containerDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
+        this.contentQualityMask = new DataParcelQualitySubscriptionMaskType();
+        this.dataParcelTypeMask = DataParcelTypeSubscriptionMaskEnum.PARCEL_TYPE_ANY;
+        this.originMask = new DataParcelBoundaryPointSubscriptionMaskType();
+        this.destinationMask = new DataParcelBoundaryPointSubscriptionMaskType();
+        this.lastActivityLocationMask = new DataParcelActivityLocationMaskType();
+        this.dataParcelFlowDirectionMask = DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_DIRECTION_ANY;
+
+        if(ori.hasDataParcelType()){
+            switch(ori.getDataParcelType()){
+                case IPC_DATA_PARCEL_TYPE:
+                    setDataParcelTypeMask(DataParcelTypeSubscriptionMaskEnum.IPC_DATA_PARCEL_TYPE);
+                    break;
+                case SEARCH_QUERY_DATA_PARCEL_TYPE:
+                    setDataParcelTypeMask(DataParcelTypeSubscriptionMaskEnum.SEARCH_QUERY_DATA_PARCEL_TYPE);
+                    break;
+                case SEARCH_RESULT_DATA_PARCEL_TYPE:
+                    setDataParcelTypeMask(DataParcelTypeSubscriptionMaskEnum.SEARCH_RESULT_DATA_PARCEL_TYPE);
+                    break;
+                case GENERAL_DATA_PARCEL_TYPE:
+                    setDataParcelTypeMask(DataParcelTypeSubscriptionMaskEnum.GENERAL_DATA_PARCEL_TYPE);
+                    break;
+            }
+        }
+
+        if(ori.hasContentQuality()){
+            setContentQualityMask(new DataParcelQualitySubscriptionMaskType(ori.getContentQuality()));
+        }
+
+        if(ori.hasLastActivityLocation()){
+            setLastActivityLocationMask(new DataParcelActivityLocationMaskType(ori.getLastActivityLocation()));
+        }
+
+        if(ori.hasOrigin()){
+            setOriginMask(new DataParcelBoundaryPointSubscriptionMaskType(ori.getOrigin()));
+        }
+
+        if(ori.hasDestination()){
+            setDestinationMask(new DataParcelBoundaryPointSubscriptionMaskType(ori.getDestination()));
+        }
+
+        if(ori.hasDataParcelFlowDirection()){
+            switch(ori.getDataParcelFlowDirection()){
+                case INFORMATION_FLOW_INBOUND_DATA_PARCEL:
+                    setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_INBOUND_DATA_PARCEL);
+                    break;
+                case INFORMATION_FLOW_OUTBOUND_DATA_PARCEL:
+                    setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
+                    break;
+                case INFORMATION_FLOW_API_ACTIVITY_REQUEST:
+                    setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_API_ACTIVITY_REQUEST);
+                    break;
+                case INFORMATION_FLOW_API_ACTIVITY_RESPONSE:
+                    setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_API_ACTIVITY_RESPONSE);
+                    break;
+                case INFORMATION_FLOW_WORKFLOW_OUTPUT:
+                    setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_WORKFLOW_OUTPUT);
+                    break;
+                case INFORMATION_FLOW_WORKFLOW_INPUT:
+                    setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_WORKFLOW_INPUT);
+                    break;
+                case INFORMATION_FLOW_WORKFLOW_TRANSIENT:
+                    setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_WORKFLOW_TRANSIENT);
+                    break;
+                case INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL:
+                    setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL);
+                    break;
+            }
+        }
+
+        if(ori.hasContentDescriptor()){
+            setContentDescriptorMask(new DataParcelTypeDescriptorSubscriptionMaskType(ori.getContentDescriptor()));
+        }
+
+        if(ori.hasContainerDescriptor()){
+            setContainerDescriptorMask(new DataParcelTypeDescriptorSubscriptionMaskType(ori.getContainerDescriptor()));
+        }
+    }
+
     //
     // ifExists (has)
     //
 
     @JsonIgnore
-    public boolean hasDataParcelFlowDirection(){
-        boolean hasValue = this.dataParcelFlowDirection != null;
+    public boolean hasDataParcelFlowDirectionMask(){
+        boolean hasValue = this.dataParcelFlowDirectionMask != null;
         return(hasValue);
     }
 
     @JsonIgnore
-    public boolean hasLastActivityPointMask(){
-        boolean hasValue = this.lastActivityPointMask != null;
+    public boolean hasLastActivityLocationMask(){
+        boolean hasValue = this.lastActivityLocationMask != null;
         return(hasValue);
     }
 
@@ -139,8 +227,8 @@ public class DataParcelManifestSubscriptionMaskType implements Serializable {
     }
 
     @JsonIgnore
-    public boolean hasPayloadQualityMask(){
-        boolean hasValue = this.payloadQualityMask != null;
+    public boolean hasContentQualityMask(){
+        boolean hasValue = this.contentQualityMask != null;
         return(hasValue);
     }
 
@@ -160,6 +248,10 @@ public class DataParcelManifestSubscriptionMaskType implements Serializable {
     // Getters and Setters
     //
 
+    @JsonIgnore
+    public static String getWildcardCharacter() {
+        return WILDCARD_CHARACTER;
+    }
 
     public DataParcelTypeDescriptorSubscriptionMaskType getContentDescriptorMask() {
         return contentDescriptorMask;
@@ -177,12 +269,12 @@ public class DataParcelManifestSubscriptionMaskType implements Serializable {
         this.containerDescriptorMask = containerDescriptorMask;
     }
 
-    public DataParcelQualitySubscriptionMaskType getPayloadQualityMask() {
-        return payloadQualityMask;
+    public DataParcelQualitySubscriptionMaskType getContentQualityMask() {
+        return contentQualityMask;
     }
 
-    public void setPayloadQualityMask(DataParcelQualitySubscriptionMaskType payloadQualityMask) {
-        this.payloadQualityMask = payloadQualityMask;
+    public void setContentQualityMask(DataParcelQualitySubscriptionMaskType contentQualityMask) {
+        this.contentQualityMask = contentQualityMask;
     }
 
     public DataParcelTypeSubscriptionMaskEnum getDataParcelTypeMask() {
@@ -209,20 +301,28 @@ public class DataParcelManifestSubscriptionMaskType implements Serializable {
         this.destinationMask = destinationMask;
     }
 
-    public DataParcelActivityPointMaskType getLastActivityPointMask() {
-        return lastActivityPointMask;
+    public DataParcelActivityLocationMaskType getLastActivityLocationMask() {
+        return lastActivityLocationMask;
     }
 
-    public void setLastActivityPointMask(DataParcelActivityPointMaskType lastActivityPointMask) {
-        this.lastActivityPointMask = lastActivityPointMask;
+    public void setLastActivityLocationMask(DataParcelActivityLocationMaskType lastActivityLocationMask) {
+        this.lastActivityLocationMask = lastActivityLocationMask;
     }
 
-    public DataParcelDirectionSubscriptionMaskEnum getDataParcelFlowDirection() {
-        return dataParcelFlowDirection;
+    public DataParcelDirectionSubscriptionMaskEnum getDataParcelFlowDirectionMask() {
+        return dataParcelFlowDirectionMask;
     }
 
-    public void setDataParcelFlowDirection(DataParcelDirectionSubscriptionMaskEnum dataParcelFlowDirection) {
-        this.dataParcelFlowDirection = dataParcelFlowDirection;
+    public void setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum dataParcelFlowDirectionMask) {
+        this.dataParcelFlowDirectionMask = dataParcelFlowDirectionMask;
+    }
+
+    // Logger
+
+    @JsonIgnore
+    @Override
+    protected Logger getLogger(){
+        return(LOG);
     }
 
     //
@@ -234,12 +334,13 @@ public class DataParcelManifestSubscriptionMaskType implements Serializable {
         return "DataParcelManifestSubscriptionMaskType{" +
                 "contentDescriptorMask=" + contentDescriptorMask +
                 ", containerDescriptorMask=" + containerDescriptorMask +
-                ", payloadQualityMask=" + payloadQualityMask +
+                ", payloadQualityMask=" + contentQualityMask +
                 ", dataParcelTypeMask=" + dataParcelTypeMask +
                 ", originMask=" + originMask +
                 ", destinationMask=" + destinationMask +
-                ", lastActivityPointMask=" + lastActivityPointMask +
-                ", dataParcelFlowDirection=" + dataParcelFlowDirection +
+                ", lastActivityPointMask=" + lastActivityLocationMask +
+                ", dataParcelFlowDirection=" + dataParcelFlowDirectionMask +
+                ", allowAll=" + getAllowAll() +
                 '}';
     }
 }

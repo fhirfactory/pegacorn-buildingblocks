@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes;
+package net.fhirfactory.pegacorn.core.model.petasos.dataparcel;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -30,7 +30,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.io.Serializable;
 import java.time.Instant;
 
-public class DataParcelActivityPointMaskType implements Serializable {
+public class DataParcelActivityLocation implements Serializable {
     private PetasosParticipantName processingPlantParticipantName;
     private PetasosParticipantName workUnitProcessorParticipantName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
@@ -40,36 +40,36 @@ public class DataParcelActivityPointMaskType implements Serializable {
     // Constructor(s)
     //
 
-    public DataParcelActivityPointMaskType(){
+    public DataParcelActivityLocation(){
         this.activityInstant = null;
         this.processingPlantParticipantName = null;
         this.workUnitProcessorParticipantName = null;
     }
 
-    public DataParcelActivityPointMaskType(String processingPlant, String workUnitProcessor){
+    public DataParcelActivityLocation(String processingPlant, String workUnitProcessor){
         this.processingPlantParticipantName = new PetasosParticipantName(processingPlant);
         this.workUnitProcessorParticipantName = new PetasosParticipantName(workUnitProcessor);
     }
 
-    public DataParcelActivityPointMaskType(String processingPlant, String workUnitProcessor, Instant instant){
+    public DataParcelActivityLocation(String processingPlant, String workUnitProcessor, Instant instant){
         this.processingPlantParticipantName = new PetasosParticipantName(processingPlant);
         this.workUnitProcessorParticipantName = new PetasosParticipantName(workUnitProcessor);
         this.activityInstant = SerializationUtils.clone(instant);
     }
 
-    public DataParcelActivityPointMaskType(DataParcelActivityPointMaskType ori){
+    public DataParcelActivityLocation(DataParcelActivityLocation ori){
         if(ori.hasActivityInstant()){
-            setActivityInstant(ori.getActivityInstant());
+            setActivityInstant(SerializationUtils.clone(ori.getActivityInstant()));
         } else {
             setActivityInstant(null);
         }
         if(ori.hasWorkUnitProcessorParticipantName()){
-            setWorkUnitProcessorParticipantName(ori.getWorkUnitProcessorParticipantName());
+            setWorkUnitProcessorParticipantName(SerializationUtils.clone(ori.getWorkUnitProcessorParticipantName()));
         } else {
             setWorkUnitProcessorParticipantName(null);
         }
         if(ori.hasProcessingPlantParticipantName()){
-            setProcessingPlantParticipantName(ori.getProcessingPlantParticipantName());
+            setProcessingPlantParticipantName(SerializationUtils.clone(ori.getProcessingPlantParticipantName()));
         }
     }
 

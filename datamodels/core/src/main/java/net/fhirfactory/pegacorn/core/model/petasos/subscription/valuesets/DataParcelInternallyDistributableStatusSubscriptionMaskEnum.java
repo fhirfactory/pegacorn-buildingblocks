@@ -22,9 +22,9 @@
 package net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets;
 
 public enum DataParcelInternallyDistributableStatusSubscriptionMaskEnum {
-    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_TRUE("InternallyDistributable.True", "pegacorn.data-parcel.internally-distributable-status.true"),
-    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE("InternallyDistributable.False", "pegacorn.data-parcel.internally-distributable-status.false"),
-    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_ANY("InternallyDistributable.Any", "pegacorn.data-parcel.internally-distributable-status.any");
+    DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_TRUE("InternallyDistributable.True", "pegacorn.data-parcel.internally-distributable-status.true"),
+    DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_FALSE("InternallyDistributable.False", "pegacorn.data-parcel.internally-distributable-status.false"),
+    DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_ANY("InternallyDistributable.Any", "pegacorn.data-parcel.internally-distributable-status.any");
 
     private String token;
     private String displayName;

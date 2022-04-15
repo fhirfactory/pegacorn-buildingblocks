@@ -94,7 +94,7 @@ public class LocalPetasosParticipantSubscriptionMapIM {
         LOG.debug(".addTopicSubscriber(): Exit");
     }
 
-    public void removeSubscriber(DataParcelManifest contentTopicID, PubSubParticipant interestedNode) {
+    public void removeSubscriber(DataParcelManifestSubscriptionMaskType contentTopicID, PubSubParticipant interestedNode) {
         LOG.debug(".removeSubscriber(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
         subscriptionCache.removeSubscriber(contentTopicID, interestedNode);
         LOG.debug(".removeSubscriber(): Exit");
