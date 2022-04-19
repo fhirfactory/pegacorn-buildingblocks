@@ -386,10 +386,23 @@
         <!-- IBM HL7 to FHIR Converter Libraries                                           -->
         <!--*******************************************************************************-->
 
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+        </dependency>
+      
         <dependency>
             <groupId>io.github.linuxforhealth</groupId>
             <artifactId>hl7v2-fhir-converter</artifactId>
             <version>1.0.13</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
 
