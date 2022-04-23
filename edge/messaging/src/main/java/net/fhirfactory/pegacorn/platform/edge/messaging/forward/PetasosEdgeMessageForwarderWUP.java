@@ -40,8 +40,8 @@ import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingP
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.Exchange;
-import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,6 +176,23 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
                         exchange.getIn().setBody(response);
                     }
                 });
+    }
+
+    //
+    // Route Helpers
+    //
+
+    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
     }
 
     //

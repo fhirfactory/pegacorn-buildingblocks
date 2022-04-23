@@ -253,7 +253,7 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
         JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
         Address targetAddress = getCandidateTargetServiceAddress(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
         if(targetAddress == null){
-            getLogger().warn(".sendNotification(): No Metrics Server available");
+            getLogger().warn(".sendNotification(): ITOpsServer Unreachable: Fallback Logging Of Notification: Participant->{}, message->{}", notification.getParticipantName(), notification.getContent());
             return;
         }
         try {
@@ -271,11 +271,13 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendNotification(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".sendNotification(): Error (NoSuchMethodException): Fallback Logging Of Notification: Participant->{}, message->{}", notification.getParticipantName(), notification.getContent());
             return;
         } catch (Exception e) {
             e.printStackTrace();
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".sendNotification: Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".sendNotification(): Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".sendNotification(): Error (GeneralException): Fallback Logging Of Notification: Participant->{}, message->{}", notification.getParticipantName(), notification.getContent());
             return;
         }
     }
@@ -291,7 +293,7 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
         JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
         Address targetAddress = getCandidateTargetServiceAddress(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
         if(targetAddress == null){
-            getLogger().warn(".sendTaskReport(): No Metrics Server available");
+            getLogger().warn(".sendTaskReport(): ITOpsServer Unreachable: Fallback Logging Of Notification: Participant->{}, message->{}", taskReportNotification.getParticipantName(), taskReportNotification.getContent());
             return;
         }
         try {
@@ -309,11 +311,13 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendTaskReport(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".sendTaskReport(): Error (NoSuchMethodException): Fallback Logging Of Notification: Participant->{}, message->{}", taskReportNotification.getParticipantName(), taskReportNotification.getContent());
             return;
         } catch (Exception e) {
             e.printStackTrace();
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".sendTaskReport: Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".sendTaskReport(): Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".sendTaskReport(): Error (GeneralException): Fallback Logging Of Notification: Participant->{}, message->{}", taskReportNotification.getParticipantName(), taskReportNotification.getContent());
             return;
         }
     }

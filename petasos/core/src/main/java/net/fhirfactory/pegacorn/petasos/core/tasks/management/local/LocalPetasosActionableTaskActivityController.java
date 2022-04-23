@@ -107,6 +107,9 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         //
         // Synchronise with Ponos
         PetasosActionableTask petasosActionableTask = getTaskRepositoryService().registerActionableTask(petasosActionableTaskSharedInstance.getInstance());
+        if(petasosActionableTask == null){
+            // Assume autonomous operation
+        }
         petasosActionableTaskSharedInstance.update();
         //
         // Build a TaskJobCard
@@ -408,25 +411,6 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         getLogger().debug(".notifyTaskWaiting(): Exit, executionStatus->{}", executionStatus);
         return(executionStatus);
     }
-
-    /*
-    @Deprecated
-    public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask){
-        getLogger().debug(".updateActionableTaskFinalisationStatus(): Entry, actionableTask->{}", actionableTask);
-        if(actionableTask == null){
-            getLogger().debug(".updateActionableTaskFinalisationStatus(): Exit, fulfillmentTask is null");
-            return(null);
-        }
-        PetasosActionableTask cachedActionableTask = getSharedActionableTaskDM().getTask(actionableTask.getTaskId());
-        if(cachedActionableTask != null){
-            cachedActionableTask.update(actionableTask);
-        }
-        PetasosActionableTask syncrhonisedActionableTask = getTaskRepositoryService().updateActionableTask(cachedActionableTask);
-        cachedActionableTask.update(syncrhonisedActionableTask);
-        return(syncrhonisedActionableTask);
-
-    }
-     */
 
     //
     // Getters (and Setters)
