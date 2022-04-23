@@ -364,6 +364,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(specifyWUPInstanceName());
     }
 
+    public WorkUnitProcessorSoftwareComponent getMeAsATopologyComponent() {
+        return meAsATopologyComponent;
+    }
+
     //
     // Routing Support Functions
     //
@@ -376,7 +380,21 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(getEgressEndpoint().getEndpointSpecification());
     }
 
-    public class NodeDetailInjector implements Processor{
+    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
+    }
+
+
+    public class NodeDetailInjector implements Processor {
         @Override
         public void process(Exchange exchange) throws Exception {
             getLogger().debug("NodeDetailInjector.process(): Entry");
@@ -409,26 +427,6 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         }
     }
 
-    public WorkUnitProcessorSoftwareComponent getMeAsATopologyComponent() {
-        return meAsATopologyComponent;
-    }
-
-    /**
-     * @param uri
-     * @return the RouteBuilder.from(uri) with all exceptions logged but not handled
-     */
-    protected RouteDefinition fromIncludingPetasosServices(String uri) {
-        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
-        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
-        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
-        RouteDefinition route = fromWithStandardExceptionHandling(uri);
-        route
-                .process(nodeDetailInjector)
-                .process(auditAgentInjector)
-                .process(taskReportAgentInjector)
-        ;
-        return route;
-    }
 
     //
     // PetasosParticipant Functions

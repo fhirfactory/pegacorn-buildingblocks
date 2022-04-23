@@ -70,6 +70,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     @Inject
     private SubsystemNames subsystemNames;
 
+
     //
     // Constructor(s)
     //
@@ -161,6 +162,12 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     public CapabilityUtilisationResponse executeTask(String capabilityProviderName, CapabilityUtilisationRequest task){
         getLogger().trace(".executeTask(): Entry, capabilityProviderName->{}, task->{}", capabilityProviderName, task);
         Address targetAddress = getCandidateTargetServiceAddress(capabilityProviderName);
+        if(targetAddress == null){
+            getLogger().error(".executeTask(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance!!!");
+            return(null);
+        }
         try {
             Object objectSet[] = new Object[1];
             Class classSet[] = new Class[1];
@@ -204,6 +211,10 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
         if(targetAddress == null){
             getLogger().warn(".registerActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".registerActionableTask(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
         }
         RemoteProcedureCallRequest remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, jgroupsIPSummary);
         try {
@@ -284,6 +295,10 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
         if(targetAddress == null){
             getLogger().warn(".fulfillActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".fulfillActionableTask(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.fulfillActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.fulfillActionableTask())!!!");
+            return(null);
         }
         RemoteProcedureCallRequest remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, endpointIdentifier);
         try {
@@ -359,8 +374,20 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
         if(targetAddress == null){
             getLogger().warn(".updateActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".updateActionableTask(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance!!!");
+            return(null);
         }
-        RemoteProcedureCallRequest remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, endpointIdentifier);
+        RemoteProcedureCallRequest remoteProcedureCallRequest = null;
+        try {
+            remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, endpointIdentifier);
+        } catch(Exception ex){
+            getLogger().warn(".updateActionableTask(): Warning: Cannot formulate Ponos-IM RPC Request (for updateActionableTask)!!!",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getMetricsAgent().sendITOpsNotification("Warning: Cannot formulate Ponos-IM RPC Request (for updateActionableTask)!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Warning: Cannot formulate Ponos-IM RPC Request (for updateActionableTask)!!!");
+            return(null);
+        }
 
         try {
             Object objectSet[] = new Object[1];

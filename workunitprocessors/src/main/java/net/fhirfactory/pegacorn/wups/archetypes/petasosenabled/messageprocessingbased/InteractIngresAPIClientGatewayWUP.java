@@ -38,10 +38,18 @@ public abstract class InteractIngresAPIClientGatewayWUP extends GenericTriggerBa
 
     private MessageBasedWUPEndpointContainer ingresEndpoint;
 
+    //
+    // Constructor(s)
+    //
+
     public InteractIngresAPIClientGatewayWUP() {
         super();
 //        getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
+
+    //
+    // Abstract Methods
+    //
 
     protected abstract String specifyIngresTopologyEndpointName();
     protected abstract String specifyIngresEndpointVersion();
@@ -50,6 +58,10 @@ public abstract class InteractIngresAPIClientGatewayWUP extends GenericTriggerBa
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT);
     }
+
+    //
+    // WUP Configuration
+    //
 
     @Override
     protected MessageBasedWUPEndpointContainer specifyEgressEndpoint(){

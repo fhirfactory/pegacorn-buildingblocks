@@ -108,7 +108,7 @@ public class ParticipantTaskExecutionController {
                         if (taskNodeAffinity.equals(getProcessingPlant().getMeAsASoftwareComponent().getComponentID())) {
                             // The requesting WUP and i are on the same node as the actual ActionableTask creation point
                             // That means we have "nodeAffinity" and therefore preference for execution
-                            // So give it execution priveleges
+                            // So give it execution privileges
                             taskJobCard.setExecutingProcessingPlant(getProcessingPlant().getMeAsASoftwareComponent().getComponentID());
                             taskJobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
                             taskJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
