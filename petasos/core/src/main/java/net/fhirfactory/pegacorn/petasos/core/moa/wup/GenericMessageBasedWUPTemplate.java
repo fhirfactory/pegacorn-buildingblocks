@@ -406,6 +406,21 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return route;
     }
 
+    protected RouteDefinition fromIncludingPetasosServicesForEndpointsWithNoExceptionHandling(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        MetricsAgentInjector metricsAgentInjector = new MetricsAgentInjector();
+        RouteDefinition route = from(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+                .process(metricsAgentInjector)
+        ;
+        return route;
+    }
+
 
     public class NodeDetailInjector implements Processor {
         @Override
@@ -437,6 +452,14 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         public void process(Exchange camelExchange) throws Exception{
             getLogger().debug("TaskReportAgentInjector.process(): Entry");
             camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, getTaskReportAgent());
+        }
+    }
+
+    public class MetricsAgentInjector implements Processor{
+        @Override
+        public void process(Exchange camelExchange) throws Exception{
+            getLogger().debug("MetricsAgentInjector.process(): Entry");
+            camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getTaskReportAgent());
         }
     }
 
