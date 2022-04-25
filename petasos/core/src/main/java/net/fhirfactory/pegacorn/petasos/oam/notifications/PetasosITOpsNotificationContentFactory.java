@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.notifications;
 
+import net.fhirfactory.pegacor.internals.hl7v2.helpers.UltraDefensivePipeParser;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
@@ -29,6 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.HL7V2XTopicFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -46,6 +48,9 @@ public class PetasosITOpsNotificationContentFactory {
 
     @Inject
     private HL7V2XTopicFactory hl7V2XTopicFactory;
+
+    @Inject
+    private UltraDefensivePipeParser pipeParser;
 
     //
     // Constructor(s)
@@ -92,7 +97,7 @@ public class PetasosITOpsNotificationContentFactory {
                 notificationContentBuilder.append("Content Payload: HL7 v2.x: Trigger:"+messageType+"^"+messageTrigger+"("+messageVersion+")");
             } else {
                 notificationContentBuilder.append("Content Payload: HL7 v2.x: Trigger:" + messageType + "^" + messageTrigger + "(" + messageVersion + ") \n");
-                List<String> metadataBody = extractMetadataFromHL7v2xMessage(payload.getPayload());
+                List<String> metadataBody = pipeParser.extractMetadataFromHL7v2xMessage(payload.getPayload());
                 for(String metadataSegment: metadataBody) {
                     notificationContentBuilder.append(metadataSegment);
                 }
@@ -121,6 +126,33 @@ public class PetasosITOpsNotificationContentFactory {
         return(messageBuilder.toString());
     }
 
+    public String payloadTypeFromUoW(UoWPayload payload){
+        if(payload == null){
+            return("---");
+        }
+        if(StringUtils.isEmpty(payload.getPayload())){
+            return("---");
+        }
+        StringBuilder messageBuilder = new StringBuilder();
+        if(payload.getPayloadManifest().hasContainerDescriptor()){
+            if(payload.getPayloadManifest().hasContainerDescriptor()){
+                String containerMessageDefiner = payload.getPayloadManifest().getContainerDescriptor().getDataParcelDefiner();
+                String containerMessageCategory= payload.getPayloadManifest().getContainerDescriptor().getDataParcelCategory();
+                String containerMessageSubcategory = payload.getPayloadManifest().getContainerDescriptor().getDataParcelSubCategory();
+                String containerMessageResource= payload.getPayloadManifest().getContainerDescriptor().getDataParcelResource();
+                String containerMessageVersion = payload.getPayloadManifest().getContainerDescriptor().getVersion();
+                messageBuilder.append(containerMessageDefiner+"::"+containerMessageCategory+"::"+containerMessageSubcategory+"::"+ containerMessageResource+"("+containerMessageVersion+")/");
+            }
+        }
+        String definer = getContentDescriptorElement(payload, DataParcelDescriptorKeyEnum.DATASET_DEFINER);
+        String category = getContentDescriptorElement(payload, DataParcelDescriptorKeyEnum.DATASET_CATEGORY);
+        String subcategory = getContentDescriptorElement(payload, DataParcelDescriptorKeyEnum.DATASET_SUBCATEGORY);
+        String resource = getContentDescriptorElement(payload, DataParcelDescriptorKeyEnum.DATASET_RESOURCE);
+        String version = getContentDescriptorElement(payload, DataParcelDescriptorKeyEnum.DATASET_VERSION);
+        messageBuilder.append(definer+"::"+category+"::"+subcategory+"::"+ resource+"("+version+")");
+        return(messageBuilder.toString());
+    }
+
     public String newNotificationContentFromUoWPayload(FulfillmentExecutionStatusEnum status, UoWPayload payload){
         if(payload == null){
             return("");
@@ -143,7 +175,7 @@ public class PetasosITOpsNotificationContentFactory {
                 notificationContentBuilder.append("Content Payload: HL7 v2.x: Trigger: "+messageType+"^"+messageTrigger+"("+messageVersion+")");
             } else {
                 notificationContentBuilder.append("Content Payload: HL7 v2.x: Trigger: " + messageType + "^" + messageTrigger + "(" + messageVersion + ") \n");
-                List<String> metadataBody = extractMetadataFromHL7v2xMessage(payload.getPayload());
+                List<String> metadataBody = pipeParser.extractMetadataFromHL7v2xMessage(payload.getPayload());
                 for(String metadataSegment: metadataBody) {
                     notificationContentBuilder.append(metadataSegment);
                 }
@@ -264,97 +296,5 @@ public class PetasosITOpsNotificationContentFactory {
             }
         }
         return(false);
-    }
-
-    public List<String> extractMetadataFromHL7v2xMessage(String payload){
-        if(payload == null){
-            List<String> errorPayload = new ArrayList<>();
-            errorPayload.add("*empty payload*");
-            return(errorPayload);
-        }
-        List<String> segmentList = getSegmentList(payload);
-        String pid = null;
-        String msh = null;
-        if(segmentList != null){
-            pid = getPatientIdentitySegment(segmentList);
-            msh = getMessageHeaderSegment(segmentList);
-        }
-        List<String> metadata = new ArrayList<>();
-        if(msh == null){
-            metadata.add("*malformed payload (cannot resolve MSH)*");
-            return(metadata);
-        }
-        metadata.add(msh);
-        if(pid == null){
-            pid = "No PID Segment";
-        }
-        metadata.add(pid);
-        return(metadata);
-    }
-
-    private String getMessageHeaderSegment(List<String> segmentList){
-        if(segmentList == null){
-            return(null);
-        }
-        for(String currentSegment: segmentList){
-            String currentSegmentStart = currentSegment.substring(0, 6);
-            if(currentSegmentStart.contains("MSH")){
-                return(currentSegment);
-            }
-        }
-        return(null);
-    }
-
-    private String getPatientIdentitySegment(List<String> segmentList){
-        if(segmentList == null){
-            return(null);
-        }
-        for(String currentSegment: segmentList){
-            if(currentSegment.startsWith("PID")){
-                return(currentSegment);
-            }
-        }
-        return(null);
-    }
-
-    private List<String> getSegmentList(String message){
-        if(message == null){
-            return(new ArrayList<>());
-        }
-        if(!message.contains("\r")){
-            return(new ArrayList<>());
-        }
-        String[] segmentArray = message.split("\r");
-        List<String> segmentList = new ArrayList<>();
-        int segmentListSize = segmentArray.length;
-        for(int counter = 0; counter < segmentListSize; counter += 1){
-            String currentSegment = segmentArray[counter];
-            getLogger().debug("Segment->{}", currentSegment);
-            segmentList.add(currentSegment);
-        }
-        return(segmentList);
-    }
-
-    public List<String> getGeneralHeaderDetail(UoWPayload payload){
-        List<String> headerInfo = new ArrayList<>();
-        if(payload.getPayloadManifest().hasContainerDescriptor()){
-            StringBuilder containerBuilder = new StringBuilder();
-            String containerMessageDefiner = payload.getPayloadManifest().getContainerDescriptor().getDataParcelDefiner();
-            String containerMessageCategory= payload.getPayloadManifest().getContainerDescriptor().getDataParcelCategory();
-            String containerMessageSubcategory = payload.getPayloadManifest().getContainerDescriptor().getDataParcelSubCategory();
-            String containerMessageResource= payload.getPayloadManifest().getContainerDescriptor().getDataParcelResource();
-            String containerMessageVersion = payload.getPayloadManifest().getContainerDescriptor().getVersion();
-            containerBuilder.append("Container Payload: "+containerMessageDefiner+"::"+containerMessageCategory+"::"+containerMessageSubcategory+"::"+ containerMessageResource+"("+containerMessageVersion+")");
-            headerInfo.add(containerBuilder.toString());
-        }
-        StringBuilder contentBuilder = new StringBuilder();
-        String contentDescriptor = payload.getPayloadManifest().getContentDescriptor().getDataParcelDefiner();
-        String contentMessageCategory= payload.getPayloadManifest().getContentDescriptor().getDataParcelCategory();
-        String contentMessageSubcategory = payload.getPayloadManifest().getContentDescriptor().getDataParcelSubCategory();
-        String contentMessageResource= payload.getPayloadManifest().getContentDescriptor().getDataParcelResource();
-        String contentMessageVersion = payload.getPayloadManifest().getContentDescriptor().getVersion();
-        contentBuilder.append("Content Payload: "+contentDescriptor+"::"+contentMessageCategory+"::"+contentMessageSubcategory+"::"+ contentMessageResource+"("+contentMessageVersion+")");
-        headerInfo.add(contentBuilder.toString());
-        return(headerInfo);
     }
 }

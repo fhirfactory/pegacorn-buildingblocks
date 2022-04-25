@@ -393,6 +393,19 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return route;
     }
 
+    protected RouteDefinition fromIncludingPetasosServicesNoExceptionHandling(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = from(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
+    }
+
 
     public class NodeDetailInjector implements Processor {
         @Override
