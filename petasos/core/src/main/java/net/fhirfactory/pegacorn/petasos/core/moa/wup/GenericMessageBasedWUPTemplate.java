@@ -48,6 +48,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementName
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
@@ -406,22 +407,6 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return route;
     }
 
-    protected RouteDefinition fromIncludingPetasosServicesForEndpointsWithNoExceptionHandling(String uri) {
-        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
-        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
-        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
-        MetricsAgentInjector metricsAgentInjector = new MetricsAgentInjector();
-        RouteDefinition route = from(uri);
-        route
-                .process(nodeDetailInjector)
-                .process(auditAgentInjector)
-                .process(taskReportAgentInjector)
-                .process(metricsAgentInjector)
-        ;
-        return route;
-    }
-
-
     public class NodeDetailInjector implements Processor {
         @Override
         public void process(Exchange exchange) throws Exception {
@@ -454,15 +439,6 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, getTaskReportAgent());
         }
     }
-
-    public class MetricsAgentInjector implements Processor{
-        @Override
-        public void process(Exchange camelExchange) throws Exception{
-            getLogger().debug("MetricsAgentInjector.process(): Entry");
-            camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getTaskReportAgent());
-        }
-    }
-
 
     //
     // PetasosParticipant Functions

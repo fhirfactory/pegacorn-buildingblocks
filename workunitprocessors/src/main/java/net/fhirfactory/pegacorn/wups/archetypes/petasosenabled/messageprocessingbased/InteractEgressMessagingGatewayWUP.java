@@ -109,17 +109,27 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
     // Route Helper Functions
     //
 
-    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+    protected RouteDefinition fromIncludingPetasosServicesForEndpointsWithNoExceptionHandling(String uri) {
         NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
         AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
         TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
-        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        MetricsAgentInjector metricsAgentInjector = new MetricsAgentInjector();
+        RouteDefinition route = from(uri);
         route
                 .process(nodeDetailInjector)
                 .process(auditAgentInjector)
                 .process(taskReportAgentInjector)
+                .process(metricsAgentInjector)
         ;
         return route;
+    }
+
+    public class MetricsAgentInjector implements Processor{
+        @Override
+        public void process(Exchange camelExchange) throws Exception{
+            getLogger().debug("MetricsAgentInjector.process(): Entry");
+            camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getEndpointMetricsAgent());
+        }
     }
 
     //
