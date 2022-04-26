@@ -165,7 +165,7 @@ public class UltraDefensivePipeParser {
         return(null);
     }
 
-    private List<String> getSegmentList(String message){
+    public List<String> getSegmentList(String message){
         getLogger().debug(".getSegmentList(): Entry, message->{}", message);
         if(StringUtils.isEmpty(message)){
             getLogger().debug(".getSegmentList(): Exit, message is empty!");
