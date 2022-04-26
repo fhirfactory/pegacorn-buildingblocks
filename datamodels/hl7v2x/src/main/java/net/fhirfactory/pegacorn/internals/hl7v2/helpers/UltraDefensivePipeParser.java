@@ -145,9 +145,11 @@ public class UltraDefensivePipeParser {
             return(null);
         }
         for(String currentSegment: segmentList){
-            String currentSegmentStart = currentSegment.substring(0, 6);
-            if(currentSegmentStart.contains("MSH")){
-                return(currentSegment);
+            if(currentSegment.length() > 3) {
+                String currentSegmentStart = currentSegment.substring(0, 4);
+                if (currentSegmentStart.contains("MSH")) {
+                    return (currentSegment);
+                }
             }
         }
         return(null);
@@ -165,7 +167,7 @@ public class UltraDefensivePipeParser {
         return(null);
     }
 
-    private List<String> getSegmentList(String message){
+    public List<String> getSegmentList(String message){
         getLogger().debug(".getSegmentList(): Entry, message->{}", message);
         if(StringUtils.isEmpty(message)){
             getLogger().debug(".getSegmentList(): Exit, message is empty!");
