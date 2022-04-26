@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.notifications;
 
-import net.fhirfactory.pegacor.internals.hl7v2.helpers.UltraDefensivePipeParser;
+import net.fhirfactory.pegacorn.internals.hl7v2.helpers.UltraDefensivePipeParser;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDescriptorKeyEnum;

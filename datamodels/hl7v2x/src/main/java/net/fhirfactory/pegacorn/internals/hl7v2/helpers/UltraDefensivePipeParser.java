@@ -19,22 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacor.internals.hl7v2.helpers;
+package net.fhirfactory.pegacorn.internals.hl7v2.helpers;
 
-import ca.uhn.hl7v2.model.Type;
-import net.fhirfactory.pegacor.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentTypeEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thymeleaf.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-
-import ca.uhn.hl7v2.model.GenericComposite;
-import ca.uhn.hl7v2.model.DataTypeUtil;
-import org.thymeleaf.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,10 +86,14 @@ public class UltraDefensivePipeParser {
     // Business Methods
     //
 
-    public String extractSegment(String message, HL7v2SegmentTypeEnum segment){
+    public String extractSegment(String message, HL7v2SegmentTypeEnum segmentType){
 
-
-        return(null);
+        if(StringUtils.isEmpty(message)){
+            return(null);
+        }
+        List<String> segmentList = getSegmentList(message);
+        String segment = getSegment(segmentList, segmentType.getKey(),1);
+        return(segment);
     }
 
 
@@ -124,6 +122,22 @@ public class UltraDefensivePipeParser {
         }
         metadata.add(pid);
         return(metadata);
+    }
+
+    public String getSegment(List<String> segmentList, String segmentName, int repetitionNumber){
+        if(segmentList == null){
+            return(null);
+        }
+        int repetitionCounter = 0;
+        for(String currentSegment: segmentList){
+            if(currentSegment.startsWith(segmentName)){
+                repetitionCounter += 1;
+                if(repetitionNumber == repetitionCounter){
+                    return(currentSegment);
+                }
+            }
+        }
+        return(null);
     }
 
     private String getMessageHeaderSegment(List<String> segmentList){
@@ -157,17 +171,7 @@ public class UltraDefensivePipeParser {
             getLogger().debug(".getSegmentList(): Exit, message is empty!");
             return(new ArrayList<>());
         }
-        if(!message.contains("\r")){
-            getLogger().debug(".getSegmentList(): Exit, message does not contain the \\r line delimiter!");
-            return(new ArrayList<>());
-        }
-        String cleanedMessage = null;
-        if(message.contains("\n")){
-            cleanedMessage = message.replace("\n", "");
-        } else {
-            cleanedMessage = message;
-        }
-        String[] segmentArray = cleanedMessage.split("\r");
+        String[] segmentArray = message.lines().toArray(String[]::new);
         List<String> segmentList = new ArrayList<>();
         int segmentListSize = segmentArray.length;
         for(int counter = 0; counter < segmentListSize; counter += 1){

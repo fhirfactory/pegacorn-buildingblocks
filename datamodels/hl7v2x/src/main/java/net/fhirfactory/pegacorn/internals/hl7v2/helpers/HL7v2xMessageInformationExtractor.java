@@ -19,14 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacor.internals.hl7v2.helpers;
+package net.fhirfactory.pegacorn.internals.hl7v2.helpers;
 
 import java.util.Date;
 
 import javax.enterprise.context.ApplicationScoped;
 
 import ca.uhn.hl7v2.parser.PipeParser;
-import net.fhirfactory.pegacor.internals.hl7v2.interfaces.HL7v2xInformationExtractionInterface;
+import net.fhirfactory.pegacorn.internals.hl7v2.interfaces.HL7v2xInformationExtractionInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

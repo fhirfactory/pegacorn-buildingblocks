@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2022 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,57 +19,71 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacor.internals.hl7v2.transfoms.tofhir.common;
+package net.fhirfactory.pegacorn.internals.hl7v2.helpers;
 
-import ca.uhn.hl7v2.DefaultHapiContext;
-import ca.uhn.hl7v2.HapiContext;
-import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentEnum;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 
-public abstract class ResourceFromHL7v2xBase {
+@ApplicationScoped
+public class SimpleHL7v2StringParser {
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleHL7v2StringParser.class);
 
-    private HapiContext hapiContext;
     private boolean initialised;
-    private HL7ToFHIRConverter hl7ToFHIRConverter;
 
     //
     // Constructor(s)
     //
 
-    public ResourceFromHL7v2xBase(){
+    public SimpleHL7v2StringParser(){
         initialised = false;
     }
 
     //
-    // Post Construct
+    // Post Constructor(s)
     //
 
     @PostConstruct
     public void initialise(){
-        if(!initialised){
-            hapiContext = new DefaultHapiContext();
-            hl7ToFHIRConverter = new HL7ToFHIRConverter();
-            initialised = true;
+        getLogger().debug(".initialise(): Entry");
+        if(isInitialised()){
+            getLogger().debug(".initialise(): Already initialised, nothing to do!");
+        } else {
+            getLogger().info(".initialise(): Initialisation Start...");
+
+
+            setInitialised(true);
+            getLogger().info(".initialise(): Initialisation Finish...");
         }
+        getLogger().debug(".initialise(): Exit");
     }
-
-    //
-    // Abstract Methods
-    //
-
-    abstract protected Logger getLogger();
 
     //
     // Getters (and Setters)
     //
 
-    protected HL7ToFHIRConverter getHL7ToFHIRConverter(){
-        return(this.hl7ToFHIRConverter);
+    protected Logger getLogger(){
+        return(LOG);
     }
 
-    protected HapiContext getHapiContext(){
-        return(this.hapiContext);
+    protected boolean isInitialised() {
+        return initialised;
+    }
+
+    protected void setInitialised(boolean initialised) {
+        this.initialised = initialised;
+    }
+
+    //
+    // Business Methods
+    //
+
+    public String extractSegment(String message, HL7v2SegmentEnum segment){
+
+
+        return(null);
     }
 }

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacor.internals.hl7v2.triggerevents.datatypes;
+package net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.datatypes;
 
 import java.io.Serializable;
 

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacor.internals.hl7v2.triggerevents.valuesets;
+package net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets;
 
 public enum HL7v2VersionEnum {
     VERSION_UNKNOWN("unknown"),
