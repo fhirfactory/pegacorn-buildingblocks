@@ -145,9 +145,11 @@ public class UltraDefensivePipeParser {
             return(null);
         }
         for(String currentSegment: segmentList){
-            String currentSegmentStart = currentSegment.substring(0, 6);
-            if(currentSegmentStart.contains("MSH")){
-                return(currentSegment);
+            if(currentSegment.length() > 3) {
+                String currentSegmentStart = currentSegment.substring(0, 4);
+                if (currentSegmentStart.contains("MSH")) {
+                    return (currentSegment);
+                }
             }
         }
         return(null);
