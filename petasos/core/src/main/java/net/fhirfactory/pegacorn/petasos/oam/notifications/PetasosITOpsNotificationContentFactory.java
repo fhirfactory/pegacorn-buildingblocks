@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.notifications;
 
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
 import net.fhirfactory.pegacorn.internals.hl7v2.helpers.UltraDefensivePipeParser;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
@@ -205,6 +206,33 @@ public class PetasosITOpsNotificationContentFactory {
         return(messageBuilder.toString());
     }
 
+    public ITOpsNotificationContent newNotificationForSoftFailure( String errorMessage){
+        StringBuilder unformattedContent = new StringBuilder();
+        StringBuilder formattedContent = new StringBuilder();
+
+        if(StringUtils.isEmpty(errorMessage)){
+            return(null);
+        }
+
+        unformattedContent.append("--- Soft Failure ---\n");
+        unformattedContent.append(errorMessage + "\n");
+        unformattedContent.append("----------------------");
+
+        formattedContent.append("<table>");
+        formattedContent.append("<tr>");
+        formattedContent.append("<th><font color=red>Soft Failure</font></th><th><font color=red>"+getTimeFormatter().format(Instant.now())+"</font></th>");
+        formattedContent.append("</tr>");
+        formattedContent.append("</table>");
+
+        ITOpsNotificationContent notificationContent = new ITOpsNotificationContent();
+        notificationContent.setContent(unformattedContent.toString());
+        notificationContent.setFormattedContent(formattedContent.toString());
+        return(notificationContent);
+    }
+
+    //
+    // HL7 v2 Message Content Helpers
+    //
     public List<String> getHL7v2MetadataHeaderInfo(UoWPayload payload){
 
         List<String> headerInfo = new ArrayList<>();
