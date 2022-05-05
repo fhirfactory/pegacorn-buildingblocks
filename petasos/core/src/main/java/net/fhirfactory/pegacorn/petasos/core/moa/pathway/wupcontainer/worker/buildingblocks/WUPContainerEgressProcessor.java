@@ -24,7 +24,10 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
@@ -54,14 +57,26 @@ public class WUPContainerEgressProcessor {
 
 
     public PetasosFulfillmentTaskSharedInstance egressContentProcessor(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
-     	getLogger().debug(".egressContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".egressContentProcessor(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
+        }
+      	getLogger().trace(".egressContentProcessor(): Entry, fulfillmentTask->{}", fulfillmentTask);
 
         //
         // Get out metricsAgent & do add some metrics
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
-        boolean createNotification = false;
+        boolean createFailureNotification = false;
+        boolean createSoftFailureNotification = false;
         switch (fulfillmentTask.getTaskFulfillment().getStatus()) {
             case FULFILLMENT_EXECUTION_STATUS_FINISHED:
+                if(fulfillmentTask.hasTaskWorkItem()){
+                    if(fulfillmentTask.getTaskWorkItem().hasProcessingOutcome()){
+                        if(fulfillmentTask.getTaskWorkItem().getProcessingOutcome().equals(UoWProcessingOutcomeEnum.UOW_OUTCOME_SOFTFAILURE)){
+                            createSoftFailureNotification = true;
+                            fulfillmentTask.getTaskWorkItem().setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_SUCCESS);
+                        }
+                    }
+                }
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask);
                 metricsAgent.touchLastActivityFinishInstant();
                 metricsAgent.incrementFinishedTasks();
@@ -80,13 +95,16 @@ public class WUPContainerEgressProcessor {
                 fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask);
                 metricsAgent.incrementFailedTasks();
                 metricsAgent.touchLastActivityFinishInstant();
-                createNotification = true;
+                createFailureNotification = true;
         }
         fulfillmentTask.update();
         metricsAgent.touchLastActivityInstant();
+
         //
-        // Add some notifications
-        if(createNotification) {
+        // Add some notifications (for failures)
+
+        // 1st, for general failure
+        if(createFailureNotification) {
             String notificationContent = null;
             if (fulfillmentTask.hasTaskWorkItem()) {
                 if (fulfillmentTask.getTaskWorkItem().hasEgressContent()) {
@@ -97,9 +115,43 @@ public class WUPContainerEgressProcessor {
                 }
             }
         }
+
+        // Now, for soft-failure
+        if(createSoftFailureNotification){
+            TaskWorkItemType workItem = fulfillmentTask.getTaskWorkItem();
+            sendSoftFailureNotification(metricsAgent, workItem);
+        }
+
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".egressContentProcessor(): Exit, fulfillmentTaskId/ActionableTaskId->{}/{}: Status->{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId(),fulfillmentTask.getTaskFulfillment().getStatus() );
+        }
+
         //
         // And we're done!
-        getLogger().debug(".egressContentProcessor(): Exit, fulfillmentTask->{}", fulfillmentTask );
         return (fulfillmentTask);
+    }
+
+    private void sendSoftFailureNotification(WorkUnitProcessorMetricsAgent metricsAgent, TaskWorkItemType workItem){
+        getLogger().debug(".sendSoftFailureNotification(): Entry, workItem->{}", workItem);
+
+        if(!workItem.hasEgressContent()){
+            getLogger().debug(".sendSoftFailureNotification(): Exit, workItem has no egressContent!");
+        }
+
+        ITOpsNotificationContent notificationContent = null;
+        for(UoWPayload currentPayload: workItem.getEgressContent().getPayloadElements()){
+            if(currentPayload.getPayloadManifest().hasContentDescriptor()){
+                if(currentPayload.getPayloadManifest().getContentDescriptor().hasDataParcelSubCategory()){
+                    if(currentPayload.getPayloadManifest().getContentDescriptor().getDataParcelSubCategory().contentEquals("Exception")){
+                        notificationContent = notificationContentFactory.newNotificationForSoftFailure(currentPayload.getPayload());
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(notificationContent != null){
+            metricsAgent.sendITOpsNotification(notificationContent.getContent(), notificationContent.getFormattedContent());
+        }
     }
 }

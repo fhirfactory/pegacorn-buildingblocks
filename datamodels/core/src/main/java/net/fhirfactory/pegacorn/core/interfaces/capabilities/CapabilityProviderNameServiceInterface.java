@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.capabilities;
 
-import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantProviderRoleEnum;
+import net.fhirfactory.pegacorn.core.model.topology.role.ProcessingPlantRoleEnum;
 
 public interface CapabilityProviderNameServiceInterface {
-    public String resolveCapabilityServiceProvider(ProcessingPlantProviderRoleEnum title);
+    public String resolveCapabilityServiceProvider(ProcessingPlantRoleEnum title);
 }

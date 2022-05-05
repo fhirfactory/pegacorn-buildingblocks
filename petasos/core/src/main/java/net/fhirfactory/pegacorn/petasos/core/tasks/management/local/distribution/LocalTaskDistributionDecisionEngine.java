@@ -72,7 +72,7 @@ public class LocalTaskDistributionDecisionEngine {
     // More sophisticated SubscriberList derivation
     //
 
-   public boolean hasRemoteServiceName(PetasosParticipant subscriber){
+    public boolean hasRemoteServiceName(PetasosParticipant subscriber){
         getLogger().debug(".hasRemoteServiceName(): Entry, subscriber->{}", subscriber.getSubsystemParticipantName());
         if(subscriber == null){
             return(false);
@@ -133,8 +133,8 @@ public class LocalTaskDistributionDecisionEngine {
                 passFirstPhaseTest = true;
             }
             if (passFirstPhaseTest) {
-                getLogger().info(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
-                for (DataParcelManifestSubscriptionMaskType currentSubscription : currentParticipant.getSubscriptions()) {
+                getLogger().debug(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
+                 for (DataParcelManifestSubscriptionMaskType currentSubscription : currentParticipant.getSubscriptions()) {
                     if (applySubscriptionFilter(currentSubscription, parcelManifest)) {
                         if (!subscriberList.contains(currentParticipant)) {
                             subscriberList.add(currentParticipant);
@@ -174,13 +174,13 @@ public class LocalTaskDistributionDecisionEngine {
         getLogger().info(".applySubscriptionFilter(): Entry, testManifest->{}", testManifest);
 
         boolean containerIsEqual = containerDescriptorIsEqual(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
 
         boolean contentIsEqual = contentDescriptorIsEqual(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
 
         boolean containerOnlyIsEqual = containerDescriptorOnlyEqual(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
 
         boolean dataQualityMaskPasses = false;
         if(subscription.hasContentQualityMask()) {
@@ -194,16 +194,16 @@ public class LocalTaskDistributionDecisionEngine {
 
 
         boolean matchedManifestType = manifestTypeMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
 
         boolean matchedParticipantSource = sourceParticipantNameMatches(testManifest, subscription);
         getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedParticipantSource->{}",matchedParticipantSource);
 
         boolean matchedSource = sourceSystemMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedSource->{}",matchedSource);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedSource->{}",matchedSource);
 
         boolean matchedTarget = targetSystemMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
 
         boolean matchedSourceInterfaceName = sourceParticipantInterfaceNameMatches(testManifest, subscription);
         getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedSourceInterfaceName->{}",matchedSourceInterfaceName);
@@ -239,7 +239,7 @@ public class LocalTaskDistributionDecisionEngine {
         getLogger().info(".filter(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 
         boolean passesFilter = goodEnoughMatch || containerBasedOKMatch;
-        getLogger().info(".filter(): Exit, passesFilter->{}", passesFilter);
+        getLogger().debug(".filter(): Exit, passesFilter->{}", passesFilter);
         return(passesFilter);
     }
 
@@ -339,7 +339,7 @@ public class LocalTaskDistributionDecisionEngine {
         if (testManifest == null || subscribedManifest == null) {
             return (false);
         }
-        boolean manifestTypeMatches = subscribedManifest.getDataParcelType().equals(testManifest.getDataParcelType());
+        boolean manifestTypeMatches = subscribedManifest.getDataParcelTypeMask()(testManifest.getDataParcelType());
         return(manifestTypeMatches);
     }
 
@@ -350,19 +350,8 @@ public class LocalTaskDistributionDecisionEngine {
         if (testManifest == null || subscribedManifest == null) {
             return (false);
         }
-        if(subscribedManifest.hasSourceProcessingPlantParticipantName()){
-            if(subscribedManifest.getSourceProcessingPlantParticipantName().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasSourceProcessingPlantParticipantName() && !subscribedManifest.hasSourceProcessingPlantParticipantName()){
-            return(true);
-        }
-        if (testManifest.hasSourceProcessingPlantParticipantName() && subscribedManifest.hasSourceProcessingPlantParticipantName()) {
-            boolean sourceIsSame = testManifest.getSourceProcessingPlantParticipantName().contentEquals(subscribedManifest.getSourceProcessingPlantParticipantName());
-            return (sourceIsSame);
-        }
-        return(false);
+        boolean maskPasses = subscribedManifest.getOriginMask().applyMask(testManifest.getOrigin());
+        return(maskPasses);
     }
 
     private boolean targetParticipantNameMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {

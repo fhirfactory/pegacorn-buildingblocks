@@ -23,7 +23,6 @@
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericTriggerBasedWUPTemplate;
@@ -39,10 +38,18 @@ public abstract class InteractIngresAPIClientGatewayWUP extends GenericTriggerBa
 
     private MessageBasedWUPEndpointContainer ingresEndpoint;
 
+    //
+    // Constructor(s)
+    //
+
     public InteractIngresAPIClientGatewayWUP() {
         super();
 //        getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
+
+    //
+    // Abstract Methods
+    //
 
     protected abstract String specifyIngresTopologyEndpointName();
     protected abstract String specifyIngresEndpointVersion();
@@ -52,12 +59,9 @@ public abstract class InteractIngresAPIClientGatewayWUP extends GenericTriggerBa
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT);
     }
 
-    /*
-    @Override
-    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
-        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES);
-    }
-     */
+    //
+    // WUP Configuration
+    //
 
     @Override
     protected MessageBasedWUPEndpointContainer specifyEgressEndpoint(){

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.workshops;
 
-import net.fhirfactory.pegacorn.core.model.topology.valuesets.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

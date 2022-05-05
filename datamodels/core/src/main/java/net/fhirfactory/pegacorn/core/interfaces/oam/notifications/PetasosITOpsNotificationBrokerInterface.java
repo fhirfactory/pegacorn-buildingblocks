@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.oam.notifications;
 
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 
 public interface PetasosITOpsNotificationBrokerInterface {
-    public void sendNotification(ITOpsNotification notification);
+    public void sendNotification(PetasosComponentITOpsNotification notification);
 }

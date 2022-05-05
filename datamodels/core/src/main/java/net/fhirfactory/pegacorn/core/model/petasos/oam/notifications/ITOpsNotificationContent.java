@@ -21,31 +21,69 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.oam.notifications;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 
 public class ITOpsNotificationContent implements Serializable {
+    private String contentHeading;
     private String content;
     private String formattedContent;
 
     //
-    // Constructor(s)
+    // Constructor
     //
 
     public ITOpsNotificationContent(){
+        this.contentHeading = null;
         this.content = null;
         this.formattedContent = null;
+    }
+
+    public ITOpsNotificationContent(String content){
+
+        this.content = content;
+        this.formattedContent = null;
+        this.contentHeading = null;
+    }
+
+    public ITOpsNotificationContent(String content, String formattedContent){
+        this.content = content;
+        this.formattedContent = formattedContent;
+        this.contentHeading = null;
+    }
+
+    public ITOpsNotificationContent(String content, String formattedContent, String contentHeading){
+        this.content = content;
+        this.formattedContent = formattedContent;
+        this.contentHeading = contentHeading;
+    }
+
+    public ITOpsNotificationContent(ITOpsNotificationContent ori){
+        this.contentHeading = null;
+        this.content = null;
+        this.formattedContent = null;
+        if(StringUtils.isNotEmpty(ori.getContentHeading())){
+            this.contentHeading = ori.getContentHeading();
+        }
+        if(StringUtils.isNotEmpty(ori.getContent())){
+            this.content = ori.getContent();
+        }
+        if(StringUtils.isNotEmpty(ori.getFormattedContent())){
+            this.formattedContent = ori.getFormattedContent();
+        }
     }
 
     //
     // Getters and Setters
     //
 
-    public String getContent() {
-        return content;
+    public String getContentHeading() {
+        return contentHeading;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setContentHeading(String contentHeading) {
+        this.contentHeading = contentHeading;
     }
 
     public String getFormattedContent() {
@@ -56,15 +94,24 @@ public class ITOpsNotificationContent implements Serializable {
         this.formattedContent = formattedContent;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     //
-    // toString
+    // To String
     //
 
     @Override
     public String toString() {
-        return "ITOpsNotificationContent{" +
+        return "PetasosComponentITOpsNotification{" +
                 "content='" + content + '\'' +
                 ", formattedContent='" + formattedContent + '\'' +
+                ", contentHeading=" + contentHeading +
                 '}';
     }
 }

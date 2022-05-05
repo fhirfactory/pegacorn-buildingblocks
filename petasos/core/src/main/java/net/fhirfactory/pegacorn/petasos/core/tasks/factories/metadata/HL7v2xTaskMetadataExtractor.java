@@ -26,6 +26,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDesc
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDescriptorKeyEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.HL7V2XTopicFactory;
+import net.fhirfactory.pegacorn.internals.hl7v2.helpers.UltraDefensivePipeParser;
+import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,9 @@ public class HL7v2xTaskMetadataExtractor {
 
     @Inject
     private HL7V2XTopicFactory hl7V2XTopicFactory;
+
+    @Inject
+    private UltraDefensivePipeParser defensivePipeParser;
 
     //
     // Constructor(s)
@@ -192,7 +197,7 @@ public class HL7v2xTaskMetadataExtractor {
 
     public String getMSH(String payload){
         List<String> segmentList = getSegmentList( payload);
-        String msh = getMessageHeaderSegment(segmentList);
+        String msh = defensivePipeParser.getSegment(segmentList, HL7v2SegmentTypeEnum.MSH.getKey(), 1);
         return(msh);
     }
 
@@ -219,32 +224,13 @@ public class HL7v2xTaskMetadataExtractor {
         if(segmentList == null){
             return(null);
         }
-        for(String currentSegment: segmentList){
-            if(currentSegment.startsWith("PID")){
-                return(currentSegment);
-            }
-        }
-        return(null);
+        String segment = defensivePipeParser.getSegment(segmentList, HL7v2SegmentTypeEnum.PID.getKey(), 1);
+        return(segment);
     }
 
     public List<String> getSegmentList(String message){
-        if(message == null){
-            return(new ArrayList<>());
-        }
-        if(!message.contains("\r")){
-            return(new ArrayList<>());
-        }
-        String[] segmentArray = message.split("\r");
-        List<String> segmentList = new ArrayList<>();
-        int segmentListSize = segmentArray.length;
-        for(int counter = 0; counter < segmentListSize; counter += 1){
-            String currentSegment = segmentArray[counter];
-            getLogger().debug("Segment->{}", currentSegment);
-            segmentList.add(currentSegment);
-        }
+        List<String> segmentList = defensivePipeParser.getSegmentList(message);
         return(segmentList);
     }
-
-
 
 }

@@ -343,4 +343,12 @@ public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase
                 ", allowAll=" + getAllowAll() +
                 '}';
     }
+
+    //
+    // Filter/Mask Implementation
+    //
+
+    public boolean applyMask(DataParcelManifest manifest){
+
+    }
 }

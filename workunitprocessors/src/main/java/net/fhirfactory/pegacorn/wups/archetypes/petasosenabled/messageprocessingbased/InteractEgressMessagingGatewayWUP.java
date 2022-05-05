@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.StandardInteractClientTopologyEndpointPort;
@@ -107,17 +106,39 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
     }
 
     //
+    // Route Helper Functions
+    //
+
+    protected RouteDefinition fromIncludingPetasosServicesForEndpointsWithNoExceptionHandling(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        MetricsAgentInjector metricsAgentInjector = new MetricsAgentInjector();
+        RouteDefinition route = from(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+                .process(metricsAgentInjector)
+        ;
+        return route;
+    }
+
+    public class MetricsAgentInjector implements Processor{
+        @Override
+        public void process(Exchange camelExchange) throws Exception{
+            getLogger().debug("MetricsAgentInjector.process(): Entry");
+            camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getEndpointMetricsAgent());
+        }
+    }
+
+    //
     // Overridden Superclass Methods
     //
 
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT);
-    }
-
-    @Override
-    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
-        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
     }
 
     @Override

@@ -25,7 +25,6 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosEdgeMessageForwarderService;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
@@ -42,6 +41,7 @@ import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,11 +119,6 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
     }
 
     @Override
-    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
-        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_EDGE);
-    }
-
-    @Override
     protected List<DataParcelManifest> declarePublishedTopics() {
         return (new ArrayList<>());
     }
@@ -181,6 +176,23 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
                         exchange.getIn().setBody(response);
                     }
                 });
+    }
+
+    //
+    // Route Helpers
+    //
+
+    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
     }
 
     //

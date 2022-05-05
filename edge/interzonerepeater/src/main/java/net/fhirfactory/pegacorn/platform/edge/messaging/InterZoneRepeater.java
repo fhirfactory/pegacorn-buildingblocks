@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging;
 
-import net.fhirfactory.pegacorn.platform.edge.itops.PetasosITOpsService;
+// import net.fhirfactory.pegacorn.platform.edge.itops.PetasosITOpsService;
 import net.fhirfactory.pegacorn.platform.edge.itops.configuration.JGroupsGossipRouterNode;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jgroups.stack.GossipRouter;
@@ -43,7 +43,7 @@ public class InterZoneRepeater{
     GossipRouter interzoneRepeaterAudit;
     GossipRouter interzoneRepeaterTasking;
     GossipRouter interzoneRepeaterDatagrid;
-    PetasosITOpsService petasosServices;
+    // PetasosITOpsService petasosServices;
     JGroupsGossipRouterNode gossipRouterNode;
 
     //
@@ -53,8 +53,8 @@ public class InterZoneRepeater{
     public void run(){
         getLogger().debug("InterZoneRepeater::run(): Entry");
         gossipRouterNode = new JGroupsGossipRouterNode();
-        petasosServices = new PetasosITOpsService(gossipRouterNode);
-        petasosServices.start();
+        // petasosServices = new PetasosITOpsService(gossipRouterNode);
+        // petasosServices.start();
         initialiseRepeater();
         eventLoop();
     }
@@ -175,7 +175,7 @@ public class InterZoneRepeater{
         while(true) {
             try {
                 Thread.sleep(300000);
-                petasosServices.updateDate();
+                // petasosServices.updateDate();
                 printSomeStatistics();
             } catch (InterruptedException e) {
                 e.printStackTrace();

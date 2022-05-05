@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.core.interfaces.oam.topology.PetasosTopologyRepo
 import net.fhirfactory.pegacorn.core.interfaces.oam.topology.PetasosTopologyReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetric;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotification;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosSubscriptionSummaryReport;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.reporting.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
@@ -248,19 +248,19 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
 
 
     @Override
-    public void sendNotification(ITOpsNotification notification) {
+    public void sendNotification(PetasosComponentITOpsNotification notification) {
         getLogger().debug(".sendNotification(): Entry, notification->{}", notification);
         JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
         Address targetAddress = getCandidateTargetServiceAddress(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
         if(targetAddress == null){
-            getLogger().warn(".sendNotification(): No Metrics Server available");
+            getLogger().warn(".sendNotification(): ITOpsServer Unreachable: Fallback Logging Of Notification: Participant->{}, message->{}", notification.getParticipantName(), notification.getContent());
             return;
         }
         try {
             Object objectSet[] = new Object[2];
             Class classSet[] = new Class[2];
             objectSet[0] = notification;
-            classSet[0] = ITOpsNotification.class;
+            classSet[0] = PetasosComponentITOpsNotification.class;
             objectSet[1] = myIntegrationPoint;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
@@ -271,11 +271,13 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendNotification(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".sendNotification(): Error (NoSuchMethodException): Fallback Logging Of Notification: Participant->{}, message->{}", notification.getParticipantName(), notification.getContent());
             return;
         } catch (Exception e) {
             e.printStackTrace();
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".sendNotification: Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".sendNotification(): Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".sendNotification(): Error (GeneralException): Fallback Logging Of Notification: Participant->{}, message->{}", notification.getParticipantName(), notification.getContent());
             return;
         }
     }
@@ -286,19 +288,19 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
 
 
     @Override
-    public void sendTaskReport(ITOpsNotification taskReportNotification) {
+    public void sendTaskReport(PetasosComponentITOpsNotification taskReportNotification) {
         getLogger().debug(".sendTaskReport(): Entry, taskReportNotification->{}", taskReportNotification);
         JGroupsIntegrationPointSummary myIntegrationPoint = createSummary(getJGroupsIntegrationPoint());
         Address targetAddress = getCandidateTargetServiceAddress(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
         if(targetAddress == null){
-            getLogger().warn(".sendTaskReport(): No Metrics Server available");
+            getLogger().warn(".sendTaskReport(): ITOpsServer Unreachable: Fallback Logging Of Notification: Participant->{}, message->{}", taskReportNotification.getParticipantName(), taskReportNotification.getContent());
             return;
         }
         try {
             Object objectSet[] = new Object[2];
             Class classSet[] = new Class[2];
             objectSet[0] = taskReportNotification;
-            classSet[0] = ITOpsNotification.class;
+            classSet[0] = PetasosComponentITOpsNotification.class;
             objectSet[1] = myIntegrationPoint;
             classSet[1] = JGroupsIntegrationPointSummary.class;
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
@@ -309,11 +311,13 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendTaskReport(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".sendTaskReport(): Error (NoSuchMethodException): Fallback Logging Of Notification: Participant->{}, message->{}", taskReportNotification.getParticipantName(), taskReportNotification.getContent());
             return;
         } catch (Exception e) {
             e.printStackTrace();
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".sendTaskReport: Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".sendTaskReport(): Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".sendTaskReport(): Error (GeneralException): Fallback Logging Of Notification: Participant->{}, message->{}", taskReportNotification.getParticipantName(), taskReportNotification.getContent());
             return;
         }
     }
