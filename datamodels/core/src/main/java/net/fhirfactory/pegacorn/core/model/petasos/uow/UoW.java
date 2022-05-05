@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 
 import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
@@ -128,10 +127,7 @@ public class UoW implements Serializable {
     private void generateInstanceID() {
         getLogger().debug(".generateInstanceID(): Entry");
         getLogger().trace(".generateInstanceID(): generating an instance id based on Timestamp");
-        UUID key = UUID.randomUUID();
-        String upperString = Long.toHexString(key.getMostSignificantBits());
-        String lowerString = Long.toHexString(key.getLeastSignificantBits());
-        String generatedInstanceValue = upperString + lowerString;
+        String generatedInstanceValue = Long.toString(Instant.now().getNano());
         FDN instanceFDN = new FDN(this.typeID);
         RDN newRDN = new RDN(HASH_ATTRIBUTE, generatedInstanceValue);
         instanceFDN.appendRDN(newRDN);

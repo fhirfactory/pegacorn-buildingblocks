@@ -27,8 +27,6 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.common.EndpointProviderInterface;
-import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantProviderRoleEnum;
-import net.fhirfactory.pegacorn.core.model.topology.valuesets.ProcessingPlantTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +48,6 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     private String petasosAuditStackConfigFile;
 
     private String multiZoneInfinispanStackConfigFile;
-
-    private ProcessingPlantProviderRoleEnum processingPlantProviderRole;
-    private ProcessingPlantTypeEnum processingPlantType;
 
     private String actualHostIP;
     private String actualPodIP;
@@ -89,30 +84,11 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.petasosAuditStackConfigFile = null;
 
         this.multiZoneInfinispanStackConfigFile = null;
-
-        this.processingPlantProviderRole = null;
-        this.processingPlantType = null;
     }
 
     //
     // Getters and Setters
     //
-
-    public ProcessingPlantTypeEnum getProcessingPlantType() {
-        return processingPlantType;
-    }
-
-    public void setProcessingPlantType(ProcessingPlantTypeEnum processingPlantType) {
-        this.processingPlantType = processingPlantType;
-    }
-
-    public ProcessingPlantProviderRoleEnum getProcessingPlantProviderRole() {
-        return processingPlantProviderRole;
-    }
-
-    public void setProcessingPlantProviderRole(ProcessingPlantProviderRoleEnum processingPlantProviderRole) {
-        this.processingPlantProviderRole = processingPlantProviderRole;
-    }
 
     public String getActualHostIP() {
         return actualHostIP;
@@ -289,8 +265,6 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
                 ", componentSystemRole=" + getComponentSystemRole() +
                 ", componentStatus=" + getComponentStatus() +
                 ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", processingPlantRole=" + getProcessingPlantProviderRole() +
-                ", processingPlantType=" + getProcessingPlantType() +
                 ", workshops=" + workshops +
                 ", endpoints=" + endpoints +
                 ", connections=" + connections +

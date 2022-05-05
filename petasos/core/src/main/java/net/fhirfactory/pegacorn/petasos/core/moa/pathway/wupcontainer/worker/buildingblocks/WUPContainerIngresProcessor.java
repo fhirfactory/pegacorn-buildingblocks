@@ -25,6 +25,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
@@ -139,25 +140,43 @@ public class WUPContainerIngresProcessor {
 
         //
         // Add some notifications
-        String notificationContent = null;
+        ITOpsNotificationContent notificationContent = new ITOpsNotificationContent();
         if(fulfillmentTask.hasTaskWorkItem()) {
             if(fulfillmentTask.getTaskWorkItem().hasIngresContent()) {
                 UoWPayload payload = fulfillmentTask.getTaskWorkItem().getIngresContent();
-                StringBuilder notificationMessageBuilder = new StringBuilder();
-                notificationMessageBuilder.append("--- Received Task (PetasosFulfillmentTask): Ingres Queue Size: "+currentQueueSize+" ---");
-                notificationMessageBuilder.append(" ("+ getTimeFormatter().format(Instant.now())+ ") ---\n");
-                notificationMessageBuilder.append("Task ID (FulfillmentTask) --> " + fulfillmentTask.getTaskId().getId() + "\n");
-                notificationMessageBuilder.append("Task ID (ActionableTask) --> " + fulfillmentTask.getActionableTaskId().getId() + "\n");
-                notificationMessageBuilder.append(notificationContentFactory.newNotificationContentFromUoWPayload(payload));
-                notificationContent = notificationMessageBuilder.toString();
+
+                StringBuilder unformattedMessageBuilder = new StringBuilder();
+                unformattedMessageBuilder.append("--- Received Task (PetasosFulfillmentTask): Ingres Queue Size: "+currentQueueSize+" ---");
+                unformattedMessageBuilder.append(" ("+ getTimeFormatter().format(Instant.now())+ ") ---\n");
+                unformattedMessageBuilder.append("Task ID (FulfillmentTask) --> " + fulfillmentTask.getTaskId().getId() + "\n");
+                unformattedMessageBuilder.append("Task ID (ActionableTask) --> " + fulfillmentTask.getActionableTaskId().getId() + "\n");
+                unformattedMessageBuilder.append(notificationContentFactory.newNotificationContentFromUoWPayload(payload));
+                notificationContent.setContent(unformattedMessageBuilder.toString());
+
+                StringBuilder formattedMessageBuilder = new StringBuilder();
+                formattedMessageBuilder.append("<table>");
+                formattedMessageBuilder.append("<tr>");
+                formattedMessageBuilder.append("<th>Ingres Task</th><th>"+getTimeFormatter().format(Instant.now())+", QueueSize:"+currentQueueSize+"</th>");
+                formattedMessageBuilder.append("</tr>");
+                formattedMessageBuilder.append("<tr>");
+                formattedMessageBuilder.append("<td>FulfillmentTaskId</td><td>"+fulfillmentTask.getTaskId().getId()+"</td>");
+                formattedMessageBuilder.append("</tr>");
+                formattedMessageBuilder.append("<tr>");
+                formattedMessageBuilder.append("<td>ActionableTask</td><td>"+fulfillmentTask.getActionableTaskId().getId()+"</td>");
+                formattedMessageBuilder.append("</tr>");
+                formattedMessageBuilder.append("<tr>");
+                formattedMessageBuilder.append("<td>Payload</td>"+notificationContentFactory.payloadTypeFromUoW(payload)+"</td>");
+                formattedMessageBuilder.append("</tr>");
+                formattedMessageBuilder.append("</table>");
+                notificationContent.setFormattedContent(formattedMessageBuilder.toString());
             }
         }
-        if(StringUtils.isEmpty(notificationContent)){
-            notificationContent = "Task Received (Metadata) \n" +
+        if(StringUtils.isEmpty(notificationContent.getContent())){
+            notificationContent.setContent("Task Received (Metadata) \n" +
             "Task Id (FulfillmentTask)--> " + fulfillmentTask.getTaskId().getId() + "\n" +
-            "Task Id (ActiomableTask)--> " + fulfillmentTask.getActionableTaskId().getId();
+            "Task Id (ActionableTask)--> " + fulfillmentTask.getActionableTaskId().getId());
         }
-        metricsAgent.sendITOpsNotification( notificationContent);
+        metricsAgent.sendITOpsNotification(notificationContent.getContent(), notificationContent.getFormattedContent());
 
         //
         // Write an AuditEvent

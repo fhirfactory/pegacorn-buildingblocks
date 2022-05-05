@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -86,11 +85,6 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT);
-    }
-
-    @Override
-    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
-        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES);
     }
 
     @Override
@@ -168,6 +162,27 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
                 exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_INGRES_SOURCE_SYSTEM_NAME, getSourceSystemName());
             }
         }
+    }
+
+    //
+    //
+    // Route Helper Functions
+
+    /**
+     * @param uri
+     * @return the RouteBuilder.from(uri) with all exceptions logged but not handled
+     */
+    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
     }
 
     //

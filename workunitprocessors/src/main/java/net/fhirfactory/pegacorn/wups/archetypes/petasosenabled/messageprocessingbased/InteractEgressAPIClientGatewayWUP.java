@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 MAHun
+ * Copyright (c) 2022 ACT Health
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -92,9 +92,19 @@ public abstract class InteractEgressAPIClientGatewayWUP extends GenericMessageBa
         return(ingressEndpoint);
     }
 
+
     @Override
-    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
-        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS);
+    protected void establishEndpointMetricAgents(){
+        getLogger().debug(".establishEndpointMetricAgents(): Entry");
+        String connectedSystem = getEgressEndpoint().getEndpointTopologyNode().getConnectedSystemName();
+        String endpointDescription = getEgressEndpoint().getEndpointSpecification();
+        this.endpointMetricsAgent = getMetricAgentFactory().newEndpointMetricsAgent(
+                processingPlantCapabilityStatement,
+                getEgressEndpoint().getEndpointTopologyNode().getComponentID(),
+                getEgressEndpoint().getEndpointTopologyNode().getParticipantName(),
+                connectedSystem,
+                endpointDescription);
+        getLogger().debug(".establishEndpointMetricAgents(): Exit");
     }
 
     @Override

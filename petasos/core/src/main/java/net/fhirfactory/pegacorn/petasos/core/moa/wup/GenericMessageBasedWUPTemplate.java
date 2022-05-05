@@ -27,7 +27,6 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupp
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
@@ -49,6 +48,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementName
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
@@ -210,10 +210,6 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             registerCapabilities();
             getLogger().info(".initialise(): [Register any Capabilities this Work Unit Processor supports] Finish");
 
-            getLogger().info(".initialise(): [Set my IPC Context Role] Start");
-            this.getMeAsATopologyComponent().setComponentSystemRole(specifyConnectivityContext());
-            getLogger().info(".initialise(): [Set my IPC Context Role] Finish");
-
             getLogger().info(".initialise(): [Set my component status!] Start");
             this.getMeAsATopologyComponent().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
             getLogger().info(".initialise(): [Set my component status!] Finish");
@@ -369,8 +365,8 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(specifyWUPInstanceName());
     }
 
-    protected SoftwareComponentConnectivityContextEnum specifyConnectivityContext(){
-        return(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL);
+    public WorkUnitProcessorSoftwareComponent getMeAsATopologyComponent() {
+        return meAsATopologyComponent;
     }
 
     //
@@ -385,7 +381,33 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(getEgressEndpoint().getEndpointSpecification());
     }
 
-    public class NodeDetailInjector implements Processor{
+    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
+    }
+
+    protected RouteDefinition fromIncludingPetasosServicesNoExceptionHandling(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = from(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
+    }
+
+    public class NodeDetailInjector implements Processor {
         @Override
         public void process(Exchange exchange) throws Exception {
             getLogger().debug("NodeDetailInjector.process(): Entry");
@@ -416,27 +438,6 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             getLogger().debug("TaskReportAgentInjector.process(): Entry");
             camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, getTaskReportAgent());
         }
-    }
-
-    public WorkUnitProcessorSoftwareComponent getMeAsATopologyComponent() {
-        return meAsATopologyComponent;
-    }
-
-    /**
-     * @param uri
-     * @return the RouteBuilder.from(uri) with all exceptions logged but not handled
-     */
-    protected RouteDefinition fromIncludingPetasosServices(String uri) {
-        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
-        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
-        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
-        RouteDefinition route = fromWithStandardExceptionHandling(uri);
-        route
-                .process(nodeDetailInjector)
-                .process(auditAgentInjector)
-                .process(taskReportAgentInjector)
-        ;
-        return route;
     }
 
     //

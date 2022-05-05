@@ -108,7 +108,7 @@ public class ParticipantTaskExecutionController {
                         if (taskNodeAffinity.equals(getProcessingPlant().getMeAsASoftwareComponent().getComponentID())) {
                             // The requesting WUP and i are on the same node as the actual ActionableTask creation point
                             // That means we have "nodeAffinity" and therefore preference for execution
-                            // So give it execution priveleges
+                            // So give it execution privileges
                             taskJobCard.setExecutingProcessingPlant(getProcessingPlant().getMeAsASoftwareComponent().getComponentID());
                             taskJobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
                             taskJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
@@ -209,6 +209,9 @@ public class ParticipantTaskExecutionController {
         if(fulfillmentTask == null){
             getLogger().debug(".reportTaskExecutionFinish(): Entry, fulfillmentTask is empty, returning null");
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED) ;
+        }
+        if(fulfillmentTask == null){
+            return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
         PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().newTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
         if(taskJobCard == null){
