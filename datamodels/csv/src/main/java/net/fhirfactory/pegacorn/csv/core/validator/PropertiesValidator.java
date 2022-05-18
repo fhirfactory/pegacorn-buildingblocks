@@ -6,7 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.datamodel.DatamodelProperties;
+import net.fhirfactory.pegacorn.core.file.common.DatamodelProperties;
+
 
 /**
  * A CSV field validator to make sure the field value is one of the keys from the supplied properties class.
