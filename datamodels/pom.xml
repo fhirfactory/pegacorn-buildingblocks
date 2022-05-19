@@ -20,7 +20,6 @@
         <module>fhir</module>
         <module>communicate</module>
         <module>hl7v2x</module>
-        <module>csv</module>
     </modules>
     <dependencies>
         <dependency>
