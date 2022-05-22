@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
+import org.apache.camel.model.RouteDefinition;
 
 public abstract class MOAStandardWUP extends GenericMessageBasedWUPTemplate {
 
@@ -55,4 +56,8 @@ public abstract class MOAStandardWUP extends GenericMessageBasedWUPTemplate {
         getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
         return(egressEndpoint);
     }
+
+    //
+    // Route Helper Functions
+    //
 }

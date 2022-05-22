@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacor.internals.hl7v2.transfoms.tofhir.common;
+package net.fhirfactory.pegacorn.internals.hl7v2.transfoms.tofhir.common;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;

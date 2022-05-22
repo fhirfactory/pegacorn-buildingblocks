@@ -26,13 +26,14 @@ package net.fhirfactory.pegacorn.core.model.petasos.uow;
  * @author ACT Health (Mark A. Hunter)
  */
 public enum UoWProcessingOutcomeEnum {
-    UOW_OUTCOME_SUCCESS("ProcessingOutcome.Success", "pegacorn.uow.processingoutcome.success"),
-    UOW_OUTCOME_FAILED("ProcessingOutcome.Failed","pegacorn.uow.processingoutcome.failed"),
-    UOW_OUTCOME_INCOMPLETE("ProcessingOutcome.Incomplete","pegacorn.uow.processingoutcome.incomplete"),
-    UOW_OUTCOME_NO_PROCESSING_REQUIRED("ProcessingOutcome.NoneRequired","pegacorn.uow.processingoutcome.nonerequired"),
-    UOW_OUTCOME_FILTERED("ProcessingOutcome.Filtered","pegacorn.uow.processingoutcome.filtered"),
-    UOW_OUTCOME_DISCARD("ProcessingOutcome.Discarded","pegacorn.uow.processingoutcome.discard"),
-    UOW_OUTCOME_NOTSTARTED("ProcessingOutcome.NotStarted","pegacorn.uow.processingoutcome.not_started");
+    UOW_OUTCOME_SUCCESS("ProcessingOutcome.Success", "pegacorn.uow.processing-outcome.success"),
+    UOW_OUTCOME_SOFTFAILURE("ProcessingOutcome.SoftFailure", "pegacorn.uow.processing-outcome.soft-failure"),
+    UOW_OUTCOME_FAILED("ProcessingOutcome.Failed","pegacorn.uow.processing-outcome.failed"),
+    UOW_OUTCOME_INCOMPLETE("ProcessingOutcome.Incomplete","pegacorn.uow.processing-outcome.incomplete"),
+    UOW_OUTCOME_NO_PROCESSING_REQUIRED("ProcessingOutcome.NoneRequired","pegacorn.uow.processing-outcome.nonerequired"),
+    UOW_OUTCOME_FILTERED("ProcessingOutcome.Filtered","pegacorn.uow.processing-outcome.filtered"),
+    UOW_OUTCOME_DISCARD("ProcessingOutcome.Discarded","pegacorn.uow.processing-outcome.discard"),
+    UOW_OUTCOME_NOTSTARTED("ProcessingOutcome.NotStarted","pegacorn.uow.processing-outcome.not_started");
     
     private String token;
     private String displayName;

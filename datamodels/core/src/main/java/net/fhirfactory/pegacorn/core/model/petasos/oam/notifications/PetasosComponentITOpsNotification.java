@@ -22,64 +22,61 @@
 package net.fhirfactory.pegacorn.core.model.petasos.oam.notifications;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
-
-import java.io.Serializable;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.valuesets.PetasosComponentITOpsNotificationTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
+import org.apache.commons.lang3.StringUtils;
 
-public class PetasosComponentITOpsNotification implements Serializable {
+public class PetasosComponentITOpsNotification extends ITOpsNotificationContent {
     private ComponentIdType componentId;
     private String participantName;
     private PetasosMonitoredComponentTypeEnum componentType;
-    private String contentHeading;
     private PetasosComponentITOpsNotificationTypeEnum notificationType;
-    private String content;
-    private String formattedContent;
 
     //
     // Constructor
     //
 
     public PetasosComponentITOpsNotification(){
+        super();
         this.componentId = null;
         this.participantName = null;
         this.componentType = null;
-        this.content = null;
-        this.formattedContent = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
     }
 
     public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content){
+        super(content);
         this.componentType = componentType;
         this.participantName = name;
         this.componentId = componentId;
-        this.content = content;
-        this.formattedContent = null;
-        this.contentHeading = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
     }
 
     public PetasosComponentITOpsNotification(ComponentIdType componentId, String name, PetasosMonitoredComponentTypeEnum componentType, String content, String formattedContent){
+        super(content, formattedContent);
         this.componentType = componentType;
         this.participantName = name;
         this.componentId = componentId;
-        this.content = content;
-        this.formattedContent = formattedContent;
-        this.contentHeading = null;
         this.notificationType = PetasosComponentITOpsNotificationTypeEnum.NORMAL_NOTIFICATION_TYPE;
+    }
+
+    public PetasosComponentITOpsNotification(PetasosComponentITOpsNotification ori){
+        super(ori);
+        this.componentId = null;
+        this.participantName = null;
+        this.componentType = null;
+        if(ori.getComponentId() != null){
+            setComponentId(ori.getComponentId());
+        }
+        if(StringUtils.isNotEmpty(ori.getParticipantName())){
+            setParticipantName(ori.getParticipantName());
+        }
+        setComponentType(ori.getComponentType());
     }
 
     //
     // Getters and Setters
     //
-
-    public String getContentHeading() {
-        return contentHeading;
-    }
-
-    public void setContentHeading(String contentHeading) {
-        this.contentHeading = contentHeading;
-    }
 
     public PetasosComponentITOpsNotificationTypeEnum getNotificationType() {
         return notificationType;
@@ -87,14 +84,6 @@ public class PetasosComponentITOpsNotification implements Serializable {
 
     public void setNotificationType(PetasosComponentITOpsNotificationTypeEnum notificationType) {
         this.notificationType = notificationType;
-    }
-
-    public String getFormattedContent() {
-        return formattedContent;
-    }
-
-    public void setFormattedContent(String formattedContent) {
-        this.formattedContent = formattedContent;
     }
 
     public ComponentIdType getComponentId() {
@@ -121,14 +110,6 @@ public class PetasosComponentITOpsNotification implements Serializable {
         this.componentType = componentType;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     //
     // To String
     //
@@ -139,9 +120,9 @@ public class PetasosComponentITOpsNotification implements Serializable {
                 "componentId=" + componentId +
                 ", participantName='" + participantName + '\'' +
                 ", componentType=" + componentType +
-                ", content='" + content + '\'' +
-                ", formattedContent='" + formattedContent + '\'' +
-                ", contentHeading=" + contentHeading +
+                ", content='" + getContent() + '\'' +
+                ", formattedContent='" + getFormattedContent() + '\'' +
+                ", contentHeading=" + getContentHeading() +
                 ", notificationType=" + notificationType +
                 '}';
     }

@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacor.internals.hl7v2.transfoms.tofhir;
+package net.fhirfactory.pegacorn.internals.hl7v2.transfoms.tofhir;
 
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import org.junit.jupiter.api.DisplayName;

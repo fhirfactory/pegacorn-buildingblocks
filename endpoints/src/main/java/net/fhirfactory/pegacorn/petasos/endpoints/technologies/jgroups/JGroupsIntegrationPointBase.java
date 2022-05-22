@@ -47,6 +47,8 @@ import net.fhirfactory.pegacorn.petasos.endpoints.services.common.ProcessingPlan
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -94,6 +96,9 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     @Inject
     private PetasosMetricAgentFactory metricsFactory;
+
+    @Inject
+    private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgent;
 
     @Inject
     private ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement;
@@ -241,6 +246,10 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     protected ProcessingPlantJGroupsIntegrationPointSet getJgroupsIPSet() {
         return jgroupsIPSet;
+    }
+
+    protected ProcessingPlantMetricsAgent getProcessingPlantMetricsAgent(){
+        return(processingPlantMetricsAgent.getMetricsAgent());
     }
 
     //
