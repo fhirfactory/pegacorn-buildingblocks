@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.reporting.tasks;
 
+import net.fhirfactory.pegacorn.internals.hl7v2.helpers.UltraDefensivePipeParser;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
@@ -47,6 +48,9 @@ public class PetasosTaskReportFactory {
 
     @Inject
     private PetasosITOpsNotificationContentFactory contentFactory;
+
+    @Inject
+    private UltraDefensivePipeParser pipeParser;
 
     //
     // Constructor(s)
@@ -108,7 +112,7 @@ public class PetasosTaskReportFactory {
         if(contentFactory.isHL7V2Payload(actionableTask.getTaskWorkItem().getIngresContent())){
             metadataHeader = contentFactory.getHL7v2MetadataHeaderInfo(actionableTask.getTaskWorkItem().getIngresContent());
             if(!actionableTask.getTaskWorkItem().getIngresContent().getPayloadManifest().hasContainerDescriptor()) {
-                metadataBody = contentFactory.extractMetadataFromHL7v2xMessage(actionableTask.getTaskWorkItem().getIngresContent().getPayload());
+                metadataBody = pipeParser.extractMetadataFromHL7v2xMessage(actionableTask.getTaskWorkItem().getIngresContent().getPayload());
             } else {
                 metadataBody = new ArrayList<>();
                 metadataBody.add("Metadata Not Available");
@@ -127,14 +131,14 @@ public class PetasosTaskReportFactory {
                 List<String> currentHeaderList = contentFactory.getHL7v2MetadataHeaderInfo(currentEgressPayload);
                 outputHeaders.put(outputPayloadCounter, currentHeaderList);
                 if(!currentEgressPayload.getPayloadManifest().hasContainerDescriptor()) {
-                    outputMetadata.put(outputPayloadCounter, contentFactory.extractMetadataFromHL7v2xMessage(currentEgressPayload.getPayload()));
+                    outputMetadata.put(outputPayloadCounter, pipeParser.extractMetadataFromHL7v2xMessage(currentEgressPayload.getPayload()));
                 } else {
                     List<String> notOutputMetadataList = new ArrayList<>();
                     notOutputMetadataList.add("Metadata Not Available");
                     outputMetadata.put(outputPayloadCounter, notOutputMetadataList);
                 }
             } else {
-                List<String> currentHeaderList = contentFactory.getGeneralHeaderDetail(currentEgressPayload);
+                List<String> currentHeaderList = pipeParser.getGeneralHeaderDetail(currentEgressPayload);
                 outputHeaders.put(outputPayloadCounter, currentHeaderList);
                 List<String> notOutputMetadataList = new ArrayList<>();
                 notOutputMetadataList.add("Metadata Not Available");

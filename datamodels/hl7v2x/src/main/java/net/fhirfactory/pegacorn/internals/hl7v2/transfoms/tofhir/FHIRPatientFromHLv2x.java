@@ -19,11 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacor.internals.hl7v2.transfoms.tofhir;
+package net.fhirfactory.pegacorn.internals.hl7v2.transfoms.tofhir;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import net.fhirfactory.pegacor.internals.hl7v2.transfoms.tofhir.common.ResourceFromHL7v2xBase;
+import net.fhirfactory.pegacorn.internals.hl7v2.transfoms.tofhir.common.ResourceFromHL7v2xBase;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

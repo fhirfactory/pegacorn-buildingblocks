@@ -165,6 +165,27 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
     }
 
     //
+    //
+    // Route Helper Functions
+
+    /**
+     * @param uri
+     * @return the RouteBuilder.from(uri) with all exceptions logged but not handled
+     */
+    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
+    }
+
+    //
     // Detail Injectors for Routes
     //
 

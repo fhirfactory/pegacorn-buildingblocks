@@ -23,9 +23,7 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelTypeEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.*;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
@@ -63,7 +61,9 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
         DataParcelManifest parcelManifest = SerializationUtils.clone(theUoW.getPayloadTopicID());
         parcelManifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
         parcelManifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
-        parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
+        parcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE);
+        parcelManifest.setNormalisationStatus(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_TRUE);
+        parcelManifest.setValidationStatus(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_FALSE);
         parcelManifest.setInterSubsystemDistributable(false);
         if(parcelManifest.hasIntendedTargetSystem()){
             if(parcelManifest.getIntendedTargetSystem().contentEquals(processingPlant.getSubsystemParticipantName())){

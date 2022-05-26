@@ -31,6 +31,7 @@ import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.*;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeIngresMessagingGatewayWUP;
 import org.apache.camel.ExchangePattern;
+import org.apache.camel.model.RouteDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,5 +142,22 @@ public class PetasosEdgeMessageReceiveWUP extends EdgeIngresMessagingGatewayWUP 
 
     public PegacornIPCCommonValues getIPCComponentNames() {
         return ipcFunctionalityNames;
+    }
+
+    //
+    // Route Helper Functions
+    //
+
+    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+        AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
+        TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
+        RouteDefinition route = fromWithStandardExceptionHandling(uri);
+        route
+                .process(nodeDetailInjector)
+                .process(auditAgentInjector)
+                .process(taskReportAgentInjector)
+        ;
+        return route;
     }
 }
