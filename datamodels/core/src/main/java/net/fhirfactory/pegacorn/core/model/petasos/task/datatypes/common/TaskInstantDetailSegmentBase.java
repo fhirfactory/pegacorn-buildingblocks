@@ -28,6 +28,8 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class TaskInstantDetailSegmentBase implements Serializable {
 
@@ -44,6 +46,8 @@ public class TaskInstantDetailSegmentBase implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant lastCheckedInstant;
 
+    private DateTimeFormatter timeFormatter;
+
     //
     // Constructor
     //
@@ -55,6 +59,7 @@ public class TaskInstantDetailSegmentBase implements Serializable {
         this.finishInstant = null;
         this.finalisationInstant = null;
         this.lastCheckedInstant = Instant.now();
+        this.timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.of(PetasosPropertyConstants.DEFAULT_TIMEZONE));
     }
 
     public TaskInstantDetailSegmentBase(TaskInstantDetailSegmentBase ori){
@@ -64,6 +69,7 @@ public class TaskInstantDetailSegmentBase implements Serializable {
         this.finishInstant = null;
         this.finalisationInstant = null;
         this.lastCheckedInstant = Instant.now();
+        this.timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS").withZone(ZoneId.of(PetasosPropertyConstants.DEFAULT_TIMEZONE));
         if(ori.hasFinalisationInstant()){
             setFinalisationInstant(SerializationUtils.clone(ori.getFinalisationInstant()));
         }
@@ -87,6 +93,11 @@ public class TaskInstantDetailSegmentBase implements Serializable {
     //
     // Getters and Setters (Bean Methods)
     //
+
+    @JsonIgnore
+    protected DateTimeFormatter getTimeFormatter(){
+        return (timeFormatter);
+    }
 
     @JsonIgnore
     public boolean hasRegistrationInstant(){
@@ -178,12 +189,12 @@ public class TaskInstantDetailSegmentBase implements Serializable {
     @Override
     public String toString() {
         return "TaskInstantDetailSegmentBase{" +
-                "registrationInstant=" + registrationInstant +
-                ", readyInstant=" + readyInstant +
-                ", startInstant=" + startInstant +
-                ", finishInstant=" + finishInstant +
-                ", finalisationInstant=" + finalisationInstant +
-                ", lastCheckedInstant=" + lastCheckedInstant +
+                "registrationInstant=" + getTimeFormatter().format(registrationInstant) +
+                ", readyInstant=" + getTimeFormatter().format(readyInstant) +
+                ", startInstant=" + getTimeFormatter().format(startInstant) +
+                ", finishInstant=" + getTimeFormatter().format(finishInstant) +
+                ", finalisationInstant=" + getTimeFormatter().format(finalisationInstant) +
+                ", lastCheckedInstant=" + getTimeFormatter().format(lastCheckedInstant) +
                 '}';
     }
 }

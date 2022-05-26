@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.communicate.workflow.model.stimulus;
 
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.common.ExtremelySimplifiedResource;
 
 public class CDTStimulusReason {
     private TopologyNodeFDN pegacornEntryPoint;

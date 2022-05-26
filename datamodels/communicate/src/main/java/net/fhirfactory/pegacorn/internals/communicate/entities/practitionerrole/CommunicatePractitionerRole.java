@@ -24,8 +24,8 @@ package net.fhirfactory.pegacorn.internals.communicate.entities.practitionerrole
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.CommunicateRoomReference;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionID;
 import net.fhirfactory.pegacorn.internals.communicate.entities.user.datatypes.CommunicateUserReference;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.PractitionerRoleESR;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.valuesets.IdentifierESDTTypesEnum;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.valuesets.IdentifierESDTTypesEnum;
 import org.hl7.fhir.r4.model.PractitionerRole;
 
 import javax.inject.Inject;

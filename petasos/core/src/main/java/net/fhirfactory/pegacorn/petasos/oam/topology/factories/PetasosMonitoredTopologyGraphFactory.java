@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.reporting.PetasosMonitoredTopologyGraph;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.ProcessingPlantSummary;
+import net.fhirfactory.pegacorn.core.model.internal.resources.summaries.ProcessingPlantSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

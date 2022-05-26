@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.oam.topology.reporting;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.ProcessingPlantSummary;
+import net.fhirfactory.pegacorn.core.model.internal.resources.summaries.ProcessingPlantSummary;
 
 import java.io.Serializable;
 import java.util.Map;

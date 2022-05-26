@@ -28,6 +28,7 @@ public class FileShareSinkAdapter extends IPCAdapter {
     private String hostName;
     private String filePath;
     private String filePathAlias;
+    private String filePathOnFail;
 
     //
     // Constructor(s)
@@ -38,12 +39,20 @@ public class FileShareSinkAdapter extends IPCAdapter {
         this.filePath = null;
         this.hostName = null;
         this.filePathAlias = null;
+        this.filePathOnFail = null;
     }
 
     //
     // Getters and Setters
     //
 
+    public String getFilePathOnFail() {
+        return filePathOnFail;
+    }
+
+    public void setFilePathOnFail(String filePathOnFail) {
+        this.filePathOnFail = filePathOnFail;
+    }
 
     public String getHostName() {
         return hostName;
@@ -80,6 +89,7 @@ public class FileShareSinkAdapter extends IPCAdapter {
                 "filePath='" + filePath + '\'' +
                 ", filePathAlias='" + filePathAlias + '\'' +
                 ", hostName=" + getHostName() +
+                ", filePathOnFail=" + getFilePathOnFail() +
                 ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
                 ", targetNameInstant='" + getTargetSystemName() + '\'' +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +

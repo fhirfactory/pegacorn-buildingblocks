@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.oam.topology.factories.common;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentSummary;
+import net.fhirfactory.pegacorn.core.model.internal.resources.summaries.SoftwareComponentSummary;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 

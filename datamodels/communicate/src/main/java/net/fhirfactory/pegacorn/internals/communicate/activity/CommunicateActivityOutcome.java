@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.activity;
 
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.common.ExtremelySimplifiedResource;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.common.ExtremelySimplifiedResource;
 
 public class CommunicateActivityOutcome {
     CommunicateActivityOutcomeElementTypeEnum activityType;

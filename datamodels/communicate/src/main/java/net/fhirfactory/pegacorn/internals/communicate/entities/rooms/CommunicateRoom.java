@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.*
 import net.fhirfactory.pegacorn.internals.communicate.entities.message.CommunicateMessage;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.valuesets.CommunicateRoomJoinRuleEnum;
 import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.valuesets.CommunicateRoomTypeEnum;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.CommunicateRoomESR;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.CommunicateRoomESR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.message;
 
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.CommunicateMessageESR;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.CommunicateMessageESR;
 import net.fhirfactory.pegacorn.internals.communicate.entities.message.valuesets.CommunicateSMSStatusEnum;
 
 import java.time.Instant;

@@ -39,9 +39,9 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTop
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPClientEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.adapters.MLLPClientAdapter;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.EndpointSummary;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.PortSoftwareComponentSummary;
-import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.SoftwareComponentSummary;
+import net.fhirfactory.pegacorn.core.model.internal.resources.summaries.EndpointSummary;
+import net.fhirfactory.pegacorn.core.model.internal.resources.summaries.PortSoftwareComponentSummary;
+import net.fhirfactory.pegacorn.core.model.internal.resources.summaries.SoftwareComponentSummary;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.oam.topology.factories.common.PetasosMonitoredComponentFactory;
 import org.apache.commons.lang3.StringUtils;

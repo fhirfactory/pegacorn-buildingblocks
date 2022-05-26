@@ -28,6 +28,10 @@ public class FileShareSourceAdapter extends IPCAdapter {
     private String hostName;
     private String filePath;
     private String filePathAlias;
+    private String filePathOnSuccessfulRead;
+    private String filePathOnFailedRead;
+    private boolean toBeMovedOnSuccessfulRead;
+    private boolean toBeMovedOnFailedRead;
 
     //
     // Constructor(s)
@@ -38,12 +42,47 @@ public class FileShareSourceAdapter extends IPCAdapter {
         this.filePath = null;
         this.filePathAlias = null;
         this.hostName = null;
+        this.filePathOnFailedRead = null;
+        this.filePathOnSuccessfulRead = null;
+        this.toBeMovedOnFailedRead = false;
+        this.toBeMovedOnSuccessfulRead = false;
     }
 
     //
     // Getters and Setters
     //
 
+    public String getFilePathOnSuccessfulRead() {
+        return filePathOnSuccessfulRead;
+    }
+
+    public void setFilePathOnSuccessfulRead(String filePathOnSuccessfulRead) {
+        this.filePathOnSuccessfulRead = filePathOnSuccessfulRead;
+    }
+
+    public String getFilePathOnFailedRead() {
+        return filePathOnFailedRead;
+    }
+
+    public void setFilePathOnFailedRead(String filePathOnFailedRead) {
+        this.filePathOnFailedRead = filePathOnFailedRead;
+    }
+
+    public boolean isToBeMovedOnSuccessfulRead() {
+        return toBeMovedOnSuccessfulRead;
+    }
+
+    public void setToBeMovedOnSuccessfulRead(boolean toBeMovedOnSuccessfulRead) {
+        this.toBeMovedOnSuccessfulRead = toBeMovedOnSuccessfulRead;
+    }
+
+    public boolean isToBeMovedOnFailedRead() {
+        return toBeMovedOnFailedRead;
+    }
+
+    public void setToBeMovedOnFailedRead(boolean toBeMovedOnFailedRead) {
+        this.toBeMovedOnFailedRead = toBeMovedOnFailedRead;
+    }
 
     public String getHostName() {
         return hostName;
@@ -77,11 +116,15 @@ public class FileShareSourceAdapter extends IPCAdapter {
     @Override
     public String toString() {
         return "FileShareSourceAdapter{" +
-                "filePath='" + filePath + '\'' +
+                "hostName='" + hostName + '\'' +
+                ", filePath='" + filePath + '\'' +
                 ", filePathAlias='" + filePathAlias + '\'' +
-                ", hostName=" + getHostName() +
+                ", filePathOnSuccessfulRead='" + filePathOnSuccessfulRead + '\'' +
+                ", filePathOnFailedRead='" + filePathOnFailedRead + '\'' +
+                ", toBeMovedOnSuccessfulRead=" + toBeMovedOnSuccessfulRead +
+                ", toBeMovedOnFailedRead=" + toBeMovedOnFailedRead +
                 ", supportedDeploymentModes=" + getSupportedDeploymentModes() +
-                ", targetNameInstant='" + getTargetSystemName() + '\'' +
+                ", targetSystemName='" + getTargetSystemName() + '\'' +
                 ", enablingTopologyEndpoint=" + getEnablingTopologyEndpoint() +
                 ", supportedInterfaceDefinitions=" + getSupportedInterfaceDefinitions() +
                 ", supportInterfaceTags=" + getSupportInterfaceTags() +
@@ -89,7 +132,7 @@ public class FileShareSourceAdapter extends IPCAdapter {
                 ", groupName='" + getGroupName() + '\'' +
                 ", active=" + isActive() +
                 ", additionalParameters=" + getAdditionalParameters() +
-                ", lastActivity=" + getLastActivity() + '\'' +
+                ", lastActivity=" + getLastActivity() +
                 '}';
     }
 }

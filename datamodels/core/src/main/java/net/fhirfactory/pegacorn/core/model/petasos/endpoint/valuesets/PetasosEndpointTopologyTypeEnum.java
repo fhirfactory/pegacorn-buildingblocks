@@ -35,6 +35,7 @@ public enum PetasosEndpointTopologyTypeEnum {
     LDAP_CLIENT("LDAP.Client", "pegacorn.fhir.endpoint.ldap_client", "endpoint.ldap.client"),
     FILE_SHARE_SOURCE("FILE.Source", "pegacorn.fhir.endpoint.file_source","endpoint.file.source"),
     FILE_SHARE_SINK("FILE.Sink", "pegacorn.fhir.endpoint.file_sink", "endpoint.file.sink"),
+    FILE_SHARE_MOVER("FILE.Mover", "pegacorn.fhir.endpoint.file_mover", "endpoint.file.mover"),
     OTHER_API_SERVER("API.Server", "endpoint.other_type_of_server", "endpoint.other_api.server"),
     OTHER_API_CLIENT("API.Client", "endpoint.other_type_of_client","endpoint.other_api.client"),
     OTHER_SERVER("Other.Server", "endpoint.other_server", "endpoint.other.server"),

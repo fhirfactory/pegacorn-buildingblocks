@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.internals.communicate.entities.rooms.datatypes.C
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionID;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.datatypes.CommunicateSessionParticipant;
 import net.fhirfactory.pegacorn.internals.communicate.entities.session.valuesets.CommunicateSessionTypeEnum;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.CommunicateSessionESR;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.CommunicateSessionESR;
 
 import java.util.ArrayList;
 import java.util.List;

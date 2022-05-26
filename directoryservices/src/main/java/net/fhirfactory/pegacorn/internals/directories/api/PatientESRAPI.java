@@ -23,10 +23,10 @@ package net.fhirfactory.pegacorn.internals.directories.api;
 
 import net.fhirfactory.pegacorn.internals.directories.api.beans.PatientServiceHandler;
 import net.fhirfactory.pegacorn.internals.directories.api.common.ResourceDirectoryAPI;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.PatientESR;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.PractitionerRoleESR;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.FavouriteListESDT;
-import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PractitionerRoleListESDT;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.PatientESR;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.PractitionerRoleESR;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.datatypes.FavouriteListESDT;
+import net.fhirfactory.pegacorn.core.model.internal.resources.simple.datatypes.PractitionerRoleListESDT;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.rest.RestParamType;
