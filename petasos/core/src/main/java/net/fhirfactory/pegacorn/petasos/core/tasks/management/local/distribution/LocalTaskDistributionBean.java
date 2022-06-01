@@ -281,7 +281,9 @@ public class LocalTaskDistributionBean {
         {
             getLogger().debug(".forwardTask(): Forwarding To->{}, Task->{}",subscriber.getParticipantName(), petasosFulfillmentTask.getActionableTaskId().getId() );
         }
-        camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentSharedInstance);
+        Object propertyValue = camelExchange.getProperty("CamelAttachmentObjects");
+        camelProducerService.sendBodyAndProperty(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentSharedInstance, "CamelAttachmentObjects", propertyValue);
+//        camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentSharedInstance);
         getLogger().trace(".forwardTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
     }
 
