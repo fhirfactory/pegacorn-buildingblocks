@@ -46,6 +46,7 @@ public class JGroupsIntegrationPointNamingUtilities {
     private static String PETASOS_METRICS_GROUP_NAME = "Petasos.Metrics";
     private static String PETASOS_AUDIT_SERVICES_GROUP_NAME = "Petasos.Audit";
     private static String PETASOS_IPC_MESSAGING_GROUP_NAME = "Petasos.IPC";
+    private static String PETASOS_MEDIA_SERVICES_GROUP_NAME = "Petasos.Media";
 
     private static int JGROUPS_INTEGRATION_POINT_SITE_POSITION_IN_CHANNEL_NAME = 0;
     private static int JGROUPS_INTEGRATION_POINT_ZONE_POSITION_IN_CHANNEL_NAME = 1;
@@ -397,4 +398,10 @@ public class JGroupsIntegrationPointNamingUtilities {
     public String getPetasosIpcMessagingGroupName() {
         return PETASOS_IPC_MESSAGING_GROUP_NAME;
     }
+    
+
+    public String getPetasosMediaServicesGroupName() {
+        return PETASOS_MEDIA_SERVICES_GROUP_NAME;
+    }
+
 }

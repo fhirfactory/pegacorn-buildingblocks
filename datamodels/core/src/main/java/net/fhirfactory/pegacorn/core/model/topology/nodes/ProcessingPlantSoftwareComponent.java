@@ -46,6 +46,8 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     private String petasosInterceptionStackConfigFile;
     private String petasosTaskingStackConfigFile;
     private String petasosAuditStackConfigFile;
+    private String petasosMediaStackConfigFile;
+
 
     private String multiZoneInfinispanStackConfigFile;
 
@@ -82,7 +84,8 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.petasosTaskingStackConfigFile = null;
         this.petasosTopologyStackConfigFile = null;
         this.petasosAuditStackConfigFile = null;
-
+        this.petasosMediaStackConfigFile = null;
+        
         this.multiZoneInfinispanStackConfigFile = null;
     }
 
@@ -137,6 +140,16 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     public void setPetasosAuditStackConfigFile(String interZoneAuditStackConfigFile) {
         this.petasosAuditStackConfigFile = interZoneAuditStackConfigFile;
     }
+    
+
+    public String getPetasosMediaStackConfigFile() {
+        return petasosMediaStackConfigFile;
+    }
+
+    public void setPetasosMediaStackConfigFile(String interZoneMediaStackConfigFile) {
+        this.petasosMediaStackConfigFile = interZoneMediaStackConfigFile;
+    }
+
 
     public String getPetasosIPCStackConfigFile() {
         return petasosIPCStackConfigFile;

@@ -35,6 +35,8 @@ public class ProcessingPlantJGroupsIntegrationPointSet {
     private JGroupsIntegrationPoint petasosTaskServicesEndpoint;
     private JGroupsIntegrationPoint petasosInterceptionServicesEndpoint;
     private JGroupsIntegrationPoint petasosMetricsServicesEndpoint;
+    private JGroupsIntegrationPoint petasosMediaServicesEndpoint;
+
 
     public ProcessingPlantJGroupsIntegrationPointSet(){
 
@@ -45,6 +47,7 @@ public class ProcessingPlantJGroupsIntegrationPointSet {
         this.petasosTaskServicesEndpoint = null;
         this.petasosInterceptionServicesEndpoint = null;
         this.petasosMetricsServicesEndpoint = null;
+        this.petasosMediaServicesEndpoint = null;
     }
 
     //
@@ -140,5 +143,14 @@ public class ProcessingPlantJGroupsIntegrationPointSet {
 
     public void setPetasosMetricsServicesEndpoint(JGroupsIntegrationPoint petasosMetricsServicesEndpoint) {
         this.petasosMetricsServicesEndpoint = petasosMetricsServicesEndpoint;
+    }
+    
+
+    public JGroupsIntegrationPoint getPetasosMediaServicesEndpoint() {
+        return petasosMediaServicesEndpoint;
+    }
+
+    public void setPetasosMediaServicesEndpoint(JGroupsIntegrationPoint petasosMediaServicesEndpoint) {
+        this.petasosMediaServicesEndpoint = petasosMediaServicesEndpoint;
     }
 }

@@ -44,6 +44,7 @@ public abstract class PegacornCommonInterfaceNamesBase {
     public String getPetasosAuditServicesEndpointName(){return("petasos-audit");}
     public String getPetasosInterceptionEndpointName(){return("petasos-snoop");}
     public String getPetasosMetricsEndpointName(){return("petasos-metric");}
+    public String getPetasosMediaServicesEndpointName(){return("petasos-media");}
     public String getMultiZoneInfinispaEndpointName(){return("multi-infini");}
     public String getEdgeAnswerEndpointName(){return("edge-answer");}
     public String getEdgeAskEndpointName(){return("edge-ask");}
