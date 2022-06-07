@@ -10,15 +10,15 @@
     <!--***********************************************************************************-->
 
     <parent>
-        <groupId>net.fhirfactory.pegacorn</groupId>
-        <artifactId>pegacorn-buildingblocks-edge</artifactId>
+        <groupId>net.fhirfactory.dricats</groupId>
+        <artifactId>dricats-buildingblocks-edge</artifactId>
         <version>1.6.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pegacorn-buildingblocks-edge-interzonerepeater</artifactId>
+    <artifactId>dricats-buildingblocks-edge-interzonerepeater</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Building Blocks :: Edge :: InterZoneRepeater</name>
+    <name>DRICaTS :: Building Blocks :: Edge :: InterZoneRepeater</name>
 
     <licenses>
         <license>
@@ -199,8 +199,8 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-properties</artifactId>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-deployment-properties</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -233,7 +233,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        net.fhirfactory.pegacorn.platform.edge.messaging.IPCGossipRouter
+                                        net.fhirfactory.dricats.platform.edge.messaging.IPCGossipRouter
                                     </mainClass>
                                 </manifest>
                             </archive>

@@ -10,15 +10,15 @@
     <!--***********************************************************************************-->
 
     <parent>
-        <groupId>net.fhirfactory.pegacorn</groupId>
-        <artifactId>pegacorn-buildingblocks-interception</artifactId>
+        <groupId>net.fhirfactory.dricats</groupId>
+        <artifactId>dricats-buildingblocks-interception</artifactId>
         <version>1.6.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pegacorn-buildingblocks-interception-collector</artifactId>
+    <artifactId>dricats-buildingblocks-interception-collector</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Building Blocks :: Interception :: Collector</name>
+    <name>DRICaTS :: Building Blocks :: Interception :: Collector</name>
     <description>The Interception Collector</description>
 
     <!--***********************************************************************************-->
@@ -192,8 +192,8 @@
         <!--*******************************************************************************-->
 
         <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-datamodels-fhir</artifactId>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-buildingblocks-datamodels-fhir</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
@@ -204,8 +204,8 @@
         <!--*******************************************************************************-->
 
         <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-datamodels-core</artifactId>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-buildingblocks-datamodels-core</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
@@ -216,8 +216,8 @@
         <!--*******************************************************************************-->
 
         <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-interception-common</artifactId>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-buildingblocks-interception-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 

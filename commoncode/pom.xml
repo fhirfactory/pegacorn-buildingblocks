@@ -11,15 +11,15 @@
     <!--***********************************************************************************-->
 
     <parent>
-        <groupId>net.fhirfactory.pegacorn</groupId>
-        <artifactId>pegacorn-buildingblocks</artifactId>
+        <groupId>net.fhirfactory.dricats</groupId>
+        <artifactId>dricats-buildingblocks</artifactId>
         <version>1.6.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pegacorn-buildingblocks-commoncode</artifactId>
+    <artifactId>dricats-buildingblocks-commoncode</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Building Blocks :: Common (Functions and References)</name>
+    <name>DRICaTS :: Building Blocks :: Common (Functions and References)</name>
     <description></description>
 
     <!--***********************************************************************************-->
