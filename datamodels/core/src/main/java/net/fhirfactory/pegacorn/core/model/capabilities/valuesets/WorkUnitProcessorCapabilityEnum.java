@@ -25,6 +25,7 @@ public enum WorkUnitProcessorCapabilityEnum {
     CAPABILITY_INFORMATION_MANAGEMENT_IT_OPS("ITOps.IM", "pegacorn.capability.im.itops"),
     CAPABILITY_INFORMATION_MANAGEMENT_AUDIT_EVENTS("AuditEvent-IM", "pegacorn.capability.im.audit-event"),
     CAPABILITY_INFORMATION_MANAGEMENT_TASK_SERVICES("Ponos.Manager", "pegacorn.capability.im.task-services"),
+    CAPABILITY_INFORMATION_MANAGEMENT_MEDIA("DAM-IM", "pegacorn.capability.im.dam"),
     CAPABILITY_DATA_MANAGEMENT_AUDIT_EVENTS("AuditEvent-DM","pegacorn.capability.dm.audit-event"),
     CAPABILITY_SERVICE_PROVIDER_A19QRY("A19Query-Task", "pegacorn.capability.task.a19query");
 

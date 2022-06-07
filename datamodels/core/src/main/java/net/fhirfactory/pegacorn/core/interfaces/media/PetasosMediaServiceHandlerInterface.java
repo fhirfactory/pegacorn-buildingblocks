@@ -21,8 +21,13 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.media;
 
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import org.hl7.fhir.r4.model.Media;
 
-public interface PetasosMediaServiceAgentInterface {
-    Boolean captureMedia(Media media, boolean synchronous);
+import java.util.List;
+
+public interface PetasosMediaServiceHandlerInterface {
+    Boolean logMediaHandler(Media media, JGroupsIntegrationPointSummary jgroupsIP);
+    Boolean logMediaAsynchronouslyHandler(Media media, JGroupsIntegrationPointSummary jgroupsIP);
+    Boolean logMultipleMediaHandler(List<Media> mediaList, JGroupsIntegrationPointSummary jgroupsIP);
 }
