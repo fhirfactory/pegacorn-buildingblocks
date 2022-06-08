@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessin
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.APIClientWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
@@ -32,7 +33,9 @@ import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class InterSubsystemAPIClientGatewayWUP extends MOAStandardWUP {
 
@@ -80,9 +83,9 @@ public abstract class InterSubsystemAPIClientGatewayWUP extends MOAStandardWUP {
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected List<DataParcelManifest> specifySubscriptionTopics() {
-        List<DataParcelManifest> subTopics = new ArrayList<>();
-        return(subTopics);
+    public Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions() {
+    	Set<DataParcelManifestSubscriptionMaskType> subscriptions = new HashSet<>();
+        return(subscriptions);
     }
 
     /**

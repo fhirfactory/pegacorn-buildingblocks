@@ -122,10 +122,10 @@ public class DataParcelQualitySubscriptionMaskType extends SubscriptionMaskBase 
         }
         if(ori.hasContentInterSubsystemDistributable()){
             switch(ori.getContentInterSubsystemDistributable()){
-                case DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_TRUE:
+                case DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_TRUE:
                     setInterSubsystemDistributableMask(DataParcelInternallyDistributableStatusSubscriptionMaskEnum.DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_TRUE);
                     break;
-                case DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE:
+                case DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_FALSE:
                     setInterSubsystemDistributableMask(DataParcelInternallyDistributableStatusSubscriptionMaskEnum.DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_FALSE);
                     break;
             }

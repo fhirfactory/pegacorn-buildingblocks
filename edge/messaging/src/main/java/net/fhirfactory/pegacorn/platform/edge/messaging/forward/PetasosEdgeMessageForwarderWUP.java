@@ -21,12 +21,27 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.forward;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosEdgeMessageForwarderService;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
@@ -39,16 +54,6 @@ import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingP
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.EdgeEgressMessagingGatewayWUP;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.model.RouteDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 @ApplicationScoped
 public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWUP implements PetasosEdgeMessageForwarderService {
@@ -113,9 +118,9 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
     }
 
     @Override
-    protected List<DataParcelManifest> specifySubscriptionTopics() {
-        List<DataParcelManifest> subscriptionList = new ArrayList<>();
-        return (subscriptionList);
+    protected Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions() {
+        Set<DataParcelManifestSubscriptionMaskType> subscriptions = new HashSet<>();
+        return (subscriptions);
     }
 
     @Override

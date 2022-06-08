@@ -22,18 +22,19 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
@@ -81,9 +82,9 @@ public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedW
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected List<DataParcelManifest> specifySubscriptionTopics() {
-        List<DataParcelManifest> subTopics = new ArrayList<>();
-        return(subTopics);
+    protected Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions() {
+        Set<DataParcelManifestSubscriptionMaskType> subscriptions = new HashSet<>();
+        return(subscriptions);
     }
 
     /**

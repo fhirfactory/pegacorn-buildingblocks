@@ -22,24 +22,26 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
+
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSourceTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.model.RouteDefinition;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSourceTopologyEndpoint;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
@@ -118,8 +120,8 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected List<DataParcelManifest> specifySubscriptionTopics() {
-        List<DataParcelManifest> subTopics = new ArrayList<>();
+    protected Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions() {
+        Set<DataParcelManifestSubscriptionMaskType> subTopics = new HashSet<>();
         return(subTopics);
     }
 

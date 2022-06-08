@@ -22,17 +22,21 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericTriggerBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericTriggerBasedWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 
 public abstract class InteractIngresAPIClientGatewayWUP extends GenericTriggerBasedWUPTemplate {
 
@@ -80,9 +84,9 @@ public abstract class InteractIngresAPIClientGatewayWUP extends GenericTriggerBa
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected List<DataParcelManifest> specifySubscriptionTopics() {
-        List<DataParcelManifest> subTopics = new ArrayList<>();
-        return(subTopics);
+    public Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions() {
+    	Set<DataParcelManifestSubscriptionMaskType> subscriptions = new HashSet<>();
+        return(subscriptions);
     }
 
     /**

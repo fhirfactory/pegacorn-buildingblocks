@@ -22,16 +22,27 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
-import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
+import java.util.ArrayList;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.ArrayList;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelActivityLocation;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelQualityStatement;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelExternallyDistributableStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelValidationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantName;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 
 /**
  * @author Mark A. Hunter
@@ -47,6 +58,7 @@ public class WUPContainerEgressMetadataProcessor {
 
     @Inject
     private PetasosFulfillmentTaskAuditServicesBroker auditServicesBroker;
+    
 
     /**
      * The WUP-Egress-Metadata-Processor updates the details of the TaskWorkItem within the FulfillmentTask to better
@@ -73,13 +85,19 @@ public class WUPContainerEgressMetadataProcessor {
             discardedParcelDescriptor.setDataParcelSubCategory("Tasking");
             discardedParcelManifest.setContentDescriptor(discardedParcelDescriptor);
             discardedParcelManifest.setDataParcelFlowDirection(fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().getDataParcelFlowDirection());
-            discardedParcelManifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
-            discardedParcelManifest.setInterSubsystemDistributable(false);
-            discardedParcelManifest.setNormalisationStatus(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_TRUE);
-            discardedParcelManifest.setValidationStatus(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_TRUE);
-            if (fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().getSourceSystem() != null){
-                discardedParcelManifest.setSourceSystem(fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().getSourceSystem());
+            DataParcelQualityStatement parcelQuality = new DataParcelQualityStatement();
+            parcelQuality.setContentPolicyEnforcementStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
+            parcelQuality.setContentExternalDistributionStatus(DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE);
+            parcelQuality.setContentNormalisationStatus(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_TRUE);
+            parcelQuality.setContentValidationStatus(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_TRUE);
+            discardedParcelManifest.setContentQuality(parcelQuality);
+            if(fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().hasOrigin()) {
+                discardedParcelManifest.setOrigin(fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().getOrigin());
             }
+            DataParcelActivityLocation activityLocation = new DataParcelActivityLocation();
+            activityLocation.setProcessingPlantParticipantName(new PetasosParticipantName(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getSubsystemParticipantName()));
+            activityLocation.setWorkUnitProcessorParticipantName(new PetasosParticipantName(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantName()));
+            discardedParcelManifest.setLastActivityLocation(activityLocation);
             UoWPayload discardedItemPayload = new UoWPayload();
 
             switch(fulfillmentTask.getTaskWorkItem().getProcessingOutcome()){

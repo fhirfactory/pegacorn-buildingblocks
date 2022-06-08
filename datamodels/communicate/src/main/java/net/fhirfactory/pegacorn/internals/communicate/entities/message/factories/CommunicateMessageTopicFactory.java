@@ -21,12 +21,17 @@
  */
 package net.fhirfactory.pegacorn.internals.communicate.entities.message.factories;
 
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
-
 import javax.enterprise.context.ApplicationScoped;
+
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelDescriptorSubscriptionMaskType;
 
 @ApplicationScoped
 public class CommunicateMessageTopicFactory {
+	
+	//
+	// DataTypes
+	//
 
     public DataParcelTypeDescriptor createEmailTypeDescriptor() {
         DataParcelTypeDescriptor typeDescriptor = createCommunicateMessageDescriptor("Email", "1.0.0");
@@ -49,5 +54,29 @@ public class CommunicateMessageTopicFactory {
         typeDescriptor.setVersion(version);
 
         return (typeDescriptor);
+    }
+    
+    //
+    // Subscriptions
+    //
+    
+    public DataParcelDescriptorSubscriptionMaskType createEmailDescriptorSubscription() {
+    	DataParcelDescriptorSubscriptionMaskType subscription = createCommunicateMessageSubscription("Email", "1.0.0");
+        return (subscription);
+    }
+    
+    public DataParcelDescriptorSubscriptionMaskType createSMSDescriptorSubscription() {
+    	DataParcelDescriptorSubscriptionMaskType subscription = createCommunicateMessageSubscription("SMS", "1.0.0");
+        return (subscription);
+    }
+
+    public DataParcelDescriptorSubscriptionMaskType createCommunicateMessageSubscription(String recordType, String version) {
+    	DataParcelDescriptorSubscriptionMaskType subscription = new DataParcelDescriptorSubscriptionMaskType();
+    	subscription.setDataParcelDefiner("FHIRFactory");
+    	subscription.setDataParcelCategory("Collaboration");
+    	subscription.setDataParcelSubCategory("CommunicateMessage");
+    	subscription.setDataParcelResource(recordType);
+    	subscription.setVersion(version);
+        return (subscription);
     }
 }

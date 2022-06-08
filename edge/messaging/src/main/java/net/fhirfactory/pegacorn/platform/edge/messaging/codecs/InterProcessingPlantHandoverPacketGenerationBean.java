@@ -116,7 +116,7 @@ import java.time.Instant;
 
             fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL);
             fulfillmentTask.update();
-            forwardingPacket.setTarget(theUoW.getPayloadTopicID().getTargetProcessingPlantParticipantName());
+            forwardingPacket.setTarget(theUoW.getPayloadTopicID().getDestination().getBoundaryPointProcessingPlantParticipantName().getName());
             forwardingPacket.setSource(processingPlant.getSubsystemParticipantName());
             LOG.debug(".constructInterProcessingPlantHandoverPacket(): Exit, forwardingPacket (InterProcessingPlantHandoverPacket) --> {}", forwardingPacket);
             return(forwardingPacket);

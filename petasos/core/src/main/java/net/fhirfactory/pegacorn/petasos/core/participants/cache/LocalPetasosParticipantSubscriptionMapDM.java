@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPe
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PubSubParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscriptionRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
-import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelTypeDescriptorSubscriptionMaskType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelDescriptorSubscriptionMaskType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocalPetasosParticipantSubscriptionMapDM {
 	private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosParticipantSubscriptionMapDM.class);
 
-	private ConcurrentHashMap<DataParcelTypeDescriptorSubscriptionMaskType, List<TaskWorkItemSubscriptionRegistration>> dataParcelSubscriptionMap;
+	private ConcurrentHashMap<DataParcelDescriptorSubscriptionMaskType, List<TaskWorkItemSubscriptionRegistration>> dataParcelSubscriptionMap;
 	private Object dataParcelSubscriptionMapLock;
 
 	@Inject
@@ -62,7 +62,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 	//
 
     public LocalPetasosParticipantSubscriptionMapDM(){
-        this.dataParcelSubscriptionMap = new ConcurrentHashMap<DataParcelTypeDescriptorSubscriptionMaskType, List<TaskWorkItemSubscriptionRegistration>>();
+        this.dataParcelSubscriptionMap = new ConcurrentHashMap<DataParcelDescriptorSubscriptionMaskType, List<TaskWorkItemSubscriptionRegistration>>();
         this.dataParcelSubscriptionMapLock = new Object();
     }
 
@@ -70,7 +70,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 	// Getters (and Setters)
 	//
 
-	protected Map<DataParcelTypeDescriptorSubscriptionMaskType, List<TaskWorkItemSubscriptionRegistration>> getDataParcelSubscriptionMap(){
+	protected Map<DataParcelDescriptorSubscriptionMaskType, List<TaskWorkItemSubscriptionRegistration>> getDataParcelSubscriptionMap(){
 		return(this.dataParcelSubscriptionMap);
 	}
 
@@ -94,7 +94,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
      * @return The set of WUPs wanting to receive this payload type.
      */
 
-    public List<TaskWorkItemSubscriptionRegistration> getSubscriberList(DataParcelTypeDescriptorSubscriptionMaskType parcelDescriptor){
+    public List<TaskWorkItemSubscriptionRegistration> getSubscriberList(DataParcelDescriptorSubscriptionMaskType parcelDescriptor){
 		getLogger().debug(".getSubscriberList(): Entry, parcelDescriptor->{}", parcelDescriptor);
 		List<TaskWorkItemSubscriptionRegistration> subscriptionList = new ArrayList<>();
 		synchronized (getDataParcelSubscriptionMapLock()){
@@ -130,10 +130,10 @@ public class LocalPetasosParticipantSubscriptionMapDM {
     	if((workItemSubscription==null) || (subscriber==null)) {
     		throw(new IllegalArgumentException(".addSubscriber(): workItemSubscription or subscriberInstanceID is null"));
     	}
-		DataParcelTypeDescriptorSubscriptionMaskType contentDescriptor = workItemSubscription.getContentDescriptorMask();
-		DataParcelTypeDescriptorSubscriptionMaskType containerDescriptor = workItemSubscription.getContainerDescriptorMask();
+		DataParcelDescriptorSubscriptionMaskType contentDescriptor = workItemSubscription.getContentDescriptorMask();
+		DataParcelDescriptorSubscriptionMaskType containerDescriptor = workItemSubscription.getContainerDescriptorMask();
 		PetasosParticipant clonedSubscriber = SerializationUtils.clone(subscriber);
-    	DataParcelTypeDescriptorSubscriptionMaskType descriptorToRegister = null;
+    	DataParcelDescriptorSubscriptionMaskType descriptorToRegister = null;
     	if(contentDescriptor != null) {
 			getLogger().trace(".addSubscriber(): contentDescriptor is not null");
 			descriptorToRegister = contentDescriptor;
@@ -242,10 +242,10 @@ public class LocalPetasosParticipantSubscriptionMapDM {
     		throw(new IllegalArgumentException(".removeSubscriber(): topic or subscriberInstanceID is null"));
     	}
 		boolean found = false;
-		DataParcelTypeDescriptorSubscriptionMaskType currentToken = null;
-		DataParcelTypeDescriptorSubscriptionMaskType contentDescriptor = parcelManifest.getContentDescriptorMask();
-		DataParcelTypeDescriptorSubscriptionMaskType containerDescriptor = parcelManifest.getContainerDescriptorMask();
-		DataParcelTypeDescriptorSubscriptionMaskType descriptorToTest = null;
+		DataParcelDescriptorSubscriptionMaskType currentToken = null;
+		DataParcelDescriptorSubscriptionMaskType contentDescriptor = parcelManifest.getContentDescriptorMask();
+		DataParcelDescriptorSubscriptionMaskType containerDescriptor = parcelManifest.getContainerDescriptorMask();
+		DataParcelDescriptorSubscriptionMaskType descriptorToTest = null;
 		if(contentDescriptor != null) {
 			descriptorToTest = contentDescriptor;
 		}
@@ -256,7 +256,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 			throw(new IllegalArgumentException(".addSubscriber(): parcelManifest does not contain suitable contentDescriptor or containerDescriptor"));
 		}
 		synchronized (getDataParcelSubscriptionMapLock()) {
-			Enumeration<DataParcelTypeDescriptorSubscriptionMaskType> topicEnumerator = dataParcelSubscriptionMap.keys();
+			Enumeration<DataParcelDescriptorSubscriptionMaskType> topicEnumerator = dataParcelSubscriptionMap.keys();
 			while (topicEnumerator.hasMoreElements()) {
 				currentToken = topicEnumerator.nextElement();
 				if (currentToken.equals(descriptorToTest)) {
@@ -293,10 +293,10 @@ public class LocalPetasosParticipantSubscriptionMapDM {
     	if(!(getLogger().isDebugEnabled() || getLogger().isTraceEnabled())){
     		return;
 		}
-    	Enumeration<DataParcelTypeDescriptorSubscriptionMaskType> topicEnumerator = dataParcelSubscriptionMap.keys();
+    	Enumeration<DataParcelDescriptorSubscriptionMaskType> topicEnumerator = dataParcelSubscriptionMap.keys();
     	getLogger().debug(".printAllSubscriptionSets(): Printing ALL Subscription Lists");
     	while(topicEnumerator.hasMoreElements()){
-			DataParcelTypeDescriptorSubscriptionMaskType currentToken = topicEnumerator.nextElement();
+			DataParcelDescriptorSubscriptionMaskType currentToken = topicEnumerator.nextElement();
     		getLogger().debug(".printAllSubscriptionSets(): Topic (TopicToken) --> {}", currentToken);
 			List<TaskWorkItemSubscriptionRegistration> subscriptionList = getSubscriberList(currentToken);
 			if(subscriptionList != null){
@@ -310,13 +310,13 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 	}
 
 	public List<TaskWorkItemSubscriptionRegistration> getPossibleSubscriptionMatches(DataParcelTypeDescriptor testDescriptor){
-    	List<DataParcelTypeDescriptorSubscriptionMaskType> possibleList = new ArrayList<>();
+    	List<DataParcelDescriptorSubscriptionMaskType> possibleList = new ArrayList<>();
     	List<TaskWorkItemSubscriptionRegistration> possibleSubscriptionList = new ArrayList<>();
     	if(this.dataParcelSubscriptionMap.isEmpty()){
     		return(possibleSubscriptionList);
 		}
 		synchronized (getDataParcelSubscriptionMapLock()) {
-			for (DataParcelTypeDescriptorSubscriptionMaskType currentSubscribedDescriptor : getDataParcelSubscriptionMap().keySet()) {
+			for (DataParcelDescriptorSubscriptionMaskType currentSubscribedDescriptor : getDataParcelSubscriptionMap().keySet()) {
 				if (currentSubscribedDescriptor.applyMask(testDescriptor)) {
 					possibleList.add(currentSubscribedDescriptor);
 				}
@@ -324,7 +324,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 		}
     	if(!possibleList.isEmpty()){
 			synchronized (getDataParcelSubscriptionMapLock()) {
-				for (DataParcelTypeDescriptorSubscriptionMaskType possibleDescriptor : possibleList) {
+				for (DataParcelDescriptorSubscriptionMaskType possibleDescriptor : possibleList) {
 					List<TaskWorkItemSubscriptionRegistration> currentSubscriptionSet = getDataParcelSubscriptionMap().get(possibleDescriptor);
 					if (currentSubscriptionSet != null) {
 						possibleSubscriptionList.addAll(currentSubscriptionSet);
@@ -342,7 +342,7 @@ public class LocalPetasosParticipantSubscriptionMapDM {
 
 		List<TaskWorkItemSubscriptionRegistration> subscriptionList = new ArrayList<>();
 		synchronized (getDataParcelSubscriptionMapLock()){
-			for(DataParcelTypeDescriptorSubscriptionMaskType currentDescriptor: getDataParcelSubscriptionMap().keySet()) {
+			for(DataParcelDescriptorSubscriptionMaskType currentDescriptor: getDataParcelSubscriptionMap().keySet()) {
 				subscriptionList.addAll(getDataParcelSubscriptionMap().get(currentDescriptor));
 			}
 		}

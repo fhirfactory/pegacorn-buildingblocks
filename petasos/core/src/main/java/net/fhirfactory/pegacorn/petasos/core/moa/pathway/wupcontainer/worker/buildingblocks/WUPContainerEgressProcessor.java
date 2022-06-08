@@ -22,22 +22,23 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.camel.Exchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.ParcelOfWorkType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.notifications.PetasosITOpsNotificationContentFactory;
-import org.apache.camel.Exchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 @ApplicationScoped
 public class WUPContainerEgressProcessor {
@@ -118,7 +119,7 @@ public class WUPContainerEgressProcessor {
 
         // Now, for soft-failure
         if(createSoftFailureNotification){
-            TaskWorkItemType workItem = fulfillmentTask.getTaskWorkItem();
+            ParcelOfWorkType workItem = fulfillmentTask.getTaskWorkItem();
             sendSoftFailureNotification(metricsAgent, workItem);
         }
 
@@ -131,7 +132,7 @@ public class WUPContainerEgressProcessor {
         return (fulfillmentTask);
     }
 
-    private void sendSoftFailureNotification(WorkUnitProcessorMetricsAgent metricsAgent, TaskWorkItemType workItem){
+    private void sendSoftFailureNotification(WorkUnitProcessorMetricsAgent metricsAgent, ParcelOfWorkType workItem){
         getLogger().debug(".sendSoftFailureNotification(): Entry, workItem->{}", workItem);
 
         if(!workItem.hasEgressContent()){

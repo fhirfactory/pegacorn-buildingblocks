@@ -36,8 +36,8 @@ public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase
 
     public static String WILDCARD_CHARACTER = "*";
 
-    private DataParcelTypeDescriptorSubscriptionMaskType contentDescriptorMask;
-    private DataParcelTypeDescriptorSubscriptionMaskType containerDescriptorMask;
+    private DataParcelDescriptorSubscriptionMaskType contentDescriptorMask;
+    private DataParcelDescriptorSubscriptionMaskType containerDescriptorMask;
     private DataParcelQualitySubscriptionMaskType contentQualityMask;
 
     private DataParcelTypeSubscriptionMaskEnum dataParcelTypeMask;
@@ -55,8 +55,8 @@ public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase
 
     public DataParcelManifestSubscriptionMaskType(){
         super();
-        this.contentDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
-        this.containerDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
+        this.contentDescriptorMask = new DataParcelDescriptorSubscriptionMaskType();
+        this.containerDescriptorMask = new DataParcelDescriptorSubscriptionMaskType();
         this.contentQualityMask = new DataParcelQualitySubscriptionMaskType();
         this.dataParcelTypeMask = DataParcelTypeSubscriptionMaskEnum.PARCEL_TYPE_ANY;
         this.originMask = new DataParcelBoundaryPointSubscriptionMaskType();
@@ -67,8 +67,8 @@ public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase
 
     public DataParcelManifestSubscriptionMaskType(DataParcelManifestSubscriptionMaskType ori){
         super(ori);
-        this.contentDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
-        this.containerDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
+        this.contentDescriptorMask = new DataParcelDescriptorSubscriptionMaskType();
+        this.containerDescriptorMask = new DataParcelDescriptorSubscriptionMaskType();
         this.contentQualityMask = new DataParcelQualitySubscriptionMaskType();
         this.dataParcelTypeMask = DataParcelTypeSubscriptionMaskEnum.PARCEL_TYPE_ANY;
         this.originMask = new DataParcelBoundaryPointSubscriptionMaskType();
@@ -111,8 +111,8 @@ public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase
 
     public DataParcelManifestSubscriptionMaskType(DataParcelManifest ori){
         super();
-        this.contentDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
-        this.containerDescriptorMask = new DataParcelTypeDescriptorSubscriptionMaskType();
+        this.contentDescriptorMask = new DataParcelDescriptorSubscriptionMaskType();
+        this.containerDescriptorMask = new DataParcelDescriptorSubscriptionMaskType();
         this.contentQualityMask = new DataParcelQualitySubscriptionMaskType();
         this.dataParcelTypeMask = DataParcelTypeSubscriptionMaskEnum.PARCEL_TYPE_ANY;
         this.originMask = new DataParcelBoundaryPointSubscriptionMaskType();
@@ -183,11 +183,11 @@ public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase
         }
 
         if(ori.hasContentDescriptor()){
-            setContentDescriptorMask(new DataParcelTypeDescriptorSubscriptionMaskType(ori.getContentDescriptor()));
+            setContentDescriptorMask(new DataParcelDescriptorSubscriptionMaskType(ori.getContentDescriptor()));
         }
 
         if(ori.hasContainerDescriptor()){
-            setContainerDescriptorMask(new DataParcelTypeDescriptorSubscriptionMaskType(ori.getContainerDescriptor()));
+            setContainerDescriptorMask(new DataParcelDescriptorSubscriptionMaskType(ori.getContainerDescriptor()));
         }
     }
 
@@ -253,19 +253,19 @@ public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase
         return WILDCARD_CHARACTER;
     }
 
-    public DataParcelTypeDescriptorSubscriptionMaskType getContentDescriptorMask() {
+    public DataParcelDescriptorSubscriptionMaskType getContentDescriptorMask() {
         return contentDescriptorMask;
     }
 
-    public void setContentDescriptorMask(DataParcelTypeDescriptorSubscriptionMaskType contentDescriptorMask) {
+    public void setContentDescriptorMask(DataParcelDescriptorSubscriptionMaskType contentDescriptorMask) {
         this.contentDescriptorMask = contentDescriptorMask;
     }
 
-    public DataParcelTypeDescriptorSubscriptionMaskType getContainerDescriptorMask() {
+    public DataParcelDescriptorSubscriptionMaskType getContainerDescriptorMask() {
         return containerDescriptorMask;
     }
 
-    public void setContainerDescriptorMask(DataParcelTypeDescriptorSubscriptionMaskType containerDescriptorMask) {
+    public void setContainerDescriptorMask(DataParcelDescriptorSubscriptionMaskType containerDescriptorMask) {
         this.containerDescriptorMask = containerDescriptorMask;
     }
 
@@ -349,6 +349,12 @@ public class DataParcelManifestSubscriptionMaskType extends SubscriptionMaskBase
     //
 
     public boolean applyMask(DataParcelManifest manifest){
-
+    	getLogger().debug(".applyMask(): Entry, manifest->{}", manifest);
+    	
+    	boolean result = false;
+    	
+    	
+    	getLogger().debug(".applyMask(): Exit, result->{}", result);
+    	return(result);
     }
 }

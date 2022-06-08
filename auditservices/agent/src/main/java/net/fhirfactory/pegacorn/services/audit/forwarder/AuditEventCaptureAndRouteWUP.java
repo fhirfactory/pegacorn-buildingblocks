@@ -21,25 +21,25 @@
  */
 package net.fhirfactory.pegacorn.services.audit.forwarder;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelValidationStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.services.audit.forwarder.beans.AuditEventExtractor;
 import net.fhirfactory.pegacorn.services.audit.forwarder.beans.AuditEventPersistenceAccessor;
 import net.fhirfactory.pegacorn.workshops.AuditWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.MOAStandardWUP;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 @ApplicationScoped
 public class AuditEventCaptureAndRouteWUP extends MOAStandardWUP  {
@@ -67,7 +67,10 @@ public class AuditEventCaptureAndRouteWUP extends MOAStandardWUP  {
     protected Logger specifyLogger() {
         return (LOG);
     }
+    
+    
 
+    /*
     @Override
     protected List<DataParcelManifest> specifySubscriptionTopics() {
         List<DataParcelManifest> subscribedTopics = new ArrayList<>();
@@ -87,8 +90,15 @@ public class AuditEventCaptureAndRouteWUP extends MOAStandardWUP  {
 
         return(subscribedTopics);
     }
+	*/
 
     @Override
+	protected Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions() {
+		// TODO Auto-generated method stub
+		return (new HashSet<>());
+	}
+
+	@Override
     protected String specifyWUPInstanceName() {
         return (getClass().getSimpleName());
     }

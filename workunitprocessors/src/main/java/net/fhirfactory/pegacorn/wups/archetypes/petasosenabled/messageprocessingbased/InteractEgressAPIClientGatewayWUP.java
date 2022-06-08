@@ -92,21 +92,6 @@ public abstract class InteractEgressAPIClientGatewayWUP extends GenericMessageBa
         return(ingressEndpoint);
     }
 
-
-    @Override
-    protected void establishEndpointMetricAgents(){
-        getLogger().debug(".establishEndpointMetricAgents(): Entry");
-        String connectedSystem = getEgressEndpoint().getEndpointTopologyNode().getConnectedSystemName();
-        String endpointDescription = getEgressEndpoint().getEndpointSpecification();
-        this.endpointMetricsAgent = getMetricAgentFactory().newEndpointMetricsAgent(
-                processingPlantCapabilityStatement,
-                getEgressEndpoint().getEndpointTopologyNode().getComponentID(),
-                getEgressEndpoint().getEndpointTopologyNode().getParticipantName(),
-                connectedSystem,
-                endpointDescription);
-        getLogger().debug(".establishEndpointMetricAgents(): Exit");
-    }
-
     @Override
     protected void establishEndpointMetricAgents(){
         getLogger().debug(".establishEndpointMetricAgents(): Entry");

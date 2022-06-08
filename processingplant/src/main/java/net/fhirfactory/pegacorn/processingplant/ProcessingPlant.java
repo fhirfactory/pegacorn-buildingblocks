@@ -21,6 +21,19 @@
  */
 package net.fhirfactory.pegacorn.processingplant;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.slf4j.Logger;
+
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
@@ -28,22 +41,27 @@ import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillme
 import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditEventGranularityLevelEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantName;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelBoundaryPointSubscriptionMaskType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelDescriptorSubscriptionMaskType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelQualitySubscriptionMaskType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets.DataParcelDirectionSubscriptionMaskEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets.DataParcelInternallyDistributableStatusSubscriptionMaskEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets.DataParcelNormalisationStatusSubscriptionMaskEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets.DataParcelValidationStatusSubscriptionMaskEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.valuesets.PolicyEnforcementPointApprovalStatusSubscriptionMaskEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
@@ -59,19 +77,6 @@ import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.slf4j.Logger;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantRoleSupportInterface, ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface {
 
@@ -487,19 +492,22 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             return(null);
         }
         getLogger().trace(".subscribeToRemoteDataParcels(): We have entries in the subscription list, processing");
-        Set<TaskWorkItemManifestType> manifestList = new HashSet<>();
+        Set<DataParcelManifestSubscriptionMaskType> manifestList = new HashSet<>();
         for(DataParcelTypeDescriptor currentTriggerEvent: triggerEventList){
             getLogger().info(".subscribeToRemoteDataParcels(): currentTriggerEvent->{}", currentTriggerEvent);
-            DataParcelTypeDescriptor container = fhirElementTopicFactory.newTopicToken(ResourceType.Communication.name(), pegacornReferenceProperties.getPegacornDefaultFHIRVersion());
-            getLogger().info(".subscribeToRemoteDataParcels(): container->{}", container);
-            TaskWorkItemManifestType manifest = new TaskWorkItemManifestType();
-            manifest.setContentDescriptor(currentTriggerEvent);
-            manifest.setContainerDescriptor(container);
-            manifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
-            manifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_INBOUND_DATA_PARCEL);
-            manifest.setInterSubsystemDistributable(true);
-            manifest.setSourceSystem(sourceSystem);
-            manifest.setSourceProcessingPlantParticipantName(sourceSystem);
+            DataParcelDescriptorSubscriptionMaskType descriptorSubscriptionMask = new DataParcelDescriptorSubscriptionMaskType(currentTriggerEvent);
+            DataParcelManifestSubscriptionMaskType manifest = new DataParcelManifestSubscriptionMaskType();
+            manifest.setContentDescriptorMask(descriptorSubscriptionMask);
+            DataParcelQualitySubscriptionMaskType parcelQuality = new DataParcelQualitySubscriptionMaskType();
+            parcelQuality.setContentPolicyEnforcementStatusMask(PolicyEnforcementPointApprovalStatusSubscriptionMaskEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
+            parcelQuality.setInterSubsystemDistributableMask(DataParcelInternallyDistributableStatusSubscriptionMaskEnum.DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_TRUE);
+            parcelQuality.setContentNormalisationStatusMask(DataParcelNormalisationStatusSubscriptionMaskEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY);
+            parcelQuality.setContentValidationStatusMask(DataParcelValidationStatusSubscriptionMaskEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY);
+            manifest.setContentQualityMask(parcelQuality);
+            manifest.setDataParcelFlowDirectionMask(DataParcelDirectionSubscriptionMaskEnum.INFORMATION_FLOW_DIRECTION_ANY);
+
+            DataParcelBoundaryPointSubscriptionMaskType boundaryPointMask = new DataParcelBoundaryPointSubscriptionMaskType();
+            boundaryPointMask.setBoundaryPointProcessingPlantParticipantNameMask(new PetasosParticipantName(sourceSystem));
             manifestList.add(manifest);
         }
         getLogger().info(".subscribeToRemoteDataParcels(): Registration Processing Plant Petasos Participant ... :)");

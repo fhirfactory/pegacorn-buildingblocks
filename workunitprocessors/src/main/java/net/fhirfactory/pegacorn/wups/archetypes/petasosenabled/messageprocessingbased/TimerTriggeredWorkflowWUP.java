@@ -22,13 +22,13 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import java.util.HashSet;
+import java.util.Set;
+
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class TimerTriggeredWorkflowWUP extends GenericMessageBasedWUPTemplate {
     
@@ -87,9 +87,9 @@ public abstract class TimerTriggeredWorkflowWUP extends GenericMessageBasedWUPTe
      * @return An empty Set<TopicToken>
      */
     @Override
-    protected List<DataParcelManifest> specifySubscriptionTopics() {
-        List<DataParcelManifest> subTopics = new ArrayList<>();
-        return(subTopics);
+    public Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions() {
+    	Set<DataParcelManifestSubscriptionMaskType> subscriptions = new HashSet<>();
+        return(subscriptions);
     }
     
     abstract protected String specifyEndpointComponentDefinition();

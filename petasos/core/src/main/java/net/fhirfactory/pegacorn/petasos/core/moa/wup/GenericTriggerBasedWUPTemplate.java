@@ -21,12 +21,26 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
+import org.slf4j.Logger;
+
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosEndpointContainerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
@@ -34,6 +48,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
@@ -51,18 +66,6 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.Wo
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
-import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.model.RouteDefinition;
-import org.slf4j.Logger;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Generic Trigger Initiated Message Architecture Work Unit Processor (WUP) Template
@@ -82,7 +85,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     private PetasosTaskJobCard wupJobCard;
     private RouteElementNames nameSet;
     private WUPArchetypeEnum wupArchetype;
-    private List<DataParcelManifest> topicSubscriptionSet;
+    private Set<DataParcelManifestSubscriptionMaskType> topicSubscriptionSet;
     private PetasosEndpointContainerInterface egressEndpoint;
     private PetasosEndpointContainerInterface ingresEndpoint;
     private String wupInstanceName;
@@ -162,7 +165,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().info(".initialise(): Now invoking subclass initialising function(s)");
         executePostInitialisationActivities();
         getLogger().info(".initialise(): Setting the Topic Subscription Set (i.e. the list of Data Sets we will process)");
-        this.topicSubscriptionSet = specifySubscriptionTopics();
+        this.topicSubscriptionSet = specifySubscriptions();
         getLogger().info(".initialise(): Building my PetasosParticipant");
         this.meAsAPetasosParticipant = buildPetasosParticipant();
         getLogger().info(".initialise(): Establish the metrics agent");
@@ -180,7 +183,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     
     // To be implemented methods (in Specialisations)
     
-    protected abstract List<DataParcelManifest> specifySubscriptionTopics();
+    protected abstract Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions();
     protected abstract List<DataParcelManifest> declarePublishedTopics();
     protected abstract WUPArchetypeEnum specifyWUPArchetype();
     protected abstract String specifyWUPInstanceVersion();
@@ -255,11 +258,11 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         return wupArchetype;
     }
 
-    public List<DataParcelManifest> getTopicSubscriptionSet() {
+    public Set<DataParcelManifestSubscriptionMaskType> getTopicSubscriptionSet() {
         return topicSubscriptionSet;
     }
 
-    public void setTopicSubscriptionSet(List<DataParcelManifest> topicSubscriptionSet) {
+    public void setTopicSubscriptionSet(Set<DataParcelManifestSubscriptionMaskType> topicSubscriptionSet) {
         this.topicSubscriptionSet = topicSubscriptionSet;
     }
 
@@ -407,19 +410,18 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     private PetasosParticipant buildPetasosParticipant(){
         getLogger().debug(".buildPetasosParticipant(): Entry");
-        Set<TaskWorkItemManifestType> subscribedTopicSet = new HashSet<>();
-        if (!specifySubscriptionTopics().isEmpty()) {
-            for (DataParcelManifest currentTopicID : specifySubscriptionTopics()) {
-                TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
-                if (subscribedTopicSet.contains(taskWorkItem)) {
+        Set<DataParcelManifestSubscriptionMaskType> subscribedTopicSet = new HashSet<>();
+        if (!specifySubscriptions().isEmpty()) {
+            for (DataParcelManifestSubscriptionMaskType currentSubscription : specifySubscriptions()) {
+                if (subscribedTopicSet.contains(currentSubscription)) {
                     // Do nothing
                 } else {
-                    subscribedTopicSet.add(taskWorkItem);
+                    subscribedTopicSet.add(currentSubscription);
                 }
             }
         }
 
-        Set<TaskWorkItemManifestType> publishedTopicSet = new HashSet<>();
+        Set<DataParcelManifest> publishedTopicSet = new HashSet<>();
         if (!declarePublishedTopics().isEmpty()) {
             for (DataParcelManifest currentTopicID : declarePublishedTopics()) {
                 TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
@@ -430,8 +432,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
                 }
             }
         }
-        String participantName = getMeAsASoftwareComponent().getParticipantName();
-        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(participantName, getMeAsASoftwareComponent(),  publishedTopicSet, subscribedTopicSet);
+        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(getMeAsASoftwareComponent(),  publishedTopicSet, subscribedTopicSet);
         PetasosParticipant participant = null;
         if(participantRegistration != null){
             participant = participantRegistration.getParticipant();

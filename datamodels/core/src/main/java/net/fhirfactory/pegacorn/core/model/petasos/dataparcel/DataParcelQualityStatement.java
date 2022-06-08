@@ -47,7 +47,7 @@ public class DataParcelQualityStatement implements Serializable {
         this.contentNormalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_FALSE;
         this.contentValidationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_FALSE;
         this.contentExternalDistributionStatus = DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE;
-        this.contentInterSubsystemDistributable = DataParcelInternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE;
+        this.contentInterSubsystemDistributable = DataParcelInternallyDistributableStatusEnum.DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_FALSE;
     }
 
     public DataParcelQualityStatement(DataParcelQualityStatement ori){
@@ -56,7 +56,7 @@ public class DataParcelQualityStatement implements Serializable {
         this.contentNormalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_FALSE;
         this.contentValidationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_FALSE;
         this.contentExternalDistributionStatus = DataParcelExternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE;
-        this.contentInterSubsystemDistributable = DataParcelInternallyDistributableStatusEnum.DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE;
+        this.contentInterSubsystemDistributable = DataParcelInternallyDistributableStatusEnum.DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_FALSE;
 
         if(ori.hasContentPolicyEnforcementStatus()){
             setContentPolicyEnforcementStatus(ori.getContentPolicyEnforcementStatus());

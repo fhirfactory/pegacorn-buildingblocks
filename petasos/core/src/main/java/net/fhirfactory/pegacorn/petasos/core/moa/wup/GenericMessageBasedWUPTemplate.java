@@ -34,6 +34,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
@@ -86,7 +87,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     private PetasosParticipant meAsAPetasosParticipant;
     private RouteElementNames nameSet;
     private WUPArchetypeEnum wupArchetype;
-    private List<DataParcelManifest> topicSubscriptionSet;
+    private Set<DataParcelManifestSubscriptionMaskType> subscriptionSet;
     private MessageBasedWUPEndpointContainer egressEndpoint;
     private MessageBasedWUPEndpointContainer ingresEndpoint;
     private WorkUnitProcessorMetricsAgent metricsAgent;
@@ -185,7 +186,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             getLogger().info(".initialise(): [Building my PetasosParticipant] Finish");
 
             getLogger().info(".initialise(): [Setting the Topic Subscription Set] Start");
-            this.topicSubscriptionSet = specifySubscriptionTopics();
+            this.subscriptionSet = specifySubscriptions();
             getLogger().info(".initialise(): [Setting the Topic Subscription Set] Finish");
 
             getLogger().info(".initialise(): [Establish the WorkUnitProcessor Metrics Agent] Start");
@@ -227,7 +228,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     // To be implemented methods (in Specialisations)
     //
 
-    protected abstract List<DataParcelManifest> specifySubscriptionTopics();
+    protected abstract Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions();
     protected abstract List<DataParcelManifest> declarePublishedTopics();
     protected abstract WUPArchetypeEnum specifyWUPArchetype();
     protected abstract String specifyWUPInstanceName();
@@ -321,12 +322,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return wupArchetype;
     }
 
-    protected List<DataParcelManifest> getTopicSubscriptionSet() {
-        return topicSubscriptionSet;
+    protected Set<DataParcelManifestSubscriptionMaskType> getTopicSubscriptionSet() {
+        return subscriptionSet;
     }
 
-    protected void setTopicSubscriptionSet(List<DataParcelManifest> topicSubscriptionSet) {
-        this.topicSubscriptionSet = topicSubscriptionSet;
+    protected void setTopicSubscriptionSet(Set<DataParcelManifestSubscriptionMaskType> topicSubscriptionSet) {
+        this.subscriptionSet = topicSubscriptionSet;
     }
 
     protected String getVersion() {
@@ -452,19 +453,18 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     private PetasosParticipant buildPetasosParticipant(){
         getLogger().debug(".buildPetasosParticipant(): Entry");
-        Set<TaskWorkItemManifestType> subscribedTopicSet = new HashSet<>();
-        if (!specifySubscriptionTopics().isEmpty()) {
-            for (DataParcelManifest currentTopicID : specifySubscriptionTopics()) {
-                TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
-                if (subscribedTopicSet.contains(taskWorkItem)) {
+        Set<DataParcelManifestSubscriptionMaskType> subscribedTopicSet = new HashSet<>();
+        if (!specifySubscriptions().isEmpty()) {
+            for (DataParcelManifestSubscriptionMaskType currentSubscription : specifySubscriptions()) {
+                if (subscribedTopicSet.contains(currentSubscription)) {
                     // Do nothing
                 } else {
-                    subscribedTopicSet.add(taskWorkItem);
+                    subscribedTopicSet.add(currentSubscription);
                 }
             }
         }
 
-        Set<TaskWorkItemManifestType> publishedTopicSet = new HashSet<>();
+        Set<DataParcelManifest> publishedTopicSet = new HashSet<>();
         if (!declarePublishedTopics().isEmpty()) {
             for (DataParcelManifest currentTopicID : declarePublishedTopics()) {
                 TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
@@ -485,7 +485,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         } else {
             participantName = getMeAsATopologyComponent().getParticipantName();
         }
-        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(participantName, getMeAsATopologyComponent(),  publishedTopicSet, subscribedTopicSet);
+        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(getMeAsATopologyComponent(),  publishedTopicSet, subscribedTopicSet);
         PetasosParticipant participant = null;
         if(participantRegistration != null){
             participant = participantRegistration.getParticipant();

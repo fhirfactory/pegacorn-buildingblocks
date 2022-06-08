@@ -39,6 +39,7 @@ import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketB
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,13 +127,24 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
             uow.getEgressContent().addPayloadElement(egressContent);
             //
             // Do some metrics
-            WorkUnitProcessorMetricsAgent wupMetricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
-            wupMetricsAgent.incrementInternalMessageDistributionCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
-
+            if(uow.getPayloadTopicID().hasDestination()) {
+            	if(uow.getPayloadTopicID().getDestination().hasBoundaryPointProcessingPlantParticipantName()) {
+            		if(StringUtils.isNotEmpty(uow.getPayloadTopicID().getDestination().getBoundaryPointProcessingPlantParticipantName().getName())) {
+			            WorkUnitProcessorMetricsAgent wupMetricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+			            wupMetricsAgent.incrementInternalMessageDistributionCount(uow.getPayloadTopicID().getDestination().getBoundaryPointProcessingPlantParticipantName().getName());
+            		}
+            	}
+            }
             //
             // Do some Processing Plant metrics
-            plantMetricsAgentAccessor.getMetricsAgent().incrementInternalMessageDistributionCount(uow.getPayloadTopicID().getTargetProcessingPlantParticipantName());
-            plantMetricsAgentAccessor.getMetricsAgent().incrementInternalMessageDistributionCount();
+            if(uow.getPayloadTopicID().hasDestination()) {
+            	if(uow.getPayloadTopicID().getDestination().hasBoundaryPointProcessingPlantParticipantName()) {
+            		if(StringUtils.isNotEmpty(uow.getPayloadTopicID().getDestination().getBoundaryPointProcessingPlantParticipantName().getName())) {
+            			plantMetricsAgentAccessor.getMetricsAgent().incrementInternalMessageDistributionCount(uow.getPayloadTopicID().getDestination().getBoundaryPointProcessingPlantParticipantName().getName());
+            		}
+            	}
+            }
+  			plantMetricsAgentAccessor.getMetricsAgent().incrementInternalMessageDistributionCount();
 
         } else {
             uow.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_FAILED);

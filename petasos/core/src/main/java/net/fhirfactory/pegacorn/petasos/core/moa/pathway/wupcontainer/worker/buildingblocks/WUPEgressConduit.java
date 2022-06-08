@@ -28,6 +28,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelActivityLocation;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelBoundaryPointType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantName;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
@@ -102,13 +105,15 @@ public class WUPEgressConduit {
         getLogger().trace(".receiveFromWUP(): We only want to check if the UoW was successful and modify the JobCard/StatusElement accordingly.");
         getLogger().trace(".receiveFromWUP(): All detailed checking of the Cluster/SiteWide details is done in the WUPContainerEgressProcessor");
         //
-        // Ensure assignment of the ParticipantName
+        // Ensure assignment of the ParticipantName/ActivityLocation
         if(incomingUoW.hasEgressContent()){
             for(UoWPayload currentEgressPayload: incomingUoW.getEgressContent().getPayloadElements()){
                 if(currentEgressPayload.getPayloadManifest() != null){
-                    if(!currentEgressPayload.getPayloadManifest().hasSourceProcessingPlantParticipantName()){
-                        currentEgressPayload.getPayloadManifest().setSourceProcessingPlantParticipantName(participantNameHolder.getSubsystemParticipantName());
+                    if(!currentEgressPayload.getPayloadManifest().hasLastActivityLocation()) {
+                    	currentEgressPayload.getPayloadManifest().setLastActivityLocation(new DataParcelActivityLocation());
                     }
+                	currentEgressPayload.getPayloadManifest().getLastActivityLocation().setProcessingPlantParticipantName(new PetasosParticipantName(participantNameHolder.getSubsystemParticipantName()));
+                    currentEgressPayload.getPayloadManifest().getLastActivityLocation().setWorkUnitProcessorParticipantName(new PetasosParticipantName(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantName()));
                 }
             }
         }

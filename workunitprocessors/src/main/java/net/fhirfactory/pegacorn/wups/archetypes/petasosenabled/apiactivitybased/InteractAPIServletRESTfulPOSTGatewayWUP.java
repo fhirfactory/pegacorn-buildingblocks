@@ -22,16 +22,18 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.apiactivitybased;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCClusteredServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMessageBasedWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractAPIServletRESTfulPOSTGatewayWUP.class);
@@ -71,9 +73,9 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMes
      * @return An empty Set<TopicToken>
      */
     @Override
-    public List<DataParcelManifest> specifySubscriptionTopics() {
-        List<DataParcelManifest> subTopics = new ArrayList<>();
-        return(subTopics);
+    public Set<DataParcelManifestSubscriptionMaskType> specifySubscriptions() {
+    	Set<DataParcelManifestSubscriptionMaskType> subscriptions = new HashSet<>();
+        return(subscriptions);
     }
     
     abstract protected String specifyIngresEndpointPath();

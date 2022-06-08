@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
 
     private PetasosParticipantStatusEnum participantStatus;
     private Set<DataParcelManifestSubscriptionMaskType> subscriptions;
-    private Set<TaskWorkItemManifestType> publishedWorkItemManifests;
+    private Set<DataParcelManifest> publishedWorkItemManifests;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant utilisationUpdateInstant;
     private PetasosParticipantFulfillment fulfillmentState;
@@ -160,11 +161,11 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         this.subscriptions = subscriptions;
     }
 
-    public Set<TaskWorkItemManifestType> getPublishedWorkItemManifests() {
+    public Set<DataParcelManifest> getPublishedWorkItemManifests() {
         return publishedWorkItemManifests;
     }
 
-    public void setPublishedWorkItemManifests(Set<TaskWorkItemManifestType> publishedWorkItemManifests) {
+    public void setPublishedWorkItemManifests(Set<DataParcelManifest> publishedWorkItemManifests) {
         this.publishedWorkItemManifests = publishedWorkItemManifests;
     }
 

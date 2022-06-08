@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class DataParcelTypeDescriptorSubscriptionMaskType extends SubscriptionMaskBase {
-    private static final Logger LOG = LoggerFactory.getLogger(DataParcelTypeDescriptorSubscriptionMaskType.class);
+public class DataParcelDescriptorSubscriptionMaskType extends SubscriptionMaskBase {
+    private static final Logger LOG = LoggerFactory.getLogger(DataParcelDescriptorSubscriptionMaskType.class);
 
     private String dataParcelDefiner;
     private String dataParcelCategory;
@@ -49,7 +49,7 @@ public class DataParcelTypeDescriptorSubscriptionMaskType extends SubscriptionMa
     // Constructor(s)
     //
 
-    public DataParcelTypeDescriptorSubscriptionMaskType(){
+    public DataParcelDescriptorSubscriptionMaskType(){
         super();
         this.dataParcelCategory = null;
         this.dataParcelDefiner = null;
@@ -62,7 +62,7 @@ public class DataParcelTypeDescriptorSubscriptionMaskType extends SubscriptionMa
         this.dataParcelDiscriminatorValue = null;
     }
 
-    public DataParcelTypeDescriptorSubscriptionMaskType(DataParcelTypeDescriptorSubscriptionMaskType ori){
+    public DataParcelDescriptorSubscriptionMaskType(DataParcelDescriptorSubscriptionMaskType ori){
         super(ori);
         this.dataParcelCategory = null;
         this.dataParcelDefiner = null;
@@ -102,7 +102,7 @@ public class DataParcelTypeDescriptorSubscriptionMaskType extends SubscriptionMa
         }
     }
 
-    public DataParcelTypeDescriptorSubscriptionMaskType(DataParcelTypeDescriptor ori){
+    public DataParcelDescriptorSubscriptionMaskType(DataParcelTypeDescriptor ori){
         super();
         this.dataParcelCategory = null;
         this.dataParcelDefiner = null;
@@ -328,8 +328,8 @@ public class DataParcelTypeDescriptorSubscriptionMaskType extends SubscriptionMa
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DataParcelTypeDescriptorSubscriptionMaskType)) return false;
-        DataParcelTypeDescriptorSubscriptionMaskType that = (DataParcelTypeDescriptorSubscriptionMaskType) o;
+        if (!(o instanceof DataParcelDescriptorSubscriptionMaskType)) return false;
+        DataParcelDescriptorSubscriptionMaskType that = (DataParcelDescriptorSubscriptionMaskType) o;
         return Objects.equals(getDataParcelDefiner(), that.getDataParcelDefiner()) && Objects.equals(getDataParcelCategory(), that.getDataParcelCategory()) && Objects.equals(getDataParcelSubCategory(), that.getDataParcelSubCategory()) && Objects.equals(getDataParcelResource(), that.getDataParcelResource()) && Objects.equals(getDataParcelSegment(), that.getDataParcelSegment()) && Objects.equals(getDataParcelAttribute(), that.getDataParcelAttribute()) && Objects.equals(getDataParcelDiscriminatorType(), that.getDataParcelDiscriminatorType()) && Objects.equals(getDataParcelDiscriminatorValue(), that.getDataParcelDiscriminatorValue()) && Objects.equals(getVersion(), that.getVersion());
     }
 

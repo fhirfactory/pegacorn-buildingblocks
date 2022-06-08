@@ -21,6 +21,22 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosEdgeMessageForwarderService;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
@@ -28,6 +44,8 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantName;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
@@ -44,21 +62,6 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardF
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
-import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * @author Mark A. Hunter
@@ -212,10 +215,10 @@ public class LocalTaskDistributionBean {
 
         if (getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber)) {
             getLogger().trace(".forwardTask(): Has Remote Service as Target");
-            boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
             boolean hasWildcardTarget = false;
+            boolean hasEmptyIntendedTarget = !(getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID));
             if (getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)) {
-                hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+                hasWildcardTarget = payloadTopicID.getDestination().getBoundaryPointProcessingPlantParticipantName().getName().contentEquals( DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
             }
             boolean hasRemoteElement = getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber);
             getLogger().trace(".forwardTask(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
@@ -246,7 +249,7 @@ public class LocalTaskDistributionBean {
         PetasosFulfillmentTask petasosFulfillmentTask = fulfillmentTaskFactory.newFulfillmentTask(actionableTask.getInstance(), currentNodeElement);
         getLogger().trace(".forwardTask(): Create actually PetasosFulfillmentTask: petasosFulfillmentTask->{}", petasosFulfillmentTask);
         getLogger().trace(".forwardTask(): Create actually PetasosFulfillmentTask: Finish");
-        petasosFulfillmentTask.getTaskWorkItem().getPayloadTopicID().setTargetProcessingPlantParticipantName(subscriber.getSubsystemParticipantName());
+        petasosFulfillmentTask.getTaskWorkItem().getPayloadTopicID().getDestination().setBoundaryPointProcessingPlantParticipantName(new PetasosParticipantName(subscriber.getParticipantName()));
         //
         // Register The FulfillmentTask
         getLogger().trace(".forwardTask(): Register PetasosFulfillmentTask: Start");

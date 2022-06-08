@@ -34,6 +34,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipan
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestSetType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
@@ -89,7 +90,7 @@ public class LocalPetasosParticipantCacheIM {
 	}
 
 	@Deprecated
-	public PetasosParticipantRegistration registerPetasosParticipant(String preferredParticipantName, SoftwareComponent participantSoftwareComponent, Set<TaskWorkItemManifestType> publishedTopics, Set<TaskWorkItemManifestType> subscribedTopics) {
+	public PetasosParticipantRegistration registerPetasosParticipant(String preferredParticipantName, SoftwareComponent participantSoftwareComponent, Set<DataParcelManifest> publishedTopics, Set<DataParcelManifest> subscribedTopics) {
 		getLogger().debug(".registerPetasosParticipant(): Entry, preferredParticipantName->{}, participantSoftwareComponent->{}", preferredParticipantName, participantSoftwareComponent);
 		//
 		// 1st, some basic defensive programming and parameter checking
@@ -101,13 +102,13 @@ public class LocalPetasosParticipantCacheIM {
 
 			participantSoftwareComponent.setParticipantName(preferredParticipantName);
 		}
-		PetasosParticipantRegistration petasosParticipantRegistration = registerPetasosParticipant(participantSoftwareComponent, publishedTopics, subscribedTopics);
+		PetasosParticipantRegistration petasosParticipantRegistration = registerPetasosParticipantUsingManifestMatching(participantSoftwareComponent, publishedTopics, subscribedTopics);
 		getLogger().debug(".registerPetasosParticipant(): Exit, registeredParticipant->{}", petasosParticipantRegistration);
 		return(petasosParticipantRegistration);
 	}
 
 
-	public PetasosParticipantRegistration registerPetasosParticipant(SoftwareComponent participantSoftwareComponent, Set<TaskWorkItemManifestType> publishedTopics, Set<TaskWorkItemManifestType> subscribedTopics) {
+	public PetasosParticipantRegistration registerPetasosParticipantUsingManifestMatching(SoftwareComponent participantSoftwareComponent, Set<DataParcelManifest> publishedTopics, Set<DataParcelManifest> subscribedTopics) {
 		getLogger().debug(".registerPetasosParticipant(): Entry, participantSoftwareComponent->{}", participantSoftwareComponent);
 		if (participantSoftwareComponent == null || publishedTopics == null) {
 			getLogger().debug(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
@@ -116,14 +117,38 @@ public class LocalPetasosParticipantCacheIM {
 		PetasosParticipant participant = new PetasosParticipant(participantSoftwareComponent);
 		if (!publishedTopics.isEmpty()) {
 			getLogger().trace(".registerPetasosParticipant(): Has published topics");
-			for (TaskWorkItemManifestType currentParcelManifest : publishedTopics) {
+			for (DataParcelManifest currentParcelManifest : publishedTopics) {
 				participant.getPublishedWorkItemManifests().add(currentParcelManifest);
 			}
 		}
 		if(!subscribedTopics.isEmpty()) {
 			getLogger().trace(".registerPetasosParticipant(): Has topics to subscribe to!");
-			for (TaskWorkItemManifestType currentParcelManifest : subscribedTopics) {
+			for (DataParcelManifest currentParcelManifest : subscribedTopics) {
 				DataParcelManifestSubscriptionMaskType currentFilter = new DataParcelManifestSubscriptionMaskType(currentParcelManifest);
+				participant.getSubscriptions().add(currentFilter);
+			}
+		}
+		PetasosParticipantRegistration registeredParticipant = registerPetasosParticipant(participant);
+		getLogger().debug(".registerPetasosParticipant(): Exit, registeredParticipant->{}", registeredParticipant);
+		return(registeredParticipant);
+	}
+	
+	public PetasosParticipantRegistration registerPetasosParticipant(SoftwareComponent participantSoftwareComponent, Set<DataParcelManifest> publishedTopics, Set<DataParcelManifestSubscriptionMaskType> subscribedTopics) {
+		getLogger().debug(".registerPetasosParticipant(): Entry, participantSoftwareComponent->{}", participantSoftwareComponent);
+		if (participantSoftwareComponent == null || publishedTopics == null) {
+			getLogger().debug(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
+			return (null);
+		}
+		PetasosParticipant participant = new PetasosParticipant(participantSoftwareComponent);
+		if (!publishedTopics.isEmpty()) {
+			getLogger().trace(".registerPetasosParticipant(): Has published topics");
+			for (DataParcelManifest currentParcelManifest : publishedTopics) {
+				participant.getPublishedWorkItemManifests().add(currentParcelManifest);
+			}
+		}
+		if(!subscribedTopics.isEmpty()) {
+			getLogger().trace(".registerPetasosParticipant(): Has topics to subscribe to!");
+			for (DataParcelManifestSubscriptionMaskType currentFilter : subscribedTopics) {
 				participant.getSubscriptions().add(currentFilter);
 			}
 		}
@@ -162,22 +187,30 @@ public class LocalPetasosParticipantCacheIM {
 			for (DataParcelManifestSubscriptionMaskType currentSubscribedManifest : registeredParticipant.getSubscriptions()) {
 				getLogger().trace(".registerPetasosParticipant(): [Update local Subscription Map] adding topic->{}", currentSubscribedManifest);
 				boolean doSubscribe = true;
-				if(currentSubscribedManifest.hasSourceProcessingPlantParticipantName()) {
-					boolean sourceTaskProducerIsMe = currentSubscribedManifest.getSourceProcessingPlantParticipantName().equals(participantNameHolder.getSubsystemParticipantName());
-					boolean sourceSystemIsWildcard = false;
-					if(currentSubscribedManifest.hasExternalSourceSystem()){
-						sourceSystemIsWildcard = currentSubscribedManifest.getExternalSourceSystem().equals(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
-					}
-					if(sourceTaskProducerIsMe || sourceSystemIsWildcard){
-						doSubscribe = true;
+				if(currentSubscribedManifest.hasOriginMask()){
+					if(currentSubscribedManifest.getOriginMask().hasBoundaryPointProcessingPlantParticipantNameMask()) {
+						boolean sourceTaskProducerIsMe = currentSubscribedManifest.getOriginMask().getBoundaryPointProcessingPlantParticipantNameMask().getName().equals(participantNameHolder.getSubsystemParticipantName());
+						boolean sourceSystemIsWildcard = false;
+						if(currentSubscribedManifest.hasOriginMask()){
+							if(currentSubscribedManifest.getOriginMask().getAllowAll()) {
+								sourceSystemIsWildcard = true;
+							} else {
+								if(sourceSystemIsWildcard = currentSubscribedManifest.getOriginMask().hasBoundaryPointProcessingPlantParticipantNameMask()){
+									sourceSystemIsWildcard = currentSubscribedManifest.getOriginMask().getBoundaryPointProcessingPlantParticipantNameMask().getName().equals(DataParcelManifestSubscriptionMaskType.WILDCARD_CHARACTER);
+								}
+							}
+						}
+						if(sourceTaskProducerIsMe || sourceSystemIsWildcard){
+							doSubscribe = true;
+						} else {
+							doSubscribe = false;
+						}
 					} else {
-						doSubscribe = false;
+						doSubscribe = true;
 					}
-				} else {
-					doSubscribe = true;
-				}
-				if(doSubscribe) {
-					getParticipantSubscriptionMapDM().addSubscriber(currentSubscribedManifest, participant);
+					if(doSubscribe) {
+						getParticipantSubscriptionMapDM().addSubscriber(currentSubscribedManifest, participant);
+					}
 				}
 			}
 		}
@@ -213,9 +246,9 @@ public class LocalPetasosParticipantCacheIM {
 			return;
 		}
 		PetasosParticipant cachedPetasosParticipant = getParticipantCacheDM().getPetasosParticipant(participantComponent.getComponentID());
-		for(TaskWorkItemManifestType additionalWorkItem: workItemSet) {
+		for(DataParcelManifest additionalWorkItem: workItemSet) {
 			boolean alreadyInSet = false;
-			for (TaskWorkItemManifestType currentWorkItem : cachedPetasosParticipant.getPublishedWorkItemManifests()){
+			for (DataParcelManifest currentWorkItem : cachedPetasosParticipant.getPublishedWorkItemManifests()){
 				if(currentWorkItem.equals(additionalWorkItem)){
 					alreadyInSet = true;
 					break;
@@ -348,7 +381,7 @@ public class LocalPetasosParticipantCacheIM {
 		PetasosParticipant petasosParticipant = getPetasosParticipant(publisherId);
 		Set<DataParcelManifest> publishedWorkItems = new HashSet<>();
 		if (petasosParticipant != null) {
-			for (TaskWorkItemManifestType currentItemManifest : petasosParticipant.getPublishedWorkItemManifests()) {
+			for (DataParcelManifest currentItemManifest : petasosParticipant.getPublishedWorkItemManifests()) {
 				publishedWorkItems.add(currentItemManifest);
 			}
 		}
@@ -361,14 +394,14 @@ public class LocalPetasosParticipantCacheIM {
 	 * @param publisherId
 	 * @return
 	 */
-	public Set<TaskWorkItemManifestType> getProducedWorkItemManifests(ComponentIdType publisherId){
+	public Set<DataParcelManifest> getProducedWorkItemManifests(ComponentIdType publisherId){
 		getLogger().debug(".getPublishedParcels(): Entry, publisherId->{}", publisherId);
 		if(publisherId == null){
 			getLogger().debug(".getPublishedParcels(): Exit, publisherId is null, returning empty set");
 			return(new HashSet<>());
 		}
 		PetasosParticipant petasosParticipant = getPetasosParticipant(publisherId);
-		Set<TaskWorkItemManifestType> publishedWorkItems = new HashSet<>();
+		Set<DataParcelManifest> publishedWorkItems = new HashSet<>();
 		if(petasosParticipant != null) {
 			publishedWorkItems.addAll(petasosParticipant.getPublishedWorkItemManifests());
 		}

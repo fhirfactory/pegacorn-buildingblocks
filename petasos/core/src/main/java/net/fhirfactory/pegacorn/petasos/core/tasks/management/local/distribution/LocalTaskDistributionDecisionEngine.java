@@ -24,9 +24,10 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distributio
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets.DataParcelTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelManifestSubscriptionMaskType;
-import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelTypeDescriptorSubscriptionMaskType;
+import net.fhirfactory.pegacorn.core.model.petasos.subscription.datatypes.DataParcelDescriptorSubscriptionMaskType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -91,10 +92,14 @@ public class LocalTaskDistributionDecisionEngine {
         if(parcelManifest == null){
             return(false);
         }
-        if(StringUtils.isEmpty(parcelManifest.getDestination().getBoundaryPointExternalSubsystemName())){
-            return(false);
+        if(parcelManifest.hasDestination()) {
+        	if(parcelManifest.getDestination().hasBoundaryPointProcessingPlantParticipantName()) {
+		        if(StringUtils.isNotEmpty(parcelManifest.getDestination().getBoundaryPointProcessingPlantParticipantName().getName())){
+		            return(true);
+		        }
+        	}
         }
-        return(true);
+        return(false);
     }
 
     public boolean hasAtLeastOneSubscriber(DataParcelManifest parcelManifest){
@@ -196,46 +201,25 @@ public class LocalTaskDistributionDecisionEngine {
         boolean matchedManifestType = manifestTypeMatches(testManifest, subscription);
         getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
 
-        boolean matchedParticipantSource = sourceParticipantNameMatches(testManifest, subscription);
-        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedParticipantSource->{}",matchedParticipantSource);
+        boolean originMatches = originMatches(testManifest, subscription);
+        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: originMatches->{}",originMatches);
 
-        boolean matchedSource = sourceSystemMatches(testManifest, subscription);
-        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedSource->{}",matchedSource);
-
-        boolean matchedTarget = targetSystemMatches(testManifest, subscription);
-        getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
-
-        boolean matchedSourceInterfaceName = sourceParticipantInterfaceNameMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedSourceInterfaceName->{}",matchedSourceInterfaceName);
-
-        boolean matchedTargetInterfaceName = targetParticipantInterfaceNameMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedTargetInterfaceName->{}",matchedTargetInterfaceName);
-
-        boolean matchedSourceParticipantName = sourceParticipantNameMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedSourceParticipantName->{}",matchedSourceParticipantName);
-
-        boolean matchedTargetParticipantName = targetParticipantNameMatches(testManifest, subscription);
-        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: matchedTargetParticipantName->{}",matchedTargetParticipantName);
+        boolean destinationMatches = destinationMatches(testManifest, subscription);
+        getLogger().info(".applySubscriptionFilter(): Checking for equivalence/match: destinationMatches->{}",destinationMatches);
 
         boolean goodEnoughMatch = containerIsEqual
                 && contentIsEqual
                 && dataQualityMaskPasses
                 && matchedManifestType
-                && matchedSource
-                && matchedTarget
-                && matchedSourceParticipantName
-                && matchedTargetParticipantName
-                && matchedSourceInterfaceName
-                && matchedTargetInterfaceName;
+                && originMatches
+                && destinationMatches;
         getLogger().info(".filter(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
 
         boolean containerBasedOKMatch = containerOnlyIsEqual
                 && dataQualityMaskPasses
                 && matchedManifestType
-                && matchedSource
-                && matchedTarget
-                && matchedSourceInterfaceName
-                && matchedTargetInterfaceName;
+                && originMatches
+                && destinationMatches;
         getLogger().info(".filter(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 
         boolean passesFilter = goodEnoughMatch || containerBasedOKMatch;
@@ -299,7 +283,7 @@ public class LocalTaskDistributionDecisionEngine {
         }
 
         DataParcelTypeDescriptor testDescriptor = testManifest.getContentDescriptor();
-        DataParcelTypeDescriptorSubscriptionMaskType subscribedDescriptor = subscribedManifest.getContentDescriptorMask();
+        DataParcelDescriptorSubscriptionMaskType subscribedDescriptor = subscribedManifest.getContentDescriptorMask();
 
         boolean equalWithWildcardsInOther = subscribedDescriptor.applyMask(testDescriptor);
 
@@ -339,131 +323,66 @@ public class LocalTaskDistributionDecisionEngine {
         if (testManifest == null || subscribedManifest == null) {
             return (false);
         }
-        boolean manifestTypeMatches = subscribedManifest.getDataParcelTypeMask()(testManifest.getDataParcelType());
-        return(manifestTypeMatches);
-    }
-
-    private boolean sourceParticipantNameMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
-        if (testManifest == null && subscribedManifest == null) {
-            return (false);
-        }
-        if (testManifest == null || subscribedManifest == null) {
-            return (false);
-        }
-        boolean maskPasses = subscribedManifest.getOriginMask().applyMask(testManifest.getOrigin());
-        return(maskPasses);
-    }
-
-    private boolean targetParticipantNameMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
-        if (testManifest == null && subscribedManifest == null) {
-            return (false);
-        }
-        if (testManifest == null || subscribedManifest == null) {
-            return (false);
-        }
-        if(subscribedManifest.hasTargetProcessingPlantParticipantName()){
-            if(subscribedManifest.getTargetProcessingPlantParticipantName().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasTargetProcessingPlantParticipantName() && !subscribedManifest.hasTargetProcessingPlantParticipantName()){
-            return(true);
-        }
-        if (testManifest.hasTargetProcessingPlantParticipantName() && subscribedManifest.hasTargetProcessingPlantParticipantName()) {
-            boolean targetIsSame = testManifest.getTargetProcessingPlantParticipantName().contentEquals(subscribedManifest.getTargetProcessingPlantParticipantName());
-            return (targetIsSame);
+        switch(subscribedManifest.getDataParcelTypeMask()) {
+	        case PARCEL_TYPE_ANY:
+	        	return(true);
+	        case IPC_DATA_PARCEL_TYPE:
+	        	if(testManifest.getDataParcelType().equals( DataParcelTypeEnum.IPC_DATA_PARCEL_TYPE)){
+	        		return(true);
+	        	}
+	        	break;
+	        case SEARCH_QUERY_DATA_PARCEL_TYPE:
+	        	if(testManifest.getDataParcelType().equals( DataParcelTypeEnum.SEARCH_QUERY_DATA_PARCEL_TYPE)){
+	        		return(true);
+	        	}
+	        	break;
+	        case SEARCH_RESULT_DATA_PARCEL_TYPE:
+	        	if(testManifest.getDataParcelType().equals( DataParcelTypeEnum.SEARCH_RESULT_DATA_PARCEL_TYPE)){
+	        		return(true);
+	        	}
+	        	break;
+	        case GENERAL_DATA_PARCEL_TYPE:
+	        	if(testManifest.getDataParcelType().equals( DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE)){
+	        		return(true);
+	        	}
+	        	break;
         }
         return(false);
     }
 
-    private boolean sourceParticipantInterfaceNameMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
+    private boolean destinationMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
         if (testManifest == null && subscribedManifest == null) {
             return (false);
         }
         if (testManifest == null || subscribedManifest == null) {
             return (false);
         }
-        if(subscribedManifest.hasSourceProcessingPlantInterfaceName()){
-            if(subscribedManifest.getSourceProcessingPlantInterfaceName().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasSourceProcessingPlantInterfaceName() && !subscribedManifest.hasSourceProcessingPlantInterfaceName()){
-            return(true);
-        }
-        if (testManifest.hasSourceProcessingPlantInterfaceName() && subscribedManifest.hasSourceProcessingPlantInterfaceName()) {
-            boolean sourceIsSame = testManifest.getSourceProcessingPlantInterfaceName().contentEquals(subscribedManifest.getSourceProcessingPlantInterfaceName());
-            return (sourceIsSame);
-        }
-        return(false);
+        if(subscribedManifest.hasDestinationMask()) {
+        	boolean passes = subscribedManifest.getDestinationMask().applyMask(testManifest.getDestination());
+        	return(passes);
+        } 
+    	if(testManifest.hasDestination()) {
+    		return(false);
+    	} else {
+    		return(true);
+    	}
     }
 
-    private boolean targetParticipantInterfaceNameMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
+    private boolean originMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
         if (testManifest == null && subscribedManifest == null) {
             return (false);
         }
         if (testManifest == null || subscribedManifest == null) {
             return (false);
         }
-        if(subscribedManifest.hasTargetProcessingPlantInterfaceName()){
-            if(subscribedManifest.getTargetProcessingPlantInterfaceName().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasTargetProcessingPlantInterfaceName() && !subscribedManifest.hasTargetProcessingPlantInterfaceName()){
-            return(true);
-        }
-        if (testManifest.hasTargetProcessingPlantInterfaceName() && subscribedManifest.hasTargetProcessingPlantInterfaceName()) {
-            boolean targetIsSame = testManifest.getTargetProcessingPlantInterfaceName().contentEquals(subscribedManifest.getTargetProcessingPlantInterfaceName());
-            return (targetIsSame);
-        }
-        return(false);
-    }
-
-    private boolean sourceSystemMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
-        if (testManifest == null && subscribedManifest == null) {
-            return (false);
-        }
-        if (testManifest == null || subscribedManifest == null) {
-            return (false);
-        }
-        if(subscribedManifest.hasExternalSourceSystem()){
-            if(subscribedManifest.getExternalSourceSystem().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasSourceSystem() && !subscribedManifest.hasExternalSourceSystem()){
-            return(true);
-        }
-        if (testManifest.hasSourceSystem() && subscribedManifest.hasExternalSourceSystem()) {
-            boolean sourceIsSame = testManifest.getSourceSystem().contentEquals(subscribedManifest.getExternalSourceSystem());
-            return (sourceIsSame);
-        }
-        return(false);
-    }
-
-    private boolean targetSystemMatches(DataParcelManifest testManifest, DataParcelManifestSubscriptionMaskType subscribedManifest) {
-        if (testManifest == null && subscribedManifest == null) {
-            return (false);
-        }
-        if (testManifest == null || subscribedManifest == null) {
-            return (false);
-        }
-        if(subscribedManifest.hasExternalTargetSystem()){
-            if(subscribedManifest.getExternalTargetSystem().contentEquals("*")){
-                return(true);
-            }
-        }
-        if(!testManifest.hasIntendedTargetSystem() && !subscribedManifest.hasExternalTargetSystem()){
-            return(true);
-        }
-        if (testManifest.hasIntendedTargetSystem() && subscribedManifest.hasExternalTargetSystem()) {
-            boolean targetIsSame = testManifest.getIntendedTargetSystem().contentEquals(subscribedManifest.getExternalTargetSystem());
-            return (targetIsSame);
-        }
-        if(!subscribedManifest.hasExternalTargetSystem()){
-            return(true);
-        }
-        return(false);
+        if(subscribedManifest.hasOriginMask()) {
+        	boolean passes = subscribedManifest.getOriginMask().applyMask(testManifest.getOrigin());
+        	return(passes);
+        } 
+    	if(testManifest.hasOrigin()) {
+    		return(false);
+    	} else {
+    		return(true);
+    	}
     }
 }

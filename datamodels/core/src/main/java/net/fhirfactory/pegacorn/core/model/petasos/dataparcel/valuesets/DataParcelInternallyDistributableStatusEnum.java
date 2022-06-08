@@ -22,8 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.petasos.dataparcel.valuesets;
 
 public enum DataParcelInternallyDistributableStatusEnum {
-    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_TRUE("InternallyDistributable.True", "pegacorn.data-parcel.internally-distributable-status.true"),
-    DATA_PARCEL_EXTERNALLY_DISTRIBUTABLE_FALSE("InternallyDistributable.False", "pegacorn.data-parcel.internally-distributable-status.false");
+    DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_TRUE("InternallyDistributable.True", "pegacorn.data-parcel.internally-distributable-status.true"),
+    DATA_PARCEL_INTERNALLY_DISTRIBUTABLE_FALSE("InternallyDistributable.False", "pegacorn.data-parcel.internally-distributable-status.false");
 
     private String token;
     private String displayName;

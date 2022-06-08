@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.oversight.tasks.factories;
+package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
@@ -37,7 +37,7 @@ import javax.inject.Inject;
 
 public class PetasosAggregateTaskFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(net.fhirfactory.pegacorn.petasos.oversight.tasks.factories.PetasosAggregateTaskFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosAggregateTaskFactory.class);
 
     @Inject
     private TaskIdTypeFactory taskIdFactory;
