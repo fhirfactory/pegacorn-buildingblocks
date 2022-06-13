@@ -23,11 +23,14 @@ package net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets;
 
 public enum HL7v2VersionEnum {
     VERSION_UNKNOWN("unknown"),
+    VERSION_HL7_V21("2.1"),
+    VERSION_HL7_V22("2.2"),
     VERSION_HL7_V23("2.3"),
     VERSION_HL7_V231("2.3.1"),
     VERSION_HL7_V24("2.4"),
     VERSION_HL7_V25("2.5"),
-    VERSION_HL7_V251("2.5.1");
+    VERSION_HL7_V251("2.5.1"),
+    VERSION_HL7_V26("2.6");
 
     private String VersionText;
 
