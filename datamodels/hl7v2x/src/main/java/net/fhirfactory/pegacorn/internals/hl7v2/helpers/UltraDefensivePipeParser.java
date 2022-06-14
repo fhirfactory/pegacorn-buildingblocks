@@ -23,14 +23,16 @@ package net.fhirfactory.pegacorn.internals.hl7v2.helpers;
 
 import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.thymeleaf.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 public class UltraDefensivePipeParser {
@@ -85,6 +87,22 @@ public class UltraDefensivePipeParser {
     //
     // Business Methods
     //
+
+    public HL7v2SegmentTypeEnum getSegmentType(String segment){
+        getLogger().warn(".getSegmentType(): Entry, segment->{}", segment);
+        if(StringUtils.isEmpty(segment)){
+            getLogger().warn(".getSegmentType(): Exit, segment is empty, returning -null-");
+            return(null);
+        }
+        if(segment.length() < 3){
+            getLogger().warn(".getSegmentType(): Exit, segment is malformed, returning -null-");
+            return(null);
+        }
+        String segmentTypeString = segment.substring(0, 3);
+        HL7v2SegmentTypeEnum hl7v2SegmentTypeEnum = HL7v2SegmentTypeEnum.fromKey(segmentTypeString);
+        getLogger().warn(".getSegmentType(): Exit, hl7v2SegmentTypeEnum->{}", hl7v2SegmentTypeEnum);
+        return(hl7v2SegmentTypeEnum);
+    }
 
     public String extractSegment(String message, HL7v2SegmentTypeEnum segmentType){
 
@@ -182,6 +200,24 @@ public class UltraDefensivePipeParser {
             segmentList.add(currentSegment);
         }
         getLogger().debug(".getSegmentList(): Exit, segmentList->{}", segmentList);
+        return(segmentList);
+    }
+
+    public Map<Integer, String> getOrderedSegmentList(String message){
+        getLogger().debug(".getOrderedSegmentList(): Entry, message->{}", message);
+        if(StringUtils.isEmpty(message)){
+            getLogger().debug(".getOrderedSegmentList(): Exit, message is empty!");
+            return(new HashMap<>());
+        }
+        String[] segmentArray = message.lines().toArray(String[]::new);
+        Map<Integer, String> segmentList = new HashMap<>();
+        int segmentListSize = segmentArray.length;
+        for(int counter = 0; counter < segmentListSize; counter += 1){
+            String currentSegment = segmentArray[counter];
+            getLogger().debug("getOrderedSegmentList->{}", currentSegment);
+            segmentList.put(counter, currentSegment);
+        }
+        getLogger().debug(".getOrderedSegmentList(): Exit, segmentList->{}", segmentList);
         return(segmentList);
     }
 
