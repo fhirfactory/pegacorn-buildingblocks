@@ -27,5 +27,4 @@ import org.hl7.fhir.r4.model.Media;
 public interface PetasosMediaServiceClientWriterInterface {
     public MethodOutcome writeMediaAsynchronously(Media media);
     public MethodOutcome writeMediaSynchronously(Media media);
-    public MethodOutcome writeMediaJSONStringSynchronously(String mediaJSONString);
 }
