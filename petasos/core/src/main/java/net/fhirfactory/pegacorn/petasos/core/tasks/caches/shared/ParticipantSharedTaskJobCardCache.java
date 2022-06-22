@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -132,6 +134,20 @@ public class ParticipantSharedTaskJobCardCache {
 
         getLogger().debug(".getJobCard(): Exit, retrieved JobCard ->{}", petasosTaskJobCard);
         return(petasosTaskJobCard);
+    }
+
+    public List<TaskIdType> getJobCardTaskIdList(){
+        getLogger().debug(".getJobCardTaskIdList(): Entry");
+        List<TaskIdType> taskIdList = new ArrayList<>();
+        if(getActionableTaskJobCardMap().isEmpty()){
+            getLogger().debug(".getJobCardTaskIdList(): Exit, empty list... ");
+            return(taskIdList);
+        }
+        synchronized (getCacheLock()){
+            taskIdList.addAll(getActionableTaskJobCardMap().keySet());
+        }
+        getLogger().debug(".getJobCardTaskIdList(): Exit");
+        return(taskIdList);
     }
 
     //

@@ -22,11 +22,14 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalFulfillmentTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.common.WatchdogBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,20 +38,23 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class LocalPetasosTaskCleanupWatchdog {
+public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
     private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosTaskCleanupWatchdog.class);
 
-    private Long TASK_CONTINUITY_CHECK_INITIAL_DELAY = 60000L; // milliseconds
-    private Long TASK_CONTINUITY_CHECK_PERIOD = 15000L; // milliseconds
-    private Long MINIMUM_TASK_AGE_FOR_RETIREMENT = 15L; // Seconds
+    private Long TASK_CLEANUP_CHECK_INITIAL_DELAY = 60000L; // milliseconds
+    private Long TASK_CLEANUP_CHECK_PERIOD = 15000L; // milliseconds
+    private Long MINIMUM_TASK_AGE_FOR_RETIREMENT = 30L; // Seconds
 
     private Instant actionableTaskCheckInstant;
     private Instant taskJobCardCheckInstant;
+    private Instant fulfillmentTaskCheckInstant;
+
     private boolean initialised;
 
     @Inject
@@ -70,6 +76,7 @@ public class LocalPetasosTaskCleanupWatchdog {
     public LocalPetasosTaskCleanupWatchdog(){
         this.actionableTaskCheckInstant = Instant.EPOCH;
         this.taskJobCardCheckInstant = Instant.EPOCH;
+        this.fulfillmentTaskCheckInstant = Instant.EPOCH;
         this.initialised = false;
     }
 
@@ -85,7 +92,9 @@ public class LocalPetasosTaskCleanupWatchdog {
             return;
         } else {
             getLogger().info("GlobalPetasosTaskContinuityWatchdog::initialise(): Starting initialisation");
-            scheduleTaskContinuityWatchdog();
+            scheduleActionableTaskCacheWatchdog();
+            scheduleFulfillmentTaskCacheWatchdog();
+            scheduleJobCardCacheWatchdog();
             getLogger().info("GlobalPetasosTaskContinuityWatchdog::initialise(): Finished initialisation");
             this.initialised = true;
             getLogger().debug(".initialise(): Exit");
@@ -96,36 +105,63 @@ public class LocalPetasosTaskCleanupWatchdog {
     // Scheduling & Initialisation
     //
 
-    public void scheduleTaskContinuityWatchdog() {
-        getLogger().debug(".scheduleTaskContinuityWatchdog(): Entry");
-        TimerTask startupWatchdogTask = new TimerTask() {
+    public void scheduleActionableTaskCacheWatchdog() {
+        getLogger().debug(".scheduleActionableTaskCacheWatchdog(): Entry");
+        TimerTask actionableTaskCleanupActivity = new TimerTask() {
             public void run() {
-                getLogger().debug(".taskContinuityWatchdog(): Entry");
-                taskContinuityWatchdog();
-                getLogger().debug(".taskContinuityWatchdog(): Exit");
+                getLogger().debug(".actionableTaskCleanupActivity(): Entry");
+                actionableTaskCleanup();
+                getLogger().debug(".actionableTaskCleanupActivity(): Exit");
             }
         };
-        Timer timer = new Timer("taskContinuityWatchdogTimer");
-        timer.schedule(startupWatchdogTask, TASK_CONTINUITY_CHECK_INITIAL_DELAY, TASK_CONTINUITY_CHECK_PERIOD);
-        getLogger().debug(".scheduleTaskContinuityWatchdog(): Exit");
+        Timer timer = new Timer("actionableTaskCleanupActivityTimer");
+        timer.schedule(actionableTaskCleanupActivity, TASK_CLEANUP_CHECK_INITIAL_DELAY, TASK_CLEANUP_CHECK_PERIOD);
+        getLogger().debug(".scheduleActionableTaskCacheWatchdog(): Exit");
     }
 
+    public void scheduleFulfillmentTaskCacheWatchdog() {
+        getLogger().debug(".scheduleFulfillmentTaskCacheWatchdog(): Entry");
+        TimerTask fulfillmentTaskCleanupActivity = new TimerTask() {
+            public void run() {
+                getLogger().debug(".fulfillmentTaskCleanupActivity(): Entry");
+                fulfillmentTaskCleanup();
+                getLogger().debug(".fulfillmentTaskCleanupActivity(): Exit");
+            }
+        };
+        Timer timer = new Timer("fulfillmentTaskCleanupActivityTimer");
+        timer.schedule(fulfillmentTaskCleanupActivity, TASK_CLEANUP_CHECK_INITIAL_DELAY, TASK_CLEANUP_CHECK_PERIOD);
+        getLogger().debug(".scheduleFulfillmentTaskCacheWatchdog(): Exit");
+    }
+
+     public void scheduleJobCardCacheWatchdog() {
+         getLogger().debug(".scheduleJobCardCacheWatchdog(): Entry");
+         TimerTask jobCardCleanupActivity = new TimerTask() {
+             public void run() {
+                 getLogger().debug(".jobCardCleanupActivity(): Entry");
+                 jobCardCleanup();
+                 getLogger().debug(".jobCardCleanupActivity(): Exit");
+             }
+         };
+         Timer timer = new Timer("JobCardTaskCleanupActivityTimer");
+         timer.schedule(jobCardCleanupActivity, TASK_CLEANUP_CHECK_INITIAL_DELAY, TASK_CLEANUP_CHECK_PERIOD);
+         getLogger().debug(".scheduleJobCardCacheWatchdog(): Exit");
+     }
 
     //
     // Actionable Task Controller / Watchdog
     //
 
-    protected void taskContinuityWatchdog(){
-        getLogger().debug(".taskContinuityWatchdog(): Entry");
-        Set<TaskIdType> allTaskIds = actionableTaskDM.getAllTaskIds();
+    protected void actionableTaskCleanup(){
+        getLogger().debug(".actionableTaskCleanup(): Entry");
+        Set<TaskIdType> allTaskIds = getActionableTaskDM().getAllTaskIds();
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("ActionableTaskCacheSharedCache", allTaskIds.size());
         for(TaskIdType currentTaskId: allTaskIds){
             if(getLogger().isInfoEnabled()){
-                getLogger().debug(".taskContinuityWatchdog(): Checking task {}", currentTaskId);
+                getLogger().debug(".actionableTaskCleanup(): Checking task {}", currentTaskId);
             }
             boolean unregisterTask = false;
             synchronized (actionableTaskDM.getTaskLock(currentTaskId)){
-                PetasosActionableTask currentActionableTask = actionableTaskDM.getTask(currentTaskId);
+                PetasosActionableTask currentActionableTask = getActionableTaskDM().getTask(currentTaskId);
                 if(currentActionableTask.hasTaskCompletionSummary()){
                     if (currentActionableTask.getTaskCompletionSummary().isFinalised()) {
                         unregisterTask = true;
@@ -162,26 +198,102 @@ public class LocalPetasosTaskCleanupWatchdog {
                 }
             }
             if(unregisterTask){
-                getLogger().debug(".taskContinuityWatchdog(): Task {} is finalised, removing from shared cache... start", currentTaskId);
+                getLogger().debug(".actionableTaskCleanup(): Task {} is finalised, removing from shared cache... start", currentTaskId);
                 PetasosActionableTask unregisteredActionableTask = actionableTaskDM.removeTask(currentTaskId);
-                getLogger().debug(".taskContinuityWatchdog(): Task {} is finalised, removing from shared cache... done...");
-            }
-            if(getLogger().isDebugEnabled()){
-                getLogger().debug(".taskContinuityWatchdog(): Shared ActionableTaskCache size->{}", actionableTaskDM.getAllTaskIds().size());
+                getLogger().debug(".actionableTaskCleanup(): Task {} is finalised, removing from shared cache... done...");
             }
         }
-        // Some metrics for the FulfillmentCache
-        Integer taskCacheSize = fulfillmentTaskCache.getTaskCacheSize();
-        processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("LocalFulfillmentCache", taskCacheSize);
-        getLogger().debug(".taskContinuityWatchdog(): Exit");
+        // Some metrics for the ActionableTaskCache
+        Integer taskCacheSize = getActionableTaskDM().getCacheSize();
+        getLogger().debug(".actionableTaskCleanup(): ActionableTaskCacheSize->{}", taskCacheSize);
+        processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("SharedActionableTaskCache", taskCacheSize);
+        getLogger().debug(".actionableTaskCleanup(): Exit");
     }
 
     //
     // Task Job Card Controller / Watchdog
     //
 
-    protected void taskJobCardWatchdog(){
+    protected void jobCardCleanup(){
+        getLogger().debug(".jobCardCleanup(): Entry");
+        List<TaskIdType> allTaskIds = getTaskJobCardDM().getJobCardTaskIdList();
+        int size = allTaskIds.size();
+        Long nowInSeconds = Instant.now().getEpochSecond();
+        for(TaskIdType currentTaskId: allTaskIds) {
+            if (getLogger().isInfoEnabled()) {
+                getLogger().debug(".jobCardCleanup(): Checking task {}", currentTaskId);
+            }
+            PetasosTaskJobCard jobCard = getTaskJobCardDM().getJobCard(currentTaskId);
+            if(jobCard != null){
+                Long age = nowInSeconds - jobCard.getCreationInstant().getEpochSecond();
+                if(age > MINIMUM_TASK_AGE_FOR_RETIREMENT){
+                    taskJobCardDM.removeJobCard(jobCard);
+                    size -= 1;
+                }
+            }
+        }
+        // Some metrics for the JobCardCache
+        getLogger().debug(".jobCardCleanup(): jobCardCacheSize->{}", size);
+        processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("TaskJobCardCacheSize", size);
+        getLogger().debug(".jobCardCleanup(): Exit");
+    }
 
+    //
+    // Fulfillment Task Controller / Watchdog
+    //
+
+    protected void fulfillmentTaskCleanup(){
+        getLogger().debug(".fulfillmentTaskCleanup(): Entry");
+        List<PetasosFulfillmentTask> allTasks = fulfillmentTaskCache.getFulfillmentTaskList();
+        for(PetasosFulfillmentTask currentTask: allTasks){
+            if(getLogger().isInfoEnabled()){
+                getLogger().debug(".fulfillmentTaskCleanup(): Checking task {}", currentTask);
+            }
+            boolean unregisterTask = false;
+            if (currentTask.hasTaskFulfillment()) {
+                if (currentTask.getTaskFulfillment().hasStatus()) {
+                    switch (currentTask.getTaskFulfillment().getStatus()) {
+                        case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
+                        case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
+                        case FULFILLMENT_EXECUTION_STATUS_INITIATED:
+                        case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
+                        case FULFILLMENT_EXECUTION_STATUS_ACTIVE_ELSEWHERE:
+                        case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
+                        case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
+                        case FULFILLMENT_EXECUTION_STATUS_FINISHED:
+                        case FULFILLMENT_EXECUTION_STATUS_FAILED:
+                        case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
+                            Long age = Instant.now().getEpochSecond() - currentTask.getCreationInstant().getEpochSecond();
+                            if (age > MINIMUM_TASK_AGE_FOR_RETIREMENT) {
+                                unregisterTask = true;
+                            }
+                            break;
+                        case FULFILLMENT_EXECUTION_STATUS_FINALISED:
+                        case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
+                            unregisterTask = true;
+                            break;
+                    }
+                }
+            }
+            if(unregisterTask){
+                TaskIdType fulfillmentTaskId = currentTask.getTaskId();
+                TaskIdType actionableTaskId = currentTask.getActionableTaskId();
+                getLogger().debug(".fulfillmentTaskCleanup(): Task {} is finalised, removing from shared cache... start", fulfillmentTaskId);
+                PetasosTask unregisteredTask = fulfillmentTaskCache.removeTask(fulfillmentTaskId);
+                getLogger().debug(".fulfillmentTaskCleanup(): Task {} is finalised, removing from shared cache... done...", fulfillmentTaskId);
+                if(actionableTaskId != null){
+                    PetasosTaskJobCard jobCard = taskJobCardDM.getJobCard(actionableTaskId);
+                    if(jobCard != null) {
+                        taskJobCardDM.removeJobCard(jobCard);
+                    }
+                }
+            }
+        }
+        // Some metrics for the FulfillmentCache
+        Integer taskCacheSize = fulfillmentTaskCache.getTaskCacheSize();
+        getLogger().debug(".fulfillmentTaskCleanup(): fulfillmentTaskCacheSize->{}", taskCacheSize);
+        processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("LocalFulfillmentCache", taskCacheSize);
+        getLogger().debug(".fulfillmentTaskCleanup(): Exit");
     }
 
     //
