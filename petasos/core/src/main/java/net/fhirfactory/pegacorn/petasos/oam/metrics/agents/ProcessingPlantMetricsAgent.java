@@ -128,15 +128,19 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     //
 
     public void updateLocalCacheStatus(String cacheName, Integer cacheSize){
+        getLogger().debug(".updateLocalCacheStatus(): Entry, cacheName->{}, cacheSize->{}", cacheName, cacheSize);
         if(StringUtils.isEmpty(cacheName) || cacheSize == null){
+            getLogger().debug(".updateLocalCacheStatus(): Exit, cacheName or cacheSize is null or empty");
             return;
         }
         synchronized (getMetricsDataLock()) {
             if (getProcessingPlantMetricsData().getLocalCacheSize().containsKey(cacheName)) {
                 getProcessingPlantMetricsData().getLocalCacheSize().replace(cacheName, cacheSize);
+            } else {
+                getProcessingPlantMetricsData().getLocalCacheSize().put(cacheName, cacheSize);
             }
-            getProcessingPlantMetricsData().getLocalCacheSize().put(cacheName, cacheSize);
         }
+        getLogger().debug(".updateLocalCacheStatus(): Exit");
     }
 
     public void incrementSynchronousAuditEventWritten(){

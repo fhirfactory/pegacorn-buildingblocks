@@ -83,6 +83,11 @@ public class ParticipantSharedActionableTaskCache implements PetasosTaskCacheSer
     // Business Methods
     //
 
+    public int getCacheSize(){
+        int size = taskCache.size();
+        return(size);
+    }
+
     @Override
     public PetasosTask registerTask(PetasosTask task){
         getLogger().debug(".registerActionableTask(): Entry, task->{}", task);

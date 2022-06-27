@@ -56,6 +56,8 @@ public class PetasosTaskJobCard implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant lastActivityCheckInstant;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant creationInstant;
 
     private PetasosTaskExecutionStatusEnum currentStatus;
     private PetasosTaskExecutionStatusEnum lastRequestedStatus;
@@ -82,6 +84,7 @@ public class PetasosTaskJobCard implements Serializable {
         this.executingWorkUnitProcessor = null;
         this.workUnitProcessorParticipantName = null;
         this.actionableTaskAffinityNode = null;
+        this.creationInstant = Instant.now();
     }
 
     public PetasosTaskJobCard(
@@ -107,6 +110,7 @@ public class PetasosTaskJobCard implements Serializable {
         this.executingWorkUnitProcessor = null;
         this.workUnitProcessorParticipantName = null;
         this.actionableTaskAffinityNode = null;
+        this.creationInstant = Instant.now();
 
         //
         // Assign provided values
@@ -178,6 +182,7 @@ public class PetasosTaskJobCard implements Serializable {
         if(ori.hasWorkUnitProcessorParticipantName()){
             setWorkUnitProcessorParticipantName(ori.getWorkUnitProcessorParticipantName());
         }
+        setCreationInstant(ori.getCreationInstant());
     }
 
     //
@@ -230,11 +235,21 @@ public class PetasosTaskJobCard implements Serializable {
         if(other.hasLastActivityCheckInstant()){
             setLastActivityCheckInstant(other.getLastActivityCheckInstant());
         }
+        setCreationInstant(other.getCreationInstant());
     }
 
     //
     // Getters (and Setters)
     //
+
+
+    public Instant getCreationInstant() {
+        return creationInstant;
+    }
+
+    public void setCreationInstant(Instant creationInstant) {
+        this.creationInstant = creationInstant;
+    }
 
     @JsonIgnore
     public boolean hasActionableTaskAffinityNode(){
@@ -452,6 +467,7 @@ public class PetasosTaskJobCard implements Serializable {
                 ", grantedStatus=" + grantedStatus +
                 ", clusterMode=" + clusterMode +
                 ", systemMode=" + systemMode +
+                ", creationInstant=" + creationInstant +
                 '}';
     }
 }
