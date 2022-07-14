@@ -22,6 +22,7 @@ import net.fhirfactory.pegacorn.csv.core.validator.annotation.ExpectedValues;
 import net.fhirfactory.pegacorn.csv.core.validator.annotation.Length;
 import net.fhirfactory.pegacorn.csv.core.validator.annotation.Mandatory;
 import net.fhirfactory.pegacorn.csv.core.validator.annotation.Money;
+import net.fhirfactory.pegacorn.csv.core.validator.annotation.Number;
 import net.fhirfactory.pegacorn.csv.core.validator.annotation.Properties;
 
 /**

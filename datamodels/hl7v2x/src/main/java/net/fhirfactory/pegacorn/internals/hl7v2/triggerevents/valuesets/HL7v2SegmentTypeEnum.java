@@ -230,4 +230,13 @@ public enum HL7v2SegmentTypeEnum {
     public Double getUntil() {
         return until;
     }
+
+    public static final HL7v2SegmentTypeEnum fromKey(String key){
+        for(HL7v2SegmentTypeEnum currentValue: values()){
+            if(currentValue.getKey().equalsIgnoreCase(key)){
+                return(currentValue);
+            }
+        }
+        return(null);
+    }
 }

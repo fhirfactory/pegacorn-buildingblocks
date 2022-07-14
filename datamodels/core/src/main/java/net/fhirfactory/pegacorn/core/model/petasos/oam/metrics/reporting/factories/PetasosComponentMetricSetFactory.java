@@ -136,6 +136,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(!plantMetricsData.getLocalCacheSize().isEmpty()){
             for(String currentCacheMetricName: plantMetricsData.getLocalCacheSize().keySet()){
+                getLogger().trace(".convertProcessingPlantMetricsData(): Processing, currentCacheMetricName->{}, value->{}", currentCacheMetricName, plantMetricsData.getLocalCacheSize().get(currentCacheMetricName));
                 PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
                 componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
                 componentStatusMetric.setMetricSource(plantMetricsData.getComponentID());
