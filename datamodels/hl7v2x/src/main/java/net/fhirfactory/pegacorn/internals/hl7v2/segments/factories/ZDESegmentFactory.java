@@ -81,7 +81,7 @@ public class ZDESegmentFactory {
             zdeSegment.setCommentType("");
         }
         zdeStringBuilder.append("ZDE").append("|");
-        zdeStringBuilder.append(Integer.toString(zdeSegment.getSetId())).append("|"s);
+        zdeStringBuilder.append(Integer.toString(zdeSegment.getSetId())).append("|");
         zdeStringBuilder.append(zdeSegment.getSource()).append("|");
         zdeStringBuilder.append(zdeSegment.getComment()).append("|");
         zdeStringBuilder.append(zdeSegment.getCommentType()).append("\r");
