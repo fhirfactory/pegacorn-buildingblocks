@@ -34,6 +34,8 @@ import org.hl7.fhir.r4.model.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
@@ -100,5 +102,28 @@ public class PegacornIdentifierFactory {
         LOG.debug(".newIdentifier(): Exit, identifier->{}", identifier);
         return(identifier);
     }
+    
+    @VisibleForTesting
+    public void setPegacornIdentifierCodeSystemFactory(PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory) {
+    	this.pegacornIdentifierCodeSystemFactory = pegacornIdentifierCodeSystemFactory;
+    }
+    
+    
+    @VisibleForTesting
+    public void setSiteIdentification(DeploymentSystemSiteIdentificationInterface siteIdentification) {
+    	this.siteIdentification = siteIdentification;
+    }
+    
+    @VisibleForTesting
+    public void setPegacornReferenceProperties(PegacornReferenceProperties pegacornReferenceProperties) {
+    	this.pegacornReferenceProperties = pegacornReferenceProperties;
+    }
+    
+    @VisibleForTesting
+    public void setDeploymentInstanceDetailInterface(DeploymentInstanceDetailInterface deploymentInstanceDetailInterface) {
+    	this.deploymentInstanceDetailInterface = deploymentInstanceDetailInterface;
+    }
+
+
 
 }

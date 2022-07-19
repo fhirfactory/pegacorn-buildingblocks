@@ -29,6 +29,7 @@ public enum PetasosEndpointFunctionTypeEnum {
     PETASOS_INTERCEPTION_ENDPOINT("petasos.endpoint_function.interception_services", "InterceptionServices", "JGroups.InterceptionServices"),
     PETASOS_TASKING_ENDPOINT("petasos.endpoint_function.tasking_services", "TaskingServices", "JGroups.TaskingServices"),
     PETASOS_AUDIT_ENDPOINT("petasos.endpoint_function.audit_services", "AuditServices", "JGroups.AuditServices"),
+    PETASOS_MEDIA_ENDPOINT("petasos.endpoint_function.media_services", "MediaServices", "JGroups.MediaServices"),
     PETASOS_METRICS_ENDPOINT("petasos.endpoint_function.metrics_services", "MetricsServices", "JGroups.MetricServices"),
     PETASOS_TOPOLOGY_ENDPOINT("petasos.endpoint_function.topology_services", "TopologyServices", "JGroups.TopologyServices");
 

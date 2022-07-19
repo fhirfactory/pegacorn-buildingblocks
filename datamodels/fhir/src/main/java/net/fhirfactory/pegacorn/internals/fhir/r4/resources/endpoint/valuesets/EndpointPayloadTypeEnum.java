@@ -28,6 +28,7 @@ public enum EndpointPayloadTypeEnum {
     ENDPOINT_PAYLOAD_INTERNAL_SUBSCRIPTION("Messaging.Subscriptions", "pegacorn.internal.messaging.payload.subscriptions", "Internal Messaging Payload (Publish/Subscribe Request/Response)"),
     ENDPOINT_PAYLOAD_INTERNAL_INTERCEPTION("Messaging.Interception", "pegacorn.internal.messaging.payload.interception", "Internal Messaging Payload (Interception Data)"),
     ENDPOINT_PAYLOAD_INTERNAL_AUDITEVENTS("Messaging.AuditEvents", "pegacorn.internal.messaging.payload.audit_events", "Internal Messaging Payload (Audit Events)"),
+    ENDPOINT_PAYLOAD_INTERNAL_MEDIA("Messaging.Media", "pegacorn.internal.messaging.payload.media", "Internal Messaging Payload (Media)"),
     ENDPOINT_PAYLOAD_INTERNAL_TASKS("Messaging.Tasks", "pegacorn.internal.messaging.payload.tasks", "Internal Messaging Payload (Petasos Tasks Distribution/Replication)"),
     ENDPOINT_PAYLOAD_FHIR("HL7.FHIR", "pegacorn.general.messaging.payload.hl7_fhir", "RESTful HL7 FHIR Operations"),
     ENDPOINT_PAYLOAD_HL7_V2X("HL7.v2x", "pegacorn.general.messaging.payload.hl7_v2x", "MLLP Transported HL7 Version 2.x Events");

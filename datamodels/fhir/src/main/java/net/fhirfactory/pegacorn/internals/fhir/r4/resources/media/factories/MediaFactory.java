@@ -21,12 +21,44 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.media.factories;
 
+import java.util.Date;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Media;
+import org.hl7.fhir.r4.model.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
+import com.google.common.annotations.VisibleForTesting;
+
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
 
 @ApplicationScoped
 public class MediaFactory {
     private static final Logger LOG = LoggerFactory.getLogger(MediaFactory.class);
+
+    @Inject
+    private PegacornIdentifierFactory identifierFactory;
+
+	
+    public Media newMediaResource(String idValue, Date date) {
+        LOG.debug(".newMediaResource(): Entry, idValue->{}, date->{}", idValue, date);
+        Media mediaResource = new Media();
+        Period newPeriod = new Period();
+        newPeriod.setStart(date);
+        Identifier baseIdentifier = identifierFactory.newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER,idValue,newPeriod);
+        mediaResource.addIdentifier(baseIdentifier);
+
+        LOG.debug(".newMediaResource(): Exit, mediaResource->{}", mediaResource);
+        return(mediaResource);
+    }
+    
+    @VisibleForTesting
+    public void setIdentifierFactory(PegacornIdentifierFactory identifierFactory) {
+    	this.identifierFactory = identifierFactory;
+    }
 }

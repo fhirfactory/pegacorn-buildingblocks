@@ -124,12 +124,12 @@ public abstract class PetasosMediaServicesEndpoint extends JGroupsIntegrationPoi
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
-        return (PetasosEndpointFunctionTypeEnum.PETASOS_AUDIT_ENDPOINT);
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_MEDIA_ENDPOINT);
     }
 
     @Override
     protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
-        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_AUDITEVENTS);
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_MEDIA);
     }
 
     //

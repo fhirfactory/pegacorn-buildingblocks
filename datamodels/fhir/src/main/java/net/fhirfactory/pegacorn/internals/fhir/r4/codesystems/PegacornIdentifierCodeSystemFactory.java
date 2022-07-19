@@ -26,6 +26,8 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.StringType;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -51,5 +53,10 @@ public class PegacornIdentifierCodeSystemFactory {
         idType.getCoding().add(idTypeCoding);
         idType.setText(identifierCode.getDisplayText());
         return(idType);
+    }
+    
+    @VisibleForTesting
+    public void setSystemWideProperties(PegacornReferenceProperties systemWideProperties) {
+    	this.systemWideProperties = systemWideProperties;
     }
 }
