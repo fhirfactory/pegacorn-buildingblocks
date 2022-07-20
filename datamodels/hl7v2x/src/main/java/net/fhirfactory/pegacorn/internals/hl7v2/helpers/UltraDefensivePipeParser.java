@@ -103,6 +103,37 @@ public class UltraDefensivePipeParser {
         getLogger().warn(".getSegmentType(): Exit, hl7v2SegmentTypeEnum->{}", hl7v2SegmentTypeEnum);
         return(hl7v2SegmentTypeEnum);
     }
+    
+    public boolean hasSegmentType(String message, HL7v2SegmentTypeEnum segmentType) {
+        if(StringUtils.isEmpty(message)){
+            return(false);
+        }
+        List<String> segmentList = getSegmentList(message);
+
+        for(String currentSegment: segmentList){
+            if(currentSegment.startsWith(segmentType.getKey())){
+            	return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean hasMatchingPatternInSegmentType(String message, String pattern, HL7v2SegmentTypeEnum segmentType) {
+        if(StringUtils.isEmpty(message) || StringUtils.isEmpty(pattern)){
+            return(false);
+        }
+        List<String> segmentList = getSegmentList(message);
+
+        for(String currentSegment: segmentList){
+            if(currentSegment.startsWith(segmentType.getKey())){
+            	if(currentSegment.contains(pattern)) {
+            		return true;
+            	}
+            }
+        }
+        return false; //Not found
+    }
+
 
     public String extractSegment(String message, HL7v2SegmentTypeEnum segmentType){
 
@@ -113,7 +144,7 @@ public class UltraDefensivePipeParser {
         String segment = getSegment(segmentList, segmentType.getKey(),1);
         return(segment);
     }
-
+   
 
 
     public List<String> extractMetadataFromHL7v2xMessage(String messageString){
