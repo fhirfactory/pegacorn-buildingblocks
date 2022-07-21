@@ -29,6 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
 
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.v24.group.ORU_R01_OBSERVATION;
+import ca.uhn.hl7v2.model.v24.group.ORU_R01_ORDER_OBSERVATION;
+import ca.uhn.hl7v2.model.v24.group.ORU_R01_PATIENT_RESULT;
+import ca.uhn.hl7v2.model.v24.message.ORU_R01;
+import ca.uhn.hl7v2.model.v24.segment.OBX;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
@@ -36,7 +44,10 @@ import java.util.List;
 
 @ApplicationScoped
 public class MediaExtractor extends UltraDefensivePipeParser {
-    private static final Logger LOG = LoggerFactory.getLogger(MediaExtractor.class);
+    private static final String OBX_KEY = HL7v2SegmentTypeEnum.OBX.getKey();
+	private static final Logger LOG = LoggerFactory.getLogger(MediaExtractor.class);
+    private static final String BASE64_PATTERN = "^Base64^";
+
 
     private boolean initialised;
 
@@ -93,13 +104,51 @@ public class MediaExtractor extends UltraDefensivePipeParser {
             return(null);
         }
         List<String> segmentList = getSegmentList(message);
-        String segment = getSegment(segmentList, HL7v2SegmentTypeEnum.OBX.getKey(),1);
+        String segment = getSegment(segmentList, OBX_KEY,1);
         return(segment);
     }
+    
+    public String extractNextAttachmentSegment(String message) {
+        if(StringUtils.isEmpty(message)){
+            return(null);
+        }
+        List<String> segmentList = getSegmentList(message);
+        for(String currentSegment: segmentList){
+            if(currentSegment.startsWith(OBX_KEY)){
+            	if(currentSegment.contains(BASE64_PATTERN)) {
+            		return (currentSegment);
+            	}
+            }
+        }
+        return (null);
+    }
+    public String[] breakSegmentIntoChunks(String message) {
+    	if(StringUtils.isEmpty(message)){
+            return(null);
+        }
+    	return message.split("\\|");
+    }
+    public String rebuildSegmentFromChunks(String[] chunks) {
+    	if(chunks == null || chunks.length == 0) {
+    		return (null);
+    	}
+    	StringBuilder sb = new StringBuilder();
+    	for(int i = 0; i < chunks.length; i++) {
+    		sb.append(chunks[i]);
+    		sb.append('|');
+    	}
+    	//Get rid of the final |
+    	return sb.substring(0, sb.length() - 1);
+    }
 
-    public String replaceOBXSegment(String message, String replacement) {
-    	//TODO KS transformation here
-    	return (message);
+    public String replaceAttachmentSegment(String message, String filePath) {
+    	String obx = extractNextAttachmentSegment(message);
+    	String[] chunks = breakSegmentIntoChunks(obx);
+    	chunks[2] = "RP";
+    	chunks[5] = filePath;
+    	String fixed = rebuildSegmentFromChunks(chunks);
+    	message = message.replace(obx, fixed); //XXX inefficient?
+       	return (message);
     }
 
 	public Media populateMedia(String obxSegment) {

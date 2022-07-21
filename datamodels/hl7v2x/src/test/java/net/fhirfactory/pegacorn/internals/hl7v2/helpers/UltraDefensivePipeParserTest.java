@@ -35,10 +35,10 @@ class UltraDefensivePipeParserTest {
     }
     
     @Test
-    void testPatterMatcher( ) {
+    void testPatterMatcher() {
     	Message message;
 		try {
-			message = loadORUResource();
+			message = loadORUAttachmentResource();
 			Assertions.assertFalse(defensivePipeParser.hasMatchingPatternInSegmentType(message.encode(), "^Base63^", HL7v2SegmentTypeEnum.OBX));
 			Assertions.assertTrue(defensivePipeParser.hasMatchingPatternInSegmentType(message.encode(), "^Base64^", HL7v2SegmentTypeEnum.OBX));
 		} catch (IOException e) {
@@ -48,13 +48,16 @@ class UltraDefensivePipeParserTest {
 		}
     	
     }
-    
 	
-	private Message loadORUResource() throws IOException {
+	private Message loadORUAttachmentResource() throws IOException {
 		Path filePath = Path.of("./src/test/resources/hl7/message/oru_r01_wth_attachment.txt");
 		return loadResource(filePath);
 	}
 	
+	private Message loadORUInlineResource() throws IOException {
+		Path filePath = Path.of("./src/test/resources/hl7/message/oru_r01_inline.txt");
+		return loadResource(filePath);
+	}	
 	
 	
 	private Message loadResource(Path filePath) throws IOException {
