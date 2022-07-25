@@ -21,32 +21,24 @@
  */
 package net.fhirfactory.pegacorn.internals.hl7v2.helpers;
 
-import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import java.util.List;
 
-import org.hl7.fhir.r4.model.Media;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
 
-import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v24.group.ORU_R01_OBSERVATION;
-import ca.uhn.hl7v2.model.v24.group.ORU_R01_ORDER_OBSERVATION;
-import ca.uhn.hl7v2.model.v24.group.ORU_R01_PATIENT_RESULT;
-import ca.uhn.hl7v2.model.v24.message.ORU_R01;
-import ca.uhn.hl7v2.model.v24.segment.OBX;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
-import java.util.List;
+import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentTypeEnum;
 
 @ApplicationScoped
-public class MediaExtractor extends UltraDefensivePipeParser {
+public class MediaPipeParser extends UltraDefensivePipeParser {
     private static final String OBX_KEY = HL7v2SegmentTypeEnum.OBX.getKey();
-	private static final Logger LOG = LoggerFactory.getLogger(MediaExtractor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MediaPipeParser.class);
     private static final String BASE64_PATTERN = "^Base64^";
+	private static final String PREFIX = "<fhir-resource>https://hestia-dam-service/fhir/r4/media/id=";
+	private static final String SUFFIX = "</fhir-resource>";
 
 
     private boolean initialised;
@@ -55,7 +47,7 @@ public class MediaExtractor extends UltraDefensivePipeParser {
     // Constructor(s)
     //
 
-    public MediaExtractor(){
+    public MediaPipeParser(){
         initialised = false;
     }
 
@@ -112,16 +104,27 @@ public class MediaExtractor extends UltraDefensivePipeParser {
         if(StringUtils.isEmpty(message)){
             return(null);
         }
-        List<String> segmentList = getSegmentList(message);
+        return extractSegmentWithPattern(message, BASE64_PATTERN);
+    }
+    
+    public String extractNextAlteredSegment(String message) {
+        if(StringUtils.isEmpty(message)){
+            return(null);
+        }
+        return extractSegmentWithPattern(message, PREFIX);
+    }
+
+	private String extractSegmentWithPattern(String message, String pattern) {
+		List<String> segmentList = getSegmentList(message);
         for(String currentSegment: segmentList){
             if(currentSegment.startsWith(OBX_KEY)){
-            	if(currentSegment.contains(BASE64_PATTERN)) {
+            	if(currentSegment.contains(pattern)) {
             		return (currentSegment);
             	}
             }
         }
         return (null);
-    }
+	}
     public String[] breakSegmentIntoChunks(String message) {
     	if(StringUtils.isEmpty(message)){
             return(null);
@@ -141,20 +144,35 @@ public class MediaExtractor extends UltraDefensivePipeParser {
     	return sb.substring(0, sb.length() - 1);
     }
 
-    public String replaceAttachmentSegment(String message, String filePath) {
+    public String replaceAttachmentSegment(String message, String id) {
     	String obx = extractNextAttachmentSegment(message);
     	String[] chunks = breakSegmentIntoChunks(obx);
     	chunks[2] = "RP";
-    	chunks[5] = filePath;
+    	chunks[5] = buildfilePathOutOfId(id);
     	String fixed = rebuildSegmentFromChunks(chunks);
     	message = message.replace(obx, fixed); //XXX inefficient?
        	return (message);
     }
+    
+    public String buildfilePathOutOfId(String id) {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append(PREFIX);
+    	sb.append(id);
+    	sb.append(SUFFIX);
+    	return sb.substring(0);
+    }
 
-	public Media populateMedia(String obxSegment) {
-		Media media = new Media();
-		//TODO KS populate me!
-		return media;
+	public String extractIdFromAlteredSegment(String segment) {
+		if(StringUtils.isEmpty(segment)) {
+			return (null);
+		}
+		int prefixIndex = segment.indexOf(PREFIX);
+		int suffixIndex = segment.indexOf(SUFFIX);
+				
+		if(prefixIndex >= 0) {
+			return segment.substring(prefixIndex + PREFIX.length(), suffixIndex);
+		}
+		return (null);
 	}
 
 }

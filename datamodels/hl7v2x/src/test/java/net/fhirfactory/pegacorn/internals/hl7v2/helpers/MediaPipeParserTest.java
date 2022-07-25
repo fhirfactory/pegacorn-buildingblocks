@@ -14,8 +14,8 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
 
-public class MediaExtractorTest {
-	private MediaExtractor mediaExtractor;
+public class MediaPipeParserTest {
+	private MediaPipeParser mediaParser;
     private Parser pipeParser;
 	
 	@SuppressWarnings("resource")
@@ -24,14 +24,14 @@ public class MediaExtractorTest {
 		pipeParser = new DefaultHapiContext().getPipeParser();
         pipeParser.getParserConfiguration().setValidating(false);
         pipeParser.getParserConfiguration().setEncodeEmptyMandatoryFirstSegments(true);
-        mediaExtractor = new MediaExtractor();
+        mediaParser = new MediaPipeParser();
 	}
 	
 	@Test
 	public void testParseOBXSegmentsIntoChunks() {
 		try {
 			String message = loadORUAttachmentResource().encode();
-			String obxSegment = mediaExtractor.extractNextAttachmentSegment(message);
+			String obxSegment = mediaParser.extractNextAttachmentSegment(message);
 			Assertions.assertNotNull(obxSegment);
 			System.out.println(obxSegment);
 			int count = 0;
@@ -41,10 +41,10 @@ public class MediaExtractorTest {
 				}
 			}
 			System.out.println("Count: " + count);
-			String[] segments = mediaExtractor.breakSegmentIntoChunks(obxSegment );
+			String[] segments = mediaParser.breakSegmentIntoChunks(obxSegment );
 			Assertions.assertNotNull(segments);
 			Assertions.assertEquals(StringUtils.countMatches(obxSegment, '|') + 1, segments.length);
-			String rejoined = mediaExtractor.rebuildSegmentFromChunks(segments);
+			String rejoined = mediaParser.rebuildSegmentFromChunks(segments);
 			Assertions.assertEquals(obxSegment, rejoined);
 		} catch (HL7Exception e) {
 			Assertions.fail(e);
@@ -57,14 +57,41 @@ public class MediaExtractorTest {
 	public void testReplacementURI() {
 			try {
 				String message = loadORUAttachmentResource().encode();
-				String filePath = "file//path.to.file.data";
-				String fixedMessage = mediaExtractor.replaceAttachmentSegment(message, filePath);
+				String id = "abcdef";
+				String fixedMessage = mediaParser.replaceAttachmentSegment(message, id);
 				Assertions.assertNotNull(fixedMessage);
 				Assertions.assertNotEquals(message, fixedMessage);
-				Assertions.assertNull(mediaExtractor.extractNextAttachmentSegment(fixedMessage));
+				Assertions.assertTrue(fixedMessage.contains(id));
+				Assertions.assertNull(mediaParser.extractNextAttachmentSegment(fixedMessage));
 			} catch (HL7Exception | IOException e) {
 				Assertions.fail(e);
 			}
+	}
+	
+	@Test
+	public void testExtractIDFromSegment() {
+		try {
+			String message = loadORUAttachmentResource().encode();
+		
+			//Show it failing
+			String segment = mediaParser.extractNextAttachmentSegment(message);
+			Assertions.assertTrue(segment.startsWith("OBX"));
+			String newId = mediaParser.extractIdFromAlteredSegment(segment);
+			Assertions.assertNull(newId);
+			//Show it succeeding
+			String id = "abcdef";
+			message = mediaParser.replaceAttachmentSegment(message, id);
+			Assertions.assertNotNull(message);
+			segment = mediaParser.extractNextAlteredSegment(message);
+			Assertions.assertNotNull(segment);
+			Assertions.assertTrue(segment.startsWith("OBX"));
+			newId = mediaParser.extractIdFromAlteredSegment(segment);
+			Assertions.assertNotNull(newId);
+			Assertions.assertEquals(id, newId);
+
+		} catch (IOException | HL7Exception e) {
+			Assertions.fail(e);
+		}
 	}
 	
 	private Message loadORUAttachmentResource() throws IOException {

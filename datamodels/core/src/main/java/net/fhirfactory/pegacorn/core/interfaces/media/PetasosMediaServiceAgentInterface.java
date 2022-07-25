@@ -25,4 +25,5 @@ import org.hl7.fhir.r4.model.Media;
 
 public interface PetasosMediaServiceAgentInterface {
     Boolean captureMedia(Media media, boolean synchronous);
+    Media loadMedia(String mediaID);
 }
