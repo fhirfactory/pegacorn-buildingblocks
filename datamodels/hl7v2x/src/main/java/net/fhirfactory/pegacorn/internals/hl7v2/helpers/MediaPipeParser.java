@@ -26,6 +26,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
+import org.hl7.fhir.r4.model.Media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
@@ -34,7 +35,9 @@ import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2Seg
 
 @ApplicationScoped
 public class MediaPipeParser extends UltraDefensivePipeParser {
-    private static final String OBX_KEY = HL7v2SegmentTypeEnum.OBX.getKey();
+    private static final String ENCAPSULATED_DATA = "ED";
+	private static final String REFERENCE_POINTER = "RP";
+	private static final String OBX_KEY = HL7v2SegmentTypeEnum.OBX.getKey();
 	private static final Logger LOG = LoggerFactory.getLogger(MediaPipeParser.class);
     private static final String BASE64_PATTERN = "^Base64^";
 	private static final String PREFIX = "<fhir-resource>https://hestia-dam-service/fhir/r4/media/id=";
@@ -147,7 +150,7 @@ public class MediaPipeParser extends UltraDefensivePipeParser {
     public String replaceAttachmentSegment(String message, String id) {
     	String obx = extractNextAttachmentSegment(message);
     	String[] chunks = breakSegmentIntoChunks(obx);
-    	chunks[2] = "RP";
+    	chunks[2] = REFERENCE_POINTER;
     	chunks[5] = buildfilePathOutOfId(id);
     	String fixed = rebuildSegmentFromChunks(chunks);
     	message = message.replace(obx, fixed); //XXX inefficient?
@@ -174,5 +177,15 @@ public class MediaPipeParser extends UltraDefensivePipeParser {
 		}
 		return (null);
 	}
+	
+    public String replaceAlteredSegment(String message, Media media) {
+    	String obx = extractNextAlteredSegment(message);
+    	String[] chunks = breakSegmentIntoChunks(obx);
+    	chunks[2] = ENCAPSULATED_DATA;
+    	chunks[5] = media.getContent().getData().toString(); //TODO check this is correct
+    	String fixed = rebuildSegmentFromChunks(chunks);
+    	message = message.replace(obx, fixed); //XXX inefficient?
+       	return (message);
+    }
 
 }
