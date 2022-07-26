@@ -33,6 +33,7 @@ import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
@@ -100,7 +101,9 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
                 }
             }
             if (!alreadyInPlace) {
-                exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_EGRESS_SOURCE_SYSTEM_NAME, getSourceSystemName());
+                if(StringUtils.isNotEmpty(getSourceSystemName())) {
+                    exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_EGRESS_SOURCE_SYSTEM_NAME, getSourceSystemName());
+                }
             }
         }
     }
@@ -113,23 +116,15 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
         NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
         AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
         TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
-        MetricsAgentInjector metricsAgentInjector = new MetricsAgentInjector();
+        PortDetailInjector portDetailInjector = new PortDetailInjector();
         RouteDefinition route = from(uri);
         route
                 .process(nodeDetailInjector)
                 .process(auditAgentInjector)
                 .process(taskReportAgentInjector)
-                .process(metricsAgentInjector)
+                .process(portDetailInjector)
         ;
         return route;
-    }
-
-    public class MetricsAgentInjector implements Processor{
-        @Override
-        public void process(Exchange camelExchange) throws Exception{
-            getLogger().debug("MetricsAgentInjector.process(): Entry");
-            camelExchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getEndpointMetricsAgent());
-        }
     }
 
     //
@@ -183,16 +178,8 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
             if (!alreadyInPlace) {
                 switch(getEgressEndpoint().getEndpointTopologyNode().getEndpointType()) {
                     case MLLP_CLIENT:
-                    case HTTP_API_CLIENT: {
-                        StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getEgressEndpoint().getEndpointTopologyNode();
-                        exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getToken());
-                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_PORT_VALUE, getEgressEndpoint().getEndpointSpecification());
-                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_TOPOLOGY_NODE_EXCHANGE_PROPERTY, clientTopologyEndpoint);
-                        exchange.setProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, getMetricsAgent());
-                        exchange.setProperty(PetasosPropertyConstants.ENDPOINT_METRICS_AGENT_EXCHANGE_PROPERTY, getEndpointMetricsAgent());
-                        break;
-                    }
-                    case FILE_SHARE_SINK: {
+                    case HTTP_API_CLIENT:
+                    case FILE_SHARE_SINK:{
                         StandardInteractClientTopologyEndpointPort clientTopologyEndpoint = (StandardInteractClientTopologyEndpointPort) getEgressEndpoint().getEndpointTopologyNode();
                         exchange.setProperty(PetasosPropertyConstants.WUP_INTERACT_PORT_TYPE, clientTopologyEndpoint.getEndpointType().getToken());
                         exchange.setProperty(PetasosPropertyConstants.ENDPOINT_PORT_VALUE, getEgressEndpoint().getEndpointSpecification());
