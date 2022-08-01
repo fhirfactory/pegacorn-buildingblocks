@@ -27,5 +27,4 @@ import java.util.List;
 
 public interface PetasosMediaServiceBrokerInterface {
     Boolean logMedia(String serviceProviderName, Media media);
-    Boolean logMedia(String serviceProviderName, List<Media> mediaList);
 }

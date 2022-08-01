@@ -31,10 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
 
+import javax.inject.Inject;
+
 import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentTypeEnum;
 
 @ApplicationScoped
-public class MediaPipeParser extends UltraDefensivePipeParser {
+public class MediaPipeParser {
     private static final String ENCAPSULATED_DATA = "ED";
 	private static final String REFERENCE_POINTER = "RP";
 	private static final String OBX_KEY = HL7v2SegmentTypeEnum.OBX.getKey();
@@ -46,6 +48,10 @@ public class MediaPipeParser extends UltraDefensivePipeParser {
 
     private boolean initialised;
 
+    
+    @Inject
+    private UltraDefensivePipeParser pipeParser;
+    
     //
     // Constructor(s)
     //
@@ -98,8 +104,8 @@ public class MediaPipeParser extends UltraDefensivePipeParser {
         if(StringUtils.isEmpty(message)){
             return(null);
         }
-        List<String> segmentList = getSegmentList(message);
-        String segment = getSegment(segmentList, OBX_KEY,1);
+        List<String> segmentList = pipeParser.getSegmentList(message);
+        String segment = pipeParser.getSegment(segmentList, OBX_KEY,1);
         return(segment);
     }
     
@@ -118,7 +124,7 @@ public class MediaPipeParser extends UltraDefensivePipeParser {
     }
 
 	private String extractSegmentWithPattern(String message, String pattern) {
-		List<String> segmentList = getSegmentList(message);
+		List<String> segmentList = pipeParser.getSegmentList(message);
         for(String currentSegment: segmentList){
             if(currentSegment.startsWith(OBX_KEY)){
             	if(currentSegment.contains(pattern)) {
@@ -186,6 +192,10 @@ public class MediaPipeParser extends UltraDefensivePipeParser {
     	String fixed = rebuildSegmentFromChunks(chunks);
     	message = message.replace(obx, fixed); //XXX inefficient?
        	return (message);
+    }
+    
+    public boolean hasMatchingPatternInSegmentType(String message, String pattern, HL7v2SegmentTypeEnum segmentType) {
+    	return pipeParser.hasMatchingPatternInSegmentType(message, pattern,segmentType);
     }
 
 }

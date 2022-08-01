@@ -34,17 +34,18 @@ import java.time.Instant;
 public class InterZoneRepeater{
     private static final Logger LOG = LoggerFactory.getLogger(InterZoneRepeater.class);
 
-    GossipRouter interzoneRepeaterIPC;
-    GossipRouter interzoneRepeaterTopology;
-    GossipRouter interzoneRepeaterSubscriptions;
-    GossipRouter interzoneRepeaterMetrics;
-    GossipRouter interzoneRepeaterInterception;
-    GossipRouter interzoneRepeaterInfinispan;
-    GossipRouter interzoneRepeaterAudit;
-    GossipRouter interzoneRepeaterTasking;
-    GossipRouter interzoneRepeaterDatagrid;
+    private GossipRouter interzoneRepeaterIPC;
+    private GossipRouter interzoneRepeaterTopology;
+    private GossipRouter interzoneRepeaterSubscriptions;
+    private GossipRouter interzoneRepeaterMetrics;
+    private GossipRouter interzoneRepeaterInterception;
+    private GossipRouter interzoneRepeaterInfinispan;
+    private GossipRouter interzoneRepeaterAudit;
+    private GossipRouter interzoneRepeaterMedia;
+    private GossipRouter interzoneRepeaterTasking;
+    private GossipRouter interzoneRepeaterDatagrid;
     // PetasosITOpsService petasosServices;
-    JGroupsGossipRouterNode gossipRouterNode;
+    private JGroupsGossipRouterNode gossipRouterNode;
 
     //
     // Business Methods
@@ -145,6 +146,19 @@ public class InterZoneRepeater{
         }
         getLogger().info("initialiseRepeater(): interzoneRepeaterAudit Bound To = Address->{}, Port->{}",getInterzoneRepeaterAudit().bindAddress(), getInterzoneRepeaterAudit().port());
 
+        //
+        // Initialise Media Repeater
+        String interzoneRepeaterMediaIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterMedia().getServerHostname();
+        int interzoneRepeaterMediaPortNumber = gossipRouterNode.getPropertyFile().getMultizoneRepeaterMedia().getServerPort();
+        this.setInterzoneRepeaterMedia(new GossipRouter(interzoneRepeaterMediaIPAddress, interzoneRepeaterMediaPortNumber));
+        try {
+            getInterzoneRepeaterMedia().start();
+        } catch (Exception e) {
+            getLogger().error(".initialiseRepeater(): Error, can not initialise Media Repeater -->{}", ExceptionUtils.getStackTrace(e));
+        }
+        getLogger().info("initialiseRepeater(): interzoneRepeaterMedia Bound To = Address->{}, Port->{}",getInterzoneRepeaterMedia().bindAddress(), getInterzoneRepeaterMedia().port());
+
+     
         //
         // Initialise Tasking Repeater
         String interzoneRepeaterTaskingIPAddress = gossipRouterNode.getPropertyFile().getMultizoneRepeaterTasking().getServerHostname();
@@ -257,4 +271,12 @@ public class InterZoneRepeater{
     protected Logger getLogger(){
         return(LOG);
     }
+
+	public GossipRouter getInterzoneRepeaterMedia() {
+		return interzoneRepeaterMedia;
+	}
+
+	public void setInterzoneRepeaterMedia(GossipRouter interzoneRepeaterMedia) {
+		this.interzoneRepeaterMedia = interzoneRepeaterMedia;
+	}
 }

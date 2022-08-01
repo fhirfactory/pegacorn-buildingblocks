@@ -55,7 +55,7 @@ public class ProcessingPlantJGroupsIntegrationPointSet {
     //
 
     public boolean hasPetasosMessagingServicesEndpoint(){
-        boolean hasValue = this.petasosAuditServicesEndpoint != null;
+        boolean hasValue = this.petasosMessagingServicesEndpoint != null;
         return(hasValue);
     }
 
@@ -105,6 +105,20 @@ public class ProcessingPlantJGroupsIntegrationPointSet {
     public void setPetasosAuditServicesEndpoint(JGroupsIntegrationPoint petasosAuditServicesEndpoint) {
         this.petasosAuditServicesEndpoint = petasosAuditServicesEndpoint;
     }
+    
+
+    public boolean hasPetasosMediaServicesEndpoint(){
+        boolean hasValue = this.petasosMediaServicesEndpoint != null;
+        return(hasValue);
+    }
+
+    public JGroupsIntegrationPoint getPetasosMediaServicesEndpoint() {
+        return petasosAuditServicesEndpoint;
+    }
+
+    public void setPetasosMediaServicesEndpoint(JGroupsIntegrationPoint petasosMediaServicesEndpoint) {
+        this.petasosMediaServicesEndpoint = petasosMediaServicesEndpoint;
+    }
 
     public boolean hasPetasosTaskServicesEndpoint(){
         boolean hasValue = this.petasosTaskServicesEndpoint != null;
@@ -143,14 +157,5 @@ public class ProcessingPlantJGroupsIntegrationPointSet {
 
     public void setPetasosMetricsServicesEndpoint(JGroupsIntegrationPoint petasosMetricsServicesEndpoint) {
         this.petasosMetricsServicesEndpoint = petasosMetricsServicesEndpoint;
-    }
-    
-
-    public JGroupsIntegrationPoint getPetasosMediaServicesEndpoint() {
-        return petasosMediaServicesEndpoint;
-    }
-
-    public void setPetasosMediaServicesEndpoint(JGroupsIntegrationPoint petasosMediaServicesEndpoint) {
-        this.petasosMediaServicesEndpoint = petasosMediaServicesEndpoint;
     }
 }

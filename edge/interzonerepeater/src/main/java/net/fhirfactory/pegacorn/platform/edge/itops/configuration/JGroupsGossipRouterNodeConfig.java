@@ -45,6 +45,7 @@ public class JGroupsGossipRouterNodeConfig {
     private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterInfinspan;
     private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterDatagrid;
     private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterAudit;
+    private JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterMedia;
     private LoadBalancerSegment loadBalancer;
     private SubsystemImageSegment subsystemImageProperties;
     private SecurityCredentialSegment trustStorePassword;
@@ -70,6 +71,7 @@ public class JGroupsGossipRouterNodeConfig {
         this.prometheusPort = new HTTPServerPortSegment();
         this.deploymentZone = new DeploymentZoneSegment();
         this.multizoneRepeaterAudit = new JGroupsInterZoneRepeaterServerPortSegment();
+        this.setMultizoneRepeaterMedia(new JGroupsInterZoneRepeaterServerPortSegment());
         this.multizoneRepeaterDatagrid = new JGroupsInterZoneRepeaterServerPortSegment();
         this.multizoneRepeaterInfinspan = new JGroupsInterZoneRepeaterServerPortSegment();
         this.multizoneRepeaterInterception = new JGroupsInterZoneRepeaterServerPortSegment();
@@ -313,4 +315,12 @@ public class JGroupsGossipRouterNodeConfig {
                 ", hapiAPIKey=" + hapiAPIKey +
                 '}';
     }
+
+	public JGroupsInterZoneRepeaterServerPortSegment getMultizoneRepeaterMedia() {
+		return multizoneRepeaterMedia;
+	}
+
+	public void setMultizoneRepeaterMedia(JGroupsInterZoneRepeaterServerPortSegment multizoneRepeaterMedia) {
+		this.multizoneRepeaterMedia = multizoneRepeaterMedia;
+	}
 }

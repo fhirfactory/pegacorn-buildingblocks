@@ -289,6 +289,7 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
                 ", petasosInterceptionStackConfigFile='" + petasosInterceptionStackConfigFile + '\'' +
                 ", petasosTaskingStackConfigFile='" + petasosTaskingStackConfigFile + '\'' +
                 ", petasosAuditStackConfigFile='" + petasosAuditStackConfigFile + '\'' +
+                ", petasosMediaStackConfigFile='" + petasosMediaStackConfigFile + '\'' +
                 ", multiZoneInfinispanStackConfigFile='" + multiZoneInfinispanStackConfigFile + '\'' +
                 ", actualHostIP='" + actualHostIP + '\'' +
                 ", actualPodIP='" + actualPodIP + '\'' +
