@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import javax.inject.Inject;
 
 import net.fhirfactory.pegacorn.internals.hl7v2.triggerevents.valuesets.HL7v2SegmentTypeEnum;
@@ -188,14 +190,55 @@ public class MediaPipeParser {
     	String obx = extractNextAlteredSegment(message);
     	String[] chunks = breakSegmentIntoChunks(obx);
     	chunks[2] = ENCAPSULATED_DATA;
-    	chunks[5] = media.getContent().getData().toString(); //TODO check this is correct
+    	chunks[5] = convertMediaBackToMessage(media);
     	String fixed = rebuildSegmentFromChunks(chunks);
     	message = message.replace(obx, fixed); //XXX inefficient?
        	return (message);
     }
     
-    public boolean hasMatchingPatternInSegmentType(String message, String pattern, HL7v2SegmentTypeEnum segmentType) {
+    private String convertMediaBackToMessage(Media media) {
+		
+		return contentTypeToHL7(media.getContent().getContentType()) 
+				+ BASE64_PATTERN + media.getContent().getData().toString();
+	}
+
+	public String contentTypeToHL7(String contentType) {
+		//TODO fill out as necessary
+		String hl7 = "";
+		
+		switch(contentType) {
+		case "application/pdf":
+			hl7 = "^application^pdf";
+			break;
+		default:
+			hl7= "";
+			break;
+		}
+		return hl7;
+	}
+	
+	public String hl7ToContentType(String hl7) {
+		//TODO fill out as necessary
+		String contentType = "";
+		
+		switch(hl7) {
+		case "^application^pdf":
+			contentType = "application/pdf";
+			break;
+		default:
+			contentType= "application/octet-stream";
+			break;
+		}
+		return contentType;
+	}
+
+	public boolean hasMatchingPatternInSegmentType(String message, String pattern, HL7v2SegmentTypeEnum segmentType) {
     	return pipeParser.hasMatchingPatternInSegmentType(message, pattern,segmentType);
+    }
+    
+    @VisibleForTesting
+    public void setPipeParser(UltraDefensivePipeParser pipeParser) {
+    	this.pipeParser = pipeParser;
     }
 
 }
