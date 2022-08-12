@@ -30,6 +30,7 @@ public enum DefaultWorkshopSetEnum {
     WORKFLOW_WORKSHOP("Workflow"),
     POLICY_ENFORCEMENT_WORKSHOP("PolicyEnforcement"),
     AUDIT_SERVICES_WORKSHOP("Audit"),
+    MEDIA_SERVICES_WORKSHOP("Media"),
     EDGE_WORKSHOP("InternalIPC");
 
     private String workshop;

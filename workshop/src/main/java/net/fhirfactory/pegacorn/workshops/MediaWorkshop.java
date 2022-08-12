@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2020 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,13 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.interfaces.media;
+package net.fhirfactory.pegacorn.workshops;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-import org.hl7.fhir.r4.model.Media;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
 
-public interface PetasosMediaServiceHandlerInterface {
-    Boolean saveMediaHandler(Media media, JGroupsIntegrationPointSummary jgroupsIP);
+@ApplicationScoped
+public class MediaWorkshop extends PetasosEnabledWorkshop {
+    private static final Logger LOG = LoggerFactory.getLogger(MediaWorkshop.class);
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
+    }
+
+    @Override
+    protected String specifyWorkshopName() {
+        return (DefaultWorkshopSetEnum.MEDIA_SERVICES_WORKSHOP.getWorkshop());
+    }
+
+    @Override
+    protected String specifyWorkshopVersion() {
+        return (getProcessingPlant().getMeAsASoftwareComponent().getComponentRDN().getNodeVersion());
+    }
+
+    @Override
+    protected void invokePostConstructInitialisation() {
+
+    }
 }

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.services.media;
+package net.fhirfactory.pegacorn.services.media.endpoint;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -34,10 +34,11 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.pegacorn.core.interfaces.media.PetasosMediaServiceBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.oam.topology.PetasosTopologyReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
+import net.fhirfactory.pegacorn.petasos.endpoints.services.media.PetasosMediaServicesEndpoint;
 
 @ApplicationScoped
 public class PetasosMediaAgentEndpoint extends PetasosMediaServicesEndpoint
-        implements PetasosMediaServiceBrokerInterface{
+        implements PetasosMediaServiceBrokerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosMediaAgentEndpoint.class);
 
     @Inject
@@ -83,8 +84,8 @@ public class PetasosMediaAgentEndpoint extends PetasosMediaServicesEndpoint
     //
 
     @Override
-    public Boolean logMedia(String serviceProviderName, Media media){
-        getLogger().info(".logMedia(): Entry, serviceProviderName->{}, media->{}", serviceProviderName, media);
+    public Boolean saveMedia(String serviceProviderName, Media media){
+        getLogger().info(".saveMedia(): Entry, serviceProviderName->{}, media->{}", serviceProviderName, media);
         JGroupsIntegrationPointSummary myJGroupsIP = createSummary(getJGroupsIntegrationPoint());
         Address targetAddress = getCandidateMediaServerTargetAddress(serviceProviderName);
         try {
@@ -97,21 +98,27 @@ public class PetasosMediaAgentEndpoint extends PetasosMediaServicesEndpoint
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Boolean response = null;
             synchronized (getIPCChannelLock()){
-                response = getRPCDispatcher().callRemoteMethod(targetAddress, "logMediaHandler", objectSet, classSet, requestOptions);
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "saveMediaHandler", objectSet, classSet, requestOptions);
             }
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            getLogger().info(".logMedia(): Exit, response->{}", response);
+            getLogger().info(".saveMedia(): Exit, response->{}", response);
             return(response);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".logMedia(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".saveMedia(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(false);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             e.printStackTrace();
-            getLogger().error(".logMedia: Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".saveMedia(): Error (GeneralException) ->{}", e.getMessage());
             return(false);
         }
     }
+
+	@Override
+	public Media retrieveMedia(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
 

@@ -23,8 +23,7 @@ package net.fhirfactory.pegacorn.core.interfaces.media;
 
 import org.hl7.fhir.r4.model.Media;
 
-import java.util.List;
-
 public interface PetasosMediaServiceBrokerInterface {
-    Boolean logMedia(String serviceProviderName, Media media);
+    Boolean saveMedia(String serviceProviderName, Media media);
+    Media retrieveMedia(String id);
 }

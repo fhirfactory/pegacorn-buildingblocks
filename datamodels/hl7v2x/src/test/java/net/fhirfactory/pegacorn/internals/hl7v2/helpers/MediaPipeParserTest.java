@@ -33,14 +33,12 @@ public class MediaPipeParserTest {
 			String message = loadORUAttachmentResource().encode();
 			String obxSegment = mediaParser.extractNextAttachmentSegment(message);
 			Assertions.assertNotNull(obxSegment);
-			System.out.println(obxSegment);
 			int count = 0;
 			for(int i = 0; i < obxSegment.length(); i++) {
 				if(obxSegment.charAt(i) == '|') {
 					++count;
 				}
 			}
-			System.out.println("Count: " + count);
 			String[] segments = mediaParser.breakSegmentIntoChunks(obxSegment );
 			Assertions.assertNotNull(segments);
 			Assertions.assertEquals(StringUtils.countMatches(obxSegment, '|') + 1, segments.length);

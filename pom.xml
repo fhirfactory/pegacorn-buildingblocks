@@ -31,5 +31,6 @@
         <module>taskservices</module>
         <module>interception</module>
 	    <module>oam</module>
+	    <module>mediaservices</module>
     </modules>
 </project>

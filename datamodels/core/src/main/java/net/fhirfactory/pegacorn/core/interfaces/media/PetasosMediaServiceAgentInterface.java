@@ -24,6 +24,6 @@ package net.fhirfactory.pegacorn.core.interfaces.media;
 import org.hl7.fhir.r4.model.Media;
 
 public interface PetasosMediaServiceAgentInterface {
-    Boolean captureMedia(Media media, boolean synchronous);
+    Boolean captureMedia(Media media);
     Media loadMedia(String mediaID);
 }

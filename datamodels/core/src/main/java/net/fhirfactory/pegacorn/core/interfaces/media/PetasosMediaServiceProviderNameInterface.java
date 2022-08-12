@@ -21,11 +21,6 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.media;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-import org.hl7.fhir.r4.model.Media;
-
-import java.util.List;
-
-public interface PetasosMediaServiceHandlerInterface {
-    Boolean saveMediaHandler(Media media, JGroupsIntegrationPointSummary jgroupsIP);
+public interface PetasosMediaServiceProviderNameInterface {
+    public String getPetasosMediaServiceProviderName();
 }
