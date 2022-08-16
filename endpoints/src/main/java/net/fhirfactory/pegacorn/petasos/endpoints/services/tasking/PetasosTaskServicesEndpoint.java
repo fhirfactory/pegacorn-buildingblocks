@@ -163,9 +163,9 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
         getLogger().trace(".executeTask(): Entry, capabilityProviderName->{}, task->{}", capabilityProviderName, task);
         Address targetAddress = getCandidateTargetServiceAddress(capabilityProviderName);
         if(targetAddress == null){
-            getLogger().error(".executeTask(): Cannot find candidate Ponos-IM Instance!!!");
-            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance!!!");
-            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance!!!");
+            getLogger().error(".executeTask(): Cannot find candidate service address: capabilityProviderName->{}, task->{}", capabilityProviderName, task);
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate " + capabilityProviderName);
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate " + capabilityProviderName);
             return(null);
         }
         try {
@@ -183,14 +183,14 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             return(response);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".executeTask: Error (GeneralException) Message->{}, StackTrace->{}", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
+            getLogger().error(".executeTask: Error (GeneralException) Message->{}, targetAddress->{}, StackTrace->{}", ExceptionUtils.getMessage(e), targetAddress, ExceptionUtils.getStackTrace(e));
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
             response.setAssociatedRequestID(task.getRequestID());
             response.setSuccessful(false);
             return(response);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".executeTask: Error (GeneralException) Message->{}, StackTrace->{}", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
+            getLogger().error(".executeTask: Error (GeneralException) Message->{}, targetAddress->{}, StackTrace->{}", ExceptionUtils.getMessage(e), targetAddress, ExceptionUtils.getStackTrace(e));
             CapabilityUtilisationResponse response = new CapabilityUtilisationResponse();
             response.setAssociatedRequestID(task.getRequestID());
             response.setSuccessful(false);
