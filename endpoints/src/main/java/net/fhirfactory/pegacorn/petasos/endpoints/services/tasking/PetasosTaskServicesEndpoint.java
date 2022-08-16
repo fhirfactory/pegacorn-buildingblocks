@@ -197,6 +197,13 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             return(response);
         }
     }
+    
+    public CapabilityUtilisationResponse executeTaskHandler(CapabilityUtilisationRequest task){
+        getLogger().debug(".executeTaskHandler(): Entry, task->{}", task);
+        CapabilityUtilisationResponse response = getProcessingPlant().executeTask(task);
+        getLogger().debug(".executeTaskHandler(): Exit, response->{}", response);
+        return(response);
+    }
 
     //
     // PetasosActionableTask Activities
