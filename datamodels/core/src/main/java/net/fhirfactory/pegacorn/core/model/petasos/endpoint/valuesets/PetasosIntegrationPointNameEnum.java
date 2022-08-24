@@ -8,6 +8,7 @@ public enum PetasosIntegrationPointNameEnum {
     PETASOS_INTERCEPTION_GROUP_NAME("Petasos.Snoop", "petasos-snoop", "InternalIPC.InterceptionServices"),
     PETASOS_METRICS_GROUP_NAME("Petasos.Metrics", "petasos-metric", "InternalIPC.MetricsServices"),
     PETASOS_AUDIT_SERVICES_GROUP_NAME("Petasos.Audit", "petasos-audit", "InternalIPC.AuditService"),
+    PETASOS_MEDIA_SERVICES_GROUP_NAME("Petasos.Media", "petasos-media", "InternalIPC.MediaService"),
     PETASOS_IPC_MESSAGING_GROUP_NAME("Petasos.IPC", "petasos-ipc", "InternalIPC.Messaging"),
     PETASOS_EDGE_ANSWER("EdgeAnswer", "edge-answer", "InternalIPC.FHIR.Servers"),
     PETASOS_EDGE_ASK("EdgeAsk", "edge-ask", "InternalIPC.FHIR.Clients"),

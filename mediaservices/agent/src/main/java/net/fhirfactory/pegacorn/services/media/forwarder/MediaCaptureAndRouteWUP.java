@@ -108,7 +108,7 @@ public class MediaCaptureAndRouteWUP extends MOAStandardWUP  {
 
         fromIncludingPetasosServices(ingresFeed())
                 .routeId(getNameSet().getRouteCoreWUP())
-                .bean(persistenceAccessor, "utiliseAuditEventPersistenceCapability")
+                .bean(persistenceAccessor, "utiliseMediaPersistenceCapability")
                 .to(egressFeed());
     }
 

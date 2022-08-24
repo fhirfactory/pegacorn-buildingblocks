@@ -220,6 +220,9 @@ public class InterZoneRepeater{
         getLogger().info(".printSomeStatistics(): ---Interzone Repeater Audit---");
         getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterAudit().dumpAddresssMappings());
         getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterAudit().dumpRoutingTable());
+        getLogger().info(".printSomeStatistics(): ---Interzone Repeater Media---");
+        getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterMedia().dumpAddresssMappings());
+        getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterMedia().dumpRoutingTable());
         getLogger().info(".printSomeStatistics(): ---Interzone Repeater Tasking---");
         getLogger().info(".printSomeStatistics(): Addressing Mappings ->{}", getInterzoneRepeaterTasking().dumpAddresssMappings());
         getLogger().info(".printSomeStatistics(): Routing Table ->{}", getInterzoneRepeaterTasking().dumpRoutingTable());
