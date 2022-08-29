@@ -16,6 +16,7 @@ import ca.uhn.hl7v2.parser.Parser;
 
 public class MediaPipeParserTest {
 	private MediaPipeParser mediaParser;
+	private UltraDefensivePipeParser udpp;
     private Parser pipeParser;
 	
 	@SuppressWarnings("resource")
@@ -24,7 +25,9 @@ public class MediaPipeParserTest {
 		pipeParser = new DefaultHapiContext().getPipeParser();
         pipeParser.getParserConfiguration().setValidating(false);
         pipeParser.getParserConfiguration().setEncodeEmptyMandatoryFirstSegments(true);
+        udpp = new UltraDefensivePipeParser();
         mediaParser = new MediaPipeParser();
+        mediaParser.setPipeParser(udpp);
 	}
 	
 	@Test
