@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.media.factories;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -52,7 +53,9 @@ public class MediaFactory {
         newPeriod.setStart(date);
         Identifier baseIdentifier = identifierFactory.newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER,idValue,newPeriod);
         mediaResource.addIdentifier(baseIdentifier);
-
+        UUID uuid = UUID.randomUUID();
+        String id = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
+        mediaResource.setId(id);
         LOG.debug(".newMediaResource(): Exit, mediaResource->{}", mediaResource);
         return(mediaResource);
     }
