@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.core.model.capabilities.base.rpc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
 import java.io.Serializable;
@@ -140,6 +141,23 @@ public class RemoteProcedureCallRequest implements Serializable {
     public void setRequestStringContent(String stringContent){
         setRequestContent(stringContent);
         setRequestContentType(String.class);
+    }
+
+    @JsonIgnore
+    public PetasosFulfillmentTask getRequestFulfillmentTask(){
+        if(hasRequestContent()){
+            if(getRequestContentType().equals(PetasosFulfillmentTask.class)){
+                PetasosFulfillmentTask task = (PetasosFulfillmentTask) getRequestContent();
+                return(task);
+            }
+        }
+        return(null);
+    }
+
+    @JsonIgnore
+    public void setRequestFulfillmentTask(PetasosFulfillmentTask task){
+        setRequestContent(task);
+        setRequestContentType(PetasosFulfillmentTask.class);
     }
 
     //

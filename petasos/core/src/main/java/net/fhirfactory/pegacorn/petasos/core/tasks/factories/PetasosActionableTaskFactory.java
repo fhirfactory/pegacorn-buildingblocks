@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
@@ -119,6 +120,27 @@ public class PetasosActionableTaskFactory {
         PetasosActionableTask petasosActionableTask = newMessageBasedActionableTask(upstreamTask, traceabilityElementType, payload);
         getLogger().debug(".newMessageBasedActionableTask(): Exit, petasosActionableTask->{}", petasosActionableTask);
         return(petasosActionableTask);
+    }
+
+    public PetasosActionableTask newMessageBasedActionableTask(PetasosFulfillmentTask upstreamTask, TaskWorkItemType payload ){
+        getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, payload->{}", upstreamTask, payload);
+
+        //
+        // Create an empty task
+        PetasosActionableTask newTask = newMessageBasedActionableTask(payload);
+        //
+        // create task traceability information
+        getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Start");
+        TaskTraceabilityType taskTraceabilityType = traceabilityTypeFactory.newTaskTraceabilityFromTask(upstreamTask);
+        newTask.setTaskTraceability(taskTraceabilityType);
+        getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Finish");
+        if(upstreamTask.hasTaskContext()){
+            newTask.setTaskContext(upstreamTask.getTaskContext());
+        }
+        //
+        // return the object
+        getLogger().debug(".newMessageBasedActionableTask(): Exit, petasosActionableTask->{}", newTask);
+        return(newTask);
     }
 
     public PetasosActionableTask newMessageBasedActionableTask(TaskWorkItemType payload){

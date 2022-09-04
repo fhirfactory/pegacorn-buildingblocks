@@ -221,6 +221,77 @@ public class UltraDefensivePipeParser {
         return(segmentList);
     }
 
+    public String getTriggerEvent(String message){
+        if(StringUtils.isNotEmpty(message)) {
+            List<String> segmentList = getSegmentList(message);
+            if (segmentList != null) {
+                if (!segmentList.isEmpty()) {
+                    String messageHeaderSegment = getMessageHeaderSegment(segmentList);
+                    String[] splitSegmentFields = messageHeaderSegment.split("\\|");
+                    if(splitSegmentFields.length > 9) {
+                        String messageType = splitSegmentFields[9];
+                        String triggerEvent = messageType.substring(4, 7);
+                        return(triggerEvent);
+                    }
+                }
+            }
+        }
+        return(null);
+    }
+
+    public String getMessageCode(String message){
+        if(StringUtils.isNotEmpty(message)) {
+            List<String> segmentList = getSegmentList(message);
+            if (segmentList != null) {
+                if (!segmentList.isEmpty()) {
+                    String messageHeaderSegment = getMessageHeaderSegment(segmentList);
+                    String[] splitSegmentFields = messageHeaderSegment.split("\\|");
+                    if(splitSegmentFields.length > 9) {
+                        String messageType = splitSegmentFields[9];
+                        String messageCode = messageType.substring(0, 3);
+                        return(messageCode);
+                    }
+                }
+            }
+        }
+        return(null);
+    }
+
+    public String getFullTriggerEvent(String message){
+        if(StringUtils.isNotEmpty(message)) {
+            List<String> segmentList = getSegmentList(message);
+            if (segmentList != null) {
+                if (!segmentList.isEmpty()) {
+                    String messageHeaderSegment = getMessageHeaderSegment(segmentList);
+                    String[] splitSegmentFields = messageHeaderSegment.split("\\|");
+                    if(splitSegmentFields.length > 9) {
+                        String messageType = splitSegmentFields[9];
+                        String fullTriggerEvent = messageType.substring(0, 7);
+                        return(fullTriggerEvent);
+                    }
+                }
+            }
+        }
+        return(null);
+    }
+
+    public String getMessageVersion(String message){
+        if(StringUtils.isNotEmpty(message)) {
+            List<String> segmentList = getSegmentList(message);
+            if (segmentList != null) {
+                if (!segmentList.isEmpty()) {
+                    String messageHeaderSegment = getMessageHeaderSegment(segmentList);
+                    String[] splitSegmentFields = messageHeaderSegment.split("\\|");
+                    if(splitSegmentFields.length > 12) {
+                        String messageVersion = splitSegmentFields[12];
+                        return(messageVersion);
+                    }
+                }
+            }
+        }
+        return(null);
+    }
+
     public List<String> getGeneralHeaderDetail(UoWPayload payload){
         List<String> headerInfo = new ArrayList<>();
         if(payload.getPayloadManifest().hasContainerDescriptor()){

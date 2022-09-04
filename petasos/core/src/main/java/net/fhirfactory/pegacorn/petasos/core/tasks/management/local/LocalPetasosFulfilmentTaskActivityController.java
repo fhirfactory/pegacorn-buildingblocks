@@ -92,7 +92,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
         PetasosFulfillmentTaskSharedInstance fulfillmentTaskSharedInstance = getFulfillmentTaskSharedInstanceAccessorFactory().newFulfillmentTaskSharedAccessor(task);
         //
         // Create an audit event
-        auditServicesBroker.logActivity(fulfillmentTaskSharedInstance.getInstance(), false);
+        auditServicesBroker.logActivity(fulfillmentTaskSharedInstance.getInstance(), synchronousWriteToAudit);
         //
         // We're done
         getLogger().debug(".registerFulfillmentTask(): Exit, fulfillmentTaskSharedInstance->{}", fulfillmentTaskSharedInstance);

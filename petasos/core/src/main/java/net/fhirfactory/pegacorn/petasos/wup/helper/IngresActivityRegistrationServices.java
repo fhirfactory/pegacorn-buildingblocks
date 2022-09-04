@@ -24,6 +24,11 @@ package net.fhirfactory.pegacorn.petasos.wup.helper;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelValidationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
@@ -34,6 +39,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.HL7V2XTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
@@ -44,12 +50,16 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasos
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.internals.hl7v2.helpers.UltraDefensivePipeParser;
 
 /**
  * This class (bean) is to be injected into the flow of an Ingres Only WUP Implementation
@@ -63,8 +73,8 @@ import java.time.Instant;
  */
 
 @ApplicationScoped
-public class IngresActivityBeginRegistration {
-    private static final Logger LOG = LoggerFactory.getLogger(IngresActivityBeginRegistration.class);
+public class IngresActivityRegistrationServices {
+    private static final Logger LOG = LoggerFactory.getLogger(IngresActivityRegistrationServices.class);
 
     @Inject
     LocalPetasosActionableTaskActivityController actionableTaskActivityController;
@@ -84,9 +94,42 @@ public class IngresActivityBeginRegistration {
     @Inject
     private PetasosFulfillmentTaskSharedInstanceAccessorFactory fulfillmentTaskSharedInstanceFactory;
 
+    @Inject
+    private HL7V2XTopicFactory topicFactory;
+    
+    @Inject
+    private UltraDefensivePipeParser defensivePipeParser;
+
+    @Produce
+    private ProducerTemplate hl7MessageInjector;
+
+
     //
     // Business Methods
     //
+
+    public UoW registerQueryActivityStart(UoW theUoW, Exchange camelExchange) {
+        getLogger().debug(".registerQueryActivityStart(): Entry, payload --> {}", theUoW);
+        UoW outcome = registerActivityStart(theUoW, camelExchange);
+        getLogger().debug(".registerQueryActivityStart(): Exit, outcome --> {}", outcome);
+        return(outcome);
+    }
+
+
+    
+    public String registerQueryActivityFinish(UoW theUoW, Exchange camelExchange){
+        getLogger().debug(".registerQueryActivityStart(): Entry, theUoW->{}", theUoW);
+                //
+        // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
+        getLogger().trace(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
+        PetasosFulfillmentTaskSharedInstance fulfillmentTaskInstance = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTaskSharedInstance.class);
+        UoWPayload payload = new UoWPayload();
+        
+        
+        String message = payload.getPayload();
+        getLogger().debug(".registerQueryActivityStart(): Exit, message --> {}", message);
+        return(message);
+    }
 
     public UoW registerActivityStart(UoW theUoW, Exchange camelExchange){
         getLogger().debug(".registerActivityStart(): Entry, payload --> {}", theUoW);
@@ -181,6 +224,12 @@ public class IngresActivityBeginRegistration {
         return(theUoW);
     }
 
+
+    public DataParcelTypeDescriptor createDataParcelTypeDescriptor(String messageEventType, String messageTriggerEvent, String version) {
+        DataParcelTypeDescriptor descriptor = getTopicFactory().newDataParcelDescriptor(messageEventType, messageTriggerEvent, version);
+        return (descriptor);
+    }
+
     //
     // Getters (and Setters)
     //
@@ -203,5 +252,17 @@ public class IngresActivityBeginRegistration {
 
     protected Logger getLogger(){
         return(LOG);
+    }
+
+    protected UltraDefensivePipeParser getDefensivePipeParser(){
+        return(defensivePipeParser);
+    }
+
+    protected HL7V2XTopicFactory getTopicFactory() {
+        return (topicFactory);
+    }
+
+    protected ProducerTemplate getHl7MessageInjector(){
+        return(hl7MessageInjector);
     }
 }

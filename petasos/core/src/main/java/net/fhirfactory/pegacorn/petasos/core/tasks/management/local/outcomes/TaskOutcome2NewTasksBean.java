@@ -25,20 +25,16 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstanceAccessorFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
-import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution.LocalTaskDistributionDecisionEngine;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
@@ -60,12 +56,6 @@ public class TaskOutcome2NewTasksBean {
     }
 
     @Inject
-    TopologyIM topologyProxy;
-
-    @Inject
-    private ParticipantSharedActionableTaskCache actionableTaskCache;
-
-    @Inject
     private PetasosActionableTaskFactory actionableTaskFactory;
 
     @Inject
@@ -77,11 +67,6 @@ public class TaskOutcome2NewTasksBean {
     @Inject
     private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceFactory;
 
-    @Inject
-    private PetasosTaskJobCardSharedInstanceAccessorFactory jobCardInstanceFactory;
-
-    @Inject
-    private PetasosTaskJobCardFactory jobCardFactory;
 
     /**
      * This method performs tree key tasks:

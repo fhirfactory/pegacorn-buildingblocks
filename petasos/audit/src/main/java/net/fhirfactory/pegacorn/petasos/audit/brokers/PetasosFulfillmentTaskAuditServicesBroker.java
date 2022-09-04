@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponent
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.common.PetasosTaskAuditServicesBrokerBase;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.Exception2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.PetasosFulfillmentTask2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.UoWPayload2FHIRAuditEvent;
@@ -40,23 +41,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class PetasosFulfillmentTaskAuditServicesBroker {
+public class PetasosFulfillmentTaskAuditServicesBroker extends PetasosTaskAuditServicesBrokerBase {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosFulfillmentTaskAuditServicesBroker.class);
 
-    @Inject
-    private PetasosAuditEventServiceAgentInterface auditWriter;
-
-    @Inject
-    private PetasosFulfillmentTask2FHIRAuditEvent parcefulfillmentTask2FHIRAuditEvent2auditevent;
-
-    @Inject
-    private UoWPayload2FHIRAuditEvent uow2auditevent;
-
-    @Inject
-    private Exception2FHIRAuditEvent exception2FHIRAuditEvent;
-
-    @Inject
-    private PetasosAuditEventGranularityLevelInterface auditEventGranularityLevel;
 
     //
     // Constructor(s)
@@ -87,8 +74,8 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
         AuditEvent fulfillmentTaskAuditEntry = null;
         boolean success = false;
         if(shouldLogAuditEventForTask(fulfillmentTask)) {
-            AuditEvent auditEntry = parcefulfillmentTask2FHIRAuditEvent2auditevent.transform(fulfillmentTask);
-            success = auditWriter.captureAuditEvent(fulfillmentTaskAuditEntry, requiresSynchronousWrite);
+            AuditEvent auditEntry = getFulfillmentTask2FHIRAuditEventTransformer().transform(fulfillmentTask);
+            success = getAuditWriter().captureAuditEvent(fulfillmentTaskAuditEntry, requiresSynchronousWrite);
         }
         getLogger().debug(".logActivity(): Exit, success->{}",success);
         return(success);
@@ -134,110 +121,19 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
         }
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event] Start...");
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Converting from PetasosFulfillmentTask to AuditEvent] Start...");
-        AuditEvent auditEvent = uow2auditevent.transform(fulfillmentTask, filteredState, true);
+        AuditEvent auditEvent = getUow2AuditEventTransformer().transform(fulfillmentTask, filteredState, true);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Converting from PetasosFulfillmentTask to AuditEvent] Finish..., auditEvent->{}", auditEvent);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Calling auditWriter service] Start...");
-        Boolean success =  auditWriter.captureAuditEvent(auditEvent, requiresSynchronousWrite);
+        Boolean success =  getAuditWriter().captureAuditEvent(auditEvent, requiresSynchronousWrite);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Calling auditWriter service] Finish..., success->{}", success);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event] Finish...");
-    }
-
-    public void logCamelExecutionException(Object object, Exchange camelExchange){
-        getLogger().debug(".logCamelExecutionException(): Entry, object->{}",object);
-        CamelExecutionException camelExecutionException = camelExchange.getProperty(Exchange.EXCEPTION_CAUGHT, CamelExecutionException.class);
-        if(camelExecutionException != null) {
-            AuditEvent auditEvent = exception2FHIRAuditEvent.transformCamelExecutionException(camelExecutionException);
-            Boolean success =  auditWriter.captureAuditEvent(auditEvent, true);
-        }
-        getLogger().debug(".logCamelExecutionException(): Entry, object->{}",object);
-    }
-
-    protected boolean shouldLogAuditEventForTask(PetasosFulfillmentTask fulfillmentTask){
-        if(fulfillmentTask.getTaskFulfillment().getStatus().equals(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED)) {
-            return(true);
-        }
-        if(fulfillmentTask.getTaskFulfillment().getStatus().equals(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED)) {
-            switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                case AUDIT_LEVEL_BLACK_BOX:
-                case AUDIT_LEVEL_COARSE:
-                    break;
-                case AUDIT_LEVEL_FINE:
-                case AUDIT_LEVEL_VERY_FINE:
-                case AUDIT_LEVEL_EXTREME:
-                    return(true);
-            }
-        }
-        if(fulfillmentTask.hasTaskFulfillment()){
-            switch(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole()){
-                case COMPONENT_ROLE_INTERACT_EGRESS:
-                case COMPONENT_ROLE_INTERACT_INGRES: {
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_COARSE:
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_EXTREME:
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        default:
-                            return (true);
-                    }
-                }
-                case COMPONENT_ROLE_SUBSYSTEM_EDGE: {
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_COARSE:
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_EXTREME:
-                            return (true);
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        default:
-                            return (false);
-                    }
-                }
-                case COMPONENT_ROLE_SUBSYSTEM_TASK_DISTRIBUTION: {
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_EXTREME:
-                            return (true);
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        case AUDIT_LEVEL_COARSE:
-                        default:
-                            return (false);
-                    }
-                }
-                case COMPONENT_ROLE_SUBSYSTEM_INTERNAL: {
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_EXTREME:
-                            return (true);
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        case AUDIT_LEVEL_COARSE:
-                        default:
-                            return (false);
-                    }
-                }
-                default:{
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_EXTREME:
-                            return (true);
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        case AUDIT_LEVEL_COARSE:
-                        default:
-                            return (false);
-                    }
-                }
-            }
-        }
-        return(false);
     }
 
     //
     // Getters (and Setters)
     //
 
+    @Override
     protected Logger getLogger(){
         return(LOG);
     }

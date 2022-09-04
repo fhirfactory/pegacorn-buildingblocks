@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.capabilities.base.rpc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -142,6 +143,23 @@ public class RemoteProcedureCallResponse implements Serializable {
     public void setResponseStringContent(String stringContent){
         setResponseContent(stringContent);
         setResponseContentType(String.class);
+    }
+
+    @JsonIgnore
+    public PetasosFulfillmentTask getResponseFulfillmentTask(){
+        if(hasResponseContent()){
+            if(getResponseContentType().equals(PetasosFulfillmentTask.class)){
+                PetasosFulfillmentTask task = (PetasosFulfillmentTask) getResponseContent();
+                return(task);
+            }
+        }
+        return(null);
+    }
+
+    @JsonIgnore
+    public void setResponseFulfillmentTask(PetasosFulfillmentTask task){
+        setResponseContent(task);
+        setResponseContentType(PetasosFulfillmentTask.class);
     }
 
     //
