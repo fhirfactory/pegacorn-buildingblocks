@@ -25,8 +25,9 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGrou
 import org.hl7.fhir.r4.model.AuditEvent;
 
 import java.util.List;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
 
-public interface PetasosAuditEventServiceHandlerInterface {
+public interface PetasosAuditEventServiceHandlerInterface extends CapabilityFulfillmentInterface {
     Boolean logAuditEventHandler(AuditEvent event, JGroupsIntegrationPointSummary jgroupsIP);
     Boolean logAuditEventAsynchronouslyHandler(AuditEvent event, JGroupsIntegrationPointSummary jgroupsIP);
     Boolean logMultipleAuditEventHandler(List<AuditEvent> eventList, JGroupsIntegrationPointSummary jgroupsIP);
