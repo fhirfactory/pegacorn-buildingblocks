@@ -31,6 +31,7 @@ public enum ProcessingPlantRoleEnum {
     PETASOS_SERVICE_PROVIDER_GATEWAY_EMAIL("Petasos.ServiceProvider.Email-Gateway"),
     PETASOS_SERVICE_PROVIDER_GATEWAY_SMS("Petasos.ServiceProvider.SMS-Gateway"),
     PETASOS_SERVICE_PROVIDER_FHIR_DATAGRID("Petasos.ServiceProvider.FHIR-Datagrid"),
+    PETASOS_SERVICE_PROVIDER_GATEWAY_A19QUERY("Petasos.ServiceProvider.A19Query-Gateway"),
     PETASOS_SERVICE_PROVIDER_MITAF_GENERAL("Petasos.ServiceProvider.MITaF-General"),
     PETASOS_SERVICE_PROVIDER_FHIRBREAK_GENERAL("Petasos.ServiceProvider.FHIRBreak-General");
 
