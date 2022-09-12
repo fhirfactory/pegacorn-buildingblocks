@@ -50,7 +50,11 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementName
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -87,6 +91,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     private PetasosEndpointContainerInterface ingresEndpoint;
     private String wupInstanceName;
     private WorkUnitProcessorMetricsAgent metricsAgent;
+    private WorkUnitProcessorTaskReportAgent taskReportAgent;
     private boolean initialised;
 
     @Inject
@@ -112,6 +117,12 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     @Inject
     private ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement;
+    
+    @Inject
+    private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgentAccessor;
+
+    @Inject
+    private PetasosTaskReportAgentFactory taskReportAgentFactory;
 
     //
     // Constructor(s)
@@ -155,20 +166,29 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
         getLogger().info(".initialise(): Setting the WUP EgressEndpoint");
         this.egressEndpoint = specifyEgressEndpoint();
+        this.getMeAsATopologyComponent().setEgressEndpoint(this.egressEndpoint.getEndpointTopologyNode());
+       
         getLogger().info(".initialise(): Setting the WUP IngresEndpoint");
         this.ingresEndpoint = specifyIngresEndpoint();
+        this.getMeAsATopologyComponent().setIngresEndpoint(this.ingresEndpoint.getEndpointTopologyNode());
+        
         getLogger().info(".initialise(): Setting the WUP Archetype - which is used by the WUP Framework to ascertain what wrapping this WUP needs");
         this.wupArchetype =  specifyWUPArchetype();
+        
         getLogger().info(".initialise(): Now invoking subclass initialising function(s)");
         executePostInitialisationActivities();
+        
         getLogger().info(".initialise(): Setting the Topic Subscription Set (i.e. the list of Data Sets we will process)");
         this.topicSubscriptionSet = specifySubscriptionTopics();
+        
         getLogger().info(".initialise(): Building my PetasosParticipant");
         this.meAsAPetasosParticipant = buildPetasosParticipant();
+        
         getLogger().info(".initialise(): Establish the metrics agent");
         ComponentIdType componentId = getMeAsASoftwareComponent().getComponentID();
         String participantName = getMeAsAPetasosParticipant().getParticipantName();
         this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(processingPlantCapabilityStatement, componentId, participantName);
+        
         getLogger().info(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
         buildWUPFramework(this.getContext());
 
@@ -281,6 +301,10 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     public PetasosParticipant getMeAsAPetasosParticipant() {
         return meAsAPetasosParticipant;
+    }
+    
+    public WorkUnitProcessorSoftwareComponent getMeAsATopologyComponent() {
+        return meAsASoftwareComponent;
     }
 
     protected WorkUnitProcessorMetricsAgent getMetricsAgent(){
