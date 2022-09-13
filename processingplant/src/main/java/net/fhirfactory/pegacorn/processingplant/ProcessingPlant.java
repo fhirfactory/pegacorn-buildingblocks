@@ -73,7 +73,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantRoleSupportInterface, ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface {
+public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantRoleSupportInterface, ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface, CapabilityFulfillmentInterface {
 
     private ProcessingPlantSoftwareComponent meAsASoftwareComponent;
     private String instanceQualifier;
@@ -415,7 +415,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         this.capabilityDeliveryServices.put(capabilityName, fulfillmentInterface);
         getLogger().debug(".registerCapabilityFulfillmentService(): Exit, Capability Fulillment Interface registered");
     }
-/*
+
     @Override
     public CapabilityUtilisationResponse executeTask(CapabilityUtilisationRequest request) {
         getLogger().debug(".executeTask(): Entry, request->{}", request);
@@ -440,8 +440,6 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         getLogger().debug(".executeTask(): Exit, capabilityUtilisationResponse->{}", capabilityUtilisationResponse);
         return(capabilityUtilisationResponse);
     }
-
- */
 
     @Override
     public boolean isITOpsNode() {
