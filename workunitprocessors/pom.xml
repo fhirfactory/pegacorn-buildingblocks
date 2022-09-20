@@ -123,7 +123,7 @@
         <!-- Pegacorn Deployment Model -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-deployment-configuration</artifactId>
+            <artifactId>dricats-deployment-constants</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
@@ -148,7 +148,7 @@
         <!-- Pegacorn Petasos Information Core -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-petasos-framework</artifactId>
+            <artifactId>dricats-buildingblocks-petasos-core</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
@@ -156,7 +156,7 @@
         <!-- Pegacorn Core Data Models (FHIR) -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-datamodels-fhir</artifactId>
+            <artifactId>dricats-buildingblocks-datamodels-fhir</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
@@ -164,15 +164,27 @@
         <!-- Pegacorn Core Data Models (FHIR) -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-datamodels-petasos</artifactId>
+            <artifactId>dricats-buildingblocks-datamodels-core</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-deployment-datasets</artifactId>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
             <artifactId>dricats-buildingblocks-workshop</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-buildingblocks-petasos-audit</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

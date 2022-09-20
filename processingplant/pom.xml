@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
 
     <name>DRICaTS :: Building Blocks :: Processing Plant</name>
-    <description>The Archetype/Template for each Subsystem within the Pegacorn EcoSystem</description>
+    <description>The Archetype/Template for each Subsystem within the DRICaTS EcoSystem</description>
 
     <licenses>
         <license>
@@ -98,7 +98,7 @@
         <!-- Pegacorn Deployment Properties -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-deployment-configuration</artifactId>
+            <artifactId>dricats-deployment-properties</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
@@ -121,12 +121,18 @@
         <!-- Pegacorn Building Blocks Datamodels Components -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-datamodels-petasos</artifactId>
+            <artifactId>dricats-buildingblocks-datamodels-core</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-deployment-constants</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
             <artifactId>dricats-deployment-topology</artifactId>
