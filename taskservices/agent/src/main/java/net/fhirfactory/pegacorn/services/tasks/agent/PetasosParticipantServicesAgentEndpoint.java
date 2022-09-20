@@ -116,43 +116,51 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
 
     public void petasosParticipantCacheSynchronisationDaemon(){
         getLogger().debug(".petasosParticipantCacheSynchronisationDaemon(): Entry");
-        //
-        // 1st, let's synchronise my subscriptions
-        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Start");
-        PetasosParticipant myProcessingPlantPetasosParticipant = getParticipantHolder().getMyProcessingPlantPetasosParticipant();
-        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] myProcessingPlantPetasosParticipant->{}", myProcessingPlantPetasosParticipant);
-        PetasosParticipantRegistration localRegistration = localPetasosParticipantCacheIM.getLocalParticipantRegistration(myProcessingPlantPetasosParticipant.getComponentID());
-        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] localRegistration->{}", localRegistration);
-        if(localRegistration == null){
-            getLogger().error(".petasosParticipantCacheSynchronisationDaemon(): My PetasosParticipantRegistration is all wrong!");
-        } else {
-            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): localRegistration->{}", localRegistration);
-            if (localRegistration.getRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_LOCAL_ONLY)) {
-                PetasosParticipantRegistration centralRegistration = getPetasosParticipantRegistration(localRegistration.getParticipant().getComponentID());
-                if (centralRegistration == null) {
-                    centralRegistration = registerPetasosParticipant(localRegistration.getParticipant());
-                } else {
-                    centralRegistration = updatePetasosParticipant(localRegistration.getParticipant());
+
+        try {
+            //
+            // 1st, let's synchronise my subscriptions
+            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Start");
+            PetasosParticipant myProcessingPlantPetasosParticipant = getParticipantHolder().getMyProcessingPlantPetasosParticipant();
+            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] myProcessingPlantPetasosParticipant->{}", myProcessingPlantPetasosParticipant);
+            PetasosParticipantRegistration localRegistration = localPetasosParticipantCacheIM.getLocalParticipantRegistration(myProcessingPlantPetasosParticipant.getComponentID());
+            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] localRegistration->{}", localRegistration);
+            if (localRegistration == null) {
+                getLogger().error(".petasosParticipantCacheSynchronisationDaemon(): My PetasosParticipantRegistration is all wrong!");
+            } else {
+                getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): localRegistration->{}", localRegistration);
+                if (localRegistration.getRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_LOCAL_ONLY)
+                    || localRegistration.getRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED)) {
+                    PetasosParticipantRegistration centralRegistration = getPetasosParticipantRegistration(localRegistration.getParticipant().getComponentID());
+                    if (centralRegistration == null) {
+                        centralRegistration = registerPetasosParticipant(localRegistration.getParticipant());
+                    } else {
+                        centralRegistration = updatePetasosParticipant(localRegistration.getParticipant());
+                    }
+                    if(centralRegistration != null) {
+                        localPetasosParticipantCacheIM.synchroniseLocalWithCentralCacheDetail(centralRegistration);
+                    }
                 }
-                localPetasosParticipantCacheIM.synchroniseLocalWithCentralCacheDetail(centralRegistration);
             }
-        }
-        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Finish");
-        //
-        // 2nd, let's synchronise my publishing
-        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] Start");
-        String myProcessingPlantParticipantName = getSubsystemParticipantName();
-        Set<PetasosParticipant> downstreamTaskPerformers = getDownstreamTaskPerformersForTaskProducer(myProcessingPlantParticipantName);
-        if(!downstreamTaskPerformers.isEmpty()){
-            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] There are downstream subscribers!");
-            for(PetasosParticipant currentDownstreamPerformer: downstreamTaskPerformers){
-                if(getLogger().isTraceEnabled()){
-                    getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getSubsystemParticipantName());
+            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Finish");
+            //
+            // 2nd, let's synchronise my publishing
+            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] Start");
+            String myProcessingPlantParticipantName = getSubsystemParticipantName();
+            Set<PetasosParticipant> downstreamTaskPerformers = getDownstreamTaskPerformersForTaskProducer(myProcessingPlantParticipantName);
+            if (!downstreamTaskPerformers.isEmpty()) {
+                getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] There are downstream subscribers!");
+                for (PetasosParticipant currentDownstreamPerformer : downstreamTaskPerformers) {
+                    if (getLogger().isTraceEnabled()) {
+                        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getSubsystemParticipantName());
+                    }
+                    localPetasosParticipantCacheIM.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
                 }
-                localPetasosParticipantCacheIM.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
             }
+            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] Finish");
+        } catch (Exception daemonException){
+            getLogger().error(".petasosParticipantCacheSynchronisationDaemon(): Exception, message->{}, stackTrace->{}", daemonException.getMessage(), daemonException.getStackTrace());
         }
-        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] Finish");
         getLogger().debug(".petasosParticipantCacheSynchornisationDaemon(): Exit");
     }
 
@@ -290,12 +298,22 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             getLogger().debug(".getTaskPerformersForTaskProducer(): Exit, registration->{}", registration);
             return(registration);
         } catch (NoSuchMethodException e) {
-            getLogger().debug(".getTaskPerformersForTaskProducer(): Error (NoSuchMethodException)->", e);
+            getLogger().error(".getTaskPerformersForTaskProducer(): Error (NoSuchMethodException)->", e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            return(null);
+            PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
+            registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
+            registration.setRegistrationCommentary("Error (NoSuchMethodException)");
+            registration.setRegistrationInstant(Instant.now());
+            getLogger().debug(".getTaskPerformersForTaskProducer(): Exit, registration->{}", registration);
+            return(registration);
         } catch (Exception e) {
             getLogger().debug(".getTaskPerformersForTaskProducer(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
+            registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
+            registration.setRegistrationCommentary("Error (GeneralException)");
+            registration.setRegistrationInstant(Instant.now());
+            getLogger().debug(".getTaskPerformersForTaskProducer(): Exit, registration->{}", registration);
             return(null);
         }
     }
@@ -323,11 +341,11 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             getLogger().debug(".deregisterPetasosParticipant(): Exit, registration->{}", registration);
             return(registration);
         } catch (NoSuchMethodException e) {
-            getLogger().debug(".deregisterPetasosParticipant(): Error (NoSuchMethodException)->", e);
+            getLogger().error(".deregisterPetasosParticipant(): Error (NoSuchMethodException)->", e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         } catch (Exception e) {
-            getLogger().debug(".deregisterPetasosParticipant(): Error (GeneralException) ->",e);
+            getLogger().error(".deregisterPetasosParticipant(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         }
@@ -356,11 +374,11 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             getLogger().debug(".getPetasosParticipantRegistration(): Exit, registration->{}", registration);
             return(registration);
         } catch (NoSuchMethodException e) {
-            getLogger().debug(".getPetasosParticipantRegistration(): Error (NoSuchMethodException)->", e);
+            getLogger().error(".getPetasosParticipantRegistration(): Error (NoSuchMethodException)->", e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         } catch (Exception e) {
-            getLogger().debug(".getPetasosParticipantRegistration(): Error (GeneralException) ->",e);
+            getLogger().error(".getPetasosParticipantRegistration(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(null);
         }
@@ -389,11 +407,11 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             getLogger().debug(".getParticipantRegistrationSetForService(): Exit, participantSet->{}", participantSet);
             return(participantSet);
         } catch (NoSuchMethodException e) {
-            getLogger().debug(".getParticipantRegistrationSetForService(): Error (NoSuchMethodException)->", e);
+            getLogger().error(".getParticipantRegistrationSetForService(): Error (NoSuchMethodException)->", e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         } catch (Exception e) {
-            getLogger().debug(".getParticipantRegistrationSetForService(): Error (GeneralException) ->",e);
+            getLogger().error(".getParticipantRegistrationSetForService(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         }
@@ -415,11 +433,11 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             getLogger().debug(".getTaskPerformerServiceRegistration(): Exit, participantSet->{}", participantSet);
             return(participantSet);
         } catch (NoSuchMethodException e) {
-            getLogger().debug(".getTaskPerformerServiceRegistration(): Error (NoSuchMethodException)->", e);
+            getLogger().error(".getTaskPerformerServiceRegistration(): Error (NoSuchMethodException)->", e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         } catch (Exception e) {
-            getLogger().debug(".getTaskPerformerServiceRegistration(): Error (GeneralException) ->",e);
+            getLogger().error(".getTaskPerformerServiceRegistration(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             return(new HashSet<>());
         }
