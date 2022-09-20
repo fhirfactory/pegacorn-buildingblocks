@@ -187,6 +187,6 @@ public class HL7V2XTopicFactory {
         LOG.debug(".newBadDataParcelManifest(): Entry");
         DataParcelManifest badManifest = new DataParcelManifest();
         badManifest.setContentDescriptor(newBadDataParcelDescriptor());
-        return(newBadDataParcelManifest());
+        return(badManifest);
     }
 }
