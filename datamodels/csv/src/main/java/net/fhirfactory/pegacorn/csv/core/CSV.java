@@ -44,7 +44,9 @@ public abstract class CSV extends PegacornFile {
      * Creates an empty CSV object
      */
     public CSV() {
-
+    	if (this instanceof HasHeaderRow) {
+    		headings = ((HasHeaderRow)this).getRequiredHeadings();
+    	}
     }
 
     /**
@@ -55,6 +57,8 @@ public abstract class CSV extends PegacornFile {
      * @throws IOException
      */
     public CSV(File csvFile) throws CSVParsingException, IOException {
+    	this();
+    	
         filename = csvFile.getAbsolutePath();
         
         CSVParser csvParser = getCSVParser();
@@ -85,6 +89,7 @@ public abstract class CSV extends PegacornFile {
      * @throws IOException
      */
     public CSV(String csvString) throws CSVParsingException, IOException {
+    	this();
         
         CSVParser csvParser = getCSVParser();
         CSVReader csvReader = null;
