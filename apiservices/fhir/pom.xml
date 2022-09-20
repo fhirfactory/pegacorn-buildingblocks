@@ -5,15 +5,15 @@
 
     <parent>
         <groupId>net.fhirfactory.dricats</groupId>
-        <artifactId>dricats-buildingblocks</artifactId>
+        <artifactId>dricats-buildingblocks-apiservices</artifactId>
         <version>1.6.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dricats-buildingblocks-workshop</artifactId>
+    <artifactId>dricats-buildingblocks-apiservices-fhir</artifactId>
+    <version>1.6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>DRICaTS :: Building Blocks :: Workshop</name>
-    <description>The Archetype/Template for each Workshop within the Pegacorn EcoSystem</description>
+    <name>DRICaTS :: Building Blocks :: API Services :: FHIR</name>
 
     <licenses>
         <license>
@@ -36,11 +36,11 @@
         </developer>
     </developers>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
+
+        <!--                                 -->
+        <!-- Jakarta/JEE & Wildfly Libraries -->
+        <!--                                 -->
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
@@ -73,14 +73,9 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core-model</artifactId>
-            <version>${version-org.apache.camel}</version>
-            <scope>compile</scope>
-            <type>jar</type>
-        </dependency>
-
+        <!--                          -->
+        <!-- Apache Commons Libraries -->
+        <!--                          -->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -88,6 +83,25 @@
             <version>${version-org.apache.commons-lang3}</version>
         </dependency>
 
+        <!--                                   -->
+        <!-- Apache Camel Components Libraries -->
+        <!--                                   -->
+
+        <!-- https://mvnrepository.com/artifact/org.apache.camel/camel-netty-http -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-netty-http</artifactId>
+            <version>${version-org.apache.camel}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version-org.apache.httpcomponents-httpclient}</version>
+        </dependency>
+
+        <!--                             -->
+        <!-- JSON Manipulation Libraries -->
+        <!--                             -->
 
         <dependency>
             <groupId>org.json</groupId>
@@ -102,22 +116,22 @@
             <version>${version-com.fasterxml.jackson.core-jackson-core}</version>
         </dependency>
 
-        <!--                     -->
-        <!-- Pegacorn Components -->
-        <!--                     -->
+        <!--                  -->
+        <!-- Pegacorn Modules -->
+        <!--                  -->
 
         <!-- Pegacorn Deployment Model -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-deployment-configuration</artifactId>
+            <artifactId>dricats-datamodels-configuration</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Deployment Topology -->
+        <!-- Pegacorn Deployment Properties -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-deployment-topology</artifactId>
+            <artifactId>dricats-deployment-configuration</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
@@ -131,7 +145,23 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Pegacorn Building Blocks Datamodels Components -->
+        <!-- Pegacorn Petasos Information Core -->
+        <dependency>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-petasos-framework</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Pegacorn Core Data Models (FHIR) -->
+        <dependency>
+            <groupId>net.fhirfactory.dricats</groupId>
+            <artifactId>dricats-datamodels-fhir</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Pegacorn Core Data Models (FHIR) -->
         <dependency>
             <groupId>net.fhirfactory.dricats</groupId>
             <artifactId>dricats-datamodels-petasos</artifactId>
@@ -140,26 +170,9 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Infinispan -->
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-core</artifactId>
-            <scope>compile</scope>
-            <version>${version-org.infinispan}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-commons</artifactId>
-            <scope>compile</scope>
-            <version>${version-org.infinispan}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jgroups</groupId>
-            <artifactId>jgroups</artifactId>
-            <scope>compile</scope>
-            <version>${version-org.jgroups-jgroups}</version>
-        </dependency>
-
+        <!--                   -->
+        <!-- HAPI FHIR Modules -->
+        <!--                   -->
 
         <!-- This dependency includes the core HAPI-FHIR classes -->
         <dependency>
@@ -168,18 +181,28 @@
             <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
 
-        <!-- This dependency is for the HAPI-FHIR Server -->
+        <!-- This dependency is for the HAPI-FHIR Client -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-client</artifactId>
             <version>${version-ca.uhn.hapi.fhir}</version>
         </dependency>
-
         <!-- At least one "structures" JAR must also be included -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-structures-r4</artifactId>
             <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-server</artifactId>
+            <version>${version-ca.uhn.hapi.fhir}</version>
+        </dependency>
+        <!-- HAPI Narrative Generation -->
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>${version-org.thymeleaf}</version>
         </dependency>
 
         <!-- Testing -->
@@ -236,21 +259,8 @@
             <version>${version-ch.qos.logback-classic}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.dricats</groupId>
-            <artifactId>dricats-petasos-framework</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
 
     </dependencies>
-
-    <distributionManagement>
-        <repository>
-            <id>Pegacorn SWDevel</id>
-            <url>file:///home/mhunter/swdevel/deploy/files</url>
-        </repository>
-    </distributionManagement>
 
     <build>
         <plugins>
@@ -292,7 +302,7 @@
             <!-- An optional Arquillian testing profile -->
             <id>arquillian-managed-wildfly</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <dependencies>
                 <dependency>
@@ -333,7 +343,7 @@
                     <plugin>
                         <groupId>org.wildfly.plugins</groupId>
                         <artifactId>wildfly-maven-plugin</artifactId>
-                        <version>2.0.2.Final</version>
+                        <version>${version-org.wildfly-maven-plugin}</version>
                         <executions>
                         </executions>
                     </plugin>

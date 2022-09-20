@@ -5,22 +5,19 @@
 
     <parent>
         <groupId>net.fhirfactory.dricats</groupId>
-        <artifactId>dricats</artifactId>
+        <artifactId>dricats-buildingblocks</artifactId>
         <version>1.6.0-SNAPSHOT</version>
-        <relativePath>../pegacorn</relativePath>
     </parent>
 
-    <artifactId>dricats-buildingblocks</artifactId>
+    <artifactId>dricats-buildingblocks-apiservices</artifactId>
+    <version>1.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>DRICaTS :: Building Blocks</name>
-    <description>The core subset of subsystem building blocks and services</description>
+    <name>DRICaTS :: Building Blocks :: API Services</name>
+    <description>The core set of RESTful API Servers and Clients</description>
 
     <modules>
-	<module>commoncode</module>
-        <!--module>workshop</module-->
-        <!--module>processingplant</module-->
-        <!--module>workunitprocessors</module-->
-        <module>apiservices</module>
+        <module>fhir</module>
+        <module>simplified</module>
     </modules>
 </project>
