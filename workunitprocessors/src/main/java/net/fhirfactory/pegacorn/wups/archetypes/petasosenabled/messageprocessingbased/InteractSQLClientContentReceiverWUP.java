@@ -26,10 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.sql.DataSource;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.support.DefaultRegistry;
+import org.apache.commons.dbcp.BasicDataSource;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
@@ -42,6 +46,8 @@ import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointCont
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 
 public abstract class InteractSQLClientContentReceiverWUP extends GenericMessageBasedWUPTemplate {
+	private static String DATABASE_USERNAME;
+	private static String DATABASE_PASSWORD;
 
     private EndpointMetricsAgent endpointMetricsAgent;
 
@@ -55,6 +61,10 @@ public abstract class InteractSQLClientContentReceiverWUP extends GenericMessage
     public InteractSQLClientContentReceiverWUP() {
         super();
         this.endpointMetricsAgent = null;
+        
+    	DATABASE_USERNAME = System.getenv("DATABASE_USERNAME");
+    	DATABASE_PASSWORD = System.getenv("DATABASE_PASSWORD");
+    	        
         getLogger().debug(".MessagingIngresGatewayWUP(): Entry, Default constructor");
     }
 
@@ -172,7 +182,8 @@ public abstract class InteractSQLClientContentReceiverWUP extends GenericMessage
      * @param uri
      * @return the RouteBuilder.from(uri) with all exceptions logged but not handled
      */
-    protected RouteDefinition fromIncludingPetasosServices(String uri) {
+    @Override
+	protected RouteDefinition fromIncludingPetasosServices(String uri) {
         NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
         AuditAgentInjector auditAgentInjector = new AuditAgentInjector();
         TaskReportAgentInjector taskReportAgentInjector = new TaskReportAgentInjector();
@@ -221,4 +232,22 @@ public abstract class InteractSQLClientContentReceiverWUP extends GenericMessage
         }
     }
 
+    
+    public void configure(CamelContext context) {
+		SQLClientTopologyEndpoint ingresEndpoint = (SQLClientTopologyEndpoint) getIngresEndpoint().getEndpointTopologyNode();
+				
+		String connectionUrl = ingresEndpoint.getConnectionURL();
+		String dataSourceName = ingresEndpoint.getDataSourceName();
+		String driverClassName = ingresEndpoint.getDriverClassName();
+		
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName(driverClassName);
+		dataSource.setUsername(DATABASE_USERNAME);
+		dataSource.setPassword(DATABASE_PASSWORD);
+		dataSource.setUrl(connectionUrl);
+
+		DefaultRegistry registry = (DefaultRegistry) context.getRegistry();
+		registry.bind(dataSourceName, DataSource.class, dataSource);
+		((org.apache.camel.impl.DefaultCamelContext) context).setRegistry(registry);
+	}
 }

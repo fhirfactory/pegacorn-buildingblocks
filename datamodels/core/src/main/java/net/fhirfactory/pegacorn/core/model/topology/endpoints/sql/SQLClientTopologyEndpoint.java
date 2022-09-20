@@ -34,8 +34,10 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.sql.adapters.SQLCl
 
 public class SQLClientTopologyEndpoint extends StandardInteractClientTopologyEndpointPort {
 	
-    private String dataSource;
+    private String connectionURL;
     private String queryTemplate;
+    private String dataSourceName;
+    private String driverClassName;
     
     //
     // Constructor
@@ -43,23 +45,36 @@ public class SQLClientTopologyEndpoint extends StandardInteractClientTopologyEnd
 
     public SQLClientTopologyEndpoint(){
         super();
-        this.dataSource = null;
+        this.connectionURL = null;
         this.queryTemplate = null;
+        this.driverClassName = null;
+        this.dataSourceName = null;
         setEndpointType(PetasosEndpointTopologyTypeEnum.SQL_CLIENT);
         setComponentSystemRole(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_BIDIRECTIONAL);
     }
+
     
-    //
-    // Getters and Setters
-    //
-    
-    public String getDataSource() {
-		return dataSource;
+    public String getConnectionURL() {
+		return connectionURL;
 	}
 
-	public void setDataSource(String dataSource) {
-		this.dataSource = dataSource;
+
+
+	public void setConnectionURL(String connectionURL) {
+		this.connectionURL = connectionURL;
 	}
+
+	public String getDataSourceName() {
+		return dataSourceName;
+	}
+
+
+
+	public void setDataSourceName(String dataSourceName) {
+		this.dataSourceName = dataSourceName;
+	}
+
+
 
 	public String getQueryTemplate() {
 		return queryTemplate;
@@ -69,7 +84,16 @@ public class SQLClientTopologyEndpoint extends StandardInteractClientTopologyEnd
 		this.queryTemplate = queryTemplate;
 	}
 
-    @JsonIgnore
+	public String getDriverClassName() {
+		return driverClassName;
+	}
+
+	public void setDriverClassName(String driverClassName) {
+		this.driverClassName = driverClassName;
+	}
+
+
+	@JsonIgnore
     public List<SQLClientAdapter> getSQLClientAdapters() {
         List<SQLClientAdapter> sqlAdapterList = new ArrayList<>();
         for(IPCAdapter currentInterface: getAdapterList()){
@@ -94,8 +118,10 @@ public class SQLClientTopologyEndpoint extends StandardInteractClientTopologyEnd
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("SQLClientTopologyEndpoint [dataSource=").append(dataSource);
+		builder.append("SQLClientTopologyEndpoint [connectionURL=").append(connectionURL);
 		builder.append(", queryTemplate=").append(queryTemplate);
+		builder.append(", driverClassName=").append(driverClassName);
+		builder.append(", dataSourceName=").append(dataSourceName);
 		builder.append(", ").append(super.toString()).append("]");
 		return builder.toString();
 	}
