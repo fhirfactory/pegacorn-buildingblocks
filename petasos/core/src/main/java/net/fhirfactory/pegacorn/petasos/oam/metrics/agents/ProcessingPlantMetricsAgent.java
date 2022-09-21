@@ -127,6 +127,35 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     // Helpers
     //
 
+    public void touchPathwaySynchronisationIndicator(String participantName){
+        getLogger().debug(".touchPathwaySynchronisationIndicator(): Entry, watchDogName->{}", participantName);
+        if(StringUtils.isEmpty(participantName)){
+            getLogger().debug(".touchPathwaySynchronisationIndicator(): Exit, watchDogName is null or empty");
+            return;
+        }
+        synchronized (getMetricsDataLock()){
+            if(getProcessingPlantMetricsData().getLocalPathwaySynchronisationActivity().containsKey(participantName)){
+                getProcessingPlantMetricsData().getLocalPathwaySynchronisationActivity().replace(participantName, Instant.now());
+            } else {
+                getProcessingPlantMetricsData().getLocalPathwaySynchronisationActivity().put(participantName, Instant.now());
+            }
+        }
+    }
+    public void touchWatchDogActivityIndicator(String watchDogName){
+        getLogger().debug(".touchWatchDogActivityIndicator(): Entry, watchDogName->{}", watchDogName);
+        if(StringUtils.isEmpty(watchDogName)){
+            getLogger().debug(".touchWatchDogActivityIndicator(): Exit, watchDogName is null or empty");
+            return;
+        }
+        synchronized (getMetricsDataLock()){
+            if(getProcessingPlantMetricsData().getLocalWatchDogActivity().containsKey(watchDogName)){
+                getProcessingPlantMetricsData().getLocalWatchDogActivity().replace(watchDogName, Instant.now());
+            } else {
+                getProcessingPlantMetricsData().getLocalWatchDogActivity().put(watchDogName, Instant.now());
+            }
+        }
+    }
+
     public void updateLocalCacheStatus(String cacheName, Integer cacheSize){
         getLogger().debug(".updateLocalCacheStatus(): Entry, cacheName->{}, cacheSize->{}", cacheName, cacheSize);
         if(StringUtils.isEmpty(cacheName) || cacheSize == null){

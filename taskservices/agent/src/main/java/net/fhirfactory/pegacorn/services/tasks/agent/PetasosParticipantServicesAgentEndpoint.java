@@ -26,6 +26,8 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.*;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.PetasosParticipantSubscriptionServicesEndpointBase;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -157,6 +159,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
                     localPetasosParticipantCacheIM.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
                 }
             }
+            getProcessingPlantMetricsAgent().touchWatchDogActivityIndicator("ParticipantCacheSynchronisationDaemon");
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] Finish");
         } catch (Exception daemonException){
             getLogger().error(".petasosParticipantCacheSynchronisationDaemon(): Exception, message->{}, stackTrace->{}", daemonException.getMessage(), daemonException.getStackTrace());
@@ -259,6 +262,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Set<PetasosParticipant> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getDownstreamTaskPerformersForTaskProducer", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
             getLogger().debug(".getDownstreamTaskPerformersForTaskProducer(): Exit, participantSet->{}", participantSet);
             return(participantSet);
         } catch (NoSuchMethodException e) {

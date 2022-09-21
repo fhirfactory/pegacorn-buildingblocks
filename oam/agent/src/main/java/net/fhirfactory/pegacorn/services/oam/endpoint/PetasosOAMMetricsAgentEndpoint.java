@@ -113,6 +113,7 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             Instant response = getRPCDispatcher().callRemoteMethod(targetAddress, "captureMetrics", objectSet, classSet, requestOptions);
             getLogger().debug(".replicateMetricSetToServer(): Exit, response->{}", response);
             getMetricsAgent().incrementRemoteProcedureCallCount();
+            getProcessingPlantMetricsAgent().touchLastActivityInstant();
             return(response);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
