@@ -207,6 +207,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
         Integer taskCacheSize = getActionableTaskDM().getCacheSize();
         getLogger().debug(".actionableTaskCleanup(): ActionableTaskCacheSize->{}", taskCacheSize);
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("SharedActionableTaskCache", taskCacheSize);
+        processingPlantMetricsAgentAccessor.getMetricsAgent().touchWatchDogActivityIndicator("ActionableTaskWatchDog");
         getLogger().debug(".actionableTaskCleanup(): Exit");
     }
 
@@ -235,6 +236,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
         // Some metrics for the JobCardCache
         getLogger().debug(".jobCardCleanup(): jobCardCacheSize->{}", size);
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("TaskJobCardCacheSize", size);
+        processingPlantMetricsAgentAccessor.getMetricsAgent().touchWatchDogActivityIndicator("JobCardWatchDog");
         getLogger().debug(".jobCardCleanup(): Exit");
     }
 
@@ -293,6 +295,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
         Integer taskCacheSize = fulfillmentTaskCache.getTaskCacheSize();
         getLogger().debug(".fulfillmentTaskCleanup(): fulfillmentTaskCacheSize->{}", taskCacheSize);
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("LocalFulfillmentCache", taskCacheSize);
+        processingPlantMetricsAgentAccessor.getMetricsAgent().touchWatchDogActivityIndicator("FulfillmentTaskWatchDog");
         getLogger().debug(".fulfillmentTaskCleanup(): Exit");
     }
 
