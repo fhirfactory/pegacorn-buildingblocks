@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.capabilities.hl7v2tasks;
 
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationResponse;
 
 public class A19QueryTaskOutcome extends CapabilityUtilisationResponse {
     String a19QueryResponse;

@@ -21,13 +21,10 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.ask.base;
 
-import java.util.ArrayList;
-
-import javax.inject.Inject;
-
+import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.interact.ExternalSystemIPCAdapter;
@@ -37,7 +34,8 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.platform.edge.ask.base.http.InternalFHIRClientProxy;
 
-import ca.uhn.fhir.parser.IParser;
+import javax.inject.Inject;
+import java.util.ArrayList;
 
 public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientProxy {
 
@@ -107,9 +105,9 @@ public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientP
 
     protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
         getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
-        ArrayList<TopologyNodeFDN> endpointFDNs = processingPlant.getMeAsASoftwareComponent().getEndpoints();
-        for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
-            IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)topologyIM.getNode(currentEndpointFDN);
+        ArrayList<ComponentIdType> endpointIds = processingPlant.getMeAsASoftwareComponent().getEndpoints();
+        for(ComponentIdType currentEndpointId: endpointIds){
+            IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)topologyIM.getNode(currentEndpointId);
             if(endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)){
                 getLogger().debug(".getTopologyEndpoint(): Exit, node found -->{}", endpointTopologyNode);
                 return(endpointTopologyNode);

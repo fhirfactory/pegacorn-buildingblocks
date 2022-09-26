@@ -31,15 +31,11 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareCompon
 public interface ProcessingPlantInterface extends CapabilityFulfillmentManagementInterface, CapabilityFulfillmentInterface {
     public void initialisePlant();
     public SolutionTopologyNode getSolutionNode();
-    public String getSimpleFunctionName();
-    public String getSimpleInstanceName();
     public NetworkSecurityZoneEnum getNetworkZone();
     public String getHostName();
     public String getDeploymentSite();
     public PegacornTopologyFactoryInterface getTopologyFactory();
     public ProcessingPlantSoftwareComponent getMeAsASoftwareComponent();
-    public String getSubsystemParticipantName();
-    public String getSubsystemName();
     public WorkshopSoftwareComponent getWorkshop(String workshopName, String version);
     public WorkshopSoftwareComponent getWorkshop(String workshopName);
     public boolean isITOpsNode();

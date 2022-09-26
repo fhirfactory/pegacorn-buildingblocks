@@ -21,6 +21,16 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
+import java.sql.Date;
+import java.time.Instant;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.camel.Exchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
@@ -32,14 +42,6 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentT
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
-import org.apache.camel.Exchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.sql.Date;
-import java.time.Instant;
 
     @ApplicationScoped
     public class InterProcessingPlantHandoverPacketGenerationBean extends IPCPacketBeanCommon {
@@ -88,7 +90,7 @@ import java.time.Instant;
 
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Create TaskFullment Traceability element");
             TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
-            traceabilityElement.setFulfillerId(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
+            traceabilityElement.setFulfillerId(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentID());
             traceabilityElement.setActionableTaskId(actionableTask.getTaskId());
             traceabilityElement.setFulfillerTaskId(fulfillmentTask.getTaskId());
             traceabilityElement.setStartInstant(fulfillmentTask.getTaskFulfillment().getStartInstant());
@@ -98,7 +100,7 @@ import java.time.Instant;
             InterProcessingPlantHandoverPacket forwardingPacket = new InterProcessingPlantHandoverPacket();
             forwardingPacket.setActionableTask(actionableTask.getInstance());
             forwardingPacket.setUpstreamFulfillmentTaskDetails(traceabilityElement);
-            String processingPlantName = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID().getDisplayName();
+            String processingPlantName = fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentID().getDisplayName();
             forwardingPacket.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
             forwardingPacket.setMessageSendStartInstant(Instant.now());
 
@@ -117,7 +119,7 @@ import java.time.Instant;
             fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL);
             fulfillmentTask.update();
             forwardingPacket.setTarget(theUoW.getPayloadTopicID().getTargetProcessingPlantParticipantName());
-            forwardingPacket.setSource(processingPlant.getSubsystemParticipantName());
+            forwardingPacket.setSource(processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
             LOG.debug(".constructInterProcessingPlantHandoverPacket(): Exit, forwardingPacket (InterProcessingPlantHandoverPacket) --> {}", forwardingPacket);
             return(forwardingPacket);
         }

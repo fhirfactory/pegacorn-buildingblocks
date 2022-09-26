@@ -52,7 +52,7 @@ public class ExternalEgressPostProcessingContainerRoute extends BasePetasosConta
         super(camelCTX, auditTrailBroker);
         getLogger().debug(".ExternalIngresWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode );
         this.wupTopologyNode = wupNode;
-        nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken());
+        nameSet = new RouteElementNames(wupTopologyNode.getParticipantId());
         this.metricsAgent = metricsAgent;
     }
 

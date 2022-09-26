@@ -21,15 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.interception;
 
-import net.fhirfactory.pegacorn.core.interfaces.interception.PetasosInterceptionBrokerInterface;
-import net.fhirfactory.pegacorn.core.interfaces.interception.PetasosInterceptionHandlerInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
@@ -39,10 +36,15 @@ import org.jgroups.blocks.ResponseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import net.fhirfactory.pegacorn.core.interfaces.interception.PetasosInterceptionBrokerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.interception.PetasosInterceptionHandlerInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 
 @ApplicationScoped
 public class PetasosOAMInterceptionEndpoint extends JGroupsIntegrationPointBase implements PetasosInterceptionBrokerInterface {
@@ -101,7 +103,7 @@ public class PetasosOAMInterceptionEndpoint extends JGroupsIntegrationPointBase 
 
     @Override
     protected String specifySubsystemParticipantName() {
-        return (getProcessingPlant().getSubsystemParticipantName());
+        return (getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
     }
 
     @Override

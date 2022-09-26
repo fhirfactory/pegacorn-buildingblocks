@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.capabilities.hl7v2tasks;
 
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationRequest;
 
 public class A19QueryTask extends CapabilityUtilisationRequest {
 

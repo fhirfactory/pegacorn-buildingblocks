@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
@@ -107,7 +106,7 @@ public class InterProcessingPlantHandoverResponseProcessingBean extends IPCPacke
             responseOK = false;
             responseReason = "Mismatch Message Flows (Passed PetasosFullmentTask id differs)";
         }
-        metricsAgent.getWorkUnitProcessingMetricsData(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
+        metricsAgent.getWorkUnitProcessingMetricsData(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentID()).setEventProcessingFinishInstant(responsePacket.getMessageSendFinishInstant());
 
         LOG.trace(".contextualiseInterProcessingPlantHandoverResponsePacket(): formulate the processing outcome");
         UoW uow = SerializationUtils.clone(fulfillmentTask.getTaskWorkItem());

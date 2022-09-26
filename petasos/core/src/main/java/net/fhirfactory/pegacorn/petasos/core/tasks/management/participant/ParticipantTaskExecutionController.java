@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.deployment.properties.reference.petasos.PetasosDefaultProperties;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.*;
@@ -110,7 +109,7 @@ public class ParticipantTaskExecutionController {
                             // That means we have "nodeAffinity" and therefore preference for execution
                             // So give it execution privileges
                             taskJobCard.setExecutingProcessingPlant(getProcessingPlant().getMeAsASoftwareComponent().getComponentID());
-                            taskJobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
+                            taskJobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentID());
                             taskJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
                             taskJobCard.setExecutingFulfillmentTaskIdAssignmentInstant(Instant.now());
                             taskJobCard.setLastRequestedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
@@ -126,7 +125,7 @@ public class ParticipantTaskExecutionController {
                                 // granted execution priveleges. This hasn't happened, so it's now up from grabs...
                                 // First-in-first-served in this case.
                                 taskJobCard.setExecutingProcessingPlant(getProcessingPlant().getMeAsASoftwareComponent().getComponentID());
-                                taskJobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
+                                taskJobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentID());
                                 taskJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
                                 taskJobCard.setExecutingFulfillmentTaskIdAssignmentInstant(Instant.now());
                                 taskJobCard.setExecutingFulfillmentTaskId(fulfillmentTask.getTaskId());

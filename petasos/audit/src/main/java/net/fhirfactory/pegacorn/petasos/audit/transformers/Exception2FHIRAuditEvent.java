@@ -21,15 +21,14 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.transformers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;
-import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.camel.CamelExecutionException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hl7.fhir.r4.model.AuditEvent;
@@ -37,12 +36,21 @@ import org.hl7.fhir.r4.model.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityLifecycleEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityRoleEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSourceTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSubTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
+import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
 
 @ApplicationScoped
 public class Exception2FHIRAuditEvent  extends Pegacorn2FHIRAuditEventBase {
@@ -95,7 +103,7 @@ public class Exception2FHIRAuditEvent  extends Pegacorn2FHIRAuditEventBase {
 
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
-                processingPlant.getSimpleInstanceName(),
+                processingPlant.getMeAsASoftwareComponent().getComponentID().getDisplayName(),
                 processingPlant.getHostName(),
                 null,
                 null,

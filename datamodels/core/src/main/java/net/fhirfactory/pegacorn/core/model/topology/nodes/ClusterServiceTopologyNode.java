@@ -21,20 +21,22 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.common.EndpointProviderInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class ClusterServiceTopologyNode extends SoftwareComponent implements EndpointProviderInterface {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterServiceTopologyNode.class);
 
-    private ArrayList<TopologyNodeFDN> platformNodes;
+    private ArrayList<ComponentIdType> platformNodes;
     private Integer platformNodeCount;
-    private ArrayList<TopologyNodeFDN> serviceEndpoints;
+    private ArrayList<ComponentIdType> serviceEndpoints;
     private String defaultDNSName;
     private boolean internalTrafficEncrypted;
 
@@ -49,19 +51,19 @@ public class ClusterServiceTopologyNode extends SoftwareComponent implements End
         this.serviceEndpoints = new ArrayList<>();
     }
 
-    public ArrayList<TopologyNodeFDN> getPlatformNodes() {
+    public ArrayList<ComponentIdType> getPlatformNodes() {
         return platformNodes;
     }
 
-    public void setPlatformNodes(ArrayList<TopologyNodeFDN> platformNodes) {
+    public void setPlatformNodes(ArrayList<ComponentIdType> platformNodes) {
         this.platformNodes = platformNodes;
     }
 
-    public ArrayList<TopologyNodeFDN> getServiceEndpoints() {
+    public ArrayList<ComponentIdType> getServiceEndpoints() {
         return serviceEndpoints;
     }
 
-    public void setServiceEndpoints(ArrayList<TopologyNodeFDN> serviceEndpoints) {
+    public void setServiceEndpoints(ArrayList<ComponentIdType> serviceEndpoints) {
         this.serviceEndpoints = serviceEndpoints;
     }
 
@@ -90,8 +92,24 @@ public class ClusterServiceTopologyNode extends SoftwareComponent implements End
     }
 
     @Override
-    public void addEndpoint(TopologyNodeFDN endpointFDN) {
+    public void addEndpoint(ComponentIdType endpointFDN) {
         getLogger().debug(".addEndpoint(): Entry, endpointFDN->{}", endpointFDN);
         serviceEndpoints.add(endpointFDN);
+    }
+
+    //
+    // ToString
+    //
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ClusterServiceTopologyNode{");
+        sb.append("platformNodes=").append(platformNodes);
+        sb.append(", platformNodeCount=").append(platformNodeCount);
+        sb.append(", serviceEndpoints=").append(serviceEndpoints);
+        sb.append(", defaultDNSName='").append(defaultDNSName).append('\'');
+        sb.append(", internalTrafficEncrypted=").append(internalTrafficEncrypted);
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

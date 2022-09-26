@@ -21,7 +21,9 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.tasks;
 
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTaskSet;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
 import java.util.List;
@@ -29,6 +31,6 @@ import java.util.List;
 public interface PetasosTaskHandlerInterface {
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier);
     public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier);
-    public List<PetasosActionableTask> retrievePendingActionableTasks(JGroupsIntegrationPointSummary requestorEndpointSummary);
+    public PetasosActionableTaskSet retrievePendingActionableTasks(PetasosParticipantId participantId);
     public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointSummary);
 }

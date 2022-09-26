@@ -21,18 +21,14 @@
  */
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantFulfillment;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 
 public class PetasosParticipantSummary extends ResourceSummaryBase {
-    private String participantName;
-    private String nodeVersion;
+    private PetasosParticipantId participantId;
     private PetasosParticipantFulfillment fulfillmentState;
-    private TopologyNodeFunctionFDN topologyNodeFunctionFDN;
     private PetasosMonitoredComponentTypeEnum nodeType;
 
     //
@@ -40,10 +36,8 @@ public class PetasosParticipantSummary extends ResourceSummaryBase {
     //
 
     public PetasosParticipantSummary(){
-        this.participantName = null;
-        this.nodeVersion = null;
+        this.participantId = new PetasosParticipantId();
         this.fulfillmentState = null;
-        this.topologyNodeFunctionFDN = null;
         this.nodeType = null;
     }
 
@@ -51,20 +45,29 @@ public class PetasosParticipantSummary extends ResourceSummaryBase {
     // Getters and Setters
     //
 
+
+    public PetasosParticipantId getParticipantId() {
+        return participantId;
+    }
+
+    public void setParticipantId(PetasosParticipantId participantId) {
+        this.participantId = participantId;
+    }
+
     public String getParticipantName() {
-        return participantName;
+        return getParticipantId().getName();
     }
 
     public void setParticipantName(String participantName) {
-        this.participantName = participantName;
+        this.getParticipantId().setName(participantName);
     }
 
     public String getNodeVersion() {
-        return nodeVersion;
+        return getParticipantId().getVersion();
     }
 
     public void setNodeVersion(String nodeVersion) {
-        this.nodeVersion = nodeVersion;
+        this.getParticipantId().setVersion(nodeVersion);
     }
 
     public PetasosMonitoredComponentTypeEnum getNodeType() {
@@ -83,29 +86,20 @@ public class PetasosParticipantSummary extends ResourceSummaryBase {
         this.fulfillmentState = fulfillmentState;
     }
 
-    public TopologyNodeFunctionFDN getTopologyNodeFunctionFDN() {
-        return topologyNodeFunctionFDN;
-    }
-
-    public void setTopologyNodeFunctionFDN(TopologyNodeFunctionFDN topologyNodeFunctionFDN) {
-        this.topologyNodeFunctionFDN = topologyNodeFunctionFDN;
-    }
-
     //
     // To String
     //
 
     @Override
     public String toString() {
-        return "PetasosParticipantSummary{" +
-                "participantName='" + participantName + '\'' +
-                ", nodeVersion='" + nodeVersion + '\'' +
-                ", fulfillmentState=" + fulfillmentState +
-                ", topologyNodeFunctionFDN=" + topologyNodeFunctionFDN +
-                ", nodeType=" + nodeType +
-                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", resourceId='" + getResourceId() + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("PetasosParticipantSummary{");
+        sb.append("participantId=").append(participantId);
+        sb.append(", fulfillmentState=").append(fulfillmentState);
+        sb.append(", nodeType=").append(nodeType);
+        sb.append(", lastSynchronisationInstant=").append(getLastSynchronisationInstant());
+        sb.append(", lastActivityInstant=").append(getLastActivityInstant());
+        sb.append(", resourceId='").append(getResourceId()).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

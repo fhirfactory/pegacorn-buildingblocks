@@ -24,9 +24,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.unmanaged;
 import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
@@ -138,10 +136,10 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
 
     private void buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
-        String participantName = getWorkshop().getWorkshopNode().getParticipantName() + "." + specifyWUPInstanceName();
+        String participantName = getWorkshop().getWorkshopNode().getParticipantId() + "." + specifyWUPInstanceName();
         WorkUnitProcessorSoftwareComponent wupNode = getTopologyFactory()
-                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), participantName, getWorkshop().getWorkshopNode(), PegacornSystemComponentTypeTypeEnum.WUP);
-        getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getComponentFDN(), wupNode);
+                .buildWUP(specifyWUPInstanceName(),specifyWUPInstanceVersion(), participantName, getWorkshop().getWorkshopNode(), SoftwareComponentTypeEnum.WUP);
+        getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getComponentID(), wupNode);
         wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());
         this.topologyNode = wupNode;
@@ -158,14 +156,6 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
 
     public void setCurrentFulfillmentTask(PetasosFulfillmentTask currentFulfillmentTask) {
         this.currentFulfillmentTask = currentFulfillmentTask;
-    }
-
-    public TopologyNodeFunctionFDN getNodeFunctionFDN(){
-        return(topologyNode.getNodeFunctionFDN());
-    }
-
-    public TopologyNodeFunctionFDNToken getNodeFunctionFDNToken(){
-        return(topologyNode.getNodeFunctionFDN().getFunctionToken());
     }
 
     public WorkUnitProcessorSoftwareComponent getTopologyNode() {

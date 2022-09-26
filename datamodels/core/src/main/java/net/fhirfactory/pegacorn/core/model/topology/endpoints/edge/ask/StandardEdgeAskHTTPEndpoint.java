@@ -71,28 +71,9 @@ public class StandardEdgeAskHTTPEndpoint extends StandardInteractClientTopologyE
 
     @Override
     public String toString() {
-        return "StandardEdgeAskHTTPEndpoint{" +
-                "componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", endpointConfigurationName='" + getEndpointConfigurationName() + '\'' +
-                ", server=" + isServer() +
-                ", implementingWUP=" + getImplementingWUP() +
-                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", endpointType=" + getEndpointType() +
-                ", adapterList=" + getAdapterList() +
-                ", HTTPClientAdapters=" + getHTTPClientAdapters() +
-                ", targetSystem=" + getTargetSystem() +
-                '}';
+        final StringBuilder sb = new StringBuilder("StandardEdgeAskHTTPEndpoint{");
+        sb.append("HTTPClientAdapters=").append(getHTTPClientAdapters());
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

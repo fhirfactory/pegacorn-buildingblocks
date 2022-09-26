@@ -104,26 +104,17 @@ public class EndpointSummary extends SoftwareComponentSummary {
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "EndpointSummary{" +
-                "connectedSystemName='" + connectedSystemName + '\'' +
-                ", endpointType=" + endpointType +
-                ", server=" + server +
-                ", serverPorts=" + serverPorts +
-                ", clientPorts=" + clientPorts +
-                ", participantName='" + getParticipantName() + '\'' +
-                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", wupParticipantName=" + getWupParticipantName() +
-                ", topologyNodeFDN=" + getTopologyNodeFDN() +
-                ", componentID=" + getComponentID() +
-                ", nodeVersion='" + getNodeVersion() + '\'' +
-                ", nodeType=" + getNodeType() +
-                ", concurrencyMode='" + getConcurrencyMode() + '\'' +
-                ", resilienceMode='" + getResilienceMode() + '\'' +
-                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", resourceId='" + getResourceId() + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("EndpointSummary{");
+        sb.append("connectedSystemName='").append(connectedSystemName).append('\'');
+        sb.append(", endpointType=").append(endpointType);
+        sb.append(", server=").append(server);
+        sb.append(", serverPorts=").append(serverPorts);
+        sb.append(", clientPorts=").append(clientPorts);
+        sb.append(", wupParticipantName='").append(wupParticipantName).append('\'');
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

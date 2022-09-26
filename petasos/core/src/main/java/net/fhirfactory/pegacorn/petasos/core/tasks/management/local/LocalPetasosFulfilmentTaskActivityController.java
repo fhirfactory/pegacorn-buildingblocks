@@ -116,7 +116,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
     public PetasosTaskExecutionStatusEnum requestFulfillmentTaskExecutionPrivilege(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
         getLogger().trace(".requestFulfillmentTaskExecutionPrivilege(): Entry, fulfillmentTask->{}", fulfillmentTask);
         if(getLogger().isDebugEnabled()){
-            getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Entry, WUP Component Id->{}", fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
+            getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Entry, WUP Component Id->{}", fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentID());
         }
         PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus = taskExecutionController.requestTaskExecutionPrivilege(fulfillmentTask.getInstance());
         fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);

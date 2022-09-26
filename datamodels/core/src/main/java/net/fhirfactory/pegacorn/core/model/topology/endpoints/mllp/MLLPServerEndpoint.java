@@ -109,36 +109,15 @@ public class MLLPServerEndpoint extends ClusteredInteractServerTopologyEndpointP
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "InteractMLLPServerEndpoint{" +
-                "componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", hasComponentID=" + hasComponentID() +
-                ", componentID=" + getComponentID() +
-                ", hasNodeFunctionFDN=" + hasNodeFunctionFDN() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", hasContainingNodeFDN=" + hasContainingNodeFDN() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", hasComponentRDN=" + hasComponentRDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", servicePortValue=" + getServicePortValue() +
-                ", servicePortName='" + getServicePortName() + '\'' +
-                ", servicePortOffset=" + getServicePortOffset() +
-                ", serviceDNSName='" + getServiceDNSName() + '\'' +
-                ", server=" + isServer() +
-                ", implementingWUP=" + getImplementingWUP() +
-                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", endpointType=" + getEndpointType() +
-                ", adapterList=" + getAdapterList() +
-                '}';
+        final StringBuilder sb = new StringBuilder("MLLPServerEndpoint{");
+        sb.append("MLLPServerAdapter=").append(getMLLPServerAdapter());
+        sb.append(", targetSystemName='").append(getTargetSystemName()).append('\'');
+        sb.append(", targetConnectionDescription='").append(getTargetConnectionDescription()).append('\'');
+        sb.append(", detailedConnectionDescription='").append(getDetailedConnectionDescription()).append('\'');
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

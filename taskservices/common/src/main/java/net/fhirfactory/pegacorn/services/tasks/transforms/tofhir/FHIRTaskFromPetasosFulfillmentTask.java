@@ -359,10 +359,12 @@ public class FHIRTaskFromPetasosFulfillmentTask extends FHIRTaskFromPetasosTask 
             performerTypes = new ArrayList<>();
             List<TaskPerformerTypeType> taskPerformerTypes = fulfillmentTask.getTaskPerformerTypes();
             for(TaskPerformerTypeType currentPerformerType: taskPerformerTypes){
-                String functionToken = currentPerformerType.getRequiredPerformerType().getFunctionToken().getToken();
-                String functionDescription = currentPerformerType.getRequiredPerformerTypeDescription();
-                CodeableConcept performerTypeCC = getPerformerTypeFactory().newTaskPerformerType(functionToken, functionDescription);
-                performerTypes.add(performerTypeCC);
+                if(currentPerformerType.isCapabilityBased()){
+                    // do nothing for now
+                } else {
+                    CodeableConcept performerTypeCC = getPerformerTypeFactory().newTaskPerformerType(currentPerformerType.getKnownTaskPerformer());
+                    performerTypes.add(performerTypeCC);
+                }
             }
         }
         getLogger().debug(".specifyPerformerType(): Exit, performerTypes->{}", performerTypes);

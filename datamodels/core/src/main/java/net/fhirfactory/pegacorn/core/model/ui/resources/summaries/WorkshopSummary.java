@@ -69,9 +69,7 @@ public class WorkshopSummary extends SoftwareComponentSummary {
     @Override
     public String toString() {
         return "WorkshopSummary{" +
-                "participantName='" + getParticipantName() + '\'' +
-                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", topologyNodeFDN=" + getTopologyNodeFDN() +
+                "participantId=" + getParticipantId() +
                 ", componentID=" + getComponentID() +
                 ", nodeVersion='" + getNodeVersion() + '\'' +
                 ", nodeType=" + getNodeType() +

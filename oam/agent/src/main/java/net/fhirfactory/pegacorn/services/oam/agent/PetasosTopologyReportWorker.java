@@ -107,7 +107,7 @@ public class PetasosTopologyReportWorker extends AgentWorkerBase {
         //
         LOG.trace(".forwardTopologyDetails(): [Grab Current Topology Graph] Start");
         PetasosMonitoredTopologyGraph currentState = itOpsTopologyDM.getCurrentState();
-        currentState.setDeploymentName(getProcessingPlant().getSolutionNode().getComponentRDN().getNodeName());
+        currentState.setDeploymentName(getProcessingPlant().getSolutionNode().getComponentID().getName());
         LOG.trace(".forwardTopologyDetails(): [Grab Current Topology Graph] Finish");
         //
         // Send Update

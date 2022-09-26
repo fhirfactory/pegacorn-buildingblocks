@@ -22,21 +22,23 @@
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(WorkUnitProcessorSoftwareComponent.class);
 
-    private ArrayList<TopologyNodeFDN> wupComponents;
-    private ArrayList<TopologyNodeFDN> wupInterchangeComponents;
+    private ArrayList<ComponentIdType> wupComponents;
+    private ArrayList<ComponentIdType> wupInterchangeComponents;
     private IPCTopologyEndpoint ingresEndpoint;
     private IPCTopologyEndpoint egressEndpoint;
     private Map<PetasosEndpointFunctionTypeEnum, PetasosEndpoint> serviceEndpoints;
@@ -98,19 +100,19 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
         return (LOG);
     }
 
-    public ArrayList<TopologyNodeFDN> getWupComponents() {
+    public ArrayList<ComponentIdType> getWupComponents() {
         return wupComponents;
     }
 
-    public void setWupComponents(ArrayList<TopologyNodeFDN> wupComponents) {
+    public void setWupComponents(ArrayList<ComponentIdType> wupComponents) {
         this.wupComponents = wupComponents;
     }
 
-    public ArrayList<TopologyNodeFDN> getWupInterchangeComponents() {
+    public ArrayList<ComponentIdType> getWupInterchangeComponents() {
         return wupInterchangeComponents;
     }
 
-    public void setWupInterchangeComponents(ArrayList<TopologyNodeFDN> wupInterchangeComponents) {
+    public void setWupInterchangeComponents(ArrayList<ComponentIdType> wupInterchangeComponents) {
         this.wupInterchangeComponents = wupInterchangeComponents;
     }
 
@@ -134,35 +136,16 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
     // To String
     //
 
-
     @Override
     public String toString() {
-        return "WorkUnitProcessorSoftwareComponent{" +
-                "deploymentSite='" + getDeploymentSite() + '\'' +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", lastReportingInstant=" + getLastReportingInstant() +
-                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", componentStatus=" + getComponentStatus() +
-                ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", wupComponents=" + wupComponents +
-                ", participantName='" + getParticipantName() + '\'' +
-                ", wupInterchangeComponents=" + wupInterchangeComponents +
-                ", ingresEndpoint=" + ingresEndpoint +
-                ", egressEndpoint=" + egressEndpoint +
-                ", replicationCount=" + replicationCount +
-                '}';
+        final StringBuilder sb = new StringBuilder("WorkUnitProcessorSoftwareComponent{");
+        sb.append("wupComponents=").append(wupComponents);
+        sb.append(", wupInterchangeComponents=").append(wupInterchangeComponents);
+        sb.append(", ingresEndpoint=").append(ingresEndpoint);
+        sb.append(", egressEndpoint=").append(egressEndpoint);
+        sb.append(", serviceEndpoints=").append(serviceEndpoints);
+        sb.append(", replicationCount=").append(replicationCount);
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

@@ -21,10 +21,24 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jgroups.Address;
+import org.jgroups.blocks.RequestOptions;
+import org.jgroups.blocks.ResponseMode;
+
 import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosServicesEndpointRegistrationService;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
@@ -49,18 +63,6 @@ import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
-import org.apache.commons.lang3.StringUtils;
-import org.jgroups.Address;
-import org.jgroups.blocks.RequestOptions;
-import org.jgroups.blocks.ResponseMode;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPointAdapterBase {
 
@@ -195,7 +197,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         // Create my Metrics Agent
         //
         getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
-        String participantName = getJGroupsIntegrationPoint().getParticipantName();
+        String participantName = getJGroupsIntegrationPoint().getParticipantId().getName();
         getLogger().info(".initialise(): Step 8: participantName->{}", participantName);
         this.metricsAgent = metricsFactory.newEndpointMetricsAgent(processingPlantCapabilityStatement, getJGroupsIntegrationPoint().getComponentID(),participantName, "Internal", specifyJGroupsChannelName());
         getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
@@ -329,7 +331,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
             return(PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_FAILED);
         }
         String targetSubsystemName = getComponentNameUtilities().getSubsystemNameFromEndpointName(targetJGroupsIP.getSubsystemParticipantName());
-        String mySubsystemName = getProcessingPlant().getSubsystemParticipantName();
+        String mySubsystemName = getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName();
         if(targetSubsystemName.contentEquals(mySubsystemName)){
             getLogger().debug(".checkJGroupsIntegrationPoint(): Exit, Endpoint is one of mine!");
             return(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getParticipantStatus());
@@ -353,15 +355,15 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         getLogger().debug(".resolveTopologyNodeForJGroupsIntegrationPoint(): Entry, endpointFunction->{}", specifyPetasosEndpointFunctionType());
         String name = getInterfaceNames().getEndpointName(PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT, specifyPetasosEndpointFunctionType().getDisplayName());
         getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): Required TopologyNodeRDN.nodeName->{}", name);
-        for(TopologyNodeFDN currentEndpointFDN: getProcessingPlant().getMeAsASoftwareComponent().getEndpoints()){
-            getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): currentEndpointFDN->{}",currentEndpointFDN);
-            IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
+        for(ComponentIdType currentEndpointId: getProcessingPlant().getMeAsASoftwareComponent().getEndpoints()){
+            getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): currentEndpointId->{}",currentEndpointId);
+            IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointId);
             getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): currentEndpoint->{}",currentEndpoint);
             PetasosEndpointTopologyTypeEnum endpointType = currentEndpoint.getEndpointType();
             boolean endpointTypeMatches = endpointType.equals(PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
             if(endpointTypeMatches){
                 getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): endpointTypeMatches!!!");
-                if(currentEndpoint.getComponentRDN().getNodeName().contentEquals(name)) {
+                if(currentEndpoint.getComponentID().getName().contentEquals(name)) {
                     JGroupsIntegrationPoint resolvedEndpoint = (JGroupsIntegrationPoint)currentEndpoint;
                     getLogger().debug(".resolveTopologyNodeForJGroupsIntegrationPoint(): Exit, found IPCTopologyEndpoint and assigned it, resolvedEndpoint->{}", resolvedEndpoint);
                     return(resolvedEndpoint);
@@ -515,7 +517,8 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
             // do nothing, it is already scheduled
         } else {
             TimerTask endpointValidationTask = new TimerTask() {
-                public void run() {
+                @Override
+				public void run() {
                     getLogger().debug(".endpointValidationTask(): Entry");
                     boolean doAgain = performEndpointValidationCheck();
                     getLogger().debug(".endpointValidationTask(): doAgain ->{}", doAgain);

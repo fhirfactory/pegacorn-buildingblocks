@@ -135,30 +135,12 @@ public class MLLPClientEndpoint extends StandardInteractClientTopologyEndpointPo
 
     @Override
     public String toString() {
-        return "InteractMLLPClientEndpoint{" +
-                "componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", server=" + isServer() +
-                ", implementingWUP=" + getImplementingWUP() +
-                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", endpointType=" + getEndpointType() +
-                ", adapterList=" + getAdapterList() +
-                ", targetSystem=" + getTargetSystem() +
-                ", targetMLLPPorts=" + getMLLPClientAdapters() +
-                ", targetSystemName='" + getTargetSystemName() + '\'' +
-                ", targetConnectionDescription='" + getTargetConnectionDescription() + '\'' +
-                ", detailedConnectionDescription='" + getDetailedConnectionDescription() + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("MLLPClientEndpoint{");
+        sb.append("MLLPClientAdapters=").append(getMLLPClientAdapters());
+        sb.append(", targetSystemName='").append(getTargetSystemName()).append('\'');
+        sb.append(", targetConnectionDescription='").append(getTargetConnectionDescription()).append('\'');
+        sb.append(", detailedConnectionDescription='").append(getDetailedConnectionDescription()).append('\'');
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

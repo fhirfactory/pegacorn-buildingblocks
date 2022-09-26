@@ -21,23 +21,28 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.transformers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;
-import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityLifecycleEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityRoleEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSourceTypeEnum;
+import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
 
 @ApplicationScoped
 public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
@@ -91,9 +96,9 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
 
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
-                processingPlant.getSimpleInstanceName(),
+                processingPlant.getMeAsASoftwareComponent().getComponentID().getDisplayName(),
                 processingPlant.getHostName(),
-                fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID().getDisplayName(),
+                fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentID().getDisplayName(),
                 null,
                 AuditEventSourceTypeEnum.HL7_APPLICATION_SERVER,
                 extractAuditEventType(fulfillmentTask),

@@ -304,8 +304,8 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
             while (taskListIterator.hasNext()) {
                 PetasosFulfillmentTask currentParcel = taskListIterator.next();
                 if (currentParcel.hasTaskFulfillment()) {
-                    if (currentParcel.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
-                        if (currentParcel.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID().equals(wupComponentId)) {
+                    if (currentParcel.getTaskFulfillment().hasFulfiller()) {
+                        if (currentParcel.getTaskFulfillment().getFulfiller().getComponentID().equals(wupComponentId)) {
                             return (currentParcel);
                         }
                     }

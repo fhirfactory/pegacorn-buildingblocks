@@ -22,6 +22,17 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local;
 
+import java.time.Instant;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.camel.CamelContext;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskActivityNotificationInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
@@ -40,16 +51,11 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.f
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.*;
-import org.apache.camel.CamelContext;
-import org.apache.commons.lang3.SerializationUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.time.Instant;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstanceAccessorFactory;
 
 @ApplicationScoped
 public class LocalPetasosActionableTaskActivityController implements PetasosTaskActivityNotificationInterface {
@@ -115,7 +121,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         // Build a TaskJobCard
         PetasosTaskJobCard newJobCard = new PetasosTaskJobCard();
         newJobCard.setActionableTaskId(petasosActionableTaskSharedInstance.getTaskId());
-        newJobCard.setProcessingPlantParticipantName(processingPlant.getSubsystemParticipantName());
+        newJobCard.setProcessingPlantParticipantName(processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
         newJobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
         newJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
         newJobCard.setSystemMode(processingPlant.getMeAsASoftwareComponent().getResilienceMode());
@@ -162,7 +168,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
         petasosActionableTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
         petasosActionableTaskSharedInstance.getTaskFulfillment().setStartInstant(Instant.now());
-        petasosActionableTaskSharedInstance.getTaskFulfillment().setFulfillerWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor());
+        petasosActionableTaskSharedInstance.getTaskFulfillment().setFulfiller(fulfillmentTask.getTaskFulfillment().getFulfiller());
         petasosActionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
         petasosActionableTaskSharedInstance.setUpdateInstant(Instant.now());
         petasosActionableTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);

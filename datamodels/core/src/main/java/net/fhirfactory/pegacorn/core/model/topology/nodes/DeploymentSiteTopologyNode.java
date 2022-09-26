@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 public class DeploymentSiteTopologyNode extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(DeploymentSiteTopologyNode.class);
 
-    private ArrayList<TopologyNodeFDN> clusterServices;
+    private ArrayList<ComponentIdType> clusterServices;
     private Integer instanceCount;
 
     public DeploymentSiteTopologyNode(){
@@ -44,11 +45,11 @@ public class DeploymentSiteTopologyNode extends SoftwareComponent {
         return (LOG);
     }
 
-    public ArrayList<TopologyNodeFDN> getClusterServices() {
+    public ArrayList<ComponentIdType> getClusterServices() {
         return clusterServices;
     }
 
-    public void setClusterServices(ArrayList<TopologyNodeFDN> clusterServices) {
+    public void setClusterServices(ArrayList<ComponentIdType> clusterServices) {
         this.clusterServices = clusterServices;
     }
 

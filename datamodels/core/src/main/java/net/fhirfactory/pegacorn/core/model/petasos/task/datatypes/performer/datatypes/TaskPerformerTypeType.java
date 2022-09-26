@@ -21,63 +21,60 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.capabilities.definition.Capability;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TaskPerformerTypeType implements Serializable {
-    private TopologyNodeFunctionFDN requiredPerformerType;
-    private ComponentIdType knownFulfillerInstance;
-    private String requiredParticipantName;
-    private String requiredPerformerTypeDescription;
+    private boolean capabilityBased;
 
+    private PetasosParticipantId knownTaskPerformer;
+    private Capability requiredPerformerCapability;
     //
     // Constructor(s)
     //
 
     public TaskPerformerTypeType(){
-        this.requiredPerformerType = null;
-        this.requiredPerformerTypeDescription = null;
-        this.requiredParticipantName = null;
-        this.knownFulfillerInstance = null;
+        super();
+        this.knownTaskPerformer = null;
+        this.requiredPerformerCapability = null;
+        this.capabilityBased = false;
     }
 
     //
     // Getters and Setters
     //
 
-    public ComponentIdType getKnownFulfillerInstance() {
-        return knownFulfillerInstance;
+    public boolean isCapabilityBased() {
+        return capabilityBased;
     }
 
-    public void setKnownFulfillerInstance(ComponentIdType knownFulfillerInstance) {
-        this.knownFulfillerInstance = knownFulfillerInstance;
+    public void setCapabilityBased(boolean capabilityBased) {
+        this.capabilityBased = capabilityBased;
     }
 
-    public TopologyNodeFunctionFDN getRequiredPerformerType() {
-        return requiredPerformerType;
+    public PetasosParticipantId getKnownTaskPerformer() {
+        return knownTaskPerformer;
     }
 
-    public void setRequiredPerformerType(TopologyNodeFunctionFDN requiredPerformerType) {
-        this.requiredPerformerType = requiredPerformerType;
+    public void setKnownTaskPerformer(PetasosParticipantId knownTaskPerformer) {
+        this.knownTaskPerformer = knownTaskPerformer;
     }
 
-    public String getRequiredPerformerTypeDescription() {
-        return requiredPerformerTypeDescription;
+    public Capability getRequiredPerformerCapability() {
+        return requiredPerformerCapability;
     }
 
-    public void setRequiredPerformerTypeDescription(String requiredPerformerTypeDescription) {
-        this.requiredPerformerTypeDescription = requiredPerformerTypeDescription;
+    public void setRequiredPerformerCapability(Capability requiredPerformerCapability) {
+        this.requiredPerformerCapability = requiredPerformerCapability;
     }
 
-    public String getRequiredParticipantName() {
-        return requiredParticipantName;
-    }
-
-    public void setRequiredParticipantName(String requiredParticipantName) {
-        this.requiredParticipantName = requiredParticipantName;
-    }
 
     //
     // To String
@@ -85,11 +82,11 @@ public class TaskPerformerTypeType implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskPerformerTypeType{" +
-                "requiredPerformerType=" + requiredPerformerType +
-                ", knownFulfillerInstance=" + knownFulfillerInstance +
-                ", requiredParticipantName='" + requiredParticipantName + '\'' +
-                ", requiredPerformerTypeDescription='" + requiredPerformerTypeDescription + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("TaskPerformerTypeType{");
+        sb.append("knownTaskPerformer=").append(getKnownTaskPerformer());
+        sb.append(", requiredPerformerCapability=").append(getRequiredPerformerCapability());
+        sb.append(", capabilityBased").append(isCapabilityBased());
+        sb.append('}');
+        return sb.toString();
     }
 }

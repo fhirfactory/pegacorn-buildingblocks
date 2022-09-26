@@ -25,8 +25,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskBeneficiaryType;
@@ -203,14 +201,10 @@ public abstract class PetasosTaskFromFHIRTask {
         }
         List<TaskPerformerTypeType> taskPerformers = new ArrayList<>();
         for(CodeableConcept currentPerformer: performers){
-            String taskPerformerTypeName = taskPerformerTypeFactory.extractCodeFromCodeableConceptForTaskPerformerType(currentPerformer);
-            TaskPerformerTypeType taskPerformerType = new TaskPerformerTypeType();
-            TopologyNodeFunctionFDNToken functionToken = new TopologyNodeFunctionFDNToken();
-            functionToken.setToken(taskPerformerTypeName);
-            TopologyNodeFunctionFDN functionFDN = new TopologyNodeFunctionFDN(functionToken);
-            taskPerformerType.setRequiredPerformerType(functionFDN);
-            taskPerformerType.setRequiredPerformerTypeDescription(currentPerformer.getText());
-            taskPerformers.add(taskPerformerType);
+            TaskPerformerTypeType taskPerformer = taskPerformerTypeFactory.newTaskPerformTypeType(currentPerformer);
+            if(taskPerformer != null) {
+                taskPerformers.add(taskPerformer);
+            }
         }
         getLogger().debug(".transformPerformerCodeableConceptIntoTaskPerformerType(): Exit, taskPerformers->{}", taskPerformers);
         return(taskPerformers);

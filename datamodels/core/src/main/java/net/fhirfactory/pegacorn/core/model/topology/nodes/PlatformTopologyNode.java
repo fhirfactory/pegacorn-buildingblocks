@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 public class PlatformTopologyNode extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(PlatformTopologyNode.class);
 
-    private ArrayList<TopologyNodeFDN> processingPlants;
+    private ArrayList<ComponentIdType> processingPlants;
     private Integer instanceCount;
     private String actualHostIP;
     private String actualPodIP;
@@ -56,11 +57,11 @@ public class PlatformTopologyNode extends SoftwareComponent {
         return (LOG);
     }
 
-    public ArrayList<TopologyNodeFDN> getProcessingPlants() {
+    public ArrayList<ComponentIdType> getProcessingPlants() {
         return processingPlants;
     }
 
-    public void setProcessingPlants(ArrayList<TopologyNodeFDN> processingPlants) {
+    public void setProcessingPlants(ArrayList<ComponentIdType> processingPlants) {
         this.processingPlants = processingPlants;
     }
 
@@ -92,31 +93,15 @@ public class PlatformTopologyNode extends SoftwareComponent {
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "PlatformTopologyNode{" +
-                "lastActivityInstant=" + getLastActivityInstant() +
-                ", lastReportingInstant=" + getLastReportingInstant() +
-                ", serviceName='" + getSubsystemParticipantName() + '\'' +
-                ", componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", componentStatus=" + getComponentStatus() +
-                ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", processingPlants=" + processingPlants +
-                ", instanceCount=" + instanceCount +
-                ", actualHostIP='" + actualHostIP + '\'' +
-                ", actualPodIP='" + actualPodIP + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("PlatformTopologyNode{");
+        sb.append("processingPlants=").append(processingPlants);
+        sb.append(", instanceCount=").append(instanceCount);
+        sb.append(", actualHostIP='").append(actualHostIP).append('\'');
+        sb.append(", actualPodIP='").append(actualPodIP).append('\'');
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

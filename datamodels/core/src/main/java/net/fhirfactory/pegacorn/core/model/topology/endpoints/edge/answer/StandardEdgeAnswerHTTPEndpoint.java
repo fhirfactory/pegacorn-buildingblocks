@@ -65,31 +65,9 @@ public class StandardEdgeAnswerHTTPEndpoint extends ClusteredInteractServerTopol
 
     @Override
     public String toString() {
-        return "StandardEdgeAnswerHTTPEndpoint{" +
-                "componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", servicePortValue=" + getServicePortValue() +
-                ", servicePortName='" + getServicePortName() + '\'' +
-                ", servicePortOffset=" + getServicePortOffset() +
-                ", serviceDNSName='" + getServiceDNSName() + '\'' +
-                ", server=" + isServer() +
-                ", implementingWUP=" + getImplementingWUP() +
-                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", endpointType=" + getEndpointType() +
-                ", adapterList=" + getAdapterList() +
-                ", HTTPServerAdapter=" + getHTTPServerAdapter() +
-                '}';
+        final StringBuilder sb = new StringBuilder("StandardEdgeAnswerHTTPEndpoint{");
+        sb.append("HTTPServerAdapter=").append(getHTTPServerAdapter());
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

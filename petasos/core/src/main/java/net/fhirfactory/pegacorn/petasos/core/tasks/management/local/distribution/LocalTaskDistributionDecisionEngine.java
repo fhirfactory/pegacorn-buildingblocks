@@ -21,6 +21,17 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
@@ -30,15 +41,6 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcemen
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @ApplicationScoped
 public class LocalTaskDistributionDecisionEngine {
@@ -155,8 +157,8 @@ public class LocalTaskDistributionDecisionEngine {
         if(StringUtils.isEmpty(subscriber.getSubsystemParticipantName())){
             return(false);
         }
-        getLogger().debug(".hasRemoteServiceName(): Entry, processingPlant.getSubsystemParticipantName()->{}", processingPlant.getSubsystemParticipantName());
-        if(subscriber.getSubsystemParticipantName().contentEquals(processingPlant.getSubsystemParticipantName())){
+        getLogger().debug(".hasRemoteServiceName(): Entry, processingPlant.getSubsystemParticipantName()->{}", processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
+        if(subscriber.getSubsystemParticipantName().contentEquals(processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName())){
             return(false);
         }
         return(true);
@@ -208,7 +210,7 @@ public class LocalTaskDistributionDecisionEngine {
                 passFirstPhaseTest = true;
             }
             if (passFirstPhaseTest) {
-                getLogger().debug(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
+                getLogger().debug(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantId(), currentParticipant.getSubsystemParticipantName());
                 for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
                     if (applySubscriptionFilter(currentSubscription, parcelManifest)) {
                         if (!subscriberList.contains(currentParticipant)) {
@@ -235,7 +237,7 @@ public class LocalTaskDistributionDecisionEngine {
         if(StringUtils.isEmpty(participant.getSubsystemParticipantName())){
             return(false);
         }
-        if(processingPlant.getSubsystemParticipantName().contentEquals(participant.getSubsystemParticipantName())){
+        if(processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName().contentEquals(participant.getSubsystemParticipantName())){
             return(false);
         }
         return(true);

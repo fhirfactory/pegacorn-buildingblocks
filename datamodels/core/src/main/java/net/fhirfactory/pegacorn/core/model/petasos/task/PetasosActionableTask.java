@@ -90,6 +90,7 @@ public class PetasosActionableTask extends PetasosTask{
         if (o == null || getClass() != o.getClass()) return false;
         PetasosActionableTask that = (PetasosActionableTask) o;
         boolean theyAreEqual = isRegistered() == that.isRegistered()
+                && Objects.equals(getSequenceNumber(), that.getSequenceNumber())
                 && Objects.equals(getCreationInstant(), that.getCreationInstant())
                 && Objects.equals(getUpdateInstant(), that.getUpdateInstant())
                 && Objects.equals(getTaskContext(), that.getTaskContext())
@@ -111,6 +112,7 @@ public class PetasosActionableTask extends PetasosTask{
     @Override
     public int hashCode() {
         return Objects.hash(
+                getSequenceNumber(),
                 getTaskFulfillment(),
                 getTaskCompletionSummary(),
                 getCreationInstant(),
@@ -135,23 +137,13 @@ public class PetasosActionableTask extends PetasosTask{
 
     @Override
     public String toString() {
-        return "PetasosActionableTask{" +
-                "  taskFulfillment=" + taskFulfillment +
-                "  sourceResourceId=" + getSourceResourceId() +
-                "  taskCompletionSummary=" + taskCompletionSummary +
-                "  taskId=" + getTaskId() +
-                "  taskType=" + getTaskType() +
-                "  taskWorkItem=" + getTaskWorkItem() +
-                "  taskTraceability=" + getTaskTraceability() +
-                "  taskOutcomeStatus=" + getTaskOutcomeStatus() +
-                "  registered=" + isRegistered() +
-                "  taskPerformerTypes=" + getTaskPerformerTypes() +
-                "  taskReason=" + getTaskReason() +
-                "  taskNodeAffinity=" + getTaskNodeAffinity() +
-                "  taskMetadata=" + getTaskContext() +
-                ", executionStatus=" + getExecutionStatus() +
-                '}';
+        final StringBuilder sb = new StringBuilder("PetasosActionableTask{");
+        sb.append("taskFulfillment=").append(taskFulfillment);
+        sb.append(", taskCompletionSummary=").append(taskCompletionSummary);
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
+
 
     //
     // Update ActionableTask
@@ -192,8 +184,8 @@ public class PetasosActionableTask extends PetasosTask{
             if(!this.hasTaskFulfillment()){
                 this.setTaskFulfillment(update.getTaskFulfillment());
             } else {
-                if(update.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
-                    this.getTaskFulfillment().setFulfillerWorkUnitProcessor(update.getTaskFulfillment().getFulfillerWorkUnitProcessor());
+                if(update.getTaskFulfillment().hasFulfiller()) {
+                    this.getTaskFulfillment().setFulfiller(update.getTaskFulfillment().getFulfiller());
                 }
                 if(update.getTaskFulfillment().hasFinalisationInstant()){
                     this.getTaskFulfillment().setFinalisationInstant(update.getTaskFulfillment().getFinalisationInstant());

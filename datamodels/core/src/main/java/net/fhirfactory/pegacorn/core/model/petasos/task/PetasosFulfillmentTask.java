@@ -135,24 +135,15 @@ public class PetasosFulfillmentTask extends PetasosTask{
     // ToString
     //
 
+
     @Override
     public String toString() {
-        return "PetasosFulfillmentTask{" +
-                "  taskFulfillment=" + taskFulfillment +
-                "  taskJobCard=" + taskJobCard +
-                "  actionableTaskId=" + actionableTaskId +
-                "  sourceResourceId=" + getSourceResourceId() +
-                "  taskId=" + getTaskId() +
-                "  hasTaskType=" + hasTaskType() +
-                "  taskType=" + getTaskType() +
-                "  taskWorkItem=" + getTaskWorkItem() +
-                "  taskTraceability=" + getTaskTraceability() +
-                "  taskOutcomeStatus=" + getTaskOutcomeStatus() +
-                "  registered=" + isRegistered() +
-                "  taskPerformerTypes=" + getTaskPerformerTypes() +
-                "  isARetry=" + isaRetry() +
-                "  taskMetadata=" + getTaskContext() +
-                ", executionStatus=" + getExecutionStatus() +
-                '}';
+        final StringBuilder sb = new StringBuilder("PetasosFulfillmentTask{");
+        sb.append("taskFulfillment=").append(taskFulfillment);
+        sb.append(", taskJobCard=").append(taskJobCard);
+        sb.append(", actionableTaskId=").append(actionableTaskId);
+        sb.append(", aRetry=").append(aRetry);
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

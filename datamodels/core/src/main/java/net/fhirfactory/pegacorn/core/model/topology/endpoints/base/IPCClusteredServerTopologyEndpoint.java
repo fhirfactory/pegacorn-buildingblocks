@@ -36,6 +36,10 @@ public class IPCClusteredServerTopologyEndpoint extends IPCServerTopologyEndpoin
     @JsonIgnore
     private String toStringString;
 
+    //
+    // Getters and Setters
+    //
+
     @Override
     protected Logger getLogger() {
         return (LOG);
@@ -77,25 +81,47 @@ public class IPCClusteredServerTopologyEndpoint extends IPCServerTopologyEndpoin
         this.serviceDNSName = serviceDNSName;
     }
 
+    //
+    // toString
+    //
+
     @Override
     public String toString() {
-        return "IPCClusteredServerTopologyEndpoint{" +
-                "nodeRDN=" + getComponentRDN() +
-                ", nodeFDN=" + getComponentFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", nodeKey=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", servicePortValue=" + servicePortValue +
-                ", servicePortName=" + servicePortName +
-                ", servicePortOffset=" + servicePortOffset +
-                ", serviceDNSName=" + serviceDNSName +
-                ", toStringString=" + toStringString +
-                ", endpointType=" + getEndpointType() +
-                '}';
+        final StringBuilder sb = new StringBuilder("IPCClusteredServerTopologyEndpoint{");
+        sb.append("servicePortValue=").append(servicePortValue);
+        sb.append(", servicePortName='").append(servicePortName).append('\'');
+        sb.append(", servicePortOffset=").append(servicePortOffset);
+        sb.append(", serviceDNSName='").append(serviceDNSName).append('\'');
+        sb.append(", assignedDNSName='").append(getAssignedDNSName()).append('\'');
+        sb.append(", actualHostIP='").append(getActualHostIP()).append('\'');
+        sb.append(", endpointConfigurationName='").append(getEndpointConfigurationName()).append('\'');
+        sb.append(", server=").append(isServer());
+        sb.append(", implementingWUP=").append(getImplementingWUP());
+        sb.append(", connectedSystemName='").append(getConnectedSystemName()).append('\'');
+        sb.append(", adapterList=").append(getAdapterList());
+        sb.append(", endpointType=").append(getEndpointType());
+        sb.append(", enablingProcessingPlantId=").append(getEnablingProcessingPlantId());
+        sb.append(", interfaceFunction=").append(getInterfaceFunction());
+        sb.append(", endpointStatus=").append(getEndpointStatus());
+        sb.append(", endpointDescription='").append(getEndpointDescription()).append('\'');
+        sb.append(", capabilities=").append(getCapabilities());
+        sb.append(", participantId=").append(getParticipantId());
+        sb.append(", deploymentSite='").append(getDeploymentSite()).append('\'');
+        sb.append(", lastActivityInstant=").append(getLastActivityInstant());
+        sb.append(", lastReportingInstant=").append(getLastReportingInstant());
+        sb.append(", subsystemParticipantName='").append(getSubsystemParticipantName()).append('\'');
+        sb.append(", kubernetesDeployed=").append(isKubernetesDeployed());
+        sb.append(", otherConfigurationParameters=").append(getOtherConfigurationParameters());
+        sb.append(", concurrencyMode=").append(getConcurrencyMode());
+        sb.append(", resilienceMode=").append(getResilienceMode());
+        sb.append(", securityZone=").append(getSecurityZone());
+        sb.append(", componentID=").append(getComponentID());
+        sb.append(", componentType=").append(getComponentType());
+        sb.append(", metrics=").append(getMetrics());
+        sb.append(", componentSystemRole=").append(getComponentSystemRole());
+        sb.append(", componentStatus=").append(getComponentStatus());
+        sb.append(", componentExecutionControl=").append(getComponentExecutionControl());
+        sb.append('}');
+        return sb.toString();
     }
 }

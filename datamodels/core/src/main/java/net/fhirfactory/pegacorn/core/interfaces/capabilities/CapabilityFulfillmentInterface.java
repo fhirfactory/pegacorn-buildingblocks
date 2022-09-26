@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.capabilities;
 
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationResponse;
 
 public interface CapabilityFulfillmentInterface {
     public CapabilityUtilisationResponse executeTask(CapabilityUtilisationRequest request);

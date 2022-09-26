@@ -28,12 +28,9 @@ import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentExecutionControlEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.*;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
@@ -81,9 +78,9 @@ public class LocalPetasosParticipantCacheIM {
 	// Business Methods
 	//
 
-	public PetasosParticipantRegistration getLocalParticipantRegistration(ComponentIdType participantId){
-    	getLogger().debug(".getLocalParticipantRegistration(): Entry, participantId->{}", participantId);
-		PetasosParticipantRegistration registration = participantCacheDM.getPetasosParticipantRegistration(participantId);
+	public PetasosParticipantRegistration getLocalParticipantRegistration(ComponentIdType componentId){
+    	getLogger().debug(".getLocalParticipantRegistration(): Entry, componentId->{}", componentId);
+		PetasosParticipantRegistration registration = participantCacheDM.getPetasosParticipantRegistration(componentId);
 		getLogger().debug(".getLocalParticipantRegistration(): Exit, registration->{}", registration);
 		return(registration);
 	}
@@ -286,7 +283,7 @@ public class LocalPetasosParticipantCacheIM {
 			//
 			// Now update local subscription map
 			getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] Start");
-			if(participant.getComponentType().equals(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT)) {
+			if(participant.getComponentType().equals(SoftwareComponentTypeEnum.PROCESSING_PLANT)) {
 				getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] is processing plant...");
 				if (!participant.getSubscriptions().isEmpty()) {
 					getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Update Local Subscription Cache] subscribed manifest set is NOT empty");
@@ -419,6 +416,15 @@ public class LocalPetasosParticipantCacheIM {
 				getParticipantCacheDM().removePetasosParticipant(removedPetasosParticipant);
 			}
 		}
+	}
+
+	public boolean isParticipantSuspended(String participantName){
+		boolean isSuspended = getParticipantCacheDM().isParticipantSuspended(participantName);
+		return(isSuspended);
+	}
+
+	public void suspendParticipant(String participantName){
+		getParticipantCacheDM().suspendParticipant(participantName);
 	}
 
 	//

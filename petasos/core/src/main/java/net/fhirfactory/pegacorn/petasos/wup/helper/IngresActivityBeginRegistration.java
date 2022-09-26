@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
@@ -95,8 +95,8 @@ public class IngresActivityBeginRegistration {
         WorkUnitProcessorSoftwareComponent wup = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorSoftwareComponent.class);
 
         getLogger().trace(".registerActivityStart(): Node Element retrieved --> {}", wup);
-        TopologyNodeFunctionFDNToken wupFunctionToken = wup.getNodeFunctionFDN().getFunctionToken();
-        getLogger().trace(".registerActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        PetasosParticipantId wupParticipantId = wup.getParticipantId();
+        getLogger().trace(".registerActivityStart(): wupParticipantId (PetasosParticipantId) for this activity --> {}", wupParticipantId);
 
         //
         // add to WUP Metrics
@@ -113,7 +113,7 @@ public class IngresActivityBeginRegistration {
         TaskContextType taskContext = new TaskContextType();
         TaskTriggerSummaryType taskTriggerSummary = new TaskTriggerSummaryType();
         taskTriggerSummary.setTriggerTaskId(petasosActionableTask.getTaskId());
-        taskTriggerSummary.setTriggerLocation(wup.getComponentFDN().getToken().getTokenValue());
+        taskTriggerSummary.setTriggerLocation(wup.getComponentID().getDisplayName());
         taskContext.setTaskTriggerSummary(taskTriggerSummary);
         petasosActionableTask.setTaskContext(taskContext);
         getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Finish");
@@ -148,7 +148,7 @@ public class IngresActivityBeginRegistration {
             petasosFulfillmentTaskSharedInstance.update();
             getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(petasosFulfillmentTaskSharedInstance);
 
-            actionableTaskSharedInstance.getTaskFulfillment().setFulfillerWorkUnitProcessor(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfillerWorkUnitProcessor());
+            actionableTaskSharedInstance.getTaskFulfillment().setFulfiller(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfiller());
             actionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(petasosFulfillmentTaskSharedInstance.getTaskId()));
             getLogger().trace(".registerActivityStart(): Before Update: actionableTaskSharedInstance.getTaskFulfillment()->{}", actionableTaskSharedInstance.getTaskFulfillment());
             actionableTaskSharedInstance.update();
@@ -165,7 +165,7 @@ public class IngresActivityBeginRegistration {
             petasosFulfillmentTaskSharedInstance.update();
             getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(petasosFulfillmentTaskSharedInstance);
 
-            actionableTaskSharedInstance.getTaskFulfillment().setFulfillerWorkUnitProcessor(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfillerWorkUnitProcessor());
+            actionableTaskSharedInstance.getTaskFulfillment().setFulfiller(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfiller());
             actionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
             actionableTaskSharedInstance.update();
             getActionableTaskActivityController().notifyTaskFailure(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());

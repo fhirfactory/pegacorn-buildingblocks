@@ -19,43 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.capabilities.base;
+package net.fhirfactory.pegacorn.core.model.capabilities.use.rpc.factories;
 
-import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedureCallResponse;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.rpc.RemoteProcedureCallRequest;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
-public class CapabilityUtilisationResponse extends RemoteProcedureCallResponse {
+import javax.enterprise.context.ApplicationScoped;
+import java.time.Instant;
+import java.util.UUID;
 
+@ApplicationScoped
+public class RemoteProcedureCallRequestFactory {
 
-    //
-    // Constructor(s)
-    //
-
-    public CapabilityUtilisationResponse(){
-        super();
-    }
-
-    //
-    // Getters and Setters
-    //
-
-
-    //
-    // Type Based Getters/Setters
-    //
-
-    //
-    // To String
-    //
-
-    @Override
-    public String toString() {
-        return "CapabilityUtilisationResponse{" +
-                "associatedRequestID='" + getAssociatedRequestID() + '\'' +
-                ", inScope=" + isInScope() +
-                ", successful=" + isSuccessful() +
-                ", dateCompleted=" + getInstantCompleted() +
-                ", responseContent=" + getResponseContent() +
-                ", responseContentType=" + getResponseContentType() +
-                '}';
+    public RemoteProcedureCallRequest newRemoteProcedureCallRequest(Object content, Class contentType, JGroupsIntegrationPointSummary endpointIdentifier){
+        RemoteProcedureCallRequest rpcRequest = new RemoteProcedureCallRequest();
+        rpcRequest.setRequestContentType(contentType);
+        rpcRequest.setRequestID(UUID.randomUUID().toString());
+        rpcRequest.setRequestContent(content);
+        rpcRequest.setRequestInstant(Instant.now());
+        rpcRequest.setRequestingEndpoint(endpointIdentifier);
+        return(rpcRequest);
     }
 }

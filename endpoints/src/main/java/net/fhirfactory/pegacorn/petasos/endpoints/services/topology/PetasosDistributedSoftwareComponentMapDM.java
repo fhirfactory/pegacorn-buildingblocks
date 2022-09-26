@@ -21,19 +21,25 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.topology;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
 @ApplicationScoped
 public class PetasosDistributedSoftwareComponentMapDM {
@@ -67,7 +73,7 @@ public class PetasosDistributedSoftwareComponentMapDM {
         if (newElement == null) {
             throw (new IllegalArgumentException(".addTopologyNode(): newElement is null"));
         }
-        if (newElement.getComponentFDN() == null) {
+        if (newElement.getComponentID() == null) {
             throw (new IllegalArgumentException(".addTopologyNode(): bad elementID within newElement"));
         }
         switch(newElement.getComponentType()){
@@ -97,17 +103,10 @@ public class PetasosDistributedSoftwareComponentMapDM {
                 break;
             }
         }
-        if(StringUtils.isEmpty(newElement.getParticipantName())){
-            if(StringUtils.isNotEmpty(newElement.getComponentID().getDisplayName())){
-                newElement.setParticipantName(newElement.getComponentID().getDisplayName());
-            } else {
-                newElement.setParticipantName(newElement.getComponentID().getId());
-            }
-        }
         if(StringUtils.isEmpty(newElement.getSubsystemParticipantName())){
-            newElement.setSubsystemParticipantName(processingPlant.getSubsystemParticipantName());
+            newElement.setSubsystemParticipantName(processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
         }
-        String participantName = newElement.getParticipantName();
+        String participantName = newElement.getParticipantId().getName();
         if (elementFound) {
             this.nodeSet.remove(currentNodeID);
             this.nodeSet.put(currentNodeID, newElement);
@@ -167,17 +166,19 @@ public class PetasosDistributedSoftwareComponentMapDM {
         return (null);
     }
 
-    public List<SoftwareComponent> nodeSearch(PegacornSystemComponentTypeTypeEnum nodeType, String nodeName, String nodeVersion){
+    public List<SoftwareComponent> nodeSearch(SoftwareComponentTypeEnum nodeType, String nodeName, String nodeVersion){
         LOG.debug(".nodeSearch(): Entry, nodeType->{}, nodeName->{}, nodeVersion->{}", nodeType, nodeName, nodeVersion);
         ArrayList<SoftwareComponent> nodeList = new ArrayList<>();
         for(SoftwareComponent currentNode: nodeSet.values()){
             if(LOG.isTraceEnabled()){
-                LOG.trace(".nodeSearch(): Search Cache Entry : nodeRDN->{}, nodeComponentType->{}", currentNode.getComponentRDN(), currentNode.getComponentType());
+                LOG.trace(".nodeSearch(): Search Cache Entry : nodeRDN->{}, nodeComponentType->{}", currentNode.getComponentID(), currentNode.getComponentType());
             }
             boolean nodeTypeMatches = nodeType.equals(currentNode.getComponentType());
-            boolean nodeNameMatches = nodeName.contentEquals(currentNode.getComponentRDN().getNodeName());
-            boolean nodeVersionMatches = nodeVersion.contentEquals(currentNode.getComponentRDN().getNodeVersion());
-            if(nodeTypeMatches && nodeNameMatches && nodeVersionMatches){
+            boolean nodeNameMatches = nodeName.contentEquals(currentNode.getComponentID().getName());
+            boolean nodeDisplayNameMatches = nodeName.contentEquals(currentNode.getComponentID().getDisplayName());
+            boolean nodeParticipantNameMatches = nodeName.contentEquals(currentNode.getParticipantName());
+            boolean nodeVersionMatches = nodeVersion.contentEquals(currentNode.getVersion());
+            if(nodeTypeMatches && (nodeNameMatches || nodeDisplayNameMatches || nodeParticipantNameMatches) && nodeVersionMatches){
                 LOG.trace(".nodeSearch(): Node found!!! Adding to search result!");
                 nodeList.add(currentNode);
             }

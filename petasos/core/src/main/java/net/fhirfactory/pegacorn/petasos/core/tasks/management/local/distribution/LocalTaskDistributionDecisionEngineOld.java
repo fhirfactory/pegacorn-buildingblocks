@@ -21,6 +21,16 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
@@ -32,14 +42,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipan
 import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscriptionRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantSubscriptionMapDM;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 @ApplicationScoped
 public class LocalTaskDistributionDecisionEngineOld {
@@ -93,7 +95,7 @@ public class LocalTaskDistributionDecisionEngineOld {
                 StringBuilder builder = new StringBuilder();
                 builder.append(".getSubscriberSet(): Number of Subscribers->"+subscriberSetSize);
                 for(PetasosParticipant currentParticipant: subscriberSet) {
-                    builder.append(", participant->"+currentParticipant.getParticipantName());
+                    builder.append(", participant->"+currentParticipant.getParticipantId());
                 }
                 getLogger().warn(builder.toString());
             }
@@ -152,7 +154,7 @@ public class LocalTaskDistributionDecisionEngineOld {
         if(subscriber.getSubsystemParticipantName() == null){
             return(false);
         }
-        if(subscriber.getSubsystemParticipantName().equals(processingPlant.getSubsystemParticipantName())){
+        if(subscriber.getSubsystemParticipantName().equals(processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName())){
             return(false);
         }
         return(true);

@@ -97,43 +97,39 @@ public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "IPCServerTopologyEndpoint{" +
-                "participantDisplayName='" + getParticipantDisplayName() + '\'' +
-                ", participantName='" + getParticipantName() + '\'' +
-                ", deploymentSite='" + getDeploymentSite() + '\'' +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", lastReportingInstant=" + getLastReportingInstant() +
-                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", componentFDN=" + getComponentFDN() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", componentStatus=" + getComponentStatus() +
-                ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", endpointType=" + getEndpointType() +
-                ", enablingProcessingPlantId=" + getEnablingProcessingPlantId() +
-                ", interfaceFunction=" + getInterfaceFunction() +
-                ", endpointStatus=" + getEndpointStatus() +
-                ", endpointDescription='" + getEndpointDescription() + '\'' +
-                ", assignedDNSName='" + assignedDNSName + '\'' +
-                ", actualHostIP='" + actualHostIP + '\'' +
-                ", hasAssignedDNSName=" + hasAssignedDNSName() +
-                ", hasActualHostIP=" + hasActualHostIP() +
-                ", endpointConfigurationName='" + getEndpointConfigurationName() + '\'' +
-                ", server=" + isServer() +
-                ", implementingWUP=" + getImplementingWUP() +
-                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", adapterList=" + getAdapterList() +
-                '}';
+        final StringBuilder sb = new StringBuilder("IPCServerTopologyEndpoint{");
+        sb.append("assignedDNSName='").append(assignedDNSName).append('\'');
+        sb.append(", actualHostIP='").append(actualHostIP).append('\'');
+        sb.append(", endpointConfigurationName='").append(getEndpointConfigurationName()).append('\'');
+        sb.append(", server=").append(isServer());
+        sb.append(", implementingWUP=").append(getImplementingWUP());
+        sb.append(", connectedSystemName='").append(getConnectedSystemName()).append('\'');
+        sb.append(", adapterList=").append(getAdapterList());
+        sb.append(", endpointType=").append(getEndpointType());
+        sb.append(", enablingProcessingPlantId=").append(getEnablingProcessingPlantId());
+        sb.append(", endpointStatus=").append(getEndpointStatus());
+        sb.append(", endpointDescription='").append(getEndpointDescription()).append('\'');
+        sb.append(", capabilities=").append(getCapabilities());
+        sb.append(", participantId=").append(getParticipantId());
+        sb.append(", deploymentSite='").append(getDeploymentSite()).append('\'');
+        sb.append(", lastActivityInstant=").append(getLastActivityInstant());
+        sb.append(", lastReportingInstant=").append(getLastReportingInstant());
+        sb.append(", subsystemParticipantName='").append(getSubsystemParticipantName()).append('\'');
+        sb.append(", kubernetesDeployed=").append(isKubernetesDeployed());
+        sb.append(", otherConfigurationParameters=").append(getOtherConfigurationParameters());
+        sb.append(", concurrencyMode=").append(getConcurrencyMode());
+        sb.append(", resilienceMode=").append(getResilienceMode());
+        sb.append(", securityZone=").append(getSecurityZone());
+        sb.append(", componentID=").append(getComponentID());
+        sb.append(", componentType=").append(getComponentType());
+        sb.append(", metrics=").append(getMetrics());
+        sb.append(", componentSystemRole=").append(getComponentSystemRole());
+        sb.append(", componentStatus=").append(getComponentStatus());
+        sb.append(", componentExecutionControl=").append(getComponentExecutionControl());
+        sb.append('}');
+        return sb.toString();
     }
 }

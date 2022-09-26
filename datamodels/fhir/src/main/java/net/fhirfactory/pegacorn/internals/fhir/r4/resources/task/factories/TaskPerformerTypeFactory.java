@@ -22,6 +22,8 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -34,28 +36,60 @@ public class TaskPerformerTypeFactory {
     @Inject
     private PegacornReferenceProperties systemWideProperties;
 
-    private static final String PEGACORN_TASK_PERFORMER_TYPE = "/task-performer-type";
+    private static final String PEGACORN_TASK_PERFORMER_PARTICIPANT_TYPE = "/task-performer-participant-type";
+    private static final String PEGACORN_TASK_PERFORMER_PARTICIPANT_SUBSYSTEM_TYPE = "/task-performer-participant-subsystem-type";
 
     //
     // Business Methods
     //
 
-    public String getPegacornTaskPerformerType(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_PERFORMER_TYPE;
+    public String getPegacornTaskPerformerParticipantType(){
+        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_PERFORMER_PARTICIPANT_TYPE;
         return (codeSystem);
     }
 
-    public CodeableConcept newTaskPerformerType(String wupFunctionID, String wupDescription){
+    public String getPegacornTaskPerformerParticipantSubsystemType(){
+        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_PERFORMER_PARTICIPANT_SUBSYSTEM_TYPE;
+        return (codeSystem);
+    }
+
+    public CodeableConcept newTaskPerformerType(PetasosParticipantId participantId){
         CodeableConcept performerTypeCC = new CodeableConcept();
         Coding performerTypeCoding = new Coding();
-        performerTypeCoding.setSystem(getPegacornTaskPerformerType());
-        performerTypeCoding.setCode(wupFunctionID);
+        performerTypeCoding.setSystem(getPegacornTaskPerformerParticipantType());
+        performerTypeCoding.setCode(participantId.getName());
+        performerTypeCoding.setVersion(participantId.getVersion());
+        performerTypeCoding.setDisplay(participantId.getDisplayName());
         performerTypeCC.addCoding(performerTypeCoding);
-        performerTypeCC.setText(wupDescription);
+        Coding performerSubsystemTypeCoding = new Coding();
+        performerSubsystemTypeCoding.setSystem(getPegacornTaskPerformerParticipantSubsystemType());
+        performerSubsystemTypeCoding.setCode(participantId.getSubsystemName());
+        performerSubsystemTypeCoding.setVersion(participantId.getVersion());
+        performerSubsystemTypeCoding.setDisplay(participantId.getSubsystemName());
+        performerTypeCC.addCoding(performerTypeCoding);
         return(performerTypeCC);
     }
 
-    public String extractCodeFromCodeableConceptForTaskPerformerType(CodeableConcept performerType){
+    public TaskPerformerTypeType newTaskPerformTypeType(CodeableConcept codeableConcept){
+        Coding taskPerformerTypeCode = extractCodeFromCodeableConceptForTaskPerformerParticipantType(codeableConcept);
+        Coding taskPerformerSubsystemCode = extractCodeFromCodeableConceptForTaskPerformerParticipantSubsystemType(codeableConcept);
+        if((taskPerformerTypeCode != null) && (taskPerformerSubsystemCode != null)) {
+            TaskPerformerTypeType taskPerformerType = new TaskPerformerTypeType();
+            PetasosParticipantId participantId = new PetasosParticipantId();
+            participantId.setName(taskPerformerTypeCode.getCode());
+            participantId.setFullName(codeableConcept.getText());
+            participantId.setVersion(taskPerformerTypeCode.getVersion());
+            participantId.setDisplayName(taskPerformerTypeCode.getDisplay());
+            participantId.setSubsystemName(taskPerformerSubsystemCode.getCode());
+            TaskPerformerTypeType taskPerformer = new TaskPerformerTypeType();
+            taskPerformer.setCapabilityBased(false);
+            taskPerformer.setKnownTaskPerformer(participantId);
+            return(taskPerformerType);
+        }
+        return(null);
+    }
+
+    public Coding extractCodeFromCodeableConceptForTaskPerformerParticipantType(CodeableConcept performerType){
         if(performerType == null){
             return(null);
         }
@@ -63,8 +97,23 @@ public class TaskPerformerTypeFactory {
             return(null);
         }
         for(Coding code: performerType.getCoding()){
-            if(code.getSystem().contentEquals(getPegacornTaskPerformerType())){
-                return(code.getCode());
+            if(code.getSystem().contentEquals(getPegacornTaskPerformerParticipantType())){
+                return(code);
+            }
+        }
+        return(null);
+    }
+
+    public Coding extractCodeFromCodeableConceptForTaskPerformerParticipantSubsystemType(CodeableConcept performerType){
+        if(performerType == null){
+            return(null);
+        }
+        if (performerType.getCoding() == null) {
+            return(null);
+        }
+        for(Coding code: performerType.getCoding()){
+            if(code.getSystem().contentEquals(getPegacornTaskPerformerParticipantSubsystemType())){
+                return(code);
             }
         }
         return(null);

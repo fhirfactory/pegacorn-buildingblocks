@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacorn.core.model.capabilities.base.factories;
+package net.fhirfactory.pegacorn.core.model.capabilities.use.factories;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.fasterxml.jackson.core.JsonProcessingException;

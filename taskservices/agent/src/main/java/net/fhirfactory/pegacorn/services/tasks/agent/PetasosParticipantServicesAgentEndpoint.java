@@ -21,13 +21,15 @@
  */
 package net.fhirfactory.pegacorn.services.tasks.agent;
 
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.*;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
-import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.PetasosParticipantSubscriptionServicesEndpointBase;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -35,10 +37,13 @@ import org.jgroups.blocks.ResponseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.time.Instant;
-import java.util.*;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistrationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
+import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.PetasosParticipantSubscriptionServicesEndpointBase;
 
 @ApplicationScoped
 public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantSubscriptionServicesEndpointBase {
@@ -93,7 +98,8 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             // do nothing, it is already scheduled
         } else {
             TimerTask petasosParticipantCacheSynchronisationDaemonScheduler = new TimerTask() {
-                public void run() {
+                @Override
+				public void run() {
                     getLogger().debug(".petasosParticipantCacheSynchronisationDaemonScheduler(): Entry");
                     petasosParticipantCacheSynchronisationDaemon();
                     getLogger().debug(".petasosParticipantCacheSynchronisationDaemonScheduler(): Exit");
@@ -103,7 +109,8 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             petasosParticipantCacheSynchronisationTimer.schedule(petasosParticipantCacheSynchronisationDaemonScheduler, PETASOS_PARTICIPANT_MAP_CACHE_SYNCHRONISATION_INITIAL_WAIT, PETASOS_PARTICIPANT_MAP_CACHE_SYNCHRONISATION_PERIOD);
 
             TimerTask participantExecutionStatusSynchronisationDaemonScheduler = new TimerTask() {
-                public void run() {
+                @Override
+				public void run() {
                     getLogger().debug(".participantExecutionStatusSynchronisationDaemonScheduler(): Entry");
                     participantExecutionStatusSynchronisationDaemon();
                     getLogger().debug(".participantExecutionStatusSynchronisationDaemonScheduler(): Exit");
@@ -200,7 +207,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             return(registration);
         }
         if(participant.getSubsystemParticipantName() == null){
-            participant.setSubsystemParticipantName(getProcessingPlant().getSubsystemParticipantName());
+            participant.setSubsystemParticipantName(getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
         }
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
         getLogger().trace(".registerPetasosParticipant(): Extract JGroups Address->{}", taskServicesAddress);
@@ -283,7 +290,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             return(null);
         }
         if(participant.getSubsystemParticipantName() == null){
-            participant.setSubsystemParticipantName(getProcessingPlant().getSubsystemParticipantName());
+            participant.setSubsystemParticipantName(getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
         }
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
         getLogger().trace(".updatePetasosParticipant(): Extract JGroups Address->{}", taskServicesAddress);

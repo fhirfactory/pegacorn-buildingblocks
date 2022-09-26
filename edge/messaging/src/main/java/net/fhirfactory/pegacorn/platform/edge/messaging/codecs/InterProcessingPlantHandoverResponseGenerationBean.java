@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
@@ -72,7 +71,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
         response.setDownstreamActionableTaskId(fulfillmentTask.getActionableTaskId());
         response.setActionableTaskId(incomingPacket.getActionableTask().getTaskId());
         response.setStatus(InterProcessingPlantHandoverPacketStatusEnum.PACKET_RECEIVED_AND_DECODED);
-        String processingPlantName = node.getComponentFDN().toTag();
+        String processingPlantName = node.getComponentID().getDisplayName();
         response.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
         response.setMessageSendFinishInstant(Instant.now());
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message: Finish");

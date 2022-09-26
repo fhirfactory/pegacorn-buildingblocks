@@ -22,31 +22,32 @@
 
 package net.fhirfactory.pegacorn.petasos.core.participants.cache;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistrationStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
-import org.apache.commons.lang3.SerializationUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import net.fhirfactory.pegacorn.core.model.petasos.participant.*;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+
 @ApplicationScoped
 public class LocalPetasosParticipantCacheDM {
 	private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosParticipantCacheDM.class);
 
 	private ConcurrentHashMap<ComponentIdType, PetasosParticipantRegistration> participantCache;
+	private ConcurrentHashMap<String, PetasosParticipantRegistration> participantNameRegistrationMap;
 	private Object participantCacheLock;
 
 	@Inject
@@ -86,6 +87,10 @@ public class LocalPetasosParticipantCacheDM {
 			if(!inCache) {
 				getParticipantCache().put(cacheEntry.getComponentID(), registration);
 			}
+			if(getParticipantNameRegistrationMap().containsKey(registration.getParticipant().getParticipantId().getName())){
+				getParticipantNameRegistrationMap().remove(registration.getParticipant().getParticipantId().getName());
+			}
+			getParticipantNameRegistrationMap().put(registration.getParticipant().getParticipantId().getName(), registration);
 		}
 		getLogger().debug(".addPetasosParticipant(): Exit, registration->{}", registration);
 		return(registration);
@@ -99,6 +104,9 @@ public class LocalPetasosParticipantCacheDM {
 		synchronized (getParticipantCacheLock()){
 			if(getParticipantCache().containsKey(participant.getComponentID())){
 				getParticipantCache().remove(participant.getComponentID());
+			}
+			if(getParticipantNameRegistrationMap().containsKey(participant.getParticipantId().getName())){
+				getParticipantNameRegistrationMap().remove(participant.getParticipantId().getName());
 			}
 		}
 		getLogger().debug(".removePetasosParticipant(): Exit");
@@ -126,6 +134,10 @@ public class LocalPetasosParticipantCacheDM {
 			if(!inCache) {
 				getParticipantCache().put(cacheEntry.getComponentID(), registration);
 			}
+			if(getParticipantNameRegistrationMap().containsKey(registration.getParticipant().getParticipantId().getName())){
+				getParticipantNameRegistrationMap().remove(registration.getParticipant().getParticipantId().getName());
+			}
+			getParticipantNameRegistrationMap().put(registration.getParticipant().getParticipantId().getName(), registration);
 		}
 		getLogger().debug(".updatePetasosParticipant(): Exit, registration->{}", registration);
 	}
@@ -158,11 +170,32 @@ public class LocalPetasosParticipantCacheDM {
 			if(!inCache) {
 				getParticipantCache().put(cacheEntry.getComponentID(), registration);
 			}
+			if(getParticipantNameRegistrationMap().containsKey(registration.getParticipant().getParticipantId().getName())){
+				getParticipantNameRegistrationMap().remove(registration.getParticipant().getParticipantId().getName());
+			}
+			getParticipantNameRegistrationMap().put(registration.getParticipant().getParticipantId().getName(), registration);
 		}
 		getLogger().debug(".updatePetasosParticipantRegistration(): Exit, localRegistration->{}", localRegistration);
 	}
 
-	public PetasosParticipant getPetasosParticipant(ComponentIdType participantId){
+	public PetasosParticipant getPetasosParticipant(ComponentIdType componentId){
+		getLogger().debug(".getPetasosParticipant(): Entry, componentId->{}", componentId);
+		if(componentId == null){
+			getLogger().debug(".getPetasosParticipant(): Exit, componentId is null");
+			return(null);
+		}
+		PetasosParticipant participant = null;
+		synchronized (getParticipantCacheLock()){
+			if(getParticipantCache().containsKey(componentId)){
+				PetasosParticipantRegistration cacheEntry = getParticipantCache().get(componentId);
+				participant = SerializationUtils.clone(cacheEntry.getParticipant());
+			}
+		}
+		getLogger().debug(".getPetasosParticipant(): Exit, participant->{}", participant);
+		return(participant);
+	}
+
+	public PetasosParticipant getPetasosParticipant(PetasosParticipantId participantId){
 		getLogger().debug(".getPetasosParticipant(): Entry, participantId->{}", participantId);
 		if(participantId == null){
 			getLogger().debug(".getPetasosParticipant(): Exit, participantId is null");
@@ -170,9 +203,10 @@ public class LocalPetasosParticipantCacheDM {
 		}
 		PetasosParticipant participant = null;
 		synchronized (getParticipantCacheLock()){
-			if(getParticipantCache().containsKey(participantId)){
-				PetasosParticipantRegistration cacheEntry = getParticipantCache().get(participantId);
-				participant = SerializationUtils.clone(cacheEntry.getParticipant());
+			for(PetasosParticipantRegistration currentParticipantRegistration: getParticipantCache().values()) {
+				if (currentParticipantRegistration.getParticipant().getParticipantId().getName().contentEquals(participantId.getName())) {
+					participant = SerializationUtils.clone(currentParticipantRegistration.getParticipant());
+				}
 			}
 		}
 		getLogger().debug(".getPetasosParticipant(): Exit, participant->{}", participant);
@@ -203,9 +237,9 @@ public class LocalPetasosParticipantCacheDM {
 			while (participantKeys.hasMoreElements()) {
 				PetasosParticipant currentParticipant = getParticipantCache().get(participantKeys.nextElement()).getParticipant();
 				if(!currentParticipant.getSubscriptions().isEmpty()){
-					if(!currentParticipant.getSubsystemParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
+					if(!currentParticipant.getSubsystemParticipantName().equals(myProcessingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName())){
 						for(TaskWorkItemSubscriptionType currentParticipantSubscription: currentParticipant.getSubscriptions()){
-							if(currentParticipantSubscription.getSourceProcessingPlantParticipantName().equals(myProcessingPlant.getSubsystemParticipantName())){
+							if(currentParticipantSubscription.getSourceProcessingPlantParticipantName().equals(myProcessingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName())){
 								if(!downstreamParticipants.contains(currentParticipant)){
 									downstreamParticipants.add(currentParticipant);
 								}
@@ -227,7 +261,7 @@ public class LocalPetasosParticipantCacheDM {
 			Enumeration<ComponentIdType> participantKeys = getParticipantCache().keys();
 			while (participantKeys.hasMoreElements()) {
 				PetasosParticipant currentParticipant = getParticipantCache().get(participantKeys.nextElement()).getParticipant();
-				if(currentParticipant.getComponentType().equals(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT)){
+				if(currentParticipant.getComponentType().equals(SoftwareComponentTypeEnum.PROCESSING_PLANT)){
 					if(currentParticipant.getSubsystemParticipantName().equals(serviceName)){
 						if(!serviceParticipantSet.contains(currentParticipant)){
 							serviceParticipantSet.add(currentParticipant);
@@ -254,6 +288,25 @@ public class LocalPetasosParticipantCacheDM {
 		return(participants);
 	}
 
+	public boolean isParticipantSuspended(String participantName){
+		if(getParticipantNameRegistrationMap().containsKey(participantName)){
+			PetasosParticipantRegistration petasosParticipantRegistration = getParticipantNameRegistrationMap().get(participantName);
+			if(petasosParticipantRegistration.getParticipant().getParticipantStatus().equals(PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_SUSPENDED)){
+				return(true);
+			}
+		}
+		return(false);
+	}
+
+	public void suspendParticipant(String participantName){
+		if(getParticipantNameRegistrationMap().containsKey(participantName)) {
+			PetasosParticipantRegistration petasosParticipantRegistration = getParticipantNameRegistrationMap().get(participantName);
+			petasosParticipantRegistration.getParticipant().setParticipantStatus(PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_SUSPENDED);
+		}
+	}
+
+
+
 	//
 	// Getters and Setters
 	//
@@ -268,5 +321,9 @@ public class LocalPetasosParticipantCacheDM {
 
 	protected Object getParticipantCacheLock() {
 		return participantCacheLock;
+	}
+
+	protected ConcurrentHashMap<String, PetasosParticipantRegistration> getParticipantNameRegistrationMap(){
+		return(participantNameRegistrationMap);
 	}
 }

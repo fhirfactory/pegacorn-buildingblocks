@@ -21,29 +21,34 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.transformers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;
-import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityLifecycleEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityRoleEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventEntityTypeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSourceTypeEnum;
+import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
 
 @ApplicationScoped
 public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
@@ -122,7 +127,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
 
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
-                processingPlant.getSimpleInstanceName(),
+                processingPlant.getMeAsASoftwareComponent().getComponentID().getDisplayName(),
                 processingPlant.getHostName(),
                 sourceSite,
                 null,
@@ -142,8 +147,8 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         if(fulfillmentTask == null){
             return(null);
         }
-        if(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentType().equals(PegacornSystemComponentTypeTypeEnum.WUP)) {
-            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor();
+        if(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentType().equals(SoftwareComponentTypeEnum.WUP)) {
+            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfiller();
             switch (wup.getComponentSystemRole()) {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {
@@ -187,15 +192,15 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         if(fulfillmentTask == null){
             return(null);
         }
-        if(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentType().equals(PegacornSystemComponentTypeTypeEnum.WUP)) {
-            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor();
+        if(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentType().equals(SoftwareComponentTypeEnum.WUP)) {
+            WorkUnitProcessorSoftwareComponent wup = (WorkUnitProcessorSoftwareComponent) fulfillmentTask.getTaskFulfillment().getFulfiller();
             switch (wup.getComponentSystemRole()) {
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     if (wup.getIngresEndpoint() != null) {
                         switch (wup.getIngresEndpoint().getEndpointType()) {
                             case MLLP_SERVER: {
                                 MLLPServerEndpoint mllpServerEndpoint = (MLLPServerEndpoint) wup.getIngresEndpoint();
-                                String source = processingPlant.getSubsystemParticipantName();
+                                String source = processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName();
                                 String port = mllpServerEndpoint.getMLLPServerAdapter().getPortNumber().toString();
                                 String sourceSite = source + ":" + port;
                                 return(sourceSite);

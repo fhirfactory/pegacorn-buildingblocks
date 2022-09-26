@@ -75,22 +75,13 @@ public class WorkUnitProcessorSummary extends SoftwareComponentSummary {
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "WorkUnitProcessorSummary{" +
-                "participantName='" + getParticipantName() + '\'' +
-                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", workshopParticipantName=" + getWorkshopParticipantName() +
-                ", topologyNodeFDN=" + getTopologyNodeFDN() +
-                ", componentID=" + getComponentID() +
-                ", nodeVersion='" + getNodeVersion() + '\'' +
-                ", nodeType=" + getNodeType() +
-                ", concurrencyMode='" + getConcurrencyMode() + '\'' +
-                ", resilienceMode='" + getResilienceMode() + '\'' +
-                ", endpoints=" + endpoints +
-                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", resourceId='" + getResourceId() + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("WorkUnitProcessorSummary{");
+        sb.append("endpoints=").append(endpoints);
+        sb.append(", workshopParticipantName='").append(workshopParticipantName).append('\'');
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

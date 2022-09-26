@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.componentid;
 
-public enum PegacornSystemComponentTypeTypeEnum {
+public enum SoftwareComponentTypeEnum {
     OAM_WORKSHOP("OAM.Workshop", "petasos.component_type.operations_administration_and_maintenance_workshop"),
     OAM_WORK_UNIT_PROCESSOR("OAM.WUP", "petasos.component_type.operations_administration_and_maintenance_wup"),
     WUP("WUP", "petasos.component_type.wup"),
@@ -47,7 +47,7 @@ public enum PegacornSystemComponentTypeTypeEnum {
     private String token;
     private String displayName;
 
-    private PegacornSystemComponentTypeTypeEnum(String displayName, String  token){
+    private SoftwareComponentTypeEnum(String displayName, String  token){
         this.displayName = displayName;
         this.token = token;
     }

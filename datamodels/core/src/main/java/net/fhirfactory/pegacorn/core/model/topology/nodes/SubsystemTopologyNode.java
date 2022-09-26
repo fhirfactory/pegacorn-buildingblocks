@@ -21,17 +21,19 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class SubsystemTopologyNode extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(SubsystemTopologyNode.class);
 
-    private ArrayList<TopologyNodeFDN> businessServices;
+    private ArrayList<ComponentIdType> businessServices;
     private Integer siteCount;
 
     public SubsystemTopologyNode(){
@@ -43,11 +45,11 @@ public class SubsystemTopologyNode extends SoftwareComponent {
         return (LOG);
     }
 
-    public ArrayList<TopologyNodeFDN> getBusinessServices() {
+    public ArrayList<ComponentIdType> getBusinessServices() {
         return businessServices;
     }
 
-    public void setBusinessServices(ArrayList<TopologyNodeFDN> businessServices) {
+    public void setBusinessServices(ArrayList<ComponentIdType> businessServices) {
         this.businessServices = businessServices;
     }
 

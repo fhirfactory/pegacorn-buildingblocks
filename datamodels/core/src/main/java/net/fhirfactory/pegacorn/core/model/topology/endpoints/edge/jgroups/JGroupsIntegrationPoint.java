@@ -88,45 +88,11 @@ public class JGroupsIntegrationPoint extends StandardEdgeIPCEndpoint {
     // To String
     //
 
-
     @Override
     public String toString() {
-        return "JGroupsIntegrationPoint{" +
-                "deploymentSite='" + getDeploymentSite() + '\'' +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", lastReportingInstant=" + getLastReportingInstant() +
-                ", subsystemName='" + getSubsystemParticipantName() + '\'' +
-                ", componentFDN=" + getComponentFDN() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", componentStatus=" + getComponentStatus() +
-                ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", enablingProcessingPlantId=" + getEnablingProcessingPlantId() +
-                ", interfaceFunction=" + getInterfaceFunction() +
-                ", endpointStatus=" + getEndpointStatus() +
-                ", endpointDescription='" + getEndpointDescription() + '\'' +
-                ", assignedDNSName='" + getAssignedDNSName() + '\'' +
-                ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", endpointConfigurationName='" + getEndpointConfigurationName() + '\'' +
-                ", server=" + isServer() +
-                ", implementingWUP=" + getImplementingWUP() +
-                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", endpointType=" + getEndpointType() +
-                ", adapterList=" + getAdapterList() +
-                ", configurationFileName='" + getConfigurationFileName() + '\'' +
-                ", initialHosts=" + getInitialHosts() +
-                ", nameSpace='" + getNameSpace() + '\'' +
-                ", JGroupsAdapter=" + getJGroupsAdapter() +
-                ", channelName='" + channelName + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("JGroupsIntegrationPoint{");
+        sb.append("channelName='").append(channelName).append('\'');
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

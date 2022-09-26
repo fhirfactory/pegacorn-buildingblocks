@@ -123,29 +123,12 @@ public class StandardEdgeIPCEndpoint extends IPCServerTopologyEndpoint {
 
     @Override
     public String toString() {
-        return "StandardEdgeIPCEndpoint{" +
-                "componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", actualHostIP='" + getActualHostIP() + '\'' +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", server=" + isServer() +
-                ", implementingWUP=" + getImplementingWUP() +
-                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", endpointType=" + getEndpointType() +
-                ", adapterList=" + getAdapterList() +
-                ", initialHosts=" + initialHosts +
-                ", nameSpace='" + nameSpace + '\'' +
-                ", configurationFileName=" + configurationFileName +
-                '}';
+        final StringBuilder sb = new StringBuilder("StandardEdgeIPCEndpoint{");
+        sb.append("initialHosts=").append(initialHosts);
+        sb.append(", nameSpace='").append(nameSpace).append('\'');
+        sb.append(", configurationFileName='").append(configurationFileName).append('\'');
+        sb.append(", JGroupsAdapter=").append(getJGroupsAdapter());
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

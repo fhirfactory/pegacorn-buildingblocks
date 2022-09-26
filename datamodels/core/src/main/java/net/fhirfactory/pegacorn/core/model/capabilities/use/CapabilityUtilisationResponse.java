@@ -19,26 +19,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.factories;
+package net.fhirfactory.pegacorn.core.model.capabilities.use;
 
-import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedureCallRequest;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.rpc.RemoteProcedureCallResponse;
 
-import javax.enterprise.context.ApplicationScoped;
-import java.time.Instant;
-import java.util.UUID;
+public class CapabilityUtilisationResponse extends RemoteProcedureCallResponse {
 
-@ApplicationScoped
-public class RemoteProcedureCallRequestFactory {
 
-    public RemoteProcedureCallRequest newRemoteProcedureCallRequest(Object content, Class contentType, JGroupsIntegrationPointSummary endpointIdentifier){
-        RemoteProcedureCallRequest rpcRequest = new RemoteProcedureCallRequest();
-        rpcRequest.setRequestContentType(contentType);
-        rpcRequest.setRequestID(UUID.randomUUID().toString());
-        rpcRequest.setRequestContent(content);
-        rpcRequest.setRequestInstant(Instant.now());
-        rpcRequest.setRequestingEndpoint(endpointIdentifier);
-        return(rpcRequest);
+    //
+    // Constructor(s)
+    //
+
+    public CapabilityUtilisationResponse(){
+        super();
+    }
+
+    //
+    // Getters and Setters
+    //
+
+
+    //
+    // Type Based Getters/Setters
+    //
+
+    //
+    // To String
+    //
+
+    @Override
+    public String toString() {
+        return "CapabilityUtilisationResponse{" +
+                "associatedRequestID='" + getAssociatedRequestID() + '\'' +
+                ", inScope=" + isInScope() +
+                ", successful=" + isSuccessful() +
+                ", dateCompleted=" + getInstantCompleted() +
+                ", responseContent=" + getResponseContent() +
+                ", responseContentType=" + getResponseContentType() +
+                '}';
     }
 }

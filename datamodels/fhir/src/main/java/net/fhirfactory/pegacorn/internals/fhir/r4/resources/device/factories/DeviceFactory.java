@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPClientAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.HTTPServerAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -151,17 +151,18 @@ public class DeviceFactory {
             period.setEnd(endDate);
         }
         Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, node.getComponentID().getId(), period);
+        device.addIdentifier(identifier);
 
         //
         // Set the Name
         Device.DeviceDeviceNameComponent nameComponent = new Device.DeviceDeviceNameComponent();
-        nameComponent.setName(node.getComponentID().getDisplayName());
-        nameComponent.setType(Device.DeviceNameType.USERFRIENDLYNAME);
+        nameComponent.setName(node.getComponentID().getName());
+        nameComponent.setType(Device.DeviceNameType.MODELNAME);
         device.addDeviceName(nameComponent);
-
-        //
-        // Set the Distinct Identifier (the FDN)
-        device.setDistinctIdentifier(node.getComponentFDN().getToken().getTokenValue());
+        Device.DeviceDeviceNameComponent displayNameComponent = new Device.DeviceDeviceNameComponent();
+        displayNameComponent.setName(node.getComponentID().getDisplayName());
+        displayNameComponent.setType(Device.DeviceNameType.USERFRIENDLYNAME);
+        device.addDeviceName(displayNameComponent);
 
         //
         // Set the Device Type
@@ -170,7 +171,7 @@ public class DeviceFactory {
 
         //
         // Set the Device Model
-        device.setModelNumber(node.getNodeFunctionFDN().getFunctionToken().getToken());
+        device.setModelNumber(node.getParticipantName());
 
         //
         // Set the Security Zone
@@ -419,7 +420,7 @@ public class DeviceFactory {
         return(softwareComponentCC);
     }
 
-    public CodeableConcept newPegacornSoftwareComponentDeviceType(PegacornSystemComponentTypeTypeEnum componentType){
+    public CodeableConcept newPegacornSoftwareComponentDeviceType(SoftwareComponentTypeEnum componentType){
         CodeableConcept softwareComponentCC = new CodeableConcept();
         Coding softwareComponentCoding = new Coding();
         softwareComponentCoding.setCode(componentType.getToken());

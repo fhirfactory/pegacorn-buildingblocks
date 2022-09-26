@@ -203,7 +203,7 @@ public class TopologyNodeFDN implements Serializable {
         }
     }
 
-    public TopologyNodeRDN extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum nodeType){
+    public TopologyNodeRDN extractRDNForNodeType(SoftwareComponentTypeEnum nodeType){
         getLogger().debug(".TopologyNodeFDN(): Entry, nodeType->{}", nodeType);
         for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
             if(nodeRDN.getNodeType().equals(nodeType)){

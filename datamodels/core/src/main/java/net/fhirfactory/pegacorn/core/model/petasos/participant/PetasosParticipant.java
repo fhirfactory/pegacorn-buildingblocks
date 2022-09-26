@@ -174,31 +174,16 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
 
     @Override
     public String toString() {
-        return "PetasosParticipant{" +
-                "lastActivityInstant=" + getLastActivityInstant() +
-                ", lastReportingInstant=" + getLastReportingInstant() +
-                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", componentFDN=" + getComponentFDN() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", componentStatus=" + getComponentStatus() +
-                ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", utilisationStatus=" + participantStatus +
-                ", subscribedWorkItemManifests=" + subscriptions +
-                ", publishedWorkItemManifests=" + publishedWorkItemManifests +
-                ", utilisationUpdateInstant=" + utilisationUpdateInstant +
-                ", fulfillmentState=" + fulfillmentState +
-                '}';
+        final StringBuilder sb = new StringBuilder("PetasosParticipant{");
+        sb.append("participantStatus=").append(participantStatus);
+        sb.append(", subscriptions=").append(subscriptions);
+        sb.append(", publishedWorkItemManifests=").append(publishedWorkItemManifests);
+        sb.append(", utilisationUpdateInstant=").append(utilisationUpdateInstant);
+        sb.append(", fulfillmentState=").append(fulfillmentState);
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
+
 
     //
     // Hash and Equals

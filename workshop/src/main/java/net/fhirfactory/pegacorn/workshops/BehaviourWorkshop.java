@@ -44,7 +44,7 @@ public class BehaviourWorkshop extends PetasosEnabledWorkshop {
 
     @Override
     protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getComponentRDN().getNodeVersion());
+        return (getProcessingPlant().getMeAsASoftwareComponent().getVersion());
     }
 
     @Override

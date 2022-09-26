@@ -135,10 +135,8 @@ public class ProcessingPlantSummary extends SoftwareComponentSummary {
                 ", workshops=" + workshops +
                 ", actualHostIP='" + actualHostIP + '\'' +
                 ", actualPodIP='" + actualPodIP + '\'' +
-                ", participantName='" + getParticipantName() + '\'' +
-                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", topologyNodeFDN=" + getTopologyNodeFDN() +
                 ", componentID=" + getComponentID() +
+                ", participantId=" + getParticipantId() +
                 ", nodeVersion='" + getNodeVersion() + '\'' +
                 ", nodeType=" + getNodeType() +
                 ", concurrencyMode='" + getConcurrencyMode() + '\'' +

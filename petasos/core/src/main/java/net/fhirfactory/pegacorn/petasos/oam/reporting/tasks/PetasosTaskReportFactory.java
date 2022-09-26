@@ -95,9 +95,9 @@ public class PetasosTaskReportFactory {
         }
         String fulfillerComponentName = "Not Available";
         String fulfillerComponentId = "Not Available";
-        if(actionableTask.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
-            fulfillerComponentName = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantDisplayName();
-            fulfillerComponentId = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID().getId();
+        if(actionableTask.getTaskFulfillment().hasFulfiller()) {
+            fulfillerComponentName = actionableTask.getTaskFulfillment().getFulfiller().getParticipantDisplayName();
+            fulfillerComponentId = actionableTask.getTaskFulfillment().getFulfiller().getComponentID().getId();
         } else {
             getLogger().warn(".newTaskSummaryReport(): No Task Fulfiller Component Defined on Task->{}", actionableTask.getTaskId());
         }

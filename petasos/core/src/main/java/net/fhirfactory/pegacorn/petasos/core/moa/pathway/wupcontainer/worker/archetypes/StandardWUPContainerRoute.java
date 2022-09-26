@@ -59,7 +59,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken());
+		this.nameSet = new RouteElementNames(wupTopologyNode.getParticipantId());
 		this.metricsAgent = metricsAgent;
 	}
 
@@ -67,7 +67,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken(), requiresDirect, sedaParameters);
+		this.nameSet = new RouteElementNames(wupTopologyNode.getParticipantId(), requiresDirect, sedaParameters);
 		this.metricsAgent = metricsAgent;
 	}
 

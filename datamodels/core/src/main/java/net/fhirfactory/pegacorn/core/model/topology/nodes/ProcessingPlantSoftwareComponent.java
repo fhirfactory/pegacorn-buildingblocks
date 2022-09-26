@@ -22,7 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
@@ -35,9 +36,9 @@ import java.util.ArrayList;
 public class ProcessingPlantSoftwareComponent extends SoftwareComponent implements EndpointProviderInterface {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantSoftwareComponent.class);
 
-    private ArrayList<TopologyNodeFDN> workshops;
-    private ArrayList<TopologyNodeFDN> endpoints;
-    private ArrayList<TopologyNodeFDN> connections;
+    private ArrayList<ComponentIdType> workshops;
+    private ArrayList<ComponentIdType> endpoints;
+    private ArrayList<ComponentIdType> connections;
     private String nameSpace;
     private String petasosIPCStackConfigFile;
     private String petasosTopologyStackConfigFile;
@@ -54,6 +55,8 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     private String assignedDNSName;
     private boolean internalTrafficEncrypted;
     private Integer replicationCount;
+    private String siteName;
+    private String podName;
 
     @Override
     protected Logger getLogger() {
@@ -73,6 +76,8 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.assignedDNSName = null;
         this.actualHostIP = null;
         this.actualPodIP = null;
+        this.podName = null;
+        this.siteName = null;
         this.internalTrafficEncrypted = false;
 
         this.petasosIPCStackConfigFile = null;
@@ -89,6 +94,22 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     //
     // Getters and Setters
     //
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
+
+    public String getPodName() {
+        return podName;
+    }
+
+    public void setPodName(String podName) {
+        this.podName = podName;
+    }
 
     public String getActualHostIP() {
         return actualHostIP;
@@ -162,27 +183,27 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.internalTrafficEncrypted = internalTrafficEncrypted;
     }
 
-    public ArrayList<TopologyNodeFDN> getWorkshops() {
+    public ArrayList<ComponentIdType> getWorkshops() {
         return workshops;
     }
 
-    public void setWorkshops(ArrayList<TopologyNodeFDN> workshops) {
+    public void setWorkshops(ArrayList<ComponentIdType> workshops) {
         this.workshops = workshops;
     }
 
-    public ArrayList<TopologyNodeFDN> getEndpoints() {
+    public ArrayList<ComponentIdType> getEndpoints() {
         return endpoints;
     }
 
-    public void setEndpoints(ArrayList<TopologyNodeFDN> endpoints) {
+    public void setEndpoints(ArrayList<ComponentIdType> endpoints) {
         this.endpoints = endpoints;
     }
 
-    public ArrayList<TopologyNodeFDN> getConnections() {
+    public ArrayList<ComponentIdType> getConnections() {
         return connections;
     }
 
-    public void setConnections(ArrayList<TopologyNodeFDN> connections) {
+    public void setConnections(ArrayList<ComponentIdType> connections) {
         this.connections = connections;
     }
 
@@ -211,8 +232,8 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     }
 
     @Override
-    public void addEndpoint(TopologyNodeFDN endpointFDN) {
-        endpoints.add(endpointFDN);
+    public void addEndpoint(ComponentIdType endpointId) {
+        endpoints.add(endpointId);
     }
 
     public String getPetasosSubscriptionsStackConfigFile() {
@@ -233,55 +254,38 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
 
     @JsonIgnore
     public String getClusterServiceName(){
-        TopologyNodeFDN nodeFDN = getComponentFDN();
-        TopologyNodeRDN subsystemRDN = nodeFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.CLUSTER_SERVICE);
-        String subsystemName = subsystemRDN.getNodeName();
-        return(subsystemName);
+        return(getSubsystemParticipantName());
     }
 
     //
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "ProcessingPlantSoftwareComponent{" +
-                "participantDisplayName='" + getParticipantDisplayName() + '\'' +
-                ", participantName='" + getParticipantName() + '\'' +
-                ", deploymentSite='" + getDeploymentSite() + '\'' +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", lastReportingInstant=" + getLastReportingInstant() +
-                ", subsystemParticipantName='" + getSubsystemParticipantName() + '\'' +
-                ", componentFDN=" + getComponentFDN() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", componentStatus=" + getComponentStatus() +
-                ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", workshops=" + workshops +
-                ", endpoints=" + endpoints +
-                ", connections=" + connections +
-                ", nameSpace='" + nameSpace + '\'' +
-                ", petasosIPCStackConfigFile='" + petasosIPCStackConfigFile + '\'' +
-                ", petasosTopologyStackConfigFile='" + petasosTopologyStackConfigFile + '\'' +
-                ", petasosSubscriptionsStackConfigFile='" + petasosSubscriptionsStackConfigFile + '\'' +
-                ", petasosMetricsStackConfigFile='" + petasosMetricsStackConfigFile + '\'' +
-                ", petasosInterceptionStackConfigFile='" + petasosInterceptionStackConfigFile + '\'' +
-                ", petasosTaskingStackConfigFile='" + petasosTaskingStackConfigFile + '\'' +
-                ", petasosAuditStackConfigFile='" + petasosAuditStackConfigFile + '\'' +
-                ", multiZoneInfinispanStackConfigFile='" + multiZoneInfinispanStackConfigFile + '\'' +
-                ", actualHostIP='" + actualHostIP + '\'' +
-                ", actualPodIP='" + actualPodIP + '\'' +
-                ", assignedDNSName='" + assignedDNSName + '\'' +
-                ", internalTrafficEncrypted=" + internalTrafficEncrypted +
-                ", replicationCount=" + replicationCount +
-                '}';
+        final StringBuilder sb = new StringBuilder("ProcessingPlantSoftwareComponent{");
+        sb.append("workshops=").append(workshops);
+        sb.append(", endpoints=").append(endpoints);
+        sb.append(", connections=").append(connections);
+        sb.append(", nameSpace='").append(nameSpace).append('\'');
+        sb.append(", petasosIPCStackConfigFile='").append(petasosIPCStackConfigFile).append('\'');
+        sb.append(", petasosTopologyStackConfigFile='").append(petasosTopologyStackConfigFile).append('\'');
+        sb.append(", petasosSubscriptionsStackConfigFile='").append(petasosSubscriptionsStackConfigFile).append('\'');
+        sb.append(", petasosMetricsStackConfigFile='").append(petasosMetricsStackConfigFile).append('\'');
+        sb.append(", petasosInterceptionStackConfigFile='").append(petasosInterceptionStackConfigFile).append('\'');
+        sb.append(", petasosTaskingStackConfigFile='").append(petasosTaskingStackConfigFile).append('\'');
+        sb.append(", petasosAuditStackConfigFile='").append(petasosAuditStackConfigFile).append('\'');
+        sb.append(", multiZoneInfinispanStackConfigFile='").append(multiZoneInfinispanStackConfigFile).append('\'');
+        sb.append(", actualHostIP='").append(actualHostIP).append('\'');
+        sb.append(", actualPodIP='").append(actualPodIP).append('\'');
+        sb.append(", assignedDNSName='").append(assignedDNSName).append('\'');
+        sb.append(", internalTrafficEncrypted=").append(internalTrafficEncrypted);
+        sb.append(", replicationCount=").append(replicationCount);
+        sb.append(", clusterServiceName='").append(getClusterServiceName()).append('\'');
+        sb.append(", siteName=").append(siteName);
+        sb.append(", podName=").append(podName);
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
 }

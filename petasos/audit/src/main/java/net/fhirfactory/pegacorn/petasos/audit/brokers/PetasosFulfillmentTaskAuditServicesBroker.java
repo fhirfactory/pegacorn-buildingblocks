@@ -101,9 +101,9 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
         getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] Start...");
         if(fulfillmentTask.hasTaskFulfillment()){
             getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask has TaskFulfillmentType element");
-            if(fulfillmentTask.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
+            if(fulfillmentTask.getTaskFulfillment().hasFulfiller()) {
                 getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType has FulfillmentWorkUnitProcessor");
-                WorkUnitProcessorSoftwareComponent wupSoftwareComponent = (WorkUnitProcessorSoftwareComponent)fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor();
+                WorkUnitProcessorSoftwareComponent wupSoftwareComponent = (WorkUnitProcessorSoftwareComponent)fulfillmentTask.getTaskFulfillment().getFulfiller();
                 if(wupSoftwareComponent.getIngresEndpoint() != null){
                     getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor has ingresEndpoint");
                     if(wupSoftwareComponent.getIngresEndpoint().getComponentSystemRole() != null){
@@ -168,7 +168,7 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
             }
         }
         if(fulfillmentTask.hasTaskFulfillment()){
-            switch(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole()){
+            switch(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentSystemRole()){
                 case COMPONENT_ROLE_INTERACT_EGRESS:
                 case COMPONENT_ROLE_INTERACT_INGRES: {
                     switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {

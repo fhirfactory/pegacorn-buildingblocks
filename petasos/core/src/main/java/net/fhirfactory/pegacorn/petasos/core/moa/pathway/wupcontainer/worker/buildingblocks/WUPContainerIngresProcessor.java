@@ -24,8 +24,8 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
@@ -134,12 +134,12 @@ public class WUPContainerIngresProcessor {
         // Set our wait-loop check state
         boolean waitState = true;
 
-        TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getNodeFunctionFDN().getFunctionToken();
-        getLogger().trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        PetasosParticipantId wupParticipantId = fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipantId();
+        getLogger().trace(".receiveFromWUP(): wupParticipantId (PetasosParticipantId) for this activity --> {}", wupParticipantId);
 
         //
         // Now, continue with business logic
-        RouteElementNames elementNames = new RouteElementNames(wupFunctionToken);
+        RouteElementNames elementNames = new RouteElementNames(wupParticipantId);
         SedaEndpoint seda = (SedaEndpoint) camelctx.getEndpoint(elementNames.getEndPointWUPContainerIngresProcessorIngres());
         int currentQueueSize = seda.getCurrentQueueSize();
 

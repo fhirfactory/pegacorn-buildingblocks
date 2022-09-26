@@ -21,22 +21,23 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.oam.topology.PetasosMonitoredTopologyReportingAgent;
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 public abstract class Workshop extends RouteBuilder implements WorkshopInterface {
 
@@ -66,7 +67,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     abstract protected String specifyWorkshopName();
     abstract protected String specifyWorkshopVersion();
-    abstract protected PegacornSystemComponentTypeTypeEnum specifyWorkshopType();
+    abstract protected SoftwareComponentTypeEnum specifyWorkshopType();
     abstract protected void invokePostConstructInitialisation();
 
     protected PegacornTopologyFactoryInterface getTopologyFactory(){
@@ -97,10 +98,10 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     private void buildWorkshop() {
         getLogger().debug(".buildWorkshop(): Entry, adding Workshop --> {}, version --> {}", specifyWorkshopName(), specifyWorkshopVersion());
-        WorkshopSoftwareComponent workshop = getTopologyFactory().createWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getMeAsASoftwareComponent(),specifyWorkshopType());
-        String workshopParticipantName = getProcessingPlant().getSubsystemParticipantName() + "." + specifyWorkshopName();
+        WorkshopSoftwareComponent workshop = getTopologyFactory().buildWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getMeAsASoftwareComponent(),specifyWorkshopType());
+        String workshopParticipantName = getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName() + "." + specifyWorkshopName();
         workshop.setParticipantName(workshopParticipantName);
-        topologyIM.addTopologyNode(getProcessingPlant().getMeAsASoftwareComponent().getComponentFDN(), workshop);
+        topologyIM.addTopologyNode(getProcessingPlant().getMeAsASoftwareComponent().getComponentID(), workshop);
         this.workshopNode = workshop;
         getLogger().debug(".buildWorkshop(): Exit");
     }
@@ -122,33 +123,48 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     }
 
     private String getFriendlyName(){
-        String nodeName = getWorkshopNode().getComponentRDN().getNodeName() + "(" + getWorkshopNode().getComponentRDN().getNodeVersion() + ")";
+        String nodeName = getWorkshopNode().getComponentID().getDisplayName();
         return(nodeName);
     }
 
     @Override
     public WorkUnitProcessorSoftwareComponent getWUP(String wupName, String wupVersion) {
         getLogger().debug(".getWUP(): Entry, wupName --> {}, wupVersion --> {}", wupName, wupVersion);
+        if(StringUtils.isEmpty(wupName)){
+            return(null);
+        }
         boolean found = false;
-        WorkUnitProcessorSoftwareComponent foundWorkshop = null;
-        for (TopologyNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
-            WorkUnitProcessorSoftwareComponent containedWorkshop = (WorkUnitProcessorSoftwareComponent)topologyIM.getNode(containedWorkshopFDN);
-            TopologyNodeRDN testRDN = new TopologyNodeRDN(PegacornSystemComponentTypeTypeEnum.WORKSHOP, wupName, wupVersion);
-            if (testRDN.equals(containedWorkshop.getComponentRDN())) {
-                found = true;
-                foundWorkshop = containedWorkshop;
-                break;
+        WorkUnitProcessorSoftwareComponent foundWUP = null;
+        for (ComponentIdType containedWUPId: this.workshopNode.getWupSet()) {
+            boolean wupNameEqual = false;
+            boolean wupDisplayNameEqual = false;
+            boolean versionEqual = true;
+            if(containedWUPId.hasName()) {
+                wupNameEqual = containedWUPId.getName().contentEquals(wupName);
+            }
+            if(containedWUPId.hasDisplayName()){
+                wupDisplayNameEqual = containedWUPId.getDisplayName().contentEquals(wupName);
+            }
+            if (wupNameEqual || wupDisplayNameEqual) {
+                foundWUP = (WorkUnitProcessorSoftwareComponent)topologyIM.getNode(containedWUPId);
+                if(StringUtils.isNotEmpty(wupVersion)){
+                    versionEqual = foundWUP.getVersion().contentEquals(wupVersion);
+                }
+                if(versionEqual){
+                    break;
+                } else {
+                    foundWUP = null;
+                }
             }
         }
-        if (found) {
-            return (foundWorkshop);
-        }
-        return (null);
+        getLogger().debug(".getWUP(): Exit, foundWUP->{}", foundWUP);
+        return (foundWUP);
     }
 
-    public WorkUnitProcessorSoftwareComponent getWUP(String workshopName){
+    @Override
+	public WorkUnitProcessorSoftwareComponent getWUP(String workshopName){
         getLogger().debug(".getWorkshop(): Entry, workshopName --> {}", workshopName);
-        String version = this.workshopNode.getComponentRDN().getNodeVersion();
+        String version = this.workshopNode.getVersion();
         WorkUnitProcessorSoftwareComponent workshop = getWUP(workshopName, version);
         return(workshop);
     }

@@ -21,22 +21,20 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.topology;
 
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.*;
 
 public interface PegacornTopologyFactoryInterface {
-    public TopologyNodeRDN createNodeRDN(String nodeName, String nodeVersion, PegacornSystemComponentTypeTypeEnum nodeType);
 
-    public WorkshopSoftwareComponent createWorkshop(String name, String version, ProcessingPlantSoftwareComponent processingPlant, PegacornSystemComponentTypeTypeEnum nodeType);
+    public WorkshopSoftwareComponent buildWorkshop(String name, String version, ProcessingPlantSoftwareComponent processingPlant, SoftwareComponentTypeEnum nodeType);
 
-    public WorkUnitProcessorSoftwareComponent createWorkUnitProcessor(String name, String version, String participantName, WorkshopSoftwareComponent workshop, PegacornSystemComponentTypeTypeEnum nodeType);
+    public WorkUnitProcessorSoftwareComponent buildWUP(String name, String version, String participantName, WorkshopSoftwareComponent workshop, SoftwareComponentTypeEnum nodeType);
 
-    public WorkUnitProcessorSubComponentSoftwareComponent createWorkUnitProcessorComponent(String name, PegacornSystemComponentTypeTypeEnum topologyType, WorkUnitProcessorSoftwareComponent wup);
+    public WorkUnitProcessorSubComponentSoftwareComponent buildWUPComponent(String name, SoftwareComponentTypeEnum topologyType, WorkUnitProcessorSoftwareComponent wup);
 
-    public WorkUnitProcessorInterchangeSoftwareComponent createWorkUnitProcessingInterchangeComponent(String name, PegacornSystemComponentTypeTypeEnum topologyNodeType, WorkUnitProcessorSoftwareComponent wup);
+    public WorkUnitProcessorInterchangeSoftwareComponent buildWUPInterchange(String name, SoftwareComponentTypeEnum topologyNodeType, WorkUnitProcessorSoftwareComponent wup);
 
     public Boolean getSubsystemInternalTrafficEncrypt();
 

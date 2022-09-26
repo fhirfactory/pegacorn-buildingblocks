@@ -23,8 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
@@ -88,12 +87,12 @@ public class EgressActivityFinalisationRegistration {
         getLogger().trace(".registerActivityFinishAndFinalisation(): Retrieve the Fulfillment Task from the Camel Exchange object");
         PetasosFulfillmentTaskSharedInstance fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTaskSharedInstance.class);
         getLogger().trace(".registerActivityFinishAndFinalisation(): Merge the UoW Egress Content into the PetasosFulfillmentTask object & process");
-        TopologyNodeFunctionFDNToken wupFunctionToken = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getNodeFunctionFDN().getFunctionToken();
-        getLogger().trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        PetasosParticipantId wupParticipantId = fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipantId();
+        getLogger().trace(".receiveFromWUP(): wupParticipantId (PetasosParticipantId) for this activity --> {}", wupParticipantId);
 
         //
         // Now, get the target point (
-        RouteElementNames elementNames = new RouteElementNames(wupFunctionToken);
+        RouteElementNames elementNames = new RouteElementNames(wupParticipantId);
 
         //
         // Send to Task Outcome Collector

@@ -23,12 +23,10 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.componentid.*;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
-
-import java.time.chrono.IsoEra;
 
 
 /**
@@ -42,7 +40,7 @@ public class RouteElementNames {
         return(LOG);
     }
 
-    private TopologyNodeFunctionFDNToken nodeFunctionFDNToken;
+    private PetasosParticipantId participantId;
     private boolean mustBeDirect;
     private String wupTypeName;
     private String wupVersion;
@@ -51,35 +49,26 @@ public class RouteElementNames {
     private static final String DIRECT_INTER_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda://";
 
-    public RouteElementNames(TopologyNodeFunctionFDNToken functionToken, boolean mustBeDirect, String sedaParameters){
-        getLogger().debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
-        this.nodeFunctionFDNToken = functionToken;
+    public RouteElementNames(PetasosParticipantId participantId, boolean mustBeDirect, String sedaParameters){
+        getLogger().debug(".RouteElementNames(): Entry, participantId->{}, mustBeDirect->{}", participantId, mustBeDirect);
+        this.participantId = participantId;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = mustBeDirect;
         this.sedaParameters = sedaParameters;
     }
 
-    public RouteElementNames(TopologyNodeFunctionFDNToken functionToken){
-        getLogger().debug(".RouteElementNames(): Entry, functionToken->{}", functionToken);
-        this.nodeFunctionFDNToken = functionToken;
+    public RouteElementNames(PetasosParticipantId participantId){
+        getLogger().debug(".RouteElementNames(): Entry, participantId->{}", participantId);
+        this.participantId = participantId;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = false;
         this.sedaParameters = null;
     }
 
     public String simplifyName(){
-        getLogger().debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.nodeFunctionFDNToken);
-        TopologyNodeFunctionFDN wupFunctionFDN = new TopologyNodeFunctionFDN(this.nodeFunctionFDNToken);
-        getLogger().trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
-        TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT);
-        getLogger().trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);
-        TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WORKSHOP);
-        getLogger().trace(".simplifyName(): workshopRDN (RDN) --> {} ", workshopRDN);
-        TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WUP);
-        getLogger().trace(".simplifyName(): wupFunctionRDN (RDN) --> {}", wupFunctionRDN);
-        String nodeVersion = wupFunctionRDN.getNodeVersion();
+        String nodeVersion = participantId.getVersion();
         String nodeVersionSimplified = nodeVersion.replace(".","");
-        String wupName = processingPlantRDN.getNodeName()+"."+workshopRDN.getNodeName()+"."+wupFunctionRDN.getNodeName()+"."+nodeVersionSimplified;
+        String wupName = participantId.getName() + "." + nodeVersionSimplified;
         getLogger().trace(".simplifyName(): wupName (String) --> {}", wupName);
         return(wupName);
     }

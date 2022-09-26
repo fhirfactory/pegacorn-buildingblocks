@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class WorkshopSoftwareComponent extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(WorkshopSoftwareComponent.class);
 
-    private ArrayList<TopologyNodeFDN> wupSet;
+    private ArrayList<ComponentIdType> wupSet;
 
     public WorkshopSoftwareComponent(){
         this.wupSet = new ArrayList<>();
@@ -42,11 +42,11 @@ public class WorkshopSoftwareComponent extends SoftwareComponent {
         return (LOG);
     }
 
-    public ArrayList<TopologyNodeFDN> getWupSet() {
+    public ArrayList<ComponentIdType> getWupSet() {
         return wupSet;
     }
 
-    public void setWupSet(ArrayList<TopologyNodeFDN> wupSet) {
+    public void setWupSet(ArrayList<ComponentIdType> wupSet) {
         this.wupSet = wupSet;
     }
 }

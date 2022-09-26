@@ -36,7 +36,7 @@ import java.util.Date;
  * @author Mark A. Hunter
  */
 public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements Serializable {
-    private SoftwareComponent fulfillerWorkUnitProcessor;
+    private SoftwareComponent fulfiller;
     private FulfillmentTrackingIdType trackingID;
     private FulfillmentExecutionStatusEnum status;
     private boolean resilientActivity;
@@ -45,7 +45,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, SoftwareComponent fulfillerCommponent, Instant registrationInstant) {
         super();
-        this.fulfillerWorkUnitProcessor = fulfillerWorkUnitProcessor;
+        this.fulfiller = fulfillerCommponent;
         this.trackingID = SerializationUtils.clone(trackingID);
         setRegistrationInstant(SerializationUtils.clone(registrationInstant));
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED;
@@ -54,7 +54,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, SoftwareComponent fulfillerComponent) {
         super();
-        this.fulfillerWorkUnitProcessor = this.fulfillerWorkUnitProcessor;
+        this.fulfiller = fulfillerComponent;
         this.trackingID = SerializationUtils.clone(trackingID);
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
@@ -62,7 +62,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType() {
         super();
-        this.fulfillerWorkUnitProcessor = null;
+        this.fulfiller = null;
         this.trackingID = null;
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
@@ -70,14 +70,14 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType(TaskFulfillmentType ori) {
         super(ori);
-        this.fulfillerWorkUnitProcessor = null;
+        this.fulfiller = null;
         this.trackingID = null;
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
 
         // Set Values
-        if (ori.hasFulfillerWorkUnitProcessor()) {
-            this.fulfillerWorkUnitProcessor = SerializationUtils.clone(ori.getFulfillerWorkUnitProcessor());
+        if (ori.hasFulfiller()) {
+            this.fulfiller = SerializationUtils.clone(ori.getFulfiller());
         }
         if (ori.hasTrackingID()) {
             this.trackingID = SerializationUtils.clone(ori.getTrackingID());
@@ -113,17 +113,17 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
     }
 
     @JsonIgnore
-    public boolean hasFulfillerWorkUnitProcessor(){
-        boolean hasValue = this.fulfillerWorkUnitProcessor != null;
+    public boolean hasFulfiller(){
+        boolean hasValue = this.fulfiller != null;
         return(hasValue);
     }
 
-    public SoftwareComponent getFulfillerWorkUnitProcessor() {
-        return fulfillerWorkUnitProcessor;
+    public SoftwareComponent getFulfiller() {
+        return fulfiller;
     }
 
-    public void setFulfillerWorkUnitProcessor(SoftwareComponent fulfillerWorkUnitProcessor) {
-        this.fulfillerWorkUnitProcessor = fulfillerWorkUnitProcessor;
+    public void setFulfiller(SoftwareComponent fulfiller) {
+        this.fulfiller = fulfiller;
     }
 
     @JsonIgnore
@@ -175,7 +175,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
                 ", finishInstant=" + getFinishInstant() +
                 ", finalisationInstant=" + getFinalisationInstant() +
                 ", lastCheckedInstant=" + getLastCheckedInstant() +
-                ", fulfillerComponent=" + fulfillerWorkUnitProcessor +
+                ", fulfillerComponent=" + fulfiller +
                 ", trackingID=" + trackingID +
                 ", status=" + status +
                 ", resilientActivity=" + resilientActivity +

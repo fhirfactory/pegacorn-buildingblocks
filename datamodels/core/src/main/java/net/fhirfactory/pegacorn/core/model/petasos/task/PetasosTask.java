@@ -31,6 +31,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.datagrid.datatypes.DatagridElementSourceResourceIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskSequenceNumber;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
@@ -48,6 +49,8 @@ import java.util.*;
 
 public class PetasosTask implements Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(PetasosTask.class);
+
+    private TaskSequenceNumber sequenceNumber;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant creationInstant;
@@ -87,6 +90,7 @@ public class PetasosTask implements Serializable {
     //
 
     public PetasosTask(){
+        this.sequenceNumber = null;
         this.taskId = null;
         this.sourceResourceId = null;
         this.creationInstant = Instant.now();
@@ -107,6 +111,20 @@ public class PetasosTask implements Serializable {
     //
     // Getters and Setters (Bean Methods)
     //
+
+    @JsonIgnore
+    public boolean hasSequenceNumber(){
+        boolean hasValue = this.sequenceNumber != null;
+        return(hasValue);
+    }
+
+    public TaskSequenceNumber getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public void setSequenceNumber(TaskSequenceNumber sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+    }
 
     @JsonIgnore
     public boolean hasExecutionStatus(){
@@ -314,6 +332,7 @@ public class PetasosTask implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         PetasosTask that = (PetasosTask) o;
         boolean theyAreEqual = isRegistered() == that.isRegistered()
+                && Objects.equals(getSequenceNumber(), that.getSequenceNumber())
                 && Objects.equals(getSourceResourceId(), that.getSourceResourceId())
                 && Objects.equals(getCreationInstant(), that.getCreationInstant())
                 && Objects.equals(getUpdateInstant(), that.getUpdateInstant())
@@ -334,6 +353,7 @@ public class PetasosTask implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getCreationInstant(),
+                getSequenceNumber(),
                 getSourceResourceId(),
                 getUpdateInstant(),
                 getTaskContext(),
@@ -357,24 +377,27 @@ public class PetasosTask implements Serializable {
 
     @Override
     public String toString() {
-        return "PetasosTask{" +
-                "creationInstant=" + creationInstant +
-                ", sourceResourceId=" + getSourceResourceId() +
-                ", updateInstant=" + updateInstant +
-                ", taskContext=" + taskContext +
-                ", taskId=" + taskId +
-                ", taskType=" + taskType +
-                ", taskWorkItem=" + taskWorkItem +
-                ", taskTraceability=" + taskTraceability +
-                ", taskOutcomeStatus=" + taskOutcomeStatus +
-                ", taskPerformerTypes=" + taskPerformerTypes +
-                ", taskReason=" + taskReason +
-                ", taskNodeAffinity=" + taskNodeAffinity +
-                ", aggregateTaskMembership=" + aggregateTaskMembership +
-                ", registered=" + registered +
-                ", executionStatus=" + getExecutionStatus() +
-                '}';
+        final StringBuilder sb = new StringBuilder("PetasosTask{");
+        sb.append("sequenceNumber=").append(sequenceNumber);
+        sb.append(", creationInstant=").append(creationInstant);
+        sb.append(", updateInstant=").append(updateInstant);
+        sb.append(", sourceResourceId=").append(sourceResourceId);
+        sb.append(", taskContext=").append(taskContext);
+        sb.append(", taskId=").append(taskId);
+        sb.append(", taskType=").append(taskType);
+        sb.append(", taskWorkItem=").append(taskWorkItem);
+        sb.append(", taskTraceability=").append(taskTraceability);
+        sb.append(", taskOutcomeStatus=").append(taskOutcomeStatus);
+        sb.append(", taskPerformerTypes=").append(taskPerformerTypes);
+        sb.append(", taskReason=").append(taskReason);
+        sb.append(", taskNodeAffinity=").append(taskNodeAffinity);
+        sb.append(", aggregateTaskMembership=").append(aggregateTaskMembership);
+        sb.append(", executionStatus=").append(executionStatus);
+        sb.append(", registered=").append(registered);
+        sb.append('}');
+        return sb.toString();
     }
+
 
     //
     // Update
@@ -389,6 +412,10 @@ public class PetasosTask implements Serializable {
         LOG.debug(".updatePetasosTask(): Entry, petasosTask->{}", update);
         if(update == null){
             return(this);
+        }
+        // sequenceNumber
+        if(update.hasSequenceNumber()){
+            this.setSequenceNumber(update.sequenceNumber);
         }
         // sourceResourceId
         if(update.hasSourceResourceId()){

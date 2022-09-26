@@ -154,7 +154,7 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBa
         this.endpointMetricsAgent = getMetricAgentFactory().newEndpointMetricsAgent(
                 processingPlantCapabilityStatement,
                 getEgressEndpoint().getEndpointTopologyNode().getComponentID(),
-                getEgressEndpoint().getEndpointTopologyNode().getParticipantName(),
+                getEgressEndpoint().getEndpointTopologyNode().getParticipantId().getName(),
                 connectedSystem,
                 endpointDescription);
         getLogger().debug(".establishEndpointMetricAgents(): Exit");

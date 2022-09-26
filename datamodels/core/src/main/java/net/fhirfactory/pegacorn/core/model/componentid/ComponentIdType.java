@@ -29,9 +29,11 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 public class ComponentIdType implements Serializable {
     private String id;
+    private String name;
     private String displayName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant idValidityStartInstant;
@@ -47,6 +49,7 @@ public class ComponentIdType implements Serializable {
         this.idValidityStartInstant = null;
         this.idValidityEndInstant = null;
         this.displayName = null;
+        this.name = null;
     }
 
     public ComponentIdType(ComponentIdType ori){
@@ -54,6 +57,7 @@ public class ComponentIdType implements Serializable {
         this.idValidityStartInstant = null;
         this.idValidityEndInstant = null;
         this.displayName = null;
+        this.name = null;
         if(ori.hasId()){
             setId(SerializationUtils.clone(ori.getId()));
         }
@@ -66,11 +70,45 @@ public class ComponentIdType implements Serializable {
         if(ori.hasDisplayName()){
             setDisplayName(SerializationUtils.clone(ori.getDisplayName()));
         }
+        if(ori.hasName()){
+            setName(SerializationUtils.clone(ori.getName()));
+        }
+    }
+
+    //
+    // Static Constructor
+    //
+
+    public static final ComponentIdType fromComponentName(String name){
+        ComponentIdType componentId = new ComponentIdType();
+        componentId.setName(name);
+        componentId.setIdValidityStartInstant(Instant.now());
+        componentId.setIdValidityEndInstant(Instant.MAX);
+        UUID uniqueId = UUID.randomUUID();
+        String msbString = Long.toHexString(uniqueId.getMostSignificantBits());
+        String lsbString = Long.toHexString(uniqueId.getLeastSignificantBits());
+        componentId.setId(msbString + lsbString);
+        componentId.setDisplayName(name + "::" + componentId.getId());
+        return(componentId);
     }
 
     //
     // Getters and Setters (Bean Methods)
     //
+
+    @JsonIgnore
+    public boolean hasName(){
+        boolean hasValue = this.name != null;
+        return(hasValue);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @JsonIgnore
     public boolean hasId(){
@@ -151,11 +189,13 @@ public class ComponentIdType implements Serializable {
 
     @Override
     public String toString() {
-        return "ComponentIdType{" +
-                "id='" + id + '\'' +
-                ", displayName='" + displayName + '\'' +
-                ", idValidityStartInstant=" + idValidityStartInstant +
-                ", idValidityEndInstant=" + idValidityEndInstant +
-                '}';
+        final StringBuilder sb = new StringBuilder("ComponentIdType{");
+        sb.append("id='").append(id).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", displayName='").append(displayName).append('\'');
+        sb.append(", idValidityStartInstant=").append(idValidityStartInstant);
+        sb.append(", idValidityEndInstant=").append(idValidityEndInstant);
+        sb.append('}');
+        return sb.toString();
     }
 }

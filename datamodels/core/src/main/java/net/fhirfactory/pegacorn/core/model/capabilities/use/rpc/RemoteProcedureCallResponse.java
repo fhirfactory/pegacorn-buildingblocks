@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.capabilities.base.rpc;
+package net.fhirfactory.pegacorn.core.model.capabilities.use.rpc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

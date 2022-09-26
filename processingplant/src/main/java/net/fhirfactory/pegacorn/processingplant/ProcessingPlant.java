@@ -21,21 +21,35 @@
  */
 package net.fhirfactory.pegacorn.processingplant;
 
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
@@ -59,19 +73,6 @@ import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.slf4j.Logger;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantRoleSupportInterface, ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface, CapabilityFulfillmentInterface {
 
@@ -192,10 +193,6 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return (topologyIM);
     }
 
-    public TopologyNodeFunctionFDN getNodeToken() {
-        return (this.meAsASoftwareComponent.getNodeFunctionFDN());
-    }
-
     public PetasosAuditEventGranularityLevelEnum getProcessingPlantAuditLevel() {
         return processingPlantAuditLevel;
     }
@@ -257,7 +254,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             this.petasosTaskRecoveryWatchdog.initialise();
             getLogger().info("ProcessingPlant::initialise(): [Initialise Task Recovery Watchdog] Finish");
             getLogger().info("ProcessingPlant::initialise(): [Initialise Metrics Agent] Start");
-            this.metricsAgent = metricAgentFactory.newProcessingPlantMetricsAgent(this, getMeAsASoftwareComponent().getComponentID(), getSubsystemParticipantName());
+            this.metricsAgent = metricAgentFactory.newProcessingPlantMetricsAgent(this, getMeAsASoftwareComponent().getComponentID(), getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
             metricsAgentAccessor.setMetricsAgent(this.metricsAgent);
             getLogger().info("ProcessingPlant::initialise(): [Initialise Metrics Agent] Finish");
             isInitialised = true;
@@ -288,7 +285,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         getLogger().debug(".resolveProcessingPlant(): Getting ProcessingPlant->{}, version->{}", processingPlantName, processingPlantVersion);
         getLogger().trace(".resolveProcessingPlant(): Resolving list of available ProcessingPlants");
         String rdnNameValue = componentNameUtilities.buildProcessingPlantName(processingPlantName, componentNameUtilities.getCurrentUUID());
-        List<SoftwareComponent> topologyNodes = topologyIM.nodeSearch(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT, rdnNameValue, processingPlantVersion);
+        List<SoftwareComponent> topologyNodes = topologyIM.nodeSearch(SoftwareComponentTypeEnum.PROCESSING_PLANT, rdnNameValue, processingPlantVersion);
         if(getLogger().isTraceEnabled()){
             if(topologyNodes == null){
                 getLogger().trace(".resolveProcessingPlant(): nodeSearch return a null list");
@@ -323,9 +320,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     private String getFriendlyName(){
         getLogger().debug(".getFriendlyName(): Entry");
-        String nodeName = this.getMeAsASoftwareComponent().getComponentRDN().getNodeName();
-        String nodeVersion = this.getMeAsASoftwareComponent().getComponentRDN().getNodeVersion();
-        String friendlyName = nodeName + "(" + nodeVersion + ")";
+        String nodeName = this.getMeAsASoftwareComponent().getComponentID().getDisplayName();
         return(nodeName);
     }
 
@@ -334,51 +329,42 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return (this.meAsASoftwareComponent);
     }
 
-    public TopologyNodeFDN getProcessingPlantNodeFDN() {
-        return (this.meAsASoftwareComponent.getComponentFDN());
-    }
-
     @Override
     public WorkshopSoftwareComponent getWorkshop(String workshopName, String version) {
         getLogger().debug(".getWorkshop(): Entry, workshopName --> {}, version --> {}", workshopName, version);
-        boolean found = false;
         WorkshopSoftwareComponent foundWorkshop = null;
-        for (TopologyNodeFDN containedWorkshopFDN : this.meAsASoftwareComponent.getWorkshops()) {
-            WorkshopSoftwareComponent containedWorkshop = (WorkshopSoftwareComponent)topologyIM.getNode(containedWorkshopFDN);
-            TopologyNodeRDN testRDN = new TopologyNodeRDN(PegacornSystemComponentTypeTypeEnum.WORKSHOP, workshopName, version);
-            if (testRDN.equals(containedWorkshop.getComponentRDN())) {
-                found = true;
-                foundWorkshop = containedWorkshop;
+        for (ComponentIdType containedWorkshopId : this.meAsASoftwareComponent.getWorkshops()) {
+            boolean sameName = false;
+            boolean sameDisplayName = false;
+            boolean sameVersion = true;
+            if(containedWorkshopId.hasName()){
+                sameName = containedWorkshopId.getName().contentEquals(workshopName);
+            }
+            if(containedWorkshopId.hasDisplayName()){
+                sameDisplayName = containedWorkshopId.getDisplayName().contentEquals(workshopName);
+            }
+            if (sameName || sameDisplayName) {
+                WorkshopSoftwareComponent containedWorkshop = (WorkshopSoftwareComponent)topologyIM.getNode(containedWorkshopId);
+                if(StringUtils.isNotEmpty(version)) {
+                    if(containedWorkshop.getVersion().contentEquals(version)) {
+                        foundWorkshop = containedWorkshop;
+                        break;
+                    }
+                }
                 break;
             }
         }
-        if (found) {
-            getLogger().debug(".getWorkshop(): Exit, workshop found!");
-            return (foundWorkshop);
-        }
-        getLogger().debug(".getWorkshop(): Exit, workshop not found!");
-        return (null);
+        getLogger().debug(".getWorkshop(): Exit, workshop->{}", foundWorkshop);
+        return (foundWorkshop);
     }
 
-    public WorkshopSoftwareComponent getWorkshop(String workshopName){
+    @Override
+	public WorkshopSoftwareComponent getWorkshop(String workshopName){
         getLogger().debug(".getWorkshop(): Entry, workshopName --> {}", workshopName);
-        String version = this.meAsASoftwareComponent.getComponentRDN().getNodeVersion();
+        String version = this.meAsASoftwareComponent.getVersion();
         WorkshopSoftwareComponent workshop = getWorkshop(workshopName, version);
         getLogger().debug(".getWorkshop(): Exit");
         return(workshop);
-    }
-
-    @Override
-    public String getSimpleFunctionName() {
-        TopologyNodeRDN functionRDN = this.getMeAsASoftwareComponent().getNodeFunctionFDN().extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT);
-        String functionName = functionRDN.getNodeName();
-        return (functionName);
-    }
-
-    @Override
-    public String getSimpleInstanceName() {
-        String instanceName = getSimpleFunctionName() + "(" + instanceQualifier + ")";
-        return (instanceName);
     }
 
     @Override
@@ -388,19 +374,8 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     }
 
     @Override
-    public String getSubsystemParticipantName() {
-        return (this.getMeAsASoftwareComponent().getSubsystemParticipantName());
-    }
-
-    @Override
-    public String getSubsystemName(){
-        return(this.getMeAsASoftwareComponent().getSubsystemParticipantName());
-    }
-
-    @Override
     public String getDeploymentSite() {
-        TopologyNodeRDN siteRDN = this.getMeAsASoftwareComponent().getComponentFDN().extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.SITE);
-        String siteName = siteRDN.getNodeName();
+        String siteName = getMeAsASoftwareComponent().getDeploymentSite();
         return (siteName);
     }
 

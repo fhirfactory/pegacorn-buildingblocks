@@ -19,13 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.capabilities.base;
+package net.fhirfactory.pegacorn.core.model.capabilities.use;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedureCallRequest;
-
-import java.io.Serializable;
-import java.time.Instant;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.rpc.RemoteProcedureCallRequest;
 
 public class CapabilityUtilisationRequest extends RemoteProcedureCallRequest {
     private String requiredCapabilityName;

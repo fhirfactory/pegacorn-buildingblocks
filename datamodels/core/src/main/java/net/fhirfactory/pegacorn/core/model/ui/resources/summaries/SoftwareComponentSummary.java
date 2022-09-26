@@ -22,21 +22,16 @@
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 
 public class SoftwareComponentSummary extends ResourceSummaryBase {
     private ComponentIdType componentID;
-    private String participantName;
-    private String subsystemParticipantName;
-    private String participantDisplayName;
+    private PetasosParticipantId participantId;
     private String nodeVersion;
     private String concurrencyMode;
     private String resilienceMode;
-    private TopologyNodeFDN topologyNodeFDN;
-    private TopologyNodeFunctionFDN topologyNodeFunctionFDN;
     private PetasosMonitoredComponentTypeEnum nodeType;
 
     //
@@ -45,62 +40,24 @@ public class SoftwareComponentSummary extends ResourceSummaryBase {
 
     public SoftwareComponentSummary(){
         this.componentID = null;
-        this.participantName = null;
+        this.participantId = null;
         this.nodeVersion = null;
-        this.subsystemParticipantName = null;
         this.concurrencyMode = null;
         this.resilienceMode = null;
-        this.topologyNodeFDN = null;
         this.nodeType = null;
-        this.topologyNodeFunctionFDN = null;
-        this.participantDisplayName = null;
     }
 
     //
     // Getters and Setters
     //
 
-
-    public String getParticipantDisplayName() {
-        return participantDisplayName;
+    public PetasosParticipantId getParticipantId() {
+        return participantId;
     }
 
-    public void setParticipantDisplayName(String participantDisplayName) {
-        this.participantDisplayName = participantDisplayName;
+    public void setParticipantId(PetasosParticipantId participantId) {
+        this.participantId = participantId;
     }
-
-    public TopologyNodeFunctionFDN getTopologyNodeFunctionFDN() {
-        return topologyNodeFunctionFDN;
-    }
-
-    public void setTopologyNodeFunctionFDN(TopologyNodeFunctionFDN topologyNodeFunctionFDN) {
-        this.topologyNodeFunctionFDN = topologyNodeFunctionFDN;
-    }
-
-    public String getParticipantName() {
-        return participantName;
-    }
-
-    public void setParticipantName(String participantName) {
-        this.participantName = participantName;
-    }
-
-    public String getSubsystemParticipantName() {
-        return subsystemParticipantName;
-    }
-
-    public void setSubsystemParticipantName(String subsystemParticipantName) {
-        this.subsystemParticipantName = subsystemParticipantName;
-    }
-
-    public TopologyNodeFDN getTopologyNodeFDN() {
-        return topologyNodeFDN;
-    }
-
-    public void setTopologyNodeFDN(TopologyNodeFDN topologyNodeFDN) {
-        this.topologyNodeFDN = topologyNodeFDN;
-    }
-
 
     public ComponentIdType getComponentID() {
         return componentID;
@@ -150,14 +107,10 @@ public class SoftwareComponentSummary extends ResourceSummaryBase {
     public String toString() {
         return "SoftwareComponentSummary{" +
                 "componentID=" + componentID +
-                ", participantName='" + participantName + '\'' +
-                ", subsystemParticipantName='" + subsystemParticipantName + '\'' +
-                ", participantDisplayName='" + participantDisplayName + '\'' +
+                ", participantId=" + participantId +
                 ", nodeVersion='" + nodeVersion + '\'' +
                 ", concurrencyMode='" + concurrencyMode + '\'' +
                 ", resilienceMode='" + resilienceMode + '\'' +
-                ", topologyNodeFDN=" + topologyNodeFDN +
-                ", topologyNodeFunctionFDN=" + topologyNodeFunctionFDN +
                 ", nodeType=" + nodeType +
                 ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
                 ", lastActivityInstant=" + getLastActivityInstant() +

@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.oamwup.base;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.workshops.base.OAMWorkshop;
@@ -111,9 +111,9 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
 
     private void buildOAMWorkUnitProcessor() {
         getLogger().debug(".buildOAMWorkUnitProcessor(): Entry, adding Workshop --> {}, version --> {}", specifyOAMWUPName(), specifyOAMWUPVersion());
-        String participantName = getWorkshop().getWorkshopNode().getParticipantName() + "." + specifyOAMWUPName();
-        WorkUnitProcessorSoftwareComponent wup = getTopologyFactory().createWorkUnitProcessor(specifyOAMWUPName(), specifyOAMWUPVersion(), participantName, specifyOAMWorkshop().getWorkshopNode(), PegacornSystemComponentTypeTypeEnum.OAM_WORK_UNIT_PROCESSOR);
-        topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getComponentFDN(), wup);
+        String participantName = getWorkshop().getWorkshopNode().getParticipantId() + "." + specifyOAMWUPName();
+        WorkUnitProcessorSoftwareComponent wup = getTopologyFactory().buildWUP(specifyOAMWUPName(), specifyOAMWUPVersion(), participantName, specifyOAMWorkshop().getWorkshopNode(), SoftwareComponentTypeEnum.OAM_WORK_UNIT_PROCESSOR);
+        topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getComponentID(), wup);
         this.wupTopologyNode = wup;
         getLogger().debug(".buildOAMWorkUnitProcessor(): Exit");
     }
@@ -127,7 +127,7 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
     }
 
     private String getFriendlyName(){
-        String nodeName = getWUPTopologyNode().getComponentRDN().getNodeName() + "(" + getWUPTopologyNode().getComponentRDN().getNodeVersion() + ")";
+        String nodeName = getWUPTopologyNode().getComponentID().getDisplayName();
         return(nodeName);
     }
 }

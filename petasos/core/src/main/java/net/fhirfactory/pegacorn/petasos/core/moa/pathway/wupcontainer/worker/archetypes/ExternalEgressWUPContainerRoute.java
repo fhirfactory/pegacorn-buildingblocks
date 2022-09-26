@@ -56,7 +56,7 @@ public class ExternalEgressWUPContainerRoute extends BasePetasosContainerRoute {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupTopologyNode = wupNode;
-		nameSet = new RouteElementNames(wupNode.getNodeFunctionFDN().getFunctionToken());
+		nameSet = new RouteElementNames(wupNode.getParticipantId());
 		this.metricsAgent = metricsAgent;
 	}
 

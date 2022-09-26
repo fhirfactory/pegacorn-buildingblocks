@@ -22,7 +22,9 @@
 package net.fhirfactory.pegacorn.services.tasks.cache;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTaskSet;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.services.tasks.datatypes.PetasosActionableTaskRegistrationType;
@@ -45,15 +47,15 @@ public abstract class PetasosActionableTaskDM {
 
     abstract protected Logger specifyLogger();
 
-    abstract public PetasosActionableTaskRegistrationType registerPetasosActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary integrationPoint);
+    abstract public PetasosActionableTaskRegistrationType registerPetasosActionableTask(PetasosActionableTask actionableTask);
 
-    abstract public PetasosActionableTaskRegistrationType updatePetasosActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary integrationPoint);
+    abstract public PetasosActionableTaskRegistrationType updatePetasosActionableTask(PetasosActionableTask actionableTask);
 
     abstract public PetasosActionableTask getPetasosActionableTask(TaskIdType taskId);
 
     abstract public List<PetasosActionableTask> getPetasosActionableTasksForComponent(ComponentIdType componentId);
 
-    abstract public List<PetasosActionableTask> getWaitingActionableTasksForComponent(ComponentIdType componentId);
+    abstract public PetasosActionableTaskSet getPendingActionableTasks(PetasosParticipantId participantId);
 
     abstract public boolean archivePetasosActionableTask(PetasosActionableTask actionableTask);
 

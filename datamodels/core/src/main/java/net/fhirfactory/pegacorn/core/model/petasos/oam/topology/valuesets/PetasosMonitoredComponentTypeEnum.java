@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets;
 
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 
 public enum PetasosMonitoredComponentTypeEnum {
     PETASOS_MONITORED_COMPONENT_SUBSYSTEM("petasos.oam.monitored_node_type.subsystem"),
@@ -42,7 +42,7 @@ public enum PetasosMonitoredComponentTypeEnum {
         return nodeType;
     }
 
-    public static PetasosMonitoredComponentTypeEnum nodeTypeFromTopologyNodeType(PegacornSystemComponentTypeTypeEnum nodeType){
+    public static PetasosMonitoredComponentTypeEnum nodeTypeFromTopologyNodeType(SoftwareComponentTypeEnum nodeType){
         switch(nodeType){
             case WORKSHOP:
             case OAM_WORKSHOP:{

@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import org.slf4j.Logger;
@@ -31,8 +32,8 @@ import java.util.ArrayList;
 public class BusinessServiceTopologyNode extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(BusinessServiceTopologyNode.class);
 
-    private ArrayList<TopologyNodeFDN> deploymentSites;
-    private ArrayList<TopologyNodeFDN> externalisedServices;
+    private ArrayList<ComponentIdType> deploymentSites;
+    private ArrayList<ComponentIdType> externalisedServices;
     private boolean preferringEncryption;
     private String defaultDNSName;
 
@@ -47,19 +48,19 @@ public class BusinessServiceTopologyNode extends SoftwareComponent {
         return (LOG);
     }
 
-    public ArrayList<TopologyNodeFDN> getDeploymentSites() {
+    public ArrayList<ComponentIdType> getDeploymentSites() {
         return deploymentSites;
     }
 
-    public void setDeploymentSites(ArrayList<TopologyNodeFDN> deploymentSites) {
+    public void setDeploymentSites(ArrayList<ComponentIdType> deploymentSites) {
         this.deploymentSites = deploymentSites;
     }
 
-    public ArrayList<TopologyNodeFDN> getExternalisedServices() {
+    public ArrayList<ComponentIdType> getExternalisedServices() {
         return externalisedServices;
     }
 
-    public void setExternalisedServices(ArrayList<TopologyNodeFDN> externalisedServices) {
+    public void setExternalisedServices(ArrayList<ComponentIdType> externalisedServices) {
         this.externalisedServices = externalisedServices;
     }
 

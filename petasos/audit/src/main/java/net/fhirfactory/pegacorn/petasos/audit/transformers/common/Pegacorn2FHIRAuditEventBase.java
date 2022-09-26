@@ -21,14 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.transformers.common;
 
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSubTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
 import org.hl7.fhir.r4.model.AuditEvent;
@@ -124,19 +120,7 @@ public abstract class Pegacorn2FHIRAuditEventBase {
     }
 
     protected AuditEventTypeEnum extractAuditEventType(PetasosFulfillmentTask fulfillmentTask){
-        if(fulfillmentTask == null){
-            return(AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY);
-        }
-        TopologyNodeFDN nodeFDN = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentFDN();
-        TopologyNodeRDN topologyNodeRDN = nodeFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WORKSHOP);
-        if(topologyNodeRDN == null){
-            return(AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY);
-        }
-        if(topologyNodeRDN.getNodeName().contentEquals(DefaultWorkshopSetEnum.TRANSFORM_WORKSHOP.getWorkshop())){
-            return(AuditEventTypeEnum.HL7_TERMINOLOGY_TRANSFORM);
-        } else {
-            return(AuditEventTypeEnum.HL7_TERMINOLOGY_TRANSMIT);
-        }
+        return(AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY);
     }
 
     protected AuditEventSubTypeEnum extractAuditEventSubType(PetasosFulfillmentTask fulfillmentTask){
@@ -238,22 +222,15 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         if(fulfillmentTask == null){
             return(null);
         }
-        TopologyNodeFDN wupFDN = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentFDN();
-        TopologyNodeRDN processingPlantRDN = wupFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT);
-        TopologyNodeRDN workshopRDN = wupFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WORKSHOP);
-        TopologyNodeRDN wupRDN = wupFDN.extractRDNForNodeType(PegacornSystemComponentTypeTypeEnum.WUP);
-
-        String name = new String();
-        if(processingPlantRDN != null){
-            name = processingPlantRDN.getNodeName() + ".";
+        if(fulfillmentTask.hasTaskFulfillment()) {
+            if(fulfillmentTask.getTaskFulfillment().hasFulfiller()) {
+                if(fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipantId() != null) {
+                    String name = fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipantId().getFullName();
+                    return (name);
+                }
+            }
         }
-        if(workshopRDN != null){
-            name = name + workshopRDN.getNodeName() + ".";
-        }
-        if(wupRDN != null){
-            name = name + wupRDN.getNodeName();
-        }
-        return(name);
+        return(null);
     }
 
 }

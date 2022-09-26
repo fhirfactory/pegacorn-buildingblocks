@@ -24,32 +24,36 @@ package net.fhirfactory.pegacorn.core.model.component;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.capabilities.definition.Capability;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentExecutionControlEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.*;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class SoftwareComponent implements Serializable {
     abstract protected Logger getLogger();
-
-    private TopologyNodeRDN componentRDN;
-    private TopologyNodeFDN componentFDN;
     private ComponentIdType componentID;
-    private TopologyNodeFunctionFDN nodeFunctionFDN;
-    private PegacornSystemComponentTypeTypeEnum componentType;
-    private TopologyNodeFDN containingNodeFDN;
+    private PetasosParticipantId participantId;
+    private Set<Capability> capabilities;
+    private String version;
+    private SoftwareComponentTypeEnum componentType;
     private ConcurrencyModeEnum concurrencyMode;
     private ResilienceModeEnum resilienceMode;
     private NetworkSecurityZoneEnum securityZone;
@@ -59,24 +63,19 @@ public abstract class SoftwareComponent implements Serializable {
     private SoftwareComponentConnectivityContextEnum componentSystemRole;
     private SoftwareComponentStatusEnum componentStatus;
     private SoftwareComponentExecutionControlEnum componentExecutionControl;
-    private String subsystemParticipantName;
-    private String participantName;
-    private String participantDisplayName;
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant lastActivityInstant;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant lastReportingInstant;
 
+    private ComponentIdType parentComponent;
+
     //
     // Constructor(s)
     //
 
     public SoftwareComponent(){
-        this.componentRDN = null;
-        this.componentFDN = null;
-        this.nodeFunctionFDN = null;
         this.concurrencyMode = null;
         this.resilienceMode = null;
         this.componentID = null;
@@ -86,41 +85,27 @@ public abstract class SoftwareComponent implements Serializable {
         this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
         this.componentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
         this.componentExecutionControl = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
-        this.subsystemParticipantName = null;
+        this.participantId = new PetasosParticipantId();
         this.lastActivityInstant = Instant.now();
         this.lastReportingInstant = null;
-        this.participantName = null;
-        this.participantDisplayName = null;
+        this.capabilities = new HashSet<>();
+        this.version = null;
+        this.parentComponent = null;
     }
 
     public SoftwareComponent(SoftwareComponent ori){
-        this.componentRDN = null;
-        this.componentFDN = null;
-        this.nodeFunctionFDN = null;
         this.concurrencyMode = null;
         this.resilienceMode = null;
         this.componentID = null;
-        this.participantDisplayName = null;
-        this.participantName = null;
-        this.subsystemParticipantName = null;
+        this.participantId = new PetasosParticipantId();
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
         this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
         this.componentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
         this.componentExecutionControl = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
+        this.version = null;
+        this.parentComponent = null;
         // Now update with passed value
-        if(ori.hasComponentRDN()){
-            setComponentRDN(ori.getComponentRDN());
-        }
-        if(ori.hasComponentFDN()){
-            setComponentFDN(ori.getComponentFDN());
-        }
-        if (ori.hasNodeFunctionFDN()) {
-            setNodeFunctionFDN(ori.getNodeFunctionFDN());
-        }
-        if(ori.hasContainingNodeFDN()){
-            setContainingNodeFDN(ori.getContainingNodeFDN());
-        }
         setComponentSystemRole(ori.getComponentSystemRole());
         setComponentStatus(ori.getComponentStatus());
         setComponentExecutionControl(ori.getComponentExecutionControl());
@@ -156,6 +141,18 @@ public abstract class SoftwareComponent implements Serializable {
         if(ori.hasParticipantDisplayName()){
             setParticipantDisplayName(ori.getParticipantDisplayName());
         }
+        if(!ori.getCapabilities().isEmpty()){
+            for(Capability currentCapability: ori.getCapabilities()){
+                Capability clonedCapability = SerializationUtils.clone(currentCapability);
+                getCapabilities().add(clonedCapability);
+            }
+        }
+        if(StringUtils.isNotEmpty(ori.getVersion())){
+            setVersion(ori.getVersion());
+        }
+        if(ori.hasParentComponent()){
+            setParentComponent(SerializationUtils.clone(ori.getParentComponent()));
+        }
     }
 
     //
@@ -163,31 +160,75 @@ public abstract class SoftwareComponent implements Serializable {
     //
 
     @JsonIgnore
+    public boolean hasParentComponent(){
+        boolean hasValue = this.parentComponent != null;
+        return(hasValue);
+    }
+
+    public ComponentIdType getParentComponent() {
+        return parentComponent;
+    }
+
+    public void setParentComponent(ComponentIdType parentComponent) {
+        this.parentComponent = parentComponent;
+    }
+
+    @JsonIgnore
+    public boolean hasVersion(){
+        boolean hasValue = this.version != null;
+        return(hasValue);
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public Set<Capability> getCapabilities() {
+        return capabilities;
+    }
+
+    public void setCapabilities(Set<Capability> capabilities) {
+        this.capabilities = capabilities;
+    }
+
+    public PetasosParticipantId getParticipantId() {
+        return participantId;
+    }
+
+    public void setParticipantId(PetasosParticipantId participantId) {
+        this.participantId = participantId;
+    }
+
+    @JsonIgnore
     public boolean hasParticipantDisplayName(){
-        boolean hasValue = this.participantDisplayName != null;
+        boolean hasValue = getParticipantId().getDisplayName() != null;
         return(hasValue);
     }
 
     public String getParticipantDisplayName() {
-        return participantDisplayName;
+        return getParticipantId().getDisplayName();
     }
 
     public void setParticipantDisplayName(String participantDisplayName) {
-        this.participantDisplayName = participantDisplayName;
+        getParticipantId().setDisplayName(participantDisplayName);
     }
 
     @JsonIgnore
     public boolean hasParticipantName(){
-        boolean hasValue = this.participantName != null;
+        boolean hasValue = getParticipantId().getName() != null;
         return(hasValue);
     }
 
     public String getParticipantName() {
-        return participantName;
+        return  getParticipantId().getName();
     }
 
     public void setParticipantName(String participantName) {
-        this.participantName = participantName;
+        getParticipantId().setName(participantName);
     }
 
     @JsonIgnore
@@ -233,86 +274,16 @@ public abstract class SoftwareComponent implements Serializable {
 
     @JsonIgnore
     public boolean hasSubsystemParticipantName(){
-        boolean hasValue = this.subsystemParticipantName != null;
+        boolean hasValue = getParticipantId().getSubsystemName() != null;
         return(hasValue);
     }
 
     public String getSubsystemParticipantName() {
-        return subsystemParticipantName;
+        return getParticipantId().getSubsystemName();
     }
 
     public void setSubsystemParticipantName(String subsystemParticipantName) {
-        this.subsystemParticipantName = subsystemParticipantName;
-    }
-
-    public boolean hasComponentFDN(){
-        boolean hasValue = this.componentFDN != null;
-        return(hasValue);
-    }
-
-    public TopologyNodeFDN getComponentFDN() {
-        return componentFDN;
-    }
-
-    public void setComponentFDN(TopologyNodeFDN componentFDN) {
-        this.componentFDN = componentFDN;
-        setComponentRDN(componentFDN.getLeafRDN());
-        constructComponentID();
-    }
-
-    @JsonIgnore
-    public void constructFDN(TopologyNodeFDN parentNodeFDN, TopologyNodeRDN nodeRDN){
-        getLogger().debug(".constructFDN(): Entry, parentNodeFDN->{}, nodeRDN->{}", parentNodeFDN, nodeRDN);
-        if(parentNodeFDN == null || nodeRDN.getNodeType().equals(PegacornSystemComponentTypeTypeEnum.SOLUTION)){
-            getLogger().trace(".constructFDN(): Is a Solution Node");
-            TopologyNodeFDN solutionFDN = new TopologyNodeFDN();
-            solutionFDN.appendTopologyNodeRDN(nodeRDN);
-            this.componentFDN = solutionFDN;
-        } else {
-            getLogger().trace(".constructFDN(): Is not a Solution Node");
-            TopologyNodeFDN newFDN = (TopologyNodeFDN)SerializationUtils.clone(parentNodeFDN);
-            getLogger().trace(".constructFDN(): newFDN Created");
-            newFDN.appendTopologyNodeRDN(nodeRDN);
-            getLogger().trace(".constructFDN(): nodeRDN appended");
-            this.componentFDN = newFDN;
-            getLogger().trace(".constructFDN(): this.nodeFDN assigned->{}", this.getComponentFDN());
-        }
-        setComponentRDN(nodeRDN);
-        constructComponentID();
-        getLogger().debug(".constructFDN(): Exit, nodeFDN->{}", this.getComponentFDN());
-    }
-
-    @JsonIgnore
-    public void constructComponentID(){
-        String id = getComponentRDN().getNodeName();
-        ComponentIdType newId = new ComponentIdType();
-        newId.setId(id);
-        newId.setDisplayName(id);
-        setComponentID(newId);
-    }
-
-    @JsonIgnore
-    public void constructFunctionFDN(TopologyNodeFunctionFDN parentFunctionFDN, TopologyNodeRDN nodeRDN){
-        getLogger().debug(".constructFunctionFDN(): Entry");
-        switch(nodeRDN.getNodeType()){
-            case SOLUTION: {
-                TopologyNodeFunctionFDN solutionFDN = new TopologyNodeFunctionFDN();
-                solutionFDN.appendTopologyNodeRDN(nodeRDN);
-                this.nodeFunctionFDN = solutionFDN;
-                break;
-            }
-            case SITE:
-            case PLATFORM:{
-                this.nodeFunctionFDN = parentFunctionFDN;
-                break;
-            }
-            default:{
-                TopologyNodeFunctionFDN newFunctionFDN = (TopologyNodeFunctionFDN)SerializationUtils.clone(parentFunctionFDN);
-                newFunctionFDN.appendTopologyNodeRDN(nodeRDN);
-                this.nodeFunctionFDN = newFunctionFDN;
-            }
-        }
-        getLogger().debug(".constructFunctionFDN(): Exit, nodeFunctionFDN->{}", this.getNodeFunctionFDN());
+        getParticipantId().setSubsystemName(subsystemParticipantName);
     }
 
     @JsonIgnore
@@ -403,55 +374,12 @@ public abstract class SoftwareComponent implements Serializable {
         this.componentID = componentID;
     }
 
-    @JsonIgnore
-    public boolean hasNodeFunctionFDN(){
-        boolean hasValue = this.nodeFunctionFDN != null;
-        return(hasValue);
-    }
-
-    public TopologyNodeFunctionFDN getNodeFunctionFDN() {
-        return nodeFunctionFDN;
-    }
-
-    public void setNodeFunctionFDN(TopologyNodeFunctionFDN nodeFunctionFDN) {
-        this.nodeFunctionFDN = nodeFunctionFDN;
-    }
-
-    public PegacornSystemComponentTypeTypeEnum getComponentType() {
+    public SoftwareComponentTypeEnum getComponentType() {
         return componentType;
     }
 
-    public void setComponentType(PegacornSystemComponentTypeTypeEnum componentType) {
+    public void setComponentType(SoftwareComponentTypeEnum componentType) {
         this.componentType = componentType;
-    }
-
-    @JsonIgnore
-    public boolean hasContainingNodeFDN(){
-        boolean hasValue = this.containingNodeFDN != null;
-        return(hasValue);
-    }
-
-    public TopologyNodeFDN getContainingNodeFDN() {
-        return containingNodeFDN;
-    }
-
-    public void setContainingNodeFDN(TopologyNodeFDN containingNodeFDN) {
-        this.containingNodeFDN = containingNodeFDN;
-    }
-
-    @JsonIgnore
-    public boolean hasComponentRDN(){
-        boolean hasValue = this.componentRDN != null;
-        return(hasValue);
-    }
-
-    public void setComponentRDN(TopologyNodeRDN componentRDN) {
-        this.componentRDN = componentRDN;
-        constructComponentID();
-    }
-
-    public TopologyNodeRDN getComponentRDN() {
-        return componentRDN;
     }
 
     public PetasosComponentMetricSet getMetrics() {
@@ -492,28 +420,26 @@ public abstract class SoftwareComponent implements Serializable {
 
     @Override
     public String toString() {
-        return "SoftwareComponent{" +
-                "componentRDN=" + componentRDN +
-                ", componentFDN=" + componentFDN +
-                ", componentID=" + componentID +
-                ", nodeFunctionFDN=" + nodeFunctionFDN +
-                ", componentType=" + componentType +
-                ", containingNodeFDN=" + containingNodeFDN +
-                ", concurrencyMode=" + concurrencyMode +
-                ", resilienceMode=" + resilienceMode +
-                ", securityZone=" + securityZone +
-                ", deploymentSite='" + deploymentSite + '\'' +
-                ", otherConfigurationParameters=" + otherConfigurationParameters +
-                ", metrics=" + metrics +
-                ", componentSystemRole=" + componentSystemRole +
-                ", componentStatus=" + componentStatus +
-                ", componentExecutionControl=" + componentExecutionControl +
-                ", subsystemParticipantName='" + subsystemParticipantName + '\'' +
-                ", participantName='" + participantName + '\'' +
-                ", participantDisplayName='" + participantDisplayName + '\'' +
-                ", lastActivityInstant=" + lastActivityInstant +
-                ", lastReportingInstant=" + lastReportingInstant +
-                '}';
+        final StringBuilder sb = new StringBuilder("SoftwareComponent{");
+        sb.append("componentID=").append(componentID);
+        sb.append(", componentType=").append(componentType);
+        sb.append(", concurrencyMode=").append(concurrencyMode);
+        sb.append(", resilienceMode=").append(resilienceMode);
+        sb.append(", securityZone=").append(securityZone);
+        sb.append(", deploymentSite='").append(deploymentSite).append('\'');
+        sb.append(", otherConfigurationParameters=").append(otherConfigurationParameters);
+        sb.append(", metrics=").append(metrics);
+        sb.append(", componentSystemRole=").append(componentSystemRole);
+        sb.append(", componentStatus=").append(componentStatus);
+        sb.append(", componentExecutionControl=").append(componentExecutionControl);
+        sb.append(", participantId=").append(participantId);
+        sb.append(", capabilities=").append(capabilities);
+        sb.append(", lastActivityInstant=").append(lastActivityInstant);
+        sb.append(", lastReportingInstant=").append(lastReportingInstant);
+        sb.append(", version=").append(version);
+        sb.append(", parentComponent=").append(parentComponent);
+        sb.append('}');
+        return sb.toString();
     }
 
 
@@ -526,11 +452,11 @@ public abstract class SoftwareComponent implements Serializable {
         if (this == o) return true;
         if (!(o instanceof SoftwareComponent)) return false;
         SoftwareComponent that = (SoftwareComponent) o;
-        return Objects.equals(getComponentRDN(), that.getComponentRDN()) && Objects.equals(getComponentFDN(), that.getComponentFDN()) && Objects.equals(getComponentID(), that.getComponentID()) && Objects.equals(getNodeFunctionFDN(), that.getNodeFunctionFDN()) && getComponentType() == that.getComponentType() && Objects.equals(getContainingNodeFDN(), that.getContainingNodeFDN()) && getConcurrencyMode() == that.getConcurrencyMode() && getResilienceMode() == that.getResilienceMode() && getSecurityZone() == that.getSecurityZone() && Objects.equals(getOtherConfigurationParameters(), that.getOtherConfigurationParameters()) && Objects.equals(getMetrics(), that.getMetrics()) && getComponentSystemRole() == that.getComponentSystemRole() && getComponentStatus() == that.getComponentStatus() && getComponentExecutionControl() == that.getComponentExecutionControl() && Objects.equals(getSubsystemParticipantName(), that.getSubsystemParticipantName());
+        return Objects.equals(getComponentID(), that.getComponentID()) && getComponentType() == that.getComponentType() && getConcurrencyMode() == that.getConcurrencyMode() && getResilienceMode() == that.getResilienceMode() && getSecurityZone() == that.getSecurityZone() && Objects.equals(getDeploymentSite(), that.getDeploymentSite()) && Objects.equals(getOtherConfigurationParameters(), that.getOtherConfigurationParameters()) && Objects.equals(getMetrics(), that.getMetrics()) && getComponentSystemRole() == that.getComponentSystemRole() && getComponentStatus() == that.getComponentStatus() && getComponentExecutionControl() == that.getComponentExecutionControl() && Objects.equals(getParticipantId(), that.getParticipantId()) && Objects.equals(getLastActivityInstant(), that.getLastActivityInstant()) && Objects.equals(getLastReportingInstant(), that.getLastReportingInstant());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getComponentRDN(), getComponentFDN(), getComponentID(), getNodeFunctionFDN(), getComponentType(), getContainingNodeFDN(), getConcurrencyMode(), getResilienceMode(), getSecurityZone(), getOtherConfigurationParameters(), getMetrics(), getComponentSystemRole(), getComponentStatus(), getComponentExecutionControl(), getSubsystemParticipantName());
+        return Objects.hash(getComponentID(), getComponentType(), getConcurrencyMode(), getResilienceMode(), getSecurityZone(), getDeploymentSite(), getOtherConfigurationParameters(), getMetrics(), getComponentSystemRole(), getComponentStatus(), getComponentExecutionControl(), getParticipantId(), getLastActivityInstant(), getLastReportingInstant());
     }
 }

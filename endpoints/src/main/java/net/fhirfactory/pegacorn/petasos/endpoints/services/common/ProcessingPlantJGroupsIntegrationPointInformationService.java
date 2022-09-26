@@ -23,16 +23,10 @@ package net.fhirfactory.pegacorn.petasos.endpoints.services.common;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
-import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.map.JGroupsIntegrationPointSharedMap;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,28 +111,4 @@ public class ProcessingPlantJGroupsIntegrationPointInformationService {
         return ENDPOINT_VALIDATION_PERIOD;
     }
 
-    //
-    // Deriving My Role
-    //
-
-    protected TopologyNodeFDNToken deriveAssociatedForwarderFDNToken(){
-        getLogger().info(".deriveAssociatedForwarderFDNToken(): Entry");
-        TopologyNodeFDN workshopNodeFDN = deriveWorkshopFDN();
-        TopologyNodeFDN wupNodeFDN = SerializationUtils.clone(workshopNodeFDN);
-        wupNodeFDN.appendTopologyNodeRDN(new TopologyNodeRDN(PegacornSystemComponentTypeTypeEnum.WUP, PETASOS_EDGE_MESSAGE_FORWARDER_WUP_NAME, EDGE_FORWARDER_WUP_VERSION));
-        TopologyNodeFDNToken associatedForwarderWUPToken = wupNodeFDN.getToken();
-        return(associatedForwarderWUPToken);
-    }
-
-    //
-    // Building the FDN
-    //
-
-    private TopologyNodeFDN deriveWorkshopFDN() {
-        TopologyNodeFDN processingPlantFDN = getProcessingPlant().getMeAsASoftwareComponent().getComponentFDN();
-        TopologyNodeFDN futureWorkshopFDN = SerializationUtils.clone(processingPlantFDN);
-        TopologyNodeRDN newRDN = new TopologyNodeRDN(PegacornSystemComponentTypeTypeEnum.WORKSHOP, DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop(), getProcessingPlant().getMeAsASoftwareComponent().getComponentRDN().getNodeVersion());
-        futureWorkshopFDN.appendTopologyNodeRDN(newRDN);
-        return(futureWorkshopFDN);
-    }
 }

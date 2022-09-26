@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
@@ -53,9 +54,9 @@ public class PetasosMonitoredWorkshopFactory extends PetasosMonitoredComponentFa
         getLogger().debug(".newWorkshop(): Entry, workshopNode->{}", workshopNode);
         WorkshopSummary workshop = new WorkshopSummary();
         workshop = (WorkshopSummary) newPetasosMonitoredComponent(workshop, workshopNode);
-        for(TopologyNodeFDN currentWUPFDN: workshopNode.getWupSet()){
-            WorkUnitProcessorSoftwareComponent wupTopologyNode = (WorkUnitProcessorSoftwareComponent) topologyIM.getNode(currentWUPFDN);
-            WorkUnitProcessorSummary currentWUP = wupFactory.newWorkUnitProcessor(workshop.getParticipantName(), wupTopologyNode);
+        for(ComponentIdType currentWUPId: workshopNode.getWupSet()){
+            WorkUnitProcessorSoftwareComponent wupTopologyNode = (WorkUnitProcessorSoftwareComponent) topologyIM.getNode(currentWUPId);
+            WorkUnitProcessorSummary currentWUP = wupFactory.newWorkUnitProcessor(workshop.getParticipantId().getName(), wupTopologyNode);
             workshop.addWorkUnitProcessor(currentWUP);
         }
         getLogger().debug(".newWorkshop(): Exit, workshop->{}", workshop);

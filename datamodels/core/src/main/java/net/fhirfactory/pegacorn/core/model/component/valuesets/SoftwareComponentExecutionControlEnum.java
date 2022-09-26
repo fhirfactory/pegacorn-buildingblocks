@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.core.model.component.valuesets;
 
 public enum SoftwareComponentExecutionControlEnum {
     SOFTWARE_COMPONENT_ALLOW_EXECUTION("ExecutionAllowed", "pegacorn.fhir.device.execution_status.allowed", "Software Component is Allowed to Execute Tasks"),
-    SOFTWARE_COMPONENT_PAUSE_EXECUTION("Stopping", "pegacorn.fhir.device.execution_status.paused", "Software Component is Paused");
+    SOFTWARE_COMPONENT_PAUSE_EXECUTION("ExecutionPaused", "pegacorn.fhir.device.execution_status.paused", "Software Component is Paused");
 
     private String token;
     private String displayName;

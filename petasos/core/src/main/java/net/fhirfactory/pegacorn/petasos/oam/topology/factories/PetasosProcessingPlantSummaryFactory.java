@@ -21,9 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.topology.factories;
 
-import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.ProcessingPlantSummary;
@@ -58,28 +56,11 @@ public class PetasosProcessingPlantSummaryFactory extends PetasosMonitoredCompon
         processingPlant.setSecurityZone(topologyNode.getSecurityZone().getToken());
         processingPlant.setActualHostIP(topologyNode.getActualHostIP());
         processingPlant.setActualPodIP(topologyNode.getActualPodIP());
-        processingPlant.setParticipantName(topologyNode.getSubsystemParticipantName());
-        processingPlant.setParticipantDisplayName(topologyNode.getSubsystemParticipantName());
+        processingPlant.setParticipantId(topologyNode.getParticipantId());
         processingPlant.setReplicationCount(topologyNode.getReplicationCount());
-        TopologyNodeFDN nodeFDN = topologyNode.getComponentFDN();
-        processingPlant.setTopologyNodeFDN(nodeFDN);
-        String platformNodeName = "Unknown";
-        for(TopologyNodeRDN currentRDN: nodeFDN.getHierarchicalNameSet()){
-            if(currentRDN.getNodeType().equals(PegacornSystemComponentTypeTypeEnum.PLATFORM)){
-                platformNodeName = currentRDN.getNodeName();
-                break;
-            }
-        }
-        String siteName = "Unknown";
-        for(TopologyNodeRDN currentRDN: nodeFDN.getHierarchicalNameSet()){
-            if(currentRDN.getNodeType().equals(PegacornSystemComponentTypeTypeEnum.SITE)){
-                siteName = currentRDN.getNodeName();
-                break;
-            }
-        }
-        processingPlant.setSite(siteName);
-        processingPlant.setPlatformID(platformNodeName);
-        for(TopologyNodeFDN currentWorkshopFDN: topologyNode.getWorkshops()){
+        processingPlant.setSite(topologyNode.getSiteName());
+        processingPlant.setPlatformID(topologyNode.getPodName());
+        for(ComponentIdType currentWorkshopFDN: topologyNode.getWorkshops()){
             WorkshopSoftwareComponent workshopSoftwareComponent = (WorkshopSoftwareComponent) topologyIM.getNode(currentWorkshopFDN);
             if(workshopSoftwareComponent.getWupSet().isEmpty()){
                 // don't add it... it's pointless

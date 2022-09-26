@@ -121,7 +121,7 @@ public class PetasosActionableTaskFromFHIRTask extends PetasosTaskFromFHIRTask {
                 }
             }
             SoftwareComponent node = topologyIM.getNode(componentId);
-            taskFulfillmentReport.setFulfillerWorkUnitProcessor(node);
+            taskFulfillmentReport.setFulfiller(node);
         }
         if(fhirTask.hasExecutionPeriod()){
             if(fhirTask.getExecutionPeriod().hasStart()){

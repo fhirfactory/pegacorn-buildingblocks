@@ -54,7 +54,7 @@ public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredCo
         if(wupTopologyNode.getEgressEndpoint() != null){
             IPCTopologyEndpoint egressEndpoint = wupTopologyNode.getEgressEndpoint();
             try {
-                EndpointSummary egressMonitoredEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantName(), egressEndpoint);
+                EndpointSummary egressMonitoredEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantId().getName(), egressEndpoint);
                 wup.addEndpoint(egressMonitoredEndpoint);
             } catch (Exception ex){
                 getLogger().warn(".newWorkUnitProcessor(): Unable to create EndpointSummary for ->{}, error->{} ", egressEndpoint, ExceptionUtils.getMessage(ex));
@@ -64,7 +64,7 @@ public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredCo
         if(wupTopologyNode.getIngresEndpoint() != null){
             IPCTopologyEndpoint ingresEndpoint = wupTopologyNode.getIngresEndpoint();
             try {
-                EndpointSummary ingresMonitoredEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantName(), ingresEndpoint);
+                EndpointSummary ingresMonitoredEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantId().getName(), ingresEndpoint);
                 wup.addEndpoint(ingresMonitoredEndpoint);
             } catch (Exception ex){
                 getLogger().warn(".newWorkUnitProcessor(): Unable to create EndpointSummary for ->{}, error->{} ", ingresEndpoint, ExceptionUtils.getMessage(ex));
@@ -73,7 +73,7 @@ public class PetasosMonitoredWorkUnitProcessorFactory extends PetasosMonitoredCo
         if(!wupTopologyNode.getServiceEndpoints().isEmpty()){
             for(PetasosEndpoint currentEndpoint: wupTopologyNode.getServiceEndpoints().values()){
                 try {
-                    EndpointSummary jgroupsEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantName(), currentEndpoint);
+                    EndpointSummary jgroupsEndpoint = (EndpointSummary) endpointFactory.newEndpoint(wup.getParticipantId().getName(), currentEndpoint);
                     wup.addEndpoint(jgroupsEndpoint);
                 } catch (Exception ex){
                     getLogger().warn(".newWorkUnitProcessor(): Unable to create EndpointSummary for ->{}, error->{} ", currentEndpoint, ExceptionUtils.getMessage(ex));

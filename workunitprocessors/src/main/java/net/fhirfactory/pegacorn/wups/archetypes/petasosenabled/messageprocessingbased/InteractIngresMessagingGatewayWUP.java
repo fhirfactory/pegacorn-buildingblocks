@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupp
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSourceTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
@@ -39,7 +40,6 @@ import org.apache.camel.model.RouteDefinition;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSourceTopologyEndpoint;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
@@ -105,7 +105,7 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
         this.endpointMetricsAgent = getMetricAgentFactory().newEndpointMetricsAgent(
                 processingPlantCapabilityStatement,
                 getIngresEndpoint().getEndpointTopologyNode().getComponentID(),
-                getIngresEndpoint().getEndpointTopologyNode().getParticipantName(),
+                getIngresEndpoint().getEndpointTopologyNode().getParticipantId().getName(),
                 connectedSystem,
                 endpointDescription);
         getLogger().debug(".establishEndpointMetricAgents(): Exit");

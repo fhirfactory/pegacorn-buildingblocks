@@ -135,28 +135,31 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
 
     @Override
     public String toString() {
-        return "PetasosEndpoint{" +
-                "processingPlantServiceName='" + getSubsystemParticipantName() + '\'' +
-                ", componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", componentStatus=" + getComponentStatus() +
-                ", componentExecutionControl=" + getComponentExecutionControl() +
-                ", endpointDescription='" + endpointDescription + '\'' +
-                ", endpointStatus=" + endpointStatus +
-                ", interfaceFunction=" + interfaceFunction +
-                '}';
+        final StringBuilder sb = new StringBuilder("PetasosEndpoint{");
+        sb.append("endpointDescription='").append(endpointDescription).append('\'');
+        sb.append(", endpointStatus=").append(endpointStatus);
+        sb.append(", interfaceFunction=").append(interfaceFunction);
+        sb.append(", enablingProcessingPlantId=").append(enablingProcessingPlantId);
+        sb.append(", endpointType=").append(endpointType);
+        sb.append(", capabilities=").append(getCapabilities());
+        sb.append(", participantId=").append(getParticipantId());
+        sb.append(", deploymentSite='").append(getDeploymentSite()).append('\'');
+        sb.append(", lastActivityInstant=").append(getLastActivityInstant());
+        sb.append(", lastReportingInstant=").append(getLastReportingInstant());
+        sb.append(", otherConfigurationParameters=").append(getOtherConfigurationParameters());
+        sb.append(", concurrencyMode=").append(getConcurrencyMode());
+        sb.append(", resilienceMode=").append(getResilienceMode());
+        sb.append(", securityZone=").append(getSecurityZone());
+        sb.append(", componentID=").append(getComponentID());
+        sb.append(", componentType=").append(getComponentType());
+        sb.append(", metrics=").append(getMetrics());
+        sb.append(", componentSystemRole=").append(getComponentSystemRole());
+        sb.append(", componentStatus=").append(getComponentStatus());
+        sb.append(", componentExecutionControl=").append(getComponentExecutionControl());
+        sb.append('}');
+        return sb.toString();
     }
+
 
     //
     // Equals and HashCode
