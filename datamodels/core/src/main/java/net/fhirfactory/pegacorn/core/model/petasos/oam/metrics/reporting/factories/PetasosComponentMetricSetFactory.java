@@ -163,7 +163,7 @@ public class PetasosComponentMetricSetFactory {
         }
 
         if(!plantMetricsData.getLocalPathwaySynchronisationActivity().isEmpty()){
-            for(String currentParticipantName: plantMetricsData.getLocalWatchDogActivity().keySet()){
+            for(String currentParticipantName: plantMetricsData.getLocalPathwaySynchronisationActivity().keySet()){
                 getLogger().trace(".convertProcessingPlantMetricsData(): Processing, currentParticipantName->{}, value->{}", currentParticipantName, plantMetricsData.getLocalWatchDogActivity().get(currentParticipantName));
                 PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
                 componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
