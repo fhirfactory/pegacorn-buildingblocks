@@ -40,8 +40,8 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentT
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityManager;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class IngresActivityBeginRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(IngresActivityBeginRegistration.class);
 
     @Inject
-    LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    LocalTaskActivityManager actionableTaskActivityController;
 
     @Inject
     LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
@@ -185,7 +185,7 @@ public class IngresActivityBeginRegistration {
     // Getters (and Setters)
     //
 
-    protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController() {
+    protected LocalTaskActivityManager getActionableTaskActivityController() {
         return actionableTaskActivityController;
     }
 

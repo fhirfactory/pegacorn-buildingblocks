@@ -155,7 +155,7 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
         sb.append(", metrics=").append(getMetrics());
         sb.append(", componentSystemRole=").append(getComponentSystemRole());
         sb.append(", componentStatus=").append(getComponentStatus());
-        sb.append(", componentExecutionControl=").append(getComponentExecutionControl());
+        sb.append(", componentExecutionControl=").append(getComponentExecutionStatus());
         sb.append('}');
         return sb.toString();
     }

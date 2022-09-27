@@ -50,8 +50,6 @@ import java.util.*;
 public class PetasosTask implements Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(PetasosTask.class);
 
-    private TaskSequenceNumber sequenceNumber;
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant creationInstant;
 
@@ -90,7 +88,6 @@ public class PetasosTask implements Serializable {
     //
 
     public PetasosTask(){
-        this.sequenceNumber = null;
         this.taskId = null;
         this.sourceResourceId = null;
         this.creationInstant = Instant.now();
@@ -111,20 +108,6 @@ public class PetasosTask implements Serializable {
     //
     // Getters and Setters (Bean Methods)
     //
-
-    @JsonIgnore
-    public boolean hasSequenceNumber(){
-        boolean hasValue = this.sequenceNumber != null;
-        return(hasValue);
-    }
-
-    public TaskSequenceNumber getSequenceNumber() {
-        return sequenceNumber;
-    }
-
-    public void setSequenceNumber(TaskSequenceNumber sequenceNumber) {
-        this.sequenceNumber = sequenceNumber;
-    }
 
     @JsonIgnore
     public boolean hasExecutionStatus(){
@@ -332,7 +315,6 @@ public class PetasosTask implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         PetasosTask that = (PetasosTask) o;
         boolean theyAreEqual = isRegistered() == that.isRegistered()
-                && Objects.equals(getSequenceNumber(), that.getSequenceNumber())
                 && Objects.equals(getSourceResourceId(), that.getSourceResourceId())
                 && Objects.equals(getCreationInstant(), that.getCreationInstant())
                 && Objects.equals(getUpdateInstant(), that.getUpdateInstant())
@@ -353,7 +335,6 @@ public class PetasosTask implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getCreationInstant(),
-                getSequenceNumber(),
                 getSourceResourceId(),
                 getUpdateInstant(),
                 getTaskContext(),

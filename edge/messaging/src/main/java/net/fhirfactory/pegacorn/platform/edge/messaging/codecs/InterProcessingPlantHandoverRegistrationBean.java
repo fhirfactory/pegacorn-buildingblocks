@@ -55,8 +55,8 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTa
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityManager;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
@@ -88,7 +88,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
     private PetasosFulfillmentTaskFactory fulfillmentTaskFactory;
 
     @Inject
-    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    private LocalTaskActivityManager actionableTaskActivityController;
 
     @Inject
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
@@ -183,7 +183,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         return(this.fulfilmentTaskActivityController);
     }
 
-    protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController(){
+    protected LocalTaskActivityManager getActionableTaskActivityController(){
         return(this.actionableTaskActivityController);
     }
 }

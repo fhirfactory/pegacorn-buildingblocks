@@ -150,7 +150,7 @@ public class PetasosActionableTask extends PetasosTask{
     //
 
     @JsonIgnore
-    public PetasosTask update(PetasosActionableTask update){
+    public PetasosActionableTask update(PetasosActionableTask update){
         LOG.debug(".update(): Entry, update->{}", update);
         //
         // 1st, update the super-class attributes

@@ -324,11 +324,11 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         getLogger().debug(".checkJGroupsIntegrationPoint(): Entry, targetJGroupsIP->{}", targetJGroupsIP);
         if(targetJGroupsIP == null){
             getLogger().debug(".checkJGroupsIntegrationPoint(): Exit, targetJGroupsIP is null");
-            return(PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_FAILED);
+            return(PetasosParticipantStatusEnum.PARTICIPANT_HAS_FAILED);
         }
         if(StringUtils.isEmpty(targetJGroupsIP.getSubsystemParticipantName())){
             getLogger().debug(".checkJGroupsIntegrationPoint(): Exit, targetJGroupsIP.getEndpointName() is empty");
-            return(PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_FAILED);
+            return(PetasosParticipantStatusEnum.PARTICIPANT_HAS_FAILED);
         }
         String targetSubsystemName = getComponentNameUtilities().getSubsystemNameFromEndpointName(targetJGroupsIP.getSubsystemParticipantName());
         String mySubsystemName = getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName();
@@ -341,7 +341,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         if(report != null){
             endpointStatus = report.getParticipantStatus();
         } else {
-            endpointStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_FAILED;
+            endpointStatus = PetasosParticipantStatusEnum.PARTICIPANT_HAS_FAILED;
         }
         getLogger().debug(".checkJGroupsIntegrationPoint(): Exit, Endpoint endpointStatus->{}", endpointStatus);
         return(endpointStatus);

@@ -21,16 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.subscriptions;
 
-import java.time.Instant;
-import java.util.Set;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
+import net.fhirfactory.pegacorn.core.interfaces.participant.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosProcessingPlantSubscriptionSummary;
@@ -40,10 +31,16 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.P
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.valuesets.PetasosSubscriptionSummaryTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
-import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
+import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantCache;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.factories.PetasosSubscriptionSummaryFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.Set;
 
 @ApplicationScoped
 public class PetasosSubscriptionReportingAgent {
@@ -53,13 +50,10 @@ public class PetasosSubscriptionReportingAgent {
     private PetasosLocalSubscriptionReportingDM subscriptionReportingDM;
 
     @Inject
-    private LocalPetasosParticipantSubscriptionMapIM subscriptionMapIM;
-
-    @Inject
     private TaskPathwayManagementServiceInterface taskPathwayManagementService;
 
     @Inject
-    private LocalPetasosParticipantCacheDM localParticipantCacheDM;
+    private LocalParticipantCache localParticipantCacheDM;
 
     @Inject
     private PetasosSubscriptionSummaryFactory topicSummaryFactory;
@@ -104,7 +98,7 @@ public class PetasosSubscriptionReportingAgent {
                 getLogger().debug(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Processing Participant->{}", currentParticipant.getParticipantId());
             }
             if(currentParticipant.getComponentType().equals(SoftwareComponentTypeEnum.PROCESSING_PLANT)) {
-                if(currentParticipant.getParticipantId().equals(processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName())) {
+                if(currentParticipant.getParticipantId().getName().equals(processingPlant.getMeAsASoftwareComponent().getParticipantId().getName())) {
                     //
                     // My ProcessingPlant as a Subscriber
                     for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {

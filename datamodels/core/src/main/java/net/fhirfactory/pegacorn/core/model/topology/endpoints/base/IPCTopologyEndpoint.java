@@ -22,12 +22,9 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import mjson.Json;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
-import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,7 +175,7 @@ public class IPCTopologyEndpoint extends PetasosEndpoint {
         sb.append(", metrics=").append(getMetrics());
         sb.append(", componentSystemRole=").append(getComponentSystemRole());
         sb.append(", componentStatus=").append(getComponentStatus());
-        sb.append(", componentExecutionControl=").append(getComponentExecutionControl());
+        sb.append(", componentExecutionControl=").append(getComponentExecutionStatus());
         sb.append('}');
         return sb.toString();
     }

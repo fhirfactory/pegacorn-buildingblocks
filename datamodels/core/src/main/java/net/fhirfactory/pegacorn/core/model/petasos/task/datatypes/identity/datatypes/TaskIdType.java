@@ -28,6 +28,8 @@ import org.hl7.fhir.r4.model.Identifier;
 
 public class TaskIdType extends PegacornResourceKeyring {
 
+    private TaskSequenceNumber taskSequenceNumber;
+
     //
     // Constructors
     //
@@ -46,6 +48,14 @@ public class TaskIdType extends PegacornResourceKeyring {
 
     public TaskIdType(TaskIdType ori){
         super(ori);
+    }
+
+    public TaskSequenceNumber getTaskSequenceNumber() {
+        return taskSequenceNumber;
+    }
+
+    public void setTaskSequenceNumber(TaskSequenceNumber taskSequenceNumber) {
+        this.taskSequenceNumber = taskSequenceNumber;
     }
 
     //
@@ -69,15 +79,14 @@ public class TaskIdType extends PegacornResourceKeyring {
     //
     // To String
     //
+
+
     @Override
     public String toString() {
-        return "PegacornResourceKeyring{" +
-                "primaryBusinessIdentifier=" + getPrimaryBusinessIdentifier() +
-                ", localId=" + getLocalId()  +
-                ", businessIdentifiersMap=" + getBusinessIdentifiersMap() +
-                ", sourceSystemKeyMap=" + getSourceSystemKeyMap() +
-                ", resourceType=" + getResourceType() +
-                '}';
+        final StringBuilder sb = new StringBuilder("TaskIdType{");
+        sb.append("taskSequenceNumber=").append(taskSequenceNumber);
+        sb.append(", id=").append(getId());
+        sb.append(", ").append(super.toString()).append('}');
+        return sb.toString();
     }
-
 }

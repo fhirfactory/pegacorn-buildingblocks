@@ -45,6 +45,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant utilisationUpdateInstant;
     private PetasosParticipantFulfillment fulfillmentState;
+    private boolean hasCentrallyBufferedTasks;
 
     //
     // Constructor(s)
@@ -52,7 +53,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
 
     public PetasosParticipant(){
         super();
-        this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
+        this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
@@ -62,7 +63,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     public PetasosParticipant(PetasosParticipant ori){
         super(ori);
 
-        this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
+        this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
@@ -86,7 +87,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
 
     public PetasosParticipant(String participantName, SoftwareComponent ori){
         super(ori);
-        this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
+        this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
         this.setParticipantName(participantName);
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
@@ -95,7 +96,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
 
     public PetasosParticipant(SoftwareComponent ori){
         super(ori);
-        this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;;
+        this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;;
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();

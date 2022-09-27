@@ -43,8 +43,8 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornI
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityManager;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.workshops.base.Workshop;
 import net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit.TransactionalWUPAuditEntryManager;
 import org.apache.camel.builder.RouteBuilder;
@@ -93,7 +93,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     private PetasosFulfillmentTaskFactory fulfillmentTaskFactory;
 
     @Inject
-    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    private LocalTaskActivityManager actionableTaskActivityController;
 
     @Inject
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
@@ -218,7 +218,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         return fulfillmentTaskFactory;
     }
 
-    protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController() {
+    protected LocalTaskActivityManager getActionableTaskActivityController() {
         return actionableTaskActivityController;
     }
 

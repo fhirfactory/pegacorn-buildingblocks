@@ -26,21 +26,22 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import net.fhirfactory.pegacorn.core.interfaces.participant.PetasosParticipantManagementServiceInterface;
 import org.apache.commons.lang3.StringUtils;
 
-import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
+import net.fhirfactory.pegacorn.core.interfaces.participant.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
+import net.fhirfactory.pegacorn.petasos.core.participants.administration.LocalParticipantAdministrator;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 
 
 public abstract class PetasosParticipantSubscriptionServicesEndpointBase extends JGroupsIntegrationPointBase
-        implements TaskPathwayManagementServiceInterface {
+        implements TaskPathwayManagementServiceInterface, PetasosParticipantManagementServiceInterface {
 
     private boolean subscriptionCheckScheduled;
     private Object subscriptionCheckLock;
@@ -52,7 +53,7 @@ public abstract class PetasosParticipantSubscriptionServicesEndpointBase extends
     private static int CHANGE_DETECTION_SUBSCRIPTION_CHECK_COUNT = 10;
 
     @Inject
-    private LocalPetasosParticipantCacheIM participantCacheIM;
+    private LocalParticipantAdministrator participantCacheIM;
 
     //
     // Constructor(s)

@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.accessors;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalFulfillmentTaskCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalFulfillmentTaskCache;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

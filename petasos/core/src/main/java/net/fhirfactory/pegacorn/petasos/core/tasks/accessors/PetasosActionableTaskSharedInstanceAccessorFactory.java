@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.accessors;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class PetasosActionableTaskSharedInstanceAccessorFactory {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosActionableTaskSharedInstanceAccessorFactory.class);
 
     @Inject
-    private ParticipantSharedActionableTaskCache taskCache;
+    private LocalActionableTaskCache taskCache;
 
     //
     // Constructor(s)

@@ -22,11 +22,8 @@
 package net.fhirfactory.pegacorn.core.model.topology.endpoints.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 
 public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(IPCServerTopologyEndpoint.class);
@@ -128,7 +125,7 @@ public class IPCServerTopologyEndpoint extends IPCTopologyEndpoint {
         sb.append(", metrics=").append(getMetrics());
         sb.append(", componentSystemRole=").append(getComponentSystemRole());
         sb.append(", componentStatus=").append(getComponentStatus());
-        sb.append(", componentExecutionControl=").append(getComponentExecutionControl());
+        sb.append(", componentExecutionControl=").append(getComponentExecutionStatus());
         sb.append('}');
         return sb.toString();
     }

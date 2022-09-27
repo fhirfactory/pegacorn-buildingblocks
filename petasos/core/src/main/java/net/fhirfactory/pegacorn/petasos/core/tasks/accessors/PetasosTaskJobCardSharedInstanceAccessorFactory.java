@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.accessors;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.shared.ParticipantSharedTaskJobCardCache;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

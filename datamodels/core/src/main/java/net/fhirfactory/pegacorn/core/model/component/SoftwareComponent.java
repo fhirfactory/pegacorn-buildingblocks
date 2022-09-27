@@ -38,7 +38,6 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-import java.awt.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Enumeration;
@@ -62,7 +61,7 @@ public abstract class SoftwareComponent implements Serializable {
     private PetasosComponentMetricSet metrics;
     private SoftwareComponentConnectivityContextEnum componentSystemRole;
     private SoftwareComponentStatusEnum componentStatus;
-    private SoftwareComponentExecutionControlEnum componentExecutionControl;
+    private SoftwareComponentExecutionControlEnum componentExecutionStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant lastActivityInstant;
 
@@ -84,7 +83,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.deploymentSite = null;
         this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
         this.componentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
-        this.componentExecutionControl = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
+        this.componentExecutionStatus = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
         this.participantId = new PetasosParticipantId();
         this.lastActivityInstant = Instant.now();
         this.lastReportingInstant = null;
@@ -102,13 +101,13 @@ public abstract class SoftwareComponent implements Serializable {
         this.metrics = null;
         this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
         this.componentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
-        this.componentExecutionControl = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
+        this.componentExecutionStatus = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
         this.version = null;
         this.parentComponent = null;
         // Now update with passed value
         setComponentSystemRole(ori.getComponentSystemRole());
         setComponentStatus(ori.getComponentStatus());
-        setComponentExecutionControl(ori.getComponentExecutionControl());
+        setComponentExecutionStatus(ori.getComponentExecutionStatus());
         setResilienceMode(ori.getResilienceMode());
         setConcurrencyMode(ori.getConcurrencyMode());
         setComponentType(ori.getComponentType());
@@ -406,12 +405,12 @@ public abstract class SoftwareComponent implements Serializable {
         this.componentStatus = componentStatus;
     }
 
-    public SoftwareComponentExecutionControlEnum getComponentExecutionControl() {
-        return componentExecutionControl;
+    public SoftwareComponentExecutionControlEnum getComponentExecutionStatus() {
+        return componentExecutionStatus;
     }
 
-    public void setComponentExecutionControl(SoftwareComponentExecutionControlEnum componentExecutionControl) {
-        this.componentExecutionControl = componentExecutionControl;
+    public void setComponentExecutionStatus(SoftwareComponentExecutionControlEnum componentExecutionStatus) {
+        this.componentExecutionStatus = componentExecutionStatus;
     }
 
     //
@@ -431,7 +430,7 @@ public abstract class SoftwareComponent implements Serializable {
         sb.append(", metrics=").append(metrics);
         sb.append(", componentSystemRole=").append(componentSystemRole);
         sb.append(", componentStatus=").append(componentStatus);
-        sb.append(", componentExecutionControl=").append(componentExecutionControl);
+        sb.append(", componentExecutionControl=").append(componentExecutionStatus);
         sb.append(", participantId=").append(participantId);
         sb.append(", capabilities=").append(capabilities);
         sb.append(", lastActivityInstant=").append(lastActivityInstant);
@@ -452,11 +451,11 @@ public abstract class SoftwareComponent implements Serializable {
         if (this == o) return true;
         if (!(o instanceof SoftwareComponent)) return false;
         SoftwareComponent that = (SoftwareComponent) o;
-        return Objects.equals(getComponentID(), that.getComponentID()) && getComponentType() == that.getComponentType() && getConcurrencyMode() == that.getConcurrencyMode() && getResilienceMode() == that.getResilienceMode() && getSecurityZone() == that.getSecurityZone() && Objects.equals(getDeploymentSite(), that.getDeploymentSite()) && Objects.equals(getOtherConfigurationParameters(), that.getOtherConfigurationParameters()) && Objects.equals(getMetrics(), that.getMetrics()) && getComponentSystemRole() == that.getComponentSystemRole() && getComponentStatus() == that.getComponentStatus() && getComponentExecutionControl() == that.getComponentExecutionControl() && Objects.equals(getParticipantId(), that.getParticipantId()) && Objects.equals(getLastActivityInstant(), that.getLastActivityInstant()) && Objects.equals(getLastReportingInstant(), that.getLastReportingInstant());
+        return Objects.equals(getComponentID(), that.getComponentID()) && getComponentType() == that.getComponentType() && getConcurrencyMode() == that.getConcurrencyMode() && getResilienceMode() == that.getResilienceMode() && getSecurityZone() == that.getSecurityZone() && Objects.equals(getDeploymentSite(), that.getDeploymentSite()) && Objects.equals(getOtherConfigurationParameters(), that.getOtherConfigurationParameters()) && Objects.equals(getMetrics(), that.getMetrics()) && getComponentSystemRole() == that.getComponentSystemRole() && getComponentStatus() == that.getComponentStatus() && getComponentExecutionStatus() == that.getComponentExecutionStatus() && Objects.equals(getParticipantId(), that.getParticipantId()) && Objects.equals(getLastActivityInstant(), that.getLastActivityInstant()) && Objects.equals(getLastReportingInstant(), that.getLastReportingInstant());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getComponentID(), getComponentType(), getConcurrencyMode(), getResilienceMode(), getSecurityZone(), getDeploymentSite(), getOtherConfigurationParameters(), getMetrics(), getComponentSystemRole(), getComponentStatus(), getComponentExecutionControl(), getParticipantId(), getLastActivityInstant(), getLastReportingInstant());
+        return Objects.hash(getComponentID(), getComponentType(), getConcurrencyMode(), getResilienceMode(), getSecurityZone(), getDeploymentSite(), getOtherConfigurationParameters(), getMetrics(), getComponentSystemRole(), getComponentStatus(), getComponentExecutionStatus(), getParticipantId(), getLastActivityInstant(), getLastReportingInstant());
     }
 }

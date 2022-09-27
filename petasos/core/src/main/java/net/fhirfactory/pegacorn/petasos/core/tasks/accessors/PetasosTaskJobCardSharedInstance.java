@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.shared.ParticipantSharedTaskJobCardCache;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
