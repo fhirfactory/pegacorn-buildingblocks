@@ -115,6 +115,7 @@ public class PetasosSubscriptionReportingAgent {
                         publisherSubscriptionSummary.setParticipantName(processingPlant.getSubsystemParticipantName());
                         publisherSubscriptionSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.PROCESSING_PLANT_SUBSCRIPTION_SUMMARY);
                         publisherSubscriptionSummary.setTimestamp(Instant.now());
+//                        publisherSubscriptionSummary.setPublisherComponentId(currentSubscription.getComponentID());
                         processingPlantSubscriptionSummary.addSubscriberSummary(publisherSubscriptionSummary);
                     }
                 } else {
