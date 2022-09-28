@@ -21,11 +21,12 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.media;
 
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import org.hl7.fhir.r4.model.Media;
 
-import java.util.List;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
-public interface PetasosMediaServiceHandlerInterface {
-    Boolean saveMediaHandler(Media media, JGroupsIntegrationPointSummary jgroupsIP);
+public interface PetasosMediaServiceHandlerInterface extends CapabilityFulfillmentInterface {
+    String saveMediaHandler(Media media, JGroupsIntegrationPointSummary jgroupsIP);
+    Media retrieveMediaHandler(String mediaId, JGroupsIntegrationPointSummary jgroupsIP);
 }

@@ -89,8 +89,15 @@ public class LocalMediaServiceClientEventManager implements PetasosMediaServiceA
 	}
 
 	@Override
-	public Media loadMedia(String mediaID) {
-		// TODO Auto-generated method stub
-		return null;
+	public Media loadMedia(String mediaId) {
+        getLogger().info(".loadMedia(): Entry, mediaId->{}", mediaId);
+        if(mediaId == null){
+            getLogger().debug(".loadMedia(): Exit, mediaId is null");
+            return(null);
+        }
+        Media media = mediaService.retrieveMedia(mediaServiceProvider.getPetasosMediaServiceProviderName(), mediaId);
+        
+        getLogger().info(".loadMedia(): Exit, media->{}", media);
+        return(media);
 	}
 }

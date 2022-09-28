@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.hl7v2.helpers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -44,7 +45,7 @@ public class MediaPipeParser {
 	private static final String OBX_KEY = HL7v2SegmentTypeEnum.OBX.getKey();
 	private static final Logger LOG = LoggerFactory.getLogger(MediaPipeParser.class);
     private static final String BASE64_PATTERN = "^Base64^";
-	private static final String PREFIX = "<fhir-resource>https://hestia-dam-service/fhir/r4/media/id=";
+	private static final String PREFIX = "<fhir-resource>https://hestia-dam-service/fhir/r4/media/";
 	private static final String SUFFIX = "</fhir-resource>";
 
 
@@ -187,19 +188,21 @@ public class MediaPipeParser {
 	}
 	
     public String replaceAlteredSegment(String message, Media media) {
+        getLogger().debug(".replaceAlteredSegment(): Entry, message->{}, mediaId->{}", message, media.getId());
     	String obx = extractNextAlteredSegment(message);
     	String[] chunks = breakSegmentIntoChunks(obx);
     	chunks[2] = ENCAPSULATED_DATA;
     	chunks[5] = convertMediaBackToMessage(media);
     	String fixed = rebuildSegmentFromChunks(chunks);
     	message = message.replace(obx, fixed); //XXX inefficient?
+    	getLogger().debug(".replaceAlteredSegment(): Exit, message->{}, mediaId->{}", message, media.getId());
        	return (message);
     }
     
     private String convertMediaBackToMessage(Media media) {
 		
 		return contentTypeToHL7(media.getContent().getContentType()) 
-				+ BASE64_PATTERN + media.getContent().getData().toString();
+				+ BASE64_PATTERN + new String(media.getContent().getData(), StandardCharsets.UTF_8);
 	}
 
 	public String contentTypeToHL7(String contentType) {

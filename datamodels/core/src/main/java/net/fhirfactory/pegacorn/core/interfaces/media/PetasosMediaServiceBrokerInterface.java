@@ -25,5 +25,5 @@ import org.hl7.fhir.r4.model.Media;
 
 public interface PetasosMediaServiceBrokerInterface {
     Boolean saveMedia(String serviceProviderName, Media media);
-    Media retrieveMedia(String id);
+    Media retrieveMedia(String serviceProviderName, String id);
 }

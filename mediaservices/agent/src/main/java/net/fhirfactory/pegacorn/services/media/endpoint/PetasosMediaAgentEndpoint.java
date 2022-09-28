@@ -88,37 +88,67 @@ public class PetasosMediaAgentEndpoint extends PetasosMediaServicesEndpoint
         getLogger().info(".saveMedia(): Entry, serviceProviderName->{}, media->{}", serviceProviderName, media);
         JGroupsIntegrationPointSummary myJGroupsIP = createSummary(getJGroupsIntegrationPoint());
         Address targetAddress = getCandidateMediaServerTargetAddress(serviceProviderName);
+        
+        Object objectSet[] = new Object[2];
+        Class classSet[] = new Class[2];
+        objectSet[0] = media;
+        classSet[0] = Media.class;
+        objectSet[1] = myJGroupsIP;
+        classSet[1] = JGroupsIntegrationPointSummary.class;
+        RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+        String savedMediaId = null;
         try {
-            Object objectSet[] = new Object[2];
-            Class classSet[] = new Class[2];
-            objectSet[0] = media;
-            classSet[0] = Media.class;
-            objectSet[1] = myJGroupsIP;
-            classSet[1] = JGroupsIntegrationPointSummary.class;
-            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Boolean response = null;
             synchronized (getIPCChannelLock()){
-                response = getRPCDispatcher().callRemoteMethod(targetAddress, "saveMediaHandler", objectSet, classSet, requestOptions);
+                savedMediaId = getRPCDispatcher().callRemoteMethod(targetAddress, "saveMediaHandler", objectSet, classSet, requestOptions);
             }
-            getMetricsAgent().incrementRemoteProcedureCallCount();
-            getLogger().info(".saveMedia(): Exit, response->{}", response);
-            return(response);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".saveMedia(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".saveMedia(): Error ({}) ->{}", e.getClass().getCanonicalName(), e.getMessage());
             return(false);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            e.printStackTrace();
-            getLogger().error(".saveMedia(): Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".saveMedia(): Error while attempting saveMediaHandler remote call for serviceProvider", e);
             return(false);
         }
+        
+        if (savedMediaId != null) {
+            media.setId(savedMediaId);
+        }
+        getMetricsAgent().incrementRemoteProcedureCallCount();
+        getLogger().info(".saveMedia(): Exit, savedMediaId->{}", savedMediaId);
+        return(savedMediaId != null);
     }
 
 	@Override
-	public Media retrieveMedia(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Media retrieveMedia(String serviceProviderName, String mediaId) {
+        getLogger().info(".retrieveMedia(): Entry, serviceProviderName->{}, mediaId->{}", serviceProviderName, mediaId);
+        JGroupsIntegrationPointSummary myJGroupsIP = createSummary(getJGroupsIntegrationPoint());
+        Address targetAddress = getCandidateMediaServerTargetAddress(serviceProviderName);
+        try {
+            Object objectSet[] = new Object[2];
+            Class classSet[] = new Class[2];
+            objectSet[0] = mediaId;
+            classSet[0] = String.class;
+            objectSet[1] = myJGroupsIP;
+            classSet[1] = JGroupsIntegrationPointSummary.class;
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            Media response = null;
+            synchronized (getIPCChannelLock()){
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "retrieveMediaHandler", objectSet, classSet, requestOptions);
+            }
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            getLogger().info(".retrieveMedia(): Exit, response->{}", response);
+            return(response);
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".retrieveMedia(): serviceProvider->{}, mediaId->{}, targetAddress->{}: Error (NoSuchMethodException) ->{}", serviceProviderName, mediaId, targetAddress, e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".retrieveMedia(): serviceProvider->{}, mediaId->{}, targetAddress->{}: Error ({}) ->{}", serviceProviderName, mediaId, targetAddress, e.getClass().getCanonicalName(), e.getMessage());
+            return(null);
+        }
 	}
 }
 

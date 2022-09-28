@@ -12,19 +12,16 @@ import org.junit.jupiter.api.Test;
 class MediaEncryptionExtensionFactoryTest {
 
 	@Test
-	void testInjectingSecretKey() {
+	void testInjectingSecretKey() throws MediaEncryptionExtensionException, NoSuchAlgorithmException {
 		MediaEncryptionExtensionFactory meef = new MediaEncryptionExtensionFactory();
 		Attachment a = new Attachment();
-		try {
-			SecretKey secretKey = KeyGenerator.getInstance("AES").generateKey();
-			Assertions.assertFalse(a.hasExtension(meef.getMediaEncryptionTypeMeaning()));
-			meef.injectSecretKey(a, secretKey);
-			Assertions.assertTrue(a.hasExtension(meef.getMediaEncryptionTypeMeaning()));
-			SecretKey returnedKey = meef.extractSecretKey(a);
-			Assertions.assertEquals(secretKey, returnedKey);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+
+		SecretKey secretKey = KeyGenerator.getInstance("AES").generateKey();
+		Assertions.assertFalse(a.hasExtension(meef.getMediaEncryptionTypeMeaning()));
+		meef.injectSecretKey(a, secretKey);
+		Assertions.assertTrue(a.hasExtension(meef.getMediaEncryptionTypeMeaning()));
+		SecretKey returnedKey = meef.extractSecretKey(a);
+		Assertions.assertEquals(secretKey, returnedKey);
 	}
 
 }
