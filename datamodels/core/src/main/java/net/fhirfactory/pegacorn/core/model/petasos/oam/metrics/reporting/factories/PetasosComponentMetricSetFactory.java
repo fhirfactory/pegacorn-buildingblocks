@@ -148,6 +148,34 @@ public class PetasosComponentMetricSetFactory {
             }
         }
 
+        if(!plantMetricsData.getLocalWatchDogActivity().isEmpty()){
+            for(String currentWatchDogName: plantMetricsData.getLocalWatchDogActivity().keySet()){
+                getLogger().trace(".convertProcessingPlantMetricsData(): Processing, currentWatchDogName->{}, value->{}", currentWatchDogName, plantMetricsData.getLocalWatchDogActivity().get(currentWatchDogName));
+                PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
+                componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                componentStatusMetric.setMetricSource(plantMetricsData.getComponentID());
+                componentStatusMetric.setMetricName(currentWatchDogName);
+                componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
+                componentStatusMetric.setMetricUnit(PetasosComponentMetricUnitEnum.TIME_INSTANT);
+                componentStatusMetric.setMetricValue(new PetasosComponentMetricValue(plantMetricsData.getLocalWatchDogActivity().get(currentWatchDogName)));
+                metricSet.addMetric(componentStatusMetric);
+            }
+        }
+
+        if(!plantMetricsData.getLocalPathwaySynchronisationActivity().isEmpty()){
+            for(String currentParticipantName: plantMetricsData.getLocalPathwaySynchronisationActivity().keySet()){
+                getLogger().trace(".convertProcessingPlantMetricsData(): Processing, currentParticipantName->{}, value->{}", currentParticipantName, plantMetricsData.getLocalWatchDogActivity().get(currentParticipantName));
+                PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
+                componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                componentStatusMetric.setMetricSource(plantMetricsData.getComponentID());
+                componentStatusMetric.setMetricName("Pathway Sync:"+ currentParticipantName);
+                componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
+                componentStatusMetric.setMetricUnit(PetasosComponentMetricUnitEnum.TIME_INSTANT);
+                componentStatusMetric.setMetricValue(new PetasosComponentMetricValue(plantMetricsData.getLocalPathwaySynchronisationActivity().get(currentParticipantName)));
+                metricSet.addMetric(componentStatusMetric);
+            }
+        }
+
         getLogger().debug(".convertProcessingPlantMetricsData(): Exit, metricSet->{}", metricSet);
         return(metricSet);
     }

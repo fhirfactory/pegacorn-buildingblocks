@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
-    private Map<ComponentIdType, PetasosSubscriberSubscriptionSummary> asSubscriber;
+    private Map<String, PetasosSubscriberSubscriptionSummary> asSubscriber;
     private Map<String, PetasosPublisherSubscriptionSummary> asPublisher;
     private ComponentIdType componentID;
     private String participantName;
@@ -51,11 +51,11 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
     // Getters and Setters
     //
 
-    public Map<ComponentIdType, PetasosSubscriberSubscriptionSummary> getAsSubscriber() {
+    public Map<String, PetasosSubscriberSubscriptionSummary> getAsSubscriber() {
         return asSubscriber;
     }
 
-    public void setAsSubscriber(Map<ComponentIdType, PetasosSubscriberSubscriptionSummary> asSubscriber) {
+    public void setAsSubscriber(Map<String, PetasosSubscriberSubscriptionSummary> asSubscriber) {
         this.asSubscriber = asSubscriber;
     }
 
@@ -89,16 +89,16 @@ public class PetasosProcessingPlantSubscriptionSummary implements Serializable {
 
     public void addPublisherSummary(PetasosPublisherSubscriptionSummary publisherSubscriptionSummary){
         if(asPublisher.containsKey(publisherSubscriptionSummary.getSubscriberParticipantName())){
-            asPublisher.remove(publisherSubscriptionSummary.getSubscriberComponentId());
+            asPublisher.remove(publisherSubscriptionSummary.getSubscriberParticipantName());
         }
         asPublisher.put(publisherSubscriptionSummary.getSubscriberParticipantName(), publisherSubscriptionSummary);
     }
 
     public void addSubscriberSummary(PetasosSubscriberSubscriptionSummary subscriberSubscriptionSummary){
-        if(asSubscriber.containsKey(subscriberSubscriptionSummary.getPublisherComponentId())){
-            asSubscriber.remove(subscriberSubscriptionSummary.getPublisherComponentId());
+        if(asSubscriber.containsKey(subscriberSubscriptionSummary.getPublisherParticipantName())){
+            asSubscriber.remove(subscriberSubscriptionSummary.getPublisherParticipantName());
         }
-        asSubscriber.put(subscriberSubscriptionSummary.getPublisherComponentId(), subscriberSubscriptionSummary);
+        asSubscriber.put(subscriberSubscriptionSummary.getPublisherParticipantName(), subscriberSubscriptionSummary);
     }
 
     public boolean addSubscriptionForExistingSubscriber(ComponentIdType componentID, TaskWorkItemSubscriptionType topic){
