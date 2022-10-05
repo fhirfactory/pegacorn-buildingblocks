@@ -110,8 +110,8 @@ public class PetasosAuditAgentEndpoint extends PetasosAuditServicesEndpoint
             return(false);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            e.printStackTrace();
-            getLogger().error(".logAuditEvent: Error (GeneralException) ->{}", e.getMessage());
+//            e.printStackTrace();
+            getLogger().error(".logAuditEvent: Error (GeneralException) ->{}", "Unable to connect to Hestia-Audit-IM :: Message not written to JPA Server");
             return(false);
         }
     }
@@ -142,8 +142,8 @@ public class PetasosAuditAgentEndpoint extends PetasosAuditServicesEndpoint
             return(false);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            e.printStackTrace();
-            getLogger().error(".logAuditEvent: Error (GeneralException) ->{}", e.getMessage());
+//            e.printStackTrace();
+            getLogger().error(".logAuditEvent: Error (GeneralException) ->{}", "Unable to connect to Hestia-Audit-IM :: Message not written to JPA Server", e);
             return(false);
         }
     }
