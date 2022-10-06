@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
+import org.infinispan.commons.hash.Hash;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -32,6 +33,8 @@ import java.util.Map;
 
 public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
     private Map<String, Integer> localCacheSize;
+    private Map<String, Instant> localWatchDogActivity;
+    private Map<String, Instant> localPathwaySynchronisationActivity;
     private int synchronousAuditEventsWritten;
     private int asynchronousAuditEventsWritten;
     private int asynchronousAuditEventsQueued;
@@ -49,11 +52,15 @@ public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
         this.asynchronousAuditEventsWritten = 0;
         this.asynchronousAuditEventsQueued = 0;
         this.lastAsynchronousAuditEventWrite = null;
+        this.localWatchDogActivity = new HashMap<>();
+        this.localPathwaySynchronisationActivity = new HashMap<>();
     }
 
     public ProcessingPlantMetricsData(ComponentIdType componentId){
         super(componentId);
         this.localCacheSize = new HashMap<>();
+        this.localWatchDogActivity = new HashMap<>();
+        this.localPathwaySynchronisationActivity = new HashMap<>();
         this.synchronousAuditEventsWritten = 0;
         this.asynchronousAuditEventsWritten = 0;
         this.asynchronousAuditEventsQueued = 0;
@@ -63,6 +70,22 @@ public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
     //
     // Getters and Setters
     //
+
+    public Map<String, Instant> getLocalPathwaySynchronisationActivity() {
+        return localPathwaySynchronisationActivity;
+    }
+
+    public void setLocalPathwaySynchronisationActivity(Map<String, Instant> localPathwaySynchronisationActivity) {
+        this.localPathwaySynchronisationActivity = localPathwaySynchronisationActivity;
+    }
+
+    public Map<String, Instant> getLocalWatchDogActivity() {
+        return localWatchDogActivity;
+    }
+
+    public void setLocalWatchDogActivity(Map<String, Instant> localWatchDogActivity) {
+        this.localWatchDogActivity = localWatchDogActivity;
+    }
 
     public Map<String, Integer> getLocalCacheSize() {
         return localCacheSize;
@@ -110,22 +133,28 @@ public class ProcessingPlantMetricsData extends CommonComponentMetricsData {
 
     @Override
     public String toString() {
-        return "ProcessingPlantMetricsData{" +
-                "localCacheStatusMap=" + localCacheSize +
-                ", synchronousAuditEventsWritten=" + synchronousAuditEventsWritten +
-                ", asynchronousAuditEventsWritten=" + asynchronousAuditEventsWritten +
-                ", asynchronousAuditEventsQueued=" + asynchronousAuditEventsQueued +
-                ", lastAsynchronousAuditEventWrite=" + lastAsynchronousAuditEventWrite +
-                ", ingresMessageCount=" + getIngresMessageCount() +
-                ", egressMessageCount=" + getEgressMessageAttemptCount() +
-                ", distributedMessageCount=" + getInternalDistributedMessageCount() +
-                ", distributionCountMap=" + getInternalDistributionCountMap() +
-                ", componentID=" + getComponentID() +
-                ", participantName=" + getParticipantName() +
-                ", metricsType='" + getComponentType() + '\'' +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", componentStartupInstant=" + getComponentStartupInstant() +
-                ", componentStatus='" + getComponentStatus() + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("ProcessingPlantMetricsData{");
+        sb.append("localCacheSize=").append(localCacheSize);
+        sb.append(", localWatchDogActivity=").append(localWatchDogActivity);
+        sb.append(", localPathwaySynchronisationActivity=").append(localPathwaySynchronisationActivity);
+        sb.append(", synchronousAuditEventsWritten=").append(synchronousAuditEventsWritten);
+        sb.append(", asynchronousAuditEventsWritten=").append(asynchronousAuditEventsWritten);
+        sb.append(", asynchronousAuditEventsQueued=").append(asynchronousAuditEventsQueued);
+        sb.append(", lastAsynchronousAuditEventWrite=").append(lastAsynchronousAuditEventWrite);
+        sb.append(", egressMessageSuccessCount=").append(getEgressMessageSuccessCount());
+        sb.append(", egressMessageFailureCount=").append(getEgressMessageFailureCount());
+        sb.append(", ingresMessageCount=").append(getIngresMessageCount());
+        sb.append(", egressMessageAttemptCount=").append(getEgressMessageAttemptCount());
+        sb.append(", internalDistributedMessageCount=").append(getInternalDistributedMessageCount());
+        sb.append(", internalDistributionCountMap=").append(getInternalDistributionCountMap());
+        sb.append(", componentID=").append(getComponentID());
+        sb.append(", componentType=").append(getComponentType());
+        sb.append(", lastActivityInstant=").append(getLastActivityInstant());
+        sb.append(", componentStartupInstant=").append(getComponentStartupInstant());
+        sb.append(", componentStatus='").append(getComponentStatus()).append('\'');
+        sb.append(", participantName='").append(getParticipantName()).append('\'');
+        sb.append(", internalReceivedMessageCount=").append(getInternalReceivedMessageCount());
+        sb.append('}');
+        return sb.toString();
     }
 }

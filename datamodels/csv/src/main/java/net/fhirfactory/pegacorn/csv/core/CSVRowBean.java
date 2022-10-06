@@ -53,7 +53,7 @@ public abstract class CSVRowBean {
         }
 
         for (int i = 0; i < rowData.length; i++) {
-            this.rowData[i] = rowData[i];
+            this.rowData[i] = rowData[i].trim();
         }
     }
 
