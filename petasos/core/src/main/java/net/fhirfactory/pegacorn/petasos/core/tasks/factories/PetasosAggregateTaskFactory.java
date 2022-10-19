@@ -21,7 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.SerializationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosAggregateTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
@@ -29,15 +34,11 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.facto
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
-import org.apache.commons.lang3.SerializationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 
 public class PetasosAggregateTaskFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosAggregateTaskFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosAggregateTaskFactory.class);
 
     @Inject
     private TaskIdTypeFactory taskIdFactory;

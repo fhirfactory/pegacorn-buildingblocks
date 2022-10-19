@@ -22,21 +22,20 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericTriggerBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 
-public abstract class InteractIngresAPIClientGatewayWUP extends GenericTriggerBasedWUPTemplate {
-
-    private MessageBasedWUPEndpointContainer ingresEndpoint;
+public abstract class InteractIngresAPIClientGatewayWUP extends GenericMessageBasedWUPTemplate		 {
 
     //
     // Constructor(s)
