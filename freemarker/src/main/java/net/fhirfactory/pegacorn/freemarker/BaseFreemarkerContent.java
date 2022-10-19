@@ -2,6 +2,7 @@ package net.fhirfactory.pegacorn.freemarker;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 
 import freemarker.template.Configuration;
@@ -9,12 +10,13 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
- * Base class for all email content to be generated in Freemarker.
+ * Base class for all content to be generated in Freemarker.
  * 
  * @author Brendan Douglas
  *
  */
-public abstract class BaseEmailContent {
+public abstract class BaseFreemarkerContent {
+	private Map<String, Object> params = new HashMap<>();
 
     /**
      * 
@@ -26,7 +28,7 @@ public abstract class BaseEmailContent {
 
         Template template = config.getTemplate(getTemplateName());
 
-        template.process(getData(), st);
+        template.process(params, st);
 
         return st.getBuffer().toString();
     }
@@ -39,9 +41,12 @@ public abstract class BaseEmailContent {
     public abstract String getTemplateName();
 
     /**
-     * The template data.
-     * 
-     * @return
-     */
-    public abstract Map<String, Object> getData();
+	 * Adds a param to the template.
+	 * 
+	 * @param key
+	 * @param data
+	 */
+	public void addParam(String key, Object data) {
+		params.put(key, data);
+	}
 }
