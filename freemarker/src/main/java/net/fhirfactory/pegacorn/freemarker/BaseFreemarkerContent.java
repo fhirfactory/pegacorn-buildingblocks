@@ -17,14 +17,22 @@ import freemarker.template.TemplateException;
  */
 public abstract class BaseFreemarkerContent {
 	private Map<String, Object> params = new HashMap<>();
+	
+	private String basePath;
+	
+	private BaseFreemarkerContent() {}
+	
+	public BaseFreemarkerContent(String basePath) {
+		this.basePath = basePath;
+	}
 
-    /**
+	/**
      * 
      */
     public String getContent() throws IOException, TemplateException {
         StringWriter st = new StringWriter();
 
-        Configuration config = TemplateConfiguration.getConfiguration();
+        Configuration config = TemplateConfiguration.getConfiguration(basePath);
 
         Template template = config.getTemplate(getTemplateName());
 
