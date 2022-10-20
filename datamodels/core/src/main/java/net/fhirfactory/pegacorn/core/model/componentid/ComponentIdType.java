@@ -28,6 +28,7 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,6 +40,8 @@ public class ComponentIdType implements Serializable {
     private Instant idValidityStartInstant;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant idValidityEndInstant;
+
+    private static final Integer ID_VALIDITY_RANGE_IN_YEARS = 100;
 
     //
     // Constructor(s)
@@ -83,7 +86,7 @@ public class ComponentIdType implements Serializable {
         ComponentIdType componentId = new ComponentIdType();
         componentId.setName(name);
         componentId.setIdValidityStartInstant(Instant.now());
-        componentId.setIdValidityEndInstant(Instant.MAX);
+        componentId.setIdValidityEndInstant(ZonedDateTime.now().plusYears(ID_VALIDITY_RANGE_IN_YEARS).toInstant());
         UUID uniqueId = UUID.randomUUID();
         String msbString = Long.toHexString(uniqueId.getMostSignificantBits());
         String lsbString = Long.toHexString(uniqueId.getLeastSignificantBits());

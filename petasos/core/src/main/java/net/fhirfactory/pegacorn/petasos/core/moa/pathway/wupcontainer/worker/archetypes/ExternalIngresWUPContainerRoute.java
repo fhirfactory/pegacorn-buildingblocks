@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftw
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressGatekeeper;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressMetadataCollector;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressProcessor;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPEgressConduit;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
@@ -52,7 +52,7 @@ public class ExternalIngresWUPContainerRoute extends BasePetasosContainerRoute {
         super(camelCTX, auditTrailBroker);
         getLogger().debug(".ExternalIngresWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode );
         this.wupTopologyNode = wupNode;
-        nameSet = new RouteElementNames(wupTopologyNode.getParticipantId());
+        nameSet = new RouteElementNames(wupTopologyNode.getParticipant().getParticipantId());
         this.metricsAgent = metricsAgent;
     }
 
@@ -92,7 +92,7 @@ public class ExternalIngresWUPContainerRoute extends BasePetasosContainerRoute {
         fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressGatekeeperIngres())
                 .routeId(nameSet.getRouteWUPContainerEgressGateway())
                 .process(nodeDetailInjector)
-                .bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange)")
+                .bean(WUPContainerEgressMetadataCollector.class, "egressGatekeeper(*, Exchange)")
                 .to(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);
 
     }

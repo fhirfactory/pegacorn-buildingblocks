@@ -21,22 +21,6 @@
  */
 package net.fhirfactory.pegacorn.processingplant;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.slf4j.Logger;
-
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
@@ -55,9 +39,9 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirect
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditEventGranularityLevelEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
@@ -66,13 +50,23 @@ import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.com
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfaces.SolutionNodeFactoryInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.GlobalPetasosTaskContinuityWatchdog;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.GlobalPetasosTaskRecoveryWatchdog;
+import net.fhirfactory.pegacorn.petasos.core.participants.management.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.slf4j.Logger;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantRoleSupportInterface, ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface, CapabilityFulfillmentInterface {
 
@@ -92,12 +86,6 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     private PegacornEnvironmentProperties environmentProperties;
 
     @Inject
-    private GlobalPetasosTaskContinuityWatchdog petasosTaskContinuityWatchdog;
-
-    @Inject
-    private GlobalPetasosTaskRecoveryWatchdog petasosTaskRecoveryWatchdog;
-
-    @Inject
     private JGroupsIntegrationPointNamingUtilities componentNameUtilities;
 
     @Inject
@@ -110,7 +98,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     private TaskPathwayManagementServiceInterface taskPathwayManagementService;
 
     @Inject
-    private LocalPetasosParticipantCacheIM localPetasosParticipantCacheIM;
+    private LocalParticipantManager participantRegistrationAdministrator;
 
     @Inject
     private PegacornReferenceProperties pegacornReferenceProperties;
@@ -163,8 +151,8 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return(taskPathwayManagementService);
     }
 
-    protected LocalPetasosParticipantCacheIM getLocalPetasosParticipantCacheIM(){
-        return(localPetasosParticipantCacheIM);
+    protected LocalParticipantManager getParticipantRegistrationAdministrator(){
+        return(participantRegistrationAdministrator);
     }
 
     protected FHIRElementTopicFactory getFHIRElementTopicFactory(){
@@ -182,11 +170,11 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public String getHostName() {
-        return (getMeAsASoftwareComponent().getAssignedDNSName());
+        return (getTopologyNode().getAssignedDNSName());
     }
 
     public void setHostName(String hostName) {
-        getMeAsASoftwareComponent().setAssignedDNSName(hostName);
+        getTopologyNode().setAssignedDNSName(hostName);
     }
 
     public TopologyIM getTopologyIM() {
@@ -221,6 +209,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             getLogger().info("ProcessingPlant::initialise(): [Solution Node Factory Initialisation] Finish");
             getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Resolution] Start");
             resolveProcessingPlant();
+            isInitialised = true;
             getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Resolution] softwareComponet->{}", meAsASoftwareComponent);
             getLogger().info("ProcessingPlant::initialise(): [ProcessingPlant Resolution] Finish");
             getLogger().info("ProcessingPlant::initialise(): [Capability Delivery Services Map Initialisation] Start");
@@ -231,33 +220,17 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             getLogger().info("ProcessingPlant::initialise(): [Executing other PostConstruct Activities] Start");
             executePostConstructActivities();
             getLogger().info("ProcessingPlant::initialise(): [Executing other PostConstruct Activities] Finish");
-            getLogger().info("ProcessingPlant::initialise(): [Check for My PetasosPartcipant] Start");
-            if(!getParticipantHolder().hasMyProcessingPlantPetasosParticipant()){
-                getLogger().info("ProcessingPlant::initialise(): [Check for My PetasosPartcipant] Registering my PetasosParticipant!");
-                PetasosParticipantRegistration petasosParticipantRegistration = localPetasosParticipantCacheIM.registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), new HashSet<>());
-                getParticipantHolder().setMyProcessingPlantPetasosParticipant(petasosParticipantRegistration.getParticipant());
-            }
-            if(localPetasosParticipantCacheIM.getLocalParticipantRegistration(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getComponentID()) == null){
-                PetasosParticipantRegistration petasosParticipantRegistration = localPetasosParticipantCacheIM.registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), new HashSet<>());
-                if(petasosParticipantRegistration == null){
-                    getLogger().error("ProcessingPlant::initialise(): [Check for My PetasosPartcipant] Cannot add my participant to local participant cache!");
-                }
-            }
-            getLogger().info("ProcessingPlant::initialise(): [Check for My PetasosPartcipant] Finish");
+            getLogger().info("ProcessingPlant::initialise(): [Register My PetasosPartcipant] Start");
+            registerParticipant();
+            getLogger().info("ProcessingPlant::initialise(): [Register My PetasosPartcipant] Finish");
             getLogger().info("ProcessingPlant::initialise(): [Audit Event Level Derivation] Start");
             this.processingPlantAuditLevel = deriveAuditEventGranularityLevel();
             getLogger().info("ProcessingPlant::initialise(): [Audit Event Level Derivation] Finish");
-            getLogger().info("ProcessingPlant::initialise(): [Initialise Task Continuity Watchdog] Start");
-            this.petasosTaskContinuityWatchdog.initialise();
-            getLogger().info("ProcessingPlant::initialise(): [Initialise Task Continuity Watchdog] Finish");
-            getLogger().info("ProcessingPlant::initialise(): [Initialise Task Recovery Watchdog] Start");
-            this.petasosTaskRecoveryWatchdog.initialise();
-            getLogger().info("ProcessingPlant::initialise(): [Initialise Task Recovery Watchdog] Finish");
             getLogger().info("ProcessingPlant::initialise(): [Initialise Metrics Agent] Start");
-            this.metricsAgent = metricAgentFactory.newProcessingPlantMetricsAgent(this, getMeAsASoftwareComponent().getComponentID(), getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
+            this.metricsAgent = metricAgentFactory.newProcessingPlantMetricsAgent(this, getTopologyNode().getComponentId(), getTopologyNode().getParticipant().getParticipantId().getSubsystemName());
             metricsAgentAccessor.setMetricsAgent(this.metricsAgent);
             getLogger().info("ProcessingPlant::initialise(): [Initialise Metrics Agent] Finish");
-            isInitialised = true;
+
             getLogger().info("StandardProcessingPlatform::initialise(): Done...");
         } else {
             getLogger().debug(".initialise(): Already initialised, nothing to do!");
@@ -271,7 +244,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public void initialisePlant() {
-        initialise();
+       //
     }
 
     //
@@ -284,22 +257,15 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         String processingPlantVersion = getPropertyFile().getSubsystemInstant().getProcessingPlantVersion();
         getLogger().debug(".resolveProcessingPlant(): Getting ProcessingPlant->{}, version->{}", processingPlantName, processingPlantVersion);
         getLogger().trace(".resolveProcessingPlant(): Resolving list of available ProcessingPlants");
-        String rdnNameValue = componentNameUtilities.buildProcessingPlantName(processingPlantName, componentNameUtilities.getCurrentUUID());
-        List<SoftwareComponent> topologyNodes = topologyIM.nodeSearch(SoftwareComponentTypeEnum.PROCESSING_PLANT, rdnNameValue, processingPlantVersion);
-        if(getLogger().isTraceEnabled()){
-            if(topologyNodes == null){
-                getLogger().trace(".resolveProcessingPlant(): nodeSearch return a null list");
-            }
-            if(topologyNodes.isEmpty()){
-                getLogger().trace(".resolveProcessingPlant(): nodeSearch return an empty list");
-            }
-            if(topologyNodes.size() > 1){
-                getLogger().trace(".resolveProcessingPlant(): nodeSearch return a list containing more than 1 entry!");
-            }
+        List<SoftwareComponent> topologyNodes = topologyIM.nodeSearch(SoftwareComponentTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
+        if(topologyNodes == null){
+            throw new RuntimeException(".resolveProcessingPlant(): nodeSearch return a null list");
         }
-        getLogger().trace(".resolveProcessingPlant(): Matching to my Name/Version");
-        if(topologyNodes.isEmpty() || topologyNodes.size() > 1){
-            throw new RuntimeException("Unable to resolve ProcessingPlant");
+        if(topologyNodes.isEmpty()){
+            throw new RuntimeException(".resolveProcessingPlant(): nodeSearch return an empty list");
+        }
+        if(topologyNodes.size() > 1){
+            throw new RuntimeException(".resolveProcessingPlant(): nodeSearch return a list containing more than 1 entry!");
         }
         this.meAsASoftwareComponent = (ProcessingPlantSoftwareComponent) topologyNodes.get(0);
         getLogger().debug(".resolveProcessingPlant(): Exit, Resolved ProcessingPlant, processingPlant->{}", meAsASoftwareComponent);
@@ -320,12 +286,12 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     private String getFriendlyName(){
         getLogger().debug(".getFriendlyName(): Entry");
-        String nodeName = this.getMeAsASoftwareComponent().getComponentID().getDisplayName();
+        String nodeName = this.getTopologyNode().getComponentId().getDisplayName();
         return(nodeName);
     }
 
     @Override
-    public ProcessingPlantSoftwareComponent getMeAsASoftwareComponent() {
+    public ProcessingPlantSoftwareComponent getTopologyNode() {
         return (this.meAsASoftwareComponent);
     }
 
@@ -369,13 +335,13 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public NetworkSecurityZoneEnum getNetworkZone(){
-        NetworkSecurityZoneEnum securityZone = this.getMeAsASoftwareComponent().getSecurityZone();
+        NetworkSecurityZoneEnum securityZone = this.getTopologyNode().getSecurityZone();
         return(securityZone);
     }
 
     @Override
     public String getDeploymentSite() {
-        String siteName = getMeAsASoftwareComponent().getDeploymentSite();
+        String siteName = getTopologyNode().getDeploymentSite();
         return (siteName);
     }
 
@@ -454,32 +420,33 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     // Remote Subscription Functions
     //
 
-    protected PetasosParticipantRegistration subscribeToRemoteDataParcels(List<DataParcelTypeDescriptor> triggerEventList, String sourceSystem){
+    protected void subscribeToRemoteDataParcels(List<DataParcelTypeDescriptor> triggerEventList, String sourceSystem){
         getLogger().info(".subscribeToRemoteDataParcels(): Entry, sourceSystem->{}", sourceSystem);
         if(triggerEventList.isEmpty()){
-            return(null);
+            return;
         }
         getLogger().trace(".subscribeToRemoteDataParcels(): We have entries in the subscription list, processing");
-        Set<TaskWorkItemManifestType> manifestList = new HashSet<>();
         for(DataParcelTypeDescriptor currentTriggerEvent: triggerEventList){
             getLogger().info(".subscribeToRemoteDataParcels(): currentTriggerEvent->{}", currentTriggerEvent);
             DataParcelTypeDescriptor container = fhirElementTopicFactory.newTopicToken(ResourceType.Communication.name(), pegacornReferenceProperties.getPegacornDefaultFHIRVersion());
             getLogger().info(".subscribeToRemoteDataParcels(): container->{}", container);
-            TaskWorkItemManifestType manifest = new TaskWorkItemManifestType();
+            TaskWorkItemSubscriptionType manifest = new TaskWorkItemSubscriptionType();
             manifest.setContentDescriptor(currentTriggerEvent);
             manifest.setContainerDescriptor(container);
             manifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
             manifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_INBOUND_DATA_PARCEL);
             manifest.setInterSubsystemDistributable(true);
-            manifest.setSourceSystem(sourceSystem);
+            manifest.setExternalSourceSystem(sourceSystem);
             manifest.setSourceProcessingPlantParticipantName(sourceSystem);
-            manifestList.add(manifest);
+            getTopologyNode().getParticipant().getSubscriptions().add(manifest);
         }
-        getLogger().info(".subscribeToRemoteDataParcels(): Registration Processing Plant Petasos Participant ... :)");
-        PetasosParticipantRegistration participantRegistration = getLocalPetasosParticipantCacheIM().registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), manifestList);
-        getLogger().info(".subscribeToRemoteDataParcels(): Exit, participantRegistration->{}", participantRegistration);
-        return(participantRegistration);
+        getLogger().info(".subscribeToRemoteDataParcels(): Exit");
     }
 
-
+    protected PetasosParticipantRegistration registerParticipant(){
+        getLogger().info(".registerParticipant(): Entry");
+        PetasosParticipantRegistration participantRegistration = getParticipantRegistrationAdministrator().registerParticipant(getTopologyNode().getParticipant());
+        getLogger().info(".registerParticipant(): Exit, partipantRegistration->{}", participantRegistration);
+        return(participantRegistration);
+    }
 }

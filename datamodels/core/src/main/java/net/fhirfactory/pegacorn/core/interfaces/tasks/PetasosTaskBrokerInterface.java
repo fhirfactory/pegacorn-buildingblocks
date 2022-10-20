@@ -21,17 +21,29 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.tasks;
 
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTaskSet;
-
-import java.util.List;
-import java.util.Map;
+import net.fhirfactory.pegacorn.core.model.petasos.task.collections.PetasosActionableTaskSet;
+import net.fhirfactory.pegacorn.core.model.petasos.task.collections.PetasosTaskIdSet;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 
 public interface PetasosTaskBrokerInterface {
-    public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask);
-    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask);
-    public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask);
-    public PetasosActionableTaskSet retrievePendingActionableTasks(PetasosParticipantId participantId);
+
+    public PetasosTaskJobCard registerTask(PetasosActionableTask actionableTask, PetasosTaskJobCard jobCard);
+    public PetasosTaskJobCard registerTaskOutcome(PetasosActionableTask actionableTask, PetasosTaskJobCard jobCard);
+
+    public PetasosTaskJobCard registerTaskWaiting(PetasosTaskJobCard jobCard);
+    public PetasosTaskJobCard registerTaskStart(PetasosTaskJobCard jobCard);
+    public PetasosTaskJobCard registerTaskFailure(PetasosTaskJobCard jobCard);
+    public PetasosTaskJobCard registerTaskFinish(PetasosTaskJobCard jobCard);
+    public PetasosTaskJobCard registerTaskCancellation(PetasosTaskJobCard jobCard);
+    public PetasosTaskJobCard registerTaskFinalisation(PetasosTaskJobCard jobCard);
+
+    public PetasosActionableTaskSet getOffloadedPendingTasks(PetasosParticipantId participantId, Integer maxNumber);
+    public PetasosActionableTask getOffloadedPendingTask(PetasosParticipantId participantId, TaskIdType additionalPendingTaskId);
+    public Boolean hasOffloadedPendingTasks(PetasosParticipantId participantId);
+    public Integer offloadPendingTasks(PetasosParticipantId participantId, PetasosTaskIdSet tasksToBeOffloaded);
+    public PetasosTaskIdSet synchronisePendingTasks(PetasosParticipantId participantId, PetasosTaskIdSet localPendingTaskSet);
+
 }

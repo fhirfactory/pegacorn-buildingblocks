@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta;
 
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
 

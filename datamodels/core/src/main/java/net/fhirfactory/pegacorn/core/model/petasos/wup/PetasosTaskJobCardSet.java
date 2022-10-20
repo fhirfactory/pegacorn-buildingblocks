@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.petasos.wup;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 
@@ -55,17 +56,17 @@ public class PetasosTaskJobCardSet implements Serializable {
         if(card == null){
             return;
         }
-        if(!card.hasActionableTaskId() || !card.hasExecutingFulfillmentTaskId()){
+        if(!card.hasTaskId() ){
             return;
         }
         //
         // Now add
-        TaskIdType fulfillmentTaskIdentifier = card.getExecutingFulfillmentTaskId();
+        TaskIdType taskId = card.getTaskId();
         synchronized (getJobCardSetLock()){
-            if(jobCardSet.containsKey(fulfillmentTaskIdentifier)){
-                jobCardSet.remove(fulfillmentTaskIdentifier);
+            if(jobCardSet.containsKey(taskId)){
+                jobCardSet.remove(taskId);
             }
-            jobCardSet.put(fulfillmentTaskIdentifier, card);
+            jobCardSet.put(taskId, card);
         }
         //
         // All done!
@@ -78,15 +79,15 @@ public class PetasosTaskJobCardSet implements Serializable {
         if(card == null){
             return;
         }
-        if(!card.hasExecutingFulfillmentTaskId()){
+        if(!card.hasTaskId()){
             return;
         }
         //
         // Now remove
-        TaskIdType fulfillmentTaskIdentifier = card.getExecutingFulfillmentTaskId();
+        TaskIdType taskId = card.getTaskId();
         synchronized (getJobCardSetLock()){
-            if(jobCardSet.containsKey(fulfillmentTaskIdentifier)){
-                jobCardSet.remove(fulfillmentTaskIdentifier);
+            if(jobCardSet.containsKey(taskId)){
+                jobCardSet.remove(taskId);
             }
         }
         //

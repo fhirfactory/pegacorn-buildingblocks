@@ -44,7 +44,7 @@ public class EdgeWorkshop extends PetasosEnabledWorkshop {
 
     @Override
     protected String specifyWorkshopVersion() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getVersion());
+        return (getProcessingPlant().getTopologyNode().getVersion());
     }
 
     @Override

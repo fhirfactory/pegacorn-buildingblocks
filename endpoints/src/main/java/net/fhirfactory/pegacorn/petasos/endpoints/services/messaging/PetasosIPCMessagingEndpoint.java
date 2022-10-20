@@ -21,11 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.messaging;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.enterprise.context.ApplicationScoped;
-
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
+import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -36,15 +40,9 @@ import org.jgroups.blocks.ResponseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
+import javax.enterprise.context.ApplicationScoped;
+import java.util.ArrayList;
+import java.util.List;
 
 @ApplicationScoped
 public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
@@ -99,11 +97,6 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
     }
 
     @Override
-    protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getPetasosIPCStackConfigFile());
-    }
-
-    @Override
     protected String specifyJGroupsClusterName() {
         return (getComponentNameUtilities().getPetasosIpcMessagingGroupName());
     }
@@ -111,11 +104,6 @@ public class PetasosIPCMessagingEndpoint extends JGroupsIntegrationPointBase {
     @Override
     protected void addIntegrationPointToJGroupsIntegrationPointSet() {
         getJgroupsIPSet().setPetasosMessagingServicesEndpoint(getJGroupsIntegrationPoint());
-    }
-
-    @Override
-    protected String specifySubsystemParticipantName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
     }
 
     @Override

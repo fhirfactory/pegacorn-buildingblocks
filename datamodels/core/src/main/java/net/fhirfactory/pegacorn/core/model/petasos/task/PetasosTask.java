@@ -23,23 +23,18 @@ package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.datagrid.datatypes.DatagridElementSourceResourceIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskSequenceNumber;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskExecutionControl;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
-import net.fhirfactory.pegacorn.internals.SerializableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +73,7 @@ public class PetasosTask implements Serializable {
 
     private Set<TaskIdType> aggregateTaskMembership;
 
-    private PetasosTaskExecutionStatusEnum executionStatus;
+    private TaskExecutionControl executionControl;
 
     private boolean registered;
 
@@ -102,7 +97,7 @@ public class PetasosTask implements Serializable {
         this.taskReason = null;
         this.taskNodeAffinity = null;
         this.taskContext = null;
-        this.executionStatus = null;
+        this.executionControl = new TaskExecutionControl();
     }
 
     //
@@ -110,17 +105,17 @@ public class PetasosTask implements Serializable {
     //
 
     @JsonIgnore
-    public boolean hasExecutionStatus(){
-        boolean hasValue = this.executionStatus != null;
+    public boolean hasExecutionControl(){
+        boolean hasValue = this.executionControl != null;
         return(hasValue);
     }
 
-    public PetasosTaskExecutionStatusEnum getExecutionStatus() {
-        return executionStatus;
+    public TaskExecutionControl getExecutionControl() {
+        return executionControl;
     }
 
-    public void setExecutionStatus(PetasosTaskExecutionStatusEnum executionStatus) {
-        this.executionStatus = executionStatus;
+    public void setExecutionControl(TaskExecutionControl executionControl) {
+        this.executionControl = executionControl;
     }
 
     @JsonIgnore
@@ -328,7 +323,7 @@ public class PetasosTask implements Serializable {
                 && Objects.equals(getTaskReason(), that.getTaskReason())
                 && Objects.equals(getTaskNodeAffinity(), that.getTaskNodeAffinity())
                 && Objects.equals(getAggregateTaskMembership(), that.getAggregateTaskMembership())
-                && Objects.equals(getExecutionStatus(), that.getExecutionStatus());
+                && Objects.equals(getExecutionControl(), that.getExecutionControl());
         return(theyAreEqual);
     }
 
@@ -347,7 +342,7 @@ public class PetasosTask implements Serializable {
                 getTaskReason(),
                 getTaskNodeAffinity(),
                 getAggregateTaskMembership(),
-                getExecutionStatus(),
+                getExecutionControl(),
                 isRegistered());
     }
 
@@ -359,8 +354,7 @@ public class PetasosTask implements Serializable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PetasosTask{");
-        sb.append("sequenceNumber=").append(sequenceNumber);
-        sb.append(", creationInstant=").append(creationInstant);
+        sb.append("creationInstant=").append(creationInstant);
         sb.append(", updateInstant=").append(updateInstant);
         sb.append(", sourceResourceId=").append(sourceResourceId);
         sb.append(", taskContext=").append(taskContext);
@@ -373,8 +367,9 @@ public class PetasosTask implements Serializable {
         sb.append(", taskReason=").append(taskReason);
         sb.append(", taskNodeAffinity=").append(taskNodeAffinity);
         sb.append(", aggregateTaskMembership=").append(aggregateTaskMembership);
-        sb.append(", executionStatus=").append(executionStatus);
+        sb.append(", executionStatus=").append(executionControl);
         sb.append(", registered=").append(registered);
+        sb.append(", executionControl=").append(executionControl);
         sb.append('}');
         return sb.toString();
     }
@@ -393,10 +388,6 @@ public class PetasosTask implements Serializable {
         LOG.debug(".updatePetasosTask(): Entry, petasosTask->{}", update);
         if(update == null){
             return(this);
-        }
-        // sequenceNumber
-        if(update.hasSequenceNumber()){
-            this.setSequenceNumber(update.sequenceNumber);
         }
         // sourceResourceId
         if(update.hasSourceResourceId()){
@@ -536,6 +527,9 @@ public class PetasosTask implements Serializable {
                 this.getAggregateTaskMembership().clear();
                 this.getAggregateTaskMembership().addAll(update.getAggregateTaskMembership());
             }
+        }
+        if(update.hasExecutionControl()){
+            this.setExecutionControl(update.getExecutionControl());
         }
         // registered
         this.setRegistered(update.isRegistered());

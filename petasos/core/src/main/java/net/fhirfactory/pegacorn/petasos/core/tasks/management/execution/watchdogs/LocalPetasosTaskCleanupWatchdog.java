@@ -21,15 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.watchdogs;
 
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalFulfillmentTaskCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cache.shared.ParticipantSharedTaskJobCardCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.watchdogs.common.WatchdogBase;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.registries.LocalFulfillmentTaskRegistry;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,16 +58,16 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
     private boolean initialised;
 
     @Inject
-    private LocalActionableTaskCache actionableTaskDM;
+    private LocalActionableTaskCache actionableTaskRegistry;
 
     @Inject
-    private ParticipantSharedTaskJobCardCache taskJobCardDM;
+    private LocalTaskJobCardCache taskJobCardDM;
 
     @Inject
     private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgentAccessor;
 
     @Inject
-    private LocalFulfillmentTaskCache fulfillmentTaskCache;
+    private LocalFulfillmentTaskRegistry fulfillmentTaskCache;
 
     //
     // Constructor(s)
@@ -153,58 +153,56 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
 
     protected void actionableTaskCleanup(){
         getLogger().debug(".actionableTaskCleanup(): Entry");
-        Set<TaskIdType> allTaskIds = getActionableTaskDM().getAllTaskIds();
+        Set<TaskIdType> allTaskIds = getActionableTaskRegistry().getAllTaskIds();
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("ActionableTaskCacheSharedCache", allTaskIds.size());
         for(TaskIdType currentTaskId: allTaskIds){
             if(getLogger().isDebugEnabled()){
                 getLogger().debug(".actionableTaskCleanup(): Checking task {}", currentTaskId);
             }
             boolean unregisterTask = false;
-            synchronized (actionableTaskDM.getTaskLock(currentTaskId)){
-                PetasosActionableTask currentActionableTask = getActionableTaskDM().getTask(currentTaskId);
-                if(currentActionableTask.hasTaskCompletionSummary()){
-                    if (currentActionableTask.getTaskCompletionSummary().isFinalised()) {
-                        unregisterTask = true;
-                    }
+            PetasosActionableTask currentActionableTask = getActionableTaskRegistry().getTask(currentTaskId);
+            if(currentActionableTask.hasTaskCompletionSummary()){
+                if (currentActionableTask.getTaskCompletionSummary().isFinalised()) {
+                    unregisterTask = true;
                 }
-                if(!unregisterTask) {
-                    if (currentActionableTask.hasTaskFulfillment()) {
-                        if (currentActionableTask.getTaskFulfillment().hasStatus()) {
-                            switch (currentActionableTask.getTaskFulfillment().getStatus()) {
-                                case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
-                                case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
-                                case FULFILLMENT_EXECUTION_STATUS_INITIATED:
-                                case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
-                                case FULFILLMENT_EXECUTION_STATUS_ACTIVE_ELSEWHERE:
+            }
+            if(!unregisterTask) {
+                if (currentActionableTask.hasTaskFulfillment()) {
+                    if (currentActionableTask.getTaskFulfillment().hasStatus()) {
+                        switch (currentActionableTask.getTaskFulfillment().getStatus()) {
+                            case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
+                            case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
+                            case FULFILLMENT_EXECUTION_STATUS_INITIATED:
+                            case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
+                            case FULFILLMENT_EXECUTION_STATUS_ACTIVE_ELSEWHERE:
 
-                                    break;
-                                case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
-                                case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
-                                case FULFILLMENT_EXECUTION_STATUS_FINISHED:
-                                case FULFILLMENT_EXECUTION_STATUS_FAILED:
-                                case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
-                                    Long age = Instant.now().getEpochSecond() - currentActionableTask.getCreationInstant().getEpochSecond();
-                                    if (age > MINIMUM_TASK_AGE_FOR_RETIREMENT) {
-                                        unregisterTask = true;
-                                    }
-                                    break;
-                                case FULFILLMENT_EXECUTION_STATUS_FINALISED:
-                                case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
+                                break;
+                            case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
+                            case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
+                            case FULFILLMENT_EXECUTION_STATUS_FINISHED:
+                            case FULFILLMENT_EXECUTION_STATUS_FAILED:
+                            case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
+                                Long age = Instant.now().getEpochSecond() - currentActionableTask.getCreationInstant().getEpochSecond();
+                                if (age > MINIMUM_TASK_AGE_FOR_RETIREMENT) {
                                     unregisterTask = true;
-                                    break;
-                            }
+                                }
+                                break;
+                            case FULFILLMENT_EXECUTION_STATUS_FINALISED:
+                            case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
+                                unregisterTask = true;
+                                break;
                         }
                     }
                 }
             }
             if(unregisterTask){
                 getLogger().debug(".actionableTaskCleanup(): Task {} is finalised, removing from shared cache... start", currentTaskId);
-                PetasosActionableTask unregisteredActionableTask = actionableTaskDM.removeTask(currentTaskId);
+                PetasosActionableTask unregisteredActionableTask = actionableTaskRegistry.removeTaskFromDirectory(currentTaskId);
                 getLogger().debug(".actionableTaskCleanup(): Task {} is finalised, removing from shared cache... done...");
             }
         }
         // Some metrics for the ActionableTaskCache
-        Integer taskCacheSize = getActionableTaskDM().getCacheSize();
+        Integer taskCacheSize = getActionableTaskRegistry().getCacheSize();
         getLogger().debug(".actionableTaskCleanup(): ActionableTaskCacheSize->{}", taskCacheSize);
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("SharedActionableTaskCache", taskCacheSize);
         processingPlantMetricsAgentAccessor.getMetricsAgent().touchWatchDogActivityIndicator("ActionableTaskWatchDog");
@@ -226,7 +224,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
             }
             PetasosTaskJobCard jobCard = getTaskJobCardDM().getJobCard(currentTaskId);
             if(jobCard != null){
-                Long age = nowInSeconds - jobCard.getCreationInstant().getEpochSecond();
+                Long age = nowInSeconds - jobCard.getUpdateInstant().getEpochSecond();
                 if(age > MINIMUM_TASK_AGE_FOR_RETIREMENT){
                     taskJobCardDM.removeJobCard(jobCard);
                     size -= 1;
@@ -327,11 +325,11 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
         this.initialised = initialised;
     }
 
-    public LocalActionableTaskCache getActionableTaskDM() {
-        return actionableTaskDM;
+    public LocalActionableTaskCache getActionableTaskRegistry() {
+        return actionableTaskRegistry;
     }
 
-    public ParticipantSharedTaskJobCardCache getTaskJobCardDM() {
+    public LocalTaskJobCardCache getTaskJobCardDM() {
         return taskJobCardDM;
     }
 

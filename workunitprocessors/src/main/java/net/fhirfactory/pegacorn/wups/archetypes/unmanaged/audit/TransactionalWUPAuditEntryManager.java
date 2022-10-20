@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.resilience.activitymatrix.sta
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;

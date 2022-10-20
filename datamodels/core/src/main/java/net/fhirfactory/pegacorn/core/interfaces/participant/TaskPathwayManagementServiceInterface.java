@@ -21,15 +21,13 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.participant;
 
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 
 import java.util.Set;
 
 public interface TaskPathwayManagementServiceInterface {
 
     // Producer (Subscription) Maps
-    public Set<PetasosParticipant> getDownstreamTaskPerformersForTaskProducer(String producerServiceName);
+    public Set<PetasosParticipantRegistration> getDownstreamSubscribers(String participantName);
 
 }

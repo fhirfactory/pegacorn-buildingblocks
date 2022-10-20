@@ -26,7 +26,6 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.participants.administration.LocalParticipantAdministrator;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PetasosIPCMessagingEndpoint;
 import net.fhirfactory.pegacorn.platform.edge.general.beans.PetasosEdgeDoNothingBean;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
@@ -53,9 +52,6 @@ public class JGroupsServiceManagementWUP extends MOAStandardWUP implements Petas
 
     @Inject
     private PetasosEdgeDoNothingBean doNothingBean;
-
-    @Inject
-    LocalParticipantAdministrator localParticipantAdministrator;
 
     @Override
     protected WorkshopInterface specifyWorkshop() {
@@ -123,9 +119,9 @@ public class JGroupsServiceManagementWUP extends MOAStandardWUP implements Petas
 
     @Override
     public void registerEndpoint(PetasosEndpointFunctionTypeEnum functionType, PetasosEndpoint endpoint) {
-        if(getMeAsATopologyComponent().getServiceEndpoints().containsKey(functionType)){
-            getMeAsATopologyComponent().getServiceEndpoints().remove(functionType);
+        if(getTopologyNode().getServiceEndpoints().containsKey(functionType)){
+            getTopologyNode().getServiceEndpoints().remove(functionType);
         }
-        getMeAsATopologyComponent().getServiceEndpoints().put(functionType, endpoint);
+        getTopologyNode().getServiceEndpoints().put(functionType, endpoint);
     }
 }

@@ -29,7 +29,9 @@ import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponent
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.*;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
@@ -49,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class SoftwareComponent implements Serializable {
     abstract protected Logger getLogger();
     private ComponentIdType componentID;
-    private PetasosParticipantId participantId;
+    private PetasosParticipant participant;
     private Set<Capability> capabilities;
     private String version;
     private SoftwareComponentTypeEnum componentType;
@@ -84,7 +86,7 @@ public abstract class SoftwareComponent implements Serializable {
         this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
         this.componentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
         this.componentExecutionStatus = SoftwareComponentExecutionControlEnum.SOFTWARE_COMPONENT_PAUSE_EXECUTION;
-        this.participantId = new PetasosParticipantId();
+        this.participant = new PetasosParticipant();
         this.lastActivityInstant = Instant.now();
         this.lastReportingInstant = null;
         this.capabilities = new HashSet<>();
@@ -96,7 +98,6 @@ public abstract class SoftwareComponent implements Serializable {
         this.concurrencyMode = null;
         this.resilienceMode = null;
         this.componentID = null;
-        this.participantId = new PetasosParticipantId();
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
         this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
@@ -111,6 +112,12 @@ public abstract class SoftwareComponent implements Serializable {
         setResilienceMode(ori.getResilienceMode());
         setConcurrencyMode(ori.getConcurrencyMode());
         setComponentType(ori.getComponentType());
+        if(ori.hasDeploymentSite()){
+            setDeploymentSite(ori.getDeploymentSite());
+        }
+        if(ori.hasComponentID()){
+            setComponentID(SerializationUtils.clone(ori.getComponentId()));
+        }
         if(ori.getOtherConfigurationParameters() != null){
             if(!ori.getOtherConfigurationParameters().isEmpty()){
                 Enumeration<String> keys = ori.getOtherConfigurationParameters().keys();
@@ -121,24 +128,20 @@ public abstract class SoftwareComponent implements Serializable {
             }
         }
         if(ori.getMetrics() != null){
-            setMetrics(ori.getMetrics());
+            setMetrics(SerializationUtils.clone(ori.getMetrics()));
         }
         setSecurityZone(ori.getSecurityZone());
         setComponentType(ori.getComponentType());
-        if(ori.hasSubsystemParticipantName()){
-            setSubsystemParticipantName(ori.getSubsystemParticipantName());
+        if(ori.hasParticipant()){
+            setParticipant(SerializationUtils.clone(ori.getParticipant()));
+        } else {
+            setParticipant(new PetasosParticipant());
         }
         if(ori.hasLastActivityInstant()){
             setLastActivityInstant(ori.getLastActivityInstant());
         }
         if(ori.hasLastReportingInstant()){
             setLastReportingInstant(ori.getLastReportingInstant());
-        }
-        if(ori.hasParticipantName()){
-            setParticipantName(ori.getParticipantName());
-        }
-        if(ori.hasParticipantDisplayName()){
-            setParticipantDisplayName(ori.getParticipantDisplayName());
         }
         if(!ori.getCapabilities().isEmpty()){
             for(Capability currentCapability: ori.getCapabilities()){
@@ -194,40 +197,28 @@ public abstract class SoftwareComponent implements Serializable {
         this.capabilities = capabilities;
     }
 
-    public PetasosParticipantId getParticipantId() {
-        return participantId;
-    }
-
-    public void setParticipantId(PetasosParticipantId participantId) {
-        this.participantId = participantId;
-    }
-
     @JsonIgnore
-    public boolean hasParticipantDisplayName(){
-        boolean hasValue = getParticipantId().getDisplayName() != null;
+    public boolean hasParticipant(){
+        boolean hasValue = this.participant != null;
         return(hasValue);
     }
 
-    public String getParticipantDisplayName() {
-        return getParticipantId().getDisplayName();
+    public PetasosParticipant getParticipant() {
+        return participant;
     }
 
-    public void setParticipantDisplayName(String participantDisplayName) {
-        getParticipantId().setDisplayName(participantDisplayName);
+    public void setParticipant(PetasosParticipant participant) {
+        this.participant = participant;
     }
 
     @JsonIgnore
-    public boolean hasParticipantName(){
-        boolean hasValue = getParticipantId().getName() != null;
-        return(hasValue);
+    public PetasosParticipantId getParticipantId(){
+        return(getParticipant().getParticipantId());
     }
 
-    public String getParticipantName() {
-        return  getParticipantId().getName();
-    }
-
-    public void setParticipantName(String participantName) {
-        getParticipantId().setName(participantName);
+    @JsonIgnore
+    public boolean hasParticipantId(){
+        return(getParticipant().hasParticipantId());
     }
 
     @JsonIgnore
@@ -269,20 +260,6 @@ public abstract class SoftwareComponent implements Serializable {
 
     public void setLastReportingInstant(Instant lastReportingInstant) {
         this.lastReportingInstant = lastReportingInstant;
-    }
-
-    @JsonIgnore
-    public boolean hasSubsystemParticipantName(){
-        boolean hasValue = getParticipantId().getSubsystemName() != null;
-        return(hasValue);
-    }
-
-    public String getSubsystemParticipantName() {
-        return getParticipantId().getSubsystemName();
-    }
-
-    public void setSubsystemParticipantName(String subsystemParticipantName) {
-        getParticipantId().setSubsystemName(subsystemParticipantName);
     }
 
     @JsonIgnore
@@ -365,7 +342,7 @@ public abstract class SoftwareComponent implements Serializable {
         return(hasValue);
     }
 
-    public ComponentIdType getComponentID() {
+    public ComponentIdType getComponentId() {
         return componentID;
     }
 
@@ -413,6 +390,28 @@ public abstract class SoftwareComponent implements Serializable {
         this.componentExecutionStatus = componentExecutionStatus;
     }
 
+    @JsonIgnore
+    public PetasosParticipantRegistration getParticipantRegistrationContent(){
+        if(hasParticipant()){
+            PetasosParticipantRegistration petasosParticipantRegistration = getParticipant().toRegistration();
+            petasosParticipantRegistration.setLocalComponentId(getComponentId());
+            petasosParticipantRegistration.setLocalComponentStatus(getComponentStatus());
+            petasosParticipantRegistration.setComponentType(getComponentType());
+            return(petasosParticipantRegistration);
+        }
+        return(null);
+    }
+
+    @JsonIgnore
+    public void setParticipantRegistrationContent(PetasosParticipantRegistration participantRegistration){
+        if(participantRegistration != null){
+            if(!hasParticipant()){
+                setParticipant(new PetasosParticipant());
+            }
+            getParticipant().updateFromRegistration(participantRegistration);
+        }
+    }
+
     //
     // To String
     //
@@ -431,7 +430,7 @@ public abstract class SoftwareComponent implements Serializable {
         sb.append(", componentSystemRole=").append(componentSystemRole);
         sb.append(", componentStatus=").append(componentStatus);
         sb.append(", componentExecutionControl=").append(componentExecutionStatus);
-        sb.append(", participantId=").append(participantId);
+        sb.append(", participantId=").append(participant);
         sb.append(", capabilities=").append(capabilities);
         sb.append(", lastActivityInstant=").append(lastActivityInstant);
         sb.append(", lastReportingInstant=").append(lastReportingInstant);
@@ -451,11 +450,12 @@ public abstract class SoftwareComponent implements Serializable {
         if (this == o) return true;
         if (!(o instanceof SoftwareComponent)) return false;
         SoftwareComponent that = (SoftwareComponent) o;
-        return Objects.equals(getComponentID(), that.getComponentID()) && getComponentType() == that.getComponentType() && getConcurrencyMode() == that.getConcurrencyMode() && getResilienceMode() == that.getResilienceMode() && getSecurityZone() == that.getSecurityZone() && Objects.equals(getDeploymentSite(), that.getDeploymentSite()) && Objects.equals(getOtherConfigurationParameters(), that.getOtherConfigurationParameters()) && Objects.equals(getMetrics(), that.getMetrics()) && getComponentSystemRole() == that.getComponentSystemRole() && getComponentStatus() == that.getComponentStatus() && getComponentExecutionStatus() == that.getComponentExecutionStatus() && Objects.equals(getParticipantId(), that.getParticipantId()) && Objects.equals(getLastActivityInstant(), that.getLastActivityInstant()) && Objects.equals(getLastReportingInstant(), that.getLastReportingInstant());
+        return Objects.equals(getComponentId(), that.getComponentId()) && getComponentType() == that.getComponentType() && getConcurrencyMode() == that.getConcurrencyMode() && getResilienceMode() == that.getResilienceMode() && getSecurityZone() == that.getSecurityZone() && Objects.equals(getDeploymentSite(), that.getDeploymentSite()) && Objects.equals(getOtherConfigurationParameters(), that.getOtherConfigurationParameters()) && Objects.equals(getMetrics(), that.getMetrics()) && getComponentSystemRole() == that.getComponentSystemRole() && getComponentStatus() == that.getComponentStatus() && getComponentExecutionStatus() == that.getComponentExecutionStatus() && Objects.equals(getParticipant(), that.getParticipant()) && Objects.equals(getLastActivityInstant(), that.getLastActivityInstant()) && Objects.equals(getLastReportingInstant(), that.getLastReportingInstant());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getComponentID(), getComponentType(), getConcurrencyMode(), getResilienceMode(), getSecurityZone(), getDeploymentSite(), getOtherConfigurationParameters(), getMetrics(), getComponentSystemRole(), getComponentStatus(), getComponentExecutionStatus(), getParticipantId(), getLastActivityInstant(), getLastReportingInstant());
+        return Objects.hash(getComponentId(), getComponentType(), getConcurrencyMode(), getResilienceMode(), getSecurityZone(), getDeploymentSite(), getOtherConfigurationParameters(), getMetrics(), getComponentSystemRole(), getComponentStatus(), getComponentExecutionStatus(), getParticipant(), getLastActivityInstant(), getLastReportingInstant());
     }
+
 }

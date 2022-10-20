@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.watchdo
 
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cache.shared.ParticipantSharedTaskJobCardCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -43,7 +43,7 @@ public class GlobalPetasosTaskRecoveryWatchdog {
     private LocalActionableTaskCache actionableTaskDM;
 
     @Inject
-    private ParticipantSharedTaskJobCardCache taskJobCardDM;
+    private LocalTaskJobCardCache taskJobCardDM;
 
     //
     // Constructor(s)
@@ -104,7 +104,7 @@ public class GlobalPetasosTaskRecoveryWatchdog {
         return actionableTaskDM;
     }
 
-    protected ParticipantSharedTaskJobCardCache getTaskJobCardDM() {
+    protected LocalTaskJobCardCache getTaskJobCardDM() {
         return taskJobCardDM;
     }
 }

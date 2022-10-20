@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.fhirim.workshops.datagrid.cache.common;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import org.infinispan.commons.marshall.JavaSerializationMarshaller;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -78,7 +79,16 @@ public abstract class BaseResourceReplicatedCacheServices {
             getLogger().info(".initialise(): [Retrieve JGroups Configuration File Name] End");
 
             getLogger().info(".initialise(): [Initialising Infinispan Cache Manager] Start");
-            GlobalConfiguration globalConfig = new GlobalConfigurationBuilder().transport()
+            GlobalConfigurationBuilder globalConfigurationBuilder = new GlobalConfigurationBuilder();
+            globalConfigurationBuilder
+                    .serialization()
+                    .marshaller(new JavaSerializationMarshaller())
+                    .allowList()
+                    .addRegexps(
+                            "net.fhirfactory.pegacorn.core.model.",
+                            "net.fhirfactory.pegacorn.services.tasks.",
+                            "java.util.");
+            GlobalConfiguration globalConfig = globalConfigurationBuilder.transport()
                     .defaultTransport()
                     .clusterName(specifyInfinispanClusterName())
                     //Uses a custom JGroups stack for cluster transport.

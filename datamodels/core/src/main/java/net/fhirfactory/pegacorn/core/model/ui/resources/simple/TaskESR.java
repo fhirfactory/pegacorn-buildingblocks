@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.core.model.ui.resources.simple;
 
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PeriodESDT;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PatientIdentifierESDT;
 
@@ -18,7 +18,7 @@ public class TaskESR {
     private String taskInput;
     private List<String> taskOutput;
     private PeriodESDT taskPeriod;
-    private ActionableTaskOutcomeStatusEnum taskStatus;
+    private TaskOutcomeStatusEnum taskStatus;
     private String taskStatusReason;
     private String taskTriggerType;
     private String taskTriggerId;
@@ -120,11 +120,11 @@ public class TaskESR {
         this.taskPeriod = taskPeriod;
     }
 
-    public ActionableTaskOutcomeStatusEnum getTaskStatus() {
+    public TaskOutcomeStatusEnum getTaskStatus() {
         return taskStatus;
     }
 
-    public void setTaskStatus(ActionableTaskOutcomeStatusEnum taskStatus) {
+    public void setTaskStatus(TaskOutcomeStatusEnum taskStatus) {
         this.taskStatus = taskStatus;
     }
 

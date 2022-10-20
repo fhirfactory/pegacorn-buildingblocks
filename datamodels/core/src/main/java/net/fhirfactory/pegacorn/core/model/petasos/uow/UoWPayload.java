@@ -69,6 +69,11 @@ public class UoWPayload implements Serializable {
         this.payload = (String) SerializationUtils.clone(payload);
     }
 
+    public boolean hasPayloadManifest(){
+        boolean hasValue = this.payloadManifest != null;
+        return(hasValue);
+    }
+
     public DataParcelManifest getPayloadManifest() {
         getLogger().debug(".getPayloadTopicID(): Entry");
         getLogger().debug(".getPayloadTopicID(): Exit, returning Payload (String) --> {}", this.payloadManifest);
@@ -84,7 +89,7 @@ public class UoWPayload implements Serializable {
         if(payloadManifest == null){
             return(false);
         }
-        return(true);
+        return(payloadManifest.hasDataParcelQualityStatement());
     }
 
     @JsonIgnore
@@ -99,13 +104,17 @@ public class UoWPayload implements Serializable {
         }
     }
 
+    //
+    // toString
+    //
+
     @Override
     public String toString() {
-        return "UoWPayload{" +
-                "payloadManifest=" + payloadManifest +
-                ", payload=" + payload +
-                ", payloadQuality=" + getPayloadQuality() +
-                '}';
+        final StringBuilder sb = new StringBuilder("UoWPayload{");
+        sb.append("payloadManifest=").append(payloadManifest);
+        sb.append(", payload='").append(payload).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override

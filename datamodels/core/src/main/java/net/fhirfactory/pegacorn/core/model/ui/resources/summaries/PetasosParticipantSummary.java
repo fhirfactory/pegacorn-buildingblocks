@@ -22,14 +22,18 @@
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantControlStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantFulfillment;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 
 public class PetasosParticipantSummary extends ResourceSummaryBase {
     private PetasosParticipantId participantId;
     private PetasosParticipantFulfillment fulfillmentState;
     private PetasosMonitoredComponentTypeEnum nodeType;
+    private PetasosParticipantStatusEnum status;
+    private PetasosParticipantControlStatusEnum controlStatus;
 
     //
     // Constructor(s)
@@ -39,12 +43,30 @@ public class PetasosParticipantSummary extends ResourceSummaryBase {
         this.participantId = new PetasosParticipantId();
         this.fulfillmentState = null;
         this.nodeType = null;
+        this.status = PetasosParticipantStatusEnum.PARTICIPANT_IS_IDLE;
+        this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
     }
 
     //
     // Getters and Setters
     //
 
+
+    public PetasosParticipantControlStatusEnum getControlStatus() {
+        return controlStatus;
+    }
+
+    public void setControlStatus(PetasosParticipantControlStatusEnum controlStatus) {
+        this.controlStatus = controlStatus;
+    }
+
+    public PetasosParticipantStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(PetasosParticipantStatusEnum status) {
+        this.status = status;
+    }
 
     public PetasosParticipantId getParticipantId() {
         return participantId;
@@ -95,6 +117,8 @@ public class PetasosParticipantSummary extends ResourceSummaryBase {
         final StringBuilder sb = new StringBuilder("PetasosParticipantSummary{");
         sb.append("participantId=").append(participantId);
         sb.append(", fulfillmentState=").append(fulfillmentState);
+        sb.append(", status=").append(status);
+        sb.append(", controlStatus=").append(controlStatus);
         sb.append(", nodeType=").append(nodeType);
         sb.append(", lastSynchronisationInstant=").append(getLastSynchronisationInstant());
         sb.append(", lastActivityInstant=").append(getLastActivityInstant());

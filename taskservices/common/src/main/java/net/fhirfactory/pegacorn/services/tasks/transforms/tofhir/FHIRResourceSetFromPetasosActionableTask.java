@@ -23,10 +23,9 @@ package net.fhirfactory.pegacorn.services.tasks.transforms.tofhir;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
-import net.fhirfactory.pegacorn.services.tasks.metadata.fromhl7v2x.FHIRTaskMetadataResourceSetFromHL7v2x;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Provenance;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +47,6 @@ public class FHIRResourceSetFromPetasosActionableTask {
     @Inject
     private ProcessingPlantInterface processingPlant;
 
-    @Inject
-    private FHIRTaskMetadataResourceSetFromHL7v2x metadataResourceSetFromHL7v2x;
-
 
     public List<Resource> transformTask(PetasosActionableTask actionableTask){
         getLogger().debug(".newTask(): Entry, actionableTask->{}", actionableTask);
@@ -62,63 +58,8 @@ public class FHIRResourceSetFromPetasosActionableTask {
         resourceList.add(fhirTask);
         //
         // Now the FHIR::Provenance
-        Provenance fhirProvenance = provenanceFromPetasosTaskJourney.newProvenanceFromTaskJourney(processingPlant.getMeAsASoftwareComponent().getComponentID(), fhirTask.getIdentifierFirstRep(), actionableTask.getTaskTraceability());
+        Provenance fhirProvenance = provenanceFromPetasosTaskJourney.newProvenanceFromTaskJourney(processingPlant.getTopologyNode().getComponentId(), fhirTask.getIdentifierFirstRep(), actionableTask.getTaskTraceability());
         resourceList.add(fhirProvenance);
-        //
-        // Now check to see if we need to build metadata set
-        boolean hasBeneficiary = false;
-        boolean hasEncounter = false;
-        boolean hasCompleteTaskTrigger = false;
-        TaskContextType taskContext = new TaskContextType();
-        if(actionableTask.hasTaskContext()){
-            if(actionableTask.getTaskContext().hasTaskBeneficiary()){
-                hasBeneficiary = true;
-                taskContext.setTaskBeneficiary(actionableTask.getTaskContext().getTaskBeneficiary());
-            }
-            if(actionableTask.getTaskContext().hasTaskEncounter()){
-                hasEncounter = true;
-                taskContext.setTaskEncounter(actionableTask.getTaskContext().getTaskEncounter());
-            }
-            if(actionableTask.getTaskContext().hasTaskTriggerSummary()){
-                taskContext.setTaskTriggerSummary(actionableTask.getTaskContext().getTaskTriggerSummary());
-                boolean hasSummaryType = actionableTask.getTaskContext().getTaskTriggerSummary().hasTriggerSummaryType();
-                boolean hasTriggerName = actionableTask.getTaskContext().getTaskTriggerSummary().hasTriggerName();
-                if(hasSummaryType && hasTriggerName){
-                    hasCompleteTaskTrigger = true;
-                }
-            }
-        }
-        if(!hasBeneficiary || !hasEncounter || !hasCompleteTaskTrigger){
-            if(actionableTask.hasTaskWorkItem()) {
-                TaskWorkItemType taskWorkItem = actionableTask.getTaskWorkItem();
-                if(metadataResourceSetFromHL7v2x.containsHL7v2xMessage(taskWorkItem)) {
-                    TaskContextType updatedTaskContext = metadataResourceSetFromHL7v2x.newTaskContextType(actionableTask);
-                    actionableTask.setTaskContext(updatedTaskContext);
-                    String hl7Message = metadataResourceSetFromHL7v2x.extractHL7Message(taskWorkItem);
-                    List<Resource> metadataResourceList = metadataResourceSetFromHL7v2x.extractResourcesForTaskMetadata(hl7Message);
-                    if(!hasBeneficiary){
-                        Patient patientFromMetadataResourceList = metadataResourceSetFromHL7v2x.getPatientFromMetadataResourceList(metadataResourceList);
-                        if(patientFromMetadataResourceList != null) {
-                            Reference patientReference = new Reference();
-                            patientReference.setIdentifier(patientFromMetadataResourceList.getIdentifierFirstRep());
-                            patientReference.setType(ResourceType.Patient.name());
-                            fhirTask.setFor(patientReference);
-                            resourceList.add(patientFromMetadataResourceList);
-                        }
-                    }
-                    if(!hasEncounter){
-                        Encounter encounterFromMetadataResourceList = metadataResourceSetFromHL7v2x.getEncounterFromMetadataResourceList(metadataResourceList);
-                        if(encounterFromMetadataResourceList != null) {
-                            Reference encounterReference = new Reference();
-                            encounterReference.setIdentifier(encounterFromMetadataResourceList.getIdentifierFirstRep());
-                            encounterReference.setType(ResourceType.Encounter.name());
-                            fhirTask.setEncounter(encounterReference);
-                            resourceList.add(encounterFromMetadataResourceList);
-                        }
-                    }
-                }
-            }
-        }
         //
         // And done...
         getLogger().debug(".newTask(): Exit, resourceList->{}", resourceList);

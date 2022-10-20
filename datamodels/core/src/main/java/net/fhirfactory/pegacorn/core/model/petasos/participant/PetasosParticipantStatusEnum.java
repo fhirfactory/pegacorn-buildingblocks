@@ -23,8 +23,8 @@ package net.fhirfactory.pegacorn.core.model.petasos.participant;
 
 public enum PetasosParticipantStatusEnum {
     PARTICIPANT_IS_ACTIVE,
+    PARTICIPANT_IS_IDLE,
     PARTICIPANT_IS_NOT_READY,
     PARTICIPANT_IS_STOPPING,
-    PARTICIPANT_IS_SUSPENDED,
     PARTICIPANT_HAS_FAILED
 }

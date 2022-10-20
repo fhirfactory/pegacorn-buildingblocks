@@ -56,7 +56,7 @@ public class PetasosProcessingPlantSummaryFactory extends PetasosMonitoredCompon
         processingPlant.setSecurityZone(topologyNode.getSecurityZone().getToken());
         processingPlant.setActualHostIP(topologyNode.getActualHostIP());
         processingPlant.setActualPodIP(topologyNode.getActualPodIP());
-        processingPlant.setParticipantId(topologyNode.getParticipantId());
+        processingPlant.setParticipantId(topologyNode.getParticipant().getParticipantId());
         processingPlant.setReplicationCount(topologyNode.getReplicationCount());
         processingPlant.setSite(topologyNode.getSiteName());
         processingPlant.setPlatformID(topologyNode.getPodName());

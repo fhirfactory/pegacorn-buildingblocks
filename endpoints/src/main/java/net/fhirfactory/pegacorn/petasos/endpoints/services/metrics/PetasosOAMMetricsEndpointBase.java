@@ -21,14 +21,13 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.metrics;
 
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
-
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 
 public abstract class PetasosOAMMetricsEndpointBase extends JGroupsIntegrationPointBase {
 
@@ -73,16 +72,6 @@ public abstract class PetasosOAMMetricsEndpointBase extends JGroupsIntegrationPo
     //
     // Endpoint Definition
     //
-
-    @Override
-    protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getPetasosMetricsStackConfigFile());
-    }
-
-    @Override
-    protected String specifySubsystemParticipantName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
-    }
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {

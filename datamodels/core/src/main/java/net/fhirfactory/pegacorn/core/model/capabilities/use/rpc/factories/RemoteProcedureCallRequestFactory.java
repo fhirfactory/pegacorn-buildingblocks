@@ -40,4 +40,15 @@ public class RemoteProcedureCallRequestFactory {
         rpcRequest.setRequestingEndpoint(endpointIdentifier);
         return(rpcRequest);
     }
+
+    public RemoteProcedureCallRequest newRemoteProcedureCallRequest(String method, Object content, Class contentType, JGroupsIntegrationPointSummary endpointIdentifier){
+        RemoteProcedureCallRequest rpcRequest = new RemoteProcedureCallRequest();
+        rpcRequest.setRequestContentType(contentType);
+        rpcRequest.setRequestID(UUID.randomUUID().toString());
+        rpcRequest.setRequestContent(content);
+        rpcRequest.setRequestInstant(Instant.now());
+        rpcRequest.setRequestingEndpoint(endpointIdentifier);
+        rpcRequest.setMethod(method);
+        return(rpcRequest);
+    }
 }

@@ -127,8 +127,8 @@ public class WorkUnitProcessorFrameworkManager {
     }
 
     private String getSedaParameters(){
-        String sedaQueueSize = processingPlant.getMeAsASoftwareComponent().getOtherConfigurationParameter(PetasosPropertyConstants.SEDA_QUEUE_SIZE_PARAMETER_NAME);
-        String sedaBlockOnFull = processingPlant.getMeAsASoftwareComponent().getOtherConfigurationParameter(PetasosPropertyConstants.SEDA_QUEUE_BLOCK_ON_FULL_PARAMETER_NAME);
+        String sedaQueueSize = processingPlant.getTopologyNode().getOtherConfigurationParameter(PetasosPropertyConstants.SEDA_QUEUE_SIZE_PARAMETER_NAME);
+        String sedaBlockOnFull = processingPlant.getTopologyNode().getOtherConfigurationParameter(PetasosPropertyConstants.SEDA_QUEUE_BLOCK_ON_FULL_PARAMETER_NAME);
         if(StringUtils.isEmpty(sedaQueueSize) && StringUtils.isEmpty(sedaBlockOnFull)){
             return(null);
         }

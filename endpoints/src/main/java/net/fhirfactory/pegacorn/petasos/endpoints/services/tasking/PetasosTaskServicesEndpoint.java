@@ -21,6 +21,13 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.tasking;
 
+import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -29,14 +36,6 @@ import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 
 public abstract class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase  {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosTaskServicesEndpoint.class);
@@ -86,16 +85,6 @@ public abstract class PetasosTaskServicesEndpoint extends JGroupsIntegrationPoin
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
         return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
-    }
-
-    @Override
-    protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getPetasosTaskingStackConfigFile());
-    }
-
-    @Override
-    protected String specifySubsystemParticipantName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
     }
 
     @Override

@@ -22,20 +22,17 @@
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PeriodESDT;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.datatypes.TaskMetadataSummary;
 import org.apache.commons.lang3.SerializationUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class TaskSummary extends ResourceSummaryBase {
     private String taskId;
     private TaskMetadataSummary taskMetadata;
     private PeriodESDT taskPeriod;
-    private ActionableTaskOutcomeStatusEnum taskStatus;
+    private TaskOutcomeStatusEnum taskStatus;
 
     //
     // Constructor(s)
@@ -105,11 +102,11 @@ public class TaskSummary extends ResourceSummaryBase {
         return(hasValue);
     }
 
-    public ActionableTaskOutcomeStatusEnum getTaskStatus() {
+    public TaskOutcomeStatusEnum getTaskStatus() {
         return taskStatus;
     }
 
-    public void setTaskStatus(ActionableTaskOutcomeStatusEnum taskStatus) {
+    public void setTaskStatus(TaskOutcomeStatusEnum taskStatus) {
         this.taskStatus = taskStatus;
     }
 

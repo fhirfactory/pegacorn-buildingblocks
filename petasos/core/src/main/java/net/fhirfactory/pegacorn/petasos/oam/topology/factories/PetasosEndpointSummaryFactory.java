@@ -75,7 +75,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 petasosEndpoint.getEndpointType().equals(PetasosEndpointTopologyTypeEnum.OTHER_SERVER);
         endpoint.setServer(isServer);
         endpoint.setWupParticipantName(wupParticipantName);
-        endpoint.setParticipantId(petasosEndpoint.getParticipantId());
+        endpoint.setParticipantId(petasosEndpoint.getParticipant().getParticipantId());
         getLogger().debug(".newEndpoint(): Exit, endpoint->{}", endpoint);
         return(endpoint);
     }
@@ -90,7 +90,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
         endpoint = (EndpointSummary) newPetasosMonitoredComponent(endpoint, endpointTopologyNode);
         endpoint.setEndpointType(endpointTopologyNode.getEndpointType());
         endpoint.setWupParticipantName(wupParticipantName);
-        endpoint.setParticipantId(endpointTopologyNode.getParticipantId());
+        endpoint.setParticipantId(endpointTopologyNode.getParticipant().getParticipantId());
         boolean isEncrypted = false;
         for(IPCAdapter currentAdapter: endpointTopologyNode.getAdapterList()){
             if(currentAdapter.isEncrypted()){
@@ -157,7 +157,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 if(httpClient.getHTTPClientAdapters() != null) {
                     for(HTTPClientAdapter currentAdapter: httpClient.getHTTPClientAdapters()) {
                         PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
-                        portSummary.setComponentID(httpClient.getComponentID());
+                        portSummary.setComponentID(httpClient.getComponentId());
                         portSummary.setHostPort(Integer.toString(currentAdapter.getPortNumber()));
                         portSummary.setHostDNSName(currentAdapter.getHostName());
                         if(httpClient.hasConnectedSystemName()) {
@@ -188,8 +188,8 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                 MLLPServerEndpoint mllpServerEndpoint = (MLLPServerEndpoint)endpointTopologyNode;
                 if(mllpServerEndpoint.getMLLPServerAdapter() != null) {
                     PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
-                    portSummary.setParticipantId(mllpServerEndpoint.getParticipantId());
-                    portSummary.setComponentID(mllpServerEndpoint.getComponentID());
+                    portSummary.setParticipantId(mllpServerEndpoint.getParticipant().getParticipantId());
+                    portSummary.setComponentID(mllpServerEndpoint.getComponentId());
                     portSummary.setHostPort(Integer.toString(mllpServerEndpoint.getMLLPServerAdapter().getPortNumber()));
                     portSummary.setHostDNSName(mllpServerEndpoint.getMLLPServerAdapter().getHostName());
                     if(mllpServerEndpoint.hasConnectedSystemName()) {
@@ -223,7 +223,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                     if (!mllpClientEndpoint.getMLLPClientAdapters().isEmpty()) {
                         for(MLLPClientAdapter currentAdapter: mllpClientEndpoint.getMLLPClientAdapters()){
                             PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
-                            portSummary.setParticipantId(mllpClientEndpoint.getParticipantId());
+                            portSummary.setParticipantId(mllpClientEndpoint.getParticipant().getParticipantId());
                             portSummary.setEncrypted(currentAdapter.isEncrypted());
                             portSummary.setPortType(PetasosEndpointTopologyTypeEnum.MLLP_CLIENT.getDisplayName());
                             if(mllpClientEndpoint.hasConnectedSystemName()) {
@@ -263,7 +263,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                         for (IPCAdapter currentIPCAdapter : fileSourceEndpoint.getAdapterList()) {
                             FileShareSourceAdapter currentAdapter = (FileShareSourceAdapter) currentIPCAdapter;
                             PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
-                            portSummary.setParticipantId(fileSourceEndpoint.getParticipantId());
+                            portSummary.setParticipantId(fileSourceEndpoint.getParticipant().getParticipantId());
                             portSummary.setEncrypted(currentAdapter.isEncrypted());
                             portSummary.setPortType(PetasosEndpointTopologyTypeEnum.FILE_SHARE_SOURCE.getDisplayName());
                             if (fileSourceEndpoint.hasConnectedSystemName()) {
@@ -275,8 +275,8 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                             portSummary.setBasePath(currentAdapter.getFilePath());
                             portSummary.setHostDNSName(currentAdapter.getHostName());
                             ComponentIdType componentId = new ComponentIdType();
-                            componentId.setId(fileSourceEndpoint.getSubsystemParticipantName() + "-" + portSummary.getHostDNSName());
-                            componentId.setDisplayName(fileSourceEndpoint.getSubsystemParticipantName() + "-" + portSummary.getHostDNSName());
+                            componentId.setId(fileSourceEndpoint.getParticipant().getParticipantId().getSubsystemName() + "-" + portSummary.getHostDNSName());
+                            componentId.setDisplayName(fileSourceEndpoint.getParticipant().getParticipantId().getSubsystemName() + "-" + portSummary.getHostDNSName());
                             portSummary.setComponentID(componentId);
                             endpoint.getServerPorts().add(portSummary);
                         }
@@ -291,7 +291,7 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                         for (IPCAdapter currentIPCAdapter : fileSinkEndpoint.getAdapterList()) {
                             FileShareSinkAdapter currentAdapter = (FileShareSinkAdapter) currentIPCAdapter;
                             PortSoftwareComponentSummary portSummary = new PortSoftwareComponentSummary();
-                            portSummary.setParticipantId(fileSinkEndpoint.getParticipantId());
+                            portSummary.setParticipantId(fileSinkEndpoint.getParticipant().getParticipantId());
                             portSummary.setEncrypted(currentAdapter.isEncrypted());
                             portSummary.setPortType(PetasosEndpointTopologyTypeEnum.FILE_SHARE_SINK.getDisplayName());
                             if (fileSinkEndpoint.hasConnectedSystemName()) {
@@ -303,8 +303,8 @@ public class PetasosEndpointSummaryFactory extends PetasosMonitoredComponentFact
                             portSummary.setBasePath(currentAdapter.getFilePath());
                             portSummary.getParticipantId().setDisplayName(currentAdapter.getFilePathAlias());
                             ComponentIdType componentId = new ComponentIdType();
-                            componentId.setId(fileSinkEndpoint.getSubsystemParticipantName() + "-" + portSummary.getHostDNSName());
-                            componentId.setDisplayName(fileSinkEndpoint.getSubsystemParticipantName() + "-" + portSummary.getHostDNSName());
+                            componentId.setId(fileSinkEndpoint.getParticipant().getParticipantId().getSubsystemName() + "-" + portSummary.getHostDNSName());
+                            componentId.setDisplayName(fileSinkEndpoint.getParticipant().getParticipantId().getSubsystemName() + "-" + portSummary.getHostDNSName());
                             portSummary.setComponentID(componentId);
                             endpoint.getServerPorts().add(portSummary);
                         }

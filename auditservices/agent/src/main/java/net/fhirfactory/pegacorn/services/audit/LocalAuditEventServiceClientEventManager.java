@@ -25,6 +25,7 @@ import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServic
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceBrokerInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.services.audit.cache.AsynchronousWriterAuditEventCache;
+import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,10 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
 
     private boolean initialised;
     private boolean writerScheduled;
+    private boolean lastAsynchronousWriteWasSuccessful;
+
+    @Inject
+    private FHIRContextUtility fhirContextUtility;
 
     private static Long AUDIT_EVENT_ASYNCHRONOUS_WRITER_CHECK_PERIOD = 5000L;
     private static Long AUDIT_EVENT_ASYNCHRONOUS_WRITER_INITIALISE_WAIT = 30000L;
@@ -63,6 +68,7 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
 
     public LocalAuditEventServiceClientEventManager(){
         this.initialised = false;
+        this.setLastAsynchronousWriteWasSuccessful(true);
     }
 
     //
@@ -109,6 +115,18 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
         return AUDIT_EVENT_ASYNCHRONOUS_WRITER_INITIALISE_WAIT;
     }
 
+    public boolean isLastAsynchronousWriteWasSuccessful() {
+        return lastAsynchronousWriteWasSuccessful;
+    }
+
+    public void setLastAsynchronousWriteWasSuccessful(boolean lastAsynchronousWriteWasSuccessful) {
+        this.lastAsynchronousWriteWasSuccessful = lastAsynchronousWriteWasSuccessful;
+    }
+
+    protected FHIRContextUtility getFhirContextUtility(){
+        return(fhirContextUtility);
+    }
+
     //
     // Audit Event Service
     //
@@ -122,13 +140,32 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
         }
         Boolean success = false;
         if(synchronous){
-            success = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), auditEvent);
+            try {
+                success = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), auditEvent);
+            } catch(Exception ex){
+                getLogger().warn(".writeQueuedAuditEvents(): Cannot write audit event, will print AuditEvent here, Message->{}, StackTrace->{}", ex.getCause(), ex.getStackTrace());
+                printAuditEvent(auditEvent);
+            }
         } else {
-            eventCache.addAuditEvent(auditEvent);
+            addToWriteQueue(auditEvent);
             success = true;
         }
         getLogger().info(".captureAuditEvent(): Exit, success->{}", success);
         return(success);
+    }
+
+    protected void addToWriteQueue(AuditEvent auditEvent){
+        getLogger().info(".addToWriteQueue(): Entry, auditEvent->{}", auditEvent);
+        if(auditEvent == null){
+            getLogger().debug(".addToWriteQueue(): Exit, auditEvent is null");
+            return;
+        }
+        if(eventCache.getNumberOfEntries() > MAX_ASYNCHRONOUS_LIST_SIZE){
+            getLogger().warn(".addToWriteQueue(): Queue is full, cannot add new AuditEvent, Printing Here!");
+            printAuditEvent(auditEvent);
+        } else {
+            eventCache.addAuditEvent(auditEvent);
+        }
     }
 
 
@@ -159,28 +196,64 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
     // TODO We should batch up the writing of the events (i.e. support "n" events at a time)
     protected void writeQueuedAuditEvents(){
         getLogger().debug(".writeQueuedAuditEvents(): Entry");
-        while(eventCache.hasEntries()){
-            List<AuditEvent> auditEventList = new ArrayList<>();
-            int count = 0;
-            while(eventCache.hasEntries()) {
-                AuditEvent currentAuditEvent = eventCache.pollAuditEvent();
-                auditEventList.add(currentAuditEvent);
-                count += 1;
-                if (count >= MAX_ASYNCHRONOUS_LIST_SIZE) {
+        boolean thisWriteWasSuccessful = false;
+        try {
+            while (eventCache.hasEntries()) {
+                List<AuditEvent> auditEventList = new ArrayList<>();
+                int count = 0;
+                while (eventCache.hasEntries()) {
+                    AuditEvent currentAuditEvent = eventCache.pollAuditEvent();
+                    auditEventList.add(currentAuditEvent);
+                    count += 1;
+                    if (count >= MAX_ASYNCHRONOUS_LIST_SIZE) {
+                        break;
+                    }
+                }
+                Boolean success = false;
+                if (!auditEventList.isEmpty()) {
+                    success = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), auditEventList);
+                }
+                if (!success) {
+                    for (AuditEvent currentAuditEvent : auditEventList) {
+                        eventCache.addAuditEvent(currentAuditEvent);
+                    }
                     break;
+                } else {
+                    thisWriteWasSuccessful = true;
                 }
             }
-            Boolean success = false;
-            if(!auditEventList.isEmpty()){
-                success = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), auditEventList);
-            }
-            if(!success){
-                for(AuditEvent currentAuditEvent: auditEventList){
-                    eventCache.addAuditEvent(currentAuditEvent);
+        } catch( Exception ex ){
+            getLogger().warn(".writeQueuedAuditEvents(): Cannot write queued audit events, Message->{}, StackTrace->{}", ex.getCause(), ex.getStackTrace());
+        }
+        if(!thisWriteWasSuccessful && !isLastAsynchronousWriteWasSuccessful()){
+            try {
+                if (eventCache.hasEntries()) {
+                    List<AuditEvent> auditEventList = new ArrayList<>();
+                    while (eventCache.hasEntries()) {
+                        AuditEvent currentAuditEvent = eventCache.pollAuditEvent();
+                        auditEventList.add(currentAuditEvent);
+                    }
+                    for(AuditEvent currentAuditEvent: auditEventList){
+                        printAuditEvent(currentAuditEvent);
+                    }
                 }
-                break;
+            } catch (Exception ex){
+
             }
+        } else {
+            setLastAsynchronousWriteWasSuccessful(thisWriteWasSuccessful);
         }
         getLogger().debug(".writeQueuedAuditEvents(): Exit");
+    }
+
+    protected void printAuditEvent(AuditEvent auditEvent){
+        String auditEventAsString = null;
+        try {
+            auditEventAsString = getFhirContextUtility().getJsonParser().encodeResourceToString(auditEvent);
+        } catch( Exception ex){
+            getLogger().warn(".printAuditEvent(): Cannot convert AuditEvent to String, error->{}", ex.getMessage());
+            auditEventAsString = "Unprintable";
+        }
+        getLogger().warn(".printAuditEvent(): AuditEvent->{}", auditEventAsString);
     }
 }

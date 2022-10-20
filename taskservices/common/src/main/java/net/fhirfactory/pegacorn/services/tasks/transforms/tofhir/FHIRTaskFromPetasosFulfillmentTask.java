@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.da
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
@@ -135,25 +135,25 @@ public class FHIRTaskFromPetasosFulfillmentTask extends FHIRTaskFromPetasosTask 
         PetasosFulfillmentTask fulfillmentTask = (PetasosFulfillmentTask) petasosTask;
 
         if(fulfillmentTask.hasTaskOutcomeStatus()) {
-            ActionableTaskOutcomeStatusEnum outcomeStatus = fulfillmentTask.getTaskOutcomeStatus().getOutcomeStatus();
+            TaskOutcomeStatusEnum outcomeStatus = fulfillmentTask.getTaskOutcomeStatus().getOutcomeStatus();
             Task.TaskStatus outcome = null;
             switch(outcomeStatus){
-                case ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN:
+                case OUTCOME_STATUS_UNKNOWN:
                     outcome = Task.TaskStatus.NULL;
                     break;
-                case ACTIONABLE_TASK_OUTCOME_STATUS_CANCELLED:
+                case OUTCOME_STATUS_CANCELLED:
                     outcome = Task.TaskStatus.CANCELLED;
                     break;
-                case ACTIONABLE_TASK_OUTCOME_STATUS_ACTIVE:
+                case OUTCOME_STATUS_ACTIVE:
                     outcome = Task.TaskStatus.INPROGRESS;
                     break;
-                case ACTIONABLE_TASK_OUTCOME_STATUS_FINISHED:
+                case OUTCOME_STATUS_FINISHED:
                     outcome = Task.TaskStatus.COMPLETED;
                     break;
-                case ACTIONABLE_TASK_OUTCOME_STATUS_FINALISED:
+                case OUTCOME_STATUS_FINALISED:
                     outcome = Task.TaskStatus.COMPLETED;
                     break;
-                case ACTIONABLE_TASK_OUTCOME_STATUS_FAILED:
+                case OUTCOME_STATUS_FAILED:
                     outcome = Task.TaskStatus.FAILED;
                     break;
             }

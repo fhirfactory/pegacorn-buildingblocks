@@ -254,7 +254,7 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
 
     @JsonIgnore
     public String getClusterServiceName(){
-        return(getSubsystemParticipantName());
+        return(getParticipant().getParticipantId().getSubsystemName());
     }
 
     //

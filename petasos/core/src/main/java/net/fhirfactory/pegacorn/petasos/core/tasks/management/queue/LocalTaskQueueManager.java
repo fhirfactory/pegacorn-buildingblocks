@@ -21,12 +21,19 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.queue;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.participants.administration.LocalParticipantAdministrator;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityManager;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.petasos.core.participants.management.LocalParticipantManager;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.distribution.LocalTaskDistributionService;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.LocalTaskActivityManager;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
@@ -36,90 +43,143 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.Instant;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @ApplicationScoped
 public class LocalTaskQueueManager {
     private static final Logger LOG = LoggerFactory.getLogger(LocalTaskQueueManager.class);
 
-    private ConcurrentHashMap<String, LocalParticipantTaskQueue> participantQueueMap;
-    private Object participantQueueMapLock;
+    private Integer retryDelay;
+
+    private boolean daemonStillRunning;
     private boolean initialised;
+    private Instant daemonLastRunTime;
 
-    private static final Long TASK_QUEUE_MANAGER_STARTUP_DELAY = 30000L;
-    private static final Long TASK_QUEUE_MANAGER_PERIOD = 15000L;
-    private static final Long DEFAULT_TASK_GAPPING_PERIOD = 10L;
-    private static final int MAXIMUM_QUEUE_SIZE = 500;
+    private static final Long TASK_QUEUE_CHECK_PERIOD = 5000L;
+    private static final Long TASK_QUEUE_CHECK_STARTUP_WAIT = 60000L;
+    private static final Long TASK_QUEUE_CHECK_MAX_PERIOD = 120000L;
+
+    private static final Integer DEFAULT_TASK_RETRY_DELAY = 30;
 
     @Inject
-    private TopologyIM topologyIM;
+    private LocalTaskQueueCache localTaskQueueCache;
 
     @Inject
-    private LocalParticipantAdministrator participantIM;
+    private LocalActionableTaskCache localTaskCache;
 
     @Produce
-    private ProducerTemplate camelRouteInjectorService;
+    private ProducerTemplate camelDistributor;
 
     @Inject
-    private LocalTaskActivityManager actionableTaskActivityController;
+    private LocalParticipantManager localParticipantManager;
 
     @Inject
-    private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceFactory;
+    private ProcessingPlantInterface processingPlant;
+
+    @Inject
+    private LocalTaskDistributionService localTaskDistributionService;
+
+    @Inject
+    private LocalTaskActivityManager taskActivityManager;
 
     //
     // Constructor(s)
     //
 
     public LocalTaskQueueManager(){
-        participantQueueMap = new ConcurrentHashMap<>();
-        participantQueueMapLock = new Object();
-        initialised = false;
+        this.initialised = false;
+        setRetryDelay(DEFAULT_TASK_RETRY_DELAY);
     }
 
     //
-    // Post Construct
+    // PostConstructor(s)
     //
 
     @PostConstruct
     public void initialise(){
-        getLogger().debug(".initialise(): Entry");
         if(initialised){
-            getLogger().debug(".initialise(): Exit, already initialised");
-            return;
+            // do nothing
+        } else {
+            String taskFailureRetryDelay = processingPlant.getTopologyNode().getOtherConfigurationParameter("TASK_FAILURE_RETRY_DELAY");
+            if(StringUtils.isNotEmpty(taskFailureRetryDelay)){
+                Integer retryDelayFromConfig = Integer.valueOf(taskFailureRetryDelay);
+                if(retryDelayFromConfig != null){
+                    setRetryDelay(retryDelayFromConfig);
+                }
+            }
         }
-        getLogger().info(".initialise(): Initialising...");
+    }
 
+    //
+    // Daemons
+    //
 
-        setInitialised(true);
-        getLogger().info(".initialise(): Initialisation complete...");
-        getLogger().debug("initialise(): Exit");
+    private void scheduleTaskQueueCheckDaemon() {
+        getLogger().debug(".scheduleTaskQueueCheckDaemon(): Entry");
+        TimerTask taskQueueCheckDaemonTimerTask = new TimerTask() {
+            public void run() {
+                getLogger().debug(".taskQueueCheckDaemonTimerTask(): Entry");
+                if (!isDaemonStillRunning()) {
+                    taskQueueCheckDaemon();
+                    setDaemonLastRunTime(Instant.now());
+                } else {
+                    Long ageSinceRun = Instant.now().getEpochSecond() - getDaemonLastRunTime().getEpochSecond();
+                    if (ageSinceRun > TASK_QUEUE_CHECK_MAX_PERIOD) {
+                        taskQueueCheckDaemon();
+                        setDaemonLastRunTime(Instant.now());
+                    }
+                }
+                getLogger().debug(".taskQueueCheckDaemonTimerTask(): Exit");
+            }
+        };
+        Timer timer = new Timer("TaskQueueDaemonTimer");
+        timer.schedule(taskQueueCheckDaemonTimerTask, TASK_QUEUE_CHECK_STARTUP_WAIT, TASK_QUEUE_CHECK_PERIOD);
+        getLogger().debug(".scheduleTaskQueueCheckDaemon(): Exit");
+    }
+
+    private void taskQueueCheckDaemon(){
+
     }
 
     //
     // Getters (and Setters)
     //
 
-    protected PetasosActionableTaskSharedInstanceAccessorFactory getActionableTaskSharedInstanceFactory(){
-        return(actionableTaskSharedInstanceFactory);
+    public Integer getRetryDelay() {
+        return retryDelay;
     }
 
-    protected LocalTaskActivityManager getActionableTaskActivityController(){
-        return(actionableTaskActivityController);
+    public void setRetryDelay(Integer retryDelay) {
+        this.retryDelay = retryDelay;
     }
 
-    protected ConcurrentHashMap<String, LocalParticipantTaskQueue> getParticipantQueueMap(){
-        return(participantQueueMap);
+    protected ProcessingPlantInterface getProcessingPlant(){
+        return(processingPlant);
     }
 
-    protected Object getParticipantQueueMapLock(){
-        return(participantQueueMapLock);
+    public Instant getDaemonLastRunTime() {
+        return daemonLastRunTime;
     }
 
-    protected boolean isInitialised(){
-        return(initialised);
+    public void setDaemonLastRunTime(Instant daemonLastRunTime) {
+        this.daemonLastRunTime = daemonLastRunTime;
     }
 
-    protected void setInitialised(boolean initialised){
+    public boolean isDaemonStillRunning() {
+        return daemonStillRunning;
+    }
+
+    public void setDaemonStillRunning(boolean daemonStillRunning) {
+        this.daemonStillRunning = daemonStillRunning;
+    }
+
+    public boolean isInitialised() {
+        return initialised;
+    }
+
+    public void setInitialised(boolean initialised) {
         this.initialised = initialised;
     }
 
@@ -127,122 +187,214 @@ public class LocalTaskQueueManager {
         return(LOG);
     }
 
-    protected TopologyIM getTopologyIM(){
-        return(topologyIM);
+    protected LocalTaskQueueCache getLocalTaskQueueCache(){
+        return(localTaskQueueCache);
     }
 
-    protected LocalParticipantAdministrator getParticipantIM(){
-        return(participantIM);
+    protected ProducerTemplate getCamelDistributor(){
+        return(camelDistributor);
     }
 
-    protected ProducerTemplate getCamelRouteInjectionService(){
-        return(camelRouteInjectorService);
+    protected LocalParticipantManager getLocalParticipantManager(){
+        return(localParticipantManager);
     }
 
-    //
-    // Daemons
-    //
-
-    public void scheduleTaskQueueManagerDaemon(){
-        getLogger().debug(".scheduleTaskQueueManagerDaemon(): Entry");
-
-        getLogger().debug(".scheduleTaskQueueManagerDaemon(): Exit");
+    protected LocalActionableTaskCache getLocalTaskCache(){
+        return(localTaskCache);
     }
 
-    public void taskQueueManagerDaemon(){
-        getLogger().debug(".taskQueueManagerDaemon(): Entry");
-
-        getLogger().debug(".taskQueueManagerDaemon(): Exit");
+    protected LocalTaskDistributionService getLocalTaskDistributionService(){
+        return(localTaskDistributionService);
+    }
+    protected LocalTaskActivityManager getTaskActivityManager(){
+        return(taskActivityManager);
     }
 
     //
-    // Participant Processing Tasks
-    //
-
-    public boolean isParticipantSuspended(String participantName){
-        boolean participantSuspended = getParticipantIM().isParticipantSuspended(participantName);
-        return(participantSuspended);
-    }
-
-    public void suspendParticipant(String participantName){
-        getParticipantIM().suspendParticipant(participantName);
-    }
-
-    //
-    // Participant Task Queueing
+    // Queue Input / Queue Output
     //
 
     public void queueTask(PetasosActionableTask actionableTask){
-        getLogger().debug(".queueTask(): Entry, actionableTask->{}", actionableTask);
         if(actionableTask != null){
-            getLogger().debug(".queueTask(): Exit, actionableTask is null");
-            return;
-        }
-        if(!actionableTask.hasTaskPerformerTypes()){
-            getLogger().debug(".queueTask(): Exit, actionableTask has no performers!");
-            return;
-        }
-        if(actionableTask.getTaskPerformerTypes().isEmpty()){
-            getLogger().debug(".queueTask(): Exit, actionableTask has no performers!");
-            return;
-        }
-        for(TaskPerformerTypeType performerType: actionableTask.getTaskPerformerTypes()){
-            if(performerType.isCapabilityBased()){
-                // do nothing
-            } else {
-                if(performerType.getKnownTaskPerformer() != null){
-                    if(StringUtils.isNotEmpty(performerType.getKnownTaskPerformer().getName())){
-                        queueTask(performerType.getKnownTaskPerformer().getName(), actionableTask);
+            if(!actionableTask.getTaskPerformerTypes().isEmpty()) {
+                for(TaskPerformerTypeType currentPerformer: actionableTask.getTaskPerformerTypes()) {
+                    boolean performerIsIdle = isTaskPerformerIdle(currentPerformer);
+                    boolean performerIsSuspended = getLocalParticipantManager().isParticipantSuspended(currentPerformer);
+                    boolean performerQueueIsEmpty = isTaskPerformerQueueEmpty(currentPerformer);
+                    if (performerQueueIsEmpty && performerIsIdle && !performerIsSuspended) {
+                        if(currentPerformer.getKnownTaskPerformer() != null) {
+                            sendQueuedTask(currentPerformer.getKnownTaskPerformer(), actionableTask);
+                        }
+                    } else {
+                        if(currentPerformer.getKnownTaskPerformer() != null) {
+                            if (StringUtils.isNotEmpty(currentPerformer.getKnownTaskPerformer().getName())) {
+                                getLocalTaskQueueCache().queueTask(currentPerformer.getKnownTaskPerformer().getName(), actionableTask);
+                            }
+                        }
                     }
                 }
             }
         }
-        getLogger().debug(".queueTask(): Exit");
     }
 
-    public void queueTask(String participantName, PetasosActionableTask actionableTask){
-        getLogger().debug(".queueTask(): Entry, participantName->{}, actionableTask->{}", participantName, actionableTask);
-        boolean inserted = false;
-        String errorMessage = null;
-        if(StringUtils.isNotEmpty(participantName)){
-            synchronized (getParticipantQueueMapLock()){
-                LocalParticipantTaskQueue taskQueue = null;
-                if(getParticipantQueueMap().containsKey(participantName)){
-                    taskQueue = getParticipantQueueMap().get(participantName);
-                } else {
-                    taskQueue = new LocalParticipantTaskQueue();
-                    getParticipantQueueMap().put(participantName, taskQueue);
+
+    /**
+     * This method "forwards" the given PetasosActionableTask (actionableTask) into the task distribution service.
+     * @param actionableTask
+     */
+    public void sendQueuedTask(PetasosParticipantId participantId, PetasosActionableTask actionableTask){
+        getLogger().debug(".sendQueuedTask(): Entry, participantId->{}, actionableTask->{}", participantId, actionableTask);
+        if(actionableTask != null) {
+            getLocalTaskDistributionService().distributeNewActionableTasks(participantId, actionableTask);
+            getCamelDistributor().sendBody(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE, ExchangePattern.InOnly, actionableTask);
+        }
+        getLogger().debug(".sendQueuedTask(): Exit");
+    }
+
+    /**
+     * This method checks the TaskQueue for the given Participant (Name) and ascertains if a task can be "commenced" (or
+     * forwarded into the task distribution service).
+     *
+     * @param participantName The name of the participant (ParticipantId.getName()) whose TaskQueue is to be checked/processed.
+     */
+    public void processNextQueuedTaskForParticipant(String participantName) {
+        getLogger().debug(".processNextQueuedTaskForParticipant(): Entry, participantName->{}", participantName);
+
+        if (StringUtils.isEmpty(participantName)) {
+            getLogger().debug(".processNextQueuedTaskForParticipant(): Exit, participantName is null");
+            return;
+        }
+
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Participant is Suspended] Start");
+        if (getLocalParticipantManager().isParticipantSuspended(participantName)){
+            getLogger().debug(".processNextQueuedTaskForParticipant(): Exit, participant is suspended");
+            return;
+        }
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Participant is Suspended] Finish -> Not Suspended");
+
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Any Pending Tasks] Start");
+        if (getLocalTaskQueueCache().getParticipantQueueSize(participantName) <= 0) {
+            getLogger().debug(".processNextQueuedTaskForParticipant(): Exit, participant has no pending tasks");
+            return;
+        }
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Any Pending Tasks] Finish -> Has Pending Tasks");
+
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Valid Task] Start");
+        ParticipantTaskQueueEntry participantTaskQueueEntry = getLocalTaskQueueCache().peekNextTask(participantName);
+        PetasosActionableTask task = getLocalTaskCache().getTask(participantTaskQueueEntry.getTaskId());
+        if(task == null){
+            getLocalTaskQueueCache().pollNextTask(participantName);
+            getLogger().debug(".processNextQueuedTaskForParticipant(): Exit, task is invalid");
+            return;
+        }
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Valid Task] Finish -> Task is Valid");
+
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Participant is Disabled] Start");
+        if (getLocalParticipantManager().isParticipantDisabled(participantName)){
+            ParticipantTaskQueueEntry actualQueueEntry = getLocalTaskQueueCache().pollNextTask(participantName);
+            PetasosActionableTask actionableTask = getLocalTaskCache().getTask(actualQueueEntry.getTaskId());
+            if(actionableTask != null){
+                actionableTask.getTaskOutcomeStatus().setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_CANCELLED);
+                actionableTask.getTaskOutcomeStatus().setEntryInstant(Instant.now());
+                if(!actionableTask.hasTaskFulfillment()) {
+                    actionableTask.setTaskFulfillment(new TaskFulfillmentType());
                 }
-                if(actionableTask.hasTaskId() && actionableTask.hasSequenceNumber()) {
-                    ParticipantTaskQueueEntry taskQueueEntry = new ParticipantTaskQueueEntry();
-                    taskQueueEntry.setTaskId(actionableTask.getTaskId());
-                    taskQueueEntry.setSequenceNumber(actionableTask.getSequenceNumber());
-                    taskQueue.insertEntry(taskQueueEntry);
-                    inserted = true;
-                } else {
-                    inserted = false;
-                    errorMessage = "actionableTask does not have taskId or sequenceNumber";
+                actionableTask.getTaskFulfillment().setFinishInstant(Instant.now());
+                actionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
+                actionableTask.getTaskFulfillment().setCurrentStateReason("Participant is Disabled");
+                getTaskActivityManager().registerTaskOutcome(actionableTask, null);
+            }
+            getLogger().debug(".processNextQueuedTaskForParticipant(): Exit, participant is suspended");
+            return;
+        }
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Participant is Suspended] Finish -> Not Suspended");
+
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Retry & Retry-Delay Passed] Start");
+        boolean delayExecution = false;
+        if (task.hasTaskTraceability()) {
+            if (task.getTaskTraceability().isaRetry()) {
+                Instant lastUtilisationInstant = getLocalParticipantManager().getParticipantLastUtilisationInstant(participantName);
+                if (Instant.now().isBefore(lastUtilisationInstant.plusSeconds(getRetryDelay()))) {
+                    delayExecution = true;
                 }
             }
-        } else {
-            inserted = false;
-            errorMessage = "participantName is emtpy";
         }
-        if(inserted){
-            getLogger().debug(".queueTask(): Exit, task inserted!");
+        if(delayExecution) {
+            getLogger().debug(".processNextQueuedTaskForParticipant(): Exit, Task is delayed until retry delay passes");
+            return;
+        }
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Check if Retry & Retry-Delay Passed] Finish, not delayed");
+
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Initiate Task Fulfillment] Start");
+        getLocalTaskQueueCache().pollNextTask(participantName);
+        PetasosParticipantId participantId = getLocalParticipantManager().getParticipantId(participantName);
+        if(participantId != null) {
+            sendQueuedTask(participantId, task);
+        }
+        getLogger().trace(".processNextQueuedTaskForParticipant(): [Initiate Task Fulfillment] Finish");
+
+        getLogger().debug(".processNextQueuedTaskForParticipant(): Exit");
+    }
+
+    //
+    // Helper Methods
+    //
+
+    protected boolean isTaskPerformerActive(TaskPerformerTypeType performerType){
+        if(performerType == null){
+            return(false);
+        }
+        if(performerType.getKnownTaskPerformer() == null){
+            return(false);
+        }
+        if(StringUtils.isEmpty(performerType.getKnownTaskPerformer().getName())){
+            return(false);
+        }
+        boolean isSuspended = getLocalParticipantManager().isParticipantSuspended(performerType.getKnownTaskPerformer().getName());
+        boolean isDisabled = getLocalParticipantManager().isParticipantDisabled(performerType.getKnownTaskPerformer().getName());
+        if(isDisabled || isSuspended){
+            return(false);
         } else {
-            getLogger().debug(".queueTask(): Exit, task not inserted, reason = {}", errorMessage);
+            return (true);
         }
     }
 
-    public boolean isFull(String participantName){
-        if(getParticipantQueueMap().containsKey(participantName)){
-            int size = getParticipantQueueMap().get(participantName).getSize();
-            if(size > MAXIMUM_QUEUE_SIZE){
+    protected boolean isTaskPerformerIdle(TaskPerformerTypeType performerType){
+        if(performerType == null){
+            return(false);
+        }
+        if(performerType.getKnownTaskPerformer() == null){
+            return(false);
+        }
+        if(StringUtils.isEmpty(performerType.getKnownTaskPerformer().getName())){
+            return(false);
+        }
+        switch(getLocalParticipantManager().getParticipantStatus(performerType.getKnownTaskPerformer().getName())) {
+            case PARTICIPANT_IS_IDLE:
                 return(true);
-            }
+            case PARTICIPANT_IS_ACTIVE:
+            case PARTICIPANT_IS_NOT_READY:
+            case PARTICIPANT_IS_STOPPING:
+            case PARTICIPANT_HAS_FAILED:
+            default:
+                return(false);
         }
-        return(false);
     }
 
+    protected boolean isTaskPerformerQueueEmpty(TaskPerformerTypeType performerType){
+        if(performerType == null){
+            return(false);
+        }
+        if(performerType.getKnownTaskPerformer() == null){
+            return(false);
+        }
+        if(StringUtils.isEmpty(performerType.getKnownTaskPerformer().getName())){
+            return(false);
+        }
+        if( getLocalTaskQueueCache().getParticipantQueueSize(performerType.getKnownTaskPerformer().getName()) <= 0){
+            return(true);
+        } else {
+            return (false);
+        }
+    }
 }

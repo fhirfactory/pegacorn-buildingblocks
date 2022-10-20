@@ -66,7 +66,7 @@ public class EndpointFactory {
 
         //
         // Add the Identifier
-        Identifier identifier = getIdentifierFactory().newEndpointIdentifier(topologyEndpoint.getComponentID().getId());
+        Identifier identifier = getIdentifierFactory().newEndpointIdentifier(topologyEndpoint.getComponentId().getId());
         endpoint.addIdentifier(identifier);
 
         //
@@ -75,12 +75,12 @@ public class EndpointFactory {
 
         //
         // Set the name
-        endpoint.setName(topologyEndpoint.getComponentID().getDisplayName());
+        endpoint.setName(topologyEndpoint.getComponentId().getDisplayName());
 
         //
         // Set the period
         Period activePeriod = new Period();
-        activePeriod.setStart(Date.from(topologyEndpoint.getComponentID().getIdValidityStartInstant()));
+        activePeriod.setStart(Date.from(topologyEndpoint.getComponentId().getIdValidityStartInstant()));
         endpoint.setPeriod(activePeriod);
 
         //

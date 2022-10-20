@@ -45,8 +45,8 @@ public abstract class PetasosMonitoredComponentFactory {
      */
     protected SoftwareComponentSummary newPetasosMonitoredComponent(SoftwareComponentSummary monitoredNode, SoftwareComponent topologyNode){
         getLogger().debug(".newITOpsMonitoredNode(): Entry, monitoredNode->{}, topologyNode->{}", monitoredNode, topologyNode);
-        monitoredNode.setComponentID(topologyNode.getComponentID());
-        monitoredNode.setParticipantId(topologyNode.getParticipantId());
+        monitoredNode.setComponentID(topologyNode.getComponentId());
+        monitoredNode.setParticipantId(topologyNode.getParticipant().getParticipantId());
         PetasosMonitoredComponentTypeEnum nodeTypeEnum = PetasosMonitoredComponentTypeEnum.nodeTypeFromTopologyNodeType(topologyNode.getComponentType());
         monitoredNode.setNodeType(nodeTypeEnum);
         monitoredNode.setNodeVersion(topologyNode.getVersion());

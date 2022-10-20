@@ -23,22 +23,22 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 /**
  * @author Mark A. Hunter
  * @since 2020-07-05
  */
-@ApplicationScoped
+@Dependent
 public class WUPIngresConduit {
 
     @Inject
@@ -59,7 +59,7 @@ public class WUPIngresConduit {
      * @param camelExchange The Apache Camel Exchange object, for injecting the WUPJobCard & ParcelStatusElement into
      * @return A UoW (Unit of Work) object for injection into the WUP for processing by the Business Logic
      */
-    public UoW forwardIntoWUP(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange){
+    public UoW forwardIntoWUP(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange){
         if(getLogger().isInfoEnabled()){
             getLogger().info(".forwardIntoWUP(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
         }

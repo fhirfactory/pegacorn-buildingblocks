@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.oam.reporting.tasks;
 
-import net.fhirfactory.pegacorn.internals.hl7v2.helpers.UltraDefensivePipeParser;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.PetasosComponentITOpsNotification;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.internals.hl7v2.helpers.UltraDefensivePipeParser;
 import net.fhirfactory.pegacorn.petasos.oam.notifications.PetasosITOpsNotificationContentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,14 +96,14 @@ public class PetasosTaskReportFactory {
         String fulfillerComponentName = "Not Available";
         String fulfillerComponentId = "Not Available";
         if(actionableTask.getTaskFulfillment().hasFulfiller()) {
-            fulfillerComponentName = actionableTask.getTaskFulfillment().getFulfiller().getParticipantDisplayName();
-            fulfillerComponentId = actionableTask.getTaskFulfillment().getFulfiller().getComponentID().getId();
+            fulfillerComponentName = actionableTask.getTaskFulfillment().getFulfiller().getParticipantId().getDisplayName();
+            fulfillerComponentId = actionableTask.getTaskFulfillment().getFulfiller().getComponentId().getId();
         } else {
             getLogger().warn(".newTaskSummaryReport(): No Task Fulfiller Component Defined on Task->{}", actionableTask.getTaskId());
         }
-        ActionableTaskOutcomeStatusEnum outcomeStatus = actionableTask.getTaskOutcomeStatus().getOutcomeStatus();
+        TaskOutcomeStatusEnum outcomeStatus = actionableTask.getTaskOutcomeStatus().getOutcomeStatus();
         if(outcomeStatus == null){
-            outcomeStatus = ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN;
+            outcomeStatus = TaskOutcomeStatusEnum.OUTCOME_STATUS_UNKNOWN;
         }
         String taskOutcomeStatus = outcomeStatus.getDisplayName();
 
@@ -195,7 +195,7 @@ public class PetasosTaskReportFactory {
         formattedReportBuilder.append("</tr>");
         formattedReportBuilder.append("<tr>");
         formattedReportBuilder.append("<td><b>Outcome</b></td>");
-        if(outcomeStatus.equals(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FAILED)) {
+        if(outcomeStatus.equals(TaskOutcomeStatusEnum.OUTCOME_STATUS_FAILED)) {
             formattedReportBuilder.append("<td><font color=Red" + taskOutcomeStatus + "</font></td>");
         } else {
             formattedReportBuilder.append("<td>" + taskOutcomeStatus + "</td>");

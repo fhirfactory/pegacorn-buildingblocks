@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskSequenceNumber;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
@@ -35,6 +36,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.d
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityElementTypeFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityTypeFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.TaskSequenceNumberGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +63,9 @@ public class PetasosActionableTaskFactory {
 
     @Inject
     private ProcessingPlantInterface processingPlant;
+
+    @Inject
+    private TaskSequenceNumberGenerator sequenceNumberGenerator;
 
     //
     // Constructor(s)
@@ -129,7 +134,9 @@ public class PetasosActionableTaskFactory {
         //
         // create a new id
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask ID] Start");
-        TaskIdType taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING, payload.getPayloadTopicID().getContentDescriptor());
+        TaskIdType taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING);
+        TaskSequenceNumber taskSequenceNumber = sequenceNumberGenerator.generateNewSequenceNumber();
+        taskId.setTaskSequenceNumber(taskSequenceNumber);
         newTask.setTaskId(taskId);
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask ID] Finish");
         //
@@ -147,7 +154,7 @@ public class PetasosActionableTaskFactory {
         //
         // add the task node affinity
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Node Affinity] Start");
-        newTask.setTaskNodeAffinity(processingPlant.getMeAsASoftwareComponent().getComponentID());
+        newTask.setTaskNodeAffinity(processingPlant.getTopologyNode().getComponentId());
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Node Affinity] Finish");
         //
         // add the task work item

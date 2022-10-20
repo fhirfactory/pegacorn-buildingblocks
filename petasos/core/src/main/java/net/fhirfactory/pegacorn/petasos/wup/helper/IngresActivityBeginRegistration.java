@@ -23,25 +23,24 @@
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.datatypes.PetasosTaskFulfillmentCard;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskTriggerSummaryType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstanceAccessorFactory;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityManager;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.LocalTaskActivityManager;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -67,10 +66,7 @@ public class IngresActivityBeginRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(IngresActivityBeginRegistration.class);
 
     @Inject
-    LocalTaskActivityManager actionableTaskActivityController;
-
-    @Inject
-    LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
+    LocalTaskActivityManager taskActivityManager;
 
     @Inject
     private PetasosFulfillmentTaskFactory fulfillmentTaskFactory;
@@ -79,10 +75,13 @@ public class IngresActivityBeginRegistration {
     private PetasosActionableTaskFactory actionableTaskFactory;
 
     @Inject
-    private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceFactory;
+    private PetasosFulfillmentTaskAuditServicesBroker fulfillmentTaskAuditServicesBroker;
 
     @Inject
-    private PetasosFulfillmentTaskSharedInstanceAccessorFactory fulfillmentTaskSharedInstanceFactory;
+    private PetasosTaskJobCardFactory jobCardFactory;
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
 
     //
     // Business Methods
@@ -95,7 +94,7 @@ public class IngresActivityBeginRegistration {
         WorkUnitProcessorSoftwareComponent wup = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorSoftwareComponent.class);
 
         getLogger().trace(".registerActivityStart(): Node Element retrieved --> {}", wup);
-        PetasosParticipantId wupParticipantId = wup.getParticipantId();
+        PetasosParticipantId wupParticipantId = wup.getParticipant().getParticipantId();
         getLogger().trace(".registerActivityStart(): wupParticipantId (PetasosParticipantId) for this activity --> {}", wupParticipantId);
 
         //
@@ -113,68 +112,62 @@ public class IngresActivityBeginRegistration {
         TaskContextType taskContext = new TaskContextType();
         TaskTriggerSummaryType taskTriggerSummary = new TaskTriggerSummaryType();
         taskTriggerSummary.setTriggerTaskId(petasosActionableTask.getTaskId());
-        taskTriggerSummary.setTriggerLocation(wup.getComponentID().getDisplayName());
+        taskTriggerSummary.setTriggerLocation(wup.getComponentId().getDisplayName());
         taskContext.setTaskTriggerSummary(taskTriggerSummary);
         petasosActionableTask.setTaskContext(taskContext);
         getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Finish");
 
         getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Start");
-        PetasosActionableTaskSharedInstance actionableTaskSharedInstance =  getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
+        PetasosTaskJobCard jobCard =  getTaskActivityManager().registerLocallyCreatedTask(petasosActionableTask, null);
         // Add some more metrics
         metricsAgent.incrementRegisteredTasks();
         getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Finish");
 
         getLogger().trace(".registerActivityStart(): Create a PetasosFulfillmentTask for the (local) processing implementation activity: Start");
         PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, wup);
-        fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+        fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
         fulfillmentTask.setUpdateInstant(Instant.now());
         fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
         fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
         getLogger().trace(".registerActivityStart(): Create a PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
 
-        getLogger().trace(".registerActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Start");
-        PetasosFulfillmentTaskSharedInstance petasosFulfillmentTaskSharedInstance = getFulfilmentTaskActivityController().registerFulfillmentTask(fulfillmentTask, true);// by default, use synchronous audit writing
-        getLogger().trace(".registerActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
+        getLogger().trace(".registerActivityStart(): Update TaskJobCard: Start");
+        PetasosTaskFulfillmentCard fulfillmentCard = new PetasosTaskFulfillmentCard();
+        fulfillmentCard.setFulfillmentExecutionStatus(fulfillmentTask.getTaskFulfillment().getStatus());
+        fulfillmentCard.setFulfillmentTaskId(fulfillmentTask.getTaskId());
+        fulfillmentCard.setFulfillmentStartInstant(fulfillmentTask.getTaskFulfillment().getStartInstant());
+        fulfillmentCard.setFulfillerParticipantId(fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId());
+        jobCard.setTaskFulfillmentCard(fulfillmentCard);
+        getLogger().trace(".registerActivityStart(): Update TaskJobCard: Finish");
 
-        getLogger().trace(".registerActivityStart(): Request Execution Privileges: Start");
-        PetasosTaskExecutionStatusEnum grantedExecutionStatus = getFulfilmentTaskActivityController().requestFulfillmentTaskExecutionPrivilege(petasosFulfillmentTaskSharedInstance);
-        getLogger().trace(".registerActivityStart(): Request Execution Privileges: Finish");
+        getLogger().trace(".registerActivityStart(): Create AuditEvent: Start");
+        fulfillmentTaskAuditServicesBroker.logActivity(fulfillmentTask, true);// by default, use synchronous audit writing
+        getLogger().trace(".registerActivityStart(): Create AuditEvent: Finish");
 
         getLogger().trace(".registerActivityStart(): Set processing to the grantedExecutionStatus: Start");
-        if(grantedExecutionStatus.equals(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING)){
-            petasosFulfillmentTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStartInstant(Instant.now());
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-            petasosFulfillmentTaskSharedInstance.update();
-            getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(petasosFulfillmentTaskSharedInstance);
-
-            actionableTaskSharedInstance.getTaskFulfillment().setFulfiller(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfiller());
-            actionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(petasosFulfillmentTaskSharedInstance.getTaskId()));
-            getLogger().trace(".registerActivityStart(): Before Update: actionableTaskSharedInstance.getTaskFulfillment()->{}", actionableTaskSharedInstance.getTaskFulfillment());
-            actionableTaskSharedInstance.update();
-            getLogger().trace(".registerActivityStart(): After Update: actionableTaskSharedInstance.getTaskFulfillment()->{}", actionableTaskSharedInstance.getTaskFulfillment());
-            getActionableTaskActivityController().notifyTaskStart(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
+        if(jobCard.getGrantedStatus().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){
+            fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
+            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+            jobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+            jobCard.getTaskFulfillmentCard().setFulfillmentStartInstant(Instant.now());
+            TaskExecutionCommandEnum taskExecutionCommand = getTaskActivityManager().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
+            getLogger().trace(".registerActivityStart(): Before Update: taskExecutionCommand->{}",taskExecutionCommand);
 
             // Add some more metrics
             metricsAgent.incrementStartedTasks();
         }  else {
-            petasosFulfillmentTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FAILED);
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStartInstant(Instant.now());
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setFinishInstant(Instant.now());
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
-            petasosFulfillmentTaskSharedInstance.update();
-            getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(petasosFulfillmentTaskSharedInstance);
-
-            actionableTaskSharedInstance.getTaskFulfillment().setFulfiller(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfiller());
-            actionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
-            actionableTaskSharedInstance.update();
-            getActionableTaskActivityController().notifyTaskFailure(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
+            fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
+            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+            fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
+            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
+            getTaskActivityManager().notifyTaskFailure(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
         }
         getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
         //
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
         getLogger().trace(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, petasosFulfillmentTaskSharedInstance);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, fulfillmentTask);
         //
         // And now we are done!
         getLogger().debug(".registerActivityStart(): exit, my work is done!");
@@ -185,12 +178,8 @@ public class IngresActivityBeginRegistration {
     // Getters (and Setters)
     //
 
-    protected LocalTaskActivityManager getActionableTaskActivityController() {
-        return actionableTaskActivityController;
-    }
-
-    protected LocalPetasosFulfilmentTaskActivityController getFulfilmentTaskActivityController() {
-        return fulfilmentTaskActivityController;
+    protected LocalTaskActivityManager getTaskActivityManager() {
+        return taskActivityManager;
     }
 
     protected PetasosFulfillmentTaskFactory getFulfillmentTaskFactory() {

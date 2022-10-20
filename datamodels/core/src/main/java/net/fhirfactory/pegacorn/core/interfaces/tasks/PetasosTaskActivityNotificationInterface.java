@@ -23,12 +23,12 @@ package net.fhirfactory.pegacorn.core.interfaces.tasks;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 
 public interface PetasosTaskActivityNotificationInterface {
-    public PetasosTaskExecutionStatusEnum notifyTaskStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
-    public PetasosTaskExecutionStatusEnum notifyTaskFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
-    public PetasosTaskExecutionStatusEnum notifyTaskFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
-    public PetasosTaskExecutionStatusEnum notifyTaskCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
-    public PetasosTaskExecutionStatusEnum notifyTaskWaiting(TaskIdType taskId);
+    public TaskExecutionCommandEnum notifyTaskStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
+    public TaskExecutionCommandEnum notifyTaskFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
+    public TaskExecutionCommandEnum notifyTaskFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
+    public TaskExecutionCommandEnum notifyTaskCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
+    public TaskExecutionCommandEnum notifyTaskWaiting(TaskIdType taskId);
 }

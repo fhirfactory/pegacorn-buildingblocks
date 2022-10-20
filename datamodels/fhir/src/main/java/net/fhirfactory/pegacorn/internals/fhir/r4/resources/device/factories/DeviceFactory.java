@@ -140,7 +140,7 @@ public class DeviceFactory {
 
         //
         // Create the Identifier
-        ComponentIdType nodeId = node.getComponentID();
+        ComponentIdType nodeId = node.getComponentId();
         Period period = new Period();
         if(nodeId.hasIdValidityStartInstant()){
             Date startDate = Date.from(nodeId.getIdValidityStartInstant());
@@ -150,17 +150,17 @@ public class DeviceFactory {
             Date endDate = Date.from(nodeId.getIdValidityEndInstant());
             period.setEnd(endDate);
         }
-        Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, node.getComponentID().getId(), period);
+        Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, node.getComponentId().getId(), period);
         device.addIdentifier(identifier);
 
         //
         // Set the Name
         Device.DeviceDeviceNameComponent nameComponent = new Device.DeviceDeviceNameComponent();
-        nameComponent.setName(node.getComponentID().getName());
+        nameComponent.setName(node.getComponentId().getName());
         nameComponent.setType(Device.DeviceNameType.MODELNAME);
         device.addDeviceName(nameComponent);
         Device.DeviceDeviceNameComponent displayNameComponent = new Device.DeviceDeviceNameComponent();
-        displayNameComponent.setName(node.getComponentID().getDisplayName());
+        displayNameComponent.setName(node.getComponentId().getDisplayName());
         displayNameComponent.setType(Device.DeviceNameType.USERFRIENDLYNAME);
         device.addDeviceName(displayNameComponent);
 
@@ -171,7 +171,7 @@ public class DeviceFactory {
 
         //
         // Set the Device Model
-        device.setModelNumber(node.getParticipantName());
+        device.setModelNumber(node.getParticipant().getParticipantId().getName());
 
         //
         // Set the Security Zone
@@ -351,14 +351,14 @@ public class DeviceFactory {
         //
         // Set the Model Name (Subsystem Name)
         Device.DeviceDeviceNameComponent nameComponent = new Device.DeviceDeviceNameComponent();
-        nameComponent.setName(processingPlant.getSubsystemParticipantName());
+        nameComponent.setName(processingPlant.getParticipant().getParticipantId().getSubsystemName());
         nameComponent.setType(Device.DeviceNameType.MODELNAME);
         device.addDeviceName(nameComponent);
 
         //
         // Set the Other Name (Cluster Service Name)
         Device.DeviceDeviceNameComponent clusterServiceNameComponent = new Device.DeviceDeviceNameComponent();
-        clusterServiceNameComponent.setName(processingPlant.getSubsystemParticipantName());
+        clusterServiceNameComponent.setName(processingPlant.getParticipant().getParticipantId().getSubsystemName());
         clusterServiceNameComponent.setType(Device.DeviceNameType.OTHER);
         device.addDeviceName(clusterServiceNameComponent);
 

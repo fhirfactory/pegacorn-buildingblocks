@@ -28,7 +28,11 @@ import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TaskTraceabilityType implements Serializable {
-    ConcurrentHashMap<Integer, TaskTraceabilityElementType> taskJourney;
+    private ConcurrentHashMap<Integer, TaskTraceabilityElementType> taskJourney;
+    private TaskStorageType persistenceStatus;
+
+    private boolean aRetry;
+    private TaskIdType retryOrigin;
 
     //
     // Constructor(s)
@@ -41,6 +45,39 @@ public class TaskTraceabilityType implements Serializable {
     //
     // Getters and Setters (Bean Methods)
     //
+
+    @JsonIgnore
+    public boolean hasPersistenceStatus(){
+        boolean hasValue = this.persistenceStatus != null;
+        return(hasValue);
+    }
+
+    public TaskStorageType getPersistenceStatus() {
+        if(this.persistenceStatus == null){
+            this.persistenceStatus = new TaskStorageType();
+        }
+        return persistenceStatus;
+    }
+
+    public boolean isaRetry() {
+        return aRetry;
+    }
+
+    public void setaRetry(boolean aRetry) {
+        this.aRetry = aRetry;
+    }
+
+    public TaskIdType getRetryOrigin() {
+        return retryOrigin;
+    }
+
+    public void setRetryOrigin(TaskIdType retryOrigin) {
+        this.retryOrigin = retryOrigin;
+    }
+
+    public void setPersistenceStatus(TaskStorageType persistenceStatus) {
+        this.persistenceStatus = persistenceStatus;
+    }
 
     public ConcurrentHashMap<Integer, TaskTraceabilityElementType> getTaskJourney() {
         return taskJourney;
@@ -97,10 +134,17 @@ public class TaskTraceabilityType implements Serializable {
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "TaskTraceabilityType{" +
-                "taskJourney=" + taskJourney +
-                '}';
+        final StringBuilder sb = new StringBuilder("TaskTraceabilityType{");
+        sb.append("taskJourney=").append(taskJourney);
+        sb.append(", persistenceStatus=").append(persistenceStatus);
+        sb.append(", upstreamActionableTaskId=").append(getUpstreamActionableTaskId());
+        sb.append(", upstreamFulfillmentTaskId=").append(getUpstreamFulfillmentTaskId());
+        sb.append(", aRetry=").append(isaRetry());
+        sb.append(", retryOrigin=").append(getRetryOrigin());
+        sb.append('}');
+        return sb.toString();
     }
 }

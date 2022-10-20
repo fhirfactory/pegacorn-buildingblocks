@@ -21,15 +21,20 @@
  */
 package net.fhirfactory.pegacorn.services.tasks.agent;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
+import net.fhirfactory.pegacorn.core.interfaces.ui.resources.ParticipantUIServicesAPI;
+import net.fhirfactory.pegacorn.core.interfaces.ui.resources.TaskUIServicesAPI;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantControlStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.PetasosParticipantESR;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.PetasosParticipantSummary;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.TaskSummary;
+import net.fhirfactory.pegacorn.petasos.core.participants.management.LocalParticipantManager;
+import net.fhirfactory.pegacorn.petasos.endpoints.services.participants.PetasosParticipantServicesEndpointBase;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -37,16 +42,13 @@ import org.jgroups.blocks.ResponseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistrationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.core.participants.administration.LocalParticipantAdministrator;
-import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.PetasosParticipantSubscriptionServicesEndpointBase;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.*;
 
 @ApplicationScoped
-public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantSubscriptionServicesEndpointBase {
+public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantServicesEndpointBase implements ParticipantUIServicesAPI, TaskUIServicesAPI {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosParticipantServicesAgentEndpoint.class);
 
     private static Long PETASOS_PARTICIPANT_MAP_CACHE_SYNCHRONISATION_INITIAL_WAIT = 60000L;
@@ -61,7 +63,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
     private PetasosTaskRepositoryServiceProviderNameInterface taskServiceProviderName;
 
     @Inject
-    private LocalParticipantAdministrator localParticipantAdministrator;
+    private LocalParticipantManager participantManager;
 
     //
     // Constructor(s)
@@ -130,25 +132,18 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             //
             // 1st, let's synchronise my subscriptions
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Start");
-            PetasosParticipant myProcessingPlantPetasosParticipant = getParticipantHolder().getMyProcessingPlantPetasosParticipant();
+            PetasosParticipant myProcessingPlantPetasosParticipant = getParticipantHolder().getParticipant();
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] myProcessingPlantPetasosParticipant->{}", myProcessingPlantPetasosParticipant);
-            PetasosParticipantRegistration localRegistration = localParticipantAdministrator.getLocalParticipantRegistration(myProcessingPlantPetasosParticipant.getComponentID());
+            PetasosParticipantRegistration localRegistration = participantManager.getLocalParticipantRegistration(myProcessingPlantPetasosParticipant.getComponentId());
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] localRegistration->{}", localRegistration);
             if (localRegistration == null) {
                 getLogger().error(".petasosParticipantCacheSynchronisationDaemon(): My PetasosParticipantRegistration is all wrong!");
             } else {
                 getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): localRegistration->{}", localRegistration);
-                if (localRegistration.getRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_LOCAL_ONLY)
-                    || localRegistration.getRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED)) {
-                    PetasosParticipantRegistration centralRegistration = getPetasosParticipantRegistration(localRegistration.getParticipant().getComponentID());
-                    if (centralRegistration == null) {
-                        centralRegistration = registerPetasosParticipant(localRegistration.getParticipant());
-                    } else {
-                        centralRegistration = updatePetasosParticipant(localRegistration.getParticipant());
-                    }
-                    if(centralRegistration != null) {
-                        localParticipantAdministrator.synchroniseLocalWithCentralCacheDetail(centralRegistration);
-                    }
+                if (localRegistration.getCentralRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_REGISTERED)
+                    || localRegistration.getCentralRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_REGISTRATION_FAILED)) {
+                    PetasosParticipantRegistration centralRegistration = synchroniseRegistration(localRegistration);
+                    participantManager.synchroniseLocalWithCentralCacheDetail(centralRegistration);
                 }
             }
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Finish");
@@ -156,14 +151,14 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             // 2nd, let's synchronise my publishing
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] Start");
             String myProcessingPlantParticipantName = getSubsystemParticipantName();
-            Set<PetasosParticipant> downstreamTaskPerformers = getDownstreamTaskPerformersForTaskProducer(myProcessingPlantParticipantName);
+            Set<PetasosParticipantRegistration> downstreamTaskPerformers = this.getDownstreamSubscribers(myProcessingPlantParticipantName);
             if (!downstreamTaskPerformers.isEmpty()) {
                 getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] There are downstream subscribers!");
-                for (PetasosParticipant currentDownstreamPerformer : downstreamTaskPerformers) {
+                for (PetasosParticipantRegistration currentDownstreamPerformer : downstreamTaskPerformers) {
                     if (getLogger().isTraceEnabled()) {
-                        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getSubsystemParticipantName());
+                        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getParticipantId().getSubsystemName());
                     }
-                    localParticipantAdministrator.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
+                    participantManager.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
                 }
             }
             getProcessingPlantMetricsAgent().touchWatchDogActivityIndicator("ParticipantCacheSynchronisationDaemon");
@@ -189,72 +184,51 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
     //
 
     @Override
-    public boolean isPetasosParticipantRegistered(PetasosParticipant publisher) {
-        return false;
-    }
-
-
-    @Override
-    public PetasosParticipantRegistration registerPetasosParticipant(PetasosParticipant participant) {
-        getLogger().debug(".registerPetasosParticipant(): Entry, participant->{}", participant);
-        if(participant == null ){
-            getLogger().trace(".registerPetasosParticipant: participant is null");
-            PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
-            registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
-            registration.setRegistrationCommentary("participant (PetasosParticipant) is null");
-            registration.setRegistrationInstant(Instant.now());
-            getLogger().debug(".registerPetasosParticipant(): Exit");
-            return(registration);
+    public PetasosParticipantRegistration synchroniseRegistration(PetasosParticipantRegistration localRegistration) {
+        getLogger().debug(".registerParticipant(): Entry, localRegistration->{}", localRegistration);
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
+        if(localRegistration == null ){
+            getLogger().trace(".registerParticipant: localRegistration is null");
+            getLogger().debug(".registerParticipant(): Exit");
+            return(null);
         }
-        if(participant.getSubsystemParticipantName() == null){
-            participant.setSubsystemParticipantName(getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
+        if(StringUtils.isEmpty(localRegistration.getParticipantId().getSubsystemName())){
+            localRegistration.getParticipantId().setSubsystemName(getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getSubsystemName());
         }
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
-        getLogger().trace(".registerPetasosParticipant(): Extract JGroups Address->{}", taskServicesAddress);
+        getLogger().trace(".registerParticipant(): Extract JGroups Address->{}", taskServicesAddress);
         if(taskServicesAddress == null){
-            getLogger().trace(".registerPetasosParticipant(): Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
-            PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
-            registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
-            registration.setRegistrationCommentary(" Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
-            registration.setRegistrationInstant(Instant.now());
-            getLogger().debug(".registerPetasosParticipant(): Exit, (Wrong endpoint technology (should be JGroups))");
-            return(registration);
+            getLogger().warn(".registerParticipant(): Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            getLogger().debug(".registerParticipant(): Exit, (Wrong endpoint technology (should be JGroups))");
+            return(null);
         }
         try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = participant;
-            classSet[0] = PetasosParticipant.class;
+            Object objectSet[] = new Object[]{myName, myParticipantName, localRegistration};
+            Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PetasosParticipantRegistration registration = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "registerPetasosParticipant", objectSet, classSet, requestOptions);
+            PetasosParticipantRegistration participantStatus = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "synchroniseRegistrationHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            getLogger().debug(".registerPetasosParticipant(): Exit, registration->{}", registration);
-            return(registration);
-        } catch (NoSuchMethodException e) {
-            getLogger().debug(".registerPetasosParticipant(): Error (NoSuchMethodException)->", e);
-            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
-            registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
-            registration.setRegistrationInstant(Instant.now());
-            registration.setRegistrationCommentary("Error (NoSuchMethodException)" + e.getMessage());
-            return(registration);
+            getLogger().debug(".registerParticipant(): Exit, participantStatus->{}", participantStatus);
+            return(participantStatus);
         } catch (Exception e) {
-            getLogger().debug(".registerPetasosParticipant(): Error (GeneralException) ->",e);
+            getLogger().warn(".registerParticipant(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
-            registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
-            registration.setRegistrationInstant(Instant.now());
-            registration.setRegistrationCommentary("Error (NoSuchMethodException)" + e.getMessage());
-            return(registration);
+            PetasosParticipantRegistration clonedRegistration = new PetasosParticipantRegistration(localRegistration);
+            clonedRegistration.setCentralRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_REGISTRATION_FAILED);
+            clonedRegistration.setCentralRegistrationInstant(Instant.now());
+            return(clonedRegistration);
         }
     }
 
     @Override
-    public Set<PetasosParticipant> getDownstreamTaskPerformersForTaskProducer(String producerServiceName) {
+    public Set<PetasosParticipantRegistration> getDownstreamSubscribers(String producerServiceName) {
         getLogger().debug(".getDownstreamTaskPerformersForTaskProducer(): Entry, producerServiceName->{}", producerServiceName);
         if(StringUtils.isEmpty(producerServiceName)){
             return(new HashSet<>());
         }
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
         getLogger().trace(".getDownstreamTaskPerformersForTaskProducer(): Extract JGroups Address->{}", taskServicesAddress);
         if(taskServicesAddress == null) {
@@ -262,12 +236,10 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             return (new HashSet<>());
         }
         try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = producerServiceName;
-            classSet[0] = String.class;
+            Object objectSet[] = new Object[]{myName, myParticipantName, producerServiceName};
+            Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Set<PetasosParticipant> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getDownstreamTaskPerformersForTaskProducer", objectSet, classSet, requestOptions);
+            Set<PetasosParticipantRegistration> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getDownstreamSubscribersHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
             getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
             getLogger().debug(".getDownstreamTaskPerformersForTaskProducer(): Exit, participantSet->{}", participantSet);
@@ -283,184 +255,249 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
         }
     }
 
+    //
+    // Command API
+    //
+
     @Override
-    public PetasosParticipantRegistration updatePetasosParticipant(PetasosParticipant participant) {
-        getLogger().debug(".updatePetasosParticipant(): Entry, participant->{}", participant);
-        if(participant == null){
-            return(null);
-        }
-        if(participant.getSubsystemParticipantName() == null){
-            participant.setSubsystemParticipantName(getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
-        }
+    public List<PetasosParticipantSummary> listSubsystems() {
+        getLogger().debug(".listSubsystems(): Entry");
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
-        getLogger().trace(".updatePetasosParticipant(): Extract JGroups Address->{}", taskServicesAddress);
+        getLogger().trace(".listSubsystems(): Extract JGroups Address->{}", taskServicesAddress);
         if(taskServicesAddress == null) {
-            getLogger().warn(".updatePetasosParticipant: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            getLogger().warn(".listSubsystems: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            List<PetasosParticipantSummary> answer = new ArrayList<>();
+            return (answer);
+        }
+        try {
+            Object objectSet[] = new Object[]{myName, myParticipantName};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            List<PetasosParticipantSummary> answer = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "listSubsystemsHandler", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+            getLogger().debug(".listSubsystems(): Exit, answer->{}", answer);
+            return(answer);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().debug(".listSubsystems(): Error (GeneralException) ->",e);
+            List<PetasosParticipantSummary> answer = new ArrayList<>();
+            return(answer);
+        }
+    }
+
+    @Override
+    public List<PetasosParticipantSummary> listParticipants(String subsystemName) {
+        getLogger().debug(".listParticipants(): Entry, subsystemName->{}", subsystemName);
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
+        Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+        getLogger().trace(".listParticipants(): Extract JGroups Address->{}", taskServicesAddress);
+        if(taskServicesAddress == null) {
+            getLogger().warn(".listParticipants: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            List<PetasosParticipantSummary> answer =new ArrayList<>();
+            return (answer);
+        }
+        try {
+            Object objectSet[] = new Object[]{myName, myParticipantName, subsystemName};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            List<PetasosParticipantSummary> answer = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "listParticipantsHandler", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+            getLogger().debug(".listParticipants(): Exit, answer->{}", answer);
+            return(answer);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().debug(".listParticipants(): Error (GeneralException) ->",e);
+            List<PetasosParticipantSummary> answer = new ArrayList<>();
+            return(answer);
+        }
+    }
+
+    @Override
+    public PetasosParticipantSummary setControlStatus(String participantName, PetasosParticipantControlStatusEnum controlStatus) {
+        getLogger().debug(".setControlStatus(): Entry, participantName->{}", participantName);
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
+        Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+        getLogger().trace(".setControlStatus(): Extract JGroups Address->{}", taskServicesAddress);
+        if(taskServicesAddress == null) {
+            getLogger().warn(".setControlStatus: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
             return (null);
         }
         try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = participant;
-            classSet[0] = PetasosParticipant.class;
+            Object objectSet[] = new Object[]{myName, myParticipantName, participantName, controlStatus};
+            Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PetasosParticipantRegistration registration = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "updatePetasosParticipant", objectSet, classSet, requestOptions);
+            PetasosParticipantSummary answer = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "setControlStatusHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            getLogger().debug(".getTaskPerformersForTaskProducer(): Exit, registration->{}", registration);
-            return(registration);
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".getTaskPerformersForTaskProducer(): Error (NoSuchMethodException)->", e);
-            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
-            registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
-            registration.setRegistrationCommentary("Error (NoSuchMethodException)");
-            registration.setRegistrationInstant(Instant.now());
-            getLogger().debug(".getTaskPerformersForTaskProducer(): Exit, registration->{}", registration);
-            return(registration);
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+            getLogger().debug(".setControlStatus(): Exit, answer->{}", answer);
+            return(answer);
         } catch (Exception e) {
-            getLogger().debug(".getTaskPerformersForTaskProducer(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            PetasosParticipantRegistration registration = new PetasosParticipantRegistration();
-            registration.setRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PETASOS_PARTICIPANT_REGISTRATION_FAILED);
-            registration.setRegistrationCommentary("Error (GeneralException)");
-            registration.setRegistrationInstant(Instant.now());
-            getLogger().debug(".getTaskPerformersForTaskProducer(): Exit, registration->{}", registration);
+            getLogger().debug(".setControlStatus(): Error (GeneralException) ->",e);
             return(null);
         }
     }
 
     @Override
-    public PetasosParticipantRegistration deregisterPetasosParticipant(PetasosParticipant participant) {
-        getLogger().debug(".deregisterPetasosParticipant(): Entry, participant->{}", participant);
-        if(participant == null){
-            return(null);
-        }
+    public List<TaskSummary> listTasks(String participantName, TaskOutcomeStatusEnum status, boolean order, Instant startTime, Instant endTime) {
+        getLogger().debug(".listTasks(): Entry, participantName->{}, status->{}, order->{}, startTime->{}, endTime->{}", participantName, status, order, startTime, endTime);
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
-        getLogger().trace(".deregisterPetasosParticipant(): Extract JGroups Address->{}", taskServicesAddress);
+        getLogger().trace(".listTasks(): Extract JGroups Address->{}", taskServicesAddress);
         if(taskServicesAddress == null) {
-            getLogger().warn(".deregisterPetasosParticipant: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            getLogger().warn(".listTasks: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            return (new ArrayList<>());
+        }
+        try {
+            Object objectSet[] = new Object[]{myName, myParticipantName, participantName, status, order, startTime, endTime};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            List<TaskSummary> answer = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "listTasksHandler", objectSet, classSet, requestOptions);
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+            getLogger().debug(".listTasks(): Exit, answer->{}", answer);
+            return(answer);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().debug(".listTasks(): Error (GeneralException) ->",e);
+            return(new ArrayList<>());
+        }
+    }
+
+    @Override
+    public TaskSummary initiateTaskRedo(String taskId) {
+        getLogger().debug(".initiateTaskRedo(): Entry, taskId->{}}", taskId);
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
+        Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+        getLogger().trace(".initiateTaskRedo(): Extract JGroups Address->{}", taskServicesAddress);
+        if(taskServicesAddress == null) {
+            getLogger().warn(".initiateTaskRedo: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
             return (null);
         }
         try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = participant;
-            classSet[0] = PetasosParticipant.class;
+            Object objectSet[] = new Object[]{myName, myParticipantName, taskId};
+            Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PetasosParticipantRegistration registration = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "deregisterPetasosParticipant", objectSet, classSet, requestOptions);
+            TaskSummary answer = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "redoTaskHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            getLogger().debug(".deregisterPetasosParticipant(): Exit, registration->{}", registration);
-            return(registration);
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".deregisterPetasosParticipant(): Error (NoSuchMethodException)->", e);
-            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            return(null);
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+            getLogger().debug(".initiateTaskRedo(): Exit, answer->{}", answer);
+            return(answer);
         } catch (Exception e) {
-            getLogger().error(".deregisterPetasosParticipant(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().debug(".redoTask(): Error (GeneralException) ->",e);
             return(null);
         }
     }
 
     @Override
-    public PetasosParticipantRegistration getPetasosParticipantRegistration(ComponentIdType participantId) {
-        getLogger().debug(".getPetasosParticipantRegistration(): Entry, participantId->{}", participantId);
-        if(participantId == null){
-            return(null);
-        }
+    public TaskSummary initiateTaskCancellation(String taskId) {
+        getLogger().debug(".initiateTaskCancellation(): Entry, taskId->{}}", taskId);
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
-        getLogger().trace(".getPetasosParticipantRegistration(): Extract JGroups Address->{}", taskServicesAddress);
+        getLogger().trace(".initiateTaskCancellation(): Extract JGroups Address->{}", taskServicesAddress);
         if(taskServicesAddress == null) {
-            getLogger().warn(".getPetasosParticipantRegistration(): Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            getLogger().warn(".initiateTaskCancellation: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
             return (null);
         }
         try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = participantId;
-            classSet[0] = ComponentIdType.class;
+            Object objectSet[] = new Object[]{myName, myParticipantName, taskId};
+            Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PetasosParticipantRegistration registration = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getPetasosParticipantRegistration", objectSet, classSet, requestOptions);
+            TaskSummary answer = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "cancelTaskHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            getLogger().debug(".getPetasosParticipantRegistration(): Exit, registration->{}", registration);
-            return(registration);
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".getPetasosParticipantRegistration(): Error (NoSuchMethodException)->", e);
-            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            return(null);
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+            getLogger().debug(".initiateTaskCancellation(): Exit, answer->{}", answer);
+            return(answer);
         } catch (Exception e) {
-            getLogger().error(".getPetasosParticipantRegistration(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().debug(".initiateTaskCancellation(): Error (GeneralException) ->",e);
             return(null);
         }
     }
 
     @Override
-    public Set<PetasosParticipantRegistration> getParticipantRegistrationSetForParticipantName(String participantSeviceName) {
-        getLogger().debug(".getParticipantRegistrationSetForService(): Entry, performerServiceName->{}", participantSeviceName);
-        if(StringUtils.isEmpty(participantSeviceName)){
-            return(new HashSet<>());
-        }
+    public PetasosParticipantSummary getParticipantSummary(String participantName) {
+        getLogger().debug(".getParticipantSummary(): Entry, participantName->{}", participantName);
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
-        getLogger().trace(".getParticipantRegistrationSetForService(): Extract JGroups Address->{}", taskServicesAddress);
+        getLogger().trace(".getParticipantSummary(): Extract JGroups Address->{}", taskServicesAddress);
         if(taskServicesAddress == null) {
-            getLogger().warn(".getParticipantRegistrationSetForService: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
-            return (new HashSet<>());
+            getLogger().warn(".getParticipantSummary: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            return (null);
         }
         try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = participantSeviceName;
-            classSet[0] = String.class;
+            Object objectSet[] = new Object[]{myName, myParticipantName, participantName};
+            Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Set<PetasosParticipantRegistration> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getParticipantRegistrationSetForService", objectSet, classSet, requestOptions);
+            PetasosParticipantSummary answer = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getParticipantSummaryHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            getLogger().debug(".getParticipantRegistrationSetForService(): Exit, participantSet->{}", participantSet);
-            return(participantSet);
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".getParticipantRegistrationSetForService(): Error (NoSuchMethodException)->", e);
-            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            return(new HashSet<>());
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+            getLogger().debug(".getParticipantSummary(): Exit, answer->{}", answer);
+            return(answer);
         } catch (Exception e) {
-            getLogger().error(".getParticipantRegistrationSetForService(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            return(new HashSet<>());
+            getLogger().debug(".getParticipantSummary(): Error (GeneralException) ->",e);
+            return(null);
         }
     }
 
     @Override
-    public Set<PetasosParticipantRegistration> getAllRegistrations() {
-        getLogger().debug(".getAllRegistrations(): Entry");
+    public PetasosParticipantESR getParticipantESR(String participantName) {
+        getLogger().debug(".getParticipantESR(): Entry, participantName->{}", participantName);
+        String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
+        String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address taskServicesAddress = getCandidateTargetServiceAddress(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
-        getLogger().trace(".getAllRegistrations(): Extract JGroups Address->{}", taskServicesAddress);
+        getLogger().trace(".getParticipantESR(): Extract JGroups Address->{}", taskServicesAddress);
         if(taskServicesAddress == null) {
-            getLogger().warn(".getAllRegistrations: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
-            return (new HashSet<>());
+            getLogger().warn(".getParticipantESR: Cannot resolve Task Services Provider endpoint (JGroups Channel Name)");
+            return (null);
         }
         try {
+            Object objectSet[] = new Object[]{myName, myParticipantName, participantName};
+            Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Set<PetasosParticipantRegistration> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getAllRegistrations", null, null, requestOptions);
+            PetasosParticipantESR answer = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getParticipantESRHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
-            getLogger().debug(".getTaskPerformerServiceRegistration(): Exit, participantSet->{}", participantSet);
-            return(participantSet);
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".getTaskPerformerServiceRegistration(): Error (NoSuchMethodException)->", e);
-            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            return(new HashSet<>());
+            getProcessingPlantMetricsAgent().touchPathwaySynchronisationIndicator(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
+            getLogger().debug(".getParticipantESR(): Exit, answer->{}", answer);
+            return(answer);
         } catch (Exception e) {
-            getLogger().error(".getTaskPerformerServiceRegistration(): Error (GeneralException) ->",e);
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            return(new HashSet<>());
+            getLogger().debug(".getParticipantESR(): Error (GeneralException) ->",e);
+            return(null);
         }
     }
+
+    protected ITOpsNotificationContent makeErrorResponse(String content){
+        ITOpsNotificationContent response = new ITOpsNotificationContent();
+        if(StringUtils.isEmpty(content)){
+            content = "Unknown Error";
+        }
+        response.setContent(content);
+        response.setContentHeading(content);
+        response.setFormattedContent("<br>"+content+"</br>");
+        return(response);
+    }
+
+
+    //
+    // Getters (and Setters)
+    //
 
     @Override
     protected Logger specifyLogger() {
         return LOG;
     }
 
-    @Override
-    public PetasosParticipant getMyPetasosParticipant() {
-        return (getParticipantHolder().getMyProcessingPlantPetasosParticipant());
-    }
-}
+ }

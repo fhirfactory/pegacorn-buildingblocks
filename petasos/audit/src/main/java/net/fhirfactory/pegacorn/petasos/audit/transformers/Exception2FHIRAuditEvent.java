@@ -103,7 +103,7 @@ public class Exception2FHIRAuditEvent  extends Pegacorn2FHIRAuditEventBase {
 
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
-                processingPlant.getMeAsASoftwareComponent().getComponentID().getDisplayName(),
+                processingPlant.getTopologyNode().getComponentId().getDisplayName(),
                 processingPlant.getHostName(),
                 null,
                 null,

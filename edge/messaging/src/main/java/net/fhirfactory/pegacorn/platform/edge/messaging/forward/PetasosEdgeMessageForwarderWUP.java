@@ -29,8 +29,6 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
-import net.fhirfactory.pegacorn.petasos.core.participants.administration.LocalParticipantAdministrator;
-import net.fhirfactory.pegacorn.petasos.core.participants.administration.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PetasosIPCMessagingEndpoint;
 import net.fhirfactory.pegacorn.petasos.wup.helper.EgressActivityFinalisationRegistration;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
@@ -65,11 +63,6 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
     @Inject
     private PegacornIPCCommonValues ipcFunctionalityNames;
 
-    @Inject
-    LocalPetasosParticipantSubscriptionMapIM topicServer;
-
-    @Inject
-    LocalParticipantAdministrator localParticipantAdministrator;
 
     @Override
     protected WorkshopInterface specifyWorkshop() {
@@ -87,10 +80,6 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
 
     public PegacornIPCCommonValues getIPCComponentNames() {
         return ipcFunctionalityNames;
-    }
-
-    public LocalPetasosParticipantSubscriptionMapIM getTopicServer(){
-        return(this.topicServer);
     }
 
     @Override
@@ -201,6 +190,6 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
 
     @Override
     public ComponentIdType getComponentId() {
-        return (getMeAsATopologyComponent().getComponentID());
+        return (getTopologyNode().getComponentId());
     }
 }

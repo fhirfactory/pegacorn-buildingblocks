@@ -142,7 +142,7 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
         sb.append(", enablingProcessingPlantId=").append(enablingProcessingPlantId);
         sb.append(", endpointType=").append(endpointType);
         sb.append(", capabilities=").append(getCapabilities());
-        sb.append(", participantId=").append(getParticipantId());
+        sb.append(", participantId=").append(getParticipant());
         sb.append(", deploymentSite='").append(getDeploymentSite()).append('\'');
         sb.append(", lastActivityInstant=").append(getLastActivityInstant());
         sb.append(", lastReportingInstant=").append(getLastReportingInstant());
@@ -150,7 +150,7 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
         sb.append(", concurrencyMode=").append(getConcurrencyMode());
         sb.append(", resilienceMode=").append(getResilienceMode());
         sb.append(", securityZone=").append(getSecurityZone());
-        sb.append(", componentID=").append(getComponentID());
+        sb.append(", componentID=").append(getComponentId());
         sb.append(", componentType=").append(getComponentType());
         sb.append(", metrics=").append(getMetrics());
         sb.append(", componentSystemRole=").append(getComponentSystemRole());

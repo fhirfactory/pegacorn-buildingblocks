@@ -224,8 +224,8 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         }
         if(fulfillmentTask.hasTaskFulfillment()) {
             if(fulfillmentTask.getTaskFulfillment().hasFulfiller()) {
-                if(fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipantId() != null) {
-                    String name = fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipantId().getFullName();
+                if(fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant() != null) {
+                    String name = fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId().getFullName();
                     return (name);
                 }
             }

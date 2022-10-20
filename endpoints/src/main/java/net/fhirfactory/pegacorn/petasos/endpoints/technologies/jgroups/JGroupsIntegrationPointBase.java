@@ -21,24 +21,13 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jgroups.Address;
-import org.jgroups.blocks.RequestOptions;
-import org.jgroups.blocks.ResponseMode;
-
 import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosServicesEndpointRegistrationService;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
+import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
@@ -63,6 +52,18 @@ import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
+import org.apache.commons.lang3.StringUtils;
+import org.jgroups.Address;
+import org.jgroups.blocks.RequestOptions;
+import org.jgroups.blocks.ResponseMode;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPointAdapterBase {
 
@@ -137,6 +138,18 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         return(channelName);
     }
 
+    @Override
+    protected String specifySubsystemParticipantName() {
+        return (getJGroupsIntegrationPoint().getParticipant().getParticipantId().getSubsystemName());
+    }
+
+    @Override
+    protected String specifyJGroupsStackFileName() {
+        return (getJGroupsIntegrationPoint().getConfigurationFileName());
+    }
+
+
+
     //
     // PostConstruct Initialisation
     //
@@ -151,6 +164,8 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         // 1st, Derive my Endpoint (Topology)
         getLogger().info(".initialise(): Step 1: Start ==> Get my IPCEndpoint Detail");
         setJGroupsIntegrationPoint(resolveTopologyNodeForJGroupsIntegrationPoint());
+        getJGroupsIntegrationPoint().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STARTING);
+        getJGroupsIntegrationPoint().setEndpointStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_STARTED);
         getLogger().info(".initialise(): Step 1: Complete ==> IPCEndpoint derived ->{}", getJGroupsIntegrationPoint());
 
         // 2nd, the Register/Update the IntegrationPoint Set
@@ -162,45 +177,46 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         getLogger().info(".initialise(): Step 3: Start ==> Initialise my JChannel Connection & Join Cluster/Group");
         establishJChannel();
         getLogger().info(".initialise(): Step 3: Completed ==> ipcChannel ->{}", getIPCChannel());
-
-        //
-        // 4th, Our Endpoint is Operational, So Assign Status
-        //
-        getLogger().info(".initialise(): Step 4: Start ==> Update my JGroupsIntegrationPoint status to OPERATIONAL");
-        getJGroupsIntegrationPoint().setEndpointStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
-        getLogger().info(".initialise(): Step 4: Completed ==> Update my JGroupsIntegrationPoint status to OPERATIONAL");
         //
         // 5th, Do an initial endpoint scan
         //
-        getLogger().info(".initialise(): Step 5: Start ==> Schedule a general IntegrationPoint scan");
+        getLogger().info(".initialise(): Step 4: Start ==> Schedule a general IntegrationPoint scan");
         scheduleEndpointScan();
-        getLogger().info(".initialise(): Step 5: Completed ==> Schedule a general IntegrationPoint scan");
+        getLogger().info(".initialise(): Step 4: Completed ==> Schedule a general IntegrationPoint scan");
         //
         // 6th, Now kickstart the ongoing Endpoint Validation Process
         //
-        getLogger().info(".initialise(): Step 6: Start ==> Schedule general IntegrationPoint validation watchdog");
+        getLogger().info(".initialise(): Step 5: Start ==> Schedule general IntegrationPoint validation watchdog");
         scheduleEndpointValidation();
-        getLogger().info(".initialise(): Step 6: Completed ==> Schedule general IntegrationPoint validation watchdog");
+        getLogger().info(".initialise(): Step 5: Completed ==> Schedule general IntegrationPoint validation watchdog");
         //
         // 7th, Call any subclass PostConstruct methods.
         //
-        getLogger().info(".initialise(): Step 7: Start ==> Executing subclass PostConstruct activities");
+        getLogger().info(".initialise(): Step 6: Start ==> Executing subclass PostConstruct activities");
         executePostConstructActivities();
-        getLogger().info(".initialise(): Step 7: Completed ==> Executing subclass PostConstruct activities");
+        getLogger().info(".initialise(): Step 6: Completed ==> Executing subclass PostConstruct activities");
         //
         // Register myself with a WUP for Metrics Reporting
         //
-        getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
+        getLogger().info(".initialise(): Step 7: Start ==> Registering with WUP");
         endpointRegistrationService.registerEndpoint(specifyPetasosEndpointFunctionType(), getJGroupsIntegrationPoint());
-        getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
+        getLogger().info(".initialise(): Step 7: Finish ==> Registering with WUP");
         //
         // Create my Metrics Agent
         //
         getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
-        String participantName = getJGroupsIntegrationPoint().getParticipantId().getName();
+        String participantName = getJGroupsIntegrationPoint().getParticipant().getParticipantId().getName();
         getLogger().info(".initialise(): Step 8: participantName->{}", participantName);
-        this.metricsAgent = metricsFactory.newEndpointMetricsAgent(processingPlantCapabilityStatement, getJGroupsIntegrationPoint().getComponentID(),participantName, "Internal", specifyJGroupsChannelName());
+        this.metricsAgent = metricsFactory.newEndpointMetricsAgent(processingPlantCapabilityStatement, getJGroupsIntegrationPoint().getComponentId(),participantName, "Internal", specifyJGroupsChannelName());
         getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
+
+        //
+        // 8th, Our Endpoint is Operational, So Assign Status
+        //
+        getLogger().info(".initialise(): Step 9: Start ==> Set Integration Point to Ready Status");
+        getJGroupsIntegrationPoint().setEndpointStatus(PetasosEndpointStatusEnum.PETASOS_ENDPOINT_STATUS_OPERATIONAL);
+        getJGroupsIntegrationPoint().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
+        getLogger().info(".initialise(): Step 9: Finish ==> Set Integration Point to Ready Status");
         // We're done!
         setInitialised(true);
 
@@ -252,6 +268,23 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     protected ProcessingPlantMetricsAgent getProcessingPlantMetricsAgent(){
         return(processingPlantMetricsAgent.getMetricsAgent());
+    }
+
+    public SoftwareComponentStatusEnum getComponentStatus(){
+        if(getJGroupsIntegrationPoint() == null){
+            return(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN);
+        }
+        if(getJGroupsIntegrationPoint().getComponentStatus() == null){
+            return(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN);
+        }
+        return(getJGroupsIntegrationPoint().getComponentStatus());
+    }
+
+    public boolean isOperational(){
+        if(getComponentStatus().equals(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL)){
+            return(true);
+        }
+        return(false);
     }
 
     //
@@ -331,10 +364,10 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
             return(PetasosParticipantStatusEnum.PARTICIPANT_HAS_FAILED);
         }
         String targetSubsystemName = getComponentNameUtilities().getSubsystemNameFromEndpointName(targetJGroupsIP.getSubsystemParticipantName());
-        String mySubsystemName = getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName();
+        String mySubsystemName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getSubsystemName();
         if(targetSubsystemName.contentEquals(mySubsystemName)){
             getLogger().debug(".checkJGroupsIntegrationPoint(): Exit, Endpoint is one of mine!");
-            return(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getParticipantStatus());
+            return(getParticipantHolder().getParticipant().getParticipantStatus());
         }
         JGroupsIntegrationPointProbeReport report = probeJGroupsIntegrationPoint(targetJGroupsIP);
         PetasosParticipantStatusEnum endpointStatus = null;
@@ -354,24 +387,40 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
     protected JGroupsIntegrationPoint resolveTopologyNodeForJGroupsIntegrationPoint(){
         getLogger().debug(".resolveTopologyNodeForJGroupsIntegrationPoint(): Entry, endpointFunction->{}", specifyPetasosEndpointFunctionType());
         String name = getInterfaceNames().getEndpointName(PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT, specifyPetasosEndpointFunctionType().getDisplayName());
-        getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): Required TopologyNodeRDN.nodeName->{}", name);
-        for(ComponentIdType currentEndpointId: getProcessingPlant().getMeAsASoftwareComponent().getEndpoints()){
-            getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): currentEndpointId->{}",currentEndpointId);
-            IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointId);
-            getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): currentEndpoint->{}",currentEndpoint);
-            PetasosEndpointTopologyTypeEnum endpointType = currentEndpoint.getEndpointType();
-            boolean endpointTypeMatches = endpointType.equals(PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
-            if(endpointTypeMatches){
-                getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): endpointTypeMatches!!!");
-                if(currentEndpoint.getComponentID().getName().contentEquals(name)) {
-                    JGroupsIntegrationPoint resolvedEndpoint = (JGroupsIntegrationPoint)currentEndpoint;
-                    getLogger().debug(".resolveTopologyNodeForJGroupsIntegrationPoint(): Exit, found IPCTopologyEndpoint and assigned it, resolvedEndpoint->{}", resolvedEndpoint);
-                    return(resolvedEndpoint);
+        getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): Required participantId.getName()->{}", name);
+
+        JGroupsIntegrationPoint resolvedEndpoint = null;
+
+        for(SoftwareComponent currentComponent: getTopologyIM().getNodeElementSet()){
+            if(getLogger().isTraceEnabled()) {
+                getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): currentComponent.getParticipant().getParticipantId()->{}", currentComponent.getParticipant().getParticipantId());
+            }
+            if(currentComponent.getComponentType().equals(SoftwareComponentTypeEnum.ENDPOINT)) {
+                IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint) currentComponent;
+                getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): is of type endpoint, checking other details");
+                PetasosEndpointTopologyTypeEnum endpointType = currentEndpoint.getEndpointType();
+                boolean endpointTypeMatches = endpointType.equals(PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
+                if (endpointTypeMatches) {
+                    getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): is a JGroups Endpoint!");
+                    if (currentEndpoint.getParticipant().getParticipantId().getName().contentEquals(name)) {
+                        resolvedEndpoint = (JGroupsIntegrationPoint) currentEndpoint;
+                        if(getLogger().isTraceEnabled()) {
+                            getLogger().trace(".resolveTopologyNodeForJGroupsIntegrationPoint(): found Endpoint!");
+                        }
+                        break;
+                    } else {
+                        getLogger().trace("..resolveTopologyNodeForJGroupsIntegrationPoint(): name does not match");
+                    }
                 }
             }
         }
-        getLogger().error(".deriveIPCTopologyEndpoint(): Exit, Could not find appropriate Endpoint for {}",specifyPetasosEndpointFunctionType().getDisplayName());
-        return(null);
+        if(resolvedEndpoint == null) {
+            getLogger().error(".deriveIPCTopologyEndpoint(): Exit, Could not find appropriate Endpoint for {}", specifyPetasosEndpointFunctionType().getDisplayName());
+            return(null);
+        } else {
+            getLogger().debug(".resolveTopologyNodeForJGroupsIntegrationPoint(): Exit, found IPCTopologyEndpoint and assigned it, resolvedEndpoint.getComponentId()->{}", resolvedEndpoint.getComponentId());
+            return (resolvedEndpoint);
+        }
     }
 
     //
@@ -401,28 +450,28 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     protected JGroupsIntegrationPointSummary createSummary(JGroupsIntegrationPoint integrationPoint){
         JGroupsIntegrationPointSummary summary = integrationPoint.toSummary();
-        summary.setParticipantStatus(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getParticipantStatus());
+        summary.setParticipantStatus(getParticipantHolder().getParticipant().getParticipantStatus());
         summary.setUniqueIdQualifier(getComponentNameUtilities().getCurrentUUID());
         return(summary);
     }
 
     protected JGroupsIntegrationPointProbeQuery createJGroupsIPQuery(JGroupsIntegrationPoint integrationPoint){
         JGroupsIntegrationPointProbeQuery query = new JGroupsIntegrationPointProbeQuery(integrationPoint.toSummary());
-        query.setParticipantStatus(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getParticipantStatus());
+        query.setParticipantStatus(getParticipantHolder().getParticipant().getParticipantStatus());
         query.setUniqueIdQualifier(getComponentNameUtilities().getCurrentUUID());
         return(query);
     }
 
     protected JGroupsIntegrationPointProbeReport createJGroupsIPReport(JGroupsIntegrationPoint integrationPoint){
         JGroupsIntegrationPointProbeReport report = new JGroupsIntegrationPointProbeReport(integrationPoint.toSummary());
-        report.setParticipantStatus(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getParticipantStatus());
+        report.setParticipantStatus(getParticipantHolder().getParticipant().getParticipantStatus());
         report.setUniqueIdQualifier(getComponentNameUtilities().getCurrentUUID());
         report.setReportInstant(Instant.now());
         report.setFunction(integrationPoint.getInterfaceFunction());
         report.setChannelName(integrationPoint.getChannelName());
-        report.setComponentId(integrationPoint.getComponentID());
-        report.setProcessingPlantInstanceId(getProcessingPlant().getMeAsASoftwareComponent().getComponentID());
-        report.setParticipantStatus(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getParticipantStatus());
+        report.setComponentId(integrationPoint.getComponentId());
+        report.setProcessingPlantInstanceId(getProcessingPlant().getTopologyNode().getComponentId());
+        report.setParticipantStatus(getParticipantHolder().getParticipant().getParticipantStatus());
         report.setSite(getProcessingPlant().getDeploymentSite());
         report.setZone(getProcessingPlant().getNetworkZone());
         report.setIntegrationPointStatus(integrationPoint.getEndpointStatus());

@@ -40,16 +40,16 @@ public class ProcessingPlantPetasosParticipantHolder {
     // Getters and Setters
     //
 
-    public boolean hasMyProcessingPlantPetasosParticipant(){
+    public boolean hasMeAsPetasosParticipant(){
         boolean hasValue = this.myProcessingPlantPetasosParticipant != null;
         return(hasValue);
     }
 
-    public PetasosParticipant getMyProcessingPlantPetasosParticipant() {
+    public PetasosParticipant getParticipant() {
         return myProcessingPlantPetasosParticipant;
     }
 
-    public void setMyProcessingPlantPetasosParticipant(PetasosParticipant myProcessingPlantPetasosParticipant) {
+    public void setMeAsPetasosParticipant(PetasosParticipant myProcessingPlantPetasosParticipant) {
         this.myProcessingPlantPetasosParticipant = myProcessingPlantPetasosParticipant;
     }
 

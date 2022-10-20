@@ -21,14 +21,6 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
@@ -38,6 +30,13 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftw
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.oam.topology.PetasosMonitoredTopologyReportingAgent;
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 public abstract class Workshop extends RouteBuilder implements WorkshopInterface {
 
@@ -98,10 +97,8 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     private void buildWorkshop() {
         getLogger().debug(".buildWorkshop(): Entry, adding Workshop --> {}, version --> {}", specifyWorkshopName(), specifyWorkshopVersion());
-        WorkshopSoftwareComponent workshop = getTopologyFactory().buildWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getMeAsASoftwareComponent(),specifyWorkshopType());
-        String workshopParticipantName = getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName() + "." + specifyWorkshopName();
-        workshop.setParticipantName(workshopParticipantName);
-        topologyIM.addTopologyNode(getProcessingPlant().getMeAsASoftwareComponent().getComponentID(), workshop);
+        WorkshopSoftwareComponent workshop = getTopologyFactory().buildWorkshop(specifyWorkshopName(), specifyWorkshopVersion(), getProcessingPlant().getTopologyNode(),specifyWorkshopType());
+        topologyIM.addTopologyNode(getProcessingPlant().getTopologyNode().getComponentId(), workshop);
         this.workshopNode = workshop;
         getLogger().debug(".buildWorkshop(): Exit");
     }
@@ -123,7 +120,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
     }
 
     private String getFriendlyName(){
-        String nodeName = getWorkshopNode().getComponentID().getDisplayName();
+        String nodeName = getWorkshopNode().getComponentId().getDisplayName();
         return(nodeName);
     }
 

@@ -4,7 +4,7 @@ import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
@@ -73,14 +73,14 @@ public abstract class GenericSTAWUPTemplate {
     private WorkUnitProcessorSoftwareComponent buildSTAClientNode() {
         getLogger().debug(".buildSTAClientNode(): Entry");
         getLogger().trace(".buildSTAClientNode(): Now construct the Work Unit Processing Node");
-        String participantDisplayName = getWorkshop().getParticipantId().getDisplayName() + "." + specifySTAClientName();
+        String participantDisplayName = getWorkshop().getParticipant().getParticipantId().getDisplayName() + "." + specifySTAClientName();
         WorkUnitProcessorSoftwareComponent wup = getTopologyFactory().buildWUP(specifySTAClientName(), specifySTAClientVersion(), participantDisplayName, getWorkshop(), SoftwareComponentTypeEnum.WUP);
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Concurrency Mode");
         wup.setConcurrencyMode(getWorkshop().getConcurrencyMode());
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Resillience Mode");
         wup.setResilienceMode(getWorkshop().getResilienceMode());
         getLogger().trace(".buildSTAClientNode(): Now registering the Node");
-        getTopologyIM().addTopologyNode(getWorkshop().getComponentID(), wup);
+        getTopologyIM().addTopologyNode(getWorkshop().getComponentId(), wup);
         getLogger().debug(".buildSTAClientNode(): Exit, buildSTAClientNode (NodeElementIdentifier) --> {}", wup);
         return (wup);
     }
@@ -89,7 +89,7 @@ public abstract class GenericSTAWUPTemplate {
     }
 
     public String getWUPName() {
-        return (getWUP().getComponentID().getName());
+        return (getWUP().getComponentId().getName());
     }
 
     public PetasosTaskJobCard getWUPJobCard() {

@@ -53,7 +53,7 @@ public class PetasosMonitoredTopologyGraphFactory {
             LOG.debug(".newTopologyGraph(): Looking for ComponentID");
             if(processingPlant.getSolutionNode().getComponentType() != null) {
                 LOG.debug(".newTopologyGraph(): Retrieving the ComponentID");
-                solutionName = processingPlant.getSolutionNode().getComponentID().getName();
+                solutionName = processingPlant.getSolutionNode().getComponentId().getName();
             }
         }
         LOG.debug(".newTopologyGraph(): Setting Solution Name");

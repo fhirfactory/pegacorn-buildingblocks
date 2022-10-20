@@ -127,7 +127,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
 
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
-                processingPlant.getMeAsASoftwareComponent().getComponentID().getDisplayName(),
+                processingPlant.getTopologyNode().getComponentId().getDisplayName(),
                 processingPlant.getHostName(),
                 sourceSite,
                 null,
@@ -200,7 +200,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                         switch (wup.getIngresEndpoint().getEndpointType()) {
                             case MLLP_SERVER: {
                                 MLLPServerEndpoint mllpServerEndpoint = (MLLPServerEndpoint) wup.getIngresEndpoint();
-                                String source = processingPlant.getMeAsASoftwareComponent().getParticipantId().getSubsystemName();
+                                String source = processingPlant.getTopologyNode().getParticipant().getParticipantId().getSubsystemName();
                                 String port = mllpServerEndpoint.getMLLPServerAdapter().getPortNumber().toString();
                                 String sourceSite = source + ":" + port;
                                 return(sourceSite);

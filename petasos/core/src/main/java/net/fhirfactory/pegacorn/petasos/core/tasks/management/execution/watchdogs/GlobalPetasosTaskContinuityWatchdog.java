@@ -23,8 +23,8 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.watchdo
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cache.shared.ParticipantSharedTaskJobCardCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,7 @@ public class GlobalPetasosTaskContinuityWatchdog {
     private LocalActionableTaskCache actionableTaskDM;
 
     @Inject
-    private ParticipantSharedTaskJobCardCache taskJobCardDM;
+    private LocalTaskJobCardCache taskJobCardDM;
 
     //
     // Constructor(s)
@@ -114,46 +114,44 @@ public class GlobalPetasosTaskContinuityWatchdog {
                 getLogger().debug(".taskContinuityWatchdog(): Checking task {}", currentTaskId);
             }
             boolean unregisterTask = false;
-            synchronized (actionableTaskDM.getTaskLock(currentTaskId)){
-                PetasosActionableTask currentActionableTask = actionableTaskDM.getTask(currentTaskId);
-                if(currentActionableTask.hasTaskCompletionSummary()){
-                    if (currentActionableTask.getTaskCompletionSummary().isFinalised()) {
-                        unregisterTask = true;
-                    }
+            PetasosActionableTask currentActionableTask = actionableTaskDM.getTask(currentTaskId);
+            if(currentActionableTask.hasTaskCompletionSummary()){
+                if (currentActionableTask.getTaskCompletionSummary().isFinalised()) {
+                    unregisterTask = true;
                 }
-                if(!unregisterTask) {
-                    if (currentActionableTask.hasTaskFulfillment()) {
-                        if (currentActionableTask.getTaskFulfillment().hasStatus()) {
-                            switch (currentActionableTask.getTaskFulfillment().getStatus()) {
-                                case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
-                                case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
-                                case FULFILLMENT_EXECUTION_STATUS_INITIATED:
-                                case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
-                                case FULFILLMENT_EXECUTION_STATUS_ACTIVE_ELSEWHERE:
+            }
+            if(!unregisterTask) {
+                if (currentActionableTask.hasTaskFulfillment()) {
+                    if (currentActionableTask.getTaskFulfillment().hasStatus()) {
+                        switch (currentActionableTask.getTaskFulfillment().getStatus()) {
+                            case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
+                            case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
+                            case FULFILLMENT_EXECUTION_STATUS_INITIATED:
+                            case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
+                            case FULFILLMENT_EXECUTION_STATUS_ACTIVE_ELSEWHERE:
 
-                                    break;
-                                case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
-                                case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
-                                case FULFILLMENT_EXECUTION_STATUS_FINISHED:
-                                case FULFILLMENT_EXECUTION_STATUS_FAILED:
-                                case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
-                                    Long age = Instant.now().getEpochSecond() - currentActionableTask.getCreationInstant().getEpochSecond();
-                                    if (age > MINIMUM_TASK_AGE_FOR_RETIREMENT) {
-                                        unregisterTask = true;
-                                    }
-                                    break;
-                                case FULFILLMENT_EXECUTION_STATUS_FINALISED:
-                                case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
+                                break;
+                            case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
+                            case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
+                            case FULFILLMENT_EXECUTION_STATUS_FINISHED:
+                            case FULFILLMENT_EXECUTION_STATUS_FAILED:
+                            case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
+                                Long age = Instant.now().getEpochSecond() - currentActionableTask.getCreationInstant().getEpochSecond();
+                                if (age > MINIMUM_TASK_AGE_FOR_RETIREMENT) {
                                     unregisterTask = true;
-                                    break;
-                            }
+                                }
+                                break;
+                            case FULFILLMENT_EXECUTION_STATUS_FINALISED:
+                            case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
+                                unregisterTask = true;
+                                break;
                         }
                     }
                 }
             }
             if(unregisterTask){
                 getLogger().debug(".taskContinuityWatchdog(): Task {} is finalised, removing from shared cache... start", currentTaskId);
-                PetasosActionableTask unregisteredActionableTask = actionableTaskDM.removeTask(currentTaskId);
+                PetasosActionableTask unregisteredActionableTask = actionableTaskDM.removeTaskFromDirectory(currentTaskId);
                 getLogger().debug(".taskContinuityWatchdog(): Task {} is finalised, removing from shared cache... done...");
             }
             if(getLogger().isDebugEnabled()){
@@ -203,7 +201,7 @@ public class GlobalPetasosTaskContinuityWatchdog {
         return actionableTaskDM;
     }
 
-    public ParticipantSharedTaskJobCardCache getTaskJobCardDM() {
+    public LocalTaskJobCardCache getTaskJobCardDM() {
         return taskJobCardDM;
     }
 

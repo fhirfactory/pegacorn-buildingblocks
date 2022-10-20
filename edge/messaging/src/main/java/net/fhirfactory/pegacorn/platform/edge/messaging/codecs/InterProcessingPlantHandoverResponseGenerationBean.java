@@ -22,10 +22,10 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
@@ -63,7 +63,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", node);
 
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Retrieve new PetasosFulfillmentTask from Camel exchange: Start");
-        PetasosFulfillmentTaskSharedInstance fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTaskSharedInstance.class);
+        PetasosFulfillmentTask fulfillmentTask = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, PetasosFulfillmentTask.class);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Retrieve new PetasosFulfillmentTask from Camel exchange: Finish");
 
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message: Start");
@@ -71,7 +71,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
         response.setDownstreamActionableTaskId(fulfillmentTask.getActionableTaskId());
         response.setActionableTaskId(incomingPacket.getActionableTask().getTaskId());
         response.setStatus(InterProcessingPlantHandoverPacketStatusEnum.PACKET_RECEIVED_AND_DECODED);
-        String processingPlantName = node.getComponentID().getDisplayName();
+        String processingPlantName = node.getComponentId().getDisplayName();
         response.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
         response.setMessageSendFinishInstant(Instant.now());
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message: Finish");

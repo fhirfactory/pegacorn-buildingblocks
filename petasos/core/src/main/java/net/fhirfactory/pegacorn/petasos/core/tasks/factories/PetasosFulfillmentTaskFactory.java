@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
@@ -86,6 +86,7 @@ public class PetasosFulfillmentTaskFactory {
         //
         // Create a TaskId (is local, so simple UUID is ok) and add to our Task
         TaskIdType fulfillmentTaskId = new TaskIdType();
+        fulfillmentTaskId.setTaskSequenceNumber(actionableTask.getTaskId().getTaskSequenceNumber());
         fulfillmentTaskId.setLocalId(UUID.randomUUID().toString());
         fulfillmentTask.setTaskId(fulfillmentTaskId);
         //
@@ -133,7 +134,7 @@ public class PetasosFulfillmentTaskFactory {
         fulfillmentTask.setTaskFulfillment(fulfillment);
         //
         // Now create and add the PetasosTaskJobCard
-        PetasosTaskJobCard jobCard = jobCardFactory.newPetasosTaskJobCard(fulfillmentTask);
+        PetasosTaskJobCard jobCard = jobCardFactory.newTaskJobCard(fulfillmentTask);
         fulfillmentTask.setTaskJobCard(jobCard);
         //
         // Done! :)

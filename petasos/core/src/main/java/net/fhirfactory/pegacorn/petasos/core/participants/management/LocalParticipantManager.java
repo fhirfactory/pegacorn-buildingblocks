@@ -21,21 +21,28 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.participants.management;
 
-import net.fhirfactory.pegacorn.core.interfaces.participant.PetasosParticipantManagementServiceInterface;
+import net.fhirfactory.pegacorn.core.interfaces.participant.ParticipantSerivcesAgentInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
-import net.fhirfactory.pegacorn.petasos.core.participants.administration.LocalParticipantAdministrator;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantControlStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
+import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantRegistrationCache;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,15 +51,17 @@ import java.util.TimerTask;
 public class LocalParticipantManager {
     private static final Logger LOG = LoggerFactory.getLogger(LocalParticipantManager.class);
 
-    private static final Long PARTICIPANT_MANAGEMENT_DAEMON_STARTUP_DELAY = 45000L;
+    private Instant startupInstant;
+
+    private static final Long PARTICIPANT_MANAGEMENT_DAEMON_STARTUP_DELAY = 60000L;
     private static final Long PARTICIPANT_MANAGEMENT_DEAMON_EXECUTIION_PERIOD = 15000L;
     private boolean initialised;
 
     @Inject
-    private PetasosParticipantManagementServiceInterface globalParticipantManagementService;
+    private ParticipantSerivcesAgentInterface globalParticipantManagementService;
 
     @Inject
-    private LocalParticipantAdministrator localParticipantAdministrator;
+    private LocalParticipantRegistrationCache localRegistrationCache;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -66,6 +75,7 @@ public class LocalParticipantManager {
 
     public LocalParticipantManager(){
         this.initialised = false;
+        this.startupInstant = Instant.now();
     }
 
     //
@@ -105,16 +115,20 @@ public class LocalParticipantManager {
         return(this.processingPlant);
     }
 
-    protected PetasosParticipantManagementServiceInterface getGlobalParticipantManagementService(){
+    protected ParticipantSerivcesAgentInterface getGlobalParticipantManagementService(){
         return(this.globalParticipantManagementService);
     }
 
-    protected LocalParticipantAdministrator getLocalParticipantAdministrator(){
-        return(localParticipantAdministrator);
+    protected LocalParticipantRegistrationCache getLocalRegistrationCache(){
+        return(localRegistrationCache);
     }
 
     protected ProcessingPlantMetricsAgent getProcessingPlantMetricsAgent(){
         return(metricsAgentAccessor.getMetricsAgent());
+    }
+
+    public Instant getStartupInstant() {
+        return startupInstant;
     }
 
     //
@@ -142,8 +156,26 @@ public class LocalParticipantManager {
      */
     public void participantManagementDaemon(){
         getLogger().debug(".participantManagementDaemon(): Entry");
-
         getProcessingPlantMetricsAgent().touchWatchDogActivityIndicator("ParticipantManagementDaemon");
+
+        // Synchronize Local with the Global Manager
+        getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Start");
+        Set<String> allRegisteredComponentIds = getLocalRegistrationCache().getAllRegisteredComponentIds();
+        for(String currentLocalRegisteredComponentIdValue: allRegisteredComponentIds) {
+            PetasosParticipantRegistration currentLocalRegistration = getLocalRegistrationCache().getParticipantRegistration(currentLocalRegisteredComponentIdValue);
+            PetasosParticipantRegistration globalParticipantRegistration = getGlobalParticipantManagementService().synchroniseRegistration(currentLocalRegistration);
+            if(globalParticipantRegistration != null){
+                getLocalRegistrationCache().updateParticipant(globalParticipantRegistration);
+            }
+        }
+        getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Finish");
+
+        // Now Synchronise any "Downstream" (Subscribers)
+        getLogger().trace(".participantManagementDaemon(): [Synchronise Downstream Systems Participants (from Ponos)] Start");
+        synchroniseExternalSubscriberParticipants();
+        getLogger().trace(".participantManagementDaemon(): [Synchronise Downstream Systems Participants (from Ponos)] Finish");
+        // Now Synchronise any "Downstream" (Subscribers)
+
         getLogger().debug(".participantManagementDaemon(): Exit");
     }
 
@@ -151,53 +183,51 @@ public class LocalParticipantManager {
     // Business Methods
     //
 
-    public PetasosParticipantRegistration registerPetasosParticipant(SoftwareComponent participantSoftwareComponent, Set<TaskWorkItemManifestType> publishedTopics, Set<TaskWorkItemManifestType> subscribedTopics) {
-        getLogger().debug(".registerPetasosParticipant(): Entry, participantSoftwareComponent->{}", participantSoftwareComponent);
-        if (participantSoftwareComponent == null || publishedTopics == null) {
-            getLogger().debug(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
-            return (null);
-        }
-        PetasosParticipant participant = new PetasosParticipant(participantSoftwareComponent);
-        if (!publishedTopics.isEmpty()) {
-            getLogger().trace(".registerPetasosParticipant(): Has published topics");
-            for (TaskWorkItemManifestType currentParcelManifest : publishedTopics) {
-                participant.getPublishedWorkItemManifests().add(currentParcelManifest);
-            }
-        }
-        if(!subscribedTopics.isEmpty()) {
-            getLogger().trace(".registerPetasosParticipant(): Has topics to subscribe to!");
-            for (TaskWorkItemManifestType currentParcelManifest : subscribedTopics) {
-                TaskWorkItemSubscriptionType currentFilter = new TaskWorkItemSubscriptionType(currentParcelManifest);
-                participant.getSubscriptions().add(currentFilter);
-            }
-        }
-        PetasosParticipantRegistration registeredParticipant = registerPetasosParticipant(participant);
-        getLogger().debug(".registerPetasosParticipant(): Exit, registeredParticipant->{}", registeredParticipant);
-        return(registeredParticipant);
-    }
-
-
-    public PetasosParticipantRegistration registerPetasosParticipant(PetasosParticipant participant){
+    public PetasosParticipantRegistration registerParticipant(PetasosParticipant participant){
         getLogger().debug(".registerPetasosParticipant(): Entry, participant->{}", participant);
         if(participant == null ){
             getLogger().debug(".registerPetasosParticipant(): Exit, publisherId or publishedTopics is null, not registering anything");
             return(null);
         }
 
+        //
+        // 1st, some basic defensive programming and parameter checking
+        if (participant.getParticipantId() == null || participant.getSubscriptions() == null || participant.getPublishedWorkItemManifests() == null) {
+            getLogger().debug(".registerPetasosParticipant(): Exit, publisherId, publishedTopics or subscribedTopics is null, not registering anything");
+            return (null);
+        }
+
+        PetasosParticipantRegistration petasosParticipantRegistration = participant.toRegistration();
+        if(participant.getParticipantStatus() == null){
+            throw new RuntimeException("What the fuck");
+        }
+
         // Register with the Global Manager
         getLogger().trace(".registerPetasosParticipant(): [Register Participant Globally (within Ponos)] Start");
-        PetasosParticipantRegistration globalParticipantRegistration = getGlobalParticipantManagementService().registerPetasosParticipant(participant);
+        PetasosParticipantRegistration globalParticipantRegistration = null;
+        if(Instant.now().isAfter(getStartupInstant().plusSeconds(PARTICIPANT_MANAGEMENT_DAEMON_STARTUP_DELAY))) {
+            globalParticipantRegistration = getGlobalParticipantManagementService().synchroniseRegistration(petasosParticipantRegistration);
+        } else {
+            globalParticipantRegistration = SerializationUtils.clone(petasosParticipantRegistration);
+            globalParticipantRegistration.setCentralRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_UNREGISTERED);
+            globalParticipantRegistration.setControlStatus(PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED);
+            globalParticipantRegistration.setCentralRegistrationInstant(Instant.now());
+        }
         getLogger().trace(".registerPetasosParticipant(): [Register Participant Globally (within Ponos)] Finish");
 
         // Update local Participant with information from global registration
         getLogger().trace(".registerPetasosParticipant(): [Synchronise Local Participant] Start");
-        participant.setParticipantStatus(globalParticipantRegistration.getParticipant().getParticipantStatus());
-        participant.setSubscriptions(globalParticipantRegistration.getParticipant().getSubscriptions());
+        if(globalParticipantRegistration.hasParticipantStatus()) {
+            participant.setParticipantStatus(globalParticipantRegistration.getParticipantStatus());
+        }
+        if(globalParticipantRegistration.getSubscriptions() != null) {
+            participant.setSubscriptions(globalParticipantRegistration.getSubscriptions());
+        }
         getLogger().trace(".registerPetasosParticipant(): [Synchronise Local Participant] Finish");
 
         // Register with local Cache/Administrator
         getLogger().trace(".registerPetasosParticipant(): [Register Participant Locally] Start");
-        PetasosParticipantRegistration registration = getLocalParticipantAdministrator().registerLocalParticipant(participant);
+        PetasosParticipantRegistration registration = getLocalRegistrationCache().addParticipant(participant);
         getLogger().trace(".registerPetasosParticipant(): [Register Participant Locally] Finish");
 
         //
@@ -206,35 +236,9 @@ public class LocalParticipantManager {
         return(registration);
     }
 
-    /**
-     *
-     * @param participant
-     */
-    public PetasosParticipantRegistration updatePetasosParticipant(PetasosParticipant participant){
-        getLogger().debug(".updatePetasosParticipant(): Entry, participant->{}", participant);
-        if(participant == null ){
-            getLogger().debug(".updatePetasosParticipant(): Exit, participant is null, not updating anything");
-            return(null);
-        }
-
-        getLogger().trace(".registerPetasosParticipant(): [Update Participant Globally (within Ponos)] Start");
-        PetasosParticipantRegistration globalRegistration = getGlobalParticipantManagementService().updatePetasosParticipant(participant);
-        getLogger().trace(".registerPetasosParticipant(): [Update Participant Globally (within Ponos)] Finish");
-
-        // Update local Participant with information from global globalRegistration
-        getLogger().trace(".registerPetasosParticipant(): [Synchronise Local Participant] Start");
-        participant.setParticipantStatus(globalRegistration.getParticipant().getParticipantStatus());
-        participant.setSubscriptions(globalRegistration.getParticipant().getSubscriptions());
-        getLogger().trace(".registerPetasosParticipant(): [Synchronise Local Participant] Finish");
-
-        //
-        // Update local Cache/Administrator
-        getLocalParticipantAdministrator().synchroniseLocalWithCentralCacheDetail(globalRegistration);
-        if(globalRegistration.getParticipant().getComponentID().equals(myProcessingPlant.getMeAsASoftwareComponent().getComponentID())){
-            participantHolder.setMyProcessingPlantPetasosParticipant(globalRegistration.getParticipant());
-        }
-        getLogger().debug(".updatePetasosParticipant(): Exit, globalRegistration->{}", globalRegistration);
-        return(globalRegistration);
+    public Set<PetasosParticipantRegistration> getDownstreamParticipants(){
+        Set<PetasosParticipantRegistration> downstreamParticipantSet = getLocalRegistrationCache().getDownstreamParticipantSet();
+        return(downstreamParticipantSet);
     }
 
     //
@@ -243,17 +247,95 @@ public class LocalParticipantManager {
 
     public void synchroniseExternalSubscriberParticipants(){
         getLogger().trace(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] Start");
-        String processingPlantParticipantName = getProcessingPlant().getMeAsASoftwareComponent().getParticipantName();
-        Set<PetasosParticipant> downstreamTaskPerformers = getGlobalParticipantManagementService().getDownstreamTaskPerformersForTaskProducer(processingPlantParticipantName);
+        String processingPlantParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
+        Set<PetasosParticipantRegistration> downstreamTaskPerformers = getGlobalParticipantManagementService().getDownstreamSubscribers(processingPlantParticipantName);
         if (!downstreamTaskPerformers.isEmpty()) {
             getLogger().trace(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] There are downstream subscribers!");
-            for (PetasosParticipant currentDownstreamPerformer : downstreamTaskPerformers) {
+            for (PetasosParticipantRegistration currentDownstreamPerformer : downstreamTaskPerformers) {
                 if (getLogger().isTraceEnabled()) {
-                    getLogger().trace(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getSubsystemParticipantName());
+                    getLogger().trace(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getParticipantId().getSubsystemName());
                 }
-                getLocalParticipantAdministrator().synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
+                getLocalRegistrationCache().updateParticipant(currentDownstreamPerformer);
             }
         }
         getLogger().trace(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] Finish");
+    }
+
+    public PetasosParticipantRegistration getLocalParticipantRegistration(ComponentIdType componentId){
+        getLogger().debug(".getLocalParticipantRegistration(): Entry, componentId->{}", componentId);
+        PetasosParticipantRegistration registration = getLocalRegistrationCache().getParticipantRegistration(componentId);
+        getLogger().debug(".getLocalParticipantRegistration(): Exit, registration->{}", registration);
+        return(registration);
+    }
+
+    public void synchroniseLocalWithCentralCacheDetail( PetasosParticipantRegistration centralRegistration){
+        getLogger().debug(".synchroniseLocalWithCentralCacheDetail(): Entry, centralRegistration->{}", centralRegistration);
+        if(centralRegistration != null) {
+            //
+            // Update local DM with Gobal details
+            getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Synchronise Local Cache] Start");
+            getLocalRegistrationCache().updateParticipant(centralRegistration);
+            getLogger().trace(".synchroniseLocalWithCentralCacheDetail(): [Synchronise Local Cache] Finish");
+        }
+        getLogger().debug(".synchroniseLocalWithCentralCacheDetail(): Exit");
+    }
+
+    public boolean isParticipantSuspended(String participantName){
+        boolean isSuspended = getLocalRegistrationCache().isParticipantSuspended(participantName);
+        return(isSuspended);
+    }
+
+    public boolean isParticipantSuspended(TaskPerformerTypeType performer){
+        if(performer == null){
+            return(false);
+        }
+        if(performer.getKnownTaskPerformer() != null) {
+            if(StringUtils.isNotEmpty(performer.getKnownTaskPerformer().getName())) {
+                boolean isSuspended = getLocalRegistrationCache().isParticipantSuspended(performer.getKnownTaskPerformer().getName());
+                return (isSuspended);
+            }
+        }
+        return(false);
+    }
+
+    public boolean isParticipantDisabled(String participantName){
+        boolean isSuspended = getLocalRegistrationCache().isParticipantDisabled(participantName);
+        return(isSuspended);
+    }
+
+    public boolean isParticipantDisabled(TaskPerformerTypeType performer){
+        if(performer == null){
+            return(false);
+        }
+        if(performer.getKnownTaskPerformer() != null) {
+            if(StringUtils.isNotEmpty(performer.getKnownTaskPerformer().getName())) {
+                boolean isSuspended = getLocalRegistrationCache().isParticipantDisabled(performer.getKnownTaskPerformer().getName());
+                return (isSuspended);
+            }
+        }
+        return(false);
+    }
+
+    public void updateParticipantStatus(String participantName, PetasosParticipantStatusEnum status){
+        getLocalRegistrationCache().updateParticipantStatus(participantName, status);
+    }
+
+    public PetasosParticipantStatusEnum getParticipantStatus(String participantName){
+        PetasosParticipantStatusEnum participantStatus = getLocalRegistrationCache().getParticipantStatus(participantName);
+        return(participantStatus);
+    }
+
+    public void touchParticipantUtilisationInstant(String participantName){
+        getLocalRegistrationCache().touchParticipantUtilisationInstant(participantName);
+    }
+
+    public Instant getParticipantLastUtilisationInstant(String participantName){
+        Instant participantLastUtilisationInstant = getLocalRegistrationCache().getParticipantLastUtilisationInstant(participantName);
+        return(participantLastUtilisationInstant);
+    }
+
+    public PetasosParticipantId getParticipantId(String participantName){
+        PetasosParticipantId participantId = getLocalRegistrationCache().getParticipantId(participantName);
+        return(participantId);
     }
 }

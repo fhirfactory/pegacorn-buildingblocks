@@ -21,12 +21,10 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.tasks;
 
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTaskSet;
+import net.fhirfactory.pegacorn.core.model.petasos.task.collections.PetasosActionableTaskSet;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-
-import java.util.List;
 
 public interface PetasosTaskHandlerInterface {
     public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier);

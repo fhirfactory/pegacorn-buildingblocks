@@ -193,6 +193,34 @@ public abstract class ComponentMetricsAgentBase  {
         }
     }
 
+    @JsonIgnore
+    public void incrementRPCRequestCount(String sourceParticipantName){
+        if(StringUtils.isNotEmpty(sourceParticipantName)){
+            synchronized (getMetricsDataLock()){
+                if(!getMetricsData().getRpcRequestsCount().containsKey(sourceParticipantName)){
+                    getMetricsData().getRpcRequestsCount().put(sourceParticipantName, 0);
+                }
+                Integer count = getMetricsData().getRpcRequestsCount().get(sourceParticipantName);
+                Integer newValue = count + 1;
+                getMetricsData().getRpcRequestsCount().replace(sourceParticipantName, newValue);
+            }
+        }
+    }
+
+    @JsonIgnore
+    public void incrementRPCInvocationCount(String sourceParticipantName){
+        if(StringUtils.isNotEmpty(sourceParticipantName)){
+            synchronized (getMetricsDataLock()){
+                if(!getMetricsData().getRpcInvocationsCount().containsKey(sourceParticipantName)){
+                    getMetricsData().getRpcInvocationsCount().put(sourceParticipantName, 0);
+                }
+                Integer count = getMetricsData().getRpcInvocationsCount().get(sourceParticipantName);
+                Integer newValue = count + 1;
+                getMetricsData().getRpcInvocationsCount().replace(sourceParticipantName, newValue);
+            }
+        }
+    }
+
     //
     // To String
     //

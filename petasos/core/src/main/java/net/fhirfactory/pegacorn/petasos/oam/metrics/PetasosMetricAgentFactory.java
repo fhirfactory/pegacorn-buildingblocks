@@ -29,6 +29,7 @@ import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosWUPMetricsAgentCache;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -40,6 +41,9 @@ public class PetasosMetricAgentFactory {
     private PetasosLocalMetricsDM localMetricsDM;
 
     @Inject
+    private PetasosWUPMetricsAgentCache localWUPMetricsAgentCache;
+
+    @Inject
     private PetasosITOpsNotificationAgentInterface notificationAgent;
 
     public WorkUnitProcessorMetricsAgent newWorkUnitProcessingMetricsAgent(ProcessingPlantRoleSupportInterface processingPlantFunction, ComponentIdType componentId, String participantName){
@@ -47,6 +51,7 @@ public class PetasosMetricAgentFactory {
         wupMetricsAgent.getWUPMetricsData().setComponentType(PetasosMonitoredComponentTypeEnum.PETASOS_MONITORED_COMPONENT_WORK_UNIT_PROCESSOR);
         wupMetricsAgent.setNotificationAgent(notificationAgent);
         wupMetricsAgent.registerWithCache();
+        localWUPMetricsAgentCache.addMetricsAgent(wupMetricsAgent);
         return(wupMetricsAgent);
     }
 

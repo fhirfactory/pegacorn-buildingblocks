@@ -23,14 +23,14 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.dataty
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 
 import java.io.Serializable;
 import java.time.Instant;
 
 public class TaskOutcomeStatusType implements Serializable {
 
-    private ActionableTaskOutcomeStatusEnum outcomeStatus;
+    private TaskOutcomeStatusEnum outcomeStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant entryInstant;
 
@@ -41,7 +41,7 @@ public class TaskOutcomeStatusType implements Serializable {
     public TaskOutcomeStatusType(){
         super();
         entryInstant = Instant.now();
-        this.outcomeStatus = ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN;
+        this.outcomeStatus = TaskOutcomeStatusEnum.OUTCOME_STATUS_UNKNOWN;
     }
 
     //
@@ -57,11 +57,11 @@ public class TaskOutcomeStatusType implements Serializable {
         this.entryInstant = entryInstant;
     }
 
-    public ActionableTaskOutcomeStatusEnum getOutcomeStatus() {
+    public TaskOutcomeStatusEnum getOutcomeStatus() {
         return outcomeStatus;
     }
 
-    public void setOutcomeStatus(ActionableTaskOutcomeStatusEnum outcomeStatus) {
+    public void setOutcomeStatus(TaskOutcomeStatusEnum outcomeStatus) {
         this.outcomeStatus = outcomeStatus;
     }
 

@@ -23,18 +23,14 @@ package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosEndpointContainerInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.*;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
@@ -47,7 +43,7 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
-import net.fhirfactory.pegacorn.petasos.core.participants.administration.LocalParticipantAdministrator;
+import net.fhirfactory.pegacorn.petasos.core.participants.management.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.CamelContext;
@@ -76,9 +72,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         return(specifyLogger());
     }
 
-    private WorkUnitProcessorSoftwareComponent meAsASoftwareComponent;
-    private PetasosParticipant meAsAPetasosParticipant;
-    private PetasosTaskJobCard wupJobCard;
+    private WorkUnitProcessorSoftwareComponent topologyNode;
     private RouteElementNames nameSet;
     private WUPArchetypeEnum wupArchetype;
     private List<DataParcelManifest> topicSubscriptionSet;
@@ -107,7 +101,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     private PetasosMetricAgentFactory metricAgentFactory;
 
     @Inject
-    private LocalParticipantAdministrator participantCacheIM;
+    private LocalParticipantManager participantManager;
 
     @Inject
     private ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement;
@@ -145,11 +139,11 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().info(".initialise(): [Initialise the Processing Plant] Finish");
 
         getLogger().info(".initialise(): [Build WUP Topology Node Element] Start");
-        this.meAsASoftwareComponent = buildWUPNodeElement();
+        this.topologyNode = buildWUPNodeElement();
         getLogger().info(".initialise(): [Build WUP Topology Node Element] Finish");
 
         getLogger().info(".initialise(): [Build WUP Component Name-set] Start");
-        this.nameSet = new RouteElementNames(getMeAsASoftwareComponent().getParticipantId());
+        this.nameSet = new RouteElementNames(getTopologyNode().getParticipant().getParticipantId());
         getLogger().info(".initialise(): [Build WUP Component Name-set] Finish");
 
         getLogger().info(".initialise(): Setting the WUP EgressEndpoint");
@@ -163,10 +157,10 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().info(".initialise(): Setting the Topic Subscription Set (i.e. the list of Data Sets we will process)");
         this.topicSubscriptionSet = specifySubscriptionTopics();
         getLogger().info(".initialise(): Building my PetasosParticipant");
-        this.meAsAPetasosParticipant = buildPetasosParticipant();
+        registerParticipant();
         getLogger().info(".initialise(): Establish the metrics agent");
-        ComponentIdType componentId = getMeAsASoftwareComponent().getComponentID();
-        String participantName = getMeAsAPetasosParticipant().getParticipantId().getName();
+        ComponentIdType componentId = getTopologyNode().getComponentId();
+        String participantName = getTopologyNode().getParticipant().getParticipantId().getName();
         this.metricsAgent = metricAgentFactory.newWorkUnitProcessingMetricsAgent(processingPlantCapabilityStatement, componentId, participantName);
         getLogger().info(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
         buildWUPFramework(this.getContext());
@@ -221,12 +215,12 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     public void buildWUPFramework(CamelContext routeContext) {
         getLogger().debug(".buildWUPFramework(): Entry");
-        frameworkManager.buildWUPFramework(this.meAsASoftwareComponent, this.getTopicSubscriptionSet(), this.getWupArchetype(), getMetricsAgent());
+        frameworkManager.buildWUPFramework(this.topologyNode, this.getTopicSubscriptionSet(), this.getWupArchetype(), getMetricsAgent());
         getLogger().debug(".buildWUPFramework(): Exit");
     }
     
     public String getEndpointHostName(){
-        String dnsName = getProcessingPlant().getMeAsASoftwareComponent().getAssignedDNSName();
+        String dnsName = getProcessingPlant().getTopologyNode().getAssignedDNSName();
         return(dnsName);
     }
     
@@ -238,8 +232,8 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         return(topologyIM);
     }
 
-    public void setMeAsASoftwareComponent(WorkUnitProcessorSoftwareComponent meAsASoftwareComponent) {
-        this.meAsASoftwareComponent = meAsASoftwareComponent;
+    public void setTopologyNode(WorkUnitProcessorSoftwareComponent topologyNode) {
+        this.topologyNode = topologyNode;
     }
 
     public RouteElementNames getNameSet() {
@@ -247,7 +241,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     public String getWupInstanceName() {
-        return getMeAsASoftwareComponent().getComponentID().getName();
+        return getTopologyNode().getComponentId().getName();
     }
 
     public WUPArchetypeEnum getWupArchetype() {
@@ -263,7 +257,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     public String getVersion() {
-        return meAsASoftwareComponent.getVersion();
+        return topologyNode.getVersion();
     }
 
     public FHIRElementTopicFactory getFHIRTopicIDBuilder(){
@@ -276,10 +270,6 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     public String getWUPInstanceName(){
         return(this.wupInstanceName);
-    }
-
-    public PetasosParticipant getMeAsAPetasosParticipant() {
-        return meAsAPetasosParticipant;
     }
 
     protected WorkUnitProcessorMetricsAgent getMetricsAgent(){
@@ -315,13 +305,13 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
                 }
             }
             if(!alreadyInPlace) {
-                exchange.setProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, getMeAsASoftwareComponent());
+                exchange.setProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, getTopologyNode());
             }
         }
     }
 
-    public WorkUnitProcessorSoftwareComponent getMeAsASoftwareComponent() {
-        return meAsASoftwareComponent;
+    public WorkUnitProcessorSoftwareComponent getTopologyNode() {
+        return topologyNode;
     }
 
     /**
@@ -343,14 +333,14 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     private WorkUnitProcessorSoftwareComponent buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
-        String participantName = getWorkshop().getWorkshopNode().getParticipantId() + "." + getWUPInstanceName();
+        String participantName = getWorkshop().getWorkshopNode().getParticipant() + "." + getWUPInstanceName();
         WorkUnitProcessorSoftwareComponent wupNode = getTopologyFactory().buildWUP(
                 getWUPInstanceName(),
                 specifyWUPInstanceVersion(),
                 participantName,
                 getWorkshop().getWorkshopNode(),
                 SoftwareComponentTypeEnum.WUP);
-        getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getComponentID(), wupNode);
+        getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getComponentId(), wupNode);
         wupNode.setResilienceMode(getWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(getWorkshop().getWorkshopNode().getConcurrencyMode());
         return(wupNode);
@@ -363,7 +353,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
      */
     protected IPCServerTopologyEndpoint deriveAssociatedTopologyEndpoint(String interfaceName, IPCAdapterDefinition interfaceDefinition){
         getLogger().debug(".deriveServerTopologyEndpoint(): Entry, interfaceName->{}, interfaceDefinition->{}", interfaceName, interfaceDefinition);
-        ProcessingPlantSoftwareComponent processingPlantSoftwareComponent = processingPlantServices.getMeAsASoftwareComponent();
+        ProcessingPlantSoftwareComponent processingPlantSoftwareComponent = processingPlantServices.getTopologyNode();
         getLogger().trace(".deriveServerTopologyEndpoint(): Parse through all endpoints and their IPC Definitions");
         for(ComponentIdType endpointId: processingPlantSoftwareComponent.getEndpoints()){
             IPCServerTopologyEndpoint endpoint = (IPCServerTopologyEndpoint)topologyIM.getNode(endpointId);
@@ -388,7 +378,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
         getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
-        ArrayList<ComponentIdType> endpointIds = getProcessingPlant().getMeAsASoftwareComponent().getEndpoints();
+        ArrayList<ComponentIdType> endpointIds = getProcessingPlant().getTopologyNode().getEndpoints();
         for(ComponentIdType currentEndpointId: endpointIds){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointId);
             if(endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)){
@@ -404,37 +394,32 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     // PetasosParticipant Functions
     //
 
-    private PetasosParticipant buildPetasosParticipant(){
-        getLogger().debug(".buildPetasosParticipant(): Entry");
+    private PetasosParticipant registerParticipant(){
+        PetasosParticipant participant = new PetasosParticipant(getTopologyNode());
         Set<TaskWorkItemManifestType> subscribedTopicSet = new HashSet<>();
         if (!specifySubscriptionTopics().isEmpty()) {
             for (DataParcelManifest currentTopicID : specifySubscriptionTopics()) {
-                TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
-                if (subscribedTopicSet.contains(taskWorkItem)) {
+                TaskWorkItemSubscriptionType taskWorkItem = new TaskWorkItemSubscriptionType(currentTopicID);
+                if (participant.getSubscriptions().contains(taskWorkItem)) {
                     // Do nothing
                 } else {
-                    subscribedTopicSet.add(taskWorkItem);
+                    participant.getSubscriptions().add(taskWorkItem);
+                }
+            }
+        }
+        if (!declarePublishedTopics().isEmpty()) {
+            for (DataParcelManifest currentTopicID : declarePublishedTopics()) {
+                TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
+                if (participant.getPublishedWorkItemManifests().contains(taskWorkItem)) {
+                    // Do nothing
+                } else {
+                    participant.getPublishedWorkItemManifests().add(taskWorkItem);
                 }
             }
         }
 
-        Set<TaskWorkItemManifestType> publishedTopicSet = new HashSet<>();
-        if (!declarePublishedTopics().isEmpty()) {
-            for (DataParcelManifest currentTopicID : declarePublishedTopics()) {
-                TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
-                if (publishedTopicSet.contains(taskWorkItem)) {
-                    // Do nothing
-                } else {
-                    publishedTopicSet.add(taskWorkItem);
-                }
-            }
-        }
-        String participantName = getMeAsASoftwareComponent().getParticipantId().getName();
-        PetasosParticipantRegistration participantRegistration = participantCacheIM.registerPetasosParticipant(participantName, getMeAsASoftwareComponent(),  publishedTopicSet, subscribedTopicSet);
-        PetasosParticipant participant = null;
-        if(participantRegistration != null){
-            participant = participantRegistration.getParticipant();
-        }
+        PetasosParticipantRegistrationStatus participantRegistration = participantManager.registerParticipant(participant);
+
         return(participant);
     }
 }

@@ -34,7 +34,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskTr
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
@@ -291,25 +291,25 @@ public abstract class PetasosTaskFromFHIRTask {
                 case REJECTED:
                 case ENTEREDINERROR:
                 case ACCEPTED:
-                    outcomeStatus.setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_CANCELLED);
+                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_CANCELLED);
                     break;
                 case READY:
-                    outcomeStatus.setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_WAITING);
+                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_WAITING);
                     break;
                 case INPROGRESS:
-                    outcomeStatus.setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_ACTIVE);
+                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_ACTIVE);
                     break;
                 case FAILED:
-                    outcomeStatus.setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FAILED);
+                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_FAILED);
                     break;
                 case COMPLETED:
-                    outcomeStatus.setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FINISHED);
+                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_FINISHED);
                     break;
                 case ONHOLD:
-                    outcomeStatus.setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_WAITING);
+                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_WAITING);
                 case NULL:
                 default:
-                    outcomeStatus.setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN);
+                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_UNKNOWN);
                     break;
             }
 
@@ -321,7 +321,7 @@ public abstract class PetasosTaskFromFHIRTask {
                 for(Coding currentCoding: statusReason.getCoding()){
                     if(currentCoding.getSystem().contentEquals(taskStatusReasonFactory.getPegacornTaskStatusReasonSystem())){
                         if(currentCoding.getCode().contentEquals(taskStatusReasonFactory.getPegacornTaskIsFinalisedCode())) {
-                            outcomeStatus.setOutcomeStatus(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FINALISED);
+                            outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_FINALISED);
                             break;
                         }
                     }

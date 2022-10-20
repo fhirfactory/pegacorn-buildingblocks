@@ -21,15 +21,10 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.capabilities.definition.Capability;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 public class TaskPerformerTypeType implements Serializable {
     private boolean capabilityBased;

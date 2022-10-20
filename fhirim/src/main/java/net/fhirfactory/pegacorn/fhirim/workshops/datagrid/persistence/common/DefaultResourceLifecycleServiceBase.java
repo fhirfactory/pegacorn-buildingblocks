@@ -88,7 +88,7 @@ public abstract class DefaultResourceLifecycleServiceBase implements DatagridEnt
     }
 
     @Override
-    public void requestDatagridEntrySave(DatagridElementKeyInterface element) {
+    public void requestDataGridEntrySave(DatagridElementKeyInterface element) {
 
     }
 

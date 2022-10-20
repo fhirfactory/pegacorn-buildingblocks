@@ -31,6 +31,4 @@ public interface PetasosTaskCacheServiceInterface {
     public PetasosTask synchroniseTask(PetasosTask task);
     public PetasosTask removeTask(TaskIdType taskId);
     public PetasosTask removeTask(PetasosTask task);
-    public Object getTaskLock(TaskIdType taskId);
-    public void addTaskLock(TaskIdType taskId);
 }

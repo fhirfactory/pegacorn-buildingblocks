@@ -25,8 +25,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.queue.PetasosParticipantTaskQueueStatus;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,38 +42,50 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class PetasosParticipant extends SoftwareComponent implements Serializable {
+public class PetasosParticipant implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosParticipant.class);
-
+    private PetasosParticipantId participantId;
+    private ComponentIdType componentId;
+    private PetasosParticipantRegistrationStatus participantRegistrationStatus;
     private PetasosParticipantStatusEnum participantStatus;
+    private PetasosParticipantControlStatusEnum controlStatus;
     private Set<TaskWorkItemSubscriptionType> subscriptions;
     private Set<TaskWorkItemManifestType> publishedWorkItemManifests;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant utilisationUpdateInstant;
     private PetasosParticipantFulfillment fulfillmentState;
-    private boolean hasCentrallyBufferedTasks;
+    private PetasosParticipantTaskQueueStatus taskQueueStatus;
 
     //
     // Constructor(s)
     //
 
     public PetasosParticipant(){
-        super();
+        this.componentId = null;
+        this.participantId = new PetasosParticipantId();
         this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
+        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
         this.fulfillmentState = null;
+        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
+        this.taskQueueStatus = null;
+        this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
     }
 
     public PetasosParticipant(PetasosParticipant ori){
-        super(ori);
-
+        this.componentId = null;
+        this.participantId = new PetasosParticipantId();
+        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
         this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
+        this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
         this.publishedWorkItemManifests = new HashSet<>();
-
+        if(ori.hasComponentId()){
+            this.setComponentId(ori.getComponentId());
+        }
         if(ori.hasParticipantStatus()) {
             this.setParticipantStatus(ori.getParticipantStatus());
         }
@@ -83,28 +101,127 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         if(ori.hasFulfillmentState()){
             this.setFulfillmentState(ori.getFulfillmentState());
         }
-    }
-
-    public PetasosParticipant(String participantName, SoftwareComponent ori){
-        super(ori);
-        this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
-        this.setParticipantName(participantName);
-        this.utilisationUpdateInstant = null;
-        this.subscriptions = new HashSet<>();
-        this.publishedWorkItemManifests = new HashSet<>();
+        if(ori.hasTaskQueueStatus()){
+            this.setTaskQueueStatus(ori.getTaskQueueStatus());
+        }
+        if(ori.hasParticipantId()){
+            setParticipantId(ori.getParticipantId());
+        }
+        if(ori.hasParticipantRegistrationStatus()){
+            setParticipantRegistrationStatus(ori.getParticipantRegistrationStatus());
+        }
+        setControlStatus(ori.getControlStatus());
     }
 
     public PetasosParticipant(SoftwareComponent ori){
-        super(ori);
+        this.componentId = null;
+        this.participantId = new PetasosParticipantId();
+        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
         this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;;
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
+        this.taskQueueStatus = null;
+        this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
+        if(ori.hasParticipant()) {
+            if(ori.hasComponentID()){
+                this.setComponentId(ori.getComponentId());
+            }
+            if (ori.getParticipant().hasParticipantStatus()) {
+                this.setParticipantStatus(ori.getParticipant().getParticipantStatus());
+            }
+            if (ori.getParticipant().hasUtilisationUpdateInstant()) {
+                this.setUtilisationUpdateInstant(ori.getParticipant().getUtilisationUpdateInstant());
+            }
+            if (!ori.getParticipant().getSubscriptions().isEmpty()) {
+                this.getSubscriptions().addAll(ori.getParticipant().getSubscriptions());
+            }
+            if (!ori.getParticipant().getPublishedWorkItemManifests().isEmpty()) {
+                this.getPublishedWorkItemManifests().addAll(ori.getParticipant().getPublishedWorkItemManifests());
+            }
+            if (ori.getParticipant().hasFulfillmentState()) {
+                this.setFulfillmentState(ori.getParticipant().getFulfillmentState());
+            }
+            if (ori.getParticipant().hasTaskQueueStatus()) {
+                this.setTaskQueueStatus(ori.getParticipant().getTaskQueueStatus());
+            }
+            if (ori.getParticipant().hasParticipantId()) {
+                setParticipantId(ori.getParticipant().getParticipantId());
+            }
+            if(ori.getParticipant().hasParticipantRegistrationStatus()){
+                setParticipantRegistrationStatus(ori.getParticipant().getParticipantRegistrationStatus());
+            }
+        }
     }
 
     //
     // Getters (and Setters)
     //
+
+
+    public PetasosParticipantControlStatusEnum getControlStatus() {
+        return controlStatus;
+    }
+
+    public void setControlStatus(PetasosParticipantControlStatusEnum controlStatus) {
+        this.controlStatus = controlStatus;
+    }
+
+    @JsonIgnore
+    public boolean hasComponentId(){
+        boolean hasValue = this.componentId != null;
+        return(hasValue);
+    }
+
+    public ComponentIdType getComponentId() {
+        return componentId;
+    }
+
+    public void setComponentId(ComponentIdType componentId) {
+        this.componentId = componentId;
+    }
+
+    @JsonIgnore
+    public boolean hasParticipantId(){
+        boolean hasValue = this.participantId != null;
+        return(hasValue);
+    }
+
+    public PetasosParticipantId getParticipantId() {
+        return participantId;
+    }
+
+    public void setParticipantId(PetasosParticipantId participantId) {
+        this.participantId = participantId;
+    }
+
+    @JsonIgnore
+    public boolean hasTaskQueueStatus(){
+        boolean hasValue = this.taskQueueStatus != null;
+        return(hasValue);
+    }
+
+    public PetasosParticipantTaskQueueStatus getTaskQueueStatus() {
+        return taskQueueStatus;
+    }
+
+    public void setTaskQueueStatus(PetasosParticipantTaskQueueStatus taskQueueStatus) {
+        this.taskQueueStatus = taskQueueStatus;
+    }
+
+    @JsonIgnore
+    public boolean hasParticipantRegistrationStatus(){
+        boolean hasValue = this.participantRegistrationStatus != null;
+        return(hasValue);
+    }
+
+    public PetasosParticipantRegistrationStatus getParticipantRegistrationStatus() {
+        return participantRegistrationStatus;
+    }
+
+    public void setParticipantRegistrationStatus(PetasosParticipantRegistrationStatus participantRegistrationStatus) {
+        this.participantRegistrationStatus = participantRegistrationStatus;
+    }
 
     public boolean hasFulfillmentState(){
         boolean hasValue = this.fulfillmentState != null;
@@ -119,7 +236,6 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         this.fulfillmentState = fulfillmentState;
     }
 
-    @Override
     protected Logger getLogger() {
         return (LOG);
     }
@@ -130,8 +246,13 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         return(hasValue);
     }
 
-    public void setParticipantStatus(PetasosParticipantStatusEnum connectionStatus) {
-        this.participantStatus = connectionStatus;
+    public void setParticipantStatus(PetasosParticipantStatusEnum status) {
+        getLogger().error(".setParticipantStatus(): Someone is setting me to->{}", status);
+        if(status == null){
+            this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
+        } else {
+            this.participantStatus = status;
+        }
     }
 
     public PetasosParticipantStatusEnum getParticipantStatus() {
@@ -176,12 +297,17 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PetasosParticipant{");
-        sb.append("participantStatus=").append(participantStatus);
+        sb.append("participantId=").append(participantId);
+        sb.append(", componentId=").append(componentId);
+        sb.append(", participantRegistrationStatus=").append(participantRegistrationStatus);
+        sb.append(", participantStatus=").append(participantStatus);
         sb.append(", subscriptions=").append(subscriptions);
         sb.append(", publishedWorkItemManifests=").append(publishedWorkItemManifests);
         sb.append(", utilisationUpdateInstant=").append(utilisationUpdateInstant);
         sb.append(", fulfillmentState=").append(fulfillmentState);
-        sb.append(", ").append(super.toString()).append('}');
+        sb.append(", taskQueueStatus=").append(taskQueueStatus);
+        sb.append(", controlStatus=").append(controlStatus);
+        sb.append('}');
         return sb.toString();
     }
 
@@ -202,5 +328,66 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getParticipantStatus(), getSubscriptions(), getPublishedWorkItemManifests(), getUtilisationUpdateInstant());
+    }
+
+    //
+    // Registration Support Services
+    //
+
+    public PetasosParticipantRegistration toRegistration(){
+        if(hasParticipantId() && hasParticipantStatus() && hasParticipantRegistrationStatus()){
+            PetasosParticipantRegistration registration = new PetasosParticipantRegistration(getParticipantRegistrationStatus());
+            registration.setParticipantId(SerializationUtils.clone(getParticipantId()));
+            registration.setLocalComponentId(SerializationUtils.clone(getComponentId()));
+            registration.getInstanceComponentIds().add(registration.getLocalComponentId());
+            if(!getSubscriptions().isEmpty()) {
+                for(TaskWorkItemSubscriptionType currentSubscription: getSubscriptions()) {
+                    registration.getSubscriptions().add(SerializationUtils.clone(currentSubscription));
+                }
+            }
+            if(!getPublishedWorkItemManifests().isEmpty()) {
+                for(TaskWorkItemManifestType currentOutput: getPublishedWorkItemManifests()) {
+                    registration.getOutputs().add(SerializationUtils.clone(currentOutput));
+                }
+            }
+            registration.setControlStatus(getControlStatus());
+            return(registration);
+        } else {
+            return(null);
+        }
+    }
+
+    public void updateFromRegistration(PetasosParticipantRegistration registration){
+        if(registration == null){
+            return;
+        }
+        if(!hasParticipantId()){
+            setParticipantId(registration.getParticipantId());
+        }
+        if(registration.hasParticipantStatus()){
+            setParticipantStatus(registration.getParticipantStatus());
+        }
+        if(registration.hasConstrolStatus()){
+            setControlStatus(registration.getControlStatus());
+        }
+        if(!registration.getSubscriptions().isEmpty()){
+            for(TaskWorkItemSubscriptionType currentSubscription: registration.getSubscriptions()){
+                if(!getSubscriptions().contains(currentSubscription)){
+                    getSubscriptions().add(currentSubscription);
+                }
+            }
+        }
+        if(registration.getCentralRegistrationInstant() != null){
+            getParticipantRegistrationStatus().setCentralRegistrationInstant(registration.getCentralRegistrationInstant());
+        }
+        if(registration.getCentralRegistrationStatus() != null){
+            getParticipantRegistrationStatus().setCentralRegistrationStatus(registration.getCentralRegistrationStatus());
+        }
+        if(registration.getLocalRegistrationInstant() != null){
+            getParticipantRegistrationStatus().setLocalRegistrationInstant(registration.getLocalRegistrationInstant());
+        }
+        if(registration.getLocalRegistrationStatus() != null){
+            getParticipantRegistrationStatus().setLocalRegistrationStatus(registration.getLocalRegistrationStatus());
+        }
     }
 }

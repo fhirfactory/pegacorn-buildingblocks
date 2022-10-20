@@ -43,20 +43,19 @@
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityManager;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.LocalTaskActivityManager;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
@@ -91,10 +90,10 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
     private LocalTaskActivityManager actionableTaskActivityController;
 
     @Inject
-    private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
+    private ProcessingPlantMetricsAgentAccessor processingPlantMetricAgentAccessor;
 
     @Inject
-    private ProcessingPlantMetricsAgentAccessor processingPlantMetricAgentAccessor;
+    private PetasosFulfillmentTaskAuditServicesBroker fulfillmentTaskAuditServicesBroker;
 
     public InterProcessingPlantHandoverRegistrationBean() {
     }
@@ -113,48 +112,37 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         PetasosActionableTask incomingActionableTask = handoverPacket.getActionableTask();
         TaskTraceabilityElementType upstreamTaskTraceability = handoverPacket.getUpstreamFulfillmentTaskDetails();
         PetasosActionableTask newActionableTask = actionableTaskFactory.newMessageBasedActionableTask(incomingActionableTask, upstreamTaskTraceability, taskWorkItem);
-        PetasosActionableTaskSharedInstance actionableTaskSharedInstance = actionableTaskActivityController.registerActionableTask(newActionableTask);
+        PetasosTaskJobCard jobCard = actionableTaskActivityController.registerLocallyCreatedTask(newActionableTask, null);
         // Add some more metrics
         metricsAgent.incrementRegisteredTasks();
         getLogger().trace(".ipcReceiverActivityStart(): Create and register a new ActionableTask: Finish");
 
         getLogger().trace(".ipcReceiverActivityStart(): Create a new FulfillmentTask: Start");
-        PetasosFulfillmentTask newFulfillmentTask = fulfillmentTaskFactory.newFulfillmentTask(newActionableTask, node);
-        newFulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
-        newFulfillmentTask.setUpdateInstant(Instant.now());
-        newFulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-        newFulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
+        PetasosFulfillmentTask fulfillmentTask = fulfillmentTaskFactory.newFulfillmentTask(newActionableTask, node);
+        fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
+        fulfillmentTask.setUpdateInstant(Instant.now());
+        fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+        fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
         getLogger().trace(".ipcReceiverActivityStart(): Create a new FulfillmentTask: Finish");
 
         getLogger().trace(".ipcReceiverActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Start");
-        PetasosFulfillmentTaskSharedInstance petasosFulfillmentTaskSharedInstance = getFulfilmentTaskActivityController().registerFulfillmentTask(newFulfillmentTask, true);// by default, use synchronous audit writing
+        fulfillmentTaskAuditServicesBroker.logActivity(fulfillmentTask, false);// by default, use synchronous audit writing
         getLogger().trace(".ipcReceiverActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
 
-        getLogger().trace(".ipcReceiverActivityStart(): Request Execution Privileges: Start");
-        PetasosTaskExecutionStatusEnum grantedExecutionStatus = getFulfilmentTaskActivityController().requestFulfillmentTaskExecutionPrivilege(petasosFulfillmentTaskSharedInstance);
-        getLogger().trace(".ipcReceiverActivityStart(): Request Execution Privileges: Finish");
-
         getLogger().trace(".ipcReceiverActivityStart(): Set processing to the grantedExecutionStatus: Start");
-        if(grantedExecutionStatus.equals(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING)){
-            petasosFulfillmentTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStartInstant(Instant.now());
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-            petasosFulfillmentTaskSharedInstance.update();
-            getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(petasosFulfillmentTaskSharedInstance);
-
-            getActionableTaskActivityController().notifyTaskStart(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
-
+        if(jobCard.getGrantedStatus().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){
+            fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
+            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+            getActionableTaskActivityController().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
             // Add some more metrics
             metricsAgent.incrementStartedTasks();
         }  else {
-            petasosFulfillmentTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FAILED);
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStartInstant(Instant.now());
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setFinishInstant(Instant.now());
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
-            petasosFulfillmentTaskSharedInstance.update();
-            getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(petasosFulfillmentTaskSharedInstance);
-
-            getActionableTaskActivityController().notifyTaskFailure(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
+            fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
+            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+            fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
+            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
+            getActionableTaskActivityController().notifyTaskFailure(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
         }
 
         getLogger().trace(".ipcReceiverActivityStart(): Capture some metrics: Start");
@@ -166,7 +154,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         getLogger().trace(".ipcReceiverActivityStart(): Capture some metrics: Finish");
 
         getLogger().trace(".ipcReceiverActivityStart(): Injecting Fulfillment Task into Exchange for extraction by the WUP Egress Conduit");
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, petasosFulfillmentTaskSharedInstance);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, fulfillmentTask);
         getLogger().debug(".ipcReceiverActivityStart(): exit, my work is done!");
         return handoverPacket;
     }
@@ -179,9 +167,6 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         return(LOG);
     }
 
-    protected LocalPetasosFulfilmentTaskActivityController getFulfilmentTaskActivityController(){
-        return(this.fulfilmentTaskActivityController);
-    }
 
     protected LocalTaskActivityManager getActionableTaskActivityController(){
         return(this.actionableTaskActivityController);

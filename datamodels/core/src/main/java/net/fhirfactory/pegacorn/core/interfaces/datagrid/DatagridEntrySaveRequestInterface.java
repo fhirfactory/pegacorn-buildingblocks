@@ -21,6 +21,14 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.datagrid;
 
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+
 public interface DatagridEntrySaveRequestInterface {
-    public void requestDatagridEntrySave(DatagridElementKeyInterface element);
+    public void requestDataGridEntrySave(DatagridElementKeyInterface elementId);
+    public void requestSynchronousDataGridEntrySave(DatagridElementKeyInterface elementId);
+
+    public void requestSynchronousDataGridEntrySave(TaskIdType taskId);
+
+    public PetasosActionableTask requestSynchronousDataGridEntrySave(PetasosActionableTask task);
 }

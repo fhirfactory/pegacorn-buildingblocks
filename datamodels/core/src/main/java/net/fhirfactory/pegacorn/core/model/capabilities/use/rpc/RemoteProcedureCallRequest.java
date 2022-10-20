@@ -33,6 +33,7 @@ public class RemoteProcedureCallRequest implements Serializable {
     private Object requestContent;
     private Class requestContentType;
     private JGroupsIntegrationPointSummary requestingEndpoint;
+    private String method;
 
     //
     // Constructor(s)
@@ -49,6 +50,20 @@ public class RemoteProcedureCallRequest implements Serializable {
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasMethod(){
+        boolean hasValue = this.method != null;
+        return(hasValue);
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
 
     @JsonIgnore
     public boolean hasRequestContentType(){
@@ -153,6 +168,7 @@ public class RemoteProcedureCallRequest implements Serializable {
                 ", requestContent=" + requestContent +
                 ", requestContentType=" + requestContentType +
                 ", requestingEndpoint=" + requestingEndpoint +
+                ", method="+method+
                 '}';
     }
 }

@@ -35,7 +35,7 @@ public interface ProcessingPlantInterface extends CapabilityFulfillmentManagemen
     public String getHostName();
     public String getDeploymentSite();
     public PegacornTopologyFactoryInterface getTopologyFactory();
-    public ProcessingPlantSoftwareComponent getMeAsASoftwareComponent();
+    public ProcessingPlantSoftwareComponent getTopologyNode();
     public WorkshopSoftwareComponent getWorkshop(String workshopName, String version);
     public WorkshopSoftwareComponent getWorkshop(String workshopName);
     public boolean isITOpsNode();

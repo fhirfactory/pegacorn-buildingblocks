@@ -104,8 +104,8 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
         String endpointDescription = getIngresEndpoint().getEndpointTopologyNode().getEndpointDescription();
         this.endpointMetricsAgent = getMetricAgentFactory().newEndpointMetricsAgent(
                 processingPlantCapabilityStatement,
-                getIngresEndpoint().getEndpointTopologyNode().getComponentID(),
-                getIngresEndpoint().getEndpointTopologyNode().getParticipantId().getName(),
+                getIngresEndpoint().getEndpointTopologyNode().getComponentId(),
+                getIngresEndpoint().getEndpointTopologyNode().getParticipant().getParticipantId().getName(),
                 connectedSystem,
                 endpointDescription);
         getLogger().debug(".establishEndpointMetricAgents(): Exit");

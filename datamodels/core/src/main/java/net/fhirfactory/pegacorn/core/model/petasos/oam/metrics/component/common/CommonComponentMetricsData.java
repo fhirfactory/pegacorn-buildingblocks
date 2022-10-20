@@ -47,6 +47,8 @@ public class CommonComponentMetricsData implements Serializable {
     private int egressMessageFailureCount;
     private int internalDistributedMessageCount;
     private int internalReceivedMessageCount;
+    private Map<String, Integer> rpcRequestsCount;
+    private Map<String, Integer> rpcInvocationsCount;
     private Map<String, Integer> internalDistributionCountMap;
 
     //
@@ -58,6 +60,8 @@ public class CommonComponentMetricsData implements Serializable {
         this.egressMessageAttemptCount = 0;
         this.internalDistributedMessageCount = 0;
         this.internalDistributionCountMap = new HashMap<>();
+        this.rpcInvocationsCount = new HashMap<>();
+        this.rpcRequestsCount = new HashMap<>();
         this.componentID = null;
         this.componentType = null;
         this.lastActivityInstant = null;
@@ -74,6 +78,8 @@ public class CommonComponentMetricsData implements Serializable {
         this.egressMessageAttemptCount = 0;
         this.internalDistributedMessageCount = 0;
         this.internalDistributionCountMap = new HashMap<>();
+        this.rpcInvocationsCount = new HashMap<>();
+        this.rpcRequestsCount = new HashMap<>();
         this.componentID = componentId;
         this.componentType = null;
         this.lastActivityInstant = null;
@@ -194,26 +200,45 @@ public class CommonComponentMetricsData implements Serializable {
         this.internalReceivedMessageCount = internalReceivedMessageCount;
     }
 
+    public Map<String, Integer> getRpcRequestsCount() {
+        return rpcRequestsCount;
+    }
+
+    public void setRpcRequestsCount(Map<String, Integer> rpcRequestsCount) {
+        this.rpcRequestsCount = rpcRequestsCount;
+    }
+
+    public Map<String, Integer> getRpcInvocationsCount() {
+        return rpcInvocationsCount;
+    }
+
+    public void setRpcInvocationsCount(Map<String, Integer> rpcInvocationsCount) {
+        this.rpcInvocationsCount = rpcInvocationsCount;
+    }
+
     //
     // To String
     //
 
     @Override
     public String toString() {
-        return "CommonComponentMetricsData{" +
-                "componentID=" + componentID +
-                ", participantName='" + participantName + '\'' +
-                ", componentType=" + componentType +
-                ", lastActivityInstant=" + lastActivityInstant +
-                ", componentStartupInstant=" + componentStartupInstant +
-                ", componentStatus='" + componentStatus + '\'' +
-                ", ingresMessageCount=" + ingresMessageCount +
-                ", egressMessageAttemptCount=" + egressMessageAttemptCount +
-                ", egressMessageSuccessCount=" + egressMessageSuccessCount +
-                ", egressMessageFailureCount=" + egressMessageFailureCount +
-                ", internalDistributedMessageCount=" + internalDistributedMessageCount +
-                ", internalReceivedMessageCount=" + internalReceivedMessageCount +
-                ", internalDistributionCountMap=" + internalDistributionCountMap +
-                '}';
+        final StringBuilder sb = new StringBuilder("CommonComponentMetricsData{");
+        sb.append("componentID=").append(componentID);
+        sb.append(", participantName='").append(participantName).append('\'');
+        sb.append(", componentType=").append(componentType);
+        sb.append(", lastActivityInstant=").append(lastActivityInstant);
+        sb.append(", componentStartupInstant=").append(componentStartupInstant);
+        sb.append(", componentStatus='").append(componentStatus).append('\'');
+        sb.append(", ingresMessageCount=").append(ingresMessageCount);
+        sb.append(", egressMessageAttemptCount=").append(egressMessageAttemptCount);
+        sb.append(", egressMessageSuccessCount=").append(egressMessageSuccessCount);
+        sb.append(", egressMessageFailureCount=").append(egressMessageFailureCount);
+        sb.append(", internalDistributedMessageCount=").append(internalDistributedMessageCount);
+        sb.append(", internalReceivedMessageCount=").append(internalReceivedMessageCount);
+        sb.append(", rpcRequestsCount=").append(rpcRequestsCount);
+        sb.append(", rpcInvocationsCount=").append(rpcInvocationsCount);
+        sb.append(", internalDistributionCountMap=").append(internalDistributionCountMap);
+        sb.append('}');
+        return sb.toString();
     }
 }

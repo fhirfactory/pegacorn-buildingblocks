@@ -75,7 +75,7 @@ public class JGroupsIntegrationPoint extends StandardEdgeIPCEndpoint {
     public JGroupsIntegrationPointSummary toSummary(){
         JGroupsIntegrationPointSummary summary = new JGroupsIntegrationPointSummary();
         summary.setFunction(getInterfaceFunction());
-        summary.setComponentId(getComponentID());
+        summary.setComponentId(getComponentId());
         summary.setLastRefreshInstant(Instant.now());
         summary.setSite(getDeploymentSite());
         summary.setProcessingPlantInstanceId(getEnablingProcessingPlantId());

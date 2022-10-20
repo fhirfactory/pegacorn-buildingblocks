@@ -21,20 +21,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.audit;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
-import org.apache.commons.lang3.StringUtils;
-import org.jgroups.Address;
-import org.jgroups.blocks.RequestOptions;
-import org.jgroups.blocks.ResponseMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ca.uhn.fhir.parser.IParser;
 import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.use.CapabilityUtilisationResponse;
@@ -45,6 +31,18 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.E
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
+import org.apache.commons.lang3.StringUtils;
+import org.jgroups.Address;
+import org.jgroups.blocks.RequestOptions;
+import org.jgroups.blocks.ResponseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public abstract class PetasosAuditServicesEndpoint extends JGroupsIntegrationPointBase {
@@ -113,15 +111,7 @@ public abstract class PetasosAuditServicesEndpoint extends JGroupsIntegrationPoi
         return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }
 
-    @Override
-    protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getPetasosAuditStackConfigFile());
-    }
 
-    @Override
-    protected String specifySubsystemParticipantName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
-    }
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {

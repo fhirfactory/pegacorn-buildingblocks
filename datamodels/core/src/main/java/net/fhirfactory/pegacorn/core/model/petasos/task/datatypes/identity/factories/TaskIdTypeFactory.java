@@ -23,65 +23,39 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.fact
 
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskSequenceNumber;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.valuesets.TaskReasonTypeEnum;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.UUID;
 
 @ApplicationScoped
 public class TaskIdTypeFactory {
 
-    public TaskIdType newTaskId(TaskReasonTypeEnum taskReason, DataParcelTypeDescriptor contentDescriptor){
+     public TaskIdType newTaskId(TaskReasonTypeEnum taskReason){
         StringBuilder idBuilder = new StringBuilder();
         idBuilder.append(taskReason.getTaskReasonDisplayName());
         idBuilder.append("(");
-        if(contentDescriptor.hasDataParcelDefiner()){
-            String definer = contentDescriptor.getDataParcelDefiner();
-            String definerValue = definer.replaceAll(" ", "");
-            idBuilder.append(definerValue);
-        }
-        if(contentDescriptor.hasDataParcelCategory()){
-            String category = contentDescriptor.getDataParcelCategory();
-            idBuilder.append("."+category);
-        }
-        if(contentDescriptor.hasDataParcelSubCategory()){
-            String subCategory = contentDescriptor.getDataParcelSubCategory();
-            idBuilder.append("."+subCategory);
-        }
-        if(contentDescriptor.hasDataParcelResource()){
-            String resource = contentDescriptor.getDataParcelResource();
-            idBuilder.append("."+resource);
-        }
-        if(contentDescriptor.hasDataParcelSegment()){
-            String segment = contentDescriptor.getDataParcelSegment();
-            idBuilder.append("."+segment);
-        }
-        if(contentDescriptor.hasDataParcelAttribute()){
-            String attribute = contentDescriptor.getDataParcelAttribute();
-            idBuilder.append("."+attribute);
-        }
-        if(contentDescriptor.hasDataParcelDiscriminatorType()){
-            String descType = contentDescriptor.getDataParcelDiscriminatorType();
-            idBuilder.append("."+descType);
-        }
-        if(contentDescriptor.hasDataParcelDiscriminatorValue()){
-            String descValue = contentDescriptor.getDataParcelDiscriminatorValue();
-            idBuilder.append("."+descValue);
-        }
         idBuilder.append(")");
         long leastSignificantBits = UUID.randomUUID().getLeastSignificantBits();
         String hexString = Long.toHexString(leastSignificantBits);
-        idBuilder.append("::");
+        idBuilder.append("-");
         idBuilder.append(hexString);
         TaskIdType id = new TaskIdType();
         id.setLocalId(idBuilder.toString());
+        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(leastSignificantBits);
+        id.setTaskSequenceNumber(sequenceNumber);
+        Identifier identifier = new Identifier();
         return(id);
     }
 
     public TaskIdType newTaskId(){
         TaskIdType taskId = newTaskId();
+        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(UUID.randomUUID().getLeastSignificantBits());
+        taskId.setTaskSequenceNumber(sequenceNumber);
         return(taskId);
     }
 
@@ -91,6 +65,8 @@ public class TaskIdTypeFactory {
         UUID uuid = UUID.randomUUID();
         String localId = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
         taskId.setLocalId(localId);
+        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(UUID.randomUUID().getLeastSignificantBits());
+        taskId.setTaskSequenceNumber(sequenceNumber);
         return(taskId);
     }
 
@@ -100,6 +76,8 @@ public class TaskIdTypeFactory {
         UUID uuid = UUID.randomUUID();
         String id = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
         taskId.setLocalId(id);
+        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(UUID.randomUUID().getLeastSignificantBits());
+        taskId.setTaskSequenceNumber(sequenceNumber);
         return(taskId);
     }
 }

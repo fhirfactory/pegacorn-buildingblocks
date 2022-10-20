@@ -21,9 +21,12 @@
  */
 package net.fhirfactory.pegacorn.core.interfaces.datagrid;
 
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import org.hl7.fhir.r4.model.Identifier;
 
 public interface DatagridEntryLoadRequestInterface {
     public void requestDatagridEntryLoad(DatagridElementKeyInterface elementId);
     public void requestDatagridEntryLoad(Identifier elementIdentifier);
+    public PetasosActionableTask requestSynchronousDatagridEntryLoad(TaskIdType taskId);
 }

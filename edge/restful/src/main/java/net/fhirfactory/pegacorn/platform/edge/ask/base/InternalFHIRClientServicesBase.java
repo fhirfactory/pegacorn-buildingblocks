@@ -105,7 +105,7 @@ public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientP
 
     protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
         getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
-        ArrayList<ComponentIdType> endpointIds = processingPlant.getMeAsASoftwareComponent().getEndpoints();
+        ArrayList<ComponentIdType> endpointIds = processingPlant.getTopologyNode().getEndpoints();
         for(ComponentIdType currentEndpointId: endpointIds){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)topologyIM.getNode(currentEndpointId);
             if(endpointTopologyNode.getEndpointConfigurationName().contentEquals(topologyEndpointName)){

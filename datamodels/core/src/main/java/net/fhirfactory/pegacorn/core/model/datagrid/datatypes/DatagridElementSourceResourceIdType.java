@@ -23,9 +23,10 @@ package net.fhirfactory.pegacorn.core.model.datagrid.datatypes;
 
 import org.hl7.fhir.r4.model.IdType;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class DatagridElementSourceResourceIdType {
+public class DatagridElementSourceResourceIdType implements Serializable {
     IdType sourceResourceId;
 
     //

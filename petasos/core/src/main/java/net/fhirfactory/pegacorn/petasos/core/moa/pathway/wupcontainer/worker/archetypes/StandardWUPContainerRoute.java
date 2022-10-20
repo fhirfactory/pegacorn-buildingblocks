@@ -59,7 +59,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		this.nameSet = new RouteElementNames(wupTopologyNode.getParticipantId());
+		this.nameSet = new RouteElementNames(wupTopologyNode.getParticipant().getParticipantId());
 		this.metricsAgent = metricsAgent;
 	}
 
@@ -67,7 +67,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		this.nameSet = new RouteElementNames(wupTopologyNode.getParticipantId(), requiresDirect, sedaParameters);
+		this.nameSet = new RouteElementNames(wupTopologyNode.getParticipant().getParticipantId(), requiresDirect, sedaParameters);
 		this.metricsAgent = metricsAgent;
 	}
 
@@ -138,7 +138,7 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressGatekeeperIngres())
 				.routeId(nameSet.getRouteWUPContainerEgressGateway())
 				.process(nodeDetailInjector)
-				.bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange)")
+				.bean(WUPContainerEgressMetadataCollector.class, "egressGatekeeper(*, Exchange)")
 				.to(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE);
 
 	}

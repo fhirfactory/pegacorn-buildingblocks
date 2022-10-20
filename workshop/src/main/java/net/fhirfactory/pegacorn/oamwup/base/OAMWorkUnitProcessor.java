@@ -111,9 +111,9 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
 
     private void buildOAMWorkUnitProcessor() {
         getLogger().debug(".buildOAMWorkUnitProcessor(): Entry, adding Workshop --> {}, version --> {}", specifyOAMWUPName(), specifyOAMWUPVersion());
-        String participantName = getWorkshop().getWorkshopNode().getParticipantId() + "." + specifyOAMWUPName();
+        String participantName = getWorkshop().getWorkshopNode().getParticipant() + "." + specifyOAMWUPName();
         WorkUnitProcessorSoftwareComponent wup = getTopologyFactory().buildWUP(specifyOAMWUPName(), specifyOAMWUPVersion(), participantName, specifyOAMWorkshop().getWorkshopNode(), SoftwareComponentTypeEnum.OAM_WORK_UNIT_PROCESSOR);
-        topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getComponentID(), wup);
+        topologyIM.addTopologyNode(specifyOAMWorkshop().getWorkshopNode().getComponentId(), wup);
         this.wupTopologyNode = wup;
         getLogger().debug(".buildOAMWorkUnitProcessor(): Exit");
     }
@@ -127,7 +127,7 @@ public abstract class OAMWorkUnitProcessor extends RouteBuilder{
     }
 
     private String getFriendlyName(){
-        String nodeName = getWUPTopologyNode().getComponentID().getDisplayName();
+        String nodeName = getWUPTopologyNode().getComponentId().getDisplayName();
         return(nodeName);
     }
 }

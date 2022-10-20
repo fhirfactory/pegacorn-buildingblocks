@@ -21,16 +21,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.topology;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jgroups.Address;
-import org.jgroups.blocks.RequestOptions;
-import org.jgroups.blocks.ResponseMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
@@ -39,6 +29,15 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGrou
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import net.fhirfactory.pegacorn.petasos.endpoints.topology.SoftwareComponentSet;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jgroups.Address;
+import org.jgroups.blocks.RequestOptions;
+import org.jgroups.blocks.ResponseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 @ApplicationScoped
 public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase {
@@ -83,11 +82,6 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
     //
 
     @Override
-    protected String specifySubsystemParticipantName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getParticipantId().getSubsystemName());
-    }
-
-    @Override
     protected String specifyIPCInterfaceName() {
         return (getInterfaceNames().getPetasosTopologyServicesEndpointName());
     }
@@ -95,11 +89,6 @@ public class PetasosTopologyServicesEndpoint extends JGroupsIntegrationPointBase
     @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
         return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
-    }
-
-    @Override
-    protected String specifyJGroupsStackFileName() {
-        return (getProcessingPlant().getMeAsASoftwareComponent().getPetasosTopologyStackConfigFile());
     }
 
     @Override

@@ -22,9 +22,12 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.datatypes.PetasosTaskFulfillmentCard;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,20 +42,32 @@ public class PetasosTaskJobCardFactory {
     @Inject
     private ProcessingPlantInterface processingPlant;
 
-    public PetasosTaskJobCard newPetasosTaskJobCard(PetasosFulfillmentTask fulfillmentTask){
+    public PetasosTaskJobCard newTaskJobCard(PetasosFulfillmentTask fulfillmentTask){
         getLogger().debug(".newPetasosTaskJobCard(): Entry, fulfillmentTask->{}", fulfillmentTask);
         PetasosTaskJobCard jobCard = new PetasosTaskJobCard();
-        jobCard.setActionableTaskId(fulfillmentTask.getActionableTaskId());
-        jobCard.setClusterMode(processingPlant.getMeAsASoftwareComponent().getConcurrencyMode());
-        jobCard.setLastActivityCheckInstant(Instant.EPOCH);
-        jobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
-        jobCard.setExecutingFulfillmentTaskId(null);
-        jobCard.setExecutingFulfillmentTaskIdAssignmentInstant(Instant.EPOCH);
-        jobCard.setSystemMode(processingPlant.getMeAsASoftwareComponent().getResilienceMode());
-        jobCard.setLastRequestedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
-        jobCard.setExecutingProcessingPlant(processingPlant.getMeAsASoftwareComponent().getComponentID());
-        jobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentID());
+        jobCard.setTaskId(fulfillmentTask.getActionableTaskId());
+        jobCard.setClusterMode(processingPlant.getTopologyNode().getConcurrencyMode());
+        jobCard.setUpdateInstant(Instant.EPOCH);
+        jobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
+        jobCard.setTaskFulfillmentCard(new PetasosTaskFulfillmentCard());
+        jobCard.getTaskFulfillmentCard().setFulfillmentTaskId(fulfillmentTask.getTaskId());
+        jobCard.getTaskFulfillmentCard().setFulfillerParticipantId(fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId());
+        jobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(fulfillmentTask.getTaskFulfillment().getStatus());
+        jobCard.setSystemMode(processingPlant.getTopologyNode().getResilienceMode());
+        jobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
+        jobCard.setUpdateInstant(Instant.now());
         getLogger().debug(".newPetasosTaskJobCard(): Exit, jobCard->{}", jobCard);
+        return(jobCard);
+    }
+
+    public PetasosTaskJobCard newTaskJobCard(TaskIdType actionableTaskId, ProcessingPlantInterface processingPlant){
+        PetasosTaskJobCard jobCard = new PetasosTaskJobCard();
+        jobCard.setTaskId(actionableTaskId);
+        jobCard.setClusterMode(processingPlant.getTopologyNode().getConcurrencyMode());
+        jobCard.setSystemMode(processingPlant.getTopologyNode().getResilienceMode());
+        jobCard.setAffinityNode(processingPlant.getTopologyNode().getComponentId());
+        jobCard.setSystemMode(ResilienceModeEnum.RESILIENCE_MODE_KUBERNETES_STANDALONE);
+        jobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
         return(jobCard);
     }
 

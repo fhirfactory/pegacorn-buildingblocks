@@ -70,7 +70,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(plantMetricsData.getComponentStatus() != null){
             PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
-            componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            componentStatusMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
             componentStatusMetric.setMetricSource(plantMetricsData.getComponentID());
             componentStatusMetric.setMetricName("ProcessingPlant-Status");
             componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.COMPONENT_GENERAL_STATUS);
@@ -81,7 +81,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(plantMetricsData.getAsynchronousAuditEventsWritten() >= 0){
             PetasosComponentMetric auditEventsWritten = new PetasosComponentMetric();
-            auditEventsWritten.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            auditEventsWritten.setMetricAgent(participantHolder.getParticipant().getComponentId());
             auditEventsWritten.setMetricSource(plantMetricsData.getComponentID());
             auditEventsWritten.setMetricName("Async-AuditEvent-Writes");
             auditEventsWritten.setMetricType(PetasosComponentMetricTypeEnum.AUDIT_EVENT_WRITES);
@@ -92,7 +92,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(plantMetricsData.getSynchronousAuditEventsWritten() >= 0){
             PetasosComponentMetric auditEventsWritten = new PetasosComponentMetric();
-            auditEventsWritten.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            auditEventsWritten.setMetricAgent(participantHolder.getParticipant().getComponentId());
             auditEventsWritten.setMetricSource(plantMetricsData.getComponentID());
             auditEventsWritten.setMetricName("Sync-AuditEvent-Writes");
             auditEventsWritten.setMetricType(PetasosComponentMetricTypeEnum.AUDIT_EVENT_WRITES);
@@ -103,7 +103,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(plantMetricsData.getAsynchronousAuditEventsQueued() >= 0){
             PetasosComponentMetric auditEventsWritten = new PetasosComponentMetric();
-            auditEventsWritten.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            auditEventsWritten.setMetricAgent(participantHolder.getParticipant().getComponentId());
             auditEventsWritten.setMetricSource(plantMetricsData.getComponentID());
             auditEventsWritten.setMetricName("Queued-AuditEvent-Writes");
             auditEventsWritten.setMetricType(PetasosComponentMetricTypeEnum.AUDIT_EVENT_WRITES);
@@ -114,7 +114,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(plantMetricsData.getLastActivityInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(plantMetricsData.getComponentID());
             activityInstant.setMetricName("Last-Activity-Instant");
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -125,7 +125,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(plantMetricsData.getComponentStartupInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(plantMetricsData.getComponentID());
             activityInstant.setMetricName("Component-Startup-Instant");
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -138,7 +138,7 @@ public class PetasosComponentMetricSetFactory {
             for(String currentCacheMetricName: plantMetricsData.getLocalCacheSize().keySet()){
                 getLogger().trace(".convertProcessingPlantMetricsData(): Processing, currentCacheMetricName->{}, value->{}", currentCacheMetricName, plantMetricsData.getLocalCacheSize().get(currentCacheMetricName));
                 PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
-                componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                componentStatusMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
                 componentStatusMetric.setMetricSource(plantMetricsData.getComponentID());
                 componentStatusMetric.setMetricName(currentCacheMetricName);
                 componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.CACHE_SIZE);
@@ -152,7 +152,7 @@ public class PetasosComponentMetricSetFactory {
             for(String currentWatchDogName: plantMetricsData.getLocalWatchDogActivity().keySet()){
                 getLogger().trace(".convertProcessingPlantMetricsData(): Processing, currentWatchDogName->{}, value->{}", currentWatchDogName, plantMetricsData.getLocalWatchDogActivity().get(currentWatchDogName));
                 PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
-                componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                componentStatusMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
                 componentStatusMetric.setMetricSource(plantMetricsData.getComponentID());
                 componentStatusMetric.setMetricName(currentWatchDogName);
                 componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -163,10 +163,10 @@ public class PetasosComponentMetricSetFactory {
         }
 
         if(!plantMetricsData.getLocalPathwaySynchronisationActivity().isEmpty()){
-            for(String currentParticipantName: plantMetricsData.getLocalWatchDogActivity().keySet()){
+            for(String currentParticipantName: plantMetricsData.getLocalPathwaySynchronisationActivity().keySet()){
                 getLogger().trace(".convertProcessingPlantMetricsData(): Processing, currentParticipantName->{}, value->{}", currentParticipantName, plantMetricsData.getLocalWatchDogActivity().get(currentParticipantName));
                 PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
-                componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                componentStatusMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
                 componentStatusMetric.setMetricSource(plantMetricsData.getComponentID());
                 componentStatusMetric.setMetricName("Pathway Sync:"+ currentParticipantName);
                 componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -211,7 +211,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getRegisteredTasks() >= 0){
             PetasosComponentMetric registeredTaskCount = new PetasosComponentMetric();
-            registeredTaskCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            registeredTaskCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             registeredTaskCount.setMetricSource(wupMetricsData.getComponentID());
             registeredTaskCount.setMetricName(PetasosComponentMetricTypeEnum.REGISTERED_TASK_COUNT.getDisplayName());
             registeredTaskCount.setMetricType(PetasosComponentMetricTypeEnum.REGISTERED_TASK_COUNT);
@@ -222,7 +222,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getStartedTasks() >= 0){
             PetasosComponentMetric startedTasks = new PetasosComponentMetric();
-            startedTasks.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            startedTasks.setMetricAgent(participantHolder.getParticipant().getComponentId());
             startedTasks.setMetricSource(wupMetricsData.getComponentID());
             startedTasks.setMetricName(PetasosComponentMetricTypeEnum.STARTED_TASK_COUNT.getDisplayName());
             startedTasks.setMetricType(PetasosComponentMetricTypeEnum.STARTED_TASK_COUNT);
@@ -233,7 +233,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getRollingEventProcessingDuration() > 0){
             PetasosComponentMetric rollingEventProcessingDuration = new PetasosComponentMetric();
-            rollingEventProcessingDuration.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            rollingEventProcessingDuration.setMetricAgent(participantHolder.getParticipant().getComponentId());
             rollingEventProcessingDuration.setMetricSource(wupMetricsData.getComponentID());
             rollingEventProcessingDuration.setMetricName(PetasosComponentMetricTypeEnum.ROLLING_TASK_PROCESSING_TIME.getDisplayName());
             rollingEventProcessingDuration.setMetricType(PetasosComponentMetricTypeEnum.ROLLING_TASK_PROCESSING_TIME);
@@ -245,7 +245,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getEventProcessingStartInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(wupMetricsData.getComponentID());
             activityInstant.setMetricName("Last-Task-Start-Time");
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -256,7 +256,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getEventProcessingFinishInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(wupMetricsData.getComponentID());
             activityInstant.setMetricName("Last-Task-Finish-Time");
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -267,7 +267,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getAverageEventProcessingDuration() > 0){
             PetasosComponentMetric averageEventProcessingDuration = new PetasosComponentMetric();
-            averageEventProcessingDuration.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            averageEventProcessingDuration.setMetricAgent(participantHolder.getParticipant().getComponentId());
             averageEventProcessingDuration.setMetricSource(wupMetricsData.getComponentID());
             averageEventProcessingDuration.setMetricName(PetasosComponentMetricTypeEnum.CUMULATIVE_TASK_PROCESSING_TIME.getDisplayName());
             averageEventProcessingDuration.setMetricType(PetasosComponentMetricTypeEnum.CUMULATIVE_TASK_PROCESSING_TIME);
@@ -279,7 +279,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getCancelledTasks() >= 0){
             PetasosComponentMetric cancelledTaskCount = new PetasosComponentMetric();
-            cancelledTaskCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            cancelledTaskCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             cancelledTaskCount.setMetricSource(wupMetricsData.getComponentID());
             cancelledTaskCount.setMetricName(PetasosComponentMetricTypeEnum.CANCELLED_TASK_COUNT.getDisplayName());
             cancelledTaskCount.setMetricType(PetasosComponentMetricTypeEnum.CANCELLED_TASK_COUNT);
@@ -290,7 +290,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getFinishedTasks() >= 0){
             PetasosComponentMetric finishedTaskCount = new PetasosComponentMetric();
-            finishedTaskCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            finishedTaskCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             finishedTaskCount.setMetricSource(wupMetricsData.getComponentID());
             finishedTaskCount.setMetricName(PetasosComponentMetricTypeEnum.FINISHED_TASK_COUNT.getDisplayName());
             finishedTaskCount.setMetricType(PetasosComponentMetricTypeEnum.FINISHED_TASK_COUNT);
@@ -301,7 +301,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getFinalisedTasks() >= 0){
             PetasosComponentMetric finalisedTasks = new PetasosComponentMetric();
-            finalisedTasks.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            finalisedTasks.setMetricAgent(participantHolder.getParticipant().getComponentId());
             finalisedTasks.setMetricSource(wupMetricsData.getComponentID());
             finalisedTasks.setMetricName(PetasosComponentMetricTypeEnum.FINALISED_TASK_COUNT.getDisplayName());
             finalisedTasks.setMetricType(PetasosComponentMetricTypeEnum.FINALISED_TASK_COUNT);
@@ -312,7 +312,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getFailedTasks() >= 0){
             PetasosComponentMetric finalisedTasks = new PetasosComponentMetric();
-            finalisedTasks.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            finalisedTasks.setMetricAgent(participantHolder.getParticipant().getComponentId());
             finalisedTasks.setMetricSource(wupMetricsData.getComponentID());
             finalisedTasks.setMetricName(PetasosComponentMetricTypeEnum.FAILED_TASK_COUNT.getDisplayName());
             finalisedTasks.setMetricType(PetasosComponentMetricTypeEnum.FAILED_TASK_COUNT);
@@ -323,7 +323,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getCurrentActionableTask() != null){
             PetasosComponentMetric currentActionalTask = new PetasosComponentMetric();
-            currentActionalTask.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            currentActionalTask.setMetricAgent(participantHolder.getParticipant().getComponentId());
             currentActionalTask.setMetricSource(wupMetricsData.getComponentID());
             currentActionalTask.setMetricName("Current-Task");
             currentActionalTask.setMetricType(PetasosComponentMetricTypeEnum.CONTEXTUAL);
@@ -334,7 +334,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getLastActionableTask() != null){
             PetasosComponentMetric lastActionalTask = new PetasosComponentMetric();
-            lastActionalTask.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            lastActionalTask.setMetricAgent(participantHolder.getParticipant().getComponentId());
             lastActionalTask.setMetricSource(wupMetricsData.getComponentID());
             lastActionalTask.setMetricName(PetasosComponentMetricTypeEnum.LAST_TASK_ID.getDisplayName());
             lastActionalTask.setMetricType(PetasosComponentMetricTypeEnum.LAST_TASK_ID);
@@ -345,7 +345,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getLastActivityInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(wupMetricsData.getComponentID());
             activityInstant.setMetricName(PetasosComponentMetricTypeEnum.LAST_TASK_INSTANT.getDisplayName());
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.LAST_TASK_INSTANT);
@@ -356,7 +356,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(wupMetricsData.getLastEventProcessingDuration() > 0){
             PetasosComponentMetric lastEventProcessingDuration = new PetasosComponentMetric();
-            lastEventProcessingDuration.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            lastEventProcessingDuration.setMetricAgent(participantHolder.getParticipant().getComponentId());
             lastEventProcessingDuration.setMetricSource(wupMetricsData.getComponentID());
             lastEventProcessingDuration.setMetricName(PetasosComponentMetricTypeEnum.LAST_TASK_PROCESSING_TIME.getDisplayName());
             lastEventProcessingDuration.setMetricType(PetasosComponentMetricTypeEnum.LAST_TASK_PROCESSING_TIME);
@@ -390,7 +390,7 @@ public class PetasosComponentMetricSetFactory {
 
         if (endpointMetricsData.getEgressSendAttemptCount() > 0) {
             PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
-            componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            componentStatusMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
             componentStatusMetric.setMetricSource(endpointMetricsData.getComponentID());
             componentStatusMetric.setMetricName("Egress-Send-Attempt-Count");
             componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.EGRESS_MESSAGES_FORWARD_ATTEMPTS);
@@ -401,7 +401,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(endpointMetricsData.getComponentStatus() != null){
             PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
-            componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            componentStatusMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
             componentStatusMetric.setMetricSource(endpointMetricsData.getComponentID());
             componentStatusMetric.setMetricName("ProcessingPlant-Status");
             componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.COMPONENT_GENERAL_STATUS);
@@ -412,7 +412,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(endpointMetricsData.getLastActivityInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(endpointMetricsData.getComponentID());
             activityInstant.setMetricName("Last-Activity-Instant");
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -423,7 +423,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(endpointMetricsData.getRemoteProcedureCallCount() > 0){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(endpointMetricsData.getComponentID());
             activityInstant.setMetricName(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_REQUEST.getDisplayName());
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_REQUEST);
@@ -434,7 +434,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(endpointMetricsData.getRemoteProcedureCallFailureCount() > 0){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(endpointMetricsData.getComponentID());
             activityInstant.setMetricName(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_FAILURE.getDisplayName());
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_FAILURE);
@@ -445,7 +445,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(endpointMetricsData.getRemoteProcedureCallHandledCount() > 0){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(endpointMetricsData.getComponentID());
             activityInstant.setMetricName(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_RESPONSE.getDisplayName());
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_RESPONSE);
@@ -458,9 +458,9 @@ public class PetasosComponentMetricSetFactory {
         if(!endpointMetricsData.getRemoteProcedureCallResponsesMap().isEmpty()){
             getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteProcedureCallResponseMap] Start");
             int counter = 0;
-            for(String currentTargetName: endpointMetricsData.getInternalDistributionCountMap().keySet()){
+            for(String currentTargetName: endpointMetricsData.getRemoteProcedureCallResponsesMap().keySet()){
                 PetasosComponentMetric rpcHandledMetric = new PetasosComponentMetric();
-                rpcHandledMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                rpcHandledMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
                 rpcHandledMetric.setMetricSource(endpointMetricsData.getComponentID());
                 rpcHandledMetric.setMetricName("RPC-HandledFrom["+currentTargetName+"]");
                 rpcHandledMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_RESPONSE);
@@ -480,7 +480,7 @@ public class PetasosComponentMetricSetFactory {
             int counter = 0;
             for(String currentTargetName: endpointMetricsData.getRemoteProcedureCallRequestsMap().keySet()){
                 PetasosComponentMetric rpcHandledMetric = new PetasosComponentMetric();
-                rpcHandledMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                rpcHandledMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
                 rpcHandledMetric.setMetricSource(endpointMetricsData.getComponentID());
                 rpcHandledMetric.setMetricName("RPC-RequestsTo["+currentTargetName+"]");
                 rpcHandledMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_REQUEST);
@@ -500,7 +500,7 @@ public class PetasosComponentMetricSetFactory {
             int counter = 0;
             for(String currentTargetName: endpointMetricsData.getRemoteProcedureCallFailuresMap().keySet()){
                 PetasosComponentMetric rpcHandledMetric = new PetasosComponentMetric();
-                rpcHandledMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                rpcHandledMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
                 rpcHandledMetric.setMetricSource(endpointMetricsData.getComponentID());
                 rpcHandledMetric.setMetricName("RPC-Failures["+currentTargetName+"]");
                 rpcHandledMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_FAILURE);
@@ -513,6 +513,26 @@ public class PetasosComponentMetricSetFactory {
             getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteProcedureCallFailuresMap] Finish (entries={})", counter);
         }
         getLogger().trace(".convertEndpointMetricsData(): [RemoteProcedureCallFailuresMap] Done...");
+
+        getLogger().trace(".convertEndpointMetricsData(): [RemoteRPCRequestsMap] Check");
+        if(!endpointMetricsData.getRpcRequestsCount().isEmpty()){
+            getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteRPCRequestsMap] Start");
+            int counter = 0;
+            for(String currentTargetName: endpointMetricsData.getRpcRequestsCount().keySet()){
+                PetasosComponentMetric rpcHandledMetric = new PetasosComponentMetric();
+                rpcHandledMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
+                rpcHandledMetric.setMetricSource(endpointMetricsData.getComponentID());
+                rpcHandledMetric.setMetricName("RPC-HandledRequests["+currentTargetName+"]");
+                rpcHandledMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_FAILURE);
+                rpcHandledMetric.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+                Integer rpcRequestsHandled = endpointMetricsData.getRpcRequestsCount().get(currentTargetName);
+                rpcHandledMetric.setMetricValue(new PetasosComponentMetricValue(rpcRequestsHandled));
+                metricSet.addMetric(rpcHandledMetric);
+                counter += 1;
+            }
+            getLogger().trace(".convertEndpointMetricsData(): [Processing RemoteRPCRequestsMap] Finish (entries={})", counter);
+        }
+        getLogger().trace(".convertEndpointMetricsData(): [RemoteRPCRequestsMap] Done...");
 
         getLogger().debug(".convertEndpointMetricsData(): Exit, metricSet->{}", metricSet);
         return(metricSet);
@@ -534,7 +554,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getComponentStatus() != null){
             PetasosComponentMetric componentStatusMetric = new PetasosComponentMetric();
-            componentStatusMetric.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            componentStatusMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
             componentStatusMetric.setMetricSource(metricsData.getComponentID());
             componentStatusMetric.setMetricName("ProcessingPlant-Status");
             componentStatusMetric.setMetricType(PetasosComponentMetricTypeEnum.COMPONENT_GENERAL_STATUS);
@@ -545,7 +565,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getLastActivityInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(metricsData.getComponentID());
             activityInstant.setMetricName("Last-Activity-Instant");
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -556,7 +576,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getComponentStartupInstant() != null){
             PetasosComponentMetric activityInstant = new PetasosComponentMetric();
-            activityInstant.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            activityInstant.setMetricAgent(participantHolder.getParticipant().getComponentId());
             activityInstant.setMetricSource(metricsData.getComponentID());
             activityInstant.setMetricName("Component-Startup-Instant");
             activityInstant.setMetricType(PetasosComponentMetricTypeEnum.ACTIVITY_TIMESTAMP);
@@ -567,7 +587,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getEgressMessageFailureCount() > 0){
             PetasosComponentMetric ingresMessageCount = new PetasosComponentMetric();
-            ingresMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            ingresMessageCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             ingresMessageCount.setMetricSource(metricsData.getComponentID());
             ingresMessageCount.setMetricName(PetasosComponentMetricTypeEnum.EGRESS_MESSAGES_FORWARD_FAILURES.getDisplayName());
             ingresMessageCount.setMetricType(PetasosComponentMetricTypeEnum.EGRESS_MESSAGES_FORWARD_FAILURES);
@@ -578,7 +598,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getEgressMessageSuccessCount() > 0){
             PetasosComponentMetric ingresMessageCount = new PetasosComponentMetric();
-            ingresMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            ingresMessageCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             ingresMessageCount.setMetricSource(metricsData.getComponentID());
             ingresMessageCount.setMetricName(PetasosComponentMetricTypeEnum.EGRESS_MESSAGES_FORWARD_SUCCESSFUL.getDisplayName());
             ingresMessageCount.setMetricType(PetasosComponentMetricTypeEnum.EGRESS_MESSAGES_FORWARD_SUCCESSFUL);
@@ -589,7 +609,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getIngresMessageCount() > 0){
             PetasosComponentMetric ingresMessageCount = new PetasosComponentMetric();
-            ingresMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            ingresMessageCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             ingresMessageCount.setMetricSource(metricsData.getComponentID());
             ingresMessageCount.setMetricName(PetasosComponentMetricTypeEnum.INGRES_MESSAGES.getDisplayName());
             ingresMessageCount.setMetricType(PetasosComponentMetricTypeEnum.INGRES_MESSAGES);
@@ -600,7 +620,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getEgressMessageAttemptCount() > 0){
             PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
-            egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            egressMessageCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             egressMessageCount.setMetricSource(metricsData.getComponentID());
             egressMessageCount.setMetricName(PetasosComponentMetricTypeEnum.EGRESS_MESSAGES_FORWARD_ATTEMPTS.getDisplayName());
             egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.EGRESS_MESSAGES_FORWARD_ATTEMPTS);
@@ -611,7 +631,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getInternalDistributedMessageCount() > 0){
             PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
-            egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            egressMessageCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             egressMessageCount.setMetricSource(metricsData.getComponentID());
             egressMessageCount.setMetricName(PetasosComponentMetricTypeEnum.INTERNAL_MESSAGE_FORWARDING.getDisplayName());
             egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.INTERNAL_MESSAGE_FORWARDING);
@@ -622,7 +642,7 @@ public class PetasosComponentMetricSetFactory {
 
         if(metricsData.getInternalReceivedMessageCount() > 0){
             PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
-            egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+            egressMessageCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
             egressMessageCount.setMetricSource(metricsData.getComponentID());
             egressMessageCount.setMetricName(PetasosComponentMetricTypeEnum.INTERNAL_MESSAGE_RECEPTION.getDisplayName());
             egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.INTERNAL_MESSAGE_RECEPTION);
@@ -637,7 +657,7 @@ public class PetasosComponentMetricSetFactory {
             int counter = 0;
             for(String currentTargetName: metricsData.getInternalDistributionCountMap().keySet()){
                 PetasosComponentMetric egressMessageCount = new PetasosComponentMetric();
-                egressMessageCount.setMetricAgent(participantHolder.getMyProcessingPlantPetasosParticipant().getComponentID());
+                egressMessageCount.setMetricAgent(participantHolder.getParticipant().getComponentId());
                 egressMessageCount.setMetricSource(metricsData.getComponentID());
                 egressMessageCount.setMetricName("Messages-Forwarded["+currentTargetName+"]");
                 egressMessageCount.setMetricType(PetasosComponentMetricTypeEnum.EGRESS_MESSAGES_FORWARD_ATTEMPTS);
@@ -650,6 +670,46 @@ public class PetasosComponentMetricSetFactory {
             getLogger().trace(".convertCommonMetrics(): [Processing DistributionCountMap] Finish (entries={})", counter);
         }
         getLogger().trace(".convertCommonMetrics(): [DistributionCountMap] Done...");
+
+        getLogger().trace(".convertCommonMetrics(): [RCP Requests] Check");
+        if(!metricsData.getRpcRequestsCount().isEmpty()){
+            getLogger().trace(".convertCommonMetrics(): [Processing RPC Requests Count] Start");
+            int counter = 0;
+            for(String currentSourceName: metricsData.getRpcRequestsCount().keySet()){
+                PetasosComponentMetric rpcRequestMetric = new PetasosComponentMetric();
+                rpcRequestMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
+                rpcRequestMetric.setMetricSource(metricsData.getComponentID());
+                rpcRequestMetric.setMetricName("RPC-RequestsReceived["+currentSourceName+"]");
+                rpcRequestMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_REQUEST);
+                rpcRequestMetric.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+                Integer rpcRequestCount = metricsData.getRpcRequestsCount().get(currentSourceName);
+                rpcRequestMetric.setMetricValue(new PetasosComponentMetricValue(rpcRequestCount));
+                metricSet.addMetric(rpcRequestMetric);
+                counter += 1;
+            }
+            getLogger().trace(".convertCommonMetrics(): [Processing RPC Requests Count] Finish (entries={})", counter);
+        }
+        getLogger().trace(".convertCommonMetrics(): [RPC Requests] Done...");
+
+        getLogger().trace(".convertCommonMetrics(): [RCP Invocations] Check");
+        if(!metricsData.getRpcInvocationsCount().isEmpty()){
+            getLogger().trace(".convertCommonMetrics(): [Processing RPC Invocations Count] Start");
+            int counter = 0;
+            for(String currentTargetName: metricsData.getRpcInvocationsCount().keySet()){
+                PetasosComponentMetric rpcInvocationMetric = new PetasosComponentMetric();
+                rpcInvocationMetric.setMetricAgent(participantHolder.getParticipant().getComponentId());
+                rpcInvocationMetric.setMetricSource(metricsData.getComponentID());
+                rpcInvocationMetric.setMetricName("RPC-InvocationsMade["+currentTargetName+"]");
+                rpcInvocationMetric.setMetricType(PetasosComponentMetricTypeEnum.INTER_SUBSYSTEM_RPC_REQUEST);
+                rpcInvocationMetric.setMetricUnit(PetasosComponentMetricUnitEnum.INTEGER_COUNT);
+                Integer rpcInvocationCount = metricsData.getRpcInvocationsCount().get(currentTargetName);
+                rpcInvocationMetric.setMetricValue(new PetasosComponentMetricValue(rpcInvocationCount));
+                metricSet.addMetric(rpcInvocationMetric);
+                counter += 1;
+            }
+            getLogger().trace(".convertCommonMetrics(): [Processing RPC Invocations Count] Finish (entries={})", counter);
+        }
+        getLogger().trace(".convertCommonMetrics(): [RPC Invocations] Done...");
 
         getLogger().debug(".convertCommonMetrics(): Exit, metricSet->{}", metricSet);
         return(metricSet);

@@ -43,8 +43,7 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornI
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityManager;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.LocalTaskActivityManager;
 import net.fhirfactory.pegacorn.workshops.base.Workshop;
 import net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit.TransactionalWUPAuditEntryManager;
 import org.apache.camel.builder.RouteBuilder;
@@ -95,9 +94,6 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     @Inject
     private LocalTaskActivityManager actionableTaskActivityController;
 
-    @Inject
-    private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
-
     //
     // Constructor(s)
     //
@@ -136,10 +132,10 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
 
     private void buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
-        String participantName = getWorkshop().getWorkshopNode().getParticipantId() + "." + specifyWUPInstanceName();
+        String participantName = getWorkshop().getWorkshopNode().getParticipant() + "." + specifyWUPInstanceName();
         WorkUnitProcessorSoftwareComponent wupNode = getTopologyFactory()
                 .buildWUP(specifyWUPInstanceName(),specifyWUPInstanceVersion(), participantName, getWorkshop().getWorkshopNode(), SoftwareComponentTypeEnum.WUP);
-        getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getComponentID(), wupNode);
+        getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getComponentId(), wupNode);
         wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());
         this.topologyNode = wupNode;
@@ -222,10 +218,6 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         return actionableTaskActivityController;
     }
 
-    protected LocalPetasosFulfilmentTaskActivityController getFulfilmentTaskActivityController() {
-        return fulfilmentTaskActivityController;
-    }
-
     //
     // Business Methods
     //
@@ -246,11 +238,10 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         //
         // Build and register a Petasos Actionable Task
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
-        getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
+        getActionableTaskActivityController().registerLocallyCreatedTask(petasosActionableTask, null);
         //
         // Build and register a Petasos Fulfillment Task
         PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, getTopologyNode());
-        getFulfilmentTaskActivityController().registerFulfillmentTask(fulfillmentTask, false);
         //
         // Now assign our "current fulfillment task"
         setCurrentFulfillmentTask(fulfillmentTask);
@@ -264,11 +255,10 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         //
         // Build and register a Petasos Actionable Task
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
-        getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
+        getActionableTaskActivityController().registerLocallyCreatedTask(petasosActionableTask,null);
         //
         // Build and register a Petasos Fulfillment Task
         PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, getTopologyNode());
-        getFulfilmentTaskActivityController().registerFulfillmentTask(fulfillmentTask, false);
         //
         // Now assign our "current fulfillment task"
         setCurrentFulfillmentTask(fulfillmentTask);

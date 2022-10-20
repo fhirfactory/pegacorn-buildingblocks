@@ -24,11 +24,12 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.data
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-public class TaskSequenceNumber {
+public class TaskSequenceNumber implements Serializable {
     private Long majorSequenceNumber;
     private Long minorSequenceNumber;
 
@@ -113,4 +114,8 @@ public class TaskSequenceNumber {
         sb.append('}');
         return sb.toString();
     }
+
+    //
+    //
+    //
 }

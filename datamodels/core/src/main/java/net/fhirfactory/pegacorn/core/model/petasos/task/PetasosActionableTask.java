@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.dat
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ public class PetasosActionableTask extends PetasosTask{
         this.taskFulfillment = null;
         this.taskCompletionSummary = null;
         setTaskType(new TaskTypeType(TaskTypeTypeEnum.PETASOS_ACTIONABLE_TASK_TYPE));
+        this.setTaskTraceability(new TaskTraceabilityType());
     }
 
     //
@@ -90,7 +92,6 @@ public class PetasosActionableTask extends PetasosTask{
         if (o == null || getClass() != o.getClass()) return false;
         PetasosActionableTask that = (PetasosActionableTask) o;
         boolean theyAreEqual = isRegistered() == that.isRegistered()
-                && Objects.equals(getSequenceNumber(), that.getSequenceNumber())
                 && Objects.equals(getCreationInstant(), that.getCreationInstant())
                 && Objects.equals(getUpdateInstant(), that.getUpdateInstant())
                 && Objects.equals(getTaskContext(), that.getTaskContext())
@@ -112,7 +113,6 @@ public class PetasosActionableTask extends PetasosTask{
     @Override
     public int hashCode() {
         return Objects.hash(
-                getSequenceNumber(),
                 getTaskFulfillment(),
                 getTaskCompletionSummary(),
                 getCreationInstant(),
