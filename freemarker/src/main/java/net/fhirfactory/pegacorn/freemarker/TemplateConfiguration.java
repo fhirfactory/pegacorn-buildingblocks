@@ -19,21 +19,18 @@ public class TemplateConfiguration {
         // Hide the constructor.
     }
 
-    private static void configure() throws IOException {
-    	
-    	String fileLocation = System.getenv("EMAIL_BODY_CONTENT_FILE_LOCATION") + "/" + System.getenv("KUBERNETES_SERVICE_NAME");
-    	
-    	 File file = new File(fileLocation);
-
-           	
+    private static void configure(String basePath) throws IOException {
+    	   	
+    	File file = new File(basePath);
+   	
         cfg = new Configuration(Configuration.VERSION_2_3_29);
 
         cfg.setTemplateLoader(new FileTemplateLoader(file));
     }
 
-    public static Configuration getConfiguration() throws IOException {
+    public static Configuration getConfiguration(String basePath) throws IOException {
         if (cfg == null) {
-            configure();
+            configure(basePath);
         }
 
         return cfg;
