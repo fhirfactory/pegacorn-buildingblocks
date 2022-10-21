@@ -45,10 +45,6 @@ public class AsynchronousWriterAuditEventCache {
         return(nextEvent);
     }
     
-    public int getNumberOfEntries(){
-        return(eventQueue.size());
-    }
-
     public boolean hasEntries(){
         boolean hasAtLeastOneEntry = !(getEventQueue().isEmpty());
         return(hasAtLeastOneEntry);

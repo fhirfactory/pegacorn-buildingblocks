@@ -49,7 +49,6 @@ import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetric
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -159,11 +158,11 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
         getLogger().info(".initialise(): Setting the WUP EgressEndpoint");
         this.egressEndpoint = specifyEgressEndpoint();
-        this.getMeAsATopologyComponent().setEgressEndpoint(this.egressEndpoint.getEndpointTopologyNode());
+        this.getTopologyNode().setEgressEndpoint(this.egressEndpoint.getEndpointTopologyNode());
        
         getLogger().info(".initialise(): Setting the WUP IngresEndpoint");
         this.ingresEndpoint = specifyIngresEndpoint();
-        this.getMeAsATopologyComponent().setIngresEndpoint(this.ingresEndpoint.getEndpointTopologyNode());
+        this.getTopologyNode().setIngresEndpoint(this.ingresEndpoint.getEndpointTopologyNode());
         
         getLogger().info(".initialise(): Setting the WUP Archetype - which is used by the WUP Framework to ascertain what wrapping this WUP needs");
         this.wupArchetype =  specifyWUPArchetype();

@@ -33,7 +33,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.support.DefaultRegistry;
-import org.apache.commons.dbcp.BasicDataSource;
+
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
@@ -44,6 +44,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.sql.SQLClientTopol
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
+import org.apache.commons.dbcp.BasicDataSource;
 
 public abstract class InteractSQLClientContentReceiverWUP extends GenericMessageBasedWUPTemplate {
 	private static String DATABASE_USERNAME;
@@ -114,8 +115,8 @@ public abstract class InteractSQLClientContentReceiverWUP extends GenericMessage
         String endpointDescription = getIngresEndpoint().getEndpointTopologyNode().getEndpointDescription();
         this.endpointMetricsAgent = getMetricAgentFactory().newEndpointMetricsAgent(
                 processingPlantCapabilityStatement,
-                getIngresEndpoint().getEndpointTopologyNode().getComponentID(),
-                getIngresEndpoint().getEndpointTopologyNode().getParticipantName(),
+                getIngresEndpoint().getEndpointTopologyNode().getComponentId(),
+                getIngresEndpoint().getEndpointTopologyNode().getParticipant().getParticipantId().getName(),
                 connectedSystem,
                 endpointDescription);
         getLogger().debug(".establishEndpointMetricAgents(): Exit");

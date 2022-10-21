@@ -50,7 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class SoftwareComponent implements Serializable {
     abstract protected Logger getLogger();
-    private ComponentIdType componentID;
+    private ComponentIdType componentId;
     private PetasosParticipant participant;
     private Set<Capability> capabilities;
     private String version;
@@ -79,7 +79,7 @@ public abstract class SoftwareComponent implements Serializable {
     public SoftwareComponent(){
         this.concurrencyMode = null;
         this.resilienceMode = null;
-        this.componentID = null;
+        this.componentId = null;
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
         this.deploymentSite = null;
@@ -97,7 +97,7 @@ public abstract class SoftwareComponent implements Serializable {
     public SoftwareComponent(SoftwareComponent ori){
         this.concurrencyMode = null;
         this.resilienceMode = null;
-        this.componentID = null;
+        this.componentId = null;
         this.otherConfigurationParameters = new ConcurrentHashMap<>();
         this.metrics = null;
         this.componentSystemRole = SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_SUBSYSTEM_INTERNAL;
@@ -116,7 +116,7 @@ public abstract class SoftwareComponent implements Serializable {
             setDeploymentSite(ori.getDeploymentSite());
         }
         if(ori.hasComponentID()){
-            setComponentID(SerializationUtils.clone(ori.getComponentId()));
+            setComponentId(SerializationUtils.clone(ori.getComponentId()));
         }
         if(ori.getOtherConfigurationParameters() != null){
             if(!ori.getOtherConfigurationParameters().isEmpty()){
@@ -338,16 +338,16 @@ public abstract class SoftwareComponent implements Serializable {
 
     @JsonIgnore
     public boolean hasComponentID(){
-        boolean hasValue = this.componentID != null;
+        boolean hasValue = this.componentId != null;
         return(hasValue);
     }
 
     public ComponentIdType getComponentId() {
-        return componentID;
+        return componentId;
     }
 
-    public void setComponentID(ComponentIdType componentID) {
-        this.componentID = componentID;
+    public void setComponentId(ComponentIdType componentId) {
+        this.componentId = componentId;
     }
 
     public SoftwareComponentTypeEnum getComponentType() {
@@ -419,7 +419,7 @@ public abstract class SoftwareComponent implements Serializable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("SoftwareComponent{");
-        sb.append("componentID=").append(componentID);
+        sb.append("componentID=").append(componentId);
         sb.append(", componentType=").append(componentType);
         sb.append(", concurrencyMode=").append(concurrencyMode);
         sb.append(", resilienceMode=").append(resilienceMode);
