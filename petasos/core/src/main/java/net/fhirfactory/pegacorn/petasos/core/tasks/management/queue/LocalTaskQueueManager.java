@@ -109,6 +109,7 @@ public class LocalTaskQueueManager {
                     setRetryDelay(retryDelayFromConfig);
                 }
             }
+            scheduleTaskQueueCheckDaemon();
         }
     }
 
@@ -237,7 +238,7 @@ public class LocalTaskQueueManager {
 
         getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] Start");
         for(TaskPerformerTypeType currentPerformer: actionableTask.getTaskPerformerTypes()) {
-            getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] processing taskPerfomer->{}", currentPerformer);
+            getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] processing taskPerformer->{}", currentPerformer);
             boolean performerIsIdle = isTaskPerformerIdle(currentPerformer);
             boolean performerIsSuspended = getLocalParticipantManager().isParticipantSuspended(currentPerformer);
             boolean performerQueueIsEmpty = isTaskPerformerQueueEmpty(currentPerformer);

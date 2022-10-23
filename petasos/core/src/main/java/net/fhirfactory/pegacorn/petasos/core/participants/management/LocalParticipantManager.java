@@ -89,7 +89,7 @@ public class LocalParticipantManager {
             return;
         }
         getLogger().info(".initialise(): Initialisation Start...");
-
+        scheduleParticipantManagementDaemon();
         setInitialised(true);
         getLogger().info(".initialise(): Initialisation Finish...");
         getLogger().debug(".initialise(): Exit");
@@ -217,8 +217,8 @@ public class LocalParticipantManager {
 
         // Update local Participant with information from global registration
         getLogger().trace(".registerPetasosParticipant(): [Synchronise Local Participant] Start");
-        if(globalParticipantRegistration.hasParticipantStatus()) {
-            participant.setParticipantStatus(globalParticipantRegistration.getParticipantStatus());
+        if(globalParticipantRegistration.hasControlStatus()) {
+            participant.setControlStatus(globalParticipantRegistration.getControlStatus());
         }
         if(globalParticipantRegistration.getSubscriptions() != null) {
             participant.setSubscriptions(globalParticipantRegistration.getSubscriptions());

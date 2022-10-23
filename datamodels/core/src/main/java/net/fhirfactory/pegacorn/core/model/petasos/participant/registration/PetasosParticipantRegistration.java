@@ -124,7 +124,7 @@ public class PetasosParticipantRegistration extends PetasosParticipantRegistrati
     //
 
     @JsonIgnore
-    public boolean hasConstrolStatus(){
+    public boolean hasControlStatus(){
         boolean hasValue = this.controlStatus != null;
         return(hasValue);
     }

@@ -490,6 +490,8 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         if(StringUtils.isNotEmpty(specifyParticipantDisplayName())){
             wupNode.getParticipant().getParticipantId().setDisplayName(specifyParticipantDisplayName());
         }
+        wupNode.setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STARTING);
+        getLogger().debug(".buildWUPNodeElement(): Exit, wupNode->{}", wupNode);
         return(wupNode);
     }
 

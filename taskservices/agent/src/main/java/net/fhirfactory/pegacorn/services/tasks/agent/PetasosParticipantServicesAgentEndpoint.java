@@ -103,7 +103,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
                 @Override
 				public void run() {
                     getLogger().debug(".petasosParticipantCacheSynchronisationDaemonScheduler(): Entry");
-                    petasosParticipantCacheSynchronisationDaemon();
+                    participantSynchronisationDaemon();
                     getLogger().debug(".petasosParticipantCacheSynchronisationDaemonScheduler(): Exit");
                 }
             };
@@ -125,48 +125,48 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
         getLogger().debug(".scheduleSynchronisationDaemons(): Exit");
     }
 
-    public void petasosParticipantCacheSynchronisationDaemon(){
-        getLogger().debug(".petasosParticipantCacheSynchronisationDaemon(): Entry");
+    public void participantSynchronisationDaemon(){
+        getLogger().debug(".participantSynchronisationDaemon(): Entry");
 
         try {
             //
-            // 1st, let's synchronise my subscriptions
-            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Start");
+            // 1st, let's synchronise my ProcessingPlant
+            getLogger().trace(".participantSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Start");
             PetasosParticipant myProcessingPlantPetasosParticipant = getParticipantHolder().getParticipant();
-            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] myProcessingPlantPetasosParticipant->{}", myProcessingPlantPetasosParticipant);
+            getLogger().trace(".participantSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] myProcessingPlantPetasosParticipant->{}", myProcessingPlantPetasosParticipant);
             PetasosParticipantRegistration localRegistration = participantManager.getLocalParticipantRegistration(myProcessingPlantPetasosParticipant.getComponentId());
-            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] localRegistration->{}", localRegistration);
+            getLogger().trace(".participantSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] localRegistration->{}", localRegistration);
             if (localRegistration == null) {
-                getLogger().error(".petasosParticipantCacheSynchronisationDaemon(): My PetasosParticipantRegistration is all wrong!");
+                getLogger().error(".participantSynchronisationDaemon(): My PetasosParticipantRegistration is all wrong!");
             } else {
-                getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): localRegistration->{}", localRegistration);
+                getLogger().trace(".participantSynchronisationDaemon(): localRegistration->{}", localRegistration);
                 if (localRegistration.getCentralRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_REGISTERED)
                     || localRegistration.getCentralRegistrationStatus().equals(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_REGISTRATION_FAILED)) {
                     PetasosParticipantRegistration centralRegistration = synchroniseRegistration(localRegistration);
                     participantManager.synchroniseLocalWithCentralCacheDetail(centralRegistration);
                 }
             }
-            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Finish");
+            getLogger().trace(".participantSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Finish");
             //
             // 2nd, let's synchronise my publishing
-            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] Start");
+            getLogger().trace(".participantSynchronisationDaemon(): [Synchronise My Participant/Publishing] Start");
             String myProcessingPlantParticipantName = getSubsystemParticipantName();
             Set<PetasosParticipantRegistration> downstreamTaskPerformers = this.getDownstreamSubscribers(myProcessingPlantParticipantName);
             if (!downstreamTaskPerformers.isEmpty()) {
-                getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] There are downstream subscribers!");
+                getLogger().trace(".participantSynchronisationDaemon(): [Synchronise My Participant/Publishing] There are downstream subscribers!");
                 for (PetasosParticipantRegistration currentDownstreamPerformer : downstreamTaskPerformers) {
                     if (getLogger().isTraceEnabled()) {
-                        getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getParticipantId().getSubsystemName());
+                        getLogger().trace(".participantSynchronisationDaemon(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getParticipantId().getSubsystemName());
                     }
                     participantManager.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
                 }
             }
             getProcessingPlantMetricsAgent().touchWatchDogActivityIndicator("ParticipantCacheSynchronisationDaemon");
-            getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] Finish");
+            getLogger().trace(".participantSynchronisationDaemon(): [Synchronise My Participant/Publishing] Finish");
         } catch (Exception daemonException){
-            getLogger().error(".petasosParticipantCacheSynchronisationDaemon(): Exception, message->{}, stackTrace->{}", daemonException.getMessage(), daemonException.getStackTrace());
+            getLogger().error(".participantSynchronisationDaemon(): Exception, message->{}, stackTrace->{}", daemonException.getMessage(), daemonException.getStackTrace());
         }
-        getLogger().debug(".petasosParticipantCacheSynchornisationDaemon(): Exit");
+        getLogger().debug(".participantSynchronisationDaemon(): Exit");
     }
 
     public void participantExecutionStatusSynchronisationDaemon(){

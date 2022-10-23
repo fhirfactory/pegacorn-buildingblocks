@@ -358,16 +358,12 @@ public class PetasosParticipant implements Serializable {
     }
 
     public void updateFromRegistration(PetasosParticipantRegistration registration){
+        getLogger().debug(".updateFromRegistration(): Entry, registration->{}", registration);
         if(registration == null){
+            getLogger().debug(".updateFromRegistration(): Exit, registration is null");
             return;
         }
-        if(!hasParticipantId()){
-            setParticipantId(registration.getParticipantId());
-        }
-        if(registration.hasParticipantStatus()){
-            setParticipantStatus(registration.getParticipantStatus());
-        }
-        if(registration.hasConstrolStatus()){
+        if(registration.hasControlStatus()){
             setControlStatus(registration.getControlStatus());
         }
         if(!registration.getSubscriptions().isEmpty()){
@@ -389,5 +385,6 @@ public class PetasosParticipant implements Serializable {
         if(registration.getLocalRegistrationStatus() != null){
             getParticipantRegistrationStatus().setLocalRegistrationStatus(registration.getLocalRegistrationStatus());
         }
+        getLogger().debug(".updateFromRegistration(): Exit");
     }
 }
