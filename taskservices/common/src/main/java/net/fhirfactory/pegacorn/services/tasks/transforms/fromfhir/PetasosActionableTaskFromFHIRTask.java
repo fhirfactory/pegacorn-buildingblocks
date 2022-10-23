@@ -30,9 +30,13 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.va
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.transformers.FHIRProvenanceToPetasosTaskJourneyTransformer;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
-import net.fhirfactory.pegacorn.services.tasks.transforms.common.TaskTransformConstants;
-import org.hl7.fhir.r4.model.*;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskExtensionSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskStatusReasonFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.InstantType;
+import org.hl7.fhir.r4.model.Period;
+import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +50,10 @@ public class PetasosActionableTaskFromFHIRTask extends PetasosTaskFromFHIRTask {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosActionableTaskFromFHIRTask.class);
 
     @Inject
-    private TaskBusinessStatusFactory taskBusinessStatusFactory;
+    private TaskStatusReasonFactory taskStatusReasonFactory1;
 
     @Inject
-    private TaskTransformConstants taskTransformConstants;
+    private TaskExtensionSystemFactory taskExtensionSystems;
 
     @Inject
     private TopologyIM topologyIM;
@@ -130,14 +134,14 @@ public class PetasosActionableTaskFromFHIRTask extends PetasosTaskFromFHIRTask {
             if(fhirTask.getExecutionPeriod().hasEnd()){
                 taskFulfillmentReport.setFinishedDate(fhirTask.getExecutionPeriod().getEnd());
             }
-            if(fhirTask.getExecutionPeriod().hasExtension(taskTransformConstants.getTaskRegistratonInstantExtensionUrl())){
-                Extension registrationExtension = fhirTask.getExecutionPeriod().getExtensionByUrl(taskTransformConstants.getTaskRegistratonInstantExtensionUrl());
+            if(fhirTask.getExecutionPeriod().hasExtension(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_REGISTRATON_INSTANT_EXTENSION_URL))){
+                Extension registrationExtension = fhirTask.getExecutionPeriod().getExtensionByUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_REGISTRATON_INSTANT_EXTENSION_URL));
                 InstantType registrationInstantType = (InstantType) registrationExtension.getValue();
                 Date registrationDate = registrationInstantType.getValue();
                 taskFulfillmentReport.setRegistrationDate(registrationDate);
             }
-            if(fhirTask.getExecutionPeriod().hasExtension(taskTransformConstants.getTaskFinalisationInstantExtensionUrl())){
-                Extension finalisationExtension = fhirTask.getExecutionPeriod().getExtensionByUrl(taskTransformConstants.getTaskFinalisationInstantExtensionUrl());
+            if(fhirTask.getExecutionPeriod().hasExtension(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_FINALISATION_INSTANT_EXTENSION_URL))){
+                Extension finalisationExtension = fhirTask.getExecutionPeriod().getExtensionByUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_FINALISATION_INSTANT_EXTENSION_URL));
                 InstantType finalisationInstantType = (InstantType) finalisationExtension.getValue();
                 Date finalisationDate = finalisationInstantType.getValue();
                 taskFulfillmentReport.setFinalisationDate(finalisationDate);

@@ -21,8 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
-import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import org.hl7.fhir.r4.model.Coding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,7 @@ public class EndpointMetaTagFactory {
 
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     private static final String PEGACORN_ENDPOINT_DEFAULT_HOSTNAME = "/Endpoint/meta-tag-default_hostname";
     private static final String PEGACORN_ENDPOINT_DEFAULT_PORT = "/Endpoint/meta-tag-default_port";
@@ -49,17 +48,17 @@ public class EndpointMetaTagFactory {
     //
 
     public String getPegacornEndpointDefaultHostname() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ENDPOINT_DEFAULT_HOSTNAME;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_ENDPOINT_DEFAULT_HOSTNAME;
         return (codeSystem);
     }
 
     public String getPegacornEndpointDefaultPort() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ENDPOINT_DEFAULT_PORT;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_ENDPOINT_DEFAULT_PORT;
         return(codeSystem);
     }
 
     public String getPegacornEndpointConnectionBehaviour(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ENDPOINT_CONNECTION_BEHAVIOUR;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_ENDPOINT_CONNECTION_BEHAVIOUR;
         return(codeSystem);
     }
 

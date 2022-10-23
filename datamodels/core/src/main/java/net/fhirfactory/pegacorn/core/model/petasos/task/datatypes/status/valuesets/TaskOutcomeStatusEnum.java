@@ -21,6 +21,9 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets;
 
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
+import org.apache.commons.lang3.StringUtils;
+
 /**
  *
  * @author ACT Health (Mark A. Hunter)
@@ -48,5 +51,16 @@ public enum TaskOutcomeStatusEnum {
 
     public String getDisplayName(){
         return(this.displayName);
+    }
+
+    public static TaskOutcomeStatusEnum fromToken(String token){
+        if(StringUtils.isNotEmpty(token)){
+            for(TaskOutcomeStatusEnum currentValue: values()){
+                if(StringUtils.equalsIgnoreCase(token,currentValue.getToken())){
+                    return(currentValue);
+                }
+            }
+        }
+        return(null);
     }
 }

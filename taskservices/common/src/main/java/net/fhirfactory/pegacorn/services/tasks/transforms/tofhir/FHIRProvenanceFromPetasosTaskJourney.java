@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.value
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.factories.ProvenanceFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.factories.ProvenanceSequenceNumberExtensionFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskIdentifierFactory;
@@ -54,7 +54,7 @@ public class FHIRProvenanceFromPetasosTaskJourney {
     private ProvenanceSequenceNumberExtensionFactory sequenceNumberExtensionFactory;
 
     @Inject
-    private PegacornIdentifierFactory identifierFactory;
+    private DRICaTSIdentifierFactory identifierFactory;
 
     @Inject
     private ProvenanceFactory provenanceFactory;
@@ -166,7 +166,7 @@ public class FHIRProvenanceFromPetasosTaskJourney {
         return(this.sequenceNumberExtensionFactory);
     }
 
-    protected PegacornIdentifierFactory getIdentifierFactory(){
+    protected DRICaTSIdentifierFactory getIdentifierFactory(){
         return(this.identifierFactory);
     }
 

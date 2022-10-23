@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.ask.base;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
@@ -45,7 +45,7 @@ public abstract class InternalFHIRClientServicesBase extends InternalFHIRClientP
     private TopologyIM topologyIM;
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     @Inject
     private ProcessingPlantInterface processingPlant;

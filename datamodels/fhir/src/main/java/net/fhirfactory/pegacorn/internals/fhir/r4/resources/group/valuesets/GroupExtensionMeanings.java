@@ -23,7 +23,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.valuesets;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -37,7 +37,7 @@ import javax.inject.Inject;
 public final class GroupExtensionMeanings {
 
     @Inject
-    private PegacornReferenceProperties pegacornReferenceProperties;
+    private DRICaTSReferenceProperties pegacornReferenceProperties;
 
     private String GROUP_CODE_BASE="/group";
 
@@ -52,47 +52,47 @@ public final class GroupExtensionMeanings {
     private static final String COMMUNICATE_ROOM_CONTEXTUAL_STATUS_EXTENSION_MEANING = "communicate_room_contextual_status_extension";
 
     public String getGroupPriorityExtensionMeaning(){
-        String groupPriority = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_PRIORITY_EXTENSION_MEANING;
+        String groupPriority = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_PRIORITY_EXTENSION_MEANING;
         return(groupPriority);
     }
 
     public String getJoinRuleExtensionMeaning(){
-        String joinRule = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_JOINRULE_EXTENSION_MEANING;
+        String joinRule = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_JOINRULE_EXTENSION_MEANING;
         return(joinRule);
     }
 
     public String getGroupPredecessorExtensionMeaning(){
-        String groupPredecessor = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_PREDECESSOR_GROUP_EXTENSION_MEANING;
+        String groupPredecessor = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_PREDECESSOR_GROUP_EXTENSION_MEANING;
         return(groupPredecessor);
     }
 
     public String getGroupChatGroupVersionExtensionMeaning(){
-        String chatGroupVersion = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_VERSION_EXTENSION_MEANING;
+        String chatGroupVersion = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_VERSION_EXTENSION_MEANING;
         return(chatGroupVersion);
     }
 
     public String getGroupPredecessorLastMessageExtensionMeaning(){
-        String predecessorLastMessage = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_PREDECSSOR_ROOM_LAST_MESSAGE_EXTENSION_MEANING;
+        String predecessorLastMessage = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_PREDECSSOR_ROOM_LAST_MESSAGE_EXTENSION_MEANING;
         return(predecessorLastMessage);
     }
 
     public String getCanonicalAliasExtensionMeaning(){
-        String canonicalAlias = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_CANONICAL_ALIAS_EXTENSION_MEANING;
+        String canonicalAlias = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_CANONICAL_ALIAS_EXTENSION_MEANING;
         return(canonicalAlias);
     }
 
     public String getGroupFederationStatusExtensionMeaning(){
-        String federationStatus = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_FEDERATION_STATUS_EXTENSION_MEANING;
+        String federationStatus = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_FEDERATION_STATUS_EXTENSION_MEANING;
         return(federationStatus);
     }
 
     public String getRepresentedResourceMeaning(){
-        String representedResource = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_REPRESENTED_RESOURCE_EXTENSION_MEANING;
+        String representedResource = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_REPRESENTED_RESOURCE_EXTENSION_MEANING;
         return(representedResource);
     }
 
     public String getContextualStatusMeaning(){
-        String contextualStatus = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_CONTEXTUAL_STATUS_EXTENSION_MEANING;
+        String contextualStatus = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + COMMUNICATE_ROOM_CONTEXTUAL_STATUS_EXTENSION_MEANING;
         return(contextualStatus);
     }
 }

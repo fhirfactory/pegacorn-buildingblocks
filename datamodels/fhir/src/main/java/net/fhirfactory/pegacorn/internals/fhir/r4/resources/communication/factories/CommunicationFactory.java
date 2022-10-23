@@ -22,14 +22,13 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.communication.factories;
 
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.Date;
 
 @ApplicationScoped
@@ -37,7 +36,7 @@ public class CommunicationFactory {
     private static final Logger LOG = LoggerFactory.getLogger(CommunicationFactory.class);
 
     @Inject
-    private PegacornIdentifierFactory identifierFactory;
+    private DRICaTSIdentifierFactory identifierFactory;
 
     public Communication newCommunicationResource(String idValue, Date date) {
         LOG.debug(".newCommunicationResource(): Entry, idValue->{}, date->{}", idValue, date);

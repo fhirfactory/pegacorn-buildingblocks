@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -34,7 +34,7 @@ import javax.inject.Inject;
 public class DeviceSpecialisationFactory {
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     private static final String PEGACORN_COMPONENT_ROLE_AS_SPECIALISATION_SYSTEM = "/device-specialisation-component-role";
 
@@ -43,7 +43,7 @@ public class DeviceSpecialisationFactory {
     //
 
     public String getPegacornComponentRoleAsSpecialisationSystem() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_COMPONENT_ROLE_AS_SPECIALISATION_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_COMPONENT_ROLE_AS_SPECIALISATION_SYSTEM;
         return (codeSystem);
     }
 

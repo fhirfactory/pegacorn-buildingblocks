@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,22 +19,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.internals.fhir.r4.codesystems;
+package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class PegacornGroupCodeSystemFactory {
-    private String PEGACORN_GROUP_CODE_SYSTEM = "/group/group_member_kind";
+public class TaskExtensionSystemFactory {
+
+    private static final String DRICATS_TASK_EXTENSION_SYSTEM = "/extension/task";
 
     @Inject
     private DRICaTSReferenceProperties systemWideProperties;
 
-    public String newPegacornIdentifierCodeSystem() {
-        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_GROUP_CODE_SYSTEM;
+    //
+    // Constructor(s)
+    //
+
+    //
+    // Business Logic
+    //
+
+    public String getDRICaTSTaskExtensionSystem(){
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + DRICATS_TASK_EXTENSION_SYSTEM;
         return (codeSystem);
     }
+
+    public String getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum taskExtensionSystem){
+        if(taskExtensionSystem == null){
+            return(null);
+        }
+        String system = getDRICaTSTaskExtensionSystem() + taskExtensionSystem.getToken();
+        return(system);
+    }
+
+
 }

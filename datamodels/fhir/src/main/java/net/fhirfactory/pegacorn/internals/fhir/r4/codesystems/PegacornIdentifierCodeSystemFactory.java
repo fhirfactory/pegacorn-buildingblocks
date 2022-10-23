@@ -21,10 +21,9 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.codesystems;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.StringType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -33,12 +32,12 @@ import javax.inject.Inject;
 public class PegacornIdentifierCodeSystemFactory {
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     private static final String PEGACORN_IDENTIFIER_CODE_SYSTEM = "/identifier-type";
 
     public String getPegacornIdentifierCodeSystem() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_IDENTIFIER_CODE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_IDENTIFIER_CODE_SYSTEM;
         return (codeSystem);
     }
 

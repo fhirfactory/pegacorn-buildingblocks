@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import org.hl7.fhir.r4.model.Coding;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class DeviceMetaTagFactory {
 
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     private static final String PEGACORN_DEVICE_SECURITY_ZONE_META_TAG_SYSTEM = "/device-meta-tag-security-zone";
     private static final String PEGACORN_DEVICE_DEPLOYMENT_POD_ID = "/device-meta-tag-pod-id";
@@ -48,22 +48,22 @@ public class DeviceMetaTagFactory {
     //
 
     public String getPegacornDeviceSecurityZoneMetaTagSystem() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_SECURITY_ZONE_META_TAG_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_DEVICE_SECURITY_ZONE_META_TAG_SYSTEM;
         return (codeSystem);
     }
 
     public String getPegacornDeviceDeploymentPodId() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_POD_ID;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_POD_ID;
         return(codeSystem);
     }
 
     public String getPegacornDeviceDeploymentPodIpAddress() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_POD_IP_ADDRESS;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_POD_IP_ADDRESS;
         return(codeSystem);
     }
 
     public String getPegacornDeviceDeploymentHostIpAddress() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_HOST_IP_ADDRESS;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_DEVICE_DEPLOYMENT_HOST_IP_ADDRESS;
         return(codeSystem);
     }
 

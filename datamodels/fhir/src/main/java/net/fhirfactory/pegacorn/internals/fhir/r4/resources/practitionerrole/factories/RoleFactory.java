@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitionerrole.factories;
 
 import net.fhirfactory.pegacorn.core.constants.ContainmentBasedValueSeparators;
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.StringType;
@@ -40,18 +40,18 @@ public class RoleFactory {
     private static final String PEGACORN_ROLE_CODE_SYSTEM = "/roles";
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     @Inject
     private ContainmentBasedValueSeparators containmentBasedValueSeparators;
 
     public String getPegacornRoleCategoryCodeSystem() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ROLE_CATEGORY_CODE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_ROLE_CATEGORY_CODE_SYSTEM;
         return (codeSystem);
     }
 
     public String getPegacornRoleCodeSystem() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ROLE_CODE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_ROLE_CODE_SYSTEM;
         return (codeSystem);
     }
 

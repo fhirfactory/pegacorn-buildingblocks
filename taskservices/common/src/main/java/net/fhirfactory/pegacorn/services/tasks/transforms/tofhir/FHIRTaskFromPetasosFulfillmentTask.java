@@ -31,9 +31,9 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.data
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskPerformerTypeFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskStatusReasonFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +50,13 @@ public class FHIRTaskFromPetasosFulfillmentTask extends FHIRTaskFromPetasosTask 
     private static final Logger LOG = LoggerFactory.getLogger(FHIRTaskFromPetasosFulfillmentTask.class);
 
     @Inject
-    private TaskStatusReasonFactory statusReasonFactory;
+    private TaskBusinessStatusFactory statusReasonFactory;
 
     @Inject
     TaskPerformerTypeFactory performerTypeFactory;
 
     @Inject
-    private PegacornIdentifierFactory identifierFactory;
+    private DRICaTSIdentifierFactory identifierFactory;
 
     //
     // Constructor(s)
@@ -419,7 +419,7 @@ public class FHIRTaskFromPetasosFulfillmentTask extends FHIRTaskFromPetasosTask 
         return(LOG);
     }
 
-    protected TaskStatusReasonFactory getStatusReasonFactory(){
+    protected TaskBusinessStatusFactory getStatusReasonFactory(){
         return(this.statusReasonFactory);
     }
 
@@ -427,7 +427,7 @@ public class FHIRTaskFromPetasosFulfillmentTask extends FHIRTaskFromPetasosTask 
         return(this.performerTypeFactory);
     }
 
-    protected PegacornIdentifierFactory getIdentifierFactory(){
+    protected DRICaTSIdentifierFactory getIdentifierFactory(){
         return(this.identifierFactory);
     }
 }

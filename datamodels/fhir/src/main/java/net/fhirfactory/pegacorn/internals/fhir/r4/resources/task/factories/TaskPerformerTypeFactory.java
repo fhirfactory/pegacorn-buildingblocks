@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -34,7 +34,7 @@ import javax.inject.Inject;
 public class TaskPerformerTypeFactory {
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     private static final String PEGACORN_TASK_PERFORMER_PARTICIPANT_TYPE = "/task-performer-participant-type";
     private static final String PEGACORN_TASK_PERFORMER_PARTICIPANT_SUBSYSTEM_TYPE = "/task-performer-participant-subsystem-type";
@@ -44,12 +44,12 @@ public class TaskPerformerTypeFactory {
     //
 
     public String getPegacornTaskPerformerParticipantType(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_PERFORMER_PARTICIPANT_TYPE;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_TASK_PERFORMER_PARTICIPANT_TYPE;
         return (codeSystem);
     }
 
     public String getPegacornTaskPerformerParticipantSubsystemType(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_PERFORMER_PARTICIPANT_SUBSYSTEM_TYPE;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_TASK_PERFORMER_PARTICIPANT_SUBSYSTEM_TYPE;
         return (codeSystem);
     }
 

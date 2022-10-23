@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.bundle;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornMessageHeaderCodeSystemFactory;
@@ -42,7 +42,7 @@ public class MessageHeaderHelper {
     private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     @Inject
     private PegacornMessageHeaderCodeSystemFactory pegacornMessageHeaderCodeSystemFactory;

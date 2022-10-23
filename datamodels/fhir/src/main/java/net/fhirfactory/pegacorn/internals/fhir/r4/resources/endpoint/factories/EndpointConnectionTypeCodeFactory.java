@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -34,14 +34,14 @@ public class EndpointConnectionTypeCodeFactory {
     private static final String PEGACORN_ENDPOINT_CONNECTION_TYPE_SYSTEM = "/endpoint-connection_type";
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     //
     // Business Methods
     //
 
     public String getPegacornEndpointConnectionTypeSystem(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ENDPOINT_CONNECTION_TYPE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_ENDPOINT_CONNECTION_TYPE_SYSTEM;
         return (codeSystem);
     }
 

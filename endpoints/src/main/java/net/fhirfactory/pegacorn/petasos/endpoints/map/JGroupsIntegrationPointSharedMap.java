@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterfac
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointConnectionTypeCodeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointPayloadTypeFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +53,7 @@ public class JGroupsIntegrationPointSharedMap {
     private Object integrationPointProcessingPlantServiceMapLock;
 
     @Inject
-    private PegacornIdentifierFactory identifierFactory;
+    private DRICaTSIdentifierFactory identifierFactory;
 
     @Inject
     private EndpointConnectionTypeCodeFactory connectionTypeCodeFactory;

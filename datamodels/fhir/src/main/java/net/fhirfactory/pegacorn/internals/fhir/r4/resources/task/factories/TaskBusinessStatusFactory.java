@@ -21,10 +21,15 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.StringType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -32,31 +37,62 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class TaskBusinessStatusFactory {
 
+    private ObjectMapper jsonMapper;
+
+    private static final String DRICATS_TASK_BUSINESS_STATUS_SYSTEM = "/task-business-status";
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
-    private static final String PEGACORN_TASK_BUSINESS_STATUS_SYSTEM = "/task-business-status";
+    @Inject
+    private TaskExtensionSystemFactory taskExtensionSystems;
 
+    //
+    // Constructor(s)
+    //
 
+    public TaskBusinessStatusFactory(){
+        this.jsonMapper = new ObjectMapper();
+    }
+
+    //
+    // Getters (and Setters)
+    //
+
+    public ObjectMapper getJsonMapper() {
+        return jsonMapper;
+    }
 
     //
     // Business Methods
     //
 
-    public String getPegacornTaskBusinessStatusSystem(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_BUSINESS_STATUS_SYSTEM;
+    public String getDRICaTSTaskStatusReasonSystem(){
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + DRICATS_TASK_BUSINESS_STATUS_SYSTEM;
         return (codeSystem);
     }
 
-    public CodeableConcept newTaskStatusReason(FulfillmentExecutionStatusEnum executionStatus ){
-        CodeableConcept taskReasonCC = new CodeableConcept();
-        Coding taskReasonCoding = new Coding();
-        taskReasonCoding.setSystem(getPegacornTaskBusinessStatusSystem());
-        taskReasonCoding.setCode(executionStatus.getToken());
-        taskReasonCoding.setDisplay(executionStatus.getDisplayName());
-        taskReasonCC.setText(executionStatus.getDisplayName());
-        taskReasonCC.addCoding(taskReasonCoding);
+    public CodeableConcept newBusinessStatusFromOutcomeStatus(TaskOutcomeStatusType taskOutcomeStatus ){
+        Coding businessStatusCoding = new Coding();
+        businessStatusCoding.setSystem(getDRICaTSTaskStatusReasonSystem());
+        businessStatusCoding.setCode(taskOutcomeStatus.getOutcomeStatus().getToken());
+        businessStatusCoding.setDisplay(taskOutcomeStatus.getOutcomeStatus().getDisplayName());
+        CodeableConcept businessStatusCC = new CodeableConcept();
+        businessStatusCC.setText(businessStatusCoding.getDisplay());
+        businessStatusCC.addCoding(businessStatusCoding);
+        businessStatusCC.setText(businessStatusCoding.getDisplay());
 
-        return(taskReasonCC);
+        try {
+            if (taskOutcomeStatus.getEntryInstant() != null) {
+                String sequenceNumberJSON = jsonMapper.writeValueAsString(taskOutcomeStatus.getEntryInstant());
+                Extension taskSequenceNumberExtension = new Extension();
+                taskSequenceNumberExtension.setUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_OUTCOME_ENTRY_INSTANT_EXTENSION_URL));
+                taskSequenceNumberExtension.setValue(new StringType(sequenceNumberJSON));
+                businessStatusCC.addExtension(taskSequenceNumberExtension);
+            }
+        } catch(Exception ex){
+            // do nothing :)
+        }
+
+        return(businessStatusCC);
     }
 }

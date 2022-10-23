@@ -21,12 +21,15 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Period;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,12 +42,30 @@ import java.util.Date;
 public class TaskIdentifierFactory {
     private static final Logger LOG = LoggerFactory.getLogger(TaskIdentifierFactory.class);
 
+    private ObjectMapper jsonMapper;
+
     @Inject
-    private PegacornIdentifierFactory generalIdentifierFactory;
+    private DRICaTSIdentifierFactory generalIdentifierFactory;
+
+    @Inject
+    private TaskExtensionSystemFactory taskExtensionSystems;
+
 
     //
     // Constructor(s)
     //
+
+    public TaskIdentifierFactory(){
+        this.jsonMapper = new ObjectMapper();
+    }
+
+    //
+    // Getters (and Setters)
+    //
+
+    public ObjectMapper getJsonMapper() {
+        return jsonMapper;
+    }
 
     //
     // Business Methods
@@ -76,6 +97,19 @@ public class TaskIdentifierFactory {
                 break;
         }
         fhirIdentifier = generalIdentifierFactory.newIdentifier(identifierCode, taskId.getLocalId(), identifierPeriod);
+
+        try {
+            if(taskId.getTaskSequenceNumber() != null) {
+                String sequenceNumberJSON = jsonMapper.writeValueAsString(taskId.getTaskSequenceNumber());
+                Extension taskSequenceNumberExtension = new Extension();
+                taskSequenceNumberExtension.setUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_SEQUENCE_NUMBER));
+                taskSequenceNumberExtension.setValue(new StringType(sequenceNumberJSON));
+                fhirIdentifier.addExtension(taskSequenceNumberExtension);
+            }
+        } catch(Exception ex){
+            getLogger().warn(".newTaskIdentifier(): Could not transform to JSON the Task Sequence Number");
+        }
+
         getLogger().debug(".newActionableTaskIdentifier(): Exit, fhirIdentifier->{}", fhirIdentifier);
         return(fhirIdentifier);
     }
@@ -89,7 +123,7 @@ public class TaskIdentifierFactory {
 
     public Identifier newTaskIdentifier(TaskTypeTypeEnum taskType, TaskIdType taskId){
         getLogger().debug(".newActionableTaskIdentifier(): Entry, taskId->{}", taskId);
-        Identifier fhirIdentifier = fhirIdentifier = newTaskIdentifier(taskType, taskId, null, null);
+        Identifier fhirIdentifier = newTaskIdentifier(taskType, taskId, null, null);
         getLogger().debug(".newActionableTaskIdentifier(): Exit, fhirIdentifier->{}", fhirIdentifier);
         return(fhirIdentifier);
     }

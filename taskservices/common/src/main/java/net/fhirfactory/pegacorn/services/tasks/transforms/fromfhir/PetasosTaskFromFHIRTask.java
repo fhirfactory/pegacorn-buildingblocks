@@ -44,14 +44,14 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifier
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.transformers.FHIRProvenanceToPetasosTaskJourneyTransformer;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskIdentifierFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskPerformerTypeFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskStatusReasonFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.*;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -74,10 +74,16 @@ public abstract class PetasosTaskFromFHIRTask {
     private TaskPerformerTypeFactory taskPerformerTypeFactory;
 
     @Inject
-    private TaskStatusReasonFactory taskStatusReasonFactory;
+    private TaskBusinessStatusFactory taskBusinessStatusFactory;
+
+    @Inject
+    private TaskExtensionSystemFactory taskExtensionSystemFactory;
 
     @Inject
     private FHIRProvenanceToPetasosTaskJourneyTransformer provenanceToTaskJourneyTransformer;
+
+    @Inject
+    private TaskStatusReasonFactory taskStatusReasonFactory;
 
     //
     // Constructor(s)
@@ -281,57 +287,26 @@ public abstract class PetasosTaskFromFHIRTask {
             getLogger().debug(".transformFHIRTaskToTaskOutcomeStatus(): Exit, fhirTask is null");
             return(null);
         }
-        TaskOutcomeStatusType outcomeStatus = new TaskOutcomeStatusType();
-        if(fhirTask.hasStatus()){
-            switch(fhirTask.getStatus()){
-                case CANCELLED:
-                case DRAFT:
-                case REQUESTED:
-                case RECEIVED:
-                case REJECTED:
-                case ENTEREDINERROR:
-                case ACCEPTED:
-                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_CANCELLED);
-                    break;
-                case READY:
-                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_WAITING);
-                    break;
-                case INPROGRESS:
-                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_ACTIVE);
-                    break;
-                case FAILED:
-                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_FAILED);
-                    break;
-                case COMPLETED:
-                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_FINISHED);
-                    break;
-                case ONHOLD:
-                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_WAITING);
-                case NULL:
-                default:
-                    outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_UNKNOWN);
-                    break;
-            }
-
-            //
-            // Check for finalisation
-            if(fhirTask.hasStatusReason()){
-                CodeableConcept statusReason = fhirTask.getStatusReason();
-                boolean hasFinalisationInfo = false;
-                for(Coding currentCoding: statusReason.getCoding()){
-                    if(currentCoding.getSystem().contentEquals(taskStatusReasonFactory.getPegacornTaskStatusReasonSystem())){
-                        if(currentCoding.getCode().contentEquals(taskStatusReasonFactory.getPegacornTaskIsFinalisedCode())) {
-                            outcomeStatus.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_FINALISED);
-                            break;
-                        }
+        TaskOutcomeStatusType outcomeStatus = null;
+        if(fhirTask.hasBusinessStatus()){
+            CodeableConcept businessStatus = fhirTask.getBusinessStatus();
+            TaskOutcomeStatusEnum taskOutcomeStatus = TaskOutcomeStatusEnum.fromToken(businessStatus.getCodingFirstRep().getCode());
+            if(taskOutcomeStatus != null) {
+                outcomeStatus = new TaskOutcomeStatusType();
+                outcomeStatus.setOutcomeStatus(taskOutcomeStatus);
+                if(fhirTask.getBusinessStatus().hasExtension(taskExtensionSystemFactory.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_OUTCOME_ENTRY_INSTANT_EXTENSION_URL))){
+                    try{
+                        String entryInstantString = fhirTask.getBusinessStatus().getExtensionString(taskExtensionSystemFactory.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_OUTCOME_ENTRY_INSTANT_EXTENSION_URL));
+                        Instant instant = getJSONMapper().readValue(entryInstantString, Instant.class);
+                        outcomeStatus.setEntryInstant(instant);
+                    } catch(Exception ex){
+                        getLogger().warn(".transformFHIRTaskToTaskOutcomeStatus(): Cannot convert outcome instant!");
+                        outcomeStatus.setEntryInstant(Instant.now());
                     }
                 }
             }
-
-            getLogger().debug(".transformFHIRTaskToTaskOutcomeStatus(): Exit, outcomeStatus->{}", outcomeStatus);
-            return(outcomeStatus);
         }
-        getLogger().debug(".transformFHIRTaskToTaskOutcomeStatus(): Exit, FHIR::Task has no .status element, returning null");
+        getLogger().debug(".transformFHIRTaskToTaskOutcomeStatus(): Exit, outcomeStatus->{}", outcomeStatus);
         return(null);
     }
 

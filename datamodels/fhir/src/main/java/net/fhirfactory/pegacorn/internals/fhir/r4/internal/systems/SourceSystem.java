@@ -23,7 +23,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SubsystemTopologyNode;
@@ -84,7 +84,7 @@ public abstract class SourceSystem {
     private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     public SourceSystem() {
         this.systemOwnerContactName = specifySystemOwnerContactName();
@@ -445,7 +445,7 @@ public abstract class SourceSystem {
         Reference systemReference = new Reference();
         systemReference.setIdentifier(getIdentifierSystemOwnerPractitioner());
         systemReference.setDisplay(this.getOrganizationName());
-        systemReference.setType("Oranization");
+        systemReference.setType("Org anization");
         getLogger().debug(".createOwningOrganizationReference(): Exit, created Reference --> {}", systemReference);
         return(systemReference);
     }

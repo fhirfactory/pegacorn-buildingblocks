@@ -55,11 +55,15 @@ public class FHIRResourceSetFromPetasosActionableTask {
         //
         // Build the FHIR::Task
         Task fhirTask = taskFromPetasosActionableTask.newTaskFromPetasosTask(actionableTask);
-        resourceList.add(fhirTask);
+        if(fhirTask != null){
+            resourceList.add(fhirTask);
+        }
         //
         // Now the FHIR::Provenance
         Provenance fhirProvenance = provenanceFromPetasosTaskJourney.newProvenanceFromTaskJourney(processingPlant.getTopologyNode().getComponentId(), fhirTask.getIdentifierFirstRep(), actionableTask.getTaskTraceability());
-        resourceList.add(fhirProvenance);
+        if(fhirProvenance != null){
+            resourceList.add(fhirProvenance);
+        }
         //
         // And done...
         getLogger().debug(".newTask(): Exit, resourceList->{}", resourceList);

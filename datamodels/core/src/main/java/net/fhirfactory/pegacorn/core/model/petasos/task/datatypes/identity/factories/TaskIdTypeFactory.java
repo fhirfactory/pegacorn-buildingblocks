@@ -25,6 +25,7 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskSequenceNumber;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.valuesets.TaskReasonTypeEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
 
@@ -35,18 +36,35 @@ import java.util.UUID;
 @ApplicationScoped
 public class TaskIdTypeFactory {
 
+    public TaskIdType newTaskId(TaskReasonTypeEnum taskReason, String participantName){
+        StringBuilder idBuilder = new StringBuilder();
+        idBuilder.append(taskReason.getTaskReasonDisplayName());
+        UUID uuid = UUID.randomUUID();
+        String uuidString = uuid.toString();
+        idBuilder.append("-");
+        if(StringUtils.isNotEmpty(participantName)){
+            idBuilder.append(participantName);
+            idBuilder.append("-");
+        }
+        idBuilder.append(uuidString);
+        TaskIdType id = new TaskIdType();
+        id.setLocalId(idBuilder.toString());
+        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(uuid.getLeastSignificantBits());
+        id.setTaskSequenceNumber(sequenceNumber);
+        Identifier identifier = new Identifier();
+        return(id);
+    }
+
      public TaskIdType newTaskId(TaskReasonTypeEnum taskReason){
         StringBuilder idBuilder = new StringBuilder();
         idBuilder.append(taskReason.getTaskReasonDisplayName());
-        idBuilder.append("(");
-        idBuilder.append(")");
-        long leastSignificantBits = UUID.randomUUID().getLeastSignificantBits();
-        String hexString = Long.toHexString(leastSignificantBits);
+        UUID uuid = UUID.randomUUID();
+        String uuidString = uuid.toString();
         idBuilder.append("-");
-        idBuilder.append(hexString);
+        idBuilder.append(uuidString);
         TaskIdType id = new TaskIdType();
         id.setLocalId(idBuilder.toString());
-        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(leastSignificantBits);
+        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(uuid.getLeastSignificantBits());
         id.setTaskSequenceNumber(sequenceNumber);
         Identifier identifier = new Identifier();
         return(id);
@@ -63,9 +81,9 @@ public class TaskIdTypeFactory {
         TaskIdType taskId = new TaskIdType();
         taskId.setResourceId(id);
         UUID uuid = UUID.randomUUID();
-        String localId = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
+        String localId = uuid.toString();
         taskId.setLocalId(localId);
-        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(UUID.randomUUID().getLeastSignificantBits());
+        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(uuid.getLeastSignificantBits());
         taskId.setTaskSequenceNumber(sequenceNumber);
         return(taskId);
     }
@@ -74,9 +92,9 @@ public class TaskIdTypeFactory {
         TaskIdType taskId = new TaskIdType();
         taskId.setPrimaryBusinessIdentifier(identifier);
         UUID uuid = UUID.randomUUID();
-        String id = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
+        String id = uuid.toString();
         taskId.setLocalId(id);
-        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(UUID.randomUUID().getLeastSignificantBits());
+        TaskSequenceNumber sequenceNumber = new TaskSequenceNumber(uuid.getLeastSignificantBits());
         taskId.setTaskSequenceNumber(sequenceNumber);
         return(taskId);
     }

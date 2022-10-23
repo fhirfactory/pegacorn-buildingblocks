@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.processingplant;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
 import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.interfaces.participant.TaskPathwayManagementServiceInterface;
@@ -101,7 +101,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     private LocalParticipantManager participantRegistrationAdministrator;
 
     @Inject
-    private PegacornReferenceProperties pegacornReferenceProperties;
+    private DRICaTSReferenceProperties pegacornReferenceProperties;
 
     @Inject
     private ProcessingPlantMetricsAgentAccessor metricsAgentAccessor;
@@ -135,7 +135,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     // Getters (and Setters)
     //
 
-    protected PegacornReferenceProperties getPegacornReferenceProperties(){
+    protected DRICaTSReferenceProperties getPegacornReferenceProperties(){
         return(pegacornReferenceProperties);
     }
 

@@ -81,7 +81,7 @@ public class TaskOutcomeCaptureBean {
         if(getLogger().isDebugEnabled()) {
             getLogger().debug(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", convertToString(fulfillmentTask));
         }
-        TaskIdType actionableTaskId = fulfillmentTask.getTaskId();
+        TaskIdType actionableTaskId = fulfillmentTask.getActionableTaskId();
         TaskExecutionCommandEnum petasosTaskExecutionStatus = null;
         switch(fulfillmentTask.getTaskFulfillment().getStatus()){
             case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.Reference;
@@ -38,7 +38,7 @@ public class ProvenanceSequenceNumberExtensionFactory {
     private static final String PROVENANCE_TARGET_SEQUENCE_NUMBER_TYPE_MEANING = "/Provenancy/provenance-target-sequence-number-extension";
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
 
     //
@@ -46,7 +46,7 @@ public class ProvenanceSequenceNumberExtensionFactory {
     //
 
     public String getProvenanceTargetSequenceNumberTypeMeaning(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PROVENANCE_TARGET_SEQUENCE_NUMBER_TYPE_MEANING;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PROVENANCE_TARGET_SEQUENCE_NUMBER_TYPE_MEANING;
         return (codeSystem);
     }
 

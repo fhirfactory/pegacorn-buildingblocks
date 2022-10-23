@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.DeploymentSystemIdentificationInterface;
 import net.fhirfactory.pegacorn.core.constants.systemwide.DeploymentSystemSiteIdentificationInterface;
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
@@ -40,11 +40,11 @@ import java.time.Instant;
 import java.util.Date;
 
 @ApplicationScoped
-public class PegacornIdentifierFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(PegacornIdentifierFactory.class);
+public class DRICaTSIdentifierFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(DRICaTSIdentifierFactory.class);
 
     @Inject
-    private PegacornReferenceProperties pegacornReferenceProperties;
+    private DRICaTSReferenceProperties pegacornReferenceProperties;
 
     @Inject
     private DeploymentInstanceDetailInterface deploymentInstanceDetailInterface;

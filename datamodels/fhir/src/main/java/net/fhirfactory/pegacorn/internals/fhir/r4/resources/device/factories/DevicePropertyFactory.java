@@ -21,16 +21,14 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DeviceConfigurationFilePropertyTypeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DevicePropertyQuantityTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DevicePropertyTypeEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Device;
-import org.hl7.fhir.r4.model.Quantity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +40,7 @@ public class DevicePropertyFactory {
     private static final Logger LOG = LoggerFactory.getLogger(DevicePropertyFactory.class);
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     private static final String PEGACORN_DEVICE_PROPERTY_CODE_SYSTEM = "/device-property-type";
     private static final String PEGACORN_DEVICE_RESILIENCE_MODE_CODE_SYSTEM = "/device-resilience-mode-type";
@@ -54,22 +52,22 @@ public class DevicePropertyFactory {
     //
 
     public String getPegacornDevicePropertyCodeSystem() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_PROPERTY_CODE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_DEVICE_PROPERTY_CODE_SYSTEM;
         return (codeSystem);
     }
 
     public String getPegacornDeviceResilienceModeCodeSystem(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_RESILIENCE_MODE_CODE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_DEVICE_RESILIENCE_MODE_CODE_SYSTEM;
         return (codeSystem);
     }
 
     public String getPegacornDeviceConcurrencyModeCodeSystem(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_CONCURRENCY_MODE_CODE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_DEVICE_CONCURRENCY_MODE_CODE_SYSTEM;
         return (codeSystem);
     }
 
     public String getPegacornDeviceConfigurationFileCodeSystem(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_DEVICE_CONFIGURATION_FILE_CODE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_DEVICE_CONFIGURATION_FILE_CODE_SYSTEM;
         return (codeSystem);
     }
 

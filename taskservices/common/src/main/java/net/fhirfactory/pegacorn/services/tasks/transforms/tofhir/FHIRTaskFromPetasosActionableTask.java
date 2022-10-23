@@ -31,13 +31,15 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatyp
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskExtensionSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskPerformerTypeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskStatusReasonFactory;
-import net.fhirfactory.pegacorn.services.tasks.transforms.common.TaskTransformConstants;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.codesystems.TaskCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,19 +55,19 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
     private static final Logger LOG = LoggerFactory.getLogger(FHIRTaskFromPetasosActionableTask.class);
 
     @Inject
-    private TaskStatusReasonFactory statusReasonFactory;
-
-    @Inject
-    TaskPerformerTypeFactory performerTypeFactory;
-
-    @Inject
-    private PegacornIdentifierFactory identifierFactory;
-
-    @Inject
     private TaskBusinessStatusFactory businessStatusFactory;
 
     @Inject
-    private TaskTransformConstants taskTransformConstants;
+    private TaskPerformerTypeFactory performerTypeFactory;
+
+    @Inject
+    private DRICaTSIdentifierFactory identifierFactory;
+
+    @Inject
+    private TaskStatusReasonFactory statusReasonFactory;
+
+    @Inject
+    private TaskExtensionSystemFactory taskExtensionSystems;
 
     //
     // Constructor(s)
@@ -147,9 +149,6 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
             Task.TaskStatus outcome = null;
             TaskOutcomeStatusEnum outcomeStatus = actionableTask.getTaskOutcomeStatus().getOutcomeStatus();
             switch(outcomeStatus){
-                case OUTCOME_STATUS_UNKNOWN:
-                    outcome = Task.TaskStatus.NULL;
-                    break;
                 case OUTCOME_STATUS_CANCELLED:
                     outcome = Task.TaskStatus.CANCELLED;
                     break;
@@ -168,12 +167,16 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
                 case OUTCOME_STATUS_WAITING:
                     outcome = Task.TaskStatus.ONHOLD;
                     break;
+                case OUTCOME_STATUS_UNKNOWN:
+                default:
+                    outcome = Task.TaskStatus.REQUESTED;
+                    break;
             }
             getLogger().debug(".specifyStatus(): Exit, outcome->{}", outcome);
             return(outcome);
         }
         getLogger().debug(".specifyStatus(): Exit, outcome->{}", Task.TaskStatus.NULL);
-        return(Task.TaskStatus.NULL);
+        return(Task.TaskStatus.REQUESTED);
     }
 
     @Override
@@ -181,10 +184,8 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
         getLogger().debug(".specifyStatusReason(): Entry");
         PetasosActionableTask actionableTask = (PetasosActionableTask) petasosTask;
         CodeableConcept statusReasonCC = null;
-        if(actionableTask.hasTaskCompletionSummary()){
-            statusReasonCC = getStatusReasonFactory().newTaskStatusReason(actionableTask.getTaskCompletionSummary().isFinalised());
-        } else {
-            statusReasonCC = getStatusReasonFactory().newTaskStatusReason(false);
+        if(actionableTask.hasTaskFulfillment()){
+            statusReasonCC = getStatusReasonFactory().newTaskStatusReason(actionableTask.getTaskFulfillment().getStatus());
         }
         getLogger().debug(".specifyStatusReason(): Exit, statusReasonCC->{}", statusReasonCC);
         return(statusReasonCC);
@@ -198,9 +199,11 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
         }
         PetasosActionableTask actionableTask = (PetasosActionableTask) petasosTask;
         CodeableConcept businessStatusCC = null;
-        if(actionableTask.hasTaskFulfillment()){
-            businessStatusCC = businessStatusFactory.newTaskStatusReason(actionableTask.getTaskFulfillment().getStatus());
+        if(actionableTask.hasTaskOutcomeStatus()){
+            businessStatusCC = getBusinessStatusFactory().newBusinessStatusFromOutcomeStatus(actionableTask.getTaskOutcomeStatus());
         }
+
+
         return (businessStatusCC);
     }
 
@@ -222,13 +225,21 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
     @Override
     protected CodeableConcept specifyCode(PetasosTask petasosTask) {
-
-        return null;
+        TaskCode taskCode = TaskCode.FULFILL;
+        Coding coding = new Coding();
+        coding.setCode(taskCode.toCode());
+        coding.setSystem(taskCode.getSystem());
+        coding.setDisplay(taskCode.getDisplay());
+        CodeableConcept taskCodeCC = new CodeableConcept();
+        taskCodeCC.addCoding(coding);
+        taskCodeCC.setText(taskCode.getDisplay());
+        return taskCodeCC;
     }
 
     @Override
     protected String specifyDescription(PetasosTask petasosTask) {
-        return null;
+        String description = petasosTask.getTaskWorkItem().getIngresContent().getPayloadManifest().toString();
+        return(description);
     }
 
     @Override
@@ -282,13 +293,13 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
             if(taskFulfillment.hasRegistrationDate()) {
                 Extension registrationInstantExtension = new Extension();
-                registrationInstantExtension.setUrl(taskTransformConstants.getTaskRegistratonInstantExtensionUrl());
+                registrationInstantExtension.setUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_REGISTRATON_INSTANT_EXTENSION_URL));
                 registrationInstantExtension.setValue(new InstantType(taskFulfillment.getRegistrationDate()));
                 executionPeriod.addExtension(registrationInstantExtension);
             }
             if(taskFulfillment.hasFinalisationDate()){
                 Extension finalisationInstantExtension = new Extension();
-                finalisationInstantExtension.setUrl(taskTransformConstants.getTaskFinalisationInstantExtensionUrl());
+                finalisationInstantExtension.setUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_FINALISATION_INSTANT_EXTENSION_URL));
                 finalisationInstantExtension.setValue(new InstantType(taskFulfillment.getFinalisationDate()));
                 executionPeriod.addExtension(finalisationInstantExtension);
             }
@@ -431,22 +442,22 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
         CodeableConcept updateBusinessStatusCC = SerializationUtils.clone(oriBusinessStatus);
 
         Extension systemWideFocusExtension = new Extension();
-        systemWideFocusExtension.setUrl(taskTransformConstants.getSystemWideFocusExtensionUrl());
+        systemWideFocusExtension.setUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.SYSTEM_WIDE_FOCUS_EXTENSION_URL));
         systemWideFocusExtension.setValue(new BooleanType(executionStatus.isSystemWideFulfillmentTask()));
         updateBusinessStatusCC.addExtension(systemWideFocusExtension);
 
         Extension clusterWideFocusExtension = new Extension();
-        clusterWideFocusExtension.setUrl(taskTransformConstants.getClusterWideFocusExtensionUrl());
+        clusterWideFocusExtension.setUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.CLUSTER_WIDE_FOCUS_EXTENSION_URL));
         clusterWideFocusExtension.setValue(new BooleanType(executionStatus.isClusterWideFulfillmentTask()));
         updateBusinessStatusCC.addExtension(clusterWideFocusExtension);
 
         Extension retryRequiredExtension = new Extension();
-        retryRequiredExtension.setUrl(taskTransformConstants.getTaskRetryRequiredExtensionUrl());
+        retryRequiredExtension.setUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_RETRY_REQUIRED_EXTENSION_URL));
         retryRequiredExtension.setValue(new BooleanType(executionStatus.isRetryRequired()));
         updateBusinessStatusCC.addExtension(retryRequiredExtension);
 
         Extension retryCountExtension = new Extension();
-        retryCountExtension.setUrl(taskTransformConstants.getTaskRetryCountExtensionUrl());
+        retryCountExtension.setUrl(taskExtensionSystems.getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum.TASK_RETRY_COUNT_EXTENSION_URL));
         retryCountExtension.setValue(new IntegerType(executionStatus.getRetryCount()));
         updateBusinessStatusCC.addExtension(retryCountExtension);
 
@@ -462,6 +473,10 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
         return(LOG);
     }
 
+    protected TaskBusinessStatusFactory getBusinessStatusFactory(){
+        return(this.businessStatusFactory);
+    }
+
     protected TaskStatusReasonFactory getStatusReasonFactory(){
         return(this.statusReasonFactory);
     }
@@ -470,7 +485,7 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
         return(this.performerTypeFactory);
     }
 
-    protected PegacornIdentifierFactory getIdentifierFactory(){
+    protected DRICaTSIdentifierFactory getIdentifierFactory(){
         return(this.identifierFactory);
     }
 }

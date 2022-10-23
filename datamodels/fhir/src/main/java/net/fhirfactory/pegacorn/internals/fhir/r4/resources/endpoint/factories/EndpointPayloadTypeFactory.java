@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -37,13 +37,13 @@ public class EndpointPayloadTypeFactory {
     private String PEGACORN_ENDPOINT_CODE_SYSTEM = "/endpoint/payload_type";
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     public CodeableConcept newPayloadType(EndpointPayloadTypeEnum codeValue){
         LOG.debug(".newPayloadType(): Entry, codeValue->{}", codeValue);
         CodeableConcept newCC = new CodeableConcept();
         Coding newCoding = new Coding();
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_ENDPOINT_CODE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_ENDPOINT_CODE_SYSTEM;
         newCoding.setSystem(codeSystem);
         newCoding.setCode(codeValue.getDisplayName());
         newCoding.setDisplay(codeValue.getDisplayName());

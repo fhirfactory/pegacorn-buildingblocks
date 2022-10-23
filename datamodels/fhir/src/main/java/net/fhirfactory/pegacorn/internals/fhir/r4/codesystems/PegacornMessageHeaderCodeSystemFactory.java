@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.codesystems;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -32,14 +32,14 @@ import javax.inject.Inject;
 public class PegacornMessageHeaderCodeSystemFactory {
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     private static final String PEGACORN_MESSAGE_HEADER_TYPE_CODE_SYSTEM = "/bundle-message-type";
     private static final String PEGACORN_MESSAGE_HEADER_REASON_CODE_SYSTEM = "/bundle-message-type";
 
     public Coding buildMessageTypeCoding(String messageType, String messageTypeDisplay){
         Coding newCoding = new Coding();
-        String messageHeaderCodingSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_MESSAGE_HEADER_TYPE_CODE_SYSTEM;
+        String messageHeaderCodingSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_MESSAGE_HEADER_TYPE_CODE_SYSTEM;
         newCoding.setSystem(messageHeaderCodingSystem);
         newCoding.setCode(messageType);
         newCoding.setDisplay(messageTypeDisplay);
@@ -54,7 +54,7 @@ public class PegacornMessageHeaderCodeSystemFactory {
     public CodeableConcept buildMessageReasonCodeableConcept(String messageReason, String MessageReasonDisplay){
         CodeableConcept messageReasonConcept = new CodeableConcept();
         Coding newCoding = new Coding();
-        String messageReasonCodingSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_MESSAGE_HEADER_REASON_CODE_SYSTEM;
+        String messageReasonCodingSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_MESSAGE_HEADER_REASON_CODE_SYSTEM;
         newCoding.setSystem(messageReasonCodingSystem);
         newCoding.setCode(messageReason);
         newCoding.setDisplay(MessageReasonDisplay);

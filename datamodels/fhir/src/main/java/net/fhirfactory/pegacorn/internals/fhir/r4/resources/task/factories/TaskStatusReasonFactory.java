@@ -21,7 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -32,43 +33,30 @@ import javax.inject.Inject;
 public class TaskStatusReasonFactory {
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
-    private static final String PEGACORN_TASK_STATUS_REASON_SYSTEM = "/task-status-reason";
+    private static final String PEGACORN_TASK_BUSINESS_STATUS_SYSTEM = "/task-business-status";
 
-    private static final String PEGACORN_TASK_IS_FINALISED_CODE = "pegacorn.task.status.reason.finalised";
-    private static final String PEGACORN_TASK_IS_NOT_FINALISED_CODE = "pegacorn.task.status.reason.not-finalised";
+
 
     //
     // Business Methods
     //
 
-    public String getPegacornTaskStatusReasonSystem(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_STATUS_REASON_SYSTEM;
+    public String getPegacornTaskBusinessStatusSystem(){
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_TASK_BUSINESS_STATUS_SYSTEM;
         return (codeSystem);
     }
 
-    public String getPegacornTaskIsFinalisedCode(){
-        return(PEGACORN_TASK_IS_FINALISED_CODE);
-    }
-
-    public String getPegacornTaskIsNotFinalisedCode(){
-        return(PEGACORN_TASK_IS_NOT_FINALISED_CODE);
-    }
-
-    public CodeableConcept newTaskStatusReason(boolean isFinalised ){
+    public CodeableConcept newTaskStatusReason(FulfillmentExecutionStatusEnum executionStatus ){
         CodeableConcept taskReasonCC = new CodeableConcept();
         Coding taskReasonCoding = new Coding();
-        taskReasonCoding.setSystem(getPegacornTaskStatusReasonSystem());
-        if(isFinalised){
-            taskReasonCoding.setCode(PEGACORN_TASK_IS_FINALISED_CODE);
-            taskReasonCoding.setDisplay("Task Finalised");
-        } else {
-            taskReasonCoding.setCode(PEGACORN_TASK_IS_NOT_FINALISED_CODE);
-            taskReasonCoding.setDisplay("Task Not Finalised");
-        }
-        taskReasonCC.setText(taskReasonCoding.getDisplay());
+        taskReasonCoding.setSystem(getPegacornTaskBusinessStatusSystem());
+        taskReasonCoding.setCode(executionStatus.getToken());
+        taskReasonCoding.setDisplay(executionStatus.getDisplayName());
+        taskReasonCC.setText(executionStatus.getDisplayName());
         taskReasonCC.addCoding(taskReasonCoding);
+
         return(taskReasonCC);
     }
 }

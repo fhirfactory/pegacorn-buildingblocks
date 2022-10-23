@@ -38,8 +38,8 @@ public class TaskSequenceNumber implements Serializable {
     //
 
     public TaskSequenceNumber(){
-        this.majorSequenceNumber = null;
-        this.minorSequenceNumber = null;
+        this.majorSequenceNumber = 0L;
+        this.minorSequenceNumber = 0L;
     }
 
     public TaskSequenceNumber(Long minorNumber){

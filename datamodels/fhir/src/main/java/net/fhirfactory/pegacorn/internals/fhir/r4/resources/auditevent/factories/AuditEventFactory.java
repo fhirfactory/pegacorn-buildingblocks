@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factorie
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSourceTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSubTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class AuditEventFactory {
     private static final Logger LOG = LoggerFactory.getLogger(AuditEventFactory.class);
 
     @Inject
-    private PegacornIdentifierFactory identifierFactory;
+    private DRICaTSIdentifierFactory identifierFactory;
 
     public AuditEvent newAuditEvent(Reference petasosNodeReference,
                                     String sourceSystem,

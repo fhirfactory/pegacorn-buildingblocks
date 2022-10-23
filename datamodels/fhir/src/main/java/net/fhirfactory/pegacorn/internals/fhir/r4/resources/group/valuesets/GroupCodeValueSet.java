@@ -23,7 +23,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.valuesets;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -32,13 +32,13 @@ import javax.inject.Inject;
 public class GroupCodeValueSet {
 
     @Inject
-    private PegacornReferenceProperties pegacornReferenceProperties;
+    private DRICaTSReferenceProperties pegacornReferenceProperties;
 
     private String GROUP_CODE_BASE="/group";
     private String GROUP_CODE_COMMUNICATE_BASED="/code/communicate_room_type";
 
     public String getCommunicateRoomCodeSystem(){
-        String codeSystem = pegacornReferenceProperties.getPegacornCodeSystemSite() + GROUP_CODE_BASE + GROUP_CODE_COMMUNICATE_BASED;
+        String codeSystem = pegacornReferenceProperties.getDRICaTSCodeSystemSite() + GROUP_CODE_BASE + GROUP_CODE_COMMUNICATE_BASED;
         return(codeSystem);
     }
 }

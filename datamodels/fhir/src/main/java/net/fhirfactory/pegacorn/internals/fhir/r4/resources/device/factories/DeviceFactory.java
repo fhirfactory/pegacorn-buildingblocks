@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories;
 
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
@@ -45,7 +45,7 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareCompon
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DeviceConfigurationFilePropertyTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,10 +68,10 @@ public class DeviceFactory {
     private DevicePropertyFactory propertyFactory;
 
     @Inject
-    private PegacornIdentifierFactory identifierFactory;
+    private DRICaTSIdentifierFactory identifierFactory;
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     @Inject
     private DeviceSpecialisationFactory specialisationFactory;
@@ -405,7 +405,7 @@ public class DeviceFactory {
     //
 
     public String getPegacornSoftwareComponentDeviceTypeSystem() {
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_SOFTWARE_COMPONENT_DEVICE_TYPE_SYSTEM;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_SOFTWARE_COMPONENT_DEVICE_TYPE_SYSTEM;
         return (codeSystem);
     }
 
@@ -447,7 +447,7 @@ public class DeviceFactory {
         return(propertyFactory);
     }
 
-    protected PegacornIdentifierFactory getIdentifierFactory(){
+    protected DRICaTSIdentifierFactory getIdentifierFactory(){
         return(identifierFactory);
     }
 

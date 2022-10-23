@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +26,7 @@ public class TaskWorkItemFactory {
     private ObjectMapper jsonMapper;
 
     @Inject
-    private PegacornReferenceProperties systemWideProperties;
+    private DRICaTSReferenceProperties systemWideProperties;
 
     private static final String PEGACORN_TASK_PARAMETER_COMPONENT_DATA_PARCEL_DESCRIPTOR = "/task-parameter-component-data-parcel-descriptor";
 
@@ -47,7 +47,7 @@ public class TaskWorkItemFactory {
     //
 
     public String getPegacornTaskParameterComponentDataParcelDescriptor(){
-        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + PEGACORN_TASK_PARAMETER_COMPONENT_DATA_PARCEL_DESCRIPTOR;
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_TASK_PARAMETER_COMPONENT_DATA_PARCEL_DESCRIPTOR;
         return (codeSystem);
     }
 
