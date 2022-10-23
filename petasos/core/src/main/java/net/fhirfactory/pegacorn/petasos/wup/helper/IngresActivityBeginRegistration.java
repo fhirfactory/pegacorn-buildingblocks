@@ -128,21 +128,18 @@ public class IngresActivityBeginRegistration {
         fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
         fulfillmentTask.setUpdateInstant(Instant.now());
         fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-        fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
+        PetasosFulfillmentTask registeredFulfillmentTask = taskActivityManager.registerFulfillmentTask(fulfillmentTask, true);
+        registeredFulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
         getLogger().trace(".registerActivityStart(): Create a PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
 
         getLogger().trace(".registerActivityStart(): Update TaskJobCard: Start");
         PetasosTaskFulfillmentCard fulfillmentCard = new PetasosTaskFulfillmentCard();
-        fulfillmentCard.setFulfillmentExecutionStatus(fulfillmentTask.getTaskFulfillment().getStatus());
-        fulfillmentCard.setFulfillmentTaskId(fulfillmentTask.getTaskId());
-        fulfillmentCard.setFulfillmentStartInstant(fulfillmentTask.getTaskFulfillment().getStartInstant());
-        fulfillmentCard.setFulfillerParticipantId(fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId());
+        fulfillmentCard.setFulfillmentExecutionStatus(registeredFulfillmentTask.getTaskFulfillment().getStatus());
+        fulfillmentCard.setFulfillmentTaskId(registeredFulfillmentTask.getTaskId());
+        fulfillmentCard.setFulfillmentStartInstant(registeredFulfillmentTask.getTaskFulfillment().getStartInstant());
+        fulfillmentCard.setFulfillerParticipantId(registeredFulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId());
         jobCard.setTaskFulfillmentCard(fulfillmentCard);
         getLogger().trace(".registerActivityStart(): Update TaskJobCard: Finish");
-
-        getLogger().trace(".registerActivityStart(): Create AuditEvent: Start");
-        fulfillmentTaskAuditServicesBroker.logActivity(fulfillmentTask, true);// by default, use synchronous audit writing
-        getLogger().trace(".registerActivityStart(): Create AuditEvent: Finish");
 
         getLogger().trace(".registerActivityStart(): Set processing to the grantedExecutionStatus: Start");
         if(jobCard.getGrantedStatus().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){

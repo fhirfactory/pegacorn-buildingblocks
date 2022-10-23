@@ -32,7 +32,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
@@ -197,9 +197,13 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             establishEndpointMetricAgents();
             getLogger().info(".initialise(): [Establish (if any) Endpoint Metric Agents] Finish");
 
-            getLogger().info(".initialise(): [Build Surrounding WUP Framework] Start");
+            getLogger().info(".initialise(): [BuildTaskOutcome2NewTasksBean Surrounding WUP Framework] Start");
             buildWUPFramework(this.getContext());
             getLogger().info(".initialise(): [Build Surrounding WUP Framework] Finish");
+
+            getLogger().info(".initialise(): [Register this Work Unit Processor's Participant] Start");
+            registerParticipant();
+            getLogger().info(".initialise(): [Register this Work Unit Processor's Participant] Finish");
 
             getLogger().info(".initialise(): [Register any Capabilities this Work Unit Processor supports] Start");
             registerCapabilities();
@@ -441,10 +445,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().debug(".buildWUPFramework(): Exit");
     }
 
-    private PetasosParticipant buildPetasosParticipant(){
-        getLogger().debug(".buildPetasosParticipant(): Entry");
-        PetasosParticipant participant = new PetasosParticipant(getTopologyNode());
-        Set<TaskWorkItemManifestType> subscribedTopicSet = new HashSet<>();
+    private PetasosParticipantRegistration registerParticipant(){
+        getLogger().debug(".registerParticipant(): Entry");
+        PetasosParticipant participant = getTopologyNode().getParticipant();
         if (!specifySubscriptionTopics().isEmpty()) {
             for (DataParcelManifest currentTopicID : specifySubscriptionTopics()) {
                 TaskWorkItemSubscriptionType taskWorkItem = new TaskWorkItemSubscriptionType(currentTopicID);
@@ -466,24 +469,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             }
         }
 
-        if(participant.getParticipantId() == null){
-            String name = participant.getParticipantId().getDisplayName();
-            if(StringUtils.isEmpty(name)){
-                name = specifyWUPInstanceName();
-            }
-            if(StringUtils.isEmpty(name)){
-                name = getTopologyNode().getComponentId().getName();
-            }
-            if(StringUtils.isEmpty(name)){
-                name = getClass().getSimpleName();
-            }
-            PetasosParticipantId participantId = new PetasosParticipantId(processingPlantServices.getTopologyNode().getParticipant().getParticipantId().getName(), name, getVersion());
-            participant.setParticipantId(participantId);
-        }
-
-        PetasosParticipantRegistrationStatus participantRegistration = participantRegistrationAdmin.registerParticipant(participant);
-
-        return(participant);
+        PetasosParticipantRegistration participantRegistration = participantRegistrationAdmin.registerParticipant(participant);
+        getLogger().debug(".registerParticipant(): Entry, participantRegistration->{}", participantRegistration);
+        return(participantRegistration);
     }
 
     //
@@ -502,8 +490,6 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         if(StringUtils.isNotEmpty(specifyParticipantDisplayName())){
             wupNode.getParticipant().getParticipantId().setDisplayName(specifyParticipantDisplayName());
         }
-        wupNode.setResilienceMode(getWorkshop().getWorkshopNode().getResilienceMode());
-        wupNode.setConcurrencyMode(getWorkshop().getWorkshopNode().getConcurrencyMode());
         return(wupNode);
     }
 

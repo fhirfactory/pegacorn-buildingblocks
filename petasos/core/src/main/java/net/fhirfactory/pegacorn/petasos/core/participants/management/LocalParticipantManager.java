@@ -199,7 +199,7 @@ public class LocalParticipantManager {
 
         PetasosParticipantRegistration petasosParticipantRegistration = participant.toRegistration();
         if(participant.getParticipantStatus() == null){
-            throw new RuntimeException("What the fuck");
+            throw new RuntimeException(".registerParticipant(): participantStatus is null");
         }
 
         // Register with the Global Manager

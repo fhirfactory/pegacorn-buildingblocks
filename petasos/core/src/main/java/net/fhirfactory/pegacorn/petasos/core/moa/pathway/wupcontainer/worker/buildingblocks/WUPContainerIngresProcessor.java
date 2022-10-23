@@ -110,24 +110,29 @@ public class WUPContainerIngresProcessor {
             getLogger().info(".ingresContentProcessor(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
         }
 
+        getLogger().trace(".ingresContentProcessor(): [Extract ParticipantId Details from FulfillmentTask] Start");
         PetasosParticipantId wupParticipantId = fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId();
-        getLogger().trace(".ingresContentProcessor(): wupParticipantId (PetasosParticipantId) for this activity --> {}", wupParticipantId);
+        getLogger().trace(".ingresContentProcessor(): [Extract ParticipantId Details from FulfillmentTask] Finish, participantId->{}", wupParticipantId);
 
         //
         // Now, continue with business logic
         RouteElementNames elementNames = new RouteElementNames(wupParticipantId);
 
-        TaskExecutionCommandEnum taskExecutionCommandEnum = getLocalTaskActivityManager().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
-
+        getLogger().trace(".ingresContentProcessor(): [Notify Task Start to Central] Start");
+        TaskExecutionCommandEnum taskExecutionCommand = getLocalTaskActivityManager().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
+        getLogger().trace(".ingresContentProcessor(): [Notify Task Start to Central] Finish, taskExecutionCommand->{}", taskExecutionCommand);
 
         //
         // Get out metricsAgent & do add some metrics
+        getLogger().trace(".ingresContentProcessor(): [Update Some Metrics (Task Register)] Start");
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
         metricsAgent.incrementRegisteredTasks();
         metricsAgent.touchLastActivityInstant();
+        getLogger().trace(".ingresContentProcessor(): [Update Some Metrics (Task Register)] Finish");
 
         //
         // Add some notifications
+        getLogger().trace(".ingresContentProcessor(): [Send an OAM Notification] Start");
         ITOpsNotificationContent notificationContent = new ITOpsNotificationContent();
         try {
             if (fulfillmentTask.hasTaskWorkItem()) {
@@ -169,23 +174,29 @@ public class WUPContainerIngresProcessor {
         } catch( Exception ex){
             getLogger().warn(".ingresContentProcessor(): Cannot send ITOps Notification: printing here->{}", notificationContent.getContent());
         }
+        getLogger().trace(".ingresContentProcessor(): [Send an OAM Notification] Finish");
 
         //
         // Write an AuditEvent
+        getLogger().trace(".ingresContentProcessor(): [Create and Forward Audit Event] Start");
         try {
             auditServicesBroker.logActivity(fulfillmentTask);
         } catch(Exception ex){
             getLogger().warn(".ingresContentProcessor(): Could not generate/forward audit event!");
         }
+        getLogger().trace(".ingresContentProcessor(): [Create and Forward Audit Event] Finish");
 
         //
         // Set the Participant Status
+        getLogger().trace(".ingresContentProcessor(): [Update Participant Status to ACTIVE] Start");
         getParticipantManager().updateParticipantStatus(wupParticipantId.getName(), PetasosParticipantStatusEnum.PARTICIPANT_IS_ACTIVE);
+        getLogger().trace(".ingresContentProcessor(): [Update Participant Status to ACTIVE] Finish");
         //
         // Write Some Metrics
-        getLogger().debug(".ingresContentProcessor(): Will be executing!");
+        getLogger().trace(".ingresContentProcessor(): [Update Some Metrics (Task Started)] Start");
         metricsAgent.incrementStartedTasks();
         metricsAgent.touchLastActivityStartInstant();
+        getLogger().trace(".ingresContentProcessor(): [Update Some Metrics (Task Started)] Finish");
 
         //
         // Do some Logging

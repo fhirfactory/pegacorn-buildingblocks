@@ -81,6 +81,8 @@ public class TaskOutcomeCaptureBean {
         if(getLogger().isDebugEnabled()) {
             getLogger().debug(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", convertToString(fulfillmentTask));
         }
+
+        getLogger().trace(".captureAndRegisterOutcome(): [Update Task Status With Central (Ponos)] Start");
         TaskIdType actionableTaskId = fulfillmentTask.getActionableTaskId();
         TaskExecutionCommandEnum petasosTaskExecutionStatus = null;
         switch(fulfillmentTask.getTaskFulfillment().getStatus()){
@@ -104,17 +106,23 @@ public class TaskOutcomeCaptureBean {
                 petasosTaskExecutionStatus = actionableTaskActivityController.notifyTaskFinish(actionableTaskId, fulfillmentTask);
                 break;
         }
+        getLogger().trace(".captureAndRegisterOutcome(): [Update Task Status With Central (Ponos)] Finish");
 
         //
         // Get the updated the ActionableTaskSharedInstance so we can do some metrics
+        getLogger().trace(".captureAndRegisterOutcome(): [Retrieve ActionableTask From Cache] Start");
         PetasosActionableTask actionableTask = localActionableTaskCache.getTask(actionableTaskId);
+        getLogger().trace(".captureAndRegisterOutcome(): [Retrieve ActionableTask From Cache] Finish, actionableTask->{}", actionableTask);
 
         //
         // Get out metricsAgent for the WUP that sent the task & do add some metrics
+        getLogger().trace(".captureAndRegisterOutcome(): [Update some Metrics] Start");
         WorkUnitProcessorTaskReportAgent taskReportAgent = camelExchange.getProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorTaskReportAgent.class);
         if(taskReportAgent != null){
+            getLogger().trace(".captureAndRegisterOutcome(): [Update some Metrics] metrics agent found!");
             taskReportAgent.sendITOpsTaskReport(actionableTask);
         }
+        getLogger().trace(".captureAndRegisterOutcome(): [Update some Metrics] Finish");
 
         if(getLogger().isDebugEnabled()) {
             getLogger().debug(".captureAndRegisterOutcome(): Exit, actionableTask->{}", convertToString(actionableTask));

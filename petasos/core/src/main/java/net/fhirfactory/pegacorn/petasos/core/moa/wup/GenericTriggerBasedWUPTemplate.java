@@ -413,7 +413,8 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     //
 
     private PetasosParticipant registerParticipant(){
-        PetasosParticipant participant = new PetasosParticipant(getTopologyNode());
+        getLogger().debug(".registerParticipant(): Entry");
+        PetasosParticipant participant = getTopologyNode().getParticipant();
         Set<TaskWorkItemManifestType> subscribedTopicSet = new HashSet<>();
         if (!specifySubscriptionTopics().isEmpty()) {
             for (DataParcelManifest currentTopicID : specifySubscriptionTopics()) {
@@ -435,9 +436,8 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
                 }
             }
         }
-
         PetasosParticipantRegistrationStatus participantRegistration = participantManager.registerParticipant(participant);
-
+        getLogger().debug(".registerParticipant(): Exit, participantRegistration->{}", participantRegistration);
         return(participant);
     }
 }

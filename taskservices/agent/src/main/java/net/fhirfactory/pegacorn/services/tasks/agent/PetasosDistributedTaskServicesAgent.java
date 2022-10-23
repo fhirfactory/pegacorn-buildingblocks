@@ -67,7 +67,10 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
     // Register a PetasosActionableTask
     @Override
     public PetasosTaskJobCard registerTask(PetasosActionableTask actionableTask, PetasosTaskJobCard jobCard){
-        getLogger().debug(".registerTask(): Entry, task->{}", actionableTask);
+        if(getLogger().isDebugEnabled()) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            getLogger().debug(".registerTask(): Entry, task->{}, stackTrace->{}", actionableTask, stackTrace);
+        }
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -111,7 +114,10 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
     @Override
     public PetasosTaskJobCard registerTaskOutcome(PetasosActionableTask actionableTask, PetasosTaskJobCard jobCard){
-        getLogger().debug(".registerTaskOutcome(): Entry, task->{}", actionableTask);
+        if(getLogger().isDebugEnabled()) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            getLogger().debug(".registerTaskOutcome(): Entry, task->{}, stackTrace->{}", actionableTask, stackTrace);
+        }
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -155,7 +161,10 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
     @Override
     public PetasosTaskJobCard registerTaskWaiting(PetasosTaskJobCard jobCard){
-        getLogger().debug(".registerTaskWaiting(): Entry, jobCard->{}", jobCard);
+        if(getLogger().isDebugEnabled()) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            getLogger().debug(".registerTaskWaiting(): Entry, jobCard->{}, stackTrace->{}", jobCard, stackTrace);
+        }
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -199,7 +208,10 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
     @Override
     public PetasosTaskJobCard registerTaskStart(PetasosTaskJobCard jobCard){
-        getLogger().debug(".registerTaskStart(): Entry, jobCard->{}", jobCard);
+        if(getLogger().isDebugEnabled()) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            getLogger().debug(".registerTaskStart(): Entry, jobCard->{}, stackTrace->{}", jobCard, stackTrace);
+        }
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -243,7 +255,10 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
     @Override
     public PetasosTaskJobCard registerTaskFailure(PetasosTaskJobCard jobCard){
-        getLogger().debug(".registerTaskFailure(): Entry, jobCard->{}", jobCard);
+        if(getLogger().isDebugEnabled()) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            getLogger().debug(".registerTaskStart(): Entry, jobCard->{}, stackTrace->{}", jobCard, stackTrace);
+        }
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -287,7 +302,10 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
     @Override
     public PetasosTaskJobCard registerTaskFinish(PetasosTaskJobCard jobCard){
-        getLogger().debug(".registerTaskCompletion(): Entry, jobCard->{}", jobCard);
+        if(getLogger().isDebugEnabled()) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            getLogger().debug(".registerTaskStart(): Entry, jobCard->{}, stackTrace->{}", jobCard, stackTrace);
+        }
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -331,7 +349,10 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
     @Override
     public PetasosTaskJobCard registerTaskFinalisation(PetasosTaskJobCard jobCard){
-        getLogger().debug(".registerTaskFinalisation(): Entry, jobCard->{}", jobCard);
+        if(getLogger().isDebugEnabled()) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            getLogger().debug(".registerTaskStart(): Entry, jobCard->{}, stackTrace->{}", jobCard, stackTrace);
+        }
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -375,7 +396,10 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
     @Override
     public PetasosTaskJobCard registerTaskCancellation(PetasosTaskJobCard jobCard){
-        getLogger().debug(".registerTaskCancellation(): Entry, jobCard->{}", jobCard);
+        if(getLogger().isDebugEnabled()) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            getLogger().debug(".registerTaskStart(): Entry, jobCard->{}, stackTrace->{}", jobCard, stackTrace);
+        }
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());

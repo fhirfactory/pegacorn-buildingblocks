@@ -119,11 +119,17 @@ public class TaskPerformerSubscriptionDecisionEngine {
         }
         List<PetasosParticipantRegistration> subscriberList = new ArrayList<>();
 
+        getLogger().trace(".deriveSubscriberList(): [Retrieve PetasosParticipant list] Start");
         Set<PetasosParticipantRegistration> participants = getLocalParticipantRegistrationCache().getAllParticipantRegistrations();
+        getLogger().trace(".deriveSubscriberList(): [Retrieve PetasosParticipant list] Finish, list.size()->{}", participants.size());
 
         List<String> alreadySubscribedSubsystemParticipants = new ArrayList<>();
 
+        getLogger().trace(".deriveSubscriberList(): [Process Participant List] Start");
         for(PetasosParticipantRegistration currentParticipant: participants) {
+            if(getLogger().isTraceEnabled()) {
+                getLogger().trace(".deriveSubscriberList(): [Process Participant List] processing participant->{}", currentParticipant.getParticipantId().getName());
+            }
             boolean passFirstPhaseTest = false;
             if(isRemoteParticipant(currentParticipant)){
                 if(alreadySubscribedSubsystemParticipants.contains(currentParticipant.getParticipantId().getSubsystemName())){
@@ -135,12 +141,14 @@ public class TaskPerformerSubscriptionDecisionEngine {
                 passFirstPhaseTest = true;
             }
             if (passFirstPhaseTest) {
-                getLogger().debug(".deriveSubscriberList(): Processing participant->{}", currentParticipant.getParticipantId());
+                if(getLogger().isTraceEnabled()) {
+                    getLogger().trace(".deriveSubscriberList(): [Process Participant List] Into 2ndPhase Test ->{}", currentParticipant.getParticipantId().getName());
+                }
                 for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
                     if (applySubscriptionFilter(currentSubscription, parcelManifest)) {
                         if (!subscriberList.contains(currentParticipant)) {
                             subscriberList.add(currentParticipant);
-                            getLogger().debug(".deriveSubscriberList(): Adding.... ");
+                            getLogger().trace(".deriveSubscriberList(): [Process Participant List] Adding.... ");
                         }
                         if(StringUtils.isNotEmpty(currentParticipant.getParticipantId().getSubsystemName())) {
                             alreadySubscribedSubsystemParticipants.add(currentParticipant.getParticipantId().getSubsystemName());
@@ -150,8 +158,9 @@ public class TaskPerformerSubscriptionDecisionEngine {
                 }
             }
         }
+        getLogger().trace(".deriveSubscriberList(): [Process Participant List] Finish");
 
-        getLogger().debug(".getSubscriberList(): Exit!");
+        getLogger().debug(".deriveSubscriberList(): Exit!");
         return(subscriberList);
     }
 

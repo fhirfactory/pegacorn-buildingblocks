@@ -215,26 +215,65 @@ public class LocalTaskQueueManager {
     //
 
     public void queueTask(PetasosActionableTask actionableTask){
-        if(actionableTask != null){
-            if(!actionableTask.getTaskPerformerTypes().isEmpty()) {
-                for(TaskPerformerTypeType currentPerformer: actionableTask.getTaskPerformerTypes()) {
-                    boolean performerIsIdle = isTaskPerformerIdle(currentPerformer);
-                    boolean performerIsSuspended = getLocalParticipantManager().isParticipantSuspended(currentPerformer);
-                    boolean performerQueueIsEmpty = isTaskPerformerQueueEmpty(currentPerformer);
-                    if (performerQueueIsEmpty && performerIsIdle && !performerIsSuspended) {
-                        if(currentPerformer.getKnownTaskPerformer() != null) {
-                            sendQueuedTask(currentPerformer.getKnownTaskPerformer(), actionableTask);
-                        }
+        getLogger().debug(".queueTask(): Entry, actionableTask->{}", actionableTask);
+
+        getLogger().debug(".queueTask(): [Checking actionableTask] Start" );
+        if(actionableTask == null){
+            getLogger().debug(".queueTask(): [Checking actionableTask] is null, exiting");
+            return;
+        }
+        getLogger().debug(".queueTask(): [Checking actionableTask] Finish (not null)" );
+
+        getLogger().trace(".queueTask(): [Check Task for TaskPerformer] Start");
+        if(!actionableTask.hasTaskPerformerTypes()){
+            getLogger().debug(".queueTask(): [Check Task for TaskPerformer] has no performerType object, exiting");
+            return;
+        }
+        if(actionableTask.getTaskPerformerTypes().isEmpty()){
+            getLogger().debug(".queueTask(): [Check Task for TaskPerformer] performerType list is emtpy, exiting");
+            return;
+        }
+        getLogger().trace(".queueTask(): [Check Task for TaskPerformer] Finish, has at least 1 performer");
+
+        getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] Start");
+        for(TaskPerformerTypeType currentPerformer: actionableTask.getTaskPerformerTypes()) {
+            getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] processing taskPerfomer->{}", currentPerformer);
+            boolean performerIsIdle = isTaskPerformerIdle(currentPerformer);
+            boolean performerIsSuspended = getLocalParticipantManager().isParticipantSuspended(currentPerformer);
+            boolean performerQueueIsEmpty = isTaskPerformerQueueEmpty(currentPerformer);
+            getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] performerIsIdle->{}, performerIsSuspended->{}, performerQueueIsEmpty->{}", performerIsIdle, performerIsSuspended, performerQueueIsEmpty);
+            boolean taskQueuedOrForwarded = false;
+            if (!performerQueueIsEmpty && performerIsIdle && !performerIsSuspended) {
+
+                if(currentPerformer.getKnownTaskPerformer() != null) {
+                    getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] Not Queueing Task, Forwarding directly into WUP");
+                    sendQueuedTask(currentPerformer.getKnownTaskPerformer(), actionableTask);
+                    taskQueuedOrForwarded = true;
+                } else {
+                    getLogger().warn(".queueTask(): [Queue to ALL TaskPerformers] No known TaskPerformer for task");
+                }
+            } else {
+                if(currentPerformer.getKnownTaskPerformer() != null) {
+                    if (StringUtils.isNotEmpty(currentPerformer.getKnownTaskPerformer().getName())) {
+                        getLocalTaskQueueCache().queueTask(currentPerformer.getKnownTaskPerformer().getName(), actionableTask);
+                        taskQueuedOrForwarded = true;
+                        getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] Task Queued");
                     } else {
-                        if(currentPerformer.getKnownTaskPerformer() != null) {
-                            if (StringUtils.isNotEmpty(currentPerformer.getKnownTaskPerformer().getName())) {
-                                getLocalTaskQueueCache().queueTask(currentPerformer.getKnownTaskPerformer().getName(), actionableTask);
-                            }
-                        }
+                        getLogger().warn(".queueTask(): [Queue to ALL TaskPerformers] TaskPerformer has invalid Participant Name");
                     }
+                } else {
+                    getLogger().warn(".queueTask(): [Queue to ALL TaskPerformers] No known TaskPerformer for task");
                 }
             }
+            if(taskQueuedOrForwarded){
+                getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] Task Queued or Forwarded :)");
+            } else {
+                getLogger().warn(".queueTask(): [Queue to ALL TaskPerformers] Task NOT Queued or Forwarded :(");
+            }
         }
+        getLogger().trace(".queueTask(): [Queue to ALL TaskPerformers] Finish");
+
+        getLogger().debug(".queueTask(): Exit");
     }
 
 

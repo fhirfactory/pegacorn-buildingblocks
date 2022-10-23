@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.jobcard.datatypes.PetasosTaskFulfillmentCard;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
@@ -34,6 +35,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.da
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskStorageType;
@@ -127,7 +129,16 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Create/Update TaskJobCard] Start");
         if(localJobCard == null){
-            localJobCard = getTaskJobCardFactory().newTaskJobCard(localActionableTask.getTaskId(), getProcessingPlant());
+            if(localActionableTask.hasTaskPerformerTypes()){
+                if(!localActionableTask.getTaskPerformerTypes().isEmpty()){
+                    TaskPerformerTypeType taskPerformerTypeType = localActionableTask.getTaskPerformerTypes().get(0);
+                    PetasosParticipantId knownTaskPerformer = taskPerformerTypeType.getKnownTaskPerformer();
+                    localJobCard = getTaskJobCardFactory().newTaskJobCard(localActionableTask.getTaskId(), knownTaskPerformer);
+                }
+            }
+            if(localJobCard == null) {
+                localJobCard = getTaskJobCardFactory().newTaskJobCard(localActionableTask.getTaskId(), getProcessingPlant());
+            }
         }
         localJobCard.setPersistenceStatus(localActionableTask.getTaskTraceability().getPersistenceStatus());
         localJobCard.setUpdateInstant(Instant.now());
@@ -314,12 +325,12 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
         //
         // Register the Task
-        PetasosFulfillmentTask petasosFulfillmentTask = getLocalFulfillmentTaskRegistry().registerTask(fulfillmentTask);
+        PetasosFulfillmentTask registeredTask = getLocalFulfillmentTaskRegistry().registerTask(fulfillmentTask);
 
         //
         // Update the ActionableTask & TaskJobCard
         getLogger().trace(".registerFulfillmentTask(): [Get the ActionableTask from Registry and Update] Start");
-        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(fulfillmentTask.getActionableTaskId());
+        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(registeredTask.getActionableTaskId());
         if(actionableTask == null){
             getLogger().debug(".registerFulfillmentTask(): There is no actionable task for this fulfillment task, deleting!");
             deregisterFulfillmentTask(fulfillmentTask);
@@ -328,11 +339,11 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         if(!actionableTask.hasTaskFulfillment()){
             actionableTask.setTaskFulfillment(new TaskFulfillmentType());
         }
-        actionableTask.getTaskFulfillment().setStatus(fulfillmentTask.getTaskFulfillment().getStatus());
-        actionableTask.getTaskFulfillment().setFulfiller(fulfillmentTask.getTaskFulfillment().getFulfiller());
+        actionableTask.getTaskFulfillment().setStatus(registeredTask.getTaskFulfillment().getStatus());
+        actionableTask.getTaskFulfillment().setFulfiller(registeredTask.getTaskFulfillment().getFulfiller());
         actionableTask.getTaskFulfillment().setRegistrationInstant(Instant.now());
-        actionableTask.getTaskFulfillment().setTrackingID(fulfillmentTask.getTaskFulfillment().getTrackingID());
-        actionableTask.getTaskFulfillment().setResilientActivity(fulfillmentTask.getTaskFulfillment().isResilientActivity());
+        actionableTask.getTaskFulfillment().setTrackingID(registeredTask.getTaskFulfillment().getTrackingID());
+        actionableTask.getTaskFulfillment().setResilientActivity(registeredTask.getTaskFulfillment().isResilientActivity());
         getLogger().trace(".registerFulfillmentTask(): [Get the ActionableTask from Registry and Update] Finish");
 
         getLogger().trace(".registerFulfillmentTask(): [Get the JobCard from Registry and Update] Start");
@@ -341,20 +352,19 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         if(taskJobCard == null) {
             needToRegisterJobCard = true;
         }
-        if(taskJobCard == null && fulfillmentTask.hasTaskJobCard()){
-            taskJobCard = fulfillmentTask.getTaskJobCard();
-            fulfillmentTask.setTaskFulfillment(null);
+        if(taskJobCard == null && registeredTask.hasTaskJobCard()){
+            taskJobCard = registeredTask.getTaskJobCard();
         }
         if(taskJobCard == null) {
-            taskJobCard = getTaskJobCardFactory().newTaskJobCard(fulfillmentTask.getActionableTaskId(), getProcessingPlant());
+            taskJobCard = getTaskJobCardFactory().newTaskJobCard(registeredTask.getActionableTaskId(), getProcessingPlant());
             taskJobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
             taskJobCard.setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_WAITING);
         }
         if(!taskJobCard.hasTaskFufillmentCard()) {
             taskJobCard.setTaskFulfillmentCard(new PetasosTaskFulfillmentCard());
-            taskJobCard.getTaskFulfillmentCard().setFulfillerParticipantId(fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId());
-            taskJobCard.getTaskFulfillmentCard().setFulfillmentTaskId(fulfillmentTask.getTaskId());
-            taskJobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(fulfillmentTask.getTaskFulfillment().getStatus());
+            taskJobCard.getTaskFulfillmentCard().setFulfillerParticipantId(registeredTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId());
+            taskJobCard.getTaskFulfillmentCard().setFulfillmentTaskId(registeredTask.getTaskId());
+            taskJobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(registeredTask.getTaskFulfillment().getStatus());
         }
         taskJobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
         if(needToRegisterJobCard){
@@ -363,20 +373,20 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         getLogger().trace(".registerFulfillmentTask(): [Get the JobCard from Registry and Update] Finish");
 
         getLogger().trace(".registerFulfillmentTask(): [Update the JobCard within the FulfillmentTask] Start");
-        fulfillmentTask.setTaskJobCard(taskJobCard);
+        registeredTask.setTaskJobCard(taskJobCard);
         getLogger().trace(".registerFulfillmentTask(): [Update the JobCard within the FulfillmentTask] Finish");
 
         getLogger().trace(".registerFulfillmentTask(): [Clone FulfillmentTask] Start");
-        PetasosFulfillmentTask clonedTask = SerializationUtils.clone(fulfillmentTask);
+        PetasosFulfillmentTask updatedRegistryTask = getLocalFulfillmentTaskRegistry().synchroniseTask(registeredTask);
         getLogger().trace(".registerFulfillmentTask(): [Clone FulfillmentTask] Finish");
 
         //
         // Create an audit event
-        auditServicesBroker.logActivity(clonedTask, writeSynchronousAuditEvent);
+        auditServicesBroker.logActivity(updatedRegistryTask, writeSynchronousAuditEvent);
         //
         // We're done
-        getLogger().debug(".registerFulfillmentTask(): Exit, fulfillmentTask->{}", clonedTask);
-        return(clonedTask);
+        getLogger().debug(".registerFulfillmentTask(): Exit, fulfillmentTask->{}", updatedRegistryTask);
+        return(updatedRegistryTask);
     }
 
     public PetasosFulfillmentTask deregisterFulfillmentTask(PetasosFulfillmentTask fulfillmentTask){

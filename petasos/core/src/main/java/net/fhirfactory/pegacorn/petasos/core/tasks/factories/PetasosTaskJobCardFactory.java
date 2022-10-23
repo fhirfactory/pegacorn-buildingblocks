@@ -23,8 +23,10 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.jobcard.datatypes.PetasosTaskFulfillmentCard;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
@@ -57,6 +59,21 @@ public class PetasosTaskJobCardFactory {
         jobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
         jobCard.setUpdateInstant(Instant.now());
         getLogger().debug(".newPetasosTaskJobCard(): Exit, jobCard->{}", jobCard);
+        return(jobCard);
+    }
+
+    public PetasosTaskJobCard newTaskJobCard(TaskIdType actionableTaskId, PetasosParticipantId participantId){
+        PetasosTaskJobCard jobCard = new PetasosTaskJobCard();
+        jobCard.setTaskId(actionableTaskId);
+        jobCard.setClusterMode(processingPlant.getTopologyNode().getConcurrencyMode());
+        jobCard.setSystemMode(processingPlant.getTopologyNode().getResilienceMode());
+        jobCard.setAffinityNode(processingPlant.getTopologyNode().getComponentId());
+        jobCard.setSystemMode(ResilienceModeEnum.RESILIENCE_MODE_KUBERNETES_STANDALONE);
+        jobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
+        jobCard.setUpdateInstant(Instant.EPOCH);
+        jobCard.setTaskFulfillmentCard(new PetasosTaskFulfillmentCard());
+        jobCard.getTaskFulfillmentCard().setFulfillerParticipantId(participantId);
+        jobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
         return(jobCard);
     }
 
