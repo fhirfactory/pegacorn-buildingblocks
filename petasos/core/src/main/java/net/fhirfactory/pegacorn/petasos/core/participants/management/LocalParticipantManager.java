@@ -29,7 +29,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipan
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantRegistrationCache;
@@ -40,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
@@ -82,6 +82,7 @@ public class LocalParticipantManager {
     // Post Construct
     //
 
+    @PostConstruct
     public void initialise(){
         getLogger().debug(".initialise(): Entry");
         if(initialised){
@@ -183,6 +184,11 @@ public class LocalParticipantManager {
     // Business Methods
     //
 
+    public Set<String> getAllRegisteredComponentIds(){
+        Set<String> allRegisteredComponentIds = getLocalRegistrationCache().getAllRegisteredComponentIds();
+        return(allRegisteredComponentIds);
+    }
+
     public PetasosParticipantRegistration registerParticipant(PetasosParticipant participant){
         getLogger().debug(".registerPetasosParticipant(): Entry, participant->{}", participant);
         if(participant == null ){
@@ -192,7 +198,7 @@ public class LocalParticipantManager {
 
         //
         // 1st, some basic defensive programming and parameter checking
-        if (participant.getParticipantId() == null || participant.getSubscriptions() == null || participant.getPublishedWorkItemManifests() == null) {
+        if (participant.getParticipantId() == null || participant.getSubscriptions() == null || participant.getOutputs() == null) {
             getLogger().debug(".registerPetasosParticipant(): Exit, publisherId, publishedTopics or subscribedTopics is null, not registering anything");
             return (null);
         }
@@ -264,6 +270,13 @@ public class LocalParticipantManager {
     public PetasosParticipantRegistration getLocalParticipantRegistration(ComponentIdType componentId){
         getLogger().debug(".getLocalParticipantRegistration(): Entry, componentId->{}", componentId);
         PetasosParticipantRegistration registration = getLocalRegistrationCache().getParticipantRegistration(componentId);
+        getLogger().debug(".getLocalParticipantRegistration(): Exit, registration->{}", registration);
+        return(registration);
+    }
+
+    public PetasosParticipantRegistration getLocalParticipantRegistration(String componentIdValue){
+        getLogger().debug(".getLocalParticipantRegistration(): Entry, componentIdValue->{}", componentIdValue);
+        PetasosParticipantRegistration registration = getLocalRegistrationCache().getParticipantRegistration(componentIdValue);
         getLogger().debug(".getLocalParticipantRegistration(): Exit, registration->{}", registration);
         return(registration);
     }

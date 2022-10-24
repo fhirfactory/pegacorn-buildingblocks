@@ -50,7 +50,7 @@ public class PetasosParticipant implements Serializable {
     private PetasosParticipantStatusEnum participantStatus;
     private PetasosParticipantControlStatusEnum controlStatus;
     private Set<TaskWorkItemSubscriptionType> subscriptions;
-    private Set<TaskWorkItemManifestType> publishedWorkItemManifests;
+    private Set<TaskWorkItemManifestType> outputs;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant utilisationUpdateInstant;
     private PetasosParticipantFulfillment fulfillmentState;
@@ -67,7 +67,7 @@ public class PetasosParticipant implements Serializable {
         this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
-        this.publishedWorkItemManifests = new HashSet<>();
+        this.outputs = new HashSet<>();
         this.fulfillmentState = null;
         this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
         this.taskQueueStatus = null;
@@ -82,7 +82,7 @@ public class PetasosParticipant implements Serializable {
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
         this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
-        this.publishedWorkItemManifests = new HashSet<>();
+        this.outputs = new HashSet<>();
         if(ori.hasComponentId()){
             this.setComponentId(ori.getComponentId());
         }
@@ -95,8 +95,8 @@ public class PetasosParticipant implements Serializable {
         if(!ori.getSubscriptions().isEmpty()){
             this.getSubscriptions().addAll(ori.getSubscriptions());
         }
-        if(!ori.getPublishedWorkItemManifests().isEmpty()){
-            this.getPublishedWorkItemManifests().addAll(ori.getPublishedWorkItemManifests());
+        if(!ori.getOutputs().isEmpty()){
+            this.getOutputs().addAll(ori.getOutputs());
         }
         if(ori.hasFulfillmentState()){
             this.setFulfillmentState(ori.getFulfillmentState());
@@ -120,7 +120,7 @@ public class PetasosParticipant implements Serializable {
         this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;;
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
-        this.publishedWorkItemManifests = new HashSet<>();
+        this.outputs = new HashSet<>();
         this.taskQueueStatus = null;
         this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
         if(ori.hasParticipant()) {
@@ -136,8 +136,8 @@ public class PetasosParticipant implements Serializable {
             if (!ori.getParticipant().getSubscriptions().isEmpty()) {
                 this.getSubscriptions().addAll(ori.getParticipant().getSubscriptions());
             }
-            if (!ori.getParticipant().getPublishedWorkItemManifests().isEmpty()) {
-                this.getPublishedWorkItemManifests().addAll(ori.getParticipant().getPublishedWorkItemManifests());
+            if (!ori.getParticipant().getOutputs().isEmpty()) {
+                this.getOutputs().addAll(ori.getParticipant().getOutputs());
             }
             if (ori.getParticipant().hasFulfillmentState()) {
                 this.setFulfillmentState(ori.getParticipant().getFulfillmentState());
@@ -151,6 +151,7 @@ public class PetasosParticipant implements Serializable {
             if(ori.getParticipant().hasParticipantRegistrationStatus()){
                 setParticipantRegistrationStatus(ori.getParticipant().getParticipantRegistrationStatus());
             }
+            setControlStatus(ori.getParticipant().getControlStatus());
         }
     }
 
@@ -164,6 +165,7 @@ public class PetasosParticipant implements Serializable {
     }
 
     public void setControlStatus(PetasosParticipantControlStatusEnum controlStatus) {
+        getLogger().error(".setControlStatus(): Setting status->{}", controlStatus);
         this.controlStatus = controlStatus;
     }
 
@@ -247,7 +249,6 @@ public class PetasosParticipant implements Serializable {
     }
 
     public void setParticipantStatus(PetasosParticipantStatusEnum status) {
-        getLogger().error(".setParticipantStatus(): Someone is setting me to->{}", status);
         if(status == null){
             this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
         } else {
@@ -282,12 +283,12 @@ public class PetasosParticipant implements Serializable {
         this.subscriptions = subscriptions;
     }
 
-    public Set<TaskWorkItemManifestType> getPublishedWorkItemManifests() {
-        return publishedWorkItemManifests;
+    public Set<TaskWorkItemManifestType> getOutputs() {
+        return outputs;
     }
 
-    public void setPublishedWorkItemManifests(Set<TaskWorkItemManifestType> publishedWorkItemManifests) {
-        this.publishedWorkItemManifests = publishedWorkItemManifests;
+    public void setOutputs(Set<TaskWorkItemManifestType> outputs) {
+        this.outputs = outputs;
     }
 
     //
@@ -302,7 +303,7 @@ public class PetasosParticipant implements Serializable {
         sb.append(", participantRegistrationStatus=").append(participantRegistrationStatus);
         sb.append(", participantStatus=").append(participantStatus);
         sb.append(", subscriptions=").append(subscriptions);
-        sb.append(", publishedWorkItemManifests=").append(publishedWorkItemManifests);
+        sb.append(", outputs=").append(outputs);
         sb.append(", utilisationUpdateInstant=").append(utilisationUpdateInstant);
         sb.append(", fulfillmentState=").append(fulfillmentState);
         sb.append(", taskQueueStatus=").append(taskQueueStatus);
@@ -322,12 +323,12 @@ public class PetasosParticipant implements Serializable {
         if (!(o instanceof PetasosParticipant)) return false;
         if (!super.equals(o)) return false;
         PetasosParticipant that = (PetasosParticipant) o;
-        return getParticipantStatus() == that.getParticipantStatus() && Objects.equals(getSubscriptions(), that.getSubscriptions()) && Objects.equals(getPublishedWorkItemManifests(), that.getPublishedWorkItemManifests()) && Objects.equals(getUtilisationUpdateInstant(), that.getUtilisationUpdateInstant());
+        return getParticipantStatus() == that.getParticipantStatus() && Objects.equals(getSubscriptions(), that.getSubscriptions()) && Objects.equals(getOutputs(), that.getOutputs()) && Objects.equals(getUtilisationUpdateInstant(), that.getUtilisationUpdateInstant());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getParticipantStatus(), getSubscriptions(), getPublishedWorkItemManifests(), getUtilisationUpdateInstant());
+        return Objects.hash(super.hashCode(), getParticipantStatus(), getSubscriptions(), getOutputs(), getUtilisationUpdateInstant());
     }
 
     //
@@ -345,12 +346,13 @@ public class PetasosParticipant implements Serializable {
                     registration.getSubscriptions().add(SerializationUtils.clone(currentSubscription));
                 }
             }
-            if(!getPublishedWorkItemManifests().isEmpty()) {
-                for(TaskWorkItemManifestType currentOutput: getPublishedWorkItemManifests()) {
+            if(!getOutputs().isEmpty()) {
+                for(TaskWorkItemManifestType currentOutput: getOutputs()) {
                     registration.getOutputs().add(SerializationUtils.clone(currentOutput));
                 }
             }
             registration.setControlStatus(getControlStatus());
+            registration.setParticipantStatus(getParticipantStatus());
             return(registration);
         } else {
             return(null);

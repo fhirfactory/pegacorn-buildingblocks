@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.d
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.valuesets.TaskStorageStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -63,8 +64,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocalActionableTaskCache {
     private static final Logger LOG = LoggerFactory.getLogger(LocalActionableTaskCache.class);
 
-    private ConcurrentHashMap<TaskIdType, PetasosActionableTask> taskDirectory;
-    private Object taskDirectoryLock;
+    private ConcurrentHashMap<String, PetasosActionableTask> taskCache;
+    private Object taskCacheLock;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -73,8 +74,8 @@ public class LocalActionableTaskCache {
     // Constructor(s)
     //
     public LocalActionableTaskCache() {
-        taskDirectory = new ConcurrentHashMap<>();
-        taskDirectoryLock = new Object();
+        taskCache = new ConcurrentHashMap<>();
+        taskCacheLock = new Object();
     }
 
     //
@@ -87,7 +88,7 @@ public class LocalActionableTaskCache {
     //
 
     public int getCacheSize(){
-        int size = taskDirectory.size();
+        int size = taskCache.size();
         return(size);
     }
 
@@ -97,11 +98,11 @@ public class LocalActionableTaskCache {
             getLogger().debug(".addToCache(): Exit, actionableTask is null, returning null");
             return(false);
         }
-        synchronized (getTaskDirectoryLock()){
-            if(getTaskDirectory().containsKey(actionableTask.getTaskId())){
-                getTaskDirectory().remove(actionableTask.getTaskId());
+        synchronized (getTaskCacheLock()){
+            if(getTaskCache().containsKey(actionableTask.getTaskId().getLocalId())){
+                getTaskCache().remove(actionableTask.getTaskId());
             }
-            getTaskDirectory().put(actionableTask.getTaskId(), actionableTask);
+            getTaskCache().put(actionableTask.getTaskId().getLocalId(), actionableTask);
             if(!actionableTask.hasTaskTraceability()){
                 actionableTask.setTaskTraceability(new TaskTraceabilityType());
             }
@@ -133,12 +134,22 @@ public class LocalActionableTaskCache {
             getLogger().debug(".removeTaskFromDirectory(): Exit, taskId is null, returning null");
             return(null);
         }
+        PetasosActionableTask unregisteredActionableTask = removeTaskFromDirectory(taskId.getLocalId());
+        getLogger().debug(".removeTaskFromDirectory(): Exit, unregisteredActionableTask->{}", unregisteredActionableTask);
+        return(unregisteredActionableTask);
+    }
+
+    public PetasosActionableTask removeTaskFromDirectory(String taskId){
+        if(StringUtils.isEmpty(taskId)) {
+            getLogger().debug(".removeTaskFromDirectory(): Exit, taskId is empty, returning null");
+            return (null);
+        }
         PetasosActionableTask unregisteredActionableTask = null;
-        synchronized(getTaskDirectoryLock()){
-            if(getTaskDirectory().containsKey(taskId)){
+        synchronized(getTaskCacheLock()){
+            if(getTaskCache().containsKey(taskId)){
                 getLogger().trace(".removeTaskFromDirectory(): actionableTask exists in cache, removing");
-                unregisteredActionableTask = getTaskDirectory().get(taskId);
-                getTaskDirectory().remove(taskId);
+                unregisteredActionableTask = getTaskCache().get(taskId);
+                getTaskCache().remove(taskId);
             }
         }
         getLogger().debug(".removeTaskFromDirectory(): Exit, unregisteredActionableTask->{}", unregisteredActionableTask);
@@ -147,29 +158,45 @@ public class LocalActionableTaskCache {
 
     public PetasosActionableTask getTask(TaskIdType taskId){
         getLogger().debug(".getTask(): Entry, taskId->{}", taskId);
-        if(taskDirectory.isEmpty()){
+        if(taskId == null){
             getLogger().debug(".getTask(): Exit, taskId is empty");
             return(null);
         }
-        if(taskDirectory.containsKey(taskId)){
-            PetasosActionableTask task = taskDirectory.get(taskId);
+        PetasosActionableTask task = getTask(taskId.getLocalId());
+        getLogger().debug(".getTask(): Exit, task->{}", task);
+        return(task);
+    }
+
+    public PetasosActionableTask getTask(String TaskIdValue){
+        getLogger().debug(".getTask(): Entry, TaskIdValue->{}", TaskIdValue);
+        if (StringUtils.isEmpty(TaskIdValue)) {
+            getLogger().debug(".getTask(): Exit, TaskIdValue is empty");
+            return(null);
+        }
+        if(taskCache.isEmpty()){
+            getLogger().debug(".getTask(): Exit, taskDirectory is empty");
+            return(null);
+        }
+        if(taskCache.containsKey(TaskIdValue)){
+            PetasosActionableTask task = taskCache.get(TaskIdValue);
             getLogger().debug(".getTask(): Exit, task->{}", task);
             return(task);
         }
-        getLogger().debug(".getTask(): Exit, Task with TaskId({}) is not within the cache", taskId);
+        getLogger().debug(".getTask(): Exit, Task with TaskIdValue->{} is not within the cache", TaskIdValue);
         return(null);
     }
 
-    public Set<TaskIdType> getAllTaskIds(){
+    public Set<String> getAllTaskIds(){
         getLogger().debug(".getAllTaskIds(): Entry");
-        HashSet<TaskIdType> idSet = new HashSet<>();
-        if(getTaskDirectory().isEmpty()){
+        HashSet<String> idSet = new HashSet<>();
+        if(getTaskCache().isEmpty()){
             getLogger().debug(".getAllTaskIds(): Exit, cache is empty, returning empty set");
             return(idSet);
         }
-        synchronized (getTaskDirectoryLock()){
-            idSet.addAll(getTaskDirectory().keySet());
+        synchronized (getTaskCacheLock()){
+            idSet.addAll(getTaskCache().keySet());
         }
+
         getLogger().debug(".getAllTaskIds(): Exit");
         return(idSet);
     }
@@ -178,12 +205,12 @@ public class LocalActionableTaskCache {
     // Getters (and Setters)
     //
 
-    protected Map<TaskIdType, PetasosActionableTask> getTaskDirectory(){
-        return(this.taskDirectory);
+    protected Map<String, PetasosActionableTask> getTaskCache(){
+        return(this.taskCache);
     }
 
-    protected Object getTaskDirectoryLock(){
-        return(this.taskDirectoryLock);
+    protected Object getTaskCacheLock(){
+        return(this.taskCacheLock);
     }
 
     protected Logger getLogger(){

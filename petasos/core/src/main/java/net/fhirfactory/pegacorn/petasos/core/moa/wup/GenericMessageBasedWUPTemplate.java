@@ -34,7 +34,6 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
@@ -66,9 +65,7 @@ import org.slf4j.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Generic Message Orientated Architecture (MOA) Work Unit Processor (WUP) Template
@@ -463,10 +460,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         if (!declarePublishedTopics().isEmpty()) {
             for (DataParcelManifest currentTopicID : declarePublishedTopics()) {
                 TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
-                if (participant.getPublishedWorkItemManifests().contains(taskWorkItem)) {
+                if (participant.getOutputs().contains(taskWorkItem)) {
                     // Do nothing
                 } else {
-                    participant.getPublishedWorkItemManifests().add(taskWorkItem);
+                    participant.getOutputs().add(taskWorkItem);
                 }
             }
         }

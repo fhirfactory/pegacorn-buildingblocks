@@ -19,12 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.registries;
+package net.fhirfactory.pegacorn.petasos.core.tasks.cache;
 
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskCacheServiceInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import org.apache.commons.lang3.SerializationUtils;
@@ -50,8 +48,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2020-06-01
  */
 @ApplicationScoped
-public class LocalFulfillmentTaskRegistry {
-    private static final Logger LOG = LoggerFactory.getLogger(LocalFulfillmentTaskRegistry.class);
+public class LocalFulfillmentTaskCache {
+    private static final Logger LOG = LoggerFactory.getLogger(LocalFulfillmentTaskCache.class);
 
     private ConcurrentHashMap<TaskIdType, PetasosFulfillmentTask> fulfillmentTaskCache;
     private Object cacheLock;
@@ -60,7 +58,7 @@ public class LocalFulfillmentTaskRegistry {
     // Constructor(s)
     //
 
-    public LocalFulfillmentTaskRegistry() {
+    public LocalFulfillmentTaskCache() {
         fulfillmentTaskCache = new ConcurrentHashMap<TaskIdType, PetasosFulfillmentTask>();
         this.cacheLock = new Object();
     }
@@ -75,14 +73,14 @@ public class LocalFulfillmentTaskRegistry {
     }
 
 
-    public PetasosFulfillmentTask registerTask(PetasosFulfillmentTask task) {
-        getLogger().debug(".registerTask(): Entry, task --> {}", task);
+    public PetasosFulfillmentTask addToCache(PetasosFulfillmentTask task) {
+        getLogger().debug(".addToCache(): Entry, task --> {}", task);
         if (task == null) {
-            getLogger().debug(".registerTask(): Exit, task is null, returning null");
+            getLogger().debug(".addToCache(): Exit, task is null, returning null");
             return (null);
         }
         if (!task.hasTaskId()) {
-            getLogger().debug(".registerTask(): Exit, task as no id, returning null");
+            getLogger().debug(".addToCache(): Exit, task as no id, returning null");
             return (null);
         }
         PetasosFulfillmentTask fulfillmentTask = (PetasosFulfillmentTask) task;
@@ -97,7 +95,7 @@ public class LocalFulfillmentTaskRegistry {
             fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
             clonedTask = SerializationUtils.clone(fulfillmentTask);
         }
-        getLogger().debug(".registerTask(): Exit, clonedTask->{}", clonedTask);
+        getLogger().debug(".addToCache(): Exit, clonedTask->{}", clonedTask);
         return(clonedTask);
     }
 
@@ -105,7 +103,7 @@ public class LocalFulfillmentTaskRegistry {
         getLogger().debug(".getTask(): Entry, taskId --> {}", taskId);
         PetasosFulfillmentTask task = null;
         if (getFulfillmentTaskCache().containsKey(taskId)) {
-            task = getFulfillmentTaskCache().get(taskId);
+            task = SerializationUtils.clone(getFulfillmentTaskCache().get(taskId));
         }
         getLogger().debug(".getTask(): Exit, task->{}", task);
         return (task);
@@ -140,40 +138,21 @@ public class LocalFulfillmentTaskRegistry {
         return(fulfillmentTask);
     }
 
-    public PetasosFulfillmentTask synchroniseTask(PetasosFulfillmentTask task) {
-        getLogger().debug(".synchroniseTask() Entry, task --> {}", task);
-        if (task == null) {
+    public PetasosFulfillmentTask synchroniseTask(PetasosFulfillmentTask oriTask) {
+        getLogger().debug(".synchroniseTask() Entry, oriTask --> {}", oriTask);
+        if (oriTask == null) {
             throw (new IllegalArgumentException(".synchroniseTask(): fulfillmentTask is null"));
         }
-        PetasosFulfillmentTask fulfillmentTask = (PetasosFulfillmentTask) task;
         PetasosFulfillmentTask clonedTask = null;
         synchronized (getCacheLock()) {
-            if (fulfillmentTaskCache.containsKey(fulfillmentTask.getTaskId())) {
-                fulfillmentTaskCache.remove(fulfillmentTask.getTaskId());
+            if (fulfillmentTaskCache.containsKey(oriTask.getTaskId())) {
+                fulfillmentTaskCache.remove(oriTask.getTaskId());
             }
-            fulfillmentTaskCache.put(fulfillmentTask.getTaskId(), fulfillmentTask);
-            clonedTask = SerializationUtils.clone(fulfillmentTask);
+            fulfillmentTaskCache.put(oriTask.getTaskId(), oriTask);
+            clonedTask = SerializationUtils.clone(oriTask);
         }
         getLogger().debug(".synchroniseTask(): Exit");
         return(clonedTask);
-    }
-
-    public PetasosFulfillmentTask refreshTask(PetasosFulfillmentTask task) {
-        getLogger().debug(".refreshTask() Entry, task --> {}", task);
-        if (task == null) {
-            throw (new IllegalArgumentException(".refreshTask(): fulfillmentTask is null"));
-        }
-        PetasosFulfillmentTask fulfillmentTask = (PetasosFulfillmentTask) task;
-        if(!fulfillmentTaskCache.containsKey(fulfillmentTask.getTaskId())){
-            fulfillmentTaskCache.put(fulfillmentTask.getTaskId(), fulfillmentTask);
-        }
-        PetasosFulfillmentTask cacheFulfillmentTask = null;
-        PetasosTask cacheTask = getTask(task.getTaskId());
-        if(cacheTask != null) {
-            cacheFulfillmentTask = SerializationUtils.clone((PetasosFulfillmentTask) getTask(task.getTaskId()));
-        }
-        getLogger().debug(".refreshTask(): Exit");
-        return(cacheFulfillmentTask);
     }
 
     public List<PetasosFulfillmentTask> getFulfillmentTaskList() {

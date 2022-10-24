@@ -22,9 +22,8 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.watchdogs;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,8 +107,8 @@ public class GlobalPetasosTaskContinuityWatchdog {
 
     protected void taskContinuityWatchdog(){
         getLogger().debug(".taskContinuityWatchdog(): Entry");
-        Set<TaskIdType> allTaskIds = actionableTaskDM.getAllTaskIds();
-        for(TaskIdType currentTaskId: allTaskIds){
+        Set<String> allTaskIds = actionableTaskDM.getAllTaskIds();
+        for(String currentTaskId: allTaskIds){
             if(getLogger().isInfoEnabled()){
                 getLogger().debug(".taskContinuityWatchdog(): Checking task {}", currentTaskId);
             }

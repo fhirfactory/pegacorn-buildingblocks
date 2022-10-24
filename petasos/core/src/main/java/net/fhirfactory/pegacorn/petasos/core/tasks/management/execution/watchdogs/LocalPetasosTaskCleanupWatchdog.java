@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.watchdogs.common.WatchdogBase;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.registries.LocalFulfillmentTaskRegistry;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalFulfillmentTaskCache;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
     private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgentAccessor;
 
     @Inject
-    private LocalFulfillmentTaskRegistry fulfillmentTaskCache;
+    private LocalFulfillmentTaskCache fulfillmentTaskCache;
 
     //
     // Constructor(s)
@@ -153,9 +153,9 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
 
     protected void actionableTaskCleanup(){
         getLogger().debug(".actionableTaskCleanup(): Entry");
-        Set<TaskIdType> allTaskIds = getActionableTaskRegistry().getAllTaskIds();
+        Set<String> allTaskIds = getActionableTaskRegistry().getAllTaskIds();
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("ActionableTaskCacheSharedCache", allTaskIds.size());
-        for(TaskIdType currentTaskId: allTaskIds){
+        for(String currentTaskId: allTaskIds){
             if(getLogger().isDebugEnabled()){
                 getLogger().debug(".actionableTaskCleanup(): Checking task {}", currentTaskId);
             }

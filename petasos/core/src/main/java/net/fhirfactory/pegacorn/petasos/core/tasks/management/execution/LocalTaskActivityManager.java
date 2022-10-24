@@ -50,7 +50,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.queue.LocalTaskQueueCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.registries.LocalFulfillmentTaskRegistry;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalFulfillmentTaskCache;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -73,7 +73,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
     private TaskTraceabilityElementTypeFactory traceabilityElementTypeFactory;
 
     @Inject
-    private LocalFulfillmentTaskRegistry localFulfillmentTaskRegistry;
+    private LocalFulfillmentTaskCache localFulfillmentTaskCache;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -153,7 +153,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Set ActionableTask to WAIT/Unsaved State] Finish");
 
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Register Task With Local Registry] Start");
-        boolean successfullyLocallyRegistered = getLocalActionableTaskRegistry().addToCache(localActionableTask);
+        boolean successfullyLocallyRegistered = getLocalActionableTaskCache().addToCache(localActionableTask);
         if(!successfullyLocallyRegistered){
             getLogger().warn(".registerLocallyCreatedActionableTask(): Cannot register ActionableTask into local registry, something is clearly wrong!");
             return(null);
@@ -230,7 +230,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Set ActionableTask to Unsaved State] Finish");
 
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Register Task With Local Registry] Start");
-        boolean successfullyLocallyRegistered = getLocalActionableTaskRegistry().addToCache(centralActionableTask);
+        boolean successfullyLocallyRegistered = getLocalActionableTaskCache().addToCache(centralActionableTask);
         if(!successfullyLocallyRegistered){
             getLogger().warn(".registerCentrallyCreatedActionableTask(): Cannot register ActionableTask into local registry, something is clearly wrong!");
             return(null);
@@ -259,7 +259,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".deregisterActionableTask(): Exit, taskId is null/empty!");
             return(null);
         }
-        PetasosActionableTask petasosActionableTask = getLocalActionableTaskRegistry().removeTaskFromDirectory(taskId);
+        PetasosActionableTask petasosActionableTask = getLocalActionableTaskCache().removeTaskFromDirectory(taskId);
         getLogger().debug(".deregisterActionableTask(): Exit, petasosActionableTask->{}", petasosActionableTask);
         return(petasosActionableTask);
     }
@@ -325,12 +325,12 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
         //
         // Register the Task
-        PetasosFulfillmentTask registeredTask = getLocalFulfillmentTaskRegistry().registerTask(fulfillmentTask);
+        PetasosFulfillmentTask registeredTask = getLocalFulfillmentTaskRegistry().addToCache(fulfillmentTask);
 
         //
         // Update the ActionableTask & TaskJobCard
         getLogger().trace(".registerFulfillmentTask(): [Get the ActionableTask from Registry and Update] Start");
-        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(registeredTask.getActionableTaskId());
+        PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(registeredTask.getActionableTaskId());
         if(actionableTask == null){
             getLogger().debug(".registerFulfillmentTask(): There is no actionable task for this fulfillment task, deleting!");
             deregisterFulfillmentTask(fulfillmentTask);
@@ -423,7 +423,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
 
         getLogger().trace(".notifyTaskStart(): [Get the ActionableTask from Registry] Start");
-        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(taskId);
+        PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(taskId);
         if(actionableTask == null){
             getLogger().warn(".notifyTaskStart(): Exit, could not find ActionableTask for given TaskId!!!");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -493,7 +493,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
 
         getLogger().trace(".notifyTaskFinish(): [Get the ActionableTask from Registry] Start");
-        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(taskId);
+        PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(taskId);
         if(actionableTask == null){
             getLogger().warn(".notifyTaskFinish(): Exit, could not find ActionableTask for given TaskId!!!");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -583,7 +583,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
 
         getLogger().trace(".notifyTaskFailure(): [Get the ActionableTask from Registry] Start");
-        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(taskId);
+        PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(taskId);
         if(actionableTask == null){
             getLogger().warn(".notifyTaskFailure(): Exit, could not find ActionableTask for given TaskId!!!");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -689,7 +689,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
 
         getLogger().trace(".notifyTaskCancellation(): [Get the ActionableTask from Registry] Start");
-        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(taskId);
+        PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(taskId);
         if(actionableTask == null){
             getLogger().warn(".notifyTaskCancellation(): Exit, could not find ActionableTask for given TaskId!!!");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -790,7 +790,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
 
         getLogger().trace(".notifyTaskWaiting(): [Get the ActionableTask from Registry] Start");
-        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(taskId);
+        PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(taskId);
         if(actionableTask == null){
             getLogger().warn(".notifyTaskWaiting(): Exit, could not find ActionableTask for given TaskId!!!");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -841,7 +841,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         }
 
         getLogger().trace(".notifyTaskFinalisation(): [Get the ActionableTask from Registry] Start");
-        PetasosActionableTask actionableTask = getLocalActionableTaskRegistry().getTask(taskId);
+        PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(taskId);
         if(actionableTask == null){
             getLogger().warn(".notifyTaskFinalisation(): Exit, could not find ActionableTask for given TaskId!!!");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -909,7 +909,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         return(localTaskQueueCache);
     }
 
-    protected LocalActionableTaskCache getLocalActionableTaskRegistry(){
+    protected LocalActionableTaskCache getLocalActionableTaskCache(){
         return(localActionableTaskCache);
     }
     
@@ -921,8 +921,8 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         return(localTaskJobCardCache);
     }
 
-    protected LocalFulfillmentTaskRegistry getLocalFulfillmentTaskRegistry(){
-        return(localFulfillmentTaskRegistry);
+    protected LocalFulfillmentTaskCache getLocalFulfillmentTaskRegistry(){
+        return(localFulfillmentTaskCache);
     }
 
     protected PetasosFulfillmentTaskAuditServicesBroker getAuditServicesBroker(){

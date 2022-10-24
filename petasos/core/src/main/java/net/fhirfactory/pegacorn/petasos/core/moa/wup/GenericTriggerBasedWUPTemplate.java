@@ -434,10 +434,10 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         if (!declarePublishedTopics().isEmpty()) {
             for (DataParcelManifest currentTopicID : declarePublishedTopics()) {
                 TaskWorkItemManifestType taskWorkItem = new TaskWorkItemManifestType(currentTopicID);
-                if (participant.getPublishedWorkItemManifests().contains(taskWorkItem)) {
+                if (participant.getOutputs().contains(taskWorkItem)) {
                     // Do nothing
                 } else {
-                    participant.getPublishedWorkItemManifests().add(taskWorkItem);
+                    participant.getOutputs().add(taskWorkItem);
                 }
             }
         }
