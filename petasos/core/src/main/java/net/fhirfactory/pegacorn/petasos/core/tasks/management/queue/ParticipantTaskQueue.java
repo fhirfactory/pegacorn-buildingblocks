@@ -44,14 +44,14 @@ public class ParticipantTaskQueue {
         this.participantId = null;
         this.queueHead = null;
         this.queueLock = new Object();
-        this.size = null;
+        this.size = 0;
     }
 
     public ParticipantTaskQueue(PetasosParticipantId participantId){
         this.participantId = participantId;
         this.queueHead = null;
         this.queueLock = new Object();
-        this.size = null;
+        this.size = 0;
     }
 
     //
