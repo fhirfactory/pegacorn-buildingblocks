@@ -37,16 +37,24 @@ public class IPCClusteredServerTopologyEndpoint extends IPCServerTopologyEndpoin
     private String toStringString;
 
     //
+    // Constructor(s)
+    //
+
+    public IPCClusteredServerTopologyEndpoint(){
+        super();
+        this.serviceDNSName = null;
+        this.servicePortName = null;
+        this.servicePortOffset = null;
+        this.servicePortValue = null;
+    }
+
+    //
     // Getters and Setters
     //
 
     @Override
     protected Logger getLogger() {
         return (LOG);
-    }
-
-    public IPCClusteredServerTopologyEndpoint(){
-        super();
     }
 
     public Integer getServicePortValue() {

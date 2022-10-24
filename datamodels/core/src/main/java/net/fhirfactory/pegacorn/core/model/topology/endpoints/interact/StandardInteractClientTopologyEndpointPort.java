@@ -29,6 +29,7 @@ public class StandardInteractClientTopologyEndpointPort extends IPCTopologyEndpo
     private ConnectedExternalSystemTopologyNode targetSystem;
 
     public StandardInteractClientTopologyEndpointPort(){
+        super();
         targetSystem = new ConnectedExternalSystemTopologyNode();
     }
 

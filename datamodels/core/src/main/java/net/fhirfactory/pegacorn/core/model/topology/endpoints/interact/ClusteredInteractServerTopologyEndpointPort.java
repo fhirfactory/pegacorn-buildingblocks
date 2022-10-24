@@ -4,4 +4,8 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCClusteredS
 
 
 public class ClusteredInteractServerTopologyEndpointPort extends IPCClusteredServerTopologyEndpoint {
+
+    public ClusteredInteractServerTopologyEndpointPort(){
+        super();
+    }
 }

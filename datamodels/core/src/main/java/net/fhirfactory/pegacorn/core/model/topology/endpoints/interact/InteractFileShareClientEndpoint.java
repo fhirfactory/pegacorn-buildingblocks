@@ -11,6 +11,18 @@ public class InteractFileShareClientEndpoint extends IPCClusteredServerTopologyE
     private String fileSharePath;
     private String fileShareServer;
 
+    //
+    // Constructor(s)
+    //
+
+    public InteractFileShareClientEndpoint(){
+        super();
+        this.fileShareName = null;
+        this.fileShareProtocol = null;
+        this.fileSharePath = null;
+        this.fileShareServer = null;
+    }
+
     public String getFileShareName() {
         return fileShareName;
     }

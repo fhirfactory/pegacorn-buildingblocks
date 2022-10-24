@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ public class BusinessServiceTopologyNode extends SoftwareComponent {
         super();
         this.deploymentSites = new ArrayList<>();
         this.externalisedServices = new ArrayList<>();
+        setComponentType(SoftwareComponentTypeEnum.EXTERNALISED_SERVICE);
     }
 
     @Override

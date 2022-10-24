@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.queue.PetasosParticipantTaskQueueStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
@@ -55,6 +56,7 @@ public class PetasosParticipant implements Serializable {
     private Instant utilisationUpdateInstant;
     private PetasosParticipantFulfillment fulfillmentState;
     private PetasosParticipantTaskQueueStatus taskQueueStatus;
+    private SoftwareComponentTypeEnum componentType;
 
     //
     // Constructor(s)
@@ -72,6 +74,7 @@ public class PetasosParticipant implements Serializable {
         this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
         this.taskQueueStatus = null;
         this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
+        this.componentType = null;
     }
 
     public PetasosParticipant(PetasosParticipant ori){
@@ -83,6 +86,8 @@ public class PetasosParticipant implements Serializable {
         this.subscriptions = new HashSet<>();
         this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
         this.outputs = new HashSet<>();
+        this.componentType = null;
+
         if(ori.hasComponentId()){
             this.setComponentId(ori.getComponentId());
         }
@@ -111,6 +116,9 @@ public class PetasosParticipant implements Serializable {
             setParticipantRegistrationStatus(ori.getParticipantRegistrationStatus());
         }
         setControlStatus(ori.getControlStatus());
+        if(ori.getComponentType() != null){
+            setComponentType(ori.getComponentType());
+        }
     }
 
     public PetasosParticipant(SoftwareComponent ori){
@@ -152,6 +160,7 @@ public class PetasosParticipant implements Serializable {
                 setParticipantRegistrationStatus(ori.getParticipant().getParticipantRegistrationStatus());
             }
             setControlStatus(ori.getParticipant().getControlStatus());
+            setComponentType(ori.getComponentType());
         }
     }
 
@@ -159,6 +168,13 @@ public class PetasosParticipant implements Serializable {
     // Getters (and Setters)
     //
 
+    public SoftwareComponentTypeEnum getComponentType() {
+        return componentType;
+    }
+
+    public void setComponentType(SoftwareComponentTypeEnum componentType) {
+        this.componentType = componentType;
+    }
 
     public PetasosParticipantControlStatusEnum getControlStatus() {
         return controlStatus;
@@ -353,6 +369,7 @@ public class PetasosParticipant implements Serializable {
             }
             registration.setControlStatus(getControlStatus());
             registration.setParticipantStatus(getParticipantStatus());
+            registration.setComponentType(getComponentType());
             return(registration);
         } else {
             return(null);

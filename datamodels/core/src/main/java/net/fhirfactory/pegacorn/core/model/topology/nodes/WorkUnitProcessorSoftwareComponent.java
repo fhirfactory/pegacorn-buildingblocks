@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.core.model.topology.nodes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
@@ -49,12 +50,14 @@ public class WorkUnitProcessorSoftwareComponent extends SoftwareComponent {
     //
 
     public WorkUnitProcessorSoftwareComponent(){
+        super();
         this.wupComponents = new ArrayList<>();
         this.wupInterchangeComponents = new ArrayList<>();
         this.ingresEndpoint = null;
         this.egressEndpoint = null;
         this.replicationCount = null;
         this.serviceEndpoints = new HashMap<>();
+        setComponentType(SoftwareComponentTypeEnum.WUP);
     }
 
     //

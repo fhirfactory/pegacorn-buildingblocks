@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,9 @@ public class WorkshopSoftwareComponent extends SoftwareComponent {
     private ArrayList<ComponentIdType> wupSet;
 
     public WorkshopSoftwareComponent(){
+        super();
         this.wupSet = new ArrayList<>();
+        setComponentType(SoftwareComponentTypeEnum.WORKSHOP);
     }
 
     @Override

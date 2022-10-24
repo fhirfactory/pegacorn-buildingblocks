@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ public class PlatformTopologyNode extends SoftwareComponent {
         this.processingPlants = new ArrayList<>();
         this.actualPodIP = null;
         this.actualHostIP = null;
+        setComponentType(SoftwareComponentTypeEnum.PLATFORM);
     }
 
     //

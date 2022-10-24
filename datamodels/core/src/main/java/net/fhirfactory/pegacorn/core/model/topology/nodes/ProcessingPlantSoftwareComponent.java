@@ -68,6 +68,7 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
     //
 
     public ProcessingPlantSoftwareComponent(){
+        super();
         this.workshops = new ArrayList<>();
         this.endpoints = new ArrayList<>();
         this.connections = new ArrayList<>();
@@ -89,6 +90,8 @@ public class ProcessingPlantSoftwareComponent extends SoftwareComponent implemen
         this.petasosAuditStackConfigFile = null;
 
         this.multiZoneInfinispanStackConfigFile = null;
+
+        setComponentType(SoftwareComponentTypeEnum.PROCESSING_PLANT);
     }
 
     //

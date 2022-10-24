@@ -23,4 +23,7 @@ package net.fhirfactory.pegacorn.core.model.topology.endpoints.base;
 
 public class IPCClientTopologyEndpoint extends IPCTopologyEndpoint {
 
+    public IPCClientTopologyEndpoint(){
+        super();
+    }
 }

@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.core.model.topology.endpoints.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class IPCTopologyEndpoint extends PetasosEndpoint {
         this.implementingWUP = null;
         this.adapterList = new ArrayList<>();
         this.endpointConfigurationName = null;
+        setComponentType(SoftwareComponentTypeEnum.ENDPOINT);
     }
 
     public IPCTopologyEndpoint(IPCTopologyEndpoint ori){

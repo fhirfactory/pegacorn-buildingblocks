@@ -22,11 +22,17 @@
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WorkUnitProcessorSubComponentSoftwareComponent extends SoftwareComponent {
     private static final Logger LOG = LoggerFactory.getLogger(WorkUnitProcessorSubComponentSoftwareComponent.class);
+
+    public WorkUnitProcessorSubComponentSoftwareComponent(){
+        super();
+        setComponentType(SoftwareComponentTypeEnum.WUP_CORE);
+    }
 
     @Override
     protected Logger getLogger() {

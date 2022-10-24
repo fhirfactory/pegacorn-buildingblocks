@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.topology.nodes;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.common.EndpointProviderInterface;
@@ -49,6 +50,7 @@ public class ClusterServiceTopologyNode extends SoftwareComponent implements End
         super();
         this.platformNodes = new ArrayList<>();
         this.serviceEndpoints = new ArrayList<>();
+        setComponentType(SoftwareComponentTypeEnum.CLUSTER_SERVICE);
     }
 
     public ArrayList<ComponentIdType> getPlatformNodes() {

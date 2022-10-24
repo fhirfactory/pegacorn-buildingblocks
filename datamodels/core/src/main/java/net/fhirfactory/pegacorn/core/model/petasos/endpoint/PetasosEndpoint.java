@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.endpoint;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
@@ -48,6 +49,7 @@ public abstract class PetasosEndpoint extends SoftwareComponent {
         this.endpointDescription = null;
         this.enablingProcessingPlantId = null;
         this.endpointType = null;
+        setComponentType(SoftwareComponentTypeEnum.ENDPOINT);
     }
 
     public PetasosEndpoint(PetasosEndpoint ori){
