@@ -24,10 +24,12 @@ package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.*;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
@@ -182,6 +184,9 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         
         getLogger().info(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
         buildWUPFramework(this.getContext());
+
+        this.getTopologyNode().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
+        participantManager.updateParticipantStatus(getTopologyNode().getParticipant().getParticipantId().getName(), PetasosParticipantStatusEnum.PARTICIPANT_IS_IDLE);
 
         this.initialised = true;
 

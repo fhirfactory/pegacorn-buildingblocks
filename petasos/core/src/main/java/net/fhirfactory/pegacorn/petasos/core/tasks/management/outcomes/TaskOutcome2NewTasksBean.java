@@ -126,7 +126,7 @@ public class TaskOutcome2NewTasksBean {
 
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Queue New Tasks] Start");
         for(PetasosActionableTask currentNewTask: newTasks){
-            getLocalTaskQueueManager().queueTask(actionableTask);
+            getLocalTaskQueueManager().queueTask(currentNewTask);
         }
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Queue New Tasks] Finish");
 
@@ -232,6 +232,9 @@ public class TaskOutcome2NewTasksBean {
                         newDownstreamTask.setTaskPerformerTypes(new ArrayList<>());
                     }
                     newDownstreamTask.getTaskPerformerTypes().add(downstreamPerformerType);
+                    if(getLogger().isTraceEnabled()){
+                        getLogger().trace(".collectOutcomesAndCreateNewTasks(): newDownstreamTask->{}", newDownstreamTask);
+                    }
                     actionableTaskCache.addToCache(newDownstreamTask);
                     newActionableTaskList.add(newDownstreamTask);
                     actionableTask.getTaskCompletionSummary().addDownstreamTask(newDownstreamTask.getTaskId());

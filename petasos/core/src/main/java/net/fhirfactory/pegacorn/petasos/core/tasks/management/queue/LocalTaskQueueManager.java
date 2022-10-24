@@ -231,7 +231,7 @@ public class LocalTaskQueueManager {
             return;
         }
         if(actionableTask.getTaskPerformerTypes().isEmpty()){
-            getLogger().debug(".queueTask(): [Check Task for TaskPerformer] performerType list is emtpy, exiting");
+            getLogger().debug(".queueTask(): [Check Task for TaskPerformer] performerType list is empty, exiting");
             return;
         }
         getLogger().trace(".queueTask(): [Check Task for TaskPerformer] Finish, has at least 1 performer");

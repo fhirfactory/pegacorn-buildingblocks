@@ -32,6 +32,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
@@ -211,6 +212,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
             getLogger().info(".initialise(): [Set my component status!] Start");
             this.getTopologyNode().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
+            participantRegistrationAdmin.updateParticipantStatus(getTopologyNode().getParticipantId().getName(), PetasosParticipantStatusEnum.PARTICIPANT_IS_IDLE );
             getLogger().info(".initialise(): [Set my component status!] Finish");
 
             this.initialised = true;

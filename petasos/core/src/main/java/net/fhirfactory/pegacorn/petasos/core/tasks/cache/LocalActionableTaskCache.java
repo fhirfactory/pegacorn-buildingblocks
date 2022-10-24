@@ -92,9 +92,9 @@ public class LocalActionableTaskCache {
     }
 
     public boolean addToCache(PetasosActionableTask actionableTask){
-        getLogger().debug(".addToDirectory(): Entry, actionableTask->{}", actionableTask);
+        getLogger().debug(".addToCache(): Entry, actionableTask->{}", actionableTask);
         if(actionableTask == null){
-            getLogger().debug(".addToDirectory(): Exit, actionableTask is null, returning null");
+            getLogger().debug(".addToCache(): Exit, actionableTask is null, returning null");
             return(false);
         }
         synchronized (getTaskDirectoryLock()){
@@ -112,7 +112,7 @@ public class LocalActionableTaskCache {
             actionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageStatus(TaskStorageStatusEnum.TASK_SAVED);
             actionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageInstant(Instant.now());
         }
-        getLogger().debug(".addToDirectory(): Exit, actionableTask->{}", actionableTask);
+        getLogger().debug(".addToCache(): Exit, actionableTask->{}", actionableTask);
         return(true);
     }
 
