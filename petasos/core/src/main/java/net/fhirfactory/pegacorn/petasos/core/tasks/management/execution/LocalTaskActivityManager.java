@@ -547,7 +547,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         getLogger().trace(".notifyTaskFinish(): [Update Local Job Card based on FulfillmentTask] Finish");
 
         getLogger().trace(".notifyTaskFinish(): [Synchronise with Ponos] Start");
-        PetasosTaskJobCard centralJobCard = getTaskRepositoryService().registerTaskStart(jobCardFromRegistry);
+        PetasosTaskJobCard centralJobCard = getTaskRepositoryService().registerTaskFinish(jobCardFromRegistry);
         getLogger().trace(".notifyTaskFinish(): [Synchronise with Ponos] Finish");
 
         getLogger().trace(".notifyTaskFinish(): [Update Local Job Card based on Central JobCard] Start");
