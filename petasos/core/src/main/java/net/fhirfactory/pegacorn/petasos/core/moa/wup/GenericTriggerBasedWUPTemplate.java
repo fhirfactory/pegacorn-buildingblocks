@@ -186,6 +186,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
         buildWUPFramework(this.getContext());
 
         this.getTopologyNode().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
+        this.getTopologyNode().getParticipant().setParticipantStatus(PetasosParticipantStatusEnum.PARTICIPANT_IS_IDLE);
         participantManager.updateParticipantStatus(getTopologyNode().getParticipant().getParticipantId().getName(), PetasosParticipantStatusEnum.PARTICIPANT_IS_IDLE);
 
         this.initialised = true;

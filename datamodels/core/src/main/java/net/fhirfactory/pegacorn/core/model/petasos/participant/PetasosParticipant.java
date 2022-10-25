@@ -383,6 +383,7 @@ public class PetasosParticipant implements Serializable {
             return;
         }
         if(registration.hasControlStatus()){
+            getLogger().trace(".updateFromRegistration(): registration has ControlStatus, updating Participant");
             setControlStatus(registration.getControlStatus());
         }
         if(!registration.getSubscriptions().isEmpty()){

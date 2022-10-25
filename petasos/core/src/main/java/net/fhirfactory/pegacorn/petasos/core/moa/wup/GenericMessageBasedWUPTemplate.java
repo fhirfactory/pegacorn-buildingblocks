@@ -209,6 +209,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
             getLogger().info(".initialise(): [Set my component status!] Start");
             this.getTopologyNode().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
+            this.getTopologyNode().getParticipant().setParticipantStatus(PetasosParticipantStatusEnum.PARTICIPANT_IS_IDLE);
             participantRegistrationAdmin.updateParticipantStatus(getTopologyNode().getParticipantId().getName(), PetasosParticipantStatusEnum.PARTICIPANT_IS_IDLE );
             getLogger().info(".initialise(): [Set my component status!] Finish");
 

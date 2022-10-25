@@ -157,25 +157,33 @@ public class LocalParticipantManager {
      */
     public void participantManagementDaemon(){
         getLogger().debug(".participantManagementDaemon(): Entry");
-        getProcessingPlantMetricsAgent().touchWatchDogActivityIndicator("ParticipantManagementDaemon");
+        try {
 
-        // Synchronize Local with the Global Manager
-        getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Start");
-        Set<String> allRegisteredComponentIds = getLocalRegistrationCache().getAllRegisteredComponentIds();
-        for(String currentLocalRegisteredComponentIdValue: allRegisteredComponentIds) {
-            PetasosParticipantRegistration currentLocalRegistration = getLocalRegistrationCache().getParticipantRegistration(currentLocalRegisteredComponentIdValue);
-            PetasosParticipantRegistration globalParticipantRegistration = getGlobalParticipantManagementService().synchroniseRegistration(currentLocalRegistration);
-            if(globalParticipantRegistration != null){
-                getLocalRegistrationCache().updateParticipant(globalParticipantRegistration);
+            getProcessingPlantMetricsAgent().touchWatchDogActivityIndicator("ParticipantManagementDaemon");
+
+            // Synchronize Local with the Global Manager
+            getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Start");
+            Set<String> allRegisteredComponentIds = getLocalRegistrationCache().getAllRegisteredComponentIds();
+            for (String currentLocalRegisteredComponentIdValue : allRegisteredComponentIds) {
+                getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] processing->{}", currentLocalRegisteredComponentIdValue);
+                PetasosParticipantRegistration currentLocalRegistration = getLocalRegistrationCache().getParticipantRegistration(currentLocalRegisteredComponentIdValue);
+                PetasosParticipantRegistration globalParticipantRegistration = getGlobalParticipantManagementService().synchroniseRegistration(currentLocalRegistration);
+                getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] centralRegistration->{}", globalParticipantRegistration);
+                if (globalParticipantRegistration != null) {
+                    getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Updating local registration");
+                    getLocalRegistrationCache().updateParticipant(globalParticipantRegistration);
+                }
             }
-        }
-        getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Finish");
+            getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Finish");
 
-        // Now Synchronise any "Downstream" (Subscribers)
-        getLogger().trace(".participantManagementDaemon(): [Synchronise Downstream Systems Participants (from Ponos)] Start");
-        synchroniseExternalSubscriberParticipants();
-        getLogger().trace(".participantManagementDaemon(): [Synchronise Downstream Systems Participants (from Ponos)] Finish");
-        // Now Synchronise any "Downstream" (Subscribers)
+            // Now Synchronise any "Downstream" (Subscribers)
+            getLogger().trace(".participantManagementDaemon(): [Synchronise Downstream Systems Participants (from Ponos)] Start");
+            synchroniseExternalSubscriberParticipants();
+            getLogger().trace(".participantManagementDaemon(): [Synchronise Downstream Systems Participants (from Ponos)] Finish");
+            // Now Synchronise any "Downstream" (Subscribers)
+        } catch(Exception ex){
+            getLogger().warn(".participantManagementDaemon(): Exception ->", ex);
+        }
 
         getLogger().debug(".participantManagementDaemon(): Exit");
     }
@@ -198,11 +206,15 @@ public class LocalParticipantManager {
 
         //
         // 1st, some basic defensive programming and parameter checking
-        if (participant.getParticipantId() == null || participant.getSubscriptions() == null || participant.getOutputs() == null) {
-            getLogger().debug(".registerPetasosParticipant(): Exit, publisherId, publishedTopics or subscribedTopics is null, not registering anything");
-            return (null);
+        if(participant.getComponentId() == null){
+            throw(new IllegalArgumentException("participant.GetComponentId() cannot be null, participant->" + participant));
         }
-
+        if(participant.getParticipantId() == null){
+            throw(new IllegalArgumentException("participant.getParticipantId() cannot be null, participant->" + participant));
+        }
+        if(StringUtils.isEmpty(participant.getParticipantId().getName())){
+            throw(new IllegalArgumentException("participant.getParticipantId() cannot be null, participant->" + participant));
+        }
         PetasosParticipantRegistration petasosParticipantRegistration = participant.toRegistration();
         if(participant.getParticipantStatus() == null){
             throw new RuntimeException(".registerParticipant(): participantStatus is null");
@@ -322,8 +334,8 @@ public class LocalParticipantManager {
         }
         if(performer.getKnownTaskPerformer() != null) {
             if(StringUtils.isNotEmpty(performer.getKnownTaskPerformer().getName())) {
-                boolean isSuspended = getLocalRegistrationCache().isParticipantDisabled(performer.getKnownTaskPerformer().getName());
-                return (isSuspended);
+                boolean isDisabled = getLocalRegistrationCache().isParticipantDisabled(performer.getKnownTaskPerformer().getName());
+                return (isDisabled);
             }
         }
         return(false);

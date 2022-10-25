@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.participants.cache;
 
+import ca.uhn.fhir.util.StringUtil;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
@@ -32,6 +33,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.Peta
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.infinispan.commons.hash.Hash;
@@ -52,8 +54,13 @@ import static net.fhirfactory.pegacorn.core.model.petasos.participant.registrati
 public class LocalParticipantRegistrationCache {
 	private static final Logger LOG = LoggerFactory.getLogger(LocalParticipantRegistrationCache.class);
 
+	// ConcurrentHashMap<ComponentIdType.getId(), PetasosParticipantRegistration> componentIdRegistrationMap
 	private ConcurrentHashMap<String, PetasosParticipantRegistration> componentIdRegistrationMap;
+
+	// private ConcurrentHashMap<ParticipantId.getName(), PetasosParticipantRegistration> registrationMap;
 	private ConcurrentHashMap<String, PetasosParticipantRegistration> registrationMap;
+
+	// private ConcurrentHashMap<ParticipantId.getName(), PetasosParticipant> participantCache;
 	private ConcurrentHashMap<String, PetasosParticipant> participantCache;
 	private Object participantCacheLock;
 
@@ -91,32 +98,31 @@ public class LocalParticipantRegistrationCache {
 			getLogger().debug(".addParticipant(): Exit, participant is null");
 			return(null);
 		}
+		if(participant.getComponentId() == null){
+			throw(new IllegalArgumentException("participant.GetComponentId() cannot be null, participant->" + participant));
+		}
+		if(participant.getParticipantId() == null){
+			throw(new IllegalArgumentException("participant.getParticipantId() cannot be null, participant->" + participant));
+		}
+		if(StringUtils.isEmpty(participant.getParticipantId().getName())){
+			throw(new IllegalArgumentException("participant.getParticipantId() cannot be null, participant->" + participant));
+		}
 		PetasosParticipantRegistration registration = null;
    	    synchronized (getParticipantCacheLock()){
 			boolean inCache = false;
-			if(getRegistrationMap().containsKey(participant.getParticipantId().getName())) {
-				getLogger().trace(".addParticipant(): ParticipantRegistration is already in Cache, so removing");
-				getRegistrationMap().remove(participant.getParticipantId().getName());
-			}
-			if(participant.getComponentId() != null){
-				if(getComponentIdRegistrationMap().containsKey(participant.getComponentId().getId())) {
-					getComponentIdRegistrationMap().remove(participant.getComponentId().getId());
-				}
-			}
-			if(getParticipantCache().containsKey(participant.getParticipantId().getName())){
-				getLogger().trace(".addParticipant(): Participant is already in Cache, so removing");
-				getParticipantCache().remove(participant.getParticipantId().getName());
-			}
 
-			getLogger().trace(".addParticipant(): [Add/Update Registration] Start");
+			getLogger().trace(".addParticipant(): [Add/Update Participant Cache] Start");
 			if(centralRegistration != null){
 				participant.updateFromRegistration(centralRegistration);
+				getLogger().trace(".addParticipant(): [Add/Update Participant Cache] updated participant->{}", participant);
 			}
 			getParticipantCache().put(participant.getParticipantId().getName(), participant);
-			getLogger().debug(".addParticipant():participant->{}", participant);
+			getLogger().trace(".addParticipant(): [Add/Update Participant Cache] Finish");
+
+			getLogger().trace(".addParticipant(): [Add/Update Registration] Start");
 			PetasosParticipantRegistration localRegistration = participant.toRegistration();
 			if(localRegistration == null){
-				throw new RuntimeException("Something is wrong!");
+				throw new RuntimeException("Something is wrong, could not build a Registration instant from the participant, participant->" + participant);
 			}
 			localRegistration.setLocalRegistrationInstant(Instant.now());
 			localRegistration.setLocalRegistrationStatus(PARTICIPANT_REGISTERED);
@@ -124,12 +130,9 @@ public class LocalParticipantRegistrationCache {
 			getLogger().trace(".addParticipant(): [Add/Update Registration] Finish");
 
 			getLogger().trace(".addParticipant(): [Add/Update Component Map] Start");
-			if(getComponentIdRegistrationMap().containsKey(participant.getComponentId().getId())){
-				getComponentIdRegistrationMap().replace(participant.getComponentId().getId(), localRegistration);
-			} else {
-				getComponentIdRegistrationMap().put(participant.getComponentId().getId(), localRegistration);
-			}
+			getComponentIdRegistrationMap().put(participant.getComponentId().getId(), localRegistration);
 			getLogger().trace(".addParticipant(): [Add/Update Component Map] Finish");
+
 			registration = localRegistration;
 		}
 		getLogger().debug(".addParticipant(): Exit, registration->{}", registration);
@@ -164,7 +167,8 @@ public class LocalParticipantRegistrationCache {
 			getLogger().debug(".updateParticipant(): Exit, centralParticipant is null");
 			return(null);
 		}
-		PetasosParticipant participant = getParticipant(centralRegistration.getParticipantId());
+		PetasosParticipant participant = getParticipant(centralRegistration.getParticipantId().getName());
+		getLogger().trace(".updateParticipant(): cached participant->{}", participant);
 		PetasosParticipantRegistration resultantRegistration = updateParticipant(participant, centralRegistration);
 		getLogger().debug(".updateParticipant(): Exit, resultantRegistration->{}", resultantRegistration);
 		return(resultantRegistration);
@@ -180,43 +184,40 @@ public class LocalParticipantRegistrationCache {
 	public PetasosParticipantRegistration updateParticipant(PetasosParticipant participant, PetasosParticipantRegistration centralRegistration){
 		getLogger().debug(".updateParticipant(): Entry, participant->{}, centralRegistration->{}", participant, centralRegistration);
 		if(participant == null){
-			getLogger().debug(".updateParticipant(): Exit, participant is null");
+			getLogger().error(".updateParticipant(): Exit, participant is null");
 			return(null);
+		}
+		if(participant.getComponentId() == null){
+			throw(new IllegalArgumentException("participant.GetComponentId() cannot be null, participant->" + participant));
+		}
+		if(participant.getParticipantId() == null){
+			throw(new IllegalArgumentException("participant.getParticipantId() cannot be null, participant->" + participant));
+		}
+		if(StringUtils.isEmpty(participant.getParticipantId().getName())){
+			throw(new IllegalArgumentException("participant.getParticipantId() cannot be null, participant->" + participant));
 		}
 		PetasosParticipantRegistration registration = null;
 		synchronized (getParticipantCacheLock()){
 			boolean inCache = false;
-			if(getRegistrationMap().containsKey(participant.getParticipantId().getName())) {
-				getLogger().trace(".addPetasosParticipant(): Participant is already in Cache, so removing");
-				getRegistrationMap().remove(participant.getParticipantId().getName());
-			}
-			if(participant.getComponentId() != null){
-				if(getComponentIdRegistrationMap().containsKey(participant.getComponentId().getId())) {
-					getComponentIdRegistrationMap().remove(participant.getComponentId().getId());
-				}
-			}
-			if(getParticipantCache().containsKey(participant.getParticipantId().getName())) {
-				getLogger().trace(".addPetasosParticipant(): Participant is already in Cache, so removing");
-				getParticipantCache().remove(participant.getParticipantId().getName());
-			}
-			getLogger().trace(".addPetasosParticipant(): [Add/Update Registration] Start");
+
+			getLogger().trace(".updateParticipant(): [Add/Update Participant] Start");
 			if(centralRegistration != null){
+				getLogger().trace(".updateParticipant(): [Add/Update Registration] centralRegistration is not null, updating participant using it");
 				participant.updateFromRegistration(centralRegistration);
 			}
 			getParticipantCache().put(participant.getParticipantId().getName(), participant);
+			getLogger().trace(".updateParticipant(): [Add/Update Participant] Finish");
+
+			getLogger().trace(".updateParticipant(): [Add/Update Registration] Finish");
 			PetasosParticipantRegistration localRegistration = participant.toRegistration();
 			localRegistration.setLocalRegistrationInstant(Instant.now());
 			localRegistration.setLocalRegistrationStatus(PARTICIPANT_REGISTERED);
 			getRegistrationMap().put(participant.getParticipantId().getName(), localRegistration);
-			getLogger().trace(".addPetasosParticipant(): [Add/Update Registration] Finish");
+			getLogger().trace(".updateParticipant(): [Add/Update Registration] Finish");
 
-			getLogger().trace(".addPetasosParticipant(): [Add/Update Component Map] Start");
-			if(getComponentIdRegistrationMap().containsKey(participant.getComponentId().getId())){
-				getComponentIdRegistrationMap().replace(participant.getComponentId().getId(), localRegistration);
-			} else {
-				getComponentIdRegistrationMap().put(participant.getComponentId().getId(), localRegistration);
-			}
-			getLogger().trace(".addPetasosParticipant(): [Add/Update Component Map] Finish");
+			getLogger().trace(".updateParticipant(): [Add/Update Component Map] Start");
+			getComponentIdRegistrationMap().put(participant.getComponentId().getId(), localRegistration);
+			getLogger().trace(".updateParticipant(): [Add/Update Component Map] Finish");
 			registration = localRegistration;
 		}
 		getLogger().debug(".updateParticipant(): Exit, registration->{}", registration);
@@ -259,7 +260,7 @@ public class LocalParticipantRegistrationCache {
 		PetasosParticipantRegistration participantRegistration = null;
 		synchronized (getParticipantCacheLock()) {
 			if (StringUtils.isNotEmpty(participantId.getName())){
-				if (getRegistrationMap().contains(participantId.getName())) {
+				if (getRegistrationMap().containsKey(participantId.getName())) {
 					participantRegistration = SerializationUtils.clone(getRegistrationMap().get(participantId.getName()));
 				}
 			}
@@ -274,11 +275,18 @@ public class LocalParticipantRegistrationCache {
 			getLogger().debug(".getParticipant(): Exit, participantId is null");
 			return(null);
 		}
+		PetasosParticipant participant = getParticipant(participantId.getName());
+		getLogger().debug(".getParticipant(): Exit, participant->{}", participant);
+		return(participant);
+	}
+
+	public PetasosParticipant getParticipant(String participantName){
+		getLogger().debug(".getParticipant(): Entry, participantName->{}", participantName);
 		PetasosParticipant participant = null;
 		synchronized (getParticipantCacheLock()) {
-			if (StringUtils.isNotEmpty(participantId.getName())){
-				if (getRegistrationMap().contains(participantId.getName())) {
-					participant = SerializationUtils.clone(getParticipantCache().get(participantId.getName()));
+			if (StringUtils.isNotEmpty(participantName)){
+				if (getParticipantCache().containsKey(participantName)) {
+					participant = SerializationUtils.clone(getParticipantCache().get(participantName));
 				}
 			}
 		}
@@ -325,7 +333,7 @@ public class LocalParticipantRegistrationCache {
 			return;
 		}
 		synchronized (getParticipantCacheLock()) {
-			if (getRegistrationMap().contains(participantName)) {
+			if (getRegistrationMap().containsKey(participantName)) {
 				getParticipantCache().get(participantName).setParticipantStatus(status);
 			}
 		}
@@ -339,7 +347,7 @@ public class LocalParticipantRegistrationCache {
 			return;
 		}
 		synchronized (getParticipantCacheLock()) {
-			if (getRegistrationMap().contains(participantName)) {
+			if (getRegistrationMap().containsKey(participantName)) {
 				getParticipantCache().get(participantName).setControlStatus(controlStatus);
 			}
 		}
@@ -353,7 +361,7 @@ public class LocalParticipantRegistrationCache {
 			return;
 		}
 		synchronized (getParticipantCacheLock()) {
-			if (getRegistrationMap().contains(participantName)) {
+			if (getRegistrationMap().containsKey(participantName)) {
 				getParticipantCache().get(participantName).setParticipantStatus(status);
 			}
 		}
@@ -368,7 +376,7 @@ public class LocalParticipantRegistrationCache {
 		}
 		PetasosParticipantStatusEnum participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_HAS_FAILED;
 		synchronized (getParticipantCacheLock()) {
-			if (getRegistrationMap().contains(participantName)) {
+			if (getRegistrationMap().containsKey(participantName)) {
 				participantStatus = getParticipantCache().get(participantName).getParticipantStatus();
 			}
 		}
