@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.dataparcel;
 
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.*;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskExecutionWindow;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -44,6 +45,7 @@ public class DataParcelManifest implements Serializable {
     private DataParcelDirectionEnum dataParcelFlowDirection;
     private String sourceProcessingPlantParticipantName;
     private String targetProcessingPlantParticipantName;
+    private TaskExecutionWindow executionWindow;
 
     public DataParcelManifest(){
         this.contentDescriptor = null;

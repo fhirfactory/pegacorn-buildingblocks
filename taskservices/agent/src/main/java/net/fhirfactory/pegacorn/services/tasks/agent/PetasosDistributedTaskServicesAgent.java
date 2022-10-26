@@ -89,11 +89,14 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(response != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".registerTask(): Exit, response->{}", response);
                 return(response);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".registerTask(): Could not register task, response->{}", response);
                 PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
                 badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -103,6 +106,8 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".registerTask: Error (GeneralException) ->", e);
             PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
             badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -136,11 +141,14 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(response != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".registerTaskOutcome(): Exit, response->{}", response);
                 return(response);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".registerTaskOutcome(): Could not register task, response->{}", response);
                 PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
                 badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -150,6 +158,8 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".registerTaskOutcome: Error (GeneralException) ->", e);
             PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
             badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -183,11 +193,14 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(response != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".registerTaskWaiting(): Exit, response->{}", response);
                 return(response);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".registerTaskWaiting(): Could not register task, response->{}", response);
                 PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
                 badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -230,11 +243,14 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(response != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".registerTaskStart(): Exit, response->{}", response);
                 return(response);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".registerTaskStart(): Could not register task, response->{}", response);
                 PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
                 badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -244,6 +260,8 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".registerTaskStart: Error (GeneralException) ->", e);
             PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
             badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -277,11 +295,14 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(response != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".registerTaskFailure(): Exit, response->{}", response);
                 return(response);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".registerTaskFailure(): Could not register task, response->{}", response);
                 PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
                 badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -291,6 +312,8 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".registerTaskFailure: Error (GeneralException) ->", e);
             PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
             badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -324,11 +347,14 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(response != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".registerTaskFinish(): Exit, response->{}", response);
                 return(response);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".registerTaskFinish(): Could not register task, response->{}", response);
                 PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
                 badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -338,6 +364,8 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".registerTaskFinish: Error (GeneralException) ->", e);
             PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
             badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -371,11 +399,14 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(response != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".registerTaskFinalisation(): Exit, response->{}", response);
                 return(response);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".registerTaskFinalisation(): Could not register task, response->{}", response);
                 PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
                 badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -385,6 +416,8 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".registerTaskFinalisation: Error (GeneralException) ->", e);
             PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
             badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -418,11 +451,14 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(response != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".registerTaskCancellation(): Exit, response->{}", response);
                 return(response);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".registerTaskCancellation(): Could not register task, response->{}", response);
                 PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
                 badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -432,6 +468,8 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".registerTaskCancellation: Error (GeneralException) ->", e);
             PetasosTaskJobCard badOutcomeJobCard = SerializationUtils.clone(jobCard);
             badOutcomeJobCard.setGrantedStatus(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -463,16 +501,21 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             }
             if(registeredTask != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().debug(".fulfillActionableTask(): Exit, registeredTask->{}", registeredTask);
                 return(registeredTask);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".fulfillActionableTask(): Could not register task, registeredTask->{}", registeredTask);
                 return(null);
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".fulfillActionableTask: Error (GeneralException) ->", e);
             return(null);
         }
@@ -501,16 +544,21 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
             if(hasAdditionalPendingTasks != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().error(".hasAdditionalPendingTasks(): Exit");
                 return(hasAdditionalPendingTasks);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".hasAdditionalPendingTasks(): could not invoke RMI method");
                 return(false);
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".hasAdditionalPendingTasks: Error (GeneralException) ->", e);
             return(false);
         }
@@ -539,16 +587,21 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
             if(offloadCount != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().error(".offloadPendingTasks(): Exit");
                 return(offloadCount);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".offloadPendingTasks(): could not invoke RMI method");
                 return(-1);
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".offloadPendingTasks: Error (GeneralException) ->", e);
             return(-1);
         }
@@ -578,17 +631,22 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
 
             if(pendingTaskSet != null){
                 getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getMetricsAgent().incrementRemoteProcedureCallCount();
                 getLogger().error(".synchronisePendingTasks(): Exit");
                 return(pendingTaskSet);
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 PetasosTaskIdSet outcome = SerializationUtils.clone(localPendingTaskSet);
                 getLogger().error(".synchronisePendingTasks(): could not invoke RMI method");
                 return(outcome);
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             PetasosTaskIdSet outcome = SerializationUtils.clone(localPendingTaskSet);
             getLogger().error(".synchronisePendingTasks: Error (GeneralException) ->", e);
             return(outcome);
@@ -618,14 +676,22 @@ public class PetasosDistributedTaskServicesAgent extends PetasosTaskServicesEndp
             getLogger().trace(".retrieveBufferedTasks(): [Invoke RMI Request] Finish, response(taskSet)->{}", taskSet);
 
             if(taskSet != null){
-                getLogger().error(".updateActionableTask(): Exit");
+                getMetricsAgent().incrementRemoteProcedureCallCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCResponseCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getLogger().debug(".updateActionableTask(): Exit");
                 return(taskSet);
             } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+                getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
                 getLogger().error(".updateActionableTask(): could not invoke RMI method");
                 return(null);
             }
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
             getLogger().error(".updateActionableTask: Error (GeneralException) ->", e);
             return(new PetasosActionableTaskSet());
         }

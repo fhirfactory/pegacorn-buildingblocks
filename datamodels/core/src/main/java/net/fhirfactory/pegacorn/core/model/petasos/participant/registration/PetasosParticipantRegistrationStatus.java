@@ -39,6 +39,8 @@ public class PetasosParticipantRegistrationStatus implements Serializable {
     private Instant localRegistrationInstant;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant centralRegistrationInstant;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant updateInstant;
     private SerializableObject lock;
 
     public PetasosParticipantRegistrationStatus(){
@@ -46,6 +48,7 @@ public class PetasosParticipantRegistrationStatus implements Serializable {
         this.localRegistrationInstant = null;
         this.registrationCommentary = null;
         this.centralRegistrationInstant = null;
+        this.updateInstant = Instant.now();
         this.centralRegistrationStatus = PetasosParticipantRegistrationStatusEnum.PARTICIPANT_UNREGISTERED;
         this.lock = new SerializableObject();
         this.registrationId = UUID.randomUUID().toString();
@@ -57,6 +60,7 @@ public class PetasosParticipantRegistrationStatus implements Serializable {
         this.registrationCommentary = null;
         this.centralRegistrationInstant = null;
         this.centralRegistrationStatus = PetasosParticipantRegistrationStatusEnum.PARTICIPANT_UNREGISTERED;
+        this.updateInstant = Instant.now();
         this.lock = new SerializableObject();
         if(ori.getRegistrationId() != null){
             setRegistrationId(ori.getRegistrationId());
@@ -90,6 +94,14 @@ public class PetasosParticipantRegistrationStatus implements Serializable {
     // Getters and Setters
     //
 
+
+    public Instant getUpdateInstant() {
+        return updateInstant;
+    }
+
+    public void setUpdateInstant(Instant updateInstant) {
+        this.updateInstant = updateInstant;
+    }
 
     public PetasosParticipantRegistrationStatusEnum getCentralRegistrationStatus() {
         return centralRegistrationStatus;
@@ -153,13 +165,17 @@ public class PetasosParticipantRegistrationStatus implements Serializable {
 
     @Override
     public String toString() {
-        return "PetasosParticipantRegistration{" +
-                "registrationId='" + registrationId + '\'' +
-                ", registrationStatus=" + localRegistrationStatus +
-                ", registrationCommentary='" + registrationCommentary + '\'' +
-                ", registrationInstant=" + localRegistrationInstant +
-                ", lock=" + lock +
-                '}';
+        final StringBuilder sb = new StringBuilder("PetasosParticipantRegistrationStatus{");
+        sb.append("registrationId='").append(registrationId).append('\'');
+        sb.append(", localRegistrationStatus=").append(localRegistrationStatus);
+        sb.append(", centralRegistrationStatus=").append(centralRegistrationStatus);
+        sb.append(", registrationCommentary='").append(registrationCommentary).append('\'');
+        sb.append(", localRegistrationInstant=").append(localRegistrationInstant);
+        sb.append(", centralRegistrationInstant=").append(centralRegistrationInstant);
+        sb.append(", updateInstant=").append(updateInstant);
+        sb.append(", lock=").append(lock);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override

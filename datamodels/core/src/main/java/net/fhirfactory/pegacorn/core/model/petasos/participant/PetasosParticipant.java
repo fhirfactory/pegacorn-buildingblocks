@@ -31,6 +31,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosPartici
 import net.fhirfactory.pegacorn.core.model.petasos.participant.queue.PetasosParticipantTaskQueueStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import org.apache.commons.lang3.SerializationUtils;
@@ -164,6 +165,29 @@ public class PetasosParticipant implements Serializable {
         }
     }
 
+    public PetasosParticipant(PetasosParticipantRegistration registration){
+        this.componentId = SerializationUtils.clone(registration.getLocalComponentId());
+        this.participantId = SerializationUtils.clone(registration.getParticipantId());
+        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
+        this.participantRegistrationStatus.setLocalRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_UNREGISTERED);
+        this.participantRegistrationStatus.setCentralRegistrationStatus(registration.getCentralRegistrationStatus());
+        this.participantRegistrationStatus.setCentralRegistrationInstant(registration.getCentralRegistrationInstant());
+        this.participantRegistrationStatus.setRegistrationCommentary(registration.getRegistrationCommentary());
+        this.participantRegistrationStatus.setRegistrationId(registration.getRegistrationId());
+        this.participantStatus = registration.getParticipantStatus();
+        this.utilisationUpdateInstant = Instant.now();
+        this.subscriptions = new HashSet<>();
+        if(registration.getSubscriptions() != null) {
+            this.subscriptions.addAll(registration.getSubscriptions());
+        }
+        this.outputs = new HashSet<>();
+        if(registration.getOutputs() != null) {
+            this.outputs.addAll(registration.getOutputs());
+        }
+        this.taskQueueStatus = null;
+        this.controlStatus = registration.getControlStatus();
+    }
+
     //
     // Getters (and Setters)
     //
@@ -181,7 +205,6 @@ public class PetasosParticipant implements Serializable {
     }
 
     public void setControlStatus(PetasosParticipantControlStatusEnum controlStatus) {
-        getLogger().error(".setControlStatus(): Setting status->{}", controlStatus);
         this.controlStatus = controlStatus;
     }
 

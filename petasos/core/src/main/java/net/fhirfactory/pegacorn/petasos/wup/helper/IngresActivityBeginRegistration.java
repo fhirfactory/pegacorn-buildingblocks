@@ -142,18 +142,18 @@ public class IngresActivityBeginRegistration {
         getLogger().trace(".registerActivityStart(): Update TaskJobCard: Finish");
 
         getLogger().trace(".registerActivityStart(): Set processing to the grantedExecutionStatus: Start");
-        if(jobCard.getGrantedStatus().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){
-            fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
-            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-            jobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-            jobCard.getTaskFulfillmentCard().setFulfillmentStartInstant(Instant.now());
-            TaskExecutionCommandEnum taskExecutionCommand = getTaskActivityManager().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
-            getLogger().trace(".registerActivityStart(): Before Update: taskExecutionCommand->{}",taskExecutionCommand);
+        fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
+        fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+        jobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+        jobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
+        jobCard.getTaskFulfillmentCard().setFulfillmentStartInstant(Instant.now());
+        TaskExecutionCommandEnum taskExecutionCommand = getTaskActivityManager().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
+        // Add some more metrics
+        metricsAgent.incrementStartedTasks();
+        getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
 
-            // Add some more metrics
-            metricsAgent.incrementStartedTasks();
-        }  else {
+        getLogger().trace(".registerActivityStart(): Set processing to the grantedExecutionStatus: Start");
+        if(!jobCard.getGrantedStatus().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){
             fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
             fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
             fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());

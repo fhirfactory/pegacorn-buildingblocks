@@ -208,15 +208,15 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
     }
 
     @JsonIgnore
-    public void incrementRPCRequestCount(String targetParticipantName){
+    public void incrementReceivedRPCRequestCount(String targetParticipantName){
         if(StringUtils.isNotEmpty(targetParticipantName)){
             synchronized (getMetricsDataLock()){
-                if(!getEndpointMetricsData().getRemoteProcedureCallRequestsMap().containsKey(targetParticipantName)){
-                    getEndpointMetricsData().getRemoteProcedureCallRequestsMap().put(targetParticipantName, 0);
+                if(!getEndpointMetricsData().getReceivedRPCRequestCountMap().containsKey(targetParticipantName)){
+                    getEndpointMetricsData().getReceivedRPCRequestCountMap().put(targetParticipantName, 0);
                 }
-                Integer count = getEndpointMetricsData().getRemoteProcedureCallRequestsMap().get(targetParticipantName);
+                Integer count = getEndpointMetricsData().getReceivedRPCRequestCountMap().get(targetParticipantName);
                 Integer newValue = count + 1;
-                getEndpointMetricsData().getRemoteProcedureCallRequestsMap().replace(targetParticipantName, newValue);
+                getEndpointMetricsData().getReceivedRPCRequestCountMap().replace(targetParticipantName, newValue);
             }
         }
     }
@@ -225,12 +225,12 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
     public void incrementRPCResponseCount(String targetParticipantName){
         if(StringUtils.isNotEmpty(targetParticipantName)){
             synchronized (getMetricsDataLock()){
-                if(!getEndpointMetricsData().getRemoteProcedureCallResponsesMap().containsKey(targetParticipantName)){
-                    getEndpointMetricsData().getRemoteProcedureCallResponsesMap().put(targetParticipantName, 0);
+                if(!getEndpointMetricsData().getCalledRPCResponsesMap().containsKey(targetParticipantName)){
+                    getEndpointMetricsData().getCalledRPCResponsesMap().put(targetParticipantName, 0);
                 }
-                Integer count = getEndpointMetricsData().getRemoteProcedureCallResponsesMap().get(targetParticipantName);
+                Integer count = getEndpointMetricsData().getCalledRPCResponsesMap().get(targetParticipantName);
                 Integer newValue = count + 1;
-                getEndpointMetricsData().getRemoteProcedureCallResponsesMap().replace(targetParticipantName, newValue);
+                getEndpointMetricsData().getCalledRPCResponsesMap().replace(targetParticipantName, newValue);
             }
         }
     }
@@ -239,12 +239,12 @@ public class EndpointMetricsAgent extends ComponentMetricsAgentBase {
     public void incrementRPCFailureCount(String targetParticipantName){
         if(StringUtils.isNotEmpty(targetParticipantName)){
             synchronized (getMetricsDataLock()){
-                if(!getEndpointMetricsData().getRemoteProcedureCallFailuresMap().containsKey(targetParticipantName)){
-                    getEndpointMetricsData().getRemoteProcedureCallFailuresMap().put(targetParticipantName, 0);
+                if(!getEndpointMetricsData().getCalledRPCFailuresMap().containsKey(targetParticipantName)){
+                    getEndpointMetricsData().getCalledRPCFailuresMap().put(targetParticipantName, 0);
                 }
-                Integer count = getEndpointMetricsData().getRemoteProcedureCallFailuresMap().get(targetParticipantName);
+                Integer count = getEndpointMetricsData().getCalledRPCFailuresMap().get(targetParticipantName);
                 Integer newValue = count + 1;
-                getEndpointMetricsData().getRemoteProcedureCallFailuresMap().replace(targetParticipantName, newValue);
+                getEndpointMetricsData().getCalledRPCFailuresMap().replace(targetParticipantName, newValue);
             }
         }
     }

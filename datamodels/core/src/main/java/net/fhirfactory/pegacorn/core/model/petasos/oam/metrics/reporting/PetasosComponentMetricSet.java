@@ -170,4 +170,20 @@ public class PetasosComponentMetricSet implements Serializable {
         }
         return this.componentType == other.componentType;
     }
+
+    public String logPrint(){
+        if(metrics.isEmpty()){
+            return("Empty Metrics");
+        }
+        StringBuilder sb = new StringBuilder();
+        for(PetasosComponentMetric currentMetric: getMetrics().values()){
+            sb.append(getMetricSourceComponentId().getName());
+            sb.append("-->");
+            sb.append(currentMetric.getMetricName());
+            sb.append("=");
+            sb.append(currentMetric.getMetricValue().getObject().toString());
+            sb.append("\n");
+        }
+        return(sb.toString());
+    }
 }

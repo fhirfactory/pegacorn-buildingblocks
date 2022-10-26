@@ -21,7 +21,9 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.participant.registration;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
@@ -32,6 +34,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +48,8 @@ public class PetasosParticipantRegistration extends PetasosParticipantRegistrati
     private PetasosParticipantControlStatusEnum controlStatus;
     private Set<TaskWorkItemSubscriptionType> subscriptions;
     private Set<TaskWorkItemManifestType> outputs;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant reportingInstant;
 
     //
     // Constructor(s)
@@ -61,6 +66,7 @@ public class PetasosParticipantRegistration extends PetasosParticipantRegistrati
         this.participantStatus = null;
         this.subscriptions = new HashSet<>();
         this.outputs = new HashSet<>();
+        this.reportingInstant = Instant.EPOCH;
     }
 
     public PetasosParticipantRegistration(PetasosParticipantRegistrationStatus registrationStatus){
@@ -74,6 +80,7 @@ public class PetasosParticipantRegistration extends PetasosParticipantRegistrati
         this.participantStatus = null;
         this.subscriptions = new HashSet<>();
         this.outputs = new HashSet<>();
+        this.reportingInstant = Instant.EPOCH;
     }
 
     public PetasosParticipantRegistration(PetasosParticipantRegistration ori){
@@ -87,6 +94,7 @@ public class PetasosParticipantRegistration extends PetasosParticipantRegistrati
         this.controlStatus = null;
         this.subscriptions = new HashSet<>();
         this.outputs = new HashSet<>();
+        this.reportingInstant = Instant.EPOCH;
         if(ori.hasComponentType()){
             setComponentType(ori.getComponentType());
         }
@@ -122,6 +130,15 @@ public class PetasosParticipantRegistration extends PetasosParticipantRegistrati
     //
     // Getters and Setters
     //
+
+
+    public Instant getReportingInstant() {
+        return reportingInstant;
+    }
+
+    public void setReportingInstant(Instant reportingInstant) {
+        this.reportingInstant = reportingInstant;
+    }
 
     @JsonIgnore
     public boolean hasControlStatus(){
@@ -235,18 +252,28 @@ public class PetasosParticipantRegistration extends PetasosParticipantRegistrati
     // toString
     //
 
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PetasosParticipantRegistration{");
         sb.append("participantId=").append(participantId);
         sb.append(", localComponentId=").append(localComponentId);
+        sb.append(", componentType=").append(componentType);
         sb.append(", localComponentStatus=").append(localComponentStatus);
         sb.append(", instanceComponentIds=").append(instanceComponentIds);
         sb.append(", participantStatus=").append(participantStatus);
         sb.append(", controlStatus=").append(controlStatus);
         sb.append(", subscriptions=").append(subscriptions);
         sb.append(", outputs=").append(outputs);
-        sb.append(", ").append(super.toString()).append('}');
+        sb.append(", updateInstant=").append(getUpdateInstant());
+        sb.append(", centralRegistrationStatus=").append(getCentralRegistrationStatus());
+        sb.append(", centralRegistrationInstant=").append(getCentralRegistrationInstant());
+        sb.append(", registrationId='").append(getRegistrationId()).append('\'');
+        sb.append(", localRegistrationStatus=").append(getLocalRegistrationStatus());
+        sb.append(", localRegistrationInstant=").append(getLocalRegistrationInstant());
+        sb.append(", registrationCommentary='").append(getRegistrationCommentary()).append('\'');
+        sb.append(", reportingInstant=").append(reportingInstant);
+        sb.append('}');
         return sb.toString();
     }
 }

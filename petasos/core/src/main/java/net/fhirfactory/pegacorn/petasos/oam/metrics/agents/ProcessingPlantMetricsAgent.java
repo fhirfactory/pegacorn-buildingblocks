@@ -127,7 +127,7 @@ public class ProcessingPlantMetricsAgent extends ComponentMetricsAgentBase {
     // Helpers
     //
 
-    public void touchPathwaySynchronisationIndicator(String participantName){
+    public void touchParticipantSynchronisationIndicator(String participantName){
         getLogger().debug(".touchPathwaySynchronisationIndicator(): Entry, watchDogName->{}", participantName);
         if(StringUtils.isEmpty(participantName)){
             getLogger().debug(".touchPathwaySynchronisationIndicator(): Exit, watchDogName is null or empty");

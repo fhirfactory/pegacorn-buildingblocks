@@ -34,9 +34,8 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
     private Integer remoteProcedureCallCount;
     private Integer remoteProcedureCallHandledCount;
     private Integer remoteProcedureCallFailureCount;
-    private Map<String, Integer> remoteProcedureCallRequestsMap;
-    private Map<String, Integer> remoteProcedureCallFailuresMap;
-    private Map<String, Integer> remoteProcedureCallResponsesMap;
+    private Map<String, Integer> calledRPCFailuresMap;
+    private Map<String, Integer> calledRPCResponsesMap;
 
     //
     // Constructor(s)
@@ -49,9 +48,8 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
         this.remoteProcedureCallCount = 0;
         this.remoteProcedureCallHandledCount = 0;
         this.remoteProcedureCallFailureCount = 0;
-        this.remoteProcedureCallRequestsMap = new ConcurrentHashMap<>();
-        this.remoteProcedureCallFailuresMap = new ConcurrentHashMap<>();
-        this.remoteProcedureCallResponsesMap = new ConcurrentHashMap<>();
+        this.calledRPCFailuresMap = new ConcurrentHashMap<>();
+        this.calledRPCResponsesMap = new ConcurrentHashMap<>();
     }
 
     public EndpointMetricsData(ComponentIdType componentId){
@@ -61,9 +59,8 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
         this.remoteProcedureCallCount = 0;
         this.remoteProcedureCallHandledCount = 0;
         this.remoteProcedureCallFailureCount = 0;
-        this.remoteProcedureCallRequestsMap = new ConcurrentHashMap<>();
-        this.remoteProcedureCallFailuresMap = new ConcurrentHashMap<>();
-        this.remoteProcedureCallResponsesMap = new ConcurrentHashMap<>();
+        this.calledRPCFailuresMap = new ConcurrentHashMap<>();
+        this.calledRPCResponsesMap = new ConcurrentHashMap<>();
     }
 
     //
@@ -110,28 +107,21 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
         this.nodeIngresQueueSize = nodeIngresQueueSize;
     }
 
-    public Map<String, Integer> getRemoteProcedureCallRequestsMap() {
-        return remoteProcedureCallRequestsMap;
+
+    public Map<String, Integer> getCalledRPCFailuresMap() {
+        return calledRPCFailuresMap;
     }
 
-    public void setRemoteProcedureCallRequestsMap(Map<String, Integer> remoteProcedureCallRequestsMap) {
-        this.remoteProcedureCallRequestsMap = remoteProcedureCallRequestsMap;
+    public void setCalledRPCFailuresMap(Map<String, Integer> calledRPCFailuresMap) {
+        this.calledRPCFailuresMap = calledRPCFailuresMap;
     }
 
-    public Map<String, Integer> getRemoteProcedureCallFailuresMap() {
-        return remoteProcedureCallFailuresMap;
+    public Map<String, Integer> getCalledRPCResponsesMap() {
+        return calledRPCResponsesMap;
     }
 
-    public void setRemoteProcedureCallFailuresMap(Map<String, Integer> remoteProcedureCallFailuresMap) {
-        this.remoteProcedureCallFailuresMap = remoteProcedureCallFailuresMap;
-    }
-
-    public Map<String, Integer> getRemoteProcedureCallResponsesMap() {
-        return remoteProcedureCallResponsesMap;
-    }
-
-    public void setRemoteProcedureCallResponsesMap(Map<String, Integer> remoteProcedureCallResponsesMap) {
-        this.remoteProcedureCallResponsesMap = remoteProcedureCallResponsesMap;
+    public void setCalledRPCResponsesMap(Map<String, Integer> calledRPCResponsesMap) {
+        this.calledRPCResponsesMap = calledRPCResponsesMap;
     }
 
     //
@@ -146,9 +136,8 @@ public class EndpointMetricsData extends CommonComponentMetricsData {
                 ", remoteProcedureCallCount=" + remoteProcedureCallCount +
                 ", remoteProcedureCallHandledCount=" + remoteProcedureCallHandledCount +
                 ", remoteProcedureCallFailureCount=" + remoteProcedureCallFailureCount +
-                ", remoteProcedureCallRequestsMap=" + remoteProcedureCallRequestsMap +
-                ", remoteProcedureCallFailuresMap=" + remoteProcedureCallFailuresMap +
-                ", remoteProcedureCallResponsesMap=" + remoteProcedureCallResponsesMap +
+                ", remoteProcedureCallFailuresMap=" + calledRPCFailuresMap +
+                ", remoteProcedureCallResponsesMap=" + calledRPCResponsesMap +
                 ", ingresMessageCount=" + getIngresMessageCount() +
                 ", egressMessageCount=" + getEgressMessageAttemptCount() +
                 ", internalDistributedMessageCount=" + getInternalDistributedMessageCount() +

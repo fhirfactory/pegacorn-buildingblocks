@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class TaskWorkItemSubscriptionType implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(TaskWorkItemSubscriptionType.class);
@@ -453,4 +454,36 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         return(description);
     }
 
+    //
+    // Equals and Hash
+    //
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TaskWorkItemSubscriptionType)) return false;
+        TaskWorkItemSubscriptionType that = (TaskWorkItemSubscriptionType) o;
+        return isInterSubsystemDistributable() == that.isInterSubsystemDistributable()
+                && Objects.equals(getContentDescriptor(), that.getContentDescriptor())
+                && Objects.equals(getContainerDescriptor(), that.getContainerDescriptor())
+                && Objects.equals(getPayloadQuality(), that.getPayloadQuality())
+                && getNormalisationStatus() == that.getNormalisationStatus()
+                && getValidationStatus() == that.getValidationStatus()
+                && getDataParcelType() == that.getDataParcelType()
+                && Objects.equals(getExternalSourceSystem(), that.getExternalSourceSystem())
+                && Objects.equals(getExternalTargetSystem(), that.getExternalTargetSystem())
+                && getEnforcementPointApprovalStatus() == that.getEnforcementPointApprovalStatus()
+                && getDataParcelFlowDirection() == that.getDataParcelFlowDirection()
+                && Objects.equals(getSourceProcessingPlantParticipantName(), that.getSourceProcessingPlantParticipantName())
+                && Objects.equals(getTargetProcessingPlantParticipantName(), that.getTargetProcessingPlantParticipantName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getContentDescriptor(), getContainerDescriptor(), getPayloadQuality(), getNormalisationStatus(),
+                getValidationStatus(), getDataParcelType(), getExternalSourceSystem(), getExternalTargetSystem(),
+                getEnforcementPointApprovalStatus(), isInterSubsystemDistributable(), getDataParcelFlowDirection(),
+                getSourceProcessingPlantParticipantName(), getTargetProcessingPlantParticipantName());
+    }
 }

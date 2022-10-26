@@ -113,15 +113,20 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             Instant response = getRPCDispatcher().callRemoteMethod(targetAddress, "captureMetrics", objectSet, classSet, requestOptions);
             getLogger().debug(".replicateMetricSetToServer(): Exit, response->{}", response);
             getMetricsAgent().incrementRemoteProcedureCallCount();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCResponseCount(serviceProviderName);
             getProcessingPlantMetricsAgent().touchLastActivityInstant();
             return(response);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCFailureCount(serviceProviderName);
             getLogger().error(".replicateMetricSetToServer(): Error (NoSuchMethodException) Message->{}, StackTrace->{} ", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            e.printStackTrace();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCFailureCount(serviceProviderName);
             getLogger().error(".replicateMetricSetToServer(): Error (GeneralException) Message->{}, StackTrace->{} ", ExceptionUtils.getMessage(e), ExceptionUtils.getStackTrace(e));
             return(null);
         }
@@ -151,15 +156,20 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "captureMetric", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCResponseCount(serviceProviderName);
             getLogger().debug(".replicateMetricToServer(): Exit, responseInstant->{}", responseInstant);
             return(responseInstant);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCFailureCount(serviceProviderName);
             getLogger().error(".replicateMetricToServer(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            e.printStackTrace();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCFailureCount(serviceProviderName);
             getLogger().error(".replicateMetricToServer: Error (GeneralException) ->{}", e.getMessage());
             return(null);
         }
@@ -188,15 +198,20 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             Instant responseInstant = getRPCDispatcher().callRemoteMethod(targetAddress, "replicateSubscriptionSummaryReportHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCResponseCount(serviceProviderName);
             getLogger().debug(".shareLocalSubscriptionSummaries(): Exit, responseInstant->{}", responseInstant);
             return(responseInstant);
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCFailureCount(serviceProviderName);
             getLogger().error(".shareLocalSubscriptionSummaries(): Error (NoSuchMethodException) ->{}", e.getMessage());
             return(null);
         } catch (Exception e) {
-            e.printStackTrace();
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCFailureCount(serviceProviderName);
             getLogger().error(".shareLocalSubscriptionSummaries: Error (GeneralException) ->{}", e.getMessage());
             return(null);
         }
@@ -237,7 +252,8 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             return(null);
         } catch (Exception e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            e.printStackTrace();
+            getMetricsAgent().incrementRPCInvocationCount(serviceProviderName);
+            getMetricsAgent().incrementRPCFailureCount(serviceProviderName);
             getLogger().error(".shareLocalTopologyGraph: Error (GeneralException) ->{}", e.getMessage());
             return(null);
         }
@@ -267,15 +283,20 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             getRPCDispatcher().callRemoteMethod(targetAddress, "receiveNotification", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
+            getMetricsAgent().incrementRPCInvocationCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
+            getMetricsAgent().incrementRPCResponseCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
             getLogger().debug(".sendNotification(): Exit, responseInstant");
             return;
         } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRPCInvocationCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendNotification(): Error (NoSuchMethodException) ->{}", e.getMessage());
             getLogger().error(".sendNotification(): Error (NoSuchMethodException): Fallback Logging Of Notification: Participant->{}, message->{}", notification.getParticipantName(), notification.getContent());
             return;
         } catch (Exception e) {
-            e.printStackTrace();
+            getMetricsAgent().incrementRPCInvocationCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getLogger().error(".sendNotification(): Error (GeneralException) ->{}", e.getMessage());
             getLogger().error(".sendNotification(): Error (GeneralException): Fallback Logging Of Notification: Participant->{}, message->{}", notification.getParticipantName(), notification.getContent());
@@ -307,16 +328,22 @@ public class PetasosOAMMetricsAgentEndpoint extends PetasosOAMMetricsEndpointBas
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             getRPCDispatcher().callRemoteMethod(targetAddress, "processTaskReport", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
+            getMetricsAgent().incrementRPCInvocationCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
+            getMetricsAgent().incrementRPCResponseCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
             getLogger().debug(".sendTaskReport(): Exit, responseInstant");
             return;
         } catch (NoSuchMethodException e) {
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
             getLogger().error(".sendTaskReport(): Error (NoSuchMethodException) ->{}", e.getMessage());
             getLogger().error(".sendTaskReport(): Error (NoSuchMethodException): Fallback Logging Of Notification: Participant->{}, message->{}", taskReportNotification.getParticipantName(), taskReportNotification.getContent());
             return;
         } catch (Exception e) {
             e.printStackTrace();
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getMetricsAgent().incrementRPCInvocationCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
+            getMetricsAgent().incrementRPCFailureCount(topologyReportingProvider.getPetasosTopologyReportingServiceProviderName());
             getLogger().error(".sendTaskReport(): Error (GeneralException) ->{}", e.getMessage());
             getLogger().error(".sendTaskReport(): Error (GeneralException): Fallback Logging Of Notification: Participant->{}, message->{}", taskReportNotification.getParticipantName(), taskReportNotification.getContent());
             return;

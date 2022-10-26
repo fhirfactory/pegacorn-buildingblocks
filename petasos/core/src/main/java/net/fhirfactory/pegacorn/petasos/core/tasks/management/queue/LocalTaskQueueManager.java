@@ -59,7 +59,7 @@ public class LocalTaskQueueManager {
     private boolean initialised;
     private Instant daemonLastRunTime;
 
-    private static final Long TASK_QUEUE_CHECK_PERIOD = 5000L;
+    private static final Long TASK_QUEUE_CHECK_PERIOD = 10000L;
     private static final Long TASK_QUEUE_CHECK_STARTUP_WAIT = 60000L;
     private static final Long TASK_QUEUE_CHECK_MAX_PERIOD = 120000L;
 
@@ -144,6 +144,7 @@ public class LocalTaskQueueManager {
 
     private void taskQueueCheckDaemon(){
         getLogger().debug(".taskQueueCheckDaemon(): Entry");
+        setDaemonStillRunning(true);
         try {
             Set<String> allRegisteredComponent = getLocalParticipantManager().getAllRegisteredComponentIds();
             for (String currentLocalRegisteredComponentIdValue : allRegisteredComponent) {
@@ -169,6 +170,7 @@ public class LocalTaskQueueManager {
         } catch (Exception ex){
             getLogger().warn(".taskQueueCheckDaemon encountered an error, exception->", ex);
         }
+        setDaemonStillRunning(false);
         getLogger().debug(".taskQueueCheckDaemon(): Exit");
     }
 

@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.outcomes;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
@@ -82,6 +83,10 @@ public class TaskOutcome2NewTasksBean {
         return(this.actionableTaskFactory);
     }
 
+    protected LocalTaskActivityManager getTaskActivityManager(){
+        return(actionableTaskActivityController);
+    }
+
     //
     // Business Methods
     //
@@ -126,6 +131,7 @@ public class TaskOutcome2NewTasksBean {
 
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Queue New Tasks] Start");
         for(PetasosActionableTask currentNewTask: newTasks){
+            PetasosTaskJobCard jobCard =  getTaskActivityManager().registerLocallyCreatedTask(currentNewTask, null);
             getLocalTaskQueueManager().queueTask(currentNewTask);
         }
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Queue New Tasks] Finish");

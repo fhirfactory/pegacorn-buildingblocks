@@ -194,15 +194,15 @@ public abstract class ComponentMetricsAgentBase  {
     }
 
     @JsonIgnore
-    public void incrementRPCRequestCount(String sourceParticipantName){
+    public void incrementReceivedRPCRequestCount(String sourceParticipantName){
         if(StringUtils.isNotEmpty(sourceParticipantName)){
             synchronized (getMetricsDataLock()){
-                if(!getMetricsData().getRpcRequestsCount().containsKey(sourceParticipantName)){
-                    getMetricsData().getRpcRequestsCount().put(sourceParticipantName, 0);
+                if(!getMetricsData().getReceivedRPCRequestCountMap().containsKey(sourceParticipantName)){
+                    getMetricsData().getReceivedRPCRequestCountMap().put(sourceParticipantName, 0);
                 }
-                Integer count = getMetricsData().getRpcRequestsCount().get(sourceParticipantName);
+                Integer count = getMetricsData().getReceivedRPCRequestCountMap().get(sourceParticipantName);
                 Integer newValue = count + 1;
-                getMetricsData().getRpcRequestsCount().replace(sourceParticipantName, newValue);
+                getMetricsData().getReceivedRPCRequestCountMap().replace(sourceParticipantName, newValue);
             }
         }
     }
@@ -211,12 +211,12 @@ public abstract class ComponentMetricsAgentBase  {
     public void incrementRPCInvocationCount(String sourceParticipantName){
         if(StringUtils.isNotEmpty(sourceParticipantName)){
             synchronized (getMetricsDataLock()){
-                if(!getMetricsData().getRpcInvocationsCount().containsKey(sourceParticipantName)){
-                    getMetricsData().getRpcInvocationsCount().put(sourceParticipantName, 0);
+                if(!getMetricsData().getCalledRPCRequestCountMap().containsKey(sourceParticipantName)){
+                    getMetricsData().getCalledRPCRequestCountMap().put(sourceParticipantName, 0);
                 }
-                Integer count = getMetricsData().getRpcInvocationsCount().get(sourceParticipantName);
+                Integer count = getMetricsData().getCalledRPCRequestCountMap().get(sourceParticipantName);
                 Integer newValue = count + 1;
-                getMetricsData().getRpcInvocationsCount().replace(sourceParticipantName, newValue);
+                getMetricsData().getCalledRPCRequestCountMap().replace(sourceParticipantName, newValue);
             }
         }
     }

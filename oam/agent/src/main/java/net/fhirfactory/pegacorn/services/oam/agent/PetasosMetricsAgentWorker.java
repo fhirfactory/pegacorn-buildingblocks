@@ -31,6 +31,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.Endpoin
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.ProcessingPlantMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.WorkUnitProcessorMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetric;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.factories.PetasosComponentMetricSetFactory;
 import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
@@ -127,6 +128,7 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
         //
         // Get Metrics from the Cache
         List<CommonComponentMetricsData> allLocalMetricsSets = getMetricsDM().getAllMetricsSets();
+        StringBuilder metricsDumpString = new StringBuilder();
         getLogger().trace(".captureLocalMetrics(): Iterating through Metrics retrieved from local cache");
         getLogger().trace(".captureLocalMetrics(): Iterating through Metrics retrieved from local cache, set size -> {}", allLocalMetricsSets.size());
         for(CommonComponentMetricsData currentMetrics: allLocalMetricsSets){
@@ -155,8 +157,18 @@ public class PetasosMetricsAgentWorker extends AgentWorkerBase {
                     }
                     getMetricsQueue().put(componentId, metricSet);
                 }
+
+            }
+
+            if(getLogger().isTraceEnabled()) {
+                metricsDumpString.append(metricSet.logPrint());
             }
         }
+
+        if(getLogger().isTraceEnabled()) {
+            getLogger().trace(".captureLocalMetrics: Report \n {}", metricsDumpString.toString());
+        }
+
         getLogger().debug(".captureLocalMetrics(): Exit");
     }
 

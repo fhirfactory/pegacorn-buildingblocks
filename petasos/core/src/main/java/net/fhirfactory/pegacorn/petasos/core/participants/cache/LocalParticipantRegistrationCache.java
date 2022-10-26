@@ -168,6 +168,11 @@ public class LocalParticipantRegistrationCache {
 			return(null);
 		}
 		PetasosParticipant participant = getParticipant(centralRegistration.getParticipantId().getName());
+		if(participant == null) {
+			if (!centralRegistration.getParticipantId().getSubsystemName().equals(myProcessingPlant.getTopologyNode().getParticipantId().getSubsystemName())) {
+				participant = new PetasosParticipant(centralRegistration);
+			}
+		}
 		getLogger().trace(".updateParticipant(): cached participant->{}", participant);
 		PetasosParticipantRegistration resultantRegistration = updateParticipant(participant, centralRegistration);
 		getLogger().debug(".updateParticipant(): Exit, resultantRegistration->{}", resultantRegistration);
