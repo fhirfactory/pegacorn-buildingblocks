@@ -82,7 +82,7 @@ public class PetasosActionableTaskFactory {
     //
 
     public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskWorkItemType payload ){
-        getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, fulfillmentTaskSummary->{}, payload->{}", upstreamTask, payload);
+        getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{},  payload->{}", upstreamTask, payload);
 
         //
         // Create an empty task

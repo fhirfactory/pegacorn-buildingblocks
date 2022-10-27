@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.common.TaskInstantDetailSegmentBase;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
@@ -31,8 +32,8 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.io.Serializable;
 
 public class TaskTraceabilityElementType extends TaskInstantDetailSegmentBase implements Serializable {
-    private ComponentIdType fulfillerId;
-    private String fulfillerParticipantName;
+    private PetasosParticipantId fulfillerId;
+    private ComponentIdType fulfillerInstanceId;
     private TaskIdType actionableTaskId;
     private TaskIdType fulfillerTaskId;
 
@@ -45,7 +46,7 @@ public class TaskTraceabilityElementType extends TaskInstantDetailSegmentBase im
         this.fulfillerId = null;
         this.actionableTaskId = null;
         this.fulfillerTaskId = null;
-        this.fulfillerParticipantName = null;
+        this.fulfillerInstanceId = null;
     }
 
     public TaskTraceabilityElementType(TaskTraceabilityElementType ori){
@@ -53,9 +54,9 @@ public class TaskTraceabilityElementType extends TaskInstantDetailSegmentBase im
         this.fulfillerId = null;
         this.actionableTaskId = null;
         this.fulfillerTaskId = null;
-        this.fulfillerParticipantName = null;
-        if(ori.hasFulfillerParticipantName()){
-            this.setFulfillerParticipantName(SerializationUtils.clone(ori.getFulfillerParticipantName()));
+        this.fulfillerInstanceId = null;
+        if(ori.hasFulfillerInstanceId()){
+            this.setFulfillerInstanceId(SerializationUtils.clone(ori.getFulfillerInstanceId()));
         }
         if(ori.hasActionableTaskId()){
             this.setActionableTaskId(SerializationUtils.clone(ori.getActionableTaskId()));
@@ -77,17 +78,17 @@ public class TaskTraceabilityElementType extends TaskInstantDetailSegmentBase im
     //
 
     @JsonIgnore
-    public boolean hasFulfillerParticipantName(){
-        boolean hasValue = this.fulfillerParticipantName != null;
+    public boolean hasFulfillerInstanceId(){
+        boolean hasValue = this.fulfillerId != null;
         return(hasValue);
     }
 
-    public String getFulfillerParticipantName() {
-        return fulfillerParticipantName;
+    public ComponentIdType getFulfillerInstanceId() {
+        return fulfillerInstanceId;
     }
 
-    public void setFulfillerParticipantName(String fulfillerParticipantName) {
-        this.fulfillerParticipantName = fulfillerParticipantName;
+    public void setFulfillerInstanceId(ComponentIdType instanceId) {
+        this.fulfillerInstanceId = instanceId;
     }
 
     @JsonIgnore
@@ -96,11 +97,11 @@ public class TaskTraceabilityElementType extends TaskInstantDetailSegmentBase im
         return(hasValue);
     }
 
-    public ComponentIdType getFulfillerId() {
+    public PetasosParticipantId getFulfillerId() {
         return fulfillerId;
     }
 
-    public void setFulfillerId(ComponentIdType fulfillerId) {
+    public void setFulfillerId(PetasosParticipantId fulfillerId) {
         this.fulfillerId = fulfillerId;
     }
 

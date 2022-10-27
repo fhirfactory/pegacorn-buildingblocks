@@ -21,15 +21,16 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.transformers;
 
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.factories.ProvenanceFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.factories.ProvenanceComponentFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.factories.ProvenanceSequenceNumberExtensionFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskIdentifierFactory;
+import org.apache.commons.lang3.SerializationUtils;
 import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.codesystems.ProvenanceAgentRole;
 import org.hl7.fhir.r4.model.codesystems.ProvenanceAgentType;
@@ -37,13 +38,15 @@ import org.hl7.fhir.r4.model.codesystems.W3cProvenanceActivityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Enumeration;
 
-public class PetasosTaskJourneyToProvenanceTransformer {
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosTaskJourneyToProvenanceTransformer.class);
+@ApplicationScoped
+public class ProvenanceFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(ProvenanceFactory.class);
 
     @Inject
     private TaskIdentifierFactory taskIdentifierFactory;
@@ -55,21 +58,26 @@ public class PetasosTaskJourneyToProvenanceTransformer {
     private DRICaTSIdentifierFactory identifierFactory;
 
     @Inject
-    private ProvenanceFactory provenanceFactory;
+    private ProvenanceComponentFactory provenanceComponentFactory;
+
 
 
     //
     // Business Methods
     //
 
-    public Provenance newProvenanceFromTaskJourney(ComponentIdType agentId, Identifier taskIdentifier, TaskTraceabilityType taskJourney){
+    public Provenance newProvenanceFromTaskJourney(PetasosParticipantId agentId, Identifier taskIdentifier, TaskTraceabilityType taskJourney){
+        getLogger().debug(".newProvenanceFromTaskJourney(): Entry, agentId->{}, taskIdentifier->{}, taskJourney->{}", agentId, taskIdentifier, taskJourney);
         if(taskIdentifier == null){
+            getLogger().debug(".newProvenanceFromTaskJourney(): Exit, taskIdentifier is null");
             return(null);
         }
         if(taskJourney == null){
+            getLogger().debug(".newProvenanceFromTaskJourney(): Exit, taskJourney is null");
             return(null);
         }
         if(taskJourney.getTaskJourney().isEmpty()){
+            getLogger().debug(".newProvenanceFromTaskJourney(): Exit, taskJourney is empty");
             return(null);
         }
 
@@ -81,7 +89,7 @@ public class PetasosTaskJourneyToProvenanceTransformer {
         // Set Provenance Target (in this case, a Task)
         Reference targetReference = new Reference();
         targetReference.setIdentifier(taskIdentifier);
-        targetReference.setReference(ResourceType.Task.name());
+        targetReference.setType(ResourceType.Task.name());
         taskJourneyProvenance.addTarget(targetReference);
 
         //
@@ -105,47 +113,57 @@ public class PetasosTaskJourneyToProvenanceTransformer {
         //
         // Set the Provenance Entities
         Enumeration<Integer> sequenceNumberEnumerator = taskJourney.getTaskJourney().keys();
+        getLogger().trace(".newProvenanceFromTaskJourney(): [Iterate Through TaskJourney] Start");
+        getLogger().trace(".newProvenanceFromTaskJourney(): [Iterate Through TaskJourney] TaskJourney Length->{}", taskJourney.getTaskJourney().size());
         while(sequenceNumberEnumerator.hasMoreElements()){
-            Integer sequenceNumber = sequenceNumberEnumerator.nextElement();
-            TaskTraceabilityElementType journeyElement = taskJourney.getTaskJourney().get(sequenceNumber);
-            Identifier journeyElementIdentifier = getTaskIdentifierFactory().newTaskIdentifier(TaskTypeTypeEnum.PETASOS_ACTIONABLE_TASK_TYPE, journeyElement.getActionableTaskId());
-            Reference journeyElementReference = new Reference();
-            journeyElementReference.setIdentifier(journeyElementIdentifier);
-            journeyElementReference.setType(ResourceType.Task.name());
-            getSequenceNumberExtensionFactory().injectTargetSequenceNumber(journeyElementReference, sequenceNumber);
-            Provenance.ProvenanceEntityComponent currentProvenanceEntity = new Provenance.ProvenanceEntityComponent();
-            currentProvenanceEntity.setWhat(journeyElementReference);
-            currentProvenanceEntity.setRole(Provenance.ProvenanceEntityRole.DERIVATION);
-            ComponentIdType currentTaskFulfillerId = journeyElement.getFulfillerId();
-            // Create the Provenance Agent (a Device --> SoftwareComponent) Identifier
-            Provenance.ProvenanceAgentComponent currentProvenanceEntityAgent = newProvenanceAgentComponent(currentTaskFulfillerId, ProvenanceAgentRole.PERFORMER, ProvenanceAgentType.PERFORMER);
-            currentProvenanceEntity.addAgent(currentProvenanceEntityAgent);
-        }
+            Integer currentSequenceNumber = sequenceNumberEnumerator.nextElement();
+            TaskTraceabilityElementType currentJourneyElement = SerializationUtils.clone(taskJourney.getTaskJourney().get(currentSequenceNumber));
+            getLogger().trace(".newProvenanceFromTaskJourney(): [Iterate Through TaskJourney] Processing TaskId->{}, JourneyElement({}):{}", taskIdentifier.getValue(), currentSequenceNumber, currentJourneyElement.getActionableTaskId().getId() );
 
+            Provenance.ProvenanceEntityComponent newProvenanceEntity = newProvenanceEntityComponent(currentJourneyElement, currentSequenceNumber);
+
+            // Create the Provenance Agent (a Device --> SoftwareComponent) Identifier
+            PetasosParticipantId currentTaskFulfillerId = currentJourneyElement.getFulfillerId();
+            Provenance.ProvenanceAgentComponent newProvenanceEntityAgent = newProvenanceAgentComponent(currentTaskFulfillerId, ProvenanceAgentRole.PERFORMER, ProvenanceAgentType.PERFORMER);
+
+            newProvenanceEntity.addAgent(newProvenanceEntityAgent);
+            taskJourneyProvenance.addEntity(newProvenanceEntity);
+
+        }
+        getLogger().trace(".newProvenanceFromTaskJourney(): [Iterate Through TaskJourney] Exit");
+        getLogger().debug(".newProvenanceFromTaskJourney(): Exit, taskJourneyProvenance->{}", taskJourneyProvenance);
         return(taskJourneyProvenance);
     }
 
-    protected Provenance.ProvenanceAgentComponent newProvenanceAgentComponent(ComponentIdType id, ProvenanceAgentRole agentRole, ProvenanceAgentType agentType){
-        Provenance.ProvenanceAgentComponent currentProvenanceAgent = new Provenance.ProvenanceAgentComponent();
+    protected Provenance.ProvenanceEntityComponent newProvenanceEntityComponent(TaskTraceabilityElementType traceabilityElement, Integer sequenceNumber){
+        getLogger().debug(".newProvenanceEntityComponent(): Entry, traceabilityElement->{}, sequenceNumber->{}", traceabilityElement, sequenceNumber);
+        Identifier journeyElementIdentifier = getTaskIdentifierFactory().newTaskIdentifier(TaskTypeTypeEnum.PETASOS_ACTIONABLE_TASK_TYPE, traceabilityElement.getActionableTaskId());
+        Reference journeyElementReference = new Reference();
+        journeyElementReference.setIdentifier(journeyElementIdentifier);
+        journeyElementReference.setType(ResourceType.Task.name());
+        getSequenceNumberExtensionFactory().injectTargetSequenceNumber(journeyElementReference, sequenceNumber);
+        Provenance.ProvenanceEntityComponent provenanceEntity = new Provenance.ProvenanceEntityComponent();
+        provenanceEntity.setWhat(journeyElementReference);
+        provenanceEntity.setRole(Provenance.ProvenanceEntityRole.DERIVATION);
+        getLogger().debug(".newProvenanceEntityComponent(): Exit, provenanceEntity->{}", provenanceEntity);
+        return(provenanceEntity);
+    }
+
+    protected Provenance.ProvenanceAgentComponent newProvenanceAgentComponent(PetasosParticipantId id, ProvenanceAgentRole agentRole, ProvenanceAgentType agentType){
+        getLogger().debug(".newProvenanceAgentComponent(): Entry, id->{}, agentRole->{}, agentType->{}", id, agentRole, agentType);
+        Provenance.ProvenanceAgentComponent createdProvenanceAgent = new Provenance.ProvenanceAgentComponent();
         Period period = new Period();
-        if(id.hasIdValidityStartInstant()){
-            Date startDate = Date.from(id.getIdValidityStartInstant());
-            period.setStart(startDate);
-        }
-        if(id.hasIdValidityEndInstant()){
-            Date endDate = Date.from(id.getIdValidityEndInstant());
-            period.setEnd(endDate);
-        }
-        Identifier deviceIdentifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, id.getId(), period);
+        Identifier deviceIdentifier = getIdentifierFactory().newIdentifier(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, id.getName(), period);
         Reference deviceReference = new Reference();
         deviceReference.setIdentifier(deviceIdentifier);
         deviceReference.setType(ResourceType.Device.name());
-        currentProvenanceAgent.setWho(deviceReference);
+        createdProvenanceAgent.setWho(deviceReference);
         CodeableConcept currentAgentRole = getProvenanceFactory().newAgentRole(agentRole);
         CodeableConcept currentAgentType = getProvenanceFactory().newAgentType(agentType);
-        currentProvenanceAgent.addRole(currentAgentRole);
-        currentProvenanceAgent.setType(currentAgentType);
-        return(currentProvenanceAgent);
+        createdProvenanceAgent.addRole(currentAgentRole);
+        createdProvenanceAgent.setType(currentAgentType);
+        getLogger().debug(".newProvenanceAgentComponent(): Exit, createdProvenanceAgent->{}", createdProvenanceAgent);
+        return(createdProvenanceAgent);
     }
 
     //
@@ -168,7 +186,7 @@ public class PetasosTaskJourneyToProvenanceTransformer {
         return(this.identifierFactory);
     }
 
-    protected ProvenanceFactory getProvenanceFactory(){
-        return(this.provenanceFactory);
+    protected ProvenanceComponentFactory getProvenanceFactory(){
+        return(this.provenanceComponentFactory);
     }
 }

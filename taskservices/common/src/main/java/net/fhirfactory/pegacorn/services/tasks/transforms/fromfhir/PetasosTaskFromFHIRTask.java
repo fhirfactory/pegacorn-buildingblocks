@@ -40,9 +40,9 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.value
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierDataTypeHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.transformers.FHIRProvenanceToPetasosTaskJourneyTransformer;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.*;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
@@ -62,13 +62,13 @@ public abstract class PetasosTaskFromFHIRTask {
     private ObjectMapper jsonMapper;
 
     @Inject
-    private PegacornIdentifierDataTypeHelpers identifierHelpers;
+    private DRICaTSIdentifierDataTypeHelpers identifierHelpers;
 
     @Inject
     private TaskIdentifierFactory taskIdentifierFactory;
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory identifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory identifierCodeSystemFactory;
 
     @Inject
     private TaskPerformerTypeFactory taskPerformerTypeFactory;
@@ -233,7 +233,7 @@ public abstract class PetasosTaskFromFHIRTask {
             boolean found = false;
             for(Reference currentReference: fhirTask.getBasedOn()){
                 for(Coding currentCoding: currentReference.getIdentifier().getType().getCoding()){
-                    if(currentCoding.getCode().contentEquals(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_ACTIONABLE_TASK.getToken())){
+                    if(currentCoding.getCode().contentEquals(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_ACTIONABLE_TASK.getToken())){
                         found = true;
                         break;
                     }
@@ -330,7 +330,7 @@ public abstract class PetasosTaskFromFHIRTask {
     // Getters (and Setters)
     //
 
-    protected PegacornIdentifierDataTypeHelpers getIdentifierHelpers(){
+    protected DRICaTSIdentifierDataTypeHelpers getIdentifierHelpers(){
         return(this.identifierHelpers);
     }
 
@@ -338,7 +338,7 @@ public abstract class PetasosTaskFromFHIRTask {
         return(this.taskIdentifierFactory);
     }
 
-    protected PegacornIdentifierCodeSystemFactory getIdentifierCodeSystemFactory(){
+    protected DRICaTSIdentifierCodeSystemFactory getIdentifierCodeSystemFactory(){
         return(this.identifierCodeSystemFactory);
     }
 

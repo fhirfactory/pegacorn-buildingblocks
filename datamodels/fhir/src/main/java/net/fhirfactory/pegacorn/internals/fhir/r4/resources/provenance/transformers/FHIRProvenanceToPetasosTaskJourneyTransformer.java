@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.transformers;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
@@ -75,17 +76,8 @@ public class FHIRProvenanceToPetasosTaskJourneyTransformer {
                 currentTaskId.setLocalId(currentReference.getIdentifier().getValue());
                 currentTaskId.setPrimaryBusinessIdentifier(currentReference.getIdentifier());
                 currentTraceabilityElement.setActionableTaskId(currentTaskId);
-                ComponentIdType currentComponentId = new ComponentIdType();
-                currentComponentId.setId(currentAgent.getWho().getIdentifier().getValue());
-                if(currentAgent.getWho().getIdentifier().hasPeriod()) {
-                    Period identifierPeriod = currentAgent.getWho().getIdentifier().getPeriod();
-                    if(identifierPeriod.hasStart()) {
-                        currentComponentId.setIdValidityStartInstant(identifierPeriod.getStart().toInstant());
-                    }
-                    if(identifierPeriod.hasEnd()){
-                        currentComponentId.setIdValidityEndInstant(identifierPeriod.getEnd().toInstant());
-                    }
-                }
+                PetasosParticipantId currentComponentId = new PetasosParticipantId();
+                currentComponentId.setName(currentAgent.getWho().getIdentifier().getValue());
                 currentTraceabilityElement.setFulfillerId(currentComponentId);
                 taskTraceability.getTaskJourney().put(traceabilitySequenceNo, currentTraceabilityElement);
             }

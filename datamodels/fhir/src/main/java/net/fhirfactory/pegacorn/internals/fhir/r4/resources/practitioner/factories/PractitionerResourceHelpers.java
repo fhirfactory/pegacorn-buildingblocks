@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitioner.factories;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.datatypes.ContactPointFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.datatypes.HumanNameFactory;
@@ -49,13 +49,13 @@ public class PractitionerResourceHelpers {
     private HumanNameFactory humanNameFactory;
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     public Identifier buildPractitionerIdentifierFromEmail(String eMailAddress){
         LOG.debug(".constructIdentifierFromEmail(): Entry");
         Identifier emailBasedIdentifier = new Identifier();
         emailBasedIdentifier.setUse(Identifier.IdentifierUse.SECONDARY);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_PRACTITIONER_EMAIL);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_PRACTITIONER_EMAIL);
         emailBasedIdentifier.setType(idType);
         emailBasedIdentifier.setSystem(deploymentInstanceDetailInterface.getDeploymentInstanceSystemEndpointSystem());
         emailBasedIdentifier.setValue(eMailAddress);

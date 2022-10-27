@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.common;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Identifier;
@@ -40,7 +40,7 @@ public class SourceOfTruthRIDIdentifierBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(SourceOfTruthRIDIdentifierBuilder.class);
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
     private DeploymentInstanceDetailInterface deploymentInstanceDetailInterface;
@@ -49,7 +49,7 @@ public class SourceOfTruthRIDIdentifierBuilder {
         LOG.debug(".constructRIDIdentifier(): Entry");
         Identifier ridIdentifier = new Identifier();
         ridIdentifier.setUse(Identifier.IdentifierUse.SECONDARY);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOURCE_OF_TRUTH_RECORD_ID);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_SOURCE_OF_TRUTH_RECORD_ID);
         ridIdentifier.setType(idType);
         ridIdentifier.setSystem(identifierSystem);
         ridIdentifier.setValue(identifierValue);

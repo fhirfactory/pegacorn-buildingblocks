@@ -39,7 +39,7 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftw
 import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierDataTypeHelpers;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
@@ -83,7 +83,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     private PetasosTaskJobCardFactory jobCardFactory;
 
     @Inject
-    private PegacornIdentifierDataTypeHelpers identifierHelpers;
+    private DRICaTSIdentifierDataTypeHelpers identifierHelpers;
 
     @Inject
     private PetasosActionableTaskFactory actionableTaskFactory;
@@ -202,7 +202,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         return jobCardFactory;
     }
 
-    protected PegacornIdentifierDataTypeHelpers getIdentifierHelpers() {
+    protected DRICaTSIdentifierDataTypeHelpers getIdentifierHelpers() {
         return identifierHelpers;
     }
 

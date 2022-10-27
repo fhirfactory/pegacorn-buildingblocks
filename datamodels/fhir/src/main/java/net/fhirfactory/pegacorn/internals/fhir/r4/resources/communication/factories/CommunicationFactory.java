@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.communication.factories;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class CommunicationFactory {
         Communication communicationResource = new Communication();
         Period newPeriod = new Period();
         newPeriod.setStart(date);
-        Identifier baseIdentifier = identifierFactory.newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER,idValue,newPeriod);
+        Identifier baseIdentifier = identifierFactory.newIdentifier(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_HL7V2_COMMUNICATION_CONTAINER,idValue,newPeriod);
         communicationResource.addIdentifier(baseIdentifier);
 
         LOG.debug(".newCommunicationResource(): Exit, communicationResource->{}", communicationResource);

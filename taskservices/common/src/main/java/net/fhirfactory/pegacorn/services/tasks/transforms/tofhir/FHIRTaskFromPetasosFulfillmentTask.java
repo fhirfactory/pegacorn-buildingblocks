@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskPerformerTypeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
@@ -389,7 +389,7 @@ public class FHIRTaskFromPetasosFulfillmentTask extends FHIRTaskFromPetasosTask 
                 Date endDate = Date.from(taskNodeAffinity.getIdValidityEndInstant());
                 period.setEnd(endDate);
             }
-            Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, taskNodeAffinity.getId(), period);
+            Identifier identifier = getIdentifierFactory().newIdentifier(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, taskNodeAffinity.getId(), period);
             owner = new Reference();
             owner.setIdentifier(identifier);
             owner.setType(ResourceType.Task.name());

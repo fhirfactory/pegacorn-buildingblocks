@@ -31,8 +31,8 @@ import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-public class PegacornIdentifierDataTypeHelpers {
-    private static final Logger LOG = LoggerFactory.getLogger(PegacornIdentifierDataTypeHelpers.class);
+public class DRICaTSIdentifierDataTypeHelpers {
+    private static final Logger LOG = LoggerFactory.getLogger(DRICaTSIdentifierDataTypeHelpers.class);
 
     /**
      * This method cycles through all the Identifiers and attempts to return "the best"!

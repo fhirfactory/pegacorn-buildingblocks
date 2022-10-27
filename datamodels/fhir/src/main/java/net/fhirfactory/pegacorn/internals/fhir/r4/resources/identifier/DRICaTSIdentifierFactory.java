@@ -24,8 +24,8 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier;
 import net.fhirfactory.pegacorn.core.constants.systemwide.DeploymentSystemIdentificationInterface;
 import net.fhirfactory.pegacorn.core.constants.systemwide.DeploymentSystemSiteIdentificationInterface;
 import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -50,7 +50,7 @@ public class DRICaTSIdentifierFactory {
     private DeploymentInstanceDetailInterface deploymentInstanceDetailInterface;
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
     private DeploymentSystemIdentificationInterface systemIdentificationInterface;
@@ -86,7 +86,7 @@ public class DRICaTSIdentifierFactory {
         return builtIdentifier;
     }
 
-    public Identifier newIdentifier(PegacornIdentifierCodeEnum codeEnum, String value, Period period){
+    public Identifier newIdentifier(DRICaTSIdentifierCodeEnum codeEnum, String value, Period period){
         LOG.debug(".newIdentifier(): Entry, codeEnum->{}, vale->{}, period->{}", codeEnum, value, period);
         Identifier identifier = new Identifier();
         CodeableConcept identifierType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(codeEnum);

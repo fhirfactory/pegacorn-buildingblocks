@@ -22,11 +22,9 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
 import org.hl7.fhir.r4.model.*;
@@ -83,17 +81,17 @@ public class TaskIdentifierFactory {
         if(endInstant != null){
             identifierPeriod.setEnd(Date.from(endInstant));
         }
-        PegacornIdentifierCodeEnum identifierCode = null;
+        DRICaTSIdentifierCodeEnum identifierCode = null;
         switch(taskType){
             case PETASOS_BASE_TASK_TYPE:
             case PETASOS_ACTIONABLE_TASK_TYPE:
-                identifierCode = PegacornIdentifierCodeEnum.IDENTIFIER_CODE_ACTIONABLE_TASK;
+                identifierCode = DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_ACTIONABLE_TASK;
                 break;
             case PETASOS_FULFILLMENT_TASK_TYPE:
-                identifierCode = PegacornIdentifierCodeEnum.IDENTIFIER_CODE_FULFILLMENT_TASK;
+                identifierCode = DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_FULFILLMENT_TASK;
                 break;
             case PETASOS_AGGREGATE_TASK_TYPE:
-                identifierCode = PegacornIdentifierCodeEnum.IDENTIFIER_CODE_AGGREGATE_TASK;
+                identifierCode = DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_AGGREGATE_TASK;
                 break;
         }
         fhirIdentifier = generalIdentifierFactory.newIdentifier(identifierCode, taskId.getLocalId(), identifierPeriod);

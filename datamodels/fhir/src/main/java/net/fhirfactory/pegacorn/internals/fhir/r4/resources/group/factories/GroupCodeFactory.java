@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.factories;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornGroupCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSGroupCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.valuesets.GroupCodeValueSet;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -36,7 +36,7 @@ public class GroupCodeFactory {
     private static final Logger LOG = LoggerFactory.getLogger(GroupCodeFactory.class);
 
     @Inject
-    private PegacornGroupCodeSystemFactory pegacornGroupCodeSystemFactory;
+    private DRICaTSGroupCodeSystemFactory pegacornGroupCodeSystemFactory;
 
     @Inject
     private GroupCodeValueSet groupCodeValueSet;

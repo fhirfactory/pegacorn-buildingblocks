@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.organization.factories;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
 import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.codesystems.OrganizationType;
@@ -38,7 +38,7 @@ public class OrganizationResourceHelpers {
     private static final Logger LOG = LoggerFactory.getLogger(OrganizationResourceHelpers.class);
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
     private DeploymentInstanceDetailInterface deploymentInstanceDetailInterface;

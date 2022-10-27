@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.location.factories;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class LocationResourceHelper {
     private static final Logger LOG = LoggerFactory.getLogger(LocationResourceHelper.class);
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
     private DeploymentInstanceDetailInterface deploymentInstanceDetailInterface;
@@ -47,7 +47,7 @@ public class LocationResourceHelper {
         LOG.debug(".constructLocationIdentifier(): Entry");
         Identifier locationIdentifier = new Identifier();
         locationIdentifier.setUse(identifierUse);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_CONTAINMENT_BASED_LOCATION);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_CONTAINMENT_BASED_LOCATION);
         locationIdentifier.setType(idType);
         locationIdentifier.setSystem(deploymentInstanceDetailInterface.getDeploymentInstanceSystemEndpointSystem());
         locationIdentifier.setValue(identifierValue);

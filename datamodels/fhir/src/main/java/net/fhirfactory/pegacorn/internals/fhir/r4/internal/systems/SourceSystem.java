@@ -24,8 +24,8 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SubsystemTopologyNode;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public abstract class SourceSystem {
     protected SubsystemTopologyNode topologyNode;
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
     private DRICaTSReferenceProperties systemWideProperties;
@@ -170,7 +170,7 @@ public abstract class SourceSystem {
         getLogger().debug(".createSystemEndpointIdentifier(): Entry");
         Identifier systemSystemEndpointIdentifier = new Identifier();
         systemSystemEndpointIdentifier.setUse(Identifier.IdentifierUse.SECONDARY);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM);
         systemSystemEndpointIdentifier.setType(idType);
         systemSystemEndpointIdentifier.setSystem(getSystemReference());
         systemSystemEndpointIdentifier.setValue(specifyEndpointName());
@@ -185,7 +185,7 @@ public abstract class SourceSystem {
     private Reference buildDefaultEndpointReference(){
         Identifier systemSystemEndpointIdentifier = new Identifier();
         systemSystemEndpointIdentifier.setUse(Identifier.IdentifierUse.SECONDARY);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM);
         systemSystemEndpointIdentifier.setType(idType);
         systemSystemEndpointIdentifier.setSystem(getSystemReference());
         systemSystemEndpointIdentifier.setValue(systemWideProperties.getSystemDeploymentName());
@@ -445,7 +445,7 @@ public abstract class SourceSystem {
         Reference systemReference = new Reference();
         systemReference.setIdentifier(getIdentifierSystemOwnerPractitioner());
         systemReference.setDisplay(this.getOrganizationName());
-        systemReference.setType("Org anization");
+        systemReference.setType("Organization");
         getLogger().debug(".createOwningOrganizationReference(): Exit, created Reference --> {}", systemReference);
         return(systemReference);
     }

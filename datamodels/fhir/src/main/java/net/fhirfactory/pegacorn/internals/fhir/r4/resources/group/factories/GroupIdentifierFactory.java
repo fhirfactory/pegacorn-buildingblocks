@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.group.factories;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -41,13 +41,13 @@ public class GroupIdentifierFactory {
     private DeploymentInstanceDetailInterface deploymentInstanceDetailInterface;
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     public Identifier newCommunicateRoomBasedGroupIdentifier(String room_id, Period period){
         LOG.debug(".buildIdentifierFromShortName(): Entry");
         Identifier identifier = new Identifier();
         identifier.setUse(Identifier.IdentifierUse.SECONDARY);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_COMMUNICATE_ROOM_ID);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_COMMUNICATE_ROOM_ID);
         identifier.setType(idType);
         identifier.setSystem(deploymentInstanceDetailInterface.getDeploymentInstanceSystemEndpointSystem());
         identifier.setValue(room_id);

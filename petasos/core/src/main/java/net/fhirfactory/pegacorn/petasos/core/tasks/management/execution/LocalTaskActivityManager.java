@@ -529,11 +529,6 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         actionableTask.getTaskOutcomeStatus().setEntryInstant(Instant.now());
         getLogger().trace(".notifyTaskFinish(): [Update ActionableTask.taskOutcomeStatus] Finish");
 
-        getLogger().trace(".notifyTaskFinish(): [Update ActionableTask.taskTraceability] Start");
-        TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(taskId,fulfillmentTask.getTaskFulfillment());
-        actionableTask.getTaskTraceability().addToTaskJourney(traceabilityElementType);
-        getLogger().trace(".notifyTaskFinish(): [Update ActionableTask.taskTraceability] Finish");
-
         getLogger().trace(".notifyTaskFinish(): [Update Local Job Card based on FulfillmentTask] Start");
         PetasosTaskJobCard jobCardFromRegistry = getLocalTaskJobCardCache().getJobCard(taskId);
         PetasosTaskJobCard jobCardFromFulfillmentTask = fulfillmentTask.getTaskJobCard();
@@ -631,11 +626,6 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         actionableTask.getTaskCompletionSummary().setLastInChain(true);
         getLogger().trace(".notifyTaskFailure(): [Update ActionableTask.taskCompletionSummary] Finish");
 
-        getLogger().trace(".notifyTaskFailure(): [Update ActionableTask.taskTraceability] Start");
-        TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(taskId,fulfillmentTask.getTaskFulfillment());
-        actionableTask.getTaskTraceability().addToTaskJourney(traceabilityElementType);
-        getLogger().trace(".notifyTaskFailure(): [Update ActionableTask.taskTraceability] Finish");
-
         getLogger().trace(".notifyTaskFailure(): [Update Local Job Card based on FulfillmentTask] Start");
         PetasosTaskJobCard jobCardFromRegistry = getLocalTaskJobCardCache().getJobCard(taskId);
         PetasosTaskJobCard jobCardFromFulfillmentTask = fulfillmentTask.getTaskJobCard();
@@ -726,11 +716,6 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         actionableTask.getTaskOutcomeStatus().setOutcomeStatus(TaskOutcomeStatusEnum.OUTCOME_STATUS_CANCELLED);
         actionableTask.getTaskOutcomeStatus().setEntryInstant(Instant.now());
         getLogger().trace(".notifyTaskCancellation(): [Update ActionableTask.taskOutcomeStatus] Start");
-
-        getLogger().trace(".notifyTaskCancellation(): [Update ActionableTask.taskTraceability] Start");
-        TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(taskId,fulfillmentTask.getTaskFulfillment());
-        actionableTask.getTaskTraceability().addToTaskJourney(traceabilityElementType);
-        getLogger().trace(".notifyTaskCancellation(): [Update ActionableTask.taskTraceability] Finish");
 
         getLogger().trace(".notifyTaskCancellation(): [Update ActionableTask.taskWorkItem] Start");
         UoWPayloadSet egressContent = fulfillmentTask.getTaskWorkItem().getEgressContent();

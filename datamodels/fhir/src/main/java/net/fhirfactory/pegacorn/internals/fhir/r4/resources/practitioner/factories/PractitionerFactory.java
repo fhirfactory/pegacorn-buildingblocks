@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitioner.factories;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.valuesets.InformationCompartmentSecurityCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.valuesets.InformationConfidentialitySecurityCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.resource.factories.SecurityLabelFactory;
@@ -45,7 +45,7 @@ public class PractitionerFactory {
     private SecurityLabelFactory securityLabelFactory;
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
     private HumanNameFactory humanNameFactory;

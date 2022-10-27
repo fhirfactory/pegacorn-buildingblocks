@@ -62,7 +62,7 @@ public class TaskTraceabilityElementTypeFactory {
         }
         TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
         if(taskFulfillment.hasFulfiller()) {
-            traceabilityElement.setFulfillerId(SerializationUtils.clone(taskFulfillment.getFulfiller().getComponentId()));
+            traceabilityElement.setFulfillerId(SerializationUtils.clone(taskFulfillment.getFulfiller().getParticipantId()));
         }
         traceabilityElement.setActionableTaskId(SerializationUtils.clone(taskId));
         traceabilityElement.setFulfillerTaskId(SerializationUtils.clone(taskFulfillment.getTrackingID()));

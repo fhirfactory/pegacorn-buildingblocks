@@ -179,6 +179,8 @@ public class LocalTaskDistributionService {
             return;
         }
 
+        getLogger().warn(".distributeNewActionableTasks(): Sending Task->{} to Participant->{}", actionableTask.getTaskId().getId(), participantId.getName());
+
         boolean isRemoteTarget = false;
         String intendedTargetName = null;
         DataParcelManifest payloadTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();

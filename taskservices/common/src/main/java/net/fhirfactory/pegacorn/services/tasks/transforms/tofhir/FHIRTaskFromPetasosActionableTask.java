@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.data
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskFulfillmenExecutionStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskExtensionSystemFactory;
@@ -364,7 +364,7 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
                 Date endDate = Date.from(taskNodeAffinity.getIdValidityEndInstant());
                 period.setEnd(endDate);
             }
-            Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, taskNodeAffinity.getId(), period);
+            Identifier identifier = getIdentifierFactory().newIdentifier(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, taskNodeAffinity.getId(), period);
             requestor = new Reference();
             requestor.setIdentifier(identifier);
             requestor.setType(ResourceType.Task.name());
@@ -417,7 +417,7 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
                     Date endDate = Date.from(nodeId.getIdValidityEndInstant());
                     period.setEnd(endDate);
                 }
-                Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, nodeId.getId(), period);
+                Identifier identifier = getIdentifierFactory().newIdentifier(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, nodeId.getId(), period);
                 owner.setIdentifier(identifier);
                 owner.setType(ResourceType.Device.name());
             }

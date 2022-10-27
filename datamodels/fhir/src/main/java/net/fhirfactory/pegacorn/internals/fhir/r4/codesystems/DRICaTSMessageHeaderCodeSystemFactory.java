@@ -29,7 +29,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class PegacornMessageHeaderCodeSystemFactory {
+public class DRICaTSMessageHeaderCodeSystemFactory {
 
     @Inject
     private DRICaTSReferenceProperties systemWideProperties;

@@ -22,8 +22,8 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Identifier;
@@ -42,7 +42,7 @@ public class EndpointIdentifierFactory {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointIdentifierFactory.class);
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     @Inject
     private DRICaTSReferenceProperties systemWideProperties;
@@ -70,7 +70,7 @@ public class EndpointIdentifierFactory {
         LOG.debug(".constructEndpointIdentifier(): Entry");
         Identifier systemSystemEndpointIdentifier = new Identifier();
         systemSystemEndpointIdentifier.setUse(Identifier.IdentifierUse.SECONDARY);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_FHIR_ENDPOINT_SYSTEM);
         systemSystemEndpointIdentifier.setType(idType);
         systemSystemEndpointIdentifier.setSystem(identifierSystem);
         systemSystemEndpointIdentifier.setValue(identifierValue);

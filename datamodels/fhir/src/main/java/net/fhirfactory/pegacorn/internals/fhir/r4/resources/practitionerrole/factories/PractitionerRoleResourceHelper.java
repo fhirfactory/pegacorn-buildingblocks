@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.practitionerrole.factories;
 
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.systems.DeploymentInstanceDetailInterface;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -41,13 +41,13 @@ public class PractitionerRoleResourceHelper {
     private DeploymentInstanceDetailInterface deploymentInstanceDetailInterface;
 
     @Inject
-    private PegacornIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
+    private DRICaTSIdentifierCodeSystemFactory pegacornIdentifierCodeSystemFactory;
 
     public Identifier buildIdentifierFromShortName(String shortName){
         LOG.debug(".buildIdentifierFromShortName(): Entry");
         Identifier identifier = new Identifier();
         identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_PRACTITIONER_ROLE_SHORT_NAME);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_PRACTITIONER_ROLE_SHORT_NAME);
         identifier.setType(idType);
         identifier.setSystem(deploymentInstanceDetailInterface.getDeploymentInstanceSystemEndpointSystem());
         identifier.setValue(shortName);
@@ -63,7 +63,7 @@ public class PractitionerRoleResourceHelper {
         LOG.debug(".buildIdentifierFromLongName(): Entry");
         Identifier identifier = new Identifier();
         identifier.setUse(Identifier.IdentifierUse.SECONDARY);
-        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_PRACTITIONER_ROLE_LONG_NAME);
+        CodeableConcept idType = pegacornIdentifierCodeSystemFactory.buildIdentifierType(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_PRACTITIONER_ROLE_LONG_NAME);
         identifier.setType(idType);
         identifier.setSystem(deploymentInstanceDetailInterface.getDeploymentInstanceSystemEndpointSystem());
         identifier.setValue(longName);

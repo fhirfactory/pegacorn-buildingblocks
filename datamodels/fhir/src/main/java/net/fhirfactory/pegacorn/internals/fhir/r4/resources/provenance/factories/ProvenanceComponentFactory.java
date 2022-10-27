@@ -23,7 +23,6 @@ package net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.factorie
 
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.codesystems.ProvenanceAgentRole;
 import org.hl7.fhir.r4.model.codesystems.ProvenanceAgentType;
 import org.hl7.fhir.r4.model.codesystems.W3cProvenanceActivityType;
@@ -31,7 +30,7 @@ import org.hl7.fhir.r4.model.codesystems.W3cProvenanceActivityType;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class ProvenanceFactory {
+public class ProvenanceComponentFactory {
 
     public CodeableConcept newAgentRole(ProvenanceAgentRole role){
         CodeableConcept agentRoleCC = new CodeableConcept();

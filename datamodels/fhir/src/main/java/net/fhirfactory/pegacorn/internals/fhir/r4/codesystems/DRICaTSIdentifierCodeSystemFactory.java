@@ -22,19 +22,33 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.codesystems;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.DRICaTSReferenceProperties;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class PegacornGroupCodeSystemFactory {
-    private String PEGACORN_GROUP_CODE_SYSTEM = "/group/group_member_kind";
+public class DRICaTSIdentifierCodeSystemFactory {
 
     @Inject
     private DRICaTSReferenceProperties systemWideProperties;
 
-    public String newPegacornIdentifierCodeSystem() {
-        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_GROUP_CODE_SYSTEM;
+    private static final String PEGACORN_IDENTIFIER_CODE_SYSTEM = "/identifier-type";
+
+    public String getPegacornIdentifierCodeSystem() {
+        String codeSystem = systemWideProperties.getDRICaTSCodeSystemSite() + PEGACORN_IDENTIFIER_CODE_SYSTEM;
         return (codeSystem);
+    }
+
+    public CodeableConcept buildIdentifierType(DRICaTSIdentifierCodeEnum identifierCode){
+        CodeableConcept idType = new CodeableConcept();
+        Coding idTypeCoding = new Coding();
+        idTypeCoding.setCode(identifierCode.getToken());
+        idTypeCoding.setSystem(getPegacornIdentifierCodeSystem());
+        idTypeCoding.setDisplay(identifierCode.getDisplayName());
+        idType.getCoding().add(idTypeCoding);
+        idType.setText(identifierCode.getDisplayText());
+        return(idType);
     }
 }

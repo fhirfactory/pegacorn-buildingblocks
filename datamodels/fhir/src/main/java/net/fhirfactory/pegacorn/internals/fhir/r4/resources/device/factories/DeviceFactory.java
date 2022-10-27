@@ -42,7 +42,7 @@ import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
-import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.DRICaTSIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets.DeviceConfigurationFilePropertyTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.DRICaTSIdentifierFactory;
@@ -150,7 +150,7 @@ public class DeviceFactory {
             Date endDate = Date.from(nodeId.getIdValidityEndInstant());
             period.setEnd(endDate);
         }
-        Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, node.getComponentId().getId(), period);
+        Identifier identifier = getIdentifierFactory().newIdentifier(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, node.getComponentId().getId(), period);
         device.addIdentifier(identifier);
 
         //

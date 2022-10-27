@@ -87,7 +87,7 @@ import java.time.Instant;
 
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Create TaskFullment Traceability element");
             TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
-            traceabilityElement.setFulfillerId(fulfillmentTask.getTaskFulfillment().getFulfiller().getComponentId());
+            traceabilityElement.setFulfillerId(fulfillmentTask.getTaskFulfillment().getFulfiller().getParticipantId());
             traceabilityElement.setActionableTaskId(actionableTask.getTaskId());
             traceabilityElement.setFulfillerTaskId(fulfillmentTask.getTaskId());
             traceabilityElement.setStartInstant(fulfillmentTask.getTaskFulfillment().getStartInstant());
