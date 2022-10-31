@@ -82,18 +82,12 @@ public class PetasosActionableTaskFactory {
     // Business Methods
     //
 
-    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskWorkItemType payload ){
+    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskWorkItemType payload, String targetPerformer ){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{},  payload->{}", upstreamTask, payload);
 
         //
         // Create an empty task
-        String sourceParticipantName = null;
-        try{
-            sourceParticipantName = upstreamTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId().getName();
-        } catch(Exception ex){
-            getLogger().debug(".newMessageBasedActionableTask(): Could derive sourceParticipantName", ex);
-        }
-        PetasosActionableTask newTask = newMessageBasedActionableTask(payload, sourceParticipantName);
+        PetasosActionableTask newTask = newMessageBasedActionableTask(payload, targetPerformer);
         //
         // create task traceability information
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Start");
@@ -106,18 +100,12 @@ public class PetasosActionableTaskFactory {
         return(newTask);
     }
 
-    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskTraceabilityElementType fulfillmentTaskSummary, TaskWorkItemType payload ){
+    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskTraceabilityElementType fulfillmentTaskSummary, TaskWorkItemType payload , String targetPerformer){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, fulfillmentTaskSummary->{}, payload->{}", upstreamTask, fulfillmentTaskSummary, payload);
 
         //
         // Create an empty task
-        String sourceParticipantName = null;
-        try{
-            sourceParticipantName = upstreamTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId().getName();
-        } catch(Exception ex){
-            getLogger().debug(".newMessageBasedActionableTask(): Could derive sourceParticipantName", ex);
-        }
-        PetasosActionableTask newTask = newMessageBasedActionableTask(payload, sourceParticipantName);
+        PetasosActionableTask newTask = newMessageBasedActionableTask(payload, targetPerformer);
         //
         // create task traceability information
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Start");
@@ -130,11 +118,11 @@ public class PetasosActionableTaskFactory {
         return(newTask);
     }
 
-    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskFulfillmentType fulfillment, TaskWorkItemType payload ){
+    public PetasosActionableTask newMessageBasedActionableTask(PetasosActionableTask upstreamTask, TaskFulfillmentType fulfillment, TaskWorkItemType payload, String targetPerformer ){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, upstreamTask->{}, fulfillment->{}, payload->{}", upstreamTask, fulfillment, payload);
 
         TaskTraceabilityElementType traceabilityElementType = traceabilityElementTypeFactory.newTaskTraceabilityElementFromTask(upstreamTask.getTaskId(), fulfillment);
-        PetasosActionableTask petasosActionableTask = newMessageBasedActionableTask(upstreamTask, traceabilityElementType, payload);
+        PetasosActionableTask petasosActionableTask = newMessageBasedActionableTask(upstreamTask, traceabilityElementType, payload, targetPerformer);
         getLogger().debug(".newMessageBasedActionableTask(): Exit, petasosActionableTask->{}", petasosActionableTask);
         return(petasosActionableTask);
     }
@@ -146,8 +134,8 @@ public class PetasosActionableTaskFactory {
         return(task);
     }
 
-    public PetasosActionableTask newMessageBasedActionableTask(TaskWorkItemType payload, String sourceParticipantName){
-        getLogger().debug(".newMessageBasedActionableTask(): Entry, payload->{}, sourceParticipantName->{}", payload, sourceParticipantName);
+    public PetasosActionableTask newMessageBasedActionableTask(TaskWorkItemType payload, String targetPerformer){
+        getLogger().debug(".newMessageBasedActionableTask(): Entry, payload->{}, targetPerformer->{}", payload, targetPerformer);
         //
         // Create an empty task
         PetasosActionableTask newTask = new PetasosActionableTask();
@@ -155,8 +143,8 @@ public class PetasosActionableTaskFactory {
         // create a new id
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask ID] Start");
         TaskIdType taskId = null;
-        if(StringUtils.isNotEmpty(sourceParticipantName)){
-            taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING, sourceParticipantName);
+        if(StringUtils.isNotEmpty(targetPerformer)){
+            taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING, targetPerformer);
         } else {
             taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING);
         }

@@ -124,7 +124,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         TaskWorkItemType taskWorkItem = SerializationUtils.clone(handoverPacket.getActionableTask().getTaskWorkItem());
         PetasosActionableTask incomingActionableTask = handoverPacket.getActionableTask();
         TaskTraceabilityElementType upstreamTaskTraceability = handoverPacket.getUpstreamFulfillmentTaskDetails();
-        PetasosActionableTask newActionableTask = actionableTaskFactory.newMessageBasedActionableTask(incomingActionableTask, upstreamTaskTraceability, taskWorkItem);
+        PetasosActionableTask newActionableTask = actionableTaskFactory.newMessageBasedActionableTask(incomingActionableTask, upstreamTaskTraceability, taskWorkItem, wupParticipantId.getName());
         getLogger().trace(".ipcReceiverActivityStart(): Create new ActionableTask: Finish");
 
         getLogger().trace(".ipcReceiverActivityStart(): Register new ActionableTask: Start");

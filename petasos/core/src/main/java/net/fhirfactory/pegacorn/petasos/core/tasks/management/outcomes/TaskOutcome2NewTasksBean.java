@@ -164,7 +164,7 @@ public class TaskOutcome2NewTasksBean {
     }
 
     public List<PetasosActionableTask> createRetryTask(PetasosActionableTask actionableTask){
-        getLogger().debug(".createRetryTask(): Entry, actionableTask->{}", actionableTask);
+        getLogger().warn(".createRetryTask(): Entry, actionableTask->{}", actionableTask);
 
         List<PetasosActionableTask> newTaskList = new ArrayList<>();
 
@@ -173,17 +173,23 @@ public class TaskOutcome2NewTasksBean {
                 if(actionableTask.getTaskWorkItem().hasIngresContent()) {
                     UoWPayload retryUoWPayload = SerializationUtils.clone(actionableTask.getTaskWorkItem().getIngresContent());
                     TaskWorkItemType taskWork = new TaskWorkItemType(retryUoWPayload);
-                    String sourceParticipantName = null;
+                    String targetParticipantName = null;
                     try{
-                        sourceParticipantName = actionableTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId().getName();
+                        targetParticipantName = actionableTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId().getName();
                     } catch(Exception ex){
                         getLogger().debug(".createRetryTask(): Unable to derive sourceParticipantName from actionableTask, ex->", ex);
                     }
-                    PetasosActionableTask newActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(taskWork, sourceParticipantName);
+                    PetasosActionableTask newActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(taskWork, targetParticipantName);
                     newActionableTask.getTaskId().setTaskSequenceNumber(SerializationUtils.clone(actionableTask.getTaskId().getTaskSequenceNumber()));
                     newActionableTask.setTaskTraceability(SerializationUtils.clone(actionableTask.getTaskTraceability()));
                     newActionableTask.getTaskTraceability().setaRetry(true);
                     newActionableTask.getTaskTraceability().setRetryOrigin(actionableTask.getTaskId());
+                    newActionableTask.setTaskPerformerTypes(new ArrayList<>());
+                    if(actionableTask.hasTaskPerformerTypes()) {
+                        for(TaskPerformerTypeType currentPerformer: actionableTask.getTaskPerformerTypes()) {
+                            newActionableTask.getTaskPerformerTypes().add(SerializationUtils.clone(currentPerformer));
+                        }
+                    }
                     actionableTaskCache.addToCache(newActionableTask);
                     newTaskList.add(newActionableTask);
                 }
@@ -236,7 +242,7 @@ public class TaskOutcome2NewTasksBean {
                 for(PetasosParticipantRegistration currentSubscriber: subscriberList) {
                     TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
                     getLogger().trace(".collectOutcomesAndCreateNewTasks(): newWorkItem->{}", newWorkItem);
-                    PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask, newWorkItem);
+                    PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask, newWorkItem, currentSubscriber.getParticipantId().getName());
                     TaskPerformerTypeType downstreamPerformerType = new TaskPerformerTypeType();
                     downstreamPerformerType.setKnownTaskPerformer(currentSubscriber.getParticipantId());
                     downstreamPerformerType.setCapabilityBased(false);
@@ -266,7 +272,7 @@ public class TaskOutcome2NewTasksBean {
         return (newActionableTaskList);
     }
 
-    private PetasosActionableTask newActionableTask(PetasosActionableTask previousActionableTask, TaskWorkItemType work){
+    private PetasosActionableTask newActionableTask(PetasosActionableTask previousActionableTask, TaskWorkItemType work, String targetPerformer){
         getLogger().debug(".newActionableTask(): Entry, previousActionableTask->{}, work->{}", previousActionableTask,  work);
         if(previousActionableTask == null){
             getLogger().debug(".newActionableTask(): Exit, previousTaskFulfillmentDetail is null, returning null");
@@ -276,7 +282,7 @@ public class TaskOutcome2NewTasksBean {
             getLogger().debug(".newActionableTask(): Exit, No new work to be done, returning null");
             return(null);
         }
-        PetasosActionableTask petasosActionableTask = actionableTaskFactory.newMessageBasedActionableTask(previousActionableTask, work);
+        PetasosActionableTask petasosActionableTask = actionableTaskFactory.newMessageBasedActionableTask(previousActionableTask, work, targetPerformer);
         return(petasosActionableTask);
     }
 }
