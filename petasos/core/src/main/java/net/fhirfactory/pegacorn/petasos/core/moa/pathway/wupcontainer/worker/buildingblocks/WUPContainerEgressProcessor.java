@@ -89,17 +89,14 @@ public class WUPContainerEgressProcessor {
                         }
                     }
                 }
-                getTaskActivityManager().notifyTaskFinish(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
                 metricsAgent.touchLastActivityFinishInstant();
                 metricsAgent.incrementFinishedTasks();
                 break;
             case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
-                getTaskActivityManager().notifyTaskCancellation(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
                 metricsAgent.incrementCancelledTasks();
                 metricsAgent.touchLastActivityFinishInstant();
                 break;
             default:
-                getTaskActivityManager().notifyTaskFailure(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
                 metricsAgent.incrementFailedTasks();
                 metricsAgent.touchLastActivityFinishInstant();
                 createFailureNotification = true;

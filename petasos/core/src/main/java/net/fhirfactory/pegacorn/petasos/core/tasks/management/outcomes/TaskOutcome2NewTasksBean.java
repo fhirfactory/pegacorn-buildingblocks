@@ -120,45 +120,39 @@ public class TaskOutcome2NewTasksBean {
         }
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create New Tasks] Finish");
 
-        if(newTasks == null) {
-            getLogger().debug(".collectOutcomesAndCreateNewTasks(): Exit, newTasks list is null, exiting");
-            return;
-        }
-        if(newTasks.isEmpty()){
-            getLogger().debug(".collectOutcomesAndCreateNewTasks(): Exit, newTasks list is empty, exiting");
-            return;
-        }
+        if(newTasks != null && !newTasks.isEmpty()) {
+            getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Register & Queue New Tasks] Start");
+            for (PetasosActionableTask currentNewTask : newTasks) {
+                PetasosTaskJobCard jobCard = getTaskActivityManager().registerLocallyCreatedTask(currentNewTask, null);
+                getLocalTaskQueueManager().queueTask(currentNewTask);
+            }
+            getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Register & Queue New Tasks] Finish");
 
-        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Queue New Tasks] Start");
-        for(PetasosActionableTask currentNewTask: newTasks){
-            PetasosTaskJobCard jobCard =  getTaskActivityManager().registerLocallyCreatedTask(currentNewTask, null);
-            getLocalTaskQueueManager().queueTask(currentNewTask);
-        }
-        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Queue New Tasks] Finish");
-
-        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Trigger Queue Check for Associated Task Performers] Start");
-        for(PetasosActionableTask currentNewTask: newTasks){
-            if(currentNewTask.hasTaskPerformerTypes()) {
-                for(TaskPerformerTypeType currentPerformer: currentNewTask.getTaskPerformerTypes()) {
-                    if(currentPerformer.getKnownTaskPerformer() != null) {
-                        String participantName = currentPerformer.getKnownTaskPerformer().getName();
-                        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Trigger Queue Check for Associated Task Performers] currentPerformer->{}", participantName);
-                        getLocalTaskQueueManager().processNextQueuedTaskForParticipant(participantName);
+            getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Trigger Queue Check for Associated Task Performers] Start");
+            for (PetasosActionableTask currentNewTask : newTasks) {
+                if (currentNewTask.hasTaskPerformerTypes()) {
+                    for (TaskPerformerTypeType currentPerformer : currentNewTask.getTaskPerformerTypes()) {
+                        if (currentPerformer.getKnownTaskPerformer() != null) {
+                            String participantName = currentPerformer.getKnownTaskPerformer().getName();
+                            getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Trigger Queue Check for Associated Task Performers] currentPerformer->{}", participantName);
+                            getLocalTaskQueueManager().processNextQueuedTaskForParticipant(participantName);
+                        }
                     }
                 }
             }
+            getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Trigger Queue Check for Associated Task Performers] Finish");
         }
-        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Trigger Queue Check for Associated Task Performers] Finish");
 
-        getLogger().trace(".collectOutcomesAndCreateNewTasks(): Updating actionableTask with task completion details");
+        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Update actionableTask with Task Completion Details] Start");
         actionableTaskActivityController.notifyTaskFinalisation(actionableTask.getTaskId());
+        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Update actionableTask with Task Completion Details] Finish");
 
-        //
-        // Get out metricsAgent for the WUP that sent the task & do add some metrics
+        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Generate Task Report for the actionableTask] Start");
         WorkUnitProcessorTaskReportAgent taskReportAgent = camelExchange.getProperty(PetasosPropertyConstants.ENDPOINT_TASK_REPORT_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorTaskReportAgent.class);
         if(taskReportAgent != null){
             taskReportAgent.sendITOpsTaskReport(actionableTask, newTasks);
         }
+        getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Generate Task Report for the actionableTask] Finish");
 
         getLogger().debug(".collectOutcomesAndCreateNewTasks(): Exit");
     }

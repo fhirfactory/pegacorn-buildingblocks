@@ -51,8 +51,6 @@ public class TaskOutcomeCollectionAndProcessingWorker extends BaseRouteBuilder {
         fromWithStandardExceptionHandling(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE)
                 .routeId(PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE)
                 .bean(taskOutcomeCapture, "captureAndRegisterOutcome(*, Exchange)")
-                .split().method(outcome2NewTasksBean, "collectOutcomesAndCreateNewTasks(*, Exchange)")
-                .to(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE);
-
+                .bean(outcome2NewTasksBean, "collectOutcomesAndCreateNewTasks(*, Exchange)");
     }
 }
