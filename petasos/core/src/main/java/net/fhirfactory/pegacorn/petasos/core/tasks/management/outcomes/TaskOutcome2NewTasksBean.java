@@ -173,7 +173,13 @@ public class TaskOutcome2NewTasksBean {
                 if(actionableTask.getTaskWorkItem().hasIngresContent()) {
                     UoWPayload retryUoWPayload = SerializationUtils.clone(actionableTask.getTaskWorkItem().getIngresContent());
                     TaskWorkItemType taskWork = new TaskWorkItemType(retryUoWPayload);
-                    PetasosActionableTask newActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(taskWork);
+                    String sourceParticipantName = null;
+                    try{
+                        sourceParticipantName = actionableTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId().getName();
+                    } catch(Exception ex){
+                        getLogger().debug(".createRetryTask(): Unable to derive sourceParticipantName from actionableTask, ex->", ex);
+                    }
+                    PetasosActionableTask newActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(taskWork, sourceParticipantName);
                     newActionableTask.getTaskId().setTaskSequenceNumber(SerializationUtils.clone(actionableTask.getTaskId().getTaskSequenceNumber()));
                     newActionableTask.setTaskTraceability(SerializationUtils.clone(actionableTask.getTaskTraceability()));
                     newActionableTask.getTaskTraceability().setaRetry(true);

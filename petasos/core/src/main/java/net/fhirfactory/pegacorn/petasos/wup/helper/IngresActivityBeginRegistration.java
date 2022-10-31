@@ -108,7 +108,7 @@ public class IngresActivityBeginRegistration {
 
         getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Start");
         TaskWorkItemType workItem = new TaskWorkItemType(theUoW.getIngresContent());
-        PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
+        PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem, wupParticipantId.getName());
         TaskContextType taskContext = new TaskContextType();
         TaskTriggerSummaryType taskTriggerSummary = new TaskTriggerSummaryType();
         taskTriggerSummary.setTriggerTaskId(petasosActionableTask.getTaskId());
@@ -142,29 +142,29 @@ public class IngresActivityBeginRegistration {
         getLogger().trace(".registerActivityStart(): Update TaskJobCard: Finish");
 
         getLogger().trace(".registerActivityStart(): Set processing to the grantedExecutionStatus: Start");
-        fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
-        fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+        registeredFulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
+        registeredFulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
         jobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
         jobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
         jobCard.getTaskFulfillmentCard().setFulfillmentStartInstant(Instant.now());
-        TaskExecutionCommandEnum taskExecutionCommand = getTaskActivityManager().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
+        TaskExecutionCommandEnum taskExecutionCommand = getTaskActivityManager().notifyTaskStart(registeredFulfillmentTask.getActionableTaskId(), registeredFulfillmentTask);
         // Add some more metrics
         metricsAgent.incrementStartedTasks();
         getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
 
         getLogger().trace(".registerActivityStart(): Set processing to the grantedExecutionStatus: Start");
         if(!jobCard.getGrantedStatus().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){
-            fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
-            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-            fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
-            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
-            getTaskActivityManager().notifyTaskFailure(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
+            registeredFulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
+            registeredFulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+            registeredFulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
+            registeredFulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
+            getTaskActivityManager().notifyTaskFailure(registeredFulfillmentTask.getActionableTaskId(), registeredFulfillmentTask);
         }
         getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
         //
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
         getLogger().trace(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, fulfillmentTask);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, registeredFulfillmentTask);
         //
         // And now we are done!
         getLogger().debug(".registerActivityStart(): exit, my work is done!");

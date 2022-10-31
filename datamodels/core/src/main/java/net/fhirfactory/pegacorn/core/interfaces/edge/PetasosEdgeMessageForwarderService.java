@@ -22,8 +22,10 @@
 package net.fhirfactory.pegacorn.core.interfaces.edge;
 
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 
 public interface PetasosEdgeMessageForwarderService {
     public ComponentIdType getComponentId();
+    public PetasosParticipantId getParticipantId();
 
 }

@@ -19,27 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.topology.nodes;
+package net.fhirfactory.pegacorn.workshops;
 
-public enum DefaultWorkshopSetEnum {
-    DATA_GRID_WORKSHOP("DataGrid"),
-    INTER_SUBSYSTEM_INTEGRATION_WORKSHOP("ISSI"),
-    BEHAVIOUR_WORKSHOP("Behaviour"),
-    INTERACT_WORKSHOP("ExternalIPC"),
-    TRANSFORM_WORKSHOP("Transform"),
-    WORKFLOW_WORKSHOP("Workflow"),
-    POLICY_ENFORCEMENT_WORKSHOP("PolicyEnforcement"),
-    AUDIT_SERVICES_WORKSHOP("Audit"),
-    PARTICIPANT_MANAGEMENT_WORKSHOP("ParticipantManagement"),
-    EDGE_WORKSHOP("InternalIPC");
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.workshops.base.PetasosEnabledWorkshop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private String workshop;
+import javax.enterprise.context.ApplicationScoped;
 
-    private DefaultWorkshopSetEnum(String newWorkshop){
-        this.workshop = newWorkshop;
+@ApplicationScoped
+public class ParticipantManagementWorkshop extends PetasosEnabledWorkshop {
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipantManagementWorkshop.class);
+
+    @Override
+    protected Logger specifyLogger() {
+        return (LOG);
     }
 
-    public String getWorkshop(){
-        return(this.workshop);
+    @Override
+    protected String specifyWorkshopName() {
+        return (DefaultWorkshopSetEnum.PARTICIPANT_MANAGEMENT_WORKSHOP.getWorkshop());
+    }
+
+    @Override
+    protected String specifyWorkshopVersion() {
+        return (getProcessingPlant().getTopologyNode().getVersion());
+    }
+
+    @Override
+    protected void invokePostConstructInitialisation() {
+
     }
 }

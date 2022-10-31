@@ -44,6 +44,8 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
+import net.fhirfactory.pegacorn.core.model.petasos.jobcard.datatypes.PetasosTaskFulfillmentCard;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
@@ -87,7 +89,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
     private PetasosFulfillmentTaskFactory fulfillmentTaskFactory;
 
     @Inject
-    private LocalTaskActivityManager actionableTaskActivityController;
+    private LocalTaskActivityManager taskActivityController;
 
     @Inject
     private ProcessingPlantMetricsAgentAccessor processingPlantMetricAgentAccessor;
@@ -104,57 +106,74 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         WorkUnitProcessorSoftwareComponent node = getWUPNodeFromExchange(camelExchange);
         getLogger().trace(".ipcReceiverActivityStart(): Node Element retrieved --> {}", node);
 
-        getLogger().trace(".ipcReceiverActivityStart(): get Metrics Agent from Exchange");
-        WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+        PetasosParticipantId wupParticipantId = node.getParticipant().getParticipantId();
+        getLogger().trace(".registerActivityStart(): wupParticipantId (PetasosParticipantId) for this activity --> {}", wupParticipantId);
 
-        getLogger().trace(".ipcReceiverActivityStart(): Create and register a new ActionableTask: Start");
+
+        getLogger().trace(".ipcReceiverActivityStart(): get Metrics Agent from Exchange");
+        WorkUnitProcessorMetricsAgent wupMetricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
+
+        getLogger().trace(".ipcReceiverActivityStart(): Capture some metrics: Start");
+        wupMetricsAgent.incrementInternalReceivedMessageCount();
+        wupMetricsAgent.getWUPMetricsData().setEventProcessingStartInstant(handoverPacket.getEventProcessingStartTime());
+        processingPlantMetricAgentAccessor.getMetricsAgent().incrementInternalReceivedMessageCount();
+        processingPlantMetricAgentAccessor.getMetricsAgent().touchLastActivityInstant();
+        getLogger().trace(".ipcReceiverActivityStart(): Capture some metrics: Finish");
+
+        getLogger().trace(".ipcReceiverActivityStart(): Create new ActionableTask: Start");
         TaskWorkItemType taskWorkItem = SerializationUtils.clone(handoverPacket.getActionableTask().getTaskWorkItem());
         PetasosActionableTask incomingActionableTask = handoverPacket.getActionableTask();
         TaskTraceabilityElementType upstreamTaskTraceability = handoverPacket.getUpstreamFulfillmentTaskDetails();
         PetasosActionableTask newActionableTask = actionableTaskFactory.newMessageBasedActionableTask(incomingActionableTask, upstreamTaskTraceability, taskWorkItem);
-        PetasosTaskJobCard jobCard = actionableTaskActivityController.registerLocallyCreatedTask(newActionableTask, null);
+        getLogger().trace(".ipcReceiverActivityStart(): Create new ActionableTask: Finish");
+
+        getLogger().trace(".ipcReceiverActivityStart(): Register new ActionableTask: Start");
+        PetasosTaskJobCard jobCard = getTaskActivityController().registerLocallyCreatedTask(newActionableTask, null);
         // Add some more metrics
-        metricsAgent.incrementRegisteredTasks();
-        getLogger().trace(".ipcReceiverActivityStart(): Create and register a new ActionableTask: Finish");
+        wupMetricsAgent.incrementRegisteredTasks();
+        getLogger().trace(".ipcReceiverActivityStart(): Register new ActionableTask: Finish");
 
         getLogger().trace(".ipcReceiverActivityStart(): Create a new FulfillmentTask: Start");
         PetasosFulfillmentTask fulfillmentTask = fulfillmentTaskFactory.newFulfillmentTask(newActionableTask, node);
         fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
         fulfillmentTask.setUpdateInstant(Instant.now());
         fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-        fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
+        PetasosFulfillmentTask registeredFulfillmentTask = getTaskActivityController().registerFulfillmentTask(fulfillmentTask, true);
+        registeredFulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
         getLogger().trace(".ipcReceiverActivityStart(): Create a new FulfillmentTask: Finish");
 
+        getLogger().trace(".registerActivityStart(): Update TaskJobCard: Start");
+        PetasosTaskFulfillmentCard fulfillmentCard = new PetasosTaskFulfillmentCard();
+        fulfillmentCard.setFulfillmentExecutionStatus(registeredFulfillmentTask.getTaskFulfillment().getStatus());
+        fulfillmentCard.setFulfillmentTaskId(registeredFulfillmentTask.getTaskId());
+        fulfillmentCard.setFulfillmentStartInstant(registeredFulfillmentTask.getTaskFulfillment().getStartInstant());
+        fulfillmentCard.setFulfillerParticipantId(registeredFulfillmentTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId());
+        jobCard.setTaskFulfillmentCard(fulfillmentCard);
+        getLogger().trace(".registerActivityStart(): Update TaskJobCard: Finish");
+
         getLogger().trace(".ipcReceiverActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Start");
-        fulfillmentTaskAuditServicesBroker.logActivity(fulfillmentTask, false);// by default, use synchronous audit writing
+        registeredFulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
+        registeredFulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+        jobCard.getTaskFulfillmentCard().setFulfillmentExecutionStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+        jobCard.setCurrentStatus(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
+        jobCard.getTaskFulfillmentCard().setFulfillmentStartInstant(Instant.now());
+        TaskExecutionCommandEnum taskExecutionCommand = getTaskActivityController().notifyTaskStart(registeredFulfillmentTask.getActionableTaskId(), registeredFulfillmentTask);
+        // Add some more metrics
+        wupMetricsAgent.incrementStartedTasks();
         getLogger().trace(".ipcReceiverActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
 
         getLogger().trace(".ipcReceiverActivityStart(): Set processing to the grantedExecutionStatus: Start");
-        if(jobCard.getGrantedStatus().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){
-            fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
-            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-            getActionableTaskActivityController().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
-            // Add some more metrics
-            metricsAgent.incrementStartedTasks();
-        }  else {
-            fulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
-            fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-            fulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
-            fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
-            getActionableTaskActivityController().notifyTaskFailure(fulfillmentTask.getActionableTaskId(), fulfillmentTask);
+        if(!jobCard.getGrantedStatus().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){
+            registeredFulfillmentTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
+            registeredFulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+            registeredFulfillmentTask.getTaskFulfillment().setFinishInstant(Instant.now());
+            registeredFulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
+            getTaskActivityController().notifyTaskFailure(registeredFulfillmentTask.getActionableTaskId(), registeredFulfillmentTask);
         }
-
-        getLogger().trace(".ipcReceiverActivityStart(): Capture some metrics: Start");
-        metricsAgent.incrementInternalReceivedMessageCount();
-
-        metricsAgent.getWUPMetricsData().setEventProcessingStartInstant(handoverPacket.getEventProcessingStartTime());
-        processingPlantMetricAgentAccessor.getMetricsAgent().incrementInternalReceivedMessageCount();
-        processingPlantMetricAgentAccessor.getMetricsAgent().touchLastActivityInstant();
-        getLogger().trace(".ipcReceiverActivityStart(): Capture some metrics: Finish");
+        getLogger().trace(".ipcReceiverActivityStart(): Update status to reflect local processing is proceeding: Finish");
 
         getLogger().trace(".ipcReceiverActivityStart(): Injecting Fulfillment Task into Exchange for extraction by the WUP Egress Conduit");
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, fulfillmentTask);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_FULFILLMENT_TASK_EXCHANGE_PROPERTY, registeredFulfillmentTask);
         getLogger().debug(".ipcReceiverActivityStart(): exit, my work is done!");
         return handoverPacket;
     }
@@ -168,7 +187,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
     }
 
 
-    protected LocalTaskActivityManager getActionableTaskActivityController(){
-        return(this.actionableTaskActivityController);
+    protected LocalTaskActivityManager getTaskActivityController(){
+        return(this.taskActivityController);
     }
 }

@@ -38,14 +38,14 @@ public class TaskIdTypeFactory {
 
     public TaskIdType newTaskId(TaskReasonTypeEnum taskReason, String participantName){
         StringBuilder idBuilder = new StringBuilder();
-        idBuilder.append(taskReason.getTaskReasonDisplayName());
         UUID uuid = UUID.randomUUID();
         String uuidString = uuid.toString();
-        idBuilder.append("-");
         if(StringUtils.isNotEmpty(participantName)){
             idBuilder.append(participantName);
             idBuilder.append("-");
         }
+        idBuilder.append(taskReason.getTaskReasonDisplayName());
+        idBuilder.append("-");
         idBuilder.append(uuidString);
         TaskIdType id = new TaskIdType();
         id.setLocalId(idBuilder.toString());

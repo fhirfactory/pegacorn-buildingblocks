@@ -150,7 +150,7 @@ public class ProvenanceFactory {
     }
 
     protected Provenance.ProvenanceAgentComponent newProvenanceAgentComponent(PetasosParticipantId id, ProvenanceAgentRole agentRole, ProvenanceAgentType agentType){
-        getLogger().debug(".newProvenanceAgentComponent(): Entry, id->{}, agentRole->{}, agentType->{}", id, agentRole, agentType);
+        getLogger().warn(".newProvenanceAgentComponent(): Entry, id->{}, agentRole->{}, agentType->{}", id, agentRole, agentType);
         Provenance.ProvenanceAgentComponent createdProvenanceAgent = new Provenance.ProvenanceAgentComponent();
         Period period = new Period();
         Identifier deviceIdentifier = getIdentifierFactory().newIdentifier(DRICaTSIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, id.getName(), period);
@@ -162,7 +162,7 @@ public class ProvenanceFactory {
         CodeableConcept currentAgentType = getProvenanceFactory().newAgentType(agentType);
         createdProvenanceAgent.addRole(currentAgentRole);
         createdProvenanceAgent.setType(currentAgentType);
-        getLogger().debug(".newProvenanceAgentComponent(): Exit, createdProvenanceAgent->{}", createdProvenanceAgent);
+        getLogger().warn(".newProvenanceAgentComponent(): Exit, createdProvenanceAgent->{}", createdProvenanceAgent);
         return(createdProvenanceAgent);
     }
 

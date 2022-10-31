@@ -315,7 +315,7 @@ public class LocalTaskQueueManager {
     public void sendQueuedTask(PetasosParticipantId participantId, PetasosActionableTask actionableTask){
         getLogger().debug(".sendQueuedTask(): Entry, participantId->{}, actionableTask->{}", participantId, actionableTask);
         if(actionableTask != null) {
-            getLocalTaskDistributionService().distributeNewActionableTasks(participantId, actionableTask);
+            getLocalTaskDistributionService().distributeTask(participantId, actionableTask);
             getCamelDistributor().sendBody(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE, ExchangePattern.InOnly, actionableTask);
         }
         getLogger().debug(".sendQueuedTask(): Exit");

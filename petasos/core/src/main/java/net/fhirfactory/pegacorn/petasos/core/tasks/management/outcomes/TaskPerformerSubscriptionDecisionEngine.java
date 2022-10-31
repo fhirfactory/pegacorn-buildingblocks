@@ -160,7 +160,7 @@ public class TaskPerformerSubscriptionDecisionEngine {
         }
         getLogger().trace(".deriveSubscriberList(): [Process Participant List] Finish");
 
-        getLogger().debug(".deriveSubscriberList(): Exit!");
+        getLogger().debug(".deriveSubscriberList(): Exit, subscriberList->{}", subscriberList);
         return(subscriberList);
     }
 
@@ -182,7 +182,7 @@ public class TaskPerformerSubscriptionDecisionEngine {
     //
 
     public boolean applySubscriptionFilter(TaskWorkItemSubscriptionType subscription, DataParcelManifest testManifest){
-        getLogger().debug(".applySubscriptionFilter(): Entry, testManifest->{}", testManifest);
+        getLogger().trace(".applySubscriptionFilter(): Entry, subscription->{}, testManifest->{}", subscription, testManifest);
 
         boolean containerIsEqual = containerDescriptorIsEqual(testManifest, subscription);
         getLogger().trace(".applySubscriptionFilter(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
@@ -241,7 +241,7 @@ public class TaskPerformerSubscriptionDecisionEngine {
         getLogger().trace(".filter(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 
         boolean passesFilter = goodEnoughMatch || containerBasedOKMatch;
-        getLogger().debug(".filter(): Exit, passesFilter->{}", passesFilter);
+        getLogger().trace(".filter(): Exit, passesFilter->{}", passesFilter);
         return(passesFilter);
     }
 

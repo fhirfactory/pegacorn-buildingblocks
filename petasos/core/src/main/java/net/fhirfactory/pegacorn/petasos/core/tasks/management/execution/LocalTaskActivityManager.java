@@ -199,7 +199,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
     }
 
     public PetasosTaskJobCard registerCentrallyCreatedActionableTask(PetasosActionableTask centralActionableTask, PetasosTaskJobCard jobCard) {
-        getLogger().debug(".registerCentrallyCreatedActionableTask(): Entry, centralActionableTask->{}, jobCard->{}", centralActionableTask, jobCard);
+        getLogger().warn(".registerCentrallyCreatedActionableTask(): Entry, centralActionableTask->{}, jobCard->{}", centralActionableTask, jobCard);
 
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Create/Update TaskJobCard] Start");
         boolean hasPersistenceStatus = false;
@@ -318,7 +318,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
      * @return
      */
     public PetasosFulfillmentTask registerFulfillmentTask(PetasosFulfillmentTask fulfillmentTask, boolean writeSynchronousAuditEvent){
-        getLogger().debug(".registerFulfillmentTask(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        getLogger().warn(".registerFulfillmentTask(): Entry, fulfillmentTask->{}", fulfillmentTask);
         if(fulfillmentTask == null){
             getLogger().debug(".registerFulfillmentTask(): Exit, fulfillmentTask is null/empty!");
             return(null);
@@ -412,7 +412,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
      */
     @Override
     public TaskExecutionCommandEnum notifyTaskStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask) {
-        getLogger().debug(".notifyTaskStart(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskStart(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskStart(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -482,7 +482,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
 
     @Override
     public TaskExecutionCommandEnum notifyTaskFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().debug(".notifyTaskFinish(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskFinish(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFinish(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -567,7 +567,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
 
     @Override
     public TaskExecutionCommandEnum notifyTaskFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().debug(".notifyTaskFailure(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskFailure(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFailure(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -668,7 +668,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
 
     @Override
     public TaskExecutionCommandEnum notifyTaskCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().debug(".notifyTaskCancellation(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskCancellation(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskCancellation(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
@@ -768,7 +768,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
 
     @Override
     public TaskExecutionCommandEnum notifyTaskWaiting(TaskIdType taskId) {
-        getLogger().debug(".notifyTaskWaiting(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskWaiting(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskWaiting(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
@@ -819,7 +819,7 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
     }
 
     public TaskExecutionCommandEnum notifyTaskFinalisation(TaskIdType taskId) {
-        getLogger().debug(".notifyTaskFinalisation(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskFinalisation(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFinalisation(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);

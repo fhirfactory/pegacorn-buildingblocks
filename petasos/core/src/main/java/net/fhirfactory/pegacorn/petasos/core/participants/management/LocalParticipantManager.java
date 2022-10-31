@@ -163,7 +163,7 @@ public class LocalParticipantManager {
             getProcessingPlantMetricsAgent().touchWatchDogActivityIndicator("ParticipantManagementDaemon");
 
             // Synchronize Local with the Global Manager
-            getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Start");
+            getLogger().debug(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] Start");
             Set<String> allRegisteredComponentIds = getLocalRegistrationCache().getAllRegisteredComponentIds();
             for (String currentLocalRegisteredComponentIdValue : allRegisteredComponentIds) {
                 getLogger().trace(".participantManagementDaemon(): [Synchronise Participant Globally (within Ponos)] processing->{}", currentLocalRegisteredComponentIdValue);
@@ -273,7 +273,7 @@ public class LocalParticipantManager {
     //
 
     public void synchroniseExternalSubscriberParticipants(){
-        getLogger().trace(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] Start");
+        getLogger().debug(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] Start");
         String processingPlantParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
         Set<PetasosParticipantRegistration> subscribers = getGlobalParticipantManagementService().getDownstreamSubscribers(processingPlantParticipantName);
         if (!subscribers.isEmpty()) {
@@ -285,7 +285,7 @@ public class LocalParticipantManager {
                 getLocalRegistrationCache().updateParticipant(currentSubscriber);
             }
         }
-        getLogger().trace(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] Finish");
+        getLogger().debug(".synchroniseExternalSubscriberParticipants(): [Synchronise My Participant/Publishing] Finish");
     }
 
     public PetasosParticipantRegistration getLocalParticipantRegistration(ComponentIdType componentId){

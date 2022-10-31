@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosEdgeMessageForwarder
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PetasosIPCMessagingEndpoint;
@@ -191,5 +192,10 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
     @Override
     public ComponentIdType getComponentId() {
         return (getTopologyNode().getComponentId());
+    }
+
+    @Override
+    public PetasosParticipantId getParticipantId() {
+        return (getTopologyNode().getParticipantId());
     }
 }

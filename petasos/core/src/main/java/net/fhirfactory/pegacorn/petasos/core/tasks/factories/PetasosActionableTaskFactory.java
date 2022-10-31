@@ -37,6 +37,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.f
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityTypeFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.TaskSequenceNumberGenerator;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +87,13 @@ public class PetasosActionableTaskFactory {
 
         //
         // Create an empty task
-        PetasosActionableTask newTask = newMessageBasedActionableTask(payload);
+        String sourceParticipantName = null;
+        try{
+            sourceParticipantName = upstreamTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId().getName();
+        } catch(Exception ex){
+            getLogger().debug(".newMessageBasedActionableTask(): Could derive sourceParticipantName", ex);
+        }
+        PetasosActionableTask newTask = newMessageBasedActionableTask(payload, sourceParticipantName);
         //
         // create task traceability information
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Start");
@@ -104,7 +111,13 @@ public class PetasosActionableTaskFactory {
 
         //
         // Create an empty task
-        PetasosActionableTask newTask = newMessageBasedActionableTask(payload);
+        String sourceParticipantName = null;
+        try{
+            sourceParticipantName = upstreamTask.getTaskFulfillment().getFulfiller().getParticipant().getParticipantId().getName();
+        } catch(Exception ex){
+            getLogger().debug(".newMessageBasedActionableTask(): Could derive sourceParticipantName", ex);
+        }
+        PetasosActionableTask newTask = newMessageBasedActionableTask(payload, sourceParticipantName);
         //
         // create task traceability information
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask Traceability Information] Start");
@@ -128,13 +141,26 @@ public class PetasosActionableTaskFactory {
 
     public PetasosActionableTask newMessageBasedActionableTask(TaskWorkItemType payload){
         getLogger().debug(".newMessageBasedActionableTask(): Entry, payload->{}", payload);
+        PetasosActionableTask task = newMessageBasedActionableTask(payload, null);
+        getLogger().debug(".newMessageBasedActionableTask(): Exit, task->{}", task);
+        return(task);
+    }
+
+    public PetasosActionableTask newMessageBasedActionableTask(TaskWorkItemType payload, String sourceParticipantName){
+        getLogger().debug(".newMessageBasedActionableTask(): Entry, payload->{}, sourceParticipantName->{}", payload, sourceParticipantName);
         //
         // Create an empty task
         PetasosActionableTask newTask = new PetasosActionableTask();
         //
         // create a new id
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask ID] Start");
-        TaskIdType taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING);
+        TaskIdType taskId = null;
+        if(StringUtils.isNotEmpty(sourceParticipantName)){
+            taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING, sourceParticipantName);
+        } else {
+            taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING);
+        }
+
         TaskSequenceNumber taskSequenceNumber = sequenceNumberGenerator.generateNewSequenceNumber();
         taskId.setTaskSequenceNumber(taskSequenceNumber);
         newTask.setTaskId(taskId);
@@ -162,7 +188,7 @@ public class PetasosActionableTaskFactory {
         newTask.setTaskWorkItem(payload);
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Item] Finish");
         //
-        // add an empty task fullfillment
+        // add an empty task fulfillment
         getLogger().trace(".newMessageBasedActionableTask(): [Add Task Fulfillment] Start");
         TaskFulfillmentType taskFulfillment = new TaskFulfillmentType();
         taskFulfillment.setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
