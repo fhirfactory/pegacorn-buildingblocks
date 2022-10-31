@@ -164,7 +164,7 @@ public class TaskOutcome2NewTasksBean {
     }
 
     public List<PetasosActionableTask> createRetryTask(PetasosActionableTask actionableTask){
-        getLogger().warn(".createRetryTask(): Entry, actionableTask->{}", actionableTask);
+        getLogger().debug(".createRetryTask(): Entry, actionableTask->{}", actionableTask);
 
         List<PetasosActionableTask> newTaskList = new ArrayList<>();
 

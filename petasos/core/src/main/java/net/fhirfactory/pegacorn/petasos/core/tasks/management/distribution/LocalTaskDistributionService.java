@@ -222,11 +222,15 @@ public class LocalTaskDistributionService {
 
         PetasosParticipantRegistration targetParticipant = localParticipantRegistrationCache.getParticipantRegistration(participantId);
         if(targetParticipant == null){
-            getLogger().warn(".distributeTask(): No Target To Deliver Task To!!!");
+            getLogger().info(".distributeTask(): No Target To Deliver Task To!!!");
             return;
         }
 
-        getLogger().warn(".distributeTask(): Sending Task->{} to Participant->{}", actionableTask.getTaskId().getId(), participantId.getName());
+        if(getLogger().isInfoEnabled()) {
+            if(actionableTask.hasTaskId()) {
+                getLogger().info(".distributeTask(): Sending Task->{} to Participant->{}", actionableTask.getTaskId().getId(), participantId.getName());
+            }
+        }
 
         boolean isRemoteTarget = false;
         String intendedTargetName = null;
@@ -250,37 +254,37 @@ public class LocalTaskDistributionService {
 
         PetasosParticipantId actualLocalSubscriberParticipantId = null;
         ComponentIdType actualLocalSubscriberComponentId = null;
-        getLogger().warn(".distributeTask(): Assigning target component id, based on whether it is a remote component or local");
+        getLogger().trace(".distributeTask(): Assigning target component id, based on whether it is a remote component or local");
         if(isRemoteTarget){
-            getLogger().warn(".distributeTask(): It is a remote target, so routing via the local forwarder service");
+            getLogger().trace(".distributeTask(): It is a remote target, so routing via the local forwarder service");
             actualLocalSubscriberParticipantId = forwarderService.getParticipantId();
             actualLocalSubscriberComponentId = forwarderService.getComponentId();
         } else {
-            getLogger().warn(".distributeTask(): It is a local target, so routing directly to target");
+            getLogger().trace(".distributeTask(): It is a local target, so routing directly to target");
             actualLocalSubscriberParticipantId = participantId;
             actualLocalSubscriberComponentId = targetParticipant.getLocalComponentId();
         }
 
-        getLogger().warn(".distributeTask(): The target actualLocalSubscriberComponentId->{}", actualLocalSubscriberComponentId);
+        getLogger().trace(".distributeTask(): The target actualLocalSubscriberComponentId->{}", actualLocalSubscriberComponentId);
         WorkUnitProcessorSoftwareComponent targetNodeElement = (WorkUnitProcessorSoftwareComponent)topologyProxy.getNode(actualLocalSubscriberComponentId);
-        getLogger().warn(".distributeTask(): The target actualLocalSubscriberParticipantId->{}", actualLocalSubscriberParticipantId);
+        getLogger().trace(".distributeTask(): The target actualLocalSubscriberParticipantId->{}", actualLocalSubscriberParticipantId);
 
         RouteElementNames routeName = new RouteElementNames(actualLocalSubscriberParticipantId);
 
         // Create FulfillmentTask and Inject into Target WUP
-        getLogger().warn(".distributeTask(): Create actual PetasosFulfillmentTask: Start");
+        getLogger().trace(".distributeTask(): Create actual PetasosFulfillmentTask: Start");
         PetasosFulfillmentTask petasosFulfillmentTask = fulfillmentTaskFactory.newFulfillmentTask(actionableTask, targetNodeElement);
-        getLogger().warn(".distributeTask(): Create actual PetasosFulfillmentTask: petasosFulfillmentTask->{}", petasosFulfillmentTask);
-        getLogger().warn(".distributeTask(): Create actual PetasosFulfillmentTask: Finish");
+        getLogger().trace(".distributeTask(): Create actual PetasosFulfillmentTask: petasosFulfillmentTask->{}", petasosFulfillmentTask);
+        getLogger().trace(".distributeTask(): Create actual PetasosFulfillmentTask: Finish");
         petasosFulfillmentTask.getTaskWorkItem().getPayloadTopicID().setTargetProcessingPlantParticipantName(targetParticipant.getParticipantId().getSubsystemName());
         //
         // Register The FulfillmentTask
-        getLogger().warn(".distributeTask(): Register PetasosFulfillmentTask: Start");
+        getLogger().trace(".distributeTask(): Register PetasosFulfillmentTask: Start");
         PetasosFulfillmentTask fulfillmentTask = getTaskActivityManager().registerFulfillmentTask(petasosFulfillmentTask, false);
-        getLogger().warn(".distributeTask(): Register PetasosFulfillmentTask: Finish");
-        getLogger().warn(".distributeTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Start");
+        getLogger().trace(".distributeTask(): Register PetasosFulfillmentTask: Finish");
+        getLogger().trace(".distributeTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Start");
         String targetCamelEndpoint = routeName.getEndPointWUPContainerIngresProcessorIngres();
-        getLogger().warn(".distributeTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: targetCamelEndpoint->{}", targetCamelEndpoint);
+        getLogger().trace(".distributeTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: targetCamelEndpoint->{}", targetCamelEndpoint);
         //
         // Get out metricsAgent & do add some metrics
         getMetricsAgent().incrementInternalMessageDistributionCount();
@@ -301,7 +305,7 @@ public class LocalTaskDistributionService {
 //        Object propertyValue = camelExchange.getProperty("CamelAttachmentObjects");
 //        camelProducerService.sendBodyAndProperty(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentTask, "CamelAttachmentObjects", propertyValue);
         camelProducerService.sendBody(targetCamelEndpoint, ExchangePattern.InOnly, petasosFulfillmentTask);
-        getLogger().warn(".distributeTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
+        getLogger().debug(".distributeTask(): Insert PetasosFulfillmentTask into Next WUP Ingress Processor: Finish");
     }
 
 }

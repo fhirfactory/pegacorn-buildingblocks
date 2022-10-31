@@ -127,9 +127,9 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".registerLocallyCreatedActionableTask(): Exit, localActionableTask is null");
             return(null);
         }
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
             if(localActionableTask.hasTaskId()) {
-                getLogger().warn(".registerLocallyCreatedTask(): Entry, taskId>{}", localActionableTask.getTaskId().getId());
+                getLogger().info(".registerLocallyCreatedTask(): Entry, taskId>{}", localActionableTask.getTaskId().getId());
             }
         }
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Create/Update TaskJobCard] Start");
@@ -205,9 +205,9 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
 
     public PetasosTaskJobCard registerCentrallyCreatedActionableTask(PetasosActionableTask centralActionableTask, PetasosTaskJobCard jobCard) {
         getLogger().debug(".registerCentrallyCreatedActionableTask(): Entry, centralActionableTask->{}, jobCard->{}", centralActionableTask, jobCard);
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
             if(centralActionableTask.hasTaskId()) {
-                getLogger().warn(".registerCentrallyCreatedActionableTask(): Entry, taskId>{}", centralActionableTask.getTaskId().getId());
+                getLogger().info(".registerCentrallyCreatedActionableTask(): Entry, taskId>{}", centralActionableTask.getTaskId().getId());
             }
         }
 
@@ -280,9 +280,9 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".registerTaskOutcome(): Exit, localActionableTask is null");
             return;
         }
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
             if(actionableTask.hasTaskId()) {
-                getLogger().warn(".registerTaskOutcome(): Entry, taskId>{}", actionableTask.getTaskId().getId());
+                getLogger().info(".registerTaskOutcome(): Entry, taskId>{}", actionableTask.getTaskId().getId());
             }
         }
         if(jobCard == null) {
@@ -432,8 +432,8 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".notifyTaskStart(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
         }
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
-            getLogger().warn(".notifyTaskStart(): Entry, taskId>{}", taskId.getId());
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
+            getLogger().info(".notifyTaskStart(): Entry, taskId>{}", taskId.getId());
         }
         if(fulfillmentTask == null){
             getLogger().debug(".notifyTaskStart(): Exit, fulfillmentTask is null");
@@ -505,8 +505,8 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".notifyTaskFinish(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
         }
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
-            getLogger().warn(".notifyTaskFinish(): Entry, taskId>{}", taskId.getId());
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
+            getLogger().info(".notifyTaskFinish(): Entry, taskId>{}", taskId.getId());
         }
         if(fulfillmentTask == null){
             getLogger().debug(".notifyTaskFinish(): Exit, fulfillmentTask is null");
@@ -593,8 +593,8 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".notifyTaskFailure(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
         }
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
-            getLogger().warn(".notifyTaskFailure(): Entry, taskId>{}", taskId.getId());
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
+            getLogger().info(".notifyTaskFailure(): Entry, taskId>{}", taskId.getId());
         }
         if(fulfillmentTask == null){
             getLogger().debug(".notifyTaskFailure(): Exit, fulfillmentTask is null");
@@ -697,8 +697,8 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".notifyTaskCancellation(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_CANCEL);
         }
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
-            getLogger().warn(".notifyTaskCancellation(): Entry, taskId>{}", taskId.getId());
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
+            getLogger().info(".notifyTaskCancellation(): Entry, taskId>{}", taskId.getId());
         }
         if(fulfillmentTask == null){
             getLogger().debug(".notifyTaskCancellation(): Exit, fulfillmentTask is null");
@@ -800,8 +800,8 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".notifyTaskWaiting(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
         }
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
-            getLogger().warn(".notifyTaskWaiting(): Entry, taskId>{}", taskId.getId());
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
+            getLogger().info(".notifyTaskWaiting(): Entry, taskId>{}", taskId.getId());
         }
         getLogger().trace(".notifyTaskWaiting(): [Get the ActionableTask from Registry] Start");
         PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(taskId);
@@ -853,8 +853,8 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().debug(".notifyTaskFinalisation(): Exit, taskId is null");
             return(TaskExecutionCommandEnum.TASK_COMMAND_FAIL);
         }
-        if(getLogger().isWarnEnabled() && !getLogger().isDebugEnabled()) {
-            getLogger().warn(".notifyTaskFinalisation(): Entry, taskId>{}", taskId.getId());
+        if(getLogger().isInfoEnabled() && !getLogger().isDebugEnabled()) {
+            getLogger().info(".notifyTaskFinalisation(): Entry, taskId>{}", taskId.getId());
         }
         getLogger().trace(".notifyTaskFinalisation(): [Get the ActionableTask from Registry] Start");
         PetasosActionableTask actionableTask = getLocalActionableTaskCache().getTask(taskId);
