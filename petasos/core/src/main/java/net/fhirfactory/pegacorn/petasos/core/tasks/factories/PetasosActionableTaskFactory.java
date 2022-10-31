@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskSequenceNumber;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskExecutionControl;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalActionableTaskCache;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
@@ -175,6 +176,16 @@ public class PetasosActionableTaskFactory {
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Item] Start");
         newTask.setTaskWorkItem(payload);
         getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Item] Finish");
+        //
+        // add the Task Execution Window
+        getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Window] Start");
+        if(newTask.getExecutionControl() == null){
+            newTask.setExecutionControl(new TaskExecutionControl());
+        }
+        if(payload.getIngresContent().getPayloadWindow() != null){
+            newTask.getExecutionControl().setExecutionWindow(payload.getIngresContent().getPayloadWindow());
+        }
+        getLogger().trace(".newMessageBasedActionableTask(): [Assign Task Work Window] Finish");
         //
         // add an empty task fulfillment
         getLogger().trace(".newMessageBasedActionableTask(): [Add Task Fulfillment] Start");

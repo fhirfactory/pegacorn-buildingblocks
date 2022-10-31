@@ -23,54 +23,48 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.data
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionWindowTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskWindowBoundaryConditionEnum;
 
 import java.io.Serializable;
 import java.time.Instant;
 
-public class TaskExecutionWindow implements Serializable {
-    TaskExecutionWindowTypeEnum executionWindowType;
+public class TaskWindowBoundary implements Serializable {
+    TaskWindowBoundaryConditionEnum windowBoundaryCondition;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant lowerTimingBound;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant upperTimingBound;
+    private Instant windowsBoundaryInstant;
 
     //
     // Constructor(s)
     //
 
-    public TaskExecutionWindow(){
-        this.executionWindowType = TaskExecutionWindowTypeEnum.TASK_EXECUTION_WINDOW_ASAP;
-        this.lowerTimingBound = Instant.now();
-        this.upperTimingBound = Instant.now();
+    public TaskWindowBoundary() {
+        this.windowBoundaryCondition = TaskWindowBoundaryConditionEnum.TASK_WINDOW_BOUNDARY_NONE;
+        this.windowsBoundaryInstant = Instant.EPOCH;
+    }
+
+    public TaskWindowBoundary(TaskWindowBoundaryConditionEnum condition, Instant boundaryInstant) {
+        this.windowBoundaryCondition = condition;
+        this.windowsBoundaryInstant = boundaryInstant;
     }
 
     //
     // Getters and Setters
     //
 
-    public TaskExecutionWindowTypeEnum getExecutionWindowType() {
-        return executionWindowType;
+    public TaskWindowBoundaryConditionEnum getWindowBoundaryCondition() {
+        return windowBoundaryCondition;
     }
 
-    public void setExecutionWindowType(TaskExecutionWindowTypeEnum executionWindowType) {
-        this.executionWindowType = executionWindowType;
+    public void setWindowBoundaryCondition(TaskWindowBoundaryConditionEnum windowBoundaryCondition) {
+        this.windowBoundaryCondition = windowBoundaryCondition;
     }
 
-    public Instant getLowerTimingBound() {
-        return lowerTimingBound;
+    public Instant getWindowsBoundaryInstant() {
+        return windowsBoundaryInstant;
     }
 
-    public void setLowerTimingBound(Instant lowerTimingBound) {
-        this.lowerTimingBound = lowerTimingBound;
-    }
-
-    public Instant getUpperTimingBound() {
-        return upperTimingBound;
-    }
-
-    public void setUpperTimingBound(Instant upperTimingBound) {
-        this.upperTimingBound = upperTimingBound;
+    public void setWindowsBoundaryInstant(Instant windowsBoundaryInstant) {
+        this.windowsBoundaryInstant = windowsBoundaryInstant;
     }
 
     //
@@ -79,11 +73,11 @@ public class TaskExecutionWindow implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("TaskExecutionWindow{");
-        sb.append("executionWindowType=").append(executionWindowType);
-        sb.append(", lowerTimingBound=").append(lowerTimingBound);
-        sb.append(", upperTimingBound=").append(upperTimingBound);
+        final StringBuilder sb = new StringBuilder("TaskWindowBoundary{");
+        sb.append("windowBoundaryCondition=").append(windowBoundaryCondition);
+        sb.append(", windowsBoundaryInstant=").append(windowsBoundaryInstant);
         sb.append('}');
         return sb.toString();
     }
+
 }

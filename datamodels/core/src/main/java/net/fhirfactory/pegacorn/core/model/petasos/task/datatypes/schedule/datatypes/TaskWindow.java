@@ -21,42 +21,44 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes;
 
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskWindowBoundaryConditionEnum;
 
 import java.io.Serializable;
+import java.time.Instant;
 
-public class TaskExecutionControl implements Serializable {
-    TaskExecutionCommandEnum executionCommand;
-    TaskWindow executionWindow;
+public class TaskWindow implements Serializable {
+    private TaskWindowBoundary upperBound;
+    private TaskWindowBoundary lowerBound;
 
     //
     // Constructor(s)
     //
 
-    public TaskExecutionControl(){
-        this.executionCommand = TaskExecutionCommandEnum.TASK_COMMAND_WAIT;
-        this.executionWindow = new TaskWindow();
+    public TaskWindow(){
+        this.upperBound = new TaskWindowBoundary(TaskWindowBoundaryConditionEnum.TASK_WINDOW_BOUNDARY_NONE, Instant.now());
+        this.lowerBound = new TaskWindowBoundary(TaskWindowBoundaryConditionEnum.TASK_WINDOW_BOUNDARY_NONE, Instant.now());
     }
 
     //
     // Getters and Setters
     //
 
-    public TaskExecutionCommandEnum getExecutionCommand() {
-        return executionCommand;
+    public TaskWindowBoundary getUpperBound() {
+        return upperBound;
     }
 
-    public void setExecutionCommand(TaskExecutionCommandEnum executionCommand) {
-        this.executionCommand = executionCommand;
+    public void setUpperBound(TaskWindowBoundary upperBound) {
+        this.upperBound = upperBound;
     }
 
-    public TaskWindow getExecutionWindow() {
-        return executionWindow;
+    public TaskWindowBoundary getLowerBound() {
+        return lowerBound;
     }
 
-    public void setExecutionWindow(TaskWindow executionWindow) {
-        this.executionWindow = executionWindow;
+    public void setLowerBound(TaskWindowBoundary lowerBound) {
+        this.lowerBound = lowerBound;
     }
+
 
     //
     // toString
@@ -64,9 +66,9 @@ public class TaskExecutionControl implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("TaskExecutionSchedule{");
-        sb.append("executionCommand=").append(executionCommand);
-        sb.append(", executionWindow=").append(executionWindow);
+        final StringBuilder sb = new StringBuilder("TaskWindow{");
+        sb.append("upperBound=").append(upperBound);
+        sb.append(", lowerBound=").append(lowerBound);
         sb.append('}');
         return sb.toString();
     }

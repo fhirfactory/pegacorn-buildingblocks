@@ -25,16 +25,15 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valu
  *
  * @author ACT Health (Mark A. Hunter)
  */
-public enum TaskExecutionWindowTypeEnum {
-    TASK_EXECUTION_WINDOW_ASAP("ASAP", "petasos.task.execution_window.asap"),
-    TASK_EXECUTION_WINDOW_NOT_BEFORE( "NotBeforeSpecifiedTime", "pegasos.execution_window.not_before_specified_time"),
-    TASK_EXECUTION_WINDOW_BETWEEN("BetweenSpecifiedTimes" , "pegasos.task.execution_window.between_specified_times"),
-    TASK_EXECUTION_WINDOW_NOT_AFTER("NotAfterSpecifiedTime" , "pegasos.task.execution_window.not_after_specified_time");
+public enum TaskWindowBoundaryConditionEnum {
+    TASK_WINDOW_BOUNDARY_NONE("ASAP", "petasos.task.window.asap"),
+    TASK_WINDOW_BOUNDARY_BEFORE( "NotBeforeSpecifiedTime", "petasos.task.window.before_specified_time"),
+    TASK_WINDOW_BOUNDARY_AFTER("NotAfterSpecifiedTime" , "petasos.task.execution_window.after_specified_time");
 
     private String name;
     private String token;
 
-    private TaskExecutionWindowTypeEnum(String name, String token ){
+    private TaskWindowBoundaryConditionEnum(String name, String token ){
         this.name = name;
         this.token = token;
     }

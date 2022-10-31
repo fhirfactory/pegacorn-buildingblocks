@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.uow;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelQualityStatement;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskWindow;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ public class UoWPayload implements Serializable {
     }
 
     private DataParcelManifest payloadManifest;
+    private TaskWindow payloadWindow;
     private String payload;
 
     public UoWPayload() {
@@ -92,6 +94,14 @@ public class UoWPayload implements Serializable {
         return(payloadManifest.hasDataParcelQualityStatement());
     }
 
+    public TaskWindow getPayloadWindow() {
+        return payloadWindow;
+    }
+
+    public void setPayloadWindow(TaskWindow payloadWindow) {
+        this.payloadWindow = payloadWindow;
+    }
+
     @JsonIgnore
     public DataParcelQualityStatement getPayloadQuality() {
         getLogger().debug(".getPayloadQuality(): Entry");
@@ -112,7 +122,8 @@ public class UoWPayload implements Serializable {
     public String toString() {
         final StringBuilder sb = new StringBuilder("UoWPayload{");
         sb.append("payloadManifest=").append(payloadManifest);
-        sb.append(", payload='").append(payload).append('\'');
+        sb.append(", payload=").append(payload);
+        sb.append(", payloadWindow=").append(payloadWindow);
         sb.append('}');
         return sb.toString();
     }
@@ -122,7 +133,7 @@ public class UoWPayload implements Serializable {
         if (this == o) return true;
         if (!(o instanceof UoWPayload)) return false;
         UoWPayload that = (UoWPayload) o;
-        return Objects.equals(getPayloadManifest(), that.getPayloadManifest()) && Objects.equals(getPayload(), that.getPayload());
+        return Objects.equals(getPayloadManifest(), that.getPayloadManifest()) && Objects.equals(getPayload(), that.getPayload()) && Objects.equals(getPayloadWindow(), that.getPayloadWindow());
     }
 
     @Override
