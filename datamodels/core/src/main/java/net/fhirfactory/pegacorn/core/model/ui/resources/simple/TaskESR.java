@@ -22,7 +22,7 @@ public class TaskESR {
     private String taskStatusReason;
     private String taskTriggerType;
     private String taskTriggerId;
-    private String taskFulfillmentLocation;
+    private String taskPerformer;
 
     //
     // Constructor(s)
@@ -41,7 +41,7 @@ public class TaskESR {
         this.taskStatusReason = null;
         this.taskTriggerId = null;
         this.taskTriggerType = null;
-        this.taskFulfillmentLocation = null;
+        this.taskPerformer = null;
     }
 
     //
@@ -152,12 +152,12 @@ public class TaskESR {
         this.taskTriggerId = taskTriggerId;
     }
 
-    public String getTaskFulfillmentLocation() {
-        return taskFulfillmentLocation;
+    public String getTaskPerformer() {
+        return taskPerformer;
     }
 
-    public void setTaskFulfillmentLocation(String taskFulfillmentLocation) {
-        this.taskFulfillmentLocation = taskFulfillmentLocation;
+    public void setTaskPerformer(String taskPerformer) {
+        this.taskPerformer = taskPerformer;
     }
 
     //
@@ -180,7 +180,7 @@ public class TaskESR {
                 ", taskStatusReason='" + taskStatusReason +
                 ", taskTriggerType=" + taskTriggerType +
                 ", taskTriggerId=" + taskTriggerId +
-                ", taskFulfillmentLocation=" + taskFulfillmentLocation +
+                ", taskPerformer=" + taskPerformer +
                 '}';
     }
 }

@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PeriodESDT;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
@@ -31,6 +32,8 @@ import org.apache.commons.lang3.SerializationUtils;
 public class TaskSummary extends ResourceSummaryBase {
     private String taskId;
     private TaskMetadataSummary taskMetadata;
+
+    private String taskPerformer;
     private PeriodESDT taskPeriod;
     private TaskOutcomeStatusEnum taskStatus;
 
@@ -43,6 +46,7 @@ public class TaskSummary extends ResourceSummaryBase {
         this.taskPeriod = null;
         this.taskStatus = null;
         this.taskMetadata = null;
+        this.taskPerformer = null;
     }
 
     public TaskSummary(TaskSummary ori){
@@ -62,11 +66,28 @@ public class TaskSummary extends ResourceSummaryBase {
         if(ori.hasTaskMetadata()){
             this.setTaskMetadata(SerializationUtils.clone(ori.getTaskMetadata()));
         }
+        if(ori.hasTaskPerformer()){
+            setTaskPerformer(ori.getTaskPerformer());
+        }
     }
 
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasTaskPerformer(){
+        boolean hasValue = this.taskPerformer != null;
+        return(hasValue);
+    }
+
+    public String getTaskPerformer() {
+        return taskPerformer;
+    }
+
+    public void setTaskPerformer(String taskPerformer) {
+        this.taskPerformer = taskPerformer;
+    }
 
     @JsonIgnore
     public boolean hasTaskId(){
@@ -130,14 +151,16 @@ public class TaskSummary extends ResourceSummaryBase {
 
     @Override
     public String toString() {
-        return "TaskSummary{" +
-                "taskId='" + taskId + '\'' +
-                ", taskMetadata=" + taskMetadata +
-                ", taskPeriod=" + taskPeriod +
-                ", taskStatus=" + taskStatus +
-                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", resourceId='" + getResourceId() + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("TaskSummary{");
+        sb.append("taskId=").append(taskId);
+        sb.append(", taskMetadata=").append(taskMetadata);
+        sb.append(", taskPerformer=").append(taskPerformer);
+        sb.append(", taskPeriod=").append(taskPeriod);
+        sb.append(", taskStatus=").append(taskStatus);
+        sb.append(", lastSynchronisationInstant=").append(getLastSynchronisationInstant());
+        sb.append(", lastActivityInstant=").append(getLastActivityInstant());
+        sb.append(", resourceId=").append(getResourceId());
+        sb.append('}');
+        return sb.toString();
     }
 }
