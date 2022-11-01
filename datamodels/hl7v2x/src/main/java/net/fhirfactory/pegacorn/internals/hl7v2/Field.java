@@ -859,6 +859,11 @@ public class Field extends MessageComponent implements Serializable {
 						result = true;
 					}
 					break;
+				case EQUALS_IGNORE_CASE:
+				    if  (text.equalsIgnoreCase(matchValue)) {
+				        result = true;
+				    }
+				    break;
 				case CONTAINS:
 					if (text.contains(matchValue)) {
 						result = true;
@@ -892,6 +897,11 @@ public class Field extends MessageComponent implements Serializable {
 						result = false;
 					}
 					break;
+				case NOT_EQUALS_IGNORE_CASE:
+				    if  (text.equalsIgnoreCase(matchValue)) {
+				        result = false;
+				    }
+				    break;
 				default:
 					if (text.equals(matchValue)) {
 						return true;
