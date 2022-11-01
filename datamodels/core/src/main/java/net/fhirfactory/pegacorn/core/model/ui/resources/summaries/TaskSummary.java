@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.core.model.ui.resources.summaries;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.datatypes.PeriodESDT;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.datatypes.TaskMetadataSummary;
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.SerializationUtils;
 public class TaskSummary extends ResourceSummaryBase {
     private String taskId;
     private TaskMetadataSummary taskMetadata;
+    private TaskTypeTypeEnum taskType;
 
     private String taskPerformer;
     private PeriodESDT taskPeriod;
@@ -47,6 +49,7 @@ public class TaskSummary extends ResourceSummaryBase {
         this.taskStatus = null;
         this.taskMetadata = null;
         this.taskPerformer = null;
+        this.taskType = TaskTypeTypeEnum.PETASOS_BASE_TASK_TYPE;
     }
 
     public TaskSummary(TaskSummary ori){
@@ -69,11 +72,28 @@ public class TaskSummary extends ResourceSummaryBase {
         if(ori.hasTaskPerformer()){
             setTaskPerformer(ori.getTaskPerformer());
         }
+        if(ori.hasTaskType()){
+            setTaskType(ori.getTaskType());
+        }
     }
 
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasTaskType(){
+        boolean hasValue = this.taskType != null;
+        return(hasValue);
+    }
+
+    public TaskTypeTypeEnum getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskTypeTypeEnum taskType) {
+        this.taskType = taskType;
+    }
 
     @JsonIgnore
     public boolean hasTaskPerformer(){
@@ -153,6 +173,7 @@ public class TaskSummary extends ResourceSummaryBase {
     public String toString() {
         final StringBuilder sb = new StringBuilder("TaskSummary{");
         sb.append("taskId=").append(taskId);
+        sb.append(", taskType=").append(taskType);
         sb.append(", taskMetadata=").append(taskMetadata);
         sb.append(", taskPerformer=").append(taskPerformer);
         sb.append(", taskPeriod=").append(taskPeriod);

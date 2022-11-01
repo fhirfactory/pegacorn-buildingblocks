@@ -59,8 +59,8 @@ public class PetasosAggregateTaskFactory {
     // Business Methods
     //
 
-    public PetasosAggregateTask newAggregateTask(PetasosActionableTask actionableTask, WorkUnitProcessorSoftwareComponent wupNode) {
-        getLogger().debug(".newFulfillmentTask(): Enter, actionableTask->{}, wupNode->{}", actionableTask, wupNode );
+    public PetasosAggregateTask newAggregateTask(PetasosActionableTask actionableTask) {
+        getLogger().debug(".newFulfillmentTask(): Enter, actionableTask->{}, wupNode->{}", actionableTask);
 
         // Get the core Items from the actionableTask (PetasosActionableTask)
         TaskWorkItemType taskWorkItem = SerializationUtils.clone(actionableTask.getTaskWorkItem());
