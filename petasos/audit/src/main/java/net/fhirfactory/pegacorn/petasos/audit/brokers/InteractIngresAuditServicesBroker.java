@@ -143,9 +143,12 @@ public class InteractIngresAuditServicesBroker {
                 detailList);
 
         String sourceSite = null;
-        if(endpoint.hasConnectedSystemName()) {
-            sourceSite = endpoint.getConnectedSystemName();
-        } else {
+        if(endpoint != null) {
+            if (endpoint.hasConnectedSystemName()) {
+                sourceSite = endpoint.getConnectedSystemName();
+            }
+        }
+        if(StringUtils.isEmpty(sourceSite)) {
             sourceSite = "Undisclosed";
         }
 
