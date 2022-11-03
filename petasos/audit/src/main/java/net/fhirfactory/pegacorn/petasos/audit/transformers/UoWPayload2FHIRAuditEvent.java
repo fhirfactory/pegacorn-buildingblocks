@@ -65,17 +65,17 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
 //        jsonMapper = new ObjectMapper();
     }
 
-    public AuditEvent transform(PetasosFulfillmentTask fulfillmentTask){
-        AuditEvent outcomeAuditEvent = transform(fulfillmentTask, false);
+    public AuditEvent transformHL7v2Activity2AuditEvent(PetasosFulfillmentTask fulfillmentTask){
+        AuditEvent outcomeAuditEvent = transformHL7v2Activity2AuditEvent(fulfillmentTask, false);
         return(outcomeAuditEvent);
     }
 
-    public AuditEvent transform(PetasosFulfillmentTask fulfillmentTask, boolean isInteractDone){
-        AuditEvent outcomeAuditEvent = transform(fulfillmentTask, "false", false);
+    public AuditEvent transformHL7v2Activity2AuditEvent(PetasosFulfillmentTask fulfillmentTask, boolean isInteractDone){
+        AuditEvent outcomeAuditEvent = transformHL7v2Activity2AuditEvent(fulfillmentTask, "false", false);
         return(outcomeAuditEvent);
     }
 
-    public AuditEvent transform(PetasosFulfillmentTask fulfillmentTask, String filteredState, boolean isInteractDone){
+    public AuditEvent transformHL7v2Activity2AuditEvent(PetasosFulfillmentTask fulfillmentTask, String filteredState, boolean isInteractDone){
         if(fulfillmentTask == null){
             return(null);
         }
@@ -150,6 +150,10 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                         switch (wup.getIngresEndpoint().getEndpointType()) {
                             case MLLP_SERVER: {
                                 String descriptionText = "Interact.Ingres: MLLP Message Reception";
+                                return (descriptionText);
+                            }
+                            case HTTP_API_SERVER:{
+                                String descriptionText = "Interact.Ingres: HTTP Server";
                                 return (descriptionText);
                             }
                             default: {

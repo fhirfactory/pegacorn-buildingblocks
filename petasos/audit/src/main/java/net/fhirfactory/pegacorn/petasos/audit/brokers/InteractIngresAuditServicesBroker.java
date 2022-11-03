@@ -21,27 +21,39 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventServiceAgentInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.factories.DeviceFactory;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.Exception2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.PetasosFulfillmentTask2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.UoWPayload2FHIRAuditEvent;
-import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.AuditEvent;
+import org.hl7.fhir.r4.model.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @ApplicationScoped
-public class PetasosFulfillmentTaskAuditServicesBroker {
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosFulfillmentTaskAuditServicesBroker.class);
+public class InteractIngresAuditServicesBroker {
+    private static final Logger LOG = LoggerFactory.getLogger(InteractIngresAuditServicesBroker.class);
 
     @Inject
     private PetasosAuditEventServiceAgentInterface auditWriter;
@@ -58,6 +70,18 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
     @Inject
     private PetasosAuditEventGranularityLevelInterface auditEventGranularityLevel;
 
+    @Inject
+    private AuditEventFactory auditEventFactory;
+
+    @Inject
+    private AuditEventEntityFactory auditEventEntityFactory;
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
+
+    @Inject
+    private DeviceFactory deviceFactory;
+
     //
     // Constructor(s)
     //
@@ -72,167 +96,103 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
     // Business Methods
     //
 
-    public Boolean logActivity(PetasosFulfillmentTask fulfillmentTask) {
-        getLogger().debug(".logActivity(): Entry, fulfillmentTask->{}",fulfillmentTask);
-        boolean success = false;
-        if(shouldLogAuditEventForTask(fulfillmentTask)) {
-            success = logActivity(fulfillmentTask, false);
-        }
-        getLogger().debug(".logActivity(): Exit, success->{}",success);
-        return(success);
-    }
+    public void logHTTPIngresActivity(Object ingresPayload, Exchange camelExchange){
+        getLogger().debug(".logMLLPTransactions(): Entry, ingresPayload->{}",ingresPayload);
 
-    public Boolean logActivity(PetasosFulfillmentTask fulfillmentTask, boolean requiresSynchronousWrite){
-        getLogger().debug(".logActivity(): Entry, fulfillmentTask->{}, requiresSynchronousWrite->{}",fulfillmentTask, requiresSynchronousWrite);
-        AuditEvent fulfillmentTaskAuditEntry = null;
-        boolean success = false;
-        if(shouldLogAuditEventForTask(fulfillmentTask)) {
-            AuditEvent auditEntry = parcefulfillmentTask2FHIRAuditEvent2auditevent.transform(fulfillmentTask);
-            success = auditWriter.captureAuditEvent(fulfillmentTaskAuditEntry, requiresSynchronousWrite);
-        }
-        getLogger().debug(".logActivity(): Exit, success->{}",success);
-        return(success);
-    }
-
-    public void logMLLPTransactions(PetasosFulfillmentTask fulfillmentTask, String filteredState, boolean requiresSynchronousWrite){
-        getLogger().debug(".logMLLPTransactions(): Entry, fulfillmentTask->{}, filteredState->{}, requiresSynchronousWrite->{}",fulfillmentTask, filteredState, requiresSynchronousWrite);
-        boolean isInteractEgressActivity = false;
-        boolean isInteractIngresActivity = false;
         getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] Start...");
-        if(fulfillmentTask.hasTaskFulfillment()){
-            getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask has TaskFulfillmentType element");
-            if(fulfillmentTask.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
-                getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType has FulfillmentWorkUnitProcessor");
-                WorkUnitProcessorSoftwareComponent wupSoftwareComponent = (WorkUnitProcessorSoftwareComponent)fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor();
-                if(wupSoftwareComponent.getIngresEndpoint() != null){
-                    getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor has ingresEndpoint");
-                    if(wupSoftwareComponent.getIngresEndpoint().getComponentSystemRole() != null){
-                        getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor().getIngresEndpoint has ComponentSystemRole");
-                        if(wupSoftwareComponent.getIngresEndpoint().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_INGRES)){
-                            isInteractIngresActivity = true;
-                        }
-                    }
-                }
-                if(wupSoftwareComponent.getEgressEndpoint() != null){
-                    getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor has egressEndpoint");
-                    if(wupSoftwareComponent.getEgressEndpoint().getComponentSystemRole() != null){
-                        getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] fulfillmentTask.getTaskFulfillmentType().getFulfillmentWorkUnitProcessor().getEgressEndpoint has ComponentSystemRole");
-                        if(wupSoftwareComponent.getEgressEndpoint().getComponentSystemRole().equals(SoftwareComponentConnectivityContextEnum.COMPONENT_ROLE_INTERACT_EGRESS)){
-                            isInteractEgressActivity = true;
-                        }
-                    }
-                }
-            }
-        }
-        getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] isInteractEgressActivity->{}", isInteractEgressActivity);
-        getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] isInteractIngresActivity->{}", isInteractIngresActivity);
-        getLogger().debug(".logMLLPTransactions(): [Derive Endpoint Role] Finish...");
+        IPCTopologyEndpoint endpoint = (IPCTopologyEndpoint) camelExchange.getProperty(PetasosPropertyConstants.ENDPOINT_TOPOLOGY_NODE_EXCHANGE_PROPERTY);
 
-        if(!(isInteractEgressActivity || isInteractIngresActivity)){
-            getLogger().debug(".logMLLPTransactions(): Not an endpoint (Ingres/Egress)!");
-            return;
+        String body = null;
+        if(ingresPayload instanceof String){
+            body = (String)ingresPayload;
+        } else {
+            body = "Unknown content";
         }
+
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event] Start...");
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Converting from PetasosFulfillmentTask to AuditEvent] Start...");
-        AuditEvent auditEvent = uow2auditevent.transform(fulfillmentTask, filteredState, true);
+        AuditEvent auditEvent = transformHTTPActivity2AuditEvent(body, endpoint);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Converting from PetasosFulfillmentTask to AuditEvent] Finish..., auditEvent->{}", auditEvent);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Calling auditWriter service] Start...");
-        Boolean success =  auditWriter.captureAuditEvent(auditEvent, requiresSynchronousWrite);
+        Boolean success =  auditWriter.captureAuditEvent(auditEvent, true);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Calling auditWriter service] Finish..., success->{}", success);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event] Finish...");
     }
 
-    public void logCamelExecutionException(Object object, Exchange camelExchange){
-        getLogger().debug(".logCamelExecutionException(): Entry, object->{}",object);
-        CamelExecutionException camelExecutionException = camelExchange.getProperty(Exchange.EXCEPTION_CAUGHT, CamelExecutionException.class);
-        if(camelExecutionException != null) {
-            AuditEvent auditEvent = exception2FHIRAuditEvent.transformCamelExecutionException(camelExecutionException);
-            Boolean success =  auditWriter.captureAuditEvent(auditEvent, true);
+    public AuditEvent transformHTTPActivity2AuditEvent(String body, IPCTopologyEndpoint endpoint){
+
+        deviceFactory.newDeviceFromSoftwareComponent(endpoint);
+
+        String auditEventEntityName = "HTTP.Ingres.Body";
+
+        List<AuditEvent.AuditEventEntityDetailComponent> detailList = new ArrayList<>();
+        AuditEvent.AuditEventEntityDetailComponent ingresDetailComponent = auditEventEntityFactory.newAuditEventEntityDetailComponent("HTTP.Ingress.Body", body);
+
+        String descriptionText = "Interact.Ingres: HTTP Server";
+
+        if(StringUtils.isEmpty(descriptionText)){
+            descriptionText = "Ingres and Egress content fromm UoW (Unit of Work) Processors";
         }
-        getLogger().debug(".logCamelExecutionException(): Entry, object->{}",object);
+
+        AuditEvent.AuditEventEntityComponent auditEventEntityComponent = auditEventEntityFactory.newAuditEventEntity(
+                AuditEventEntityTypeEnum.PEGACORN_MLLP_MSG,
+                AuditEventEntityRoleEnum.HL7_JOB,
+                AuditEventEntityLifecycleEnum.HL7_TRANSMIT,
+                auditEventEntityName,
+                descriptionText,
+                detailList);
+
+        String sourceSite = null;
+        if(endpoint.hasConnectedSystemName()) {
+            sourceSite = endpoint.getConnectedSystemName();
+        } else {
+            sourceSite = "Undisclosed";
+        }
+
+        /*
+            AuditEventAction
+            C	Create	Create a new database object, such as placing an order.
+            R	Read/View/Print	Display or print data, such as a doctor census.
+            U	Update	Update data, such as revise patient information.
+            D	Delete	Delete items, such as a doctor master file record.
+            E	Execute	Perform a system or application function such as log-on, program execution or use of an object's method, or perform a query/search operation.
+         */
+        AuditEvent.AuditEventAction auditEventAction = AuditEvent.AuditEventAction.C;
+
+        /*
+        	AuditEventOutcome
+            0	Success	The operation completed successfully (whether with warnings or not).
+            4	Minor failure	The action was not successful due to some kind of minor failure (often equivalent to an HTTP 400 response).
+            8	Serious failure	The action was not successful due to some kind of unexpected error (often equivalent to an HTTP 500 response).
+            12	Major failure	An error of such magnitude occurred that the system is no longer available for use (i.e. the system died).
+         */
+        AuditEvent.AuditEventOutcome auditEventOutcome = AuditEvent.AuditEventOutcome._0;
+
+        Period period = new Period();
+        period.setStart(Date.from(Instant.now()));
+        period.setEnd(Date.from(Instant.now()));
+
+        String outcomeString = "HTTP Action Received";
+
+        AuditEvent auditEvent = auditEventFactory.newAuditEvent(
+                null,
+                processingPlant.getSimpleInstanceName(),
+                processingPlant.getHostName(),
+                sourceSite,
+                null,
+                AuditEventSourceTypeEnum.HL7_APPLICATION_SERVER,
+                AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY,
+                AuditEventSubTypeEnum.DICOM_APPLICATION_LOCAL_SERVICE_OPERATION_STARTED,
+                auditEventAction,
+                auditEventOutcome,
+                outcomeString,
+                period,
+                auditEventEntityComponent);
+
+        return(auditEvent);
     }
 
-    protected boolean shouldLogAuditEventForTask(PetasosFulfillmentTask fulfillmentTask){
-        if(fulfillmentTask.getTaskFulfillment().getStatus().equals(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED)) {
-            return(true);
-        }
-        if(fulfillmentTask.getTaskFulfillment().getStatus().equals(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED)) {
-            switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                case AUDIT_LEVEL_BLACK_BOX:
-                case AUDIT_LEVEL_COARSE:
-                    break;
-                case AUDIT_LEVEL_FINE:
-                case AUDIT_LEVEL_VERY_FINE:
-                case AUDIT_LEVEL_EXTREME:
-                    return(true);
-            }
-        }
-        if(fulfillmentTask.hasTaskFulfillment()){
-            switch(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentSystemRole()){
-                case COMPONENT_ROLE_INTERACT_EGRESS:
-                case COMPONENT_ROLE_INTERACT_INGRES: {
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_COARSE:
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_EXTREME:
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        default:
-                            return (true);
-                    }
-                }
-                case COMPONENT_ROLE_SUBSYSTEM_EDGE: {
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_COARSE:
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_EXTREME:
-                            return (true);
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        default:
-                            return (false);
-                    }
-                }
-                case COMPONENT_ROLE_SUBSYSTEM_TASK_DISTRIBUTION: {
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_EXTREME:
-                            return (true);
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        case AUDIT_LEVEL_COARSE:
-                        default:
-                            return (false);
-                    }
-                }
-                case COMPONENT_ROLE_SUBSYSTEM_INTERNAL: {
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_EXTREME:
-                            return (true);
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        case AUDIT_LEVEL_COARSE:
-                        default:
-                            return (false);
-                    }
-                }
-                default:{
-                    switch (auditEventGranularityLevel.getAuditEventGranularityLevel()) {
-                        case AUDIT_LEVEL_EXTREME:
-                            return (true);
-                        case AUDIT_LEVEL_FINE:
-                        case AUDIT_LEVEL_VERY_FINE:
-                        case AUDIT_LEVEL_BLACK_BOX:
-                        case AUDIT_LEVEL_COARSE:
-                        default:
-                            return (false);
-                    }
-                }
-            }
-        }
-        return(false);
-    }
+
 
     //
     // Getters (and Setters)

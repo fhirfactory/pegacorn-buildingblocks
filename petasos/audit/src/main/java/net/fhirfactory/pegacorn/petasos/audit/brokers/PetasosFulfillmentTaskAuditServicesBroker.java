@@ -134,7 +134,7 @@ public class PetasosFulfillmentTaskAuditServicesBroker {
         }
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event] Start...");
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Converting from PetasosFulfillmentTask to AuditEvent] Start...");
-        AuditEvent auditEvent = uow2auditevent.transform(fulfillmentTask, filteredState, true);
+        AuditEvent auditEvent = uow2auditevent.transformHL7v2Activity2AuditEvent(fulfillmentTask, filteredState, true);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Converting from PetasosFulfillmentTask to AuditEvent] Finish..., auditEvent->{}", auditEvent);
         getLogger().debug(".logMLLPTransactions(): [Capture Audit Event][Calling auditWriter service] Start...");
         Boolean success =  auditWriter.captureAuditEvent(auditEvent, requiresSynchronousWrite);
