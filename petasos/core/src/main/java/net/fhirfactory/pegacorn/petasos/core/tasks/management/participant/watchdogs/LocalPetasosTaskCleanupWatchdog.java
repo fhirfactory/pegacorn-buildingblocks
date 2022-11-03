@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs;
 
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
@@ -31,6 +32,8 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantShar
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.common.WatchdogBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
+import net.fhirfactory.pegacorn.util.PegacornProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,9 +50,11 @@ import java.util.TimerTask;
 public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
     private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosTaskCleanupWatchdog.class);
 
+    private Long minimumAgeForTaskRetirement;
+
     private Long TASK_CLEANUP_CHECK_INITIAL_DELAY = 60000L; // milliseconds
     private Long TASK_CLEANUP_CHECK_PERIOD = 15000L; // milliseconds
-    private Long MINIMUM_TASK_AGE_FOR_RETIREMENT = 30L; // Seconds
+    private Long MINIMUM_TASK_AGE_FOR_RETIREMENT = 45L; // Seconds
 
     private Instant actionableTaskCheckInstant;
     private Instant taskJobCardCheckInstant;
@@ -69,6 +74,9 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
     @Inject
     private LocalFulfillmentTaskCache fulfillmentTaskCache;
 
+    @Inject
+    private ProcessingPlantInterface processingPlant;
+
     //
     // Constructor(s)
     //
@@ -78,6 +86,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
         this.taskJobCardCheckInstant = Instant.EPOCH;
         this.fulfillmentTaskCheckInstant = Instant.EPOCH;
         this.initialised = false;
+        this.minimumAgeForTaskRetirement = MINIMUM_TASK_AGE_FOR_RETIREMENT;
     }
 
     //
@@ -92,6 +101,14 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
             return;
         } else {
             getLogger().info("GlobalPetasosTaskContinuityWatchdog::initialise(): Starting initialisation");
+            String minimum_task_age_for_retirement = processingPlant.getMeAsASoftwareComponent().getOtherConfigurationParameter("MINIMUM_TASK_AGE_FOR_RETIREMENT");
+            if(StringUtils.isNotEmpty(minimum_task_age_for_retirement)){
+                try{
+                    minimumAgeForTaskRetirement = Long.valueOf(minimum_task_age_for_retirement);
+                } catch(Exception ex){
+                    getLogger().debug(".initialise(): Unable to resolve age for retirement, using default. Error->", ex);
+                }
+            }
             scheduleActionableTaskCacheWatchdog();
             scheduleFulfillmentTaskCacheWatchdog();
             scheduleJobCardCacheWatchdog();
@@ -184,7 +201,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
                                 case FULFILLMENT_EXECUTION_STATUS_FAILED:
                                 case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
                                     Long age = Instant.now().getEpochSecond() - currentActionableTask.getCreationInstant().getEpochSecond();
-                                    if (age > MINIMUM_TASK_AGE_FOR_RETIREMENT) {
+                                    if (age > minimumAgeForTaskRetirement) {
                                         unregisterTask = true;
                                     }
                                     break;
@@ -227,7 +244,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
             PetasosTaskJobCard jobCard = getTaskJobCardDM().getJobCard(currentTaskId);
             if(jobCard != null){
                 Long age = nowInSeconds - jobCard.getCreationInstant().getEpochSecond();
-                if(age > MINIMUM_TASK_AGE_FOR_RETIREMENT){
+                if(age > minimumAgeForTaskRetirement){
                     taskJobCardDM.removeJobCard(jobCard);
                     size -= 1;
                 }
@@ -266,7 +283,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
                         case FULFILLMENT_EXECUTION_STATUS_FAILED:
                         case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
                             Long age = Instant.now().getEpochSecond() - currentTask.getCreationInstant().getEpochSecond();
-                            if (age > MINIMUM_TASK_AGE_FOR_RETIREMENT) {
+                            if (age > minimumAgeForTaskRetirement) {
                                 unregisterTask = true;
                             }
                             break;
