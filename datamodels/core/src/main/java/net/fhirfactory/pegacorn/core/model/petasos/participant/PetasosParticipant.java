@@ -24,337 +24,360 @@ package net.fhirfactory.pegacorn.core.model.petasos.participant;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.queue.PetasosParticipantTaskQueueStatus;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.internals.SerializableObject;
 import org.apache.commons.lang3.SerializationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
-public class PetasosParticipant implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosParticipant.class);
-    private PetasosParticipantId participantId;
-    private ComponentIdType componentId;
-    private PetasosParticipantRegistrationStatus participantRegistrationStatus;
-    private PetasosParticipantStatusEnum participantStatus;
-    private PetasosParticipantControlStatusEnum controlStatus;
-    private Set<TaskWorkItemSubscriptionType> subscriptions;
-    private Set<TaskWorkItemManifestType> outputs;
+public class PetasosParticipant extends PetasosParticipantBase {
+    private SoftwareComponentStatusEnum localComponentStatus;
+    private Set<ComponentIdType> instanceComponentIds;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant utilisationUpdateInstant;
-    private PetasosParticipantFulfillment fulfillmentState;
-    private PetasosParticipantTaskQueueStatus taskQueueStatus;
-    private SoftwareComponentTypeEnum componentType;
+    private Instant reportingInstant;
+    private String registrationId;
+    private PetasosParticipantRegistrationStatusEnum localRegistrationStatus;
+    private PetasosParticipantRegistrationStatusEnum centralRegistrationStatus;
+    private String registrationCommentary;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant localRegistrationInstant;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant centralRegistrationInstant;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant updateInstant;
+    private SerializableObject lock;
+
 
     //
     // Constructor(s)
     //
 
     public PetasosParticipant(){
-        this.componentId = null;
-        this.participantId = new PetasosParticipantId();
-        this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
-        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
-        this.utilisationUpdateInstant = null;
-        this.subscriptions = new HashSet<>();
-        this.outputs = new HashSet<>();
-        this.fulfillmentState = null;
-        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
-        this.taskQueueStatus = null;
-        this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
-        this.componentType = null;
+        super();
+        this.localComponentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
+        this.instanceComponentIds = new HashSet<>();
+        this.reportingInstant = Instant.EPOCH;
+        this.localRegistrationStatus = PetasosParticipantRegistrationStatusEnum.PARTICIPANT_UNREGISTERED;
+        this.localRegistrationInstant = Instant.EPOCH;
+        this.registrationCommentary = null;
+        this.centralRegistrationInstant = Instant.EPOCH;
+        this.updateInstant = Instant.now();
+        this.centralRegistrationStatus = PetasosParticipantRegistrationStatusEnum.PARTICIPANT_UNREGISTERED;
+        this.lock = new SerializableObject();
+        this.registrationId = UUID.randomUUID().toString();
     }
 
     public PetasosParticipant(PetasosParticipant ori){
-        this.componentId = null;
-        this.participantId = new PetasosParticipantId();
-        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
-        this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
-        this.utilisationUpdateInstant = null;
-        this.subscriptions = new HashSet<>();
-        this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
-        this.outputs = new HashSet<>();
-        this.componentType = null;
-
-        if(ori.hasComponentId()){
-            this.setComponentId(ori.getComponentId());
-        }
-        if(ori.hasParticipantStatus()) {
-            this.setParticipantStatus(ori.getParticipantStatus());
-        }
-        if(ori.hasUtilisationUpdateInstant()) {
-            this.setUtilisationUpdateInstant(ori.getUtilisationUpdateInstant());
-        }
-        if(!ori.getSubscriptions().isEmpty()){
-            this.getSubscriptions().addAll(ori.getSubscriptions());
-        }
-        if(!ori.getOutputs().isEmpty()){
-            this.getOutputs().addAll(ori.getOutputs());
-        }
-        if(ori.hasFulfillmentState()){
-            this.setFulfillmentState(ori.getFulfillmentState());
-        }
-        if(ori.hasTaskQueueStatus()){
-            this.setTaskQueueStatus(ori.getTaskQueueStatus());
+        super(ori);
+        this.localComponentStatus = SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_STATUS_UNKNOWN;
+        this.instanceComponentIds = new HashSet<>();
+        this.reportingInstant = Instant.EPOCH;
+        if(ori.hasComponentType()){
+            setComponentType(ori.getComponentType());
         }
         if(ori.hasParticipantId()){
-            setParticipantId(ori.getParticipantId());
+            setParticipantId(SerializationUtils.clone(ori.getParticipantId()));
         }
-        if(ori.hasParticipantRegistrationStatus()){
-            setParticipantRegistrationStatus(ori.getParticipantRegistrationStatus());
+        if(ori.hasLocalComponentId()){
+            setLocalComponentId(SerializationUtils.clone(ori.getLocalComponentId()));
         }
-        setControlStatus(ori.getControlStatus());
-        if(ori.getComponentType() != null){
-            setComponentType(ori.getComponentType());
+        if(ori.hasLocalComponentStatus()){
+            setLocalComponentStatus(ori.getLocalComponentStatus());
         }
-    }
-
-    public PetasosParticipant(SoftwareComponent ori){
-        this.componentId = null;
-        this.participantId = new PetasosParticipantId();
-        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
-        this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;;
-        this.utilisationUpdateInstant = null;
-        this.subscriptions = new HashSet<>();
-        this.outputs = new HashSet<>();
-        this.taskQueueStatus = null;
-        this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_SUSPENDED;
-        if(ori.hasParticipant()) {
-            if(ori.hasComponentID()){
-                this.setComponentId(ori.getComponentId());
+        if(!ori.getInstanceComponentIds().isEmpty()){
+            for(ComponentIdType currentComponentId: ori.getInstanceComponentIds()){
+                getInstanceComponentIds().add(SerializationUtils.clone(currentComponentId));
             }
-            if (ori.getParticipant().hasParticipantStatus()) {
-                this.setParticipantStatus(ori.getParticipant().getParticipantStatus());
-            }
-            if (ori.getParticipant().hasUtilisationUpdateInstant()) {
-                this.setUtilisationUpdateInstant(ori.getParticipant().getUtilisationUpdateInstant());
-            }
-            if (!ori.getParticipant().getSubscriptions().isEmpty()) {
-                this.getSubscriptions().addAll(ori.getParticipant().getSubscriptions());
-            }
-            if (!ori.getParticipant().getOutputs().isEmpty()) {
-                this.getOutputs().addAll(ori.getParticipant().getOutputs());
-            }
-            if (ori.getParticipant().hasFulfillmentState()) {
-                this.setFulfillmentState(ori.getParticipant().getFulfillmentState());
-            }
-            if (ori.getParticipant().hasTaskQueueStatus()) {
-                this.setTaskQueueStatus(ori.getParticipant().getTaskQueueStatus());
-            }
-            if (ori.getParticipant().hasParticipantId()) {
-                setParticipantId(ori.getParticipant().getParticipantId());
-            }
-            if(ori.getParticipant().hasParticipantRegistrationStatus()){
-                setParticipantRegistrationStatus(ori.getParticipant().getParticipantRegistrationStatus());
-            }
-            setControlStatus(ori.getParticipant().getControlStatus());
-            setComponentType(ori.getComponentType());
         }
-    }
-
-    public PetasosParticipant(PetasosParticipantRegistration registration){
-        this.componentId = SerializationUtils.clone(registration.getLocalComponentId());
-        this.participantId = SerializationUtils.clone(registration.getParticipantId());
-        this.participantRegistrationStatus = new PetasosParticipantRegistrationStatus();
-        this.participantRegistrationStatus.setLocalRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_UNREGISTERED);
-        this.participantRegistrationStatus.setCentralRegistrationStatus(registration.getCentralRegistrationStatus());
-        this.participantRegistrationStatus.setCentralRegistrationInstant(registration.getCentralRegistrationInstant());
-        this.participantRegistrationStatus.setRegistrationCommentary(registration.getRegistrationCommentary());
-        this.participantRegistrationStatus.setRegistrationId(registration.getRegistrationId());
-        this.participantStatus = registration.getParticipantStatus();
-        this.utilisationUpdateInstant = Instant.now();
-        this.subscriptions = new HashSet<>();
-        if(registration.getSubscriptions() != null) {
-            this.subscriptions.addAll(registration.getSubscriptions());
+        if(ori.hasParticipantStatus()){
+            setParticipantStatus(ori.getParticipantStatus());
         }
-        this.outputs = new HashSet<>();
-        if(registration.getOutputs() != null) {
-            this.outputs.addAll(registration.getOutputs());
+        if(!ori.getSubscriptions().isEmpty()){
+            for(TaskWorkItemSubscriptionType currentSubscription: ori.getSubscriptions()){
+                getSubscriptions().add(SerializationUtils.clone(currentSubscription));
+            }
         }
-        this.taskQueueStatus = null;
-        this.controlStatus = registration.getControlStatus();
-    }
-
-    //
-    // Getters (and Setters)
-    //
-
-    public SoftwareComponentTypeEnum getComponentType() {
-        return componentType;
-    }
-
-    public void setComponentType(SoftwareComponentTypeEnum componentType) {
-        this.componentType = componentType;
-    }
-
-    public PetasosParticipantControlStatusEnum getControlStatus() {
-        return controlStatus;
-    }
-
-    public void setControlStatus(PetasosParticipantControlStatusEnum controlStatus) {
-        this.controlStatus = controlStatus;
-    }
-
-    @JsonIgnore
-    public boolean hasComponentId(){
-        boolean hasValue = this.componentId != null;
-        return(hasValue);
-    }
-
-    public ComponentIdType getComponentId() {
-        return componentId;
-    }
-
-    public void setComponentId(ComponentIdType componentId) {
-        this.componentId = componentId;
-    }
-
-    @JsonIgnore
-    public boolean hasParticipantId(){
-        boolean hasValue = this.participantId != null;
-        return(hasValue);
-    }
-
-    public PetasosParticipantId getParticipantId() {
-        return participantId;
-    }
-
-    public void setParticipantId(PetasosParticipantId participantId) {
-        this.participantId = participantId;
-    }
-
-    @JsonIgnore
-    public boolean hasTaskQueueStatus(){
-        boolean hasValue = this.taskQueueStatus != null;
-        return(hasValue);
-    }
-
-    public PetasosParticipantTaskQueueStatus getTaskQueueStatus() {
-        return taskQueueStatus;
-    }
-
-    public void setTaskQueueStatus(PetasosParticipantTaskQueueStatus taskQueueStatus) {
-        this.taskQueueStatus = taskQueueStatus;
-    }
-
-    @JsonIgnore
-    public boolean hasParticipantRegistrationStatus(){
-        boolean hasValue = this.participantRegistrationStatus != null;
-        return(hasValue);
-    }
-
-    public PetasosParticipantRegistrationStatus getParticipantRegistrationStatus() {
-        return participantRegistrationStatus;
-    }
-
-    public void setParticipantRegistrationStatus(PetasosParticipantRegistrationStatus participantRegistrationStatus) {
-        this.participantRegistrationStatus = participantRegistrationStatus;
-    }
-
-    public boolean hasFulfillmentState(){
-        boolean hasValue = this.fulfillmentState != null;
-        return(hasValue);
-    }
-
-    public PetasosParticipantFulfillment getFulfillmentState() {
-        return fulfillmentState;
-    }
-
-    public void setFulfillmentState(PetasosParticipantFulfillment fulfillmentState) {
-        this.fulfillmentState = fulfillmentState;
-    }
-
-    protected Logger getLogger() {
-        return (LOG);
-    }
-
-    @JsonIgnore
-    public boolean hasParticipantStatus(){
-        boolean hasValue = this.participantStatus != null;
-        return(hasValue);
-    }
-
-    public void setParticipantStatus(PetasosParticipantStatusEnum status) {
-        if(status == null){
-            this.participantStatus = PetasosParticipantStatusEnum.PARTICIPANT_IS_NOT_READY;
+        if(!ori.getOutputs().isEmpty()){
+            for(TaskWorkItemManifestType currentOutput: ori.getOutputs()){
+                getOutputs().add(SerializationUtils.clone(currentOutput));
+            }
+        }
+        if(ori.getRegistrationId() != null){
+            setRegistrationId(ori.getRegistrationId());
         } else {
-            this.participantStatus = status;
+            this.registrationId = UUID.randomUUID().toString();
         }
+        if(ori.getLocalRegistrationStatus() != null){
+            setLocalRegistrationStatus(ori.getLocalRegistrationStatus());
+        }
+        if(ori.getLocalRegistrationInstant() != null){
+            setLocalRegistrationInstant(ori.getLocalRegistrationInstant());
+        }
+        if(ori.getRegistrationCommentary() != null){
+            setRegistrationCommentary(ori.getRegistrationCommentary());
+        }
+        if(ori.getCentralRegistrationInstant() != null){
+            setCentralRegistrationInstant(ori.getCentralRegistrationInstant());
+        }
+        if(ori.getCentralRegistrationStatus() != null){
+            setCentralRegistrationStatus(ori.getCentralRegistrationStatus());
+        }
+        this.lock = new SerializableObject();
     }
 
-    public PetasosParticipantStatusEnum getParticipantStatus() {
-        return participantStatus;
+    //
+    // Getters and Setters
+    //
+
+    public Instant getUpdateInstant() {
+        return updateInstant;
+    }
+
+    public void setUpdateInstant(Instant updateInstant) {
+        this.updateInstant = updateInstant;
+    }
+
+    public PetasosParticipantRegistrationStatusEnum getCentralRegistrationStatus() {
+        return centralRegistrationStatus;
+    }
+
+    public void setCentralRegistrationStatus(PetasosParticipantRegistrationStatusEnum centralRegistrationStatus) {
+        this.centralRegistrationStatus = centralRegistrationStatus;
+    }
+
+    public Instant getCentralRegistrationInstant() {
+        return centralRegistrationInstant;
+    }
+
+    public void setCentralRegistrationInstant(Instant centralRegistrationInstant) {
+        this.centralRegistrationInstant = centralRegistrationInstant;
+    }
+
+    public String getRegistrationId() {
+        return registrationId;
+    }
+
+    public void setRegistrationId(String registrationId) {
+        this.registrationId = registrationId;
+    }
+
+    public SerializableObject getLock() {
+        return lock;
+    }
+
+    public void setLock(SerializableObject lock) {
+        this.lock = lock;
+    }
+
+    public PetasosParticipantRegistrationStatusEnum getLocalRegistrationStatus() {
+        return localRegistrationStatus;
+    }
+
+    public void setLocalRegistrationStatus(PetasosParticipantRegistrationStatusEnum localRegistrationStatus) {
+        this.localRegistrationStatus = localRegistrationStatus;
+    }
+
+    public Instant getLocalRegistrationInstant() {
+        return localRegistrationInstant;
+    }
+
+    public void setLocalRegistrationInstant(Instant localRegistrationInstant) {
+        this.localRegistrationInstant = localRegistrationInstant;
+    }
+
+    public String getRegistrationCommentary() {
+        return registrationCommentary;
+    }
+
+    public void setRegistrationCommentary(String registrationCommentary) {
+        this.registrationCommentary = registrationCommentary;
+    }
+
+
+    public Instant getReportingInstant() {
+        return reportingInstant;
+    }
+
+    public void setReportingInstant(Instant reportingInstant) {
+        this.reportingInstant = reportingInstant;
     }
 
 
     @JsonIgnore
-    public boolean hasUtilisationUpdateInstant(){
-        boolean hasValue = this.utilisationUpdateInstant != null;
+    public boolean hasLocalComponentId(){
+        boolean hasValue = hasComponentId();
         return(hasValue);
     }
 
-    public void setUtilisationUpdateInstant(Instant utilisationUpdateInstant) {
-        this.utilisationUpdateInstant = utilisationUpdateInstant;
+    public ComponentIdType getLocalComponentId() {
+        return getComponentId();
     }
 
-    public Instant getUtilisationUpdateInstant() {
-        return utilisationUpdateInstant;
+    public void setLocalComponentId(ComponentIdType localComponentId) {
+        setComponentId(localComponentId);
     }
 
-    public Set<TaskWorkItemSubscriptionType> getSubscriptions() {
-        return subscriptions;
+    @JsonIgnore
+    public boolean hasLocalComponentStatus(){
+        boolean hasValue = this.localComponentStatus != null;
+        return(hasValue);
     }
 
-    public void setSubscriptions(Set<TaskWorkItemSubscriptionType> subscriptions) {
-        this.subscriptions = subscriptions;
+    public SoftwareComponentStatusEnum getLocalComponentStatus() {
+        return localComponentStatus;
     }
 
-    public Set<TaskWorkItemManifestType> getOutputs() {
-        return outputs;
+    public void setLocalComponentStatus(SoftwareComponentStatusEnum localComponentStatus) {
+        this.localComponentStatus = localComponentStatus;
     }
 
-    public void setOutputs(Set<TaskWorkItemManifestType> outputs) {
-        this.outputs = outputs;
+    public Set<ComponentIdType> getInstanceComponentIds() {
+        return instanceComponentIds;
+    }
+
+    public void setInstanceComponentIds(Set<ComponentIdType> instanceComponentIds) {
+        this.instanceComponentIds = instanceComponentIds;
     }
 
     //
-    // To String
+    // Update Methods
+    //
+
+    public PetasosParticipant updateFromCentralParticipant(PetasosParticipant centrallyPersistedParticipant){
+        getLogger().debug(".updateFromCentralParticipant(): Entry, centrallyPersistedParticipant->{}",centrallyPersistedParticipant);
+        if(centrallyPersistedParticipant == null){
+            getLogger().debug(".updateFromCentralParticipant(): Exit, centrallyPersistedParticipant is null");
+            return(this);
+        }
+        getLogger().trace(".updateFromCentralParticipant(): [Update Task Queue Status] Start");
+        if(centrallyPersistedParticipant.hasTaskQueueStatus()){
+            getLogger().trace(".updateFromCentralParticipant(): [Update Task Queue Status] has Updated Queue Status Details");
+            getTaskQueueStatus().setCentralQueueStatus(centrallyPersistedParticipant.getTaskQueueStatus().getCentralQueueStatus());
+            getTaskQueueStatus().setPendingTasksOffloaded(centrallyPersistedParticipant.getTaskQueueStatus().isPendingTasksOffloaded());
+            getTaskQueueStatus().setPendingTasksPersisted(centrallyPersistedParticipant.getTaskQueueStatus().isPendingTasksPersisted());
+        }
+        getLogger().trace(".updateFromCentralParticipant(): [Update Task Queue Status] Start");
+        getLogger().trace(".updateFromCentralParticipant(): [Update Control Status] Start");
+        if(centrallyPersistedParticipant.hasControlStatus()){
+            getLogger().trace(".updateFromCentralParticipant(): [Update Control Status] has Updated Control Status Details");
+            setControlStatus(centrallyPersistedParticipant.getControlStatus());
+        }
+        getLogger().trace(".updateFromCentralParticipant(): [Update Control Status] End");
+        if(centrallyPersistedParticipant.getCentralRegistrationInstant() != null){
+            setCentralRegistrationInstant(centrallyPersistedParticipant.getCentralRegistrationInstant());
+        }
+        if(centrallyPersistedParticipant.getCentralRegistrationStatus() != null){
+            setCentralRegistrationStatus(centrallyPersistedParticipant.getCentralRegistrationStatus());
+        }
+        if(centrallyPersistedParticipant.getSubscriptions() != null){
+            getSubscriptions().clear();
+            for(TaskWorkItemSubscriptionType currentSubscription: centrallyPersistedParticipant.getSubscriptions()){
+                getSubscriptions().add(currentSubscription);
+            }
+        }
+        getLogger().debug(".updateFromCentralParticipant(): Exit");
+        return(this);
+    }
+
+    public PetasosParticipant updateFromLocalParticipant(PetasosParticipant updatedParticipant){
+        getLogger().debug(".updateFromLocalParticipant(): Entry");
+        if(updatedParticipant == null){
+            return(this);
+        }
+        if(updatedParticipant.hasTaskQueueStatus()){
+            getTaskQueueStatus().setLocalQueueStatus(updatedParticipant.getTaskQueueStatus().getLocalQueueStatus());
+        }
+        //if(updatedParticipant.hasControlStatus()){
+        //    setControlStatus(updatedParticipant.getControlStatus());
+        //}
+        if(updatedParticipant.getLocalRegistrationInstant() != null){
+            setLocalRegistrationInstant(updatedParticipant.getLocalRegistrationInstant());
+        }
+        if(updatedParticipant.getLocalRegistrationStatus() != null){
+            setLocalRegistrationStatus(updatedParticipant.getLocalRegistrationStatus());
+        }
+        if(updatedParticipant.getSubscriptions() != null){
+            for(TaskWorkItemSubscriptionType currentSubscription: updatedParticipant.getSubscriptions()){
+                if(!getSubscriptions().contains(currentSubscription)) {
+                    getSubscriptions().add(currentSubscription);
+                }
+            }
+        }
+        if(updatedParticipant.getOutputs() != null){
+            for(TaskWorkItemManifestType currentOutput: updatedParticipant.getOutputs()){
+                if(!getOutputs().contains(currentOutput)) {
+                    getOutputs().add(currentOutput);
+                }
+            }
+        }
+        if(updatedParticipant.hasComponentId()){
+            setComponentId(updatedParticipant.getComponentId());
+        }
+        if(updatedParticipant.hasFulfillmentState()){
+            if(updatedParticipant.getFulfillmentState().getFulfillerComponents() != null){
+                for(ComponentIdType currentComponentId: updatedParticipant.getFulfillmentState().getFulfillerComponents()){
+                    if(!getFulfillmentState().getFulfillerComponents().contains(currentComponentId)){
+                        getFulfillmentState().getFulfillerComponents().add(currentComponentId);
+                    }
+                }
+            }
+            if(updatedParticipant.getFulfillmentState().getFulfillmentStatus() != null){
+                getFulfillmentState().setFulfillmentStatus(updatedParticipant.getFulfillmentState().getFulfillmentStatus());
+            }
+        }
+        if(updatedParticipant.getParticipantStatus() != null){
+            setParticipantStatus(updatedParticipant.getParticipantStatus());
+        }
+        if(updatedParticipant.getReportingInstant() != null){
+            setReportingInstant(updatedParticipant.getReportingInstant());
+        }
+        return(this);
+    }
+
+
+    //
+    // toString
     //
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PetasosParticipant{");
-        sb.append("participantId=").append(participantId);
-        sb.append(", componentId=").append(componentId);
-        sb.append(", participantRegistrationStatus=").append(participantRegistrationStatus);
-        sb.append(", participantStatus=").append(participantStatus);
-        sb.append(", subscriptions=").append(subscriptions);
-        sb.append(", outputs=").append(outputs);
-        sb.append(", utilisationUpdateInstant=").append(utilisationUpdateInstant);
-        sb.append(", fulfillmentState=").append(fulfillmentState);
-        sb.append(", taskQueueStatus=").append(taskQueueStatus);
-        sb.append(", controlStatus=").append(controlStatus);
+        sb.append("componentType=").append(getComponentType());
+        sb.append(", localComponentStatus=").append(localComponentStatus);
+        sb.append(", instanceComponentIds=").append(instanceComponentIds);
+        sb.append(", reportingInstant=").append(reportingInstant);
+        sb.append(", registrationId='").append(registrationId).append('\'');
+        sb.append(", localRegistrationStatus=").append(localRegistrationStatus);
+        sb.append(", centralRegistrationStatus=").append(centralRegistrationStatus);
+        sb.append(", registrationCommentary='").append(registrationCommentary).append('\'');
+        sb.append(", localRegistrationInstant=").append(localRegistrationInstant);
+        sb.append(", centralRegistrationInstant=").append(centralRegistrationInstant);
+        sb.append(", updateInstant=").append(updateInstant);
+        sb.append(", lock=").append(lock);
+        sb.append(", controlStatus=").append(getControlStatus());
+        sb.append(", componentId=").append(getComponentId());
+        sb.append(", participantId=").append(getParticipantId());
+        sb.append(", taskQueueStatus=").append(getTaskQueueStatus());
+        sb.append(", fulfillmentState=").append(getFulfillmentState());
+        sb.append(", participantStatus=").append(getParticipantStatus());
+        sb.append(", utilisationUpdateInstant=").append(getUtilisationUpdateInstant());
+        sb.append(", outputs=").append(getOutputs());
         sb.append('}');
         return sb.toString();
     }
 
+    //
+    // Hash and Equals overrides
+    //
 
-    //
-    // Hash and Equals
-    //
 
     @Override
     public boolean equals(Object o) {
@@ -362,72 +385,11 @@ public class PetasosParticipant implements Serializable {
         if (!(o instanceof PetasosParticipant)) return false;
         if (!super.equals(o)) return false;
         PetasosParticipant that = (PetasosParticipant) o;
-        return getParticipantStatus() == that.getParticipantStatus() && Objects.equals(getSubscriptions(), that.getSubscriptions()) && Objects.equals(getOutputs(), that.getOutputs()) && Objects.equals(getUtilisationUpdateInstant(), that.getUtilisationUpdateInstant());
+        return getComponentType() == that.getComponentType() && getLocalComponentStatus() == that.getLocalComponentStatus() && Objects.equals(getInstanceComponentIds(), that.getInstanceComponentIds()) && Objects.equals(getReportingInstant(), that.getReportingInstant()) && Objects.equals(getRegistrationId(), that.getRegistrationId()) && getLocalRegistrationStatus() == that.getLocalRegistrationStatus() && getCentralRegistrationStatus() == that.getCentralRegistrationStatus() && Objects.equals(getRegistrationCommentary(), that.getRegistrationCommentary()) && Objects.equals(getLocalRegistrationInstant(), that.getLocalRegistrationInstant()) && Objects.equals(getCentralRegistrationInstant(), that.getCentralRegistrationInstant()) && Objects.equals(getUpdateInstant(), that.getUpdateInstant()) && Objects.equals(getLock(), that.getLock());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getParticipantStatus(), getSubscriptions(), getOutputs(), getUtilisationUpdateInstant());
-    }
-
-    //
-    // Registration Support Services
-    //
-
-    public PetasosParticipantRegistration toRegistration(){
-        if(hasParticipantId() && hasParticipantStatus() && hasParticipantRegistrationStatus()){
-            PetasosParticipantRegistration registration = new PetasosParticipantRegistration(getParticipantRegistrationStatus());
-            registration.setParticipantId(SerializationUtils.clone(getParticipantId()));
-            registration.setLocalComponentId(SerializationUtils.clone(getComponentId()));
-            registration.getInstanceComponentIds().add(registration.getLocalComponentId());
-            if(!getSubscriptions().isEmpty()) {
-                for(TaskWorkItemSubscriptionType currentSubscription: getSubscriptions()) {
-                    registration.getSubscriptions().add(SerializationUtils.clone(currentSubscription));
-                }
-            }
-            if(!getOutputs().isEmpty()) {
-                for(TaskWorkItemManifestType currentOutput: getOutputs()) {
-                    registration.getOutputs().add(SerializationUtils.clone(currentOutput));
-                }
-            }
-            registration.setControlStatus(getControlStatus());
-            registration.setParticipantStatus(getParticipantStatus());
-            registration.setComponentType(getComponentType());
-            return(registration);
-        } else {
-            return(null);
-        }
-    }
-
-    public void updateFromRegistration(PetasosParticipantRegistration registration){
-        getLogger().debug(".updateFromRegistration(): Entry, registration->{}", registration);
-        if(registration == null){
-            getLogger().debug(".updateFromRegistration(): Exit, registration is null");
-            return;
-        }
-        if(registration.hasControlStatus()){
-            getLogger().trace(".updateFromRegistration(): registration has ControlStatus, updating Participant");
-            setControlStatus(registration.getControlStatus());
-        }
-        if(!registration.getSubscriptions().isEmpty()){
-            for(TaskWorkItemSubscriptionType currentSubscription: registration.getSubscriptions()){
-                if(!getSubscriptions().contains(currentSubscription)){
-                    getSubscriptions().add(currentSubscription);
-                }
-            }
-        }
-        if(registration.getCentralRegistrationInstant() != null){
-            getParticipantRegistrationStatus().setCentralRegistrationInstant(registration.getCentralRegistrationInstant());
-        }
-        if(registration.getCentralRegistrationStatus() != null){
-            getParticipantRegistrationStatus().setCentralRegistrationStatus(registration.getCentralRegistrationStatus());
-        }
-        if(registration.getLocalRegistrationInstant() != null){
-            getParticipantRegistrationStatus().setLocalRegistrationInstant(registration.getLocalRegistrationInstant());
-        }
-        if(registration.getLocalRegistrationStatus() != null){
-            getParticipantRegistrationStatus().setLocalRegistrationStatus(registration.getLocalRegistrationStatus());
-        }
-        getLogger().debug(".updateFromRegistration(): Exit");
+        return Objects.hash(super.hashCode(), getComponentType(), getLocalComponentStatus(), getInstanceComponentIds(), getReportingInstant(), getRegistrationId(), getLocalRegistrationStatus(), getCentralRegistrationStatus(), getRegistrationCommentary(), getLocalRegistrationInstant(), getCentralRegistrationInstant(), getUpdateInstant(), getLock());
     }
 }

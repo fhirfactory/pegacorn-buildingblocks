@@ -33,7 +33,6 @@ import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
@@ -445,7 +444,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().debug(".buildWUPFramework(): Exit");
     }
 
-    private PetasosParticipantRegistration registerParticipant(){
+    private PetasosParticipant registerParticipant(){
         getLogger().debug(".registerParticipant(): Entry");
         PetasosParticipant participant = getTopologyNode().getParticipant();
         if (!specifySubscriptionTopics().isEmpty()) {
@@ -469,7 +468,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             }
         }
 
-        PetasosParticipantRegistration participantRegistration = participantRegistrationAdmin.registerParticipant(participant);
+        PetasosParticipant participantRegistration = participantRegistrationAdmin.registerParticipant(participant);
         getLogger().debug(".registerParticipant(): Entry, participantRegistration->{}", participantRegistration);
         return(participantRegistration);
     }

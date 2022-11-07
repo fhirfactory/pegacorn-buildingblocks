@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosPartici
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.deployment.properties.reference.petasos.PetasosDefaultProperties;
-import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantRegistrationCache;
+import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public class LocalParticipantExecutionManager {
     private PetasosDefaultProperties petasosDefaultProperties;
 
     @Inject
-    private LocalParticipantRegistrationCache participantRegistrationCache;
+    private LocalParticipantCache participantRegistrationCache;
 
     //
     // Constructor(s)
@@ -133,7 +133,7 @@ public class LocalParticipantExecutionManager {
         return(jobCardCache);
     }
 
-    protected LocalParticipantRegistrationCache getParticipantRegistrationCache(){
+    protected LocalParticipantCache getParticipantRegistrationCache(){
         return(participantRegistrationCache);
     }
 }

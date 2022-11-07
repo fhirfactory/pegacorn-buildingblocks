@@ -27,9 +27,9 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelValidationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
-import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantRegistrationCache;
+import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantCache;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class TaskPerformerSubscriptionDecisionEngine {
     private static final Logger LOG = LoggerFactory.getLogger(TaskPerformerSubscriptionDecisionEngine.class);
 
     @Inject
-    private LocalParticipantRegistrationCache localParticipantRegistrationCache;
+    private LocalParticipantCache localParticipantCache;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -62,8 +62,8 @@ public class TaskPerformerSubscriptionDecisionEngine {
         return(LOG);
     }
 
-    protected LocalParticipantRegistrationCache getLocalParticipantRegistrationCache(){
-        return(localParticipantRegistrationCache);
+    protected LocalParticipantCache getLocalParticipantRegistrationCache(){
+        return(localParticipantCache);
     }
 
     protected ProcessingPlantInterface getProcessingPlant(){
@@ -74,7 +74,7 @@ public class TaskPerformerSubscriptionDecisionEngine {
     // More sophisticated SubscriberList derivation
     //
 
-    public boolean hasRemoteServiceName(PetasosParticipantRegistration subscriber){
+    public boolean hasRemoteServiceName(PetasosParticipant subscriber){
         getLogger().debug(".hasRemoteServiceName(): Entry, subscriber->{}", subscriber.getParticipantId().getSubsystemName());
         if(subscriber == null){
             return(false);
@@ -109,7 +109,7 @@ public class TaskPerformerSubscriptionDecisionEngine {
         return(true);
     }
 
-    public List<PetasosParticipantRegistration> deriveSubscriberList(DataParcelManifest parcelManifest){
+    public List<PetasosParticipant> deriveSubscriberList(DataParcelManifest parcelManifest){
         getLogger().debug(".deriveSubscriberList(): Entry, parcelManifest->{}", parcelManifest);
         if(getLogger().isDebugEnabled()){
             if(parcelManifest.hasContentDescriptor()){
@@ -117,16 +117,16 @@ public class TaskPerformerSubscriptionDecisionEngine {
                 getLogger().debug(".deriveSubscriberList(): parcel.ContentDescriptor->{}", messageToken);
             }
         }
-        List<PetasosParticipantRegistration> subscriberList = new ArrayList<>();
+        List<PetasosParticipant> subscriberList = new ArrayList<>();
 
         getLogger().trace(".deriveSubscriberList(): [Retrieve PetasosParticipant list] Start");
-        Set<PetasosParticipantRegistration> participants = getLocalParticipantRegistrationCache().getAllParticipantRegistrations();
+        Set<PetasosParticipant> participants = getLocalParticipantRegistrationCache().getAllParticipants();
         getLogger().trace(".deriveSubscriberList(): [Retrieve PetasosParticipant list] Finish, list.size()->{}", participants.size());
 
         List<String> alreadySubscribedSubsystemParticipants = new ArrayList<>();
 
         getLogger().trace(".deriveSubscriberList(): [Process Participant List] Start");
-        for(PetasosParticipantRegistration currentParticipant: participants) {
+        for(PetasosParticipant currentParticipant: participants) {
             if(getLogger().isTraceEnabled()) {
                 getLogger().trace(".deriveSubscriberList(): [Process Participant List] processing participant->{}", currentParticipant.getParticipantId().getName());
             }
@@ -164,7 +164,7 @@ public class TaskPerformerSubscriptionDecisionEngine {
         return(subscriberList);
     }
 
-    protected boolean isRemoteParticipant(PetasosParticipantRegistration participant){
+    protected boolean isRemoteParticipant(PetasosParticipant participant){
         if(participant == null){
             return(false);
         }

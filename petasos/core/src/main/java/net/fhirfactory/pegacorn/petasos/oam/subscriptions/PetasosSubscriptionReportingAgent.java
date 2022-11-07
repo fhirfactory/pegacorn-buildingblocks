@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.P
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.valuesets.PetasosSubscriptionSummaryTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantRegistrationCache;
+import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantCache;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class PetasosSubscriptionReportingAgent {
     private PetasosLocalSubscriptionReportingDM subscriptionReportingDM;
 
     @Inject
-    private LocalParticipantRegistrationCache participantRegistrationCache;
+    private LocalParticipantCache participantRegistrationCache;
 
     @Inject
     private ProcessingPlantInterface processingPlant;

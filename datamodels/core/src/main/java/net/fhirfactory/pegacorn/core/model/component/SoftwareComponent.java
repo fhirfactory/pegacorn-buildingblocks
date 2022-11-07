@@ -25,17 +25,17 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.capabilities.definition.Capability;
+import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentExecutionControlEnum;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
-import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentConnectivityContextEnum;
-import net.fhirfactory.pegacorn.core.model.componentid.*;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
-import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.reporting.PetasosComponentMetricSet;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -388,28 +388,6 @@ public abstract class SoftwareComponent implements Serializable {
 
     public void setComponentExecutionStatus(SoftwareComponentExecutionControlEnum componentExecutionStatus) {
         this.componentExecutionStatus = componentExecutionStatus;
-    }
-
-    @JsonIgnore
-    public PetasosParticipantRegistration getParticipantRegistrationContent(){
-        if(hasParticipant()){
-            PetasosParticipantRegistration petasosParticipantRegistration = getParticipant().toRegistration();
-            petasosParticipantRegistration.setLocalComponentId(getComponentId());
-            petasosParticipantRegistration.setLocalComponentStatus(getComponentStatus());
-            petasosParticipantRegistration.setComponentType(getComponentType());
-            return(petasosParticipantRegistration);
-        }
-        return(null);
-    }
-
-    @JsonIgnore
-    public void setParticipantRegistrationContent(PetasosParticipantRegistration participantRegistration){
-        if(participantRegistration != null){
-            if(!hasParticipant()){
-                setParticipant(new PetasosParticipant());
-            }
-            getParticipant().updateFromRegistration(participantRegistration);
-        }
     }
 
     //

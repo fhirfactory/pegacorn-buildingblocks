@@ -39,8 +39,8 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirect
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditEventGranularityLevelEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
@@ -443,9 +443,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         getLogger().info(".subscribeToRemoteDataParcels(): Exit");
     }
 
-    protected PetasosParticipantRegistration registerParticipant(){
+    protected PetasosParticipant registerParticipant(){
         getLogger().info(".registerParticipant(): Entry");
-        PetasosParticipantRegistration participantRegistration = getParticipantRegistrationAdministrator().registerParticipant(getTopologyNode().getParticipant());
+        PetasosParticipant participantRegistration = getParticipantRegistrationAdministrator().registerParticipant(getTopologyNode().getParticipant());
         getLogger().info(".registerParticipant(): Exit, partipantRegistration->{}", participantRegistration);
         return(participantRegistration);
     }

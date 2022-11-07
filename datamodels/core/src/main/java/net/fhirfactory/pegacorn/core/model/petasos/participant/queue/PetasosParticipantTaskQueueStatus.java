@@ -21,22 +21,44 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.participant.queue;
 
-public class PetasosParticipantTaskQueueStatus {
+import java.io.Serializable;
+
+public class PetasosParticipantTaskQueueStatus implements Serializable {
     private TaskQueueStatus localQueueStatus;
     private TaskQueueStatus centralQueueStatus;
+    private boolean pendingTasksOffloaded;
+    private boolean pendingTasksPersisted;
 
     //
     // Constructor(s)
     //
 
     public PetasosParticipantTaskQueueStatus(){
-        this.localQueueStatus = null;
-        this.centralQueueStatus = null;
+        this.localQueueStatus = new TaskQueueStatus();
+        this.centralQueueStatus = new TaskQueueStatus();
+        this.pendingTasksPersisted = false;
+        this.pendingTasksOffloaded = false;
     }
 
     //
     // Getters and Setters
     //
+
+    public boolean isPendingTasksOffloaded() {
+        return pendingTasksOffloaded;
+    }
+
+    public void setPendingTasksOffloaded(boolean pendingTasksOffloaded) {
+        this.pendingTasksOffloaded = pendingTasksOffloaded;
+    }
+
+    public boolean isPendingTasksPersisted() {
+        return pendingTasksPersisted;
+    }
+
+    public void setPendingTasksPersisted(boolean pendingTasksPersisted) {
+        this.pendingTasksPersisted = pendingTasksPersisted;
+    }
 
     public TaskQueueStatus getLocalQueueStatus() {
         return localQueueStatus;
@@ -63,6 +85,8 @@ public class PetasosParticipantTaskQueueStatus {
         final StringBuffer sb = new StringBuffer("PetasosParticipantTaskQueueStatus{");
         sb.append("localQueueStatus=").append(localQueueStatus);
         sb.append(", centralQueueStatus=").append(centralQueueStatus);
+        sb.append(", pendingTasksOffloaded=").append(pendingTasksOffloaded);
+        sb.append(", pendingTasksPersisted=").append(pendingTasksPersisted);
         sb.append('}');
         return sb.toString();
     }

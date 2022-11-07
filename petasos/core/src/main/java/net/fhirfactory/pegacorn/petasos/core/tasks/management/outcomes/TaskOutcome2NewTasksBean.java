@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.outcomes;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
@@ -228,12 +228,12 @@ public class TaskOutcome2NewTasksBean {
         Boolean hasADownstreamTask = false;
         for (UoWPayload currentPayload : egressPayloadList) {
             DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
-            List<PetasosParticipantRegistration> subscriberList = distributionDecisionEngine.deriveSubscriberList(payloadManifest);
+            List<PetasosParticipant> subscriberList = distributionDecisionEngine.deriveSubscriberList(payloadManifest);
             if(getLogger().isDebugEnabled()){
                 getLogger().debug(".collectOutcomesAndCreateNewTasks(): number of subscribers for egressPayload->{} is count->{}", payloadManifest, subscriberList.size());
             }
             if (!subscriberList.isEmpty()) {
-                for(PetasosParticipantRegistration currentSubscriber: subscriberList) {
+                for(PetasosParticipant currentSubscriber: subscriberList) {
                     TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
                     getLogger().trace(".collectOutcomesAndCreateNewTasks(): newWorkItem->{}", newWorkItem);
                     PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask, newWorkItem, currentSubscriber.getParticipantId().getName());

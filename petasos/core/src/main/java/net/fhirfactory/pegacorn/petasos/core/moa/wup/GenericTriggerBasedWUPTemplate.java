@@ -30,7 +30,6 @@ import net.fhirfactory.pegacorn.core.model.componentid.SoftwareComponentTypeEnum
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
@@ -442,7 +441,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
                 }
             }
         }
-        PetasosParticipantRegistrationStatus participantRegistration = participantManager.registerParticipant(participant);
+        PetasosParticipant participantRegistration = participantManager.registerParticipant(participant);
         getLogger().debug(".registerParticipant(): Exit, participantRegistration->{}", participantRegistration);
         return(participant);
     }

@@ -22,10 +22,10 @@
 package net.fhirfactory.pegacorn.core.interfaces.participant;
 
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatus;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 
 import java.util.List;
 
 public interface PetasosSubscriptionServiceInterface {
-    public PetasosParticipantRegistrationStatus subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem);
+    public PetasosParticipant subscribe(List<DataParcelManifest> dataParcelManifestList, String sourceSubSystem);
 }

@@ -26,14 +26,14 @@ import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosEdgeMessageForwarder
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantRegistrationCache;
+import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.LocalTaskActivityManager;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.outcomes.TaskPerformerSubscriptionDecisionEngine;
@@ -96,7 +96,7 @@ public class LocalTaskDistributionService {
     private TaskPerformerSubscriptionDecisionEngine taskDistributionDecisionEngine;
 
     @Inject
-    private LocalParticipantRegistrationCache localParticipantRegistrationCache;
+    private LocalParticipantCache localParticipantCache;
 
 
     @Inject
@@ -220,7 +220,7 @@ public class LocalTaskDistributionService {
             return;
         }
 
-        PetasosParticipantRegistration targetParticipant = localParticipantRegistrationCache.getParticipantRegistration(participantId);
+        PetasosParticipant targetParticipant = localParticipantCache.getParticipantClone(participantId);
         if(targetParticipant == null){
             getLogger().info(".distributeTask(): No Target To Deliver Task To!!!");
             return;

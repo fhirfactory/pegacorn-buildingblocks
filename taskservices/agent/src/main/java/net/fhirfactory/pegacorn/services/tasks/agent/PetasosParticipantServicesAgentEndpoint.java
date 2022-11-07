@@ -25,8 +25,8 @@ import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServi
 import net.fhirfactory.pegacorn.core.interfaces.ui.resources.ParticipantUIServicesAPI;
 import net.fhirfactory.pegacorn.core.interfaces.ui.resources.TaskUIServicesAPI;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantControlStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.registration.PetasosParticipantRegistrationStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.ui.resources.simple.PetasosParticipantESR;
@@ -34,6 +34,7 @@ import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.PetasosPartici
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.TaskSummary;
 import net.fhirfactory.pegacorn.petasos.core.participants.management.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.participants.PetasosParticipantServicesEndpointBase;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -87,7 +88,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
     //
 
     @Override
-    public PetasosParticipantRegistration synchroniseRegistration(PetasosParticipantRegistration localRegistration) {
+    public PetasosParticipant synchroniseRegistration(PetasosParticipant localRegistration) {
         getLogger().debug(".synchroniseRegistration(): Entry, localRegistration->{}", localRegistration);
         String myName = getProcessingPlant().getTopologyNode().getComponentId().getName();
         String myParticipantName = getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName();
@@ -110,7 +111,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             Object objectSet[] = new Object[]{myName, myParticipantName, localRegistration};
             Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            PetasosParticipantRegistration participantStatus = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "synchroniseRegistrationHandler", objectSet, classSet, requestOptions);
+            PetasosParticipant participantStatus = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "synchroniseRegistrationHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
             getMetricsAgent().incrementRPCInvocationCount(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
             getMetricsAgent().incrementRPCResponseCount(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
@@ -121,7 +122,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             getMetricsAgent().incrementRemoteProcedureCallFailureCount();
             getMetricsAgent().incrementRPCInvocationCount(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
             getMetricsAgent().incrementRPCFailureCount(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
-            PetasosParticipantRegistration clonedRegistration = new PetasosParticipantRegistration(localRegistration);
+            PetasosParticipant clonedRegistration = SerializationUtils.clone(localRegistration);
             clonedRegistration.setCentralRegistrationStatus(PetasosParticipantRegistrationStatusEnum.PARTICIPANT_REGISTRATION_FAILED);
             clonedRegistration.setCentralRegistrationInstant(Instant.now());
             return(clonedRegistration);
@@ -129,7 +130,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
     }
 
     @Override
-    public Set<PetasosParticipantRegistration> getDownstreamSubscribers(String producerServiceName) {
+    public Set<PetasosParticipant> getDownstreamSubscribers(String producerServiceName) {
         getLogger().debug(".getDownstreamSubscribers(): Entry, producerServiceName->{}", producerServiceName);
         if(StringUtils.isEmpty(producerServiceName)){
             return(new HashSet<>());
@@ -146,7 +147,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             Object objectSet[] = new Object[]{myName, myParticipantName, producerServiceName};
             Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            Set<PetasosParticipantRegistration> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getDownstreamSubscribersHandler", objectSet, classSet, requestOptions);
+            Set<PetasosParticipant> participantSet = getRPCDispatcher().callRemoteMethod(taskServicesAddress, "getDownstreamSubscribersHandler", objectSet, classSet, requestOptions);
             getMetricsAgent().incrementRemoteProcedureCallCount();
             getMetricsAgent().incrementRPCInvocationCount(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
             getMetricsAgent().incrementRPCResponseCount(taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
