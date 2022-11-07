@@ -92,6 +92,32 @@ public class RouteElementNames {
         return(this.wupTypeName+".WUP.Core");
     }
 
+    public String getInteractEgressLeadInName(){
+        return(this.wupTypeName+".WUP.EgressLeadInRoute");
+    }
+
+    public String getInteractEgressName(){
+        return(this.wupTypeName+".WUP.EgressRoute");
+    }
+    public String getInteractEgressLeadOutName(){
+        return(this.wupTypeName+".WUP.EgressLeadOutRoute");
+    }
+
+    public String getInteractEgressEndpointInRoute(){
+        String name = this.wupTypeName+"WUP.Core.InteractEgressEndpointIn";
+        return(name);
+    }
+
+    public String getInteractEgressEndpointOutRoute(){
+        String name = this.wupTypeName+"WUP.Core.InteractEgressEndpointOut";
+        return(name);
+    }
+
+    public String getInteractEgressEndpointTimer(){
+        String name = this.wupTypeName+"WUP.Core.InteractEgressEndpointTimer";
+        return(name);
+    }
+
     public String getEndPointWUPContainerIngresProcessorIngres() {
         getLogger().debug(".getEndPointWUPContainerIngresProcessorIngres(): Entry");
         String endpointName;
