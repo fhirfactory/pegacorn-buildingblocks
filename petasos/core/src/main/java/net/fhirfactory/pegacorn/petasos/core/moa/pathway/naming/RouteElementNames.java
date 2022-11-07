@@ -102,7 +102,7 @@ public class RouteElementNames {
         return(name);
     }
 
-    public String getInteractEgressEndpointTimer(){
+    public String getInteractEgressEndpointTimerName(){
         String name = this.wupTypeName+"WUP.Core.InteractEgressEndpointTimer";
         return(name);
     }
