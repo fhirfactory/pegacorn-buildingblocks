@@ -96,6 +96,10 @@ public class InteractIngresAuditServicesBroker {
     // Business Methods
     //
 
+    public void logHTTPIngresActivity(String ingresPayload, Exchange camelExchange) {
+        this.logHTTPIngresActivity(ingresPayload, camelExchange);
+    }
+    
     public void logHTTPIngresActivity(Object ingresPayload, Exchange camelExchange){
         getLogger().debug(".logMLLPTransactions(): Entry, ingresPayload->{}",ingresPayload);
 
@@ -128,6 +132,7 @@ public class InteractIngresAuditServicesBroker {
         List<AuditEvent.AuditEventEntityDetailComponent> detailList = new ArrayList<>();
         AuditEvent.AuditEventEntityDetailComponent ingresDetailComponent = auditEventEntityFactory.newAuditEventEntityDetailComponent("HTTP.Ingress.Body", body);
 
+        detailList.add(ingresDetailComponent);
         String descriptionText = "Interact.Ingres: HTTP Server";
 
         if(StringUtils.isEmpty(descriptionText)){
