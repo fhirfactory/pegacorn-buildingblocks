@@ -22,7 +22,8 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets;
 
 public enum EndpointPayloadTypeEnum {
-    ENDPOINT_PAYLOAD_INTERNAL_IPC("Messaging.MulticastTasks", "pegacorn.internal.messaging.payload.multicast_tasks", "Internal Messaging Payload (Subscribed Task/Trigger Distribution)"),
+    ENDPOINT_PAYLOAD_INTERNAL_TASK_ROUTING_RECEIVER("Messaging.TaskRoutingReceiver", "pegacorn.internal.messaging.payload.routed_tasks_receiver", "Internal Task Routing (Receiver)"),
+    ENDPOINT_PAYLOAD_INTERNAL_TASK_ROUTING_FORWARDER("Messaging.TaskRoutingForwarder", "pegacorn.internal.messaging.payload.routed_tasks_forwarder", "Internal Task Routing (Forwarder)"),
     ENDPOINT_PAYLOAD_INTERNAL_METRICS("Messaging.Metrics", "pegacorn.internal.messaging.payload.metrics", "Internal Messaging Payload (Petasos Metrics)"),
     ENDPOINT_PAYLOAD_INTERNAL_TOPOLOGY("Messaging.Topology", "pegacorn.internal.messaging.payload.topology", "Internal Messaging Payload (Petasos Topology/Discovery Updates)"),
     ENDPOINT_PAYLOAD_INTERNAL_SUBSCRIPTION("Messaging.Subscriptions", "pegacorn.internal.messaging.payload.subscriptions", "Internal Messaging Payload (Publish/Subscribe Request/Response)"),

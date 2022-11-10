@@ -192,7 +192,7 @@ public class ProcessingPlantJGroupsIntegrationPointWatchdog
         if (!processingPlantIntegrationPoints.hasPetasosInterceptionServicesEndpoint()) {
             singleSitePortsLaunched = singleSitePortsLaunched && false;
         }
-        if (!processingPlantIntegrationPoints.hasPetasosMessagingServicesEndpoint()) {
+        if (!processingPlantIntegrationPoints.hasPetasosTaskRoutingReceiverEndpoint()) {
             singleSitePortsLaunched = singleSitePortsLaunched && false;
         }
         if (!processingPlantIntegrationPoints.hasPetasosMetricsServicesEndpoint()){
@@ -295,10 +295,15 @@ public class ProcessingPlantJGroupsIntegrationPointWatchdog
         getLogger().debug(".deriveAggregateStatus(): Entry, startingStatus->{}", startingStatus);
         List<PetasosEndpointStatusEnum> statusList = new ArrayList<>();
         getLogger().trace(".deriveAggregateStatus(): Assembling the list of status'es");
-        if (processingPlantIntegrationPoints.hasPetasosMessagingServicesEndpoint()) {
-            PetasosEndpointStatusEnum interzoneIPCStatus = processingPlantIntegrationPoints.getPetasosMessagingServicesEndpoint().getEndpointStatus();
-            getLogger().debug(".deriveAggregateStatus(): Entry, getInterzoneIPC().getEndpointStatus()->{}", interzoneIPCStatus);
-            statusList.add(resolveStatusValue(startingStatus, interzoneIPCStatus));
+        if (processingPlantIntegrationPoints.hasPetasosTaskRoutingForwarderEndpoint()) {
+            PetasosEndpointStatusEnum interzoneTaskForwarderStatus= processingPlantIntegrationPoints.getPetasosTaskRoutingForwarderEndpoint().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getPetasosTaskRoutingForwarderEndpoint().getEndpointStatus()->{}", interzoneTaskForwarderStatus);
+            statusList.add(resolveStatusValue(startingStatus, interzoneTaskForwarderStatus));
+        }
+        if (processingPlantIntegrationPoints.hasPetasosTaskRoutingReceiverEndpoint()) {
+            PetasosEndpointStatusEnum interzoneTaskReceiverStatus = processingPlantIntegrationPoints.getPetasosTaskRoutingReceiverEndpoint().getEndpointStatus();
+            getLogger().debug(".deriveAggregateStatus(): Entry, getPetasosTaskRoutingReceiverEndpoint().getEndpointStatus()->{}", interzoneTaskReceiverStatus);
+            statusList.add(resolveStatusValue(startingStatus, interzoneTaskReceiverStatus));
         }
         if (processingPlantIntegrationPoints.hasPetasosTopologyServicesEndpoint()) {
             PetasosEndpointStatusEnum interzoneTopologyStatus = processingPlantIntegrationPoints.getPetasosTopologyServicesEndpoint().getEndpointStatus();

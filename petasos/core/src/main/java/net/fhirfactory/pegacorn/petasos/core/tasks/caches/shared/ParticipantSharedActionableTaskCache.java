@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared;
 
+import net.fhirfactory.pegacorn.core.interfaces.oam.metrics.PetasosTaskCacheStatusInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskCacheServiceInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
@@ -57,7 +58,7 @@ import javax.enterprise.context.ApplicationScoped;
  */
 
 @ApplicationScoped
-public class ParticipantSharedActionableTaskCache implements PetasosTaskCacheServiceInterface {
+public class ParticipantSharedActionableTaskCache implements PetasosTaskCacheServiceInterface, PetasosTaskCacheStatusInterface {
     private static final Logger LOG = LoggerFactory.getLogger(ParticipantSharedActionableTaskCache.class);
 
     // <Action Task Id, Actionable Task> This will be shared across infinispan
@@ -268,5 +269,10 @@ public class ParticipantSharedActionableTaskCache implements PetasosTaskCacheSer
 
     protected Logger getLogger(){
         return(LOG);
+    }
+
+    @Override
+    public Integer getActionableTaskCacheSize() {
+        return (getTaskCache().size());
     }
 }

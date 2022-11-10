@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -36,6 +37,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.d
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 
+@ApplicationScoped
 public class PetasosAggregateTaskFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(PetasosAggregateTaskFactory.class);

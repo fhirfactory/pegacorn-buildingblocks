@@ -28,7 +28,8 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ProcessingPlantJGroupsIntegrationPointSet {
 
-    private JGroupsIntegrationPoint petasosMessagingServicesEndpoint;
+    private JGroupsIntegrationPoint petasosTaskRoutingReceiverEndpoint;
+    private JGroupsIntegrationPoint petasosTaskRoutingForwarderEndpoint;
     private JGroupsIntegrationPoint petasosSubscriptionServicesEndpoint;
     private JGroupsIntegrationPoint petasosTopologyServicesEndpoint;
     private JGroupsIntegrationPoint petasosAuditServicesEndpoint;
@@ -37,8 +38,8 @@ public class ProcessingPlantJGroupsIntegrationPointSet {
     private JGroupsIntegrationPoint petasosMetricsServicesEndpoint;
 
     public ProcessingPlantJGroupsIntegrationPointSet(){
-
-        this.petasosMessagingServicesEndpoint = null;
+        this.petasosTaskRoutingForwarderEndpoint = null;
+        this.petasosTaskRoutingReceiverEndpoint = null;
         this.petasosTopologyServicesEndpoint = null;
         this.petasosSubscriptionServicesEndpoint = null;
         this.petasosAuditServicesEndpoint = null;
@@ -51,17 +52,30 @@ public class ProcessingPlantJGroupsIntegrationPointSet {
     // Getters and Setters
     //
 
-    public boolean hasPetasosMessagingServicesEndpoint(){
-        boolean hasValue = this.petasosAuditServicesEndpoint != null;
+    public boolean hasPetasosTaskRoutingForwarderEndpoint(){
+        boolean hasValue = this.petasosTaskRoutingForwarderEndpoint != null;
         return(hasValue);
     }
 
-    public JGroupsIntegrationPoint getPetasosMessagingServicesEndpoint() {
-        return petasosMessagingServicesEndpoint;
+    public JGroupsIntegrationPoint getPetasosTaskRoutingForwarderEndpoint() {
+        return petasosTaskRoutingForwarderEndpoint;
     }
 
-    public void setPetasosMessagingServicesEndpoint(JGroupsIntegrationPoint petasosMessagingServicesEndpoint) {
-        this.petasosMessagingServicesEndpoint = petasosMessagingServicesEndpoint;
+    public void setPetasosTaskRoutingForwarderEndpoint(JGroupsIntegrationPoint petasosTaskRoutingForwarderEndpoint) {
+        this.petasosTaskRoutingForwarderEndpoint = petasosTaskRoutingForwarderEndpoint;
+    }
+
+    public boolean hasPetasosTaskRoutingReceiverEndpoint(){
+        boolean hasValue = this.petasosTaskRoutingReceiverEndpoint != null;
+        return(hasValue);
+    }
+
+    public JGroupsIntegrationPoint getPetasosTaskRoutingReceiverEndpoint() {
+        return petasosTaskRoutingReceiverEndpoint;
+    }
+
+    public void setPetasosTaskRoutingReceiverEndpoint(JGroupsIntegrationPoint petasosTaskRoutingReceiverEndpoint) {
+        this.petasosTaskRoutingReceiverEndpoint = petasosTaskRoutingReceiverEndpoint;
     }
 
     public boolean hasPetasosSubscriptionServicesEndpoint(){

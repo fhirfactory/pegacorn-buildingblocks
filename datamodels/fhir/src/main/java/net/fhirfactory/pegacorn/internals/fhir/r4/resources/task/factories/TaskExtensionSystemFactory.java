@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,42 +19,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.topology;
+package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
+import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskExtensionSystemEnum;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-public abstract class EdgeIPCEndpoint extends RouteBuilder {
+@ApplicationScoped
+public class TaskExtensionSystemFactory {
+
+    private static final String DRICATS_TASK_EXTENSION_SYSTEM = "/extension/task";
 
     @Inject
-    private CamelContext camelContext;
+    private PegacornReferenceProperties systemWideProperties;
 
-    @Inject
-    private ProcessingPlantInterface processingPlant;
+    //
+    // Constructor(s)
+    //
 
-    @Inject
-    private TopologyIM topologyIM;
+    //
+    // Business Logic
+    //
 
-    abstract protected Logger specifyLogger();
-
-    protected Logger getLogger(){
-        return(specifyLogger());
+    public String getDRICaTSTaskExtensionSystem(){
+        String codeSystem = systemWideProperties.getPegacornCodeSystemSite() + DRICATS_TASK_EXTENSION_SYSTEM;
+        return (codeSystem);
     }
 
-    public CamelContext getCamelContext(){
-        return(camelContext);
+    public String getDricatsTaskExtensionSystemURL(TaskExtensionSystemEnum taskExtensionSystem){
+        if(taskExtensionSystem == null){
+            return(null);
+        }
+        String system = getDRICaTSTaskExtensionSystem() + taskExtensionSystem.getToken();
+        return(system);
     }
 
-    protected ProcessingPlantInterface getProcessingPlant(){
-        return(processingPlant);
-    }
 
-    public TopologyIM getTopologyIM() {
-        return topologyIM;
-    }
 }
+

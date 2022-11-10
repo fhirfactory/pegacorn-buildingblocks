@@ -422,6 +422,18 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
         return(null);
     }
 
+    protected Class[] createClassSet(Object[] objectSet){
+        if(objectSet == null){
+            return(null);
+        }
+        Class classSet[] = new Class[objectSet.length];
+        for(int counter = 0; counter < objectSet.length; counter++){
+            classSet[counter] = objectSet[counter].getClass();
+        }
+        return(classSet);
+    }
+
+
     //
     // Route
     //

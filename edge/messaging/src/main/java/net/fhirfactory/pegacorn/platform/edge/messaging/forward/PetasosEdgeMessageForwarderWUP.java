@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCA
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PetasosIPCMessagingEndpoint;
+import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PonosTaskRouterClientSender;
 import net.fhirfactory.pegacorn.petasos.wup.helper.EgressActivityFinalisationRegistration;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverPacketGenerationBean;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.InterProcessingPlantHandoverResponseProcessingBean;
@@ -57,7 +57,7 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
     private static String WUP_VERSION = "1.0.0";
 
     @Inject
-    private PetasosIPCMessagingEndpoint petasosMessagingEndpoint;
+    private PonosTaskRouterClientSender petasosMessagingEndpoint;
 
     @Inject
     private EdgeWorkshop edgeWorkshop;
@@ -77,7 +77,7 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
     }
 
 
-    protected PetasosIPCMessagingEndpoint getPetasosMessagingEndpoint() {
+    protected PonosTaskRouterClientSender getPetasosMessagingEndpoint() {
         return (petasosMessagingEndpoint);
     }
 
@@ -199,7 +199,6 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
     // Component Id
     //
 
-    @Override
     public ComponentIdType getComponentId() {
         return (getMeAsATopologyComponent().getComponentID());
     }

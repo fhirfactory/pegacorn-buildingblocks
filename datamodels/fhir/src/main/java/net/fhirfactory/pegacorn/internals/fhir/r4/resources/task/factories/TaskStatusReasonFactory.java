@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -36,8 +37,8 @@ public class TaskStatusReasonFactory {
 
     private static final String PEGACORN_TASK_STATUS_REASON_SYSTEM = "/task-status-reason";
 
-    private static final String PEGACORN_TASK_IS_FINALISED_CODE = "pegacorn.task.status.reason.finalised";
-    private static final String PEGACORN_TASK_IS_NOT_FINALISED_CODE = "pegacorn.task.status.reason.not-finalised";
+    private static final String PEGACORN_TASK_IS_FINALISED_CODE = "dricats.task.status.reason.finalised";
+    private static final String PEGACORN_TASK_IS_NOT_FINALISED_CODE = "dricats.task.status.reason.not-finalised";
 
     //
     // Business Methods
@@ -69,6 +70,18 @@ public class TaskStatusReasonFactory {
         }
         taskReasonCC.setText(taskReasonCoding.getDisplay());
         taskReasonCC.addCoding(taskReasonCoding);
+        return(taskReasonCC);
+    }
+
+    public CodeableConcept newTaskStatusReason(FulfillmentExecutionStatusEnum executionStatus ){
+        CodeableConcept taskReasonCC = new CodeableConcept();
+        Coding taskReasonCoding = new Coding();
+        taskReasonCoding.setSystem(getPegacornTaskStatusReasonSystem());
+        taskReasonCoding.setCode(executionStatus.getToken());
+        taskReasonCoding.setDisplay(executionStatus.getDisplayName());
+        taskReasonCC.setText(executionStatus.getDisplayName());
+        taskReasonCC.addCoding(taskReasonCoding);
+
         return(taskReasonCC);
     }
 }

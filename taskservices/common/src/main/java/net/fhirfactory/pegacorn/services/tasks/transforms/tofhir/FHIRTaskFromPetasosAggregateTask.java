@@ -49,7 +49,7 @@ public class FHIRTaskFromPetasosAggregateTask extends FHIRTaskFromPetasosTask {
     private TaskStatusReasonFactory statusReasonFactory;
 
     @Inject
-    TaskPerformerTypeFactory performerTypeFactory;
+    private TaskPerformerTypeFactory performerTypeFactory;
 
     @Inject
     private PegacornIdentifierFactory identifierFactory;

@@ -337,7 +337,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(this.fhirTopicIDBuilder);
     }
 
-    protected CamelContext getCamelContext() {
+    public CamelContext getCamelContext() {
         return camelContext;
     }
 

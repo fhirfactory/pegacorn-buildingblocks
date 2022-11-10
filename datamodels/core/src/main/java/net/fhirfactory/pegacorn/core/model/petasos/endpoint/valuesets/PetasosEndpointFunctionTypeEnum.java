@@ -24,7 +24,8 @@ package net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets;
 public enum PetasosEndpointFunctionTypeEnum {
     PETASOS_INFINISPAN_ENDPOINT("petasos.endpoint_function.infinispan", "Infinispan", "JGroups.Infinispan"),
     PETASOS_INTERACT_ENDPOINT("petasos.endpoint_function.interact", "Interact", "JGroups.Interact"),
-    PETASOS_MESSAGING_ENDPOINT("petasos.endpoint_function.messaging","Messaging", "JGroups.MessagingIPC"),
+    PETASOS_TASK_ROUTING_RECEIVER_ENDPOINT("petasos.endpoint_function.task_routing_receiver","TaskRoutingReceiver", "JGroups.MessagingIPC"),
+    PETASOS_TASK_ROUTING_FORWARDER_ENDPOINT("petasos.endpoint_function.task_routing_forwarder","TaskRoutingForwarder", "JGroups.MessagingIPC"),
     PETASOS_SUBSCRIPTIONS_ENDPOINT("petasos.endpoint_function.subscription_services", "SubscriptionServices","JGroups.SubscriptionServices"),
     PETASOS_INTERCEPTION_ENDPOINT("petasos.endpoint_function.interception_services", "InterceptionServices", "JGroups.InterceptionServices"),
     PETASOS_TASKING_ENDPOINT("petasos.endpoint_function.tasking_services", "TaskingServices", "JGroups.TaskingServices"),

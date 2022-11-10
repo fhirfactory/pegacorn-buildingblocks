@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.fact
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.valuesets.TaskReasonTypeEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
 
@@ -80,8 +81,57 @@ public class TaskIdTypeFactory {
         return(id);
     }
 
+    public TaskIdType newTaskId(String participantName, TaskReasonTypeEnum taskReason, DataParcelTypeDescriptor contentDescriptor){
+        StringBuilder idBuilder = new StringBuilder();
+        idBuilder.append(participantName);
+        idBuilder.append("::");
+        idBuilder.append(taskReason.getTaskReasonDisplayName());
+        idBuilder.append("(");
+        if(contentDescriptor.hasDataParcelDefiner()){
+            String definer = contentDescriptor.getDataParcelDefiner();
+            String definerValue = definer.replaceAll(" ", "");
+            idBuilder.append(definerValue);
+        }
+        if(contentDescriptor.hasDataParcelCategory()){
+            String category = contentDescriptor.getDataParcelCategory();
+            idBuilder.append("."+category);
+        }
+        if(contentDescriptor.hasDataParcelSubCategory()){
+            String subCategory = contentDescriptor.getDataParcelSubCategory();
+            idBuilder.append("."+subCategory);
+        }
+        if(contentDescriptor.hasDataParcelResource()){
+            String resource = contentDescriptor.getDataParcelResource();
+            idBuilder.append("."+resource);
+        }
+        if(contentDescriptor.hasDataParcelSegment()){
+            String segment = contentDescriptor.getDataParcelSegment();
+            idBuilder.append("."+segment);
+        }
+        if(contentDescriptor.hasDataParcelAttribute()){
+            String attribute = contentDescriptor.getDataParcelAttribute();
+            idBuilder.append("."+attribute);
+        }
+        if(contentDescriptor.hasDataParcelDiscriminatorType()){
+            String descType = contentDescriptor.getDataParcelDiscriminatorType();
+            idBuilder.append("."+descType);
+        }
+        if(contentDescriptor.hasDataParcelDiscriminatorValue()){
+            String descValue = contentDescriptor.getDataParcelDiscriminatorValue();
+            idBuilder.append("."+descValue);
+        }
+        idBuilder.append(")");
+        long leastSignificantBits = UUID.randomUUID().getLeastSignificantBits();
+        String hexString = Long.toHexString(leastSignificantBits);
+        idBuilder.append("::");
+        idBuilder.append(hexString);
+        TaskIdType id = new TaskIdType();
+        id.setLocalId(idBuilder.toString());
+        return(id);
+    }
+
     public TaskIdType newTaskId(){
-        TaskIdType taskId = newTaskId();
+        TaskIdType taskId = new TaskIdType();
         return(taskId);
     }
 
@@ -101,5 +151,36 @@ public class TaskIdTypeFactory {
         String id = Long.toHexString(uuid.getMostSignificantBits()) + Long.toHexString(uuid.getLeastSignificantBits());
         taskId.setLocalId(id);
         return(taskId);
+    }
+
+    public TaskIdType newRoutingTaskId(String participantName, TaskIdType oldId){
+        if(oldId == null){
+            return(null);
+        }
+        if(StringUtils.isEmpty(oldId.getId())){
+            return(null);
+        }
+        int startingPoint = oldId.getId().indexOf('(');
+        int endingPoint = oldId.getId().indexOf(')');
+
+        if(startingPoint <= 0 && endingPoint <= 0){
+            return(null);
+        }
+        String dataType = oldId.getId().substring(startingPoint, endingPoint);
+        if(StringUtils.isEmpty(dataType)){
+            return(null);
+        }
+        StringBuilder newID = new StringBuilder();
+        newID.append(participantName);
+        newID.append("::");
+        newID.append(TaskReasonTypeEnum.TASK_REASON_TASK_ROUTING.getTaskReasonDisplayName());
+        newID.append(dataType);
+        long leastSignificantBits = UUID.randomUUID().getLeastSignificantBits();
+        String hexString = Long.toHexString(leastSignificantBits);
+        newID.append("::");
+        newID.append(hexString);
+        TaskIdType id = new TaskIdType();
+        id.setLocalId(newID.toString());
+        return(id);
     }
 }

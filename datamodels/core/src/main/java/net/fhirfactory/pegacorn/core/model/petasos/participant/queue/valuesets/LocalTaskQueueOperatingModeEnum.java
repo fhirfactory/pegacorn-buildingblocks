@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2022 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,42 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.topology;
+package net.fhirfactory.pegacorn.core.model.petasos.participant.queue.valuesets;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
-
-import javax.inject.Inject;
-
-public abstract class EdgeIPCEndpoint extends RouteBuilder {
-
-    @Inject
-    private CamelContext camelContext;
-
-    @Inject
-    private ProcessingPlantInterface processingPlant;
-
-    @Inject
-    private TopologyIM topologyIM;
-
-    abstract protected Logger specifyLogger();
-
-    protected Logger getLogger(){
-        return(specifyLogger());
-    }
-
-    public CamelContext getCamelContext(){
-        return(camelContext);
-    }
-
-    protected ProcessingPlantInterface getProcessingPlant(){
-        return(processingPlant);
-    }
-
-    public TopologyIM getTopologyIM() {
-        return topologyIM;
-    }
+public enum LocalTaskQueueOperatingModeEnum {
+    QUEUE_MODE_OFFLOAO_NOT_REQUIRED,
+    QUEUE_MODE_OFFLOAD_REQUIRED
 }

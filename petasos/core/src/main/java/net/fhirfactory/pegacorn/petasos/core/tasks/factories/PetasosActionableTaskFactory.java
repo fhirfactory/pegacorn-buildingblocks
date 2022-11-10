@@ -23,6 +23,8 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskSequenceNumber;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.TaskSequenceNumberGenerator;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
@@ -61,6 +63,9 @@ public class PetasosActionableTaskFactory {
 
     @Inject
     private ProcessingPlantInterface processingPlant;
+
+    @Inject
+    private TaskSequenceNumberGenerator sequenceNumberGenerator;
 
     //
     // Constructor(s)
@@ -130,6 +135,8 @@ public class PetasosActionableTaskFactory {
         // create a new id
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask ID] Start");
         TaskIdType taskId = taskIdFactory.newTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING, payload.getPayloadTopicID().getContentDescriptor());
+        TaskSequenceNumber taskSequenceNumber = sequenceNumberGenerator.generateNewSequenceNumber();
+        taskId.setTaskSequenceNumber(taskSequenceNumber);
         newTask.setTaskId(taskId);
         getLogger().trace(".newMessageBasedActionableTask(): [Create ActionableTask ID] Finish");
         //

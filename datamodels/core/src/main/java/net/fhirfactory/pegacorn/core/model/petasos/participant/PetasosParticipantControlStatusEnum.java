@@ -19,42 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.topology;
+package net.fhirfactory.pegacorn.core.model.petasos.participant;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
+public enum PetasosParticipantControlStatusEnum {
+    PARTICIPANT_IS_IN_ERROR("InError", "Participant-is-In-Error", "dricats.petasos.participant.operational_status.error"),
+    PARTICIPANT_IS_ENABLED("Enabled", "Participant-is-Enabled", "dricats.petasos.participant.operational_status.enabled"),
+    PARTICIPANT_IS_SUSPENDED("Suspended", "Participant-is-Suspended", "dricats.petasos.participant.operational_status.suspended"),
+    PARTICIPANT_IS_DISABLED("Disabled", "Participant-is-Disabled", "dricats.petasos.participant.operational_status.disabled");
 
-import javax.inject.Inject;
-
-public abstract class EdgeIPCEndpoint extends RouteBuilder {
-
-    @Inject
-    private CamelContext camelContext;
-
-    @Inject
-    private ProcessingPlantInterface processingPlant;
-
-    @Inject
-    private TopologyIM topologyIM;
-
-    abstract protected Logger specifyLogger();
-
-    protected Logger getLogger(){
-        return(specifyLogger());
+    private String value;
+    private String displayValue;
+    private String token;
+    private PetasosParticipantControlStatusEnum(String value, String displayValue, String token){
+        this.value = value;
+        this.displayValue = displayValue;
+        this.token = token;
     }
 
-    public CamelContext getCamelContext(){
-        return(camelContext);
-    }
-
-    protected ProcessingPlantInterface getProcessingPlant(){
-        return(processingPlant);
-    }
-
-    public TopologyIM getTopologyIM() {
-        return topologyIM;
+    @Override
+    public String toString() {
+        return "PetasosParticipantControlStatusEnum{" +
+                "value=" + value +
+                '}';
     }
 }

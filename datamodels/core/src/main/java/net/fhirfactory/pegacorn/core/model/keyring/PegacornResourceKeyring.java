@@ -178,12 +178,12 @@ public class PegacornResourceKeyring implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PegacornResourceKeyring that = (PegacornResourceKeyring) o;
-        return Objects.equals(getPrimaryBusinessIdentifier(), that.getPrimaryBusinessIdentifier()) && Objects.equals(getLocalId(), that.getLocalId()) && Objects.equals(getSourceSystemKeyMap(), that.getSourceSystemKeyMap());
+        return Objects.equals(getPrimaryBusinessIdentifier(), that.getPrimaryBusinessIdentifier()) && Objects.equals(getLocalId(), that.getLocalId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPrimaryBusinessIdentifier(), getLocalId(), getSourceSystemKeyMap());
+        return Objects.hash(getPrimaryBusinessIdentifier(), getLocalId());
     }
 
     //

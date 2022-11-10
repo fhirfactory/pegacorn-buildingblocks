@@ -19,42 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.topology;
+package net.fhirfactory.pegacorn.core.interfaces.oam.metrics;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
-
-import javax.inject.Inject;
-
-public abstract class EdgeIPCEndpoint extends RouteBuilder {
-
-    @Inject
-    private CamelContext camelContext;
-
-    @Inject
-    private ProcessingPlantInterface processingPlant;
-
-    @Inject
-    private TopologyIM topologyIM;
-
-    abstract protected Logger specifyLogger();
-
-    protected Logger getLogger(){
-        return(specifyLogger());
-    }
-
-    public CamelContext getCamelContext(){
-        return(camelContext);
-    }
-
-    protected ProcessingPlantInterface getProcessingPlant(){
-        return(processingPlant);
-    }
-
-    public TopologyIM getTopologyIM() {
-        return topologyIM;
-    }
+public interface PetasosTaskCacheStatusInterface {
+    public Integer getActionableTaskCacheSize();
 }

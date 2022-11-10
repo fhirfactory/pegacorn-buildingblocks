@@ -26,7 +26,13 @@ import net.fhirfactory.pegacorn.core.model.keyring.PegacornResourceKeyring;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
 
+import java.util.Objects;
+
 public class TaskIdType extends PegacornResourceKeyring {
+
+    private TaskSequenceNumber taskSequenceNumber;
+
+    public static final String RESOURCE_TYPE = "PetasosTask";
 
     //
     // Constructors
@@ -34,14 +40,17 @@ public class TaskIdType extends PegacornResourceKeyring {
 
     public TaskIdType(){
         super();
+        setResourceType(RESOURCE_TYPE);
     }
 
     public TaskIdType(IdType id, String keyContext){
         super(id, keyContext);
+        setResourceType(RESOURCE_TYPE);
     }
 
     public TaskIdType(Identifier identifier){
         super(identifier);
+        setResourceType(RESOURCE_TYPE);
     }
 
     public TaskIdType(TaskIdType ori){
@@ -62,22 +71,51 @@ public class TaskIdType extends PegacornResourceKeyring {
         setLocalId(id);
     }
 
+    public TaskSequenceNumber getTaskSequenceNumber() {
+        return taskSequenceNumber;
+    }
+
+    public void setTaskSequenceNumber(TaskSequenceNumber taskSequenceNumber) {
+        this.taskSequenceNumber = taskSequenceNumber;
+    }
+
     //
     // Hashcode && Equals
     //
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        TaskIdType that = (TaskIdType) o;
+        return getTaskSequenceNumber().equals(that.getTaskSequenceNumber());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getTaskSequenceNumber());
+    }
+
+
     //
     // To String
     //
+
+
     @Override
     public String toString() {
-        return "PegacornResourceKeyring{" +
-                "primaryBusinessIdentifier=" + getPrimaryBusinessIdentifier() +
-                ", localId=" + getLocalId()  +
-                ", businessIdentifiersMap=" + getBusinessIdentifiersMap() +
-                ", sourceSystemKeyMap=" + getSourceSystemKeyMap() +
-                ", resourceType=" + getResourceType() +
-                '}';
+        final StringBuffer sb = new StringBuffer("TaskIdType{");
+        sb.append("taskSequenceNumber=").append(taskSequenceNumber);
+        sb.append(", id='").append(getId()).append('\'');
+        sb.append(", primaryBusinessIdentifier=").append(getPrimaryBusinessIdentifier());
+        sb.append(", localId='").append(getLocalId()).append('\'');
+        sb.append(", sourceSystemKeyMap=").append(getSourceSystemKeyMap());
+        sb.append(", resourceId=").append(getResourceId());
+        sb.append(", businessIdentifiersMap=").append(getBusinessIdentifiersMap());
+        sb.append(", defaultSourceSystemMapEntry='").append(getDefaultSourceSystemMapEntry()).append('\'');
+        sb.append(", resourceType='").append(getResourceType()).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
-
 }

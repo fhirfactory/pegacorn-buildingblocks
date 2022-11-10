@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2022 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,42 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.endpoints.topology;
+package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets;
 
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
+/**
+ *
+ * @author ACT Health (Mark A. Hunter)
+ */
+public enum TaskWindowBoundaryConditionEnum {
+    TASK_WINDOW_BOUNDARY_NONE("ASAP", "petasos.task.window.asap"),
+    TASK_WINDOW_BOUNDARY_BEFORE( "NotBeforeSpecifiedTime", "petasos.task.window.before_specified_time"),
+    TASK_WINDOW_BOUNDARY_AFTER("NotAfterSpecifiedTime" , "petasos.task.execution_window.after_specified_time");
 
-import javax.inject.Inject;
+    private String name;
+    private String token;
 
-public abstract class EdgeIPCEndpoint extends RouteBuilder {
-
-    @Inject
-    private CamelContext camelContext;
-
-    @Inject
-    private ProcessingPlantInterface processingPlant;
-
-    @Inject
-    private TopologyIM topologyIM;
-
-    abstract protected Logger specifyLogger();
-
-    protected Logger getLogger(){
-        return(specifyLogger());
+    private TaskWindowBoundaryConditionEnum(String name, String token ){
+        this.name = name;
+        this.token = token;
     }
 
-    public CamelContext getCamelContext(){
-        return(camelContext);
+    public String getName() {
+        return name;
     }
 
-    protected ProcessingPlantInterface getProcessingPlant(){
-        return(processingPlant);
-    }
-
-    public TopologyIM getTopologyIM() {
-        return topologyIM;
+    public String getToken() {
+        return token;
     }
 }
