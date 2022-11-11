@@ -48,9 +48,6 @@ public class FHIRResourceSetFromPetasosActionableTask {
     @Inject
     private ProcessingPlantInterface processingPlant;
 
-    @Inject
-    private FHIRTaskMetadataResourceSetFromHL7v2x metadataResourceSetFromHL7v2x;
-
 
     public List<Resource> transformTask(PetasosActionableTask actionableTask){
         getLogger().debug(".newTask(): Entry, actionableTask->{}", actionableTask);
@@ -64,7 +61,7 @@ public class FHIRResourceSetFromPetasosActionableTask {
         // Now the FHIR::Provenance
         Provenance fhirProvenance = provenanceFromPetasosTaskJourney.newProvenanceFromTaskJourney(processingPlant.getMeAsASoftwareComponent().getComponentID(), fhirTask.getIdentifierFirstRep(), actionableTask.getTaskTraceability());
         resourceList.add(fhirProvenance);
-        
+
         //
         // And done...
         getLogger().debug(".newTask(): Exit, resourceList->{}", resourceList);

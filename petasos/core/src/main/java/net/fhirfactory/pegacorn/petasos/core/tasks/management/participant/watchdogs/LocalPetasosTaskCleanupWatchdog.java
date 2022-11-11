@@ -200,7 +200,10 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
                                 case FULFILLMENT_EXECUTION_STATUS_FINISHED:
                                 case FULFILLMENT_EXECUTION_STATUS_FAILED:
                                 case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
-                                    Long age = Instant.now().getEpochSecond() - currentActionableTask.getCreationInstant().getEpochSecond();
+                                    if(currentActionableTask.getUpdateInstant() == null){
+                                        currentActionableTask.setUpdateInstant(currentActionableTask.getCreationInstant());
+                                    }
+                                    Long age = Instant.now().getEpochSecond() - currentActionableTask.getUpdateInstant().getEpochSecond();
                                     if (age > minimumAgeForTaskRetirement) {
                                         unregisterTask = true;
                                     }
@@ -282,7 +285,10 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
                         case FULFILLMENT_EXECUTION_STATUS_FINISHED:
                         case FULFILLMENT_EXECUTION_STATUS_FAILED:
                         case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
-                            Long age = Instant.now().getEpochSecond() - currentTask.getCreationInstant().getEpochSecond();
+                            if(currentTask.getUpdateInstant() == null){
+                                currentTask.setUpdateInstant(currentTask.getCreationInstant());
+                            }
+                            Long age = Instant.now().getEpochSecond() - currentTask.getUpdateInstant().getEpochSecond();
                             if (age > minimumAgeForTaskRetirement) {
                                 unregisterTask = true;
                             }
@@ -314,6 +320,28 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("LocalFulfillmentCache", taskCacheSize);
         processingPlantMetricsAgentAccessor.getMetricsAgent().touchWatchDogActivityIndicator("FulfillmentTaskWatchDog");
         getLogger().debug(".fulfillmentTaskCleanup(): Exit");
+    }
+
+    //
+    // Watchdog Issue
+    //
+
+    public void extendAllTaskLifetimes(){
+        List<PetasosFulfillmentTask> allFulfillmentIds = fulfillmentTaskCache.getFulfillmentTaskList();
+        for(PetasosFulfillmentTask currentTask: allFulfillmentIds){
+            currentTask.setUpdateInstant(Instant.now());
+        }
+
+        Set<String> allActionableTaskIds = getActionableTaskDM().getAllTaskIds();
+        for(String currentTaskId: allActionableTaskIds){
+            Object taskLock = actionableTaskDM.getTaskLock(currentTaskId);
+            if(taskLock != null) {
+                synchronized (taskLock) {
+                    PetasosActionableTask currentActionableTask = getActionableTaskDM().getTask(currentTaskId);
+                    currentActionableTask.setUpdateInstant(Instant.now());
+                }
+            }
+        }
     }
 
     //
