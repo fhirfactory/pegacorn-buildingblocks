@@ -59,7 +59,7 @@ public class FHIRResourceSetFromPetasosActionableTask {
         resourceList.add(fhirTask);
         //
         // Now the FHIR::Provenance
-        Provenance fhirProvenance = provenanceFromPetasosTaskJourney.newProvenanceFromTaskJourney(processingPlant.getMeAsASoftwareComponent().getComponentID(), fhirTask.getIdentifierFirstRep(), actionableTask.getTaskTraceability());
+        Provenance fhirProvenance = provenanceFromPetasosTaskJourney.newProvenanceFromTaskJourney(processingPlant.getMeAsASoftwareComponent().getParticipantName(), fhirTask.getIdentifierFirstRep(), actionableTask.getTaskTraceability());
         resourceList.add(fhirProvenance);
 
         //

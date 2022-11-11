@@ -65,6 +65,7 @@ public abstract class FHIRTaskFromPetasosTask {
         JavaTimeModule module = new JavaTimeModule();
         this.jsonMapper.registerModule(module);
         this.jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        this.initialised = false;
     }
 
     @PostConstruct
