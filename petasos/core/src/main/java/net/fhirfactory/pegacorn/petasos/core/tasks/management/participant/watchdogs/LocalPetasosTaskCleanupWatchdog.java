@@ -31,9 +31,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalFulfillmentTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.common.WatchdogBase;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.common.DaemonBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
-import net.fhirfactory.pegacorn.util.PegacornProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase implements PetasosTaskLifetimeExtensionInterface {
+public class LocalPetasosTaskCleanupWatchdog extends DaemonBase implements PetasosTaskLifetimeExtensionInterface {
     private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosTaskCleanupWatchdog.class);
 
     private Long minimumAgeForTaskRetirement;

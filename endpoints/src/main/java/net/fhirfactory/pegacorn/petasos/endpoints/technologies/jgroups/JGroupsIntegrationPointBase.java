@@ -130,7 +130,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
 
     @Override
     protected String specifyJGroupsChannelName() {
-        getLogger().debug(".specifyJGroupsChannelName(): Entry, getJGroupsIntegrationPoint()->", getJGroupsIntegrationPoint());
+        getLogger().debug(".specifyJGroupsChannelName(): Entry, getJGroupsIntegrationPoint()->{}", getJGroupsIntegrationPoint());
         String channelName = getJGroupsIntegrationPoint().getChannelName();
         return(channelName);
     }

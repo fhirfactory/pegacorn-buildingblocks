@@ -3,13 +3,13 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watch
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 
-public abstract class WatchdogBase extends RouteBuilder {
+public abstract class DaemonBase extends RouteBuilder {
 
     //
     // Constructor(s)
     //
 
-    public WatchdogBase(){
+    public DaemonBase(){
         super();
     }
 

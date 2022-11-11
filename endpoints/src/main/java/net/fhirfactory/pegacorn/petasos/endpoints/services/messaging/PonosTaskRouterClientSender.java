@@ -33,7 +33,6 @@ import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingP
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacketStatusEnum;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import net.fhirfactory.pegacorn.platform.edge.model.router.TaskRouterResponsePacket;
-import net.fhirfactory.pegacorn.platform.edge.model.router.TaskRouterStatusPacket;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -157,11 +156,11 @@ public class PonosTaskRouterClientSender extends PonosTaskRouterClientCommon {
     // Message Senders
     //
 
-    public TaskRouterResponsePacket forwardTask( PetasosActionableTask task){
-        getLogger().debug(".forwardTask(): Entry, task->{}", task);
+    public TaskRouterResponsePacket forwardTaskToRouter( PetasosActionableTask task){
+        getLogger().debug(".forwardTaskToRouter(): Entry, task->{}", task);
         Address targetAddress = resolveTargetAddressForTaskHub();
         if(targetAddress == null){
-            getLogger().error(".forwardTask(): Cannot find candidate service address for {}: task->{}",taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName(),  task);
+            getLogger().error(".forwardTaskToRouter(): Cannot find candidate service address for {}: task->{}",taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName(),  task);
             getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate " + taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
             getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate " + taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
             TaskRouterResponsePacket response = new TaskRouterResponsePacket();
@@ -173,21 +172,22 @@ public class PonosTaskRouterClientSender extends PonosTaskRouterClientCommon {
             return(response);
         }
         try {
+            getLogger().trace(".forwardTaskToRouter(): [Construct RMI Method Arguments] Start");
             String sourceName = getProcessingPlant().getMeAsASoftwareComponent().getParticipantName();
             Object objectSet[] = new Object[]{sourceName, task};
             Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            getLogger().trace(".forwardTaskToRouter(): [Construct RMI Method Arguments] Finish");
+            getLogger().trace(".forwardTaskToRouter(): [Invoke RMI Method] Start");
             TaskRouterResponsePacket response = null;
             synchronized(getIPCChannelLock()) {
                 response = getRPCDispatcher().callRemoteMethod(targetAddress, "receiveTask", objectSet, classSet, requestOptions);
             }
-            getLogger().trace(".forwardTask(): Message.SEND.RESPONSE: response->{}", response);
-            if(getLogger().isInfoEnabled()){
-                getLogger().info(".forwardTask(): Forwarding of Task Complete");
-            }
+            getLogger().trace(".forwardTaskToRouter(): [Invoke RMI Method] Finish, response->{}", response);
+            getLogger().trace(".forwardTaskToRouter(): Exit, task->{}", task);
             return(response);
         } catch (NoSuchMethodException e) {
-            getLogger().error(".forwardTask(): Error (NoSuchMethodException) -> ", e);
+            getLogger().error(".forwardTaskToRouter(): Error (NoSuchMethodException) -> ", e);
             TaskRouterResponsePacket response = new TaskRouterResponsePacket();
             response.setRoutedTaskId(task.getTaskId());
             response.setSuccessorTaskId(null);
@@ -196,7 +196,7 @@ public class PonosTaskRouterClientSender extends PonosTaskRouterClientCommon {
             response.setResponseCommentary("Error (NoSuchMethodException) -> " + e.getMessage());
             return(response);
         } catch (Exception e) {
-            getLogger().error(".forwardTask: Error (GeneralException) -> ",e);
+            getLogger().error(".forwardTaskToRouter: Error (GeneralException) -> ",e);
             TaskRouterResponsePacket response = new TaskRouterResponsePacket();
             response.setRoutedTaskId(task.getTaskId());
             response.setSuccessorTaskId(null);
@@ -208,12 +208,10 @@ public class PonosTaskRouterClientSender extends PonosTaskRouterClientCommon {
     }
 
     public InterProcessingPlantHandoverResponsePacket sendIPCMessage(String targetParticipantServiceName, InterProcessingPlantHandoverPacket handoverPacket){
-        if(getLogger().isInfoEnabled()) {
-            getLogger().info(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket.getActionableTask().getTaskId()->{}", targetParticipantServiceName, handoverPacket.getActionableTask().getTaskId());
-        }
+        getLogger().debug(".sendIPCMessage(): Entry, targetParticipantServiceName->{}, handoverPacket->{}", targetParticipantServiceName, handoverPacket);
 
         PetasosActionableTask actionableTask = handoverPacket.getActionableTask();
-        TaskRouterResponsePacket taskRouterResponsePacket = forwardTask(actionableTask);
+        TaskRouterResponsePacket taskRouterResponsePacket = forwardTaskToRouter(actionableTask);
 
         InterProcessingPlantHandoverResponsePacket interProcessingPlantHandoverResponsePacket = new InterProcessingPlantHandoverResponsePacket();
         if(!taskRouterResponsePacket.getParticipantStatus().equals(PetasosParticipantControlStatusEnum.PARTICIPANT_IS_IN_ERROR)) {
@@ -230,9 +228,7 @@ public class PonosTaskRouterClientSender extends PonosTaskRouterClientCommon {
 
         getMetricsAgent().incrementInternalMessageDistributionCount();
         getMetricsAgent().incrementInternalMessageDistributionCount(targetParticipantServiceName);
-        if(getLogger().isInfoEnabled()) {
-            getLogger().info(".sendIPCMessage(): Exit, interProcessingPlantHandoverResponsePacket->{}", interProcessingPlantHandoverResponsePacket.getStatus());
-        }
+        getLogger().debug(".sendIPCMessage(): Exit, interProcessingPlantHandoverResponsePacket->{}", interProcessingPlantHandoverResponsePacket);
         return(interProcessingPlantHandoverResponsePacket);
     }
 }

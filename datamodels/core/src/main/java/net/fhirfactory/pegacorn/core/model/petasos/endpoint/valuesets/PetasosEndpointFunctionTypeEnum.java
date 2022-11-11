@@ -26,6 +26,8 @@ public enum PetasosEndpointFunctionTypeEnum {
     PETASOS_INTERACT_ENDPOINT("petasos.endpoint_function.interact", "Interact", "JGroups.Interact"),
     PETASOS_TASK_ROUTING_RECEIVER_ENDPOINT("petasos.endpoint_function.task_routing_receiver","TaskRoutingReceiver", "JGroups.MessagingIPC"),
     PETASOS_TASK_ROUTING_FORWARDER_ENDPOINT("petasos.endpoint_function.task_routing_forwarder","TaskRoutingForwarder", "JGroups.MessagingIPC"),
+    PETASOS_TASK_ROUTING_RECEIVER_HUB_ENDPOINT("petasos.endpoint_function.task_routing_hub_receiver","TaskRoutingHubReceiver", "JGroups.MessagingIPC"),
+    PETASOS_TASK_ROUTING_FORWARDER_HUB_ENDPOINT("petasos.endpoint_function.task_routing_hub_forwarder","TaskRoutingHubForwarder", "JGroups.MessagingIPC"),
     PETASOS_SUBSCRIPTIONS_ENDPOINT("petasos.endpoint_function.subscription_services", "SubscriptionServices","JGroups.SubscriptionServices"),
     PETASOS_INTERCEPTION_ENDPOINT("petasos.endpoint_function.interception_services", "InterceptionServices", "JGroups.InterceptionServices"),
     PETASOS_TASKING_ENDPOINT("petasos.endpoint_function.tasking_services", "TaskingServices", "JGroups.TaskingServices"),

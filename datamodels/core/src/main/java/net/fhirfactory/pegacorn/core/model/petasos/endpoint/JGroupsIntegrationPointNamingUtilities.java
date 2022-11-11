@@ -137,7 +137,7 @@ public class JGroupsIntegrationPointNamingUtilities {
         if(StringUtils.isEmpty(channelName)){
             return(null);
         }
-        String ipcName = remapFunctionTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_ENDPOINT);
+        String ipcName = remapFunctionTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_HUB_ENDPOINT);
         return(ipcName);
     }
 
@@ -355,7 +355,7 @@ public class JGroupsIntegrationPointNamingUtilities {
     }
 
     public String getIPCFunctionName(){
-        return(PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_ENDPOINT.getDisplayName());
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_HUB_ENDPOINT.getDisplayName());
     }
 
     public String getPetasosTaskServicesFunctionName(){

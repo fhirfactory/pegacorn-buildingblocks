@@ -40,26 +40,26 @@ public abstract class PonosTaskRouterClientCommon extends JGroupsIntegrationPoin
     //
 
     protected Address resolveTargetAddressForTaskHub(){
-        getLogger().warn(".resolveTargetAddressForTaskReceiver(): Entry");
+        getLogger().debug(".resolveTargetAddressForTaskReceiver(): Entry");
 
         String taskRouterHubName = taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName();
-        getLogger().warn(".resolveTargetAddressForTaskReceiver(): taskRouterHubName->{}", taskRouterHubName);
+        getLogger().trace(".resolveTargetAddressForTaskReceiver(): taskRouterHubName->{}", taskRouterHubName);
         if(getIPCChannel() == null){
-            getLogger().warn(".resolveTargetAddressForTaskReceiver(): IPCChannel is null, exit returning (null)");
+            getLogger().debug(".resolveTargetAddressForTaskReceiver(): IPCChannel is null, exit returning (null)");
             return(null);
         }
-        getLogger().warn(".resolveTargetAddressForTaskReceiver(): IPCChannel is NOT null, get updated Address set via view");
+        getLogger().trace(".resolveTargetAddressForTaskReceiver(): IPCChannel is NOT null, get updated Address set via view");
         List<Address> addressList = getAllViewMembers();
         Address foundAddress = null;
         synchronized (this.getCurrentScannedMembershipLock()) {
-            getLogger().warn(".getCandidateTargetServiceAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+            getLogger().trace(".getCandidateTargetServiceAddress(): Got the Address set via view, now iterate through and see if one is suitable");
             for (Address currentAddress : addressList) {
-                getLogger().warn(".resolveTargetAddressForTaskReceiver(): Iterating through Address list, current element->{}", currentAddress);
+                getLogger().trace(".resolveTargetAddressForTaskReceiver(): Iterating through Address list, current element->{}", currentAddress);
                 String currentService = deriveIntegrationPointSubsystemName(currentAddress.toString());
-                getLogger().warn(".resolveTargetAddressForTaskReceiver(): Iterating through Address list, current service->{}", currentService);
+                getLogger().trace(".resolveTargetAddressForTaskReceiver(): Iterating through Address list, current service->{}", currentService);
                 if (currentService.contentEquals(taskRouterHubName)) {
-                    if(currentAddress.toString().contains(PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_ENDPOINT.getDisplayName())) {
-                        getLogger().warn(".resolveTargetAddressForTaskReceiver(): Exit, A match!");
+                    if(currentAddress.toString().contains(PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_HUB_ENDPOINT.getDisplayName())) {
+                        getLogger().trace(".resolveTargetAddressForTaskReceiver(): Exit, A match!");
                         foundAddress = currentAddress;
                         break;
                     }

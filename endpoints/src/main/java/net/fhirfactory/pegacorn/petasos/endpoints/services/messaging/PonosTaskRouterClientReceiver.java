@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.services.messaging;
 
 import net.fhirfactory.pegacorn.core.interfaces.oam.metrics.PetasosTaskCacheStatusInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
