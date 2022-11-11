@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.general;
+package net.fhirfactory.pegacorn.petasos.endpoints.topology;
 
 import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosServicesEndpointRegistrationService;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
@@ -29,7 +29,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEnd
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PonosTaskRouterClientSender;
-import net.fhirfactory.pegacorn.platform.edge.general.beans.PetasosEdgeDoNothingBean;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.MOAStandardWUP;
 import org.slf4j.Logger;

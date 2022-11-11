@@ -187,22 +187,22 @@ public class PonosTaskRouterClientSender extends PonosTaskRouterClientCommon {
             }
             return(response);
         } catch (NoSuchMethodException e) {
-            getLogger().error(".forwardTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            getLogger().error(".forwardTask(): Error (NoSuchMethodException) -> ", e);
             TaskRouterResponsePacket response = new TaskRouterResponsePacket();
             response.setRoutedTaskId(task.getTaskId());
             response.setSuccessorTaskId(null);
             response.setRoutingActivityInstant(Instant.now());
             response.setParticipantStatus(PetasosParticipantControlStatusEnum.PARTICIPANT_IS_IN_ERROR);
-            response.setResponseCommentary("Error (NoSuchMethodException)" + e.getMessage());
+            response.setResponseCommentary("Error (NoSuchMethodException) -> " + e.getMessage());
             return(response);
         } catch (Exception e) {
-            getLogger().error(".forwardTask: Error (GeneralException) ->{}", e.getMessage());
+            getLogger().error(".forwardTask: Error (GeneralException) -> ",e);
             TaskRouterResponsePacket response = new TaskRouterResponsePacket();
             response.setRoutedTaskId(task.getTaskId());
             response.setSuccessorTaskId(null);
             response.setRoutingActivityInstant(Instant.now());
             response.setParticipantStatus(PetasosParticipantControlStatusEnum.PARTICIPANT_IS_IN_ERROR);
-            response.setResponseCommentary("Error (GeneralException)" + e.getMessage());
+            response.setResponseCommentary("Error (GeneralException) ->" + e.getMessage());
             return(response);
         }
     }
