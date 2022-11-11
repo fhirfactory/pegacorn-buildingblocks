@@ -33,11 +33,13 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.value
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskExtensionSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskPerformerTypeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskStatusReasonFactory;
 import net.fhirfactory.pegacorn.services.tasks.transforms.common.TaskTransformConstants;
 import org.apache.commons.lang3.SerializationUtils;
 import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.codesystems.TaskCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,9 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
     @Inject
     private TaskTransformConstants taskTransformConstants;
+
+    @Inject
+    private TaskExtensionSystemFactory taskExtensionSystems;
 
     //
     // Constructor(s)
@@ -148,7 +153,7 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
             ActionableTaskOutcomeStatusEnum outcomeStatus = actionableTask.getTaskOutcomeStatus().getOutcomeStatus();
             switch(outcomeStatus){
                 case ACTIONABLE_TASK_OUTCOME_STATUS_UNKNOWN:
-                    outcome = Task.TaskStatus.NULL;
+                    outcome = Task.TaskStatus.DRAFT;
                     break;
                 case ACTIONABLE_TASK_OUTCOME_STATUS_CANCELLED:
                     outcome = Task.TaskStatus.CANCELLED;
@@ -172,8 +177,8 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
             getLogger().debug(".specifyStatus(): Exit, outcome->{}", outcome);
             return(outcome);
         }
-        getLogger().debug(".specifyStatus(): Exit, outcome->{}", Task.TaskStatus.NULL);
-        return(Task.TaskStatus.NULL);
+        getLogger().debug(".specifyStatus(): Exit, outcome->{}", Task.TaskStatus.DRAFT);
+        return(Task.TaskStatus.DRAFT);
     }
 
     @Override
@@ -222,13 +227,21 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
     @Override
     protected CodeableConcept specifyCode(PetasosTask petasosTask) {
-
-        return null;
+        TaskCode taskCode = TaskCode.FULFILL;
+        Coding coding = new Coding();
+        coding.setCode(taskCode.toCode());
+        coding.setSystem(taskCode.getSystem());
+        coding.setDisplay(taskCode.getDisplay());
+        CodeableConcept taskCodeCC = new CodeableConcept();
+        taskCodeCC.addCoding(coding);
+        taskCodeCC.setText(taskCode.getDisplay());
+        return taskCodeCC;
     }
 
     @Override
     protected String specifyDescription(PetasosTask petasosTask) {
-        return null;
+        String description = petasosTask.getTaskWorkItem().getIngresContent().getPayloadManifest().toString();
+        return(description);
     }
 
     @Override

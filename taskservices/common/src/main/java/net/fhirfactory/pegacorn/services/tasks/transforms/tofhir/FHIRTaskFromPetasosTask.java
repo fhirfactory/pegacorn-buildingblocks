@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.services.tasks.transforms.tofhir;
 
+import ca.uhn.fhir.parser.IParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -31,11 +32,13 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.value
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskIdentifierFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskWorkItemFactory;
+import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Date;
@@ -43,11 +46,15 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class FHIRTaskFromPetasosTask {
-
-    ObjectMapper jsonMapper = new ObjectMapper();
+    private ObjectMapper jsonMapper;
+    private Boolean initialised;
+    private IParser fhirJSONParser;
 
     @Inject
     private TaskIdentifierFactory taskIdentifierFactory;
+
+    @Inject
+    private FHIRContextUtility fhirContextUtility;
 
     @Inject
     private TaskWorkItemFactory workItemFactory;
@@ -58,6 +65,16 @@ public abstract class FHIRTaskFromPetasosTask {
         JavaTimeModule module = new JavaTimeModule();
         this.jsonMapper.registerModule(module);
         this.jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
+    @PostConstruct
+    public void initialise(){
+        if(initialised){
+            // do nothing
+        } else {
+            fhirJSONParser = getFHIRContextUtility().getJsonParser();
+            this.initialised = true;
+        }
     }
 
     //
@@ -91,158 +108,203 @@ public abstract class FHIRTaskFromPetasosTask {
     //
 
     public Task newTaskFromPetasosTask(PetasosTask petasosTask){
-        getLogger().debug(".newTask(): Entry, actionableTask->{}", petasosTask);
+        getLogger().debug(".newTaskFromPetasosTask(): Entry, actionableTask->{}", petasosTask);
         Task fhirTask = new Task();
 
         //
         // Create and add the Task::Identifier
+        getLogger().trace(".newTaskFromPetasosTask(): [Create and Add Identifier] Start");
         Identifier identifier = getTaskIdentifierFactory().newTaskIdentifier(TaskTypeTypeEnum.PETASOS_ACTIONABLE_TASK_TYPE, petasosTask.getTaskId());
         fhirTask.addIdentifier(identifier);
+        getLogger().trace(".newTaskFromPetasosTask(): [Create and Add Identifier] Finish");
 
         //
         // Set the "BasedOn" Attribute
+        getLogger().trace(".newTaskFromPetasosTask(): [Create and Add BasedOn] Start");
         Reference basedOnReference = specifyBasedOn(petasosTask);
         if(basedOnReference != null) {
             fhirTask.addBasedOn(basedOnReference);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Create and Add -basedOn-] Finish");
 
         //
         // Set the Group Identifier
+        getLogger().trace(".newTaskFromPetasosTask(): [Create and Add GroupIdentifier] Start");
         Identifier groupIdentifier = specifyGroupIdentifier(petasosTask);
         if(groupIdentifier != null){
             fhirTask.setGroupIdentifier(groupIdentifier);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Create and Add GroupIdentifier] Finish");
 
         //
         // Set the "Part Of" Attribute
+        getLogger().trace(".newTaskFromPetasosTask(): [Create and Add PartOf] Start");
         List<Reference> partOfReference = specifyPartOf(petasosTask);
         if(partOfReference != null){
             fhirTask.getPartOf().addAll(partOfReference);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Create and Add PartOf] Finish");
 
         //
         // Set the status
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Status] Start");
         fhirTask.setStatus(specifyStatus(petasosTask));
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Status] Finish");
 
         //
         // Set the Status Reason
+        getLogger().trace(".newTaskFromPetasosTask(): [Set StatusReason] Start");
         CodeableConcept statusReasonCC = specifyStatusReason(petasosTask);
         if(statusReasonCC != null) {
             fhirTask.setStatusReason(statusReasonCC);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set StatusReason] Finish");
 
         //
         // Set the Business Status
+        getLogger().trace(".newTaskFromPetasosTask(): [Set BusinessStatus] Start");
         CodeableConcept businessStatusCC = specifyBusinessStatus(petasosTask);
         if(businessStatusCC != null){
             fhirTask.setBusinessStatus(businessStatusCC);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set BusinessStatus] Finish");
 
         //
         // Set the Task "Intent"
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Intent] Start");
         Task.TaskIntent taskIntent = specifyIntent(petasosTask);
         if(taskIntent != null){
             fhirTask.setIntent(taskIntent);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Intent] Finish");
 
         //
         // Set the Task "Priority"
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Priority] Start");
         Task.TaskPriority taskPriority = specifyPriority(petasosTask);
         if(taskPriority != null){
             fhirTask.setPriority(taskPriority);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Priority] Finish");
 
         //
         // Set the Task "Code"
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Code] Start");
         CodeableConcept taskCodeCC = specifyCode(petasosTask);
         if(taskCodeCC != null){
             fhirTask.setCode(taskCodeCC);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Code] Finish");
 
         //
         // Set the Task Description
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Description] Start");
         String taskDescription = specifyDescription(petasosTask);
         if(StringUtils.isNotBlank(taskDescription)){
             fhirTask.setDescription(taskDescription);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Description] Finish");
 
         //
         // Set the Task "Focus"
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Focus] Start");
         Reference taskFocus = specifyFocus(petasosTask);
         if(taskFocus != null){
             fhirTask.setFocus(taskFocus);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Focus] Finish");
 
         //
         // Set the Task "For" (Beneficiary)
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Beneficiary] Start");
         Reference taskFor = specifyFor(petasosTask);
         if(taskFor != null){
             fhirTask.setFor(taskFor);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Beneficiary] Finish");
 
         //
         // Set the Task Encounter
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Encounter] Start");
         Reference taskEncounter = specifyEncounter(petasosTask);
         if(taskEncounter != null){
             fhirTask.setEncounter(taskEncounter);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Encounter] Finish");
 
         //
         // Set the Execution Period
+        getLogger().trace(".newTaskFromPetasosTask(): [Set ExecutionPeriod] Start");
         Period taskExecutionPeriod = specifyExecutionPeriod(petasosTask);
         if(taskExecutionPeriod != null){
             fhirTask.setExecutionPeriod(taskExecutionPeriod);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set ExecutionPeriod] Finish");
 
         //
         // Set the creation (Authored On) date
+        getLogger().trace(".newTaskFromPetasosTask(): [Set AuthoredOn] Start");
         Instant creationInstant = petasosTask.getCreationInstant();
         Date creationDate = Date.from(creationInstant);
         fhirTask.setAuthoredOn(creationDate);
+        getLogger().trace(".newTaskFromPetasosTask(): [Set AuthoredOn] Finish");
 
         //
         // Set the last update (Last Update On) date
+        getLogger().trace(".newTaskFromPetasosTask(): [Set LastModified] Start");
         Instant lastModifiedInstant = petasosTask.getUpdateInstant();
         Date updateDate = Date.from(lastModifiedInstant);
         fhirTask.setLastModified(creationDate);
+        getLogger().trace(".newTaskFromPetasosTask(): [Set LastModified] Finish");
 
         //
         // Set the Requester
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Requester] Start");
         Reference taskRequester = specifyRequester(petasosTask);
         if(taskRequester != null){
             fhirTask.setRequester(taskRequester);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Requester] Finish");
 
         //
         // Set the PerformerType
+        getLogger().trace(".newTaskFromPetasosTask(): [Set PerformerType] Start");
         List<CodeableConcept> taskPerformerCC = specifyPerformerType(petasosTask);
         if(taskPerformerCC != null){
             fhirTask.getPerformerType().addAll(taskPerformerCC);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set PerformerType] Finsh");
 
         //
         // Set the Owner
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Owner] Start");
         Reference taskOwner = specifyOwner(petasosTask);
         if(taskOwner != null){
             fhirTask.setOwner(taskOwner);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Owner] Finish");
 
         //
         // Set the Task Reason
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Reason] Start");
         CodeableConcept taskReasonCodeCC = specifyReasonCode(petasosTask);
         if(taskReasonCodeCC != null){
             fhirTask.setReasonCode(taskReasonCodeCC);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Reason] Finish");
 
         //
         // Add the Task Input
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Input] Start");
         if(petasosTask.getTaskWorkItem().getIngresContent() != null){
             Task.ParameterComponent taskInput = getWorkItemFactory().newWorkItemPayload(petasosTask.getTaskWorkItem().getIngresContent());
             fhirTask.addInput(taskInput);
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Input] Finish");
 
         //
         // Add the Task Output
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Output] Start");
         if(petasosTask.getTaskWorkItem().hasEgressContent()){
             if(!petasosTask.getTaskWorkItem().getEgressContent().getPayloadElements().isEmpty()){
                 for(UoWPayload currentEgressPayload: petasosTask.getTaskWorkItem().getEgressContent().getPayloadElements()){
@@ -251,8 +313,19 @@ public abstract class FHIRTaskFromPetasosTask {
                 }
             }
         }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Output] Start");
 
-        getLogger().debug(".newTask(): Exit, fhirTask->{}", fhirTask);
+        if(getLogger().isTraceEnabled()){
+            try{
+                getFHIRJSONParser().setPrettyPrint(true);
+                String taskAsString = getFHIRJSONParser().encodeResourceToString(fhirTask);
+                getLogger().trace(".newTaskFromPetasosTask(): Task->{}", taskAsString);
+            } catch(Exception ex){
+                getLogger().trace(".newTaskFromPetasosTask(): Can't print task...", ex);
+            }
+        }
+
+        getLogger().debug(".newTaskFromPetasosTask(): Exit, fhirTask->{}", fhirTask);
         return(fhirTask);
     }
 
@@ -285,4 +358,13 @@ public abstract class FHIRTaskFromPetasosTask {
     protected TaskWorkItemFactory getWorkItemFactory(){
         return(this.workItemFactory);
     }
+
+    protected IParser getFHIRJSONParser(){
+        return(fhirJSONParser);
+    }
+
+    protected FHIRContextUtility getFHIRContextUtility(){
+        return(fhirContextUtility);
+    }
+
 }
