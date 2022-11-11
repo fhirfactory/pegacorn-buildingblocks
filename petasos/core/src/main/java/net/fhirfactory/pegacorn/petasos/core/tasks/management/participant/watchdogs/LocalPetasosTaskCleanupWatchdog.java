@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs;
 
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskLifetimeExtensionInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
@@ -47,7 +48,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @ApplicationScoped
-public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
+public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase implements PetasosTaskLifetimeExtensionInterface {
     private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosTaskCleanupWatchdog.class);
 
     private Long minimumAgeForTaskRetirement;
@@ -326,6 +327,7 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
     // Watchdog Issue
     //
 
+    @Override
     public void extendAllTaskLifetimes(){
         List<PetasosFulfillmentTask> allFulfillmentIds = fulfillmentTaskCache.getFulfillmentTaskList();
         for(PetasosFulfillmentTask currentTask: allFulfillmentIds){
@@ -338,7 +340,9 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
             if(taskLock != null) {
                 synchronized (taskLock) {
                     PetasosActionableTask currentActionableTask = getActionableTaskDM().getTask(currentTaskId);
-                    currentActionableTask.setUpdateInstant(Instant.now());
+                    if(currentActionableTask != null) {
+                        currentActionableTask.setUpdateInstant(Instant.now());
+                    }
                 }
             }
         }
