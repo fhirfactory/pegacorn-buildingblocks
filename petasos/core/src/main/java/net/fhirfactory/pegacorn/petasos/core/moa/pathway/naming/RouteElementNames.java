@@ -104,17 +104,17 @@ public class RouteElementNames {
     }
 
     public String getInteractEgressEndpointInRoute(){
-        String name = this.wupTypeName+"WUP.Core.InteractEgressEndpointIn";
+        String name = INTRA_FUNCTION_DIRECT_TYPE + this.wupTypeName+"WUP.Core.InteractEgressEndpointIn";
         return(name);
     }
 
     public String getInteractEgressEndpointOutRoute(){
-        String name = this.wupTypeName+"WUP.Core.InteractEgressEndpointOut";
+        String name = INTRA_FUNCTION_DIRECT_TYPE + this.wupTypeName+"WUP.Core.InteractEgressEndpointOut";
         return(name);
     }
 
     public String getInteractEgressEndpointTimer(){
-        String name = this.wupTypeName+"WUP.Core.InteractEgressEndpointTimer";
+        String name = INTRA_FUNCTION_DIRECT_TYPE + this.wupTypeName+"WUP.Core.InteractEgressEndpointTimer";
         return(name);
     }
 

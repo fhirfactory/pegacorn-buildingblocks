@@ -170,9 +170,9 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase {
 
     protected void actionableTaskCleanup(){
         getLogger().debug(".actionableTaskCleanup(): Entry");
-        Set<TaskIdType> allTaskIds = getActionableTaskDM().getAllTaskIds();
+        Set<String> allTaskIds = getActionableTaskDM().getAllTaskIds();
         processingPlantMetricsAgentAccessor.getMetricsAgent().updateLocalCacheStatus("ActionableTaskCacheSharedCache", allTaskIds.size());
-        for(TaskIdType currentTaskId: allTaskIds){
+        for(String currentTaskId: allTaskIds){
             if(getLogger().isDebugEnabled()){
                 getLogger().debug(".actionableTaskCleanup(): Checking task {}", currentTaskId);
             }

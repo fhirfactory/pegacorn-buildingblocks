@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.time.Instant;
@@ -53,8 +54,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterface {
     private static final Logger LOG = LoggerFactory.getLogger(LocalFulfillmentTaskCache.class);
 
-    private ConcurrentHashMap<TaskIdType, PetasosFulfillmentTask> fulfillmentTaskCache;
-    private ConcurrentHashMap<TaskIdType, Object> fulfillmentTaskCacheLockMap;
+    private ConcurrentHashMap<String, PetasosFulfillmentTask> fulfillmentTaskCache;
+    private ConcurrentHashMap<String, Object> fulfillmentTaskCacheLockMap;
     private Object cacheLock;
 
     //
@@ -62,7 +63,7 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
     //
 
     public LocalFulfillmentTaskCache() {
-        fulfillmentTaskCache = new ConcurrentHashMap<TaskIdType, PetasosFulfillmentTask>();
+        fulfillmentTaskCache = new ConcurrentHashMap<String, PetasosFulfillmentTask>();
         fulfillmentTaskCacheLockMap = new ConcurrentHashMap<>();
         this.cacheLock = new Object();
     }
@@ -92,14 +93,10 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
         TaskIdType taskId = task.getTaskId();
         PetasosFulfillmentTask clonedTask = null;
         synchronized (getCacheLock()) {
-            if (!getFulfillmentTaskCacheLockMap().containsKey(taskId)) {
-                getFulfillmentTaskCacheLockMap().put(task.getTaskId(), new Object());
-            }
-            synchronized (getFulfillmentTaskCacheLockMap().get(taskId)) {
-                if (getFulfillmentTaskCache().containsKey(taskId)) {
-                    getFulfillmentTaskCache().remove(taskId);
-                }
-                getFulfillmentTaskCache().put(taskId, fulfillmentTask);
+            getFulfillmentTaskCacheLockMap().putIfAbsent(task.getTaskId().getId(), new Object());
+
+            synchronized (getFulfillmentTaskCacheLockMap().get(taskId.getId())) {
+                getFulfillmentTaskCache().put(taskId.getId(), fulfillmentTask);
                 fulfillmentTask.getTaskFulfillment().setRegistrationInstant(Instant.now());
                 fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
                 clonedTask = SerializationUtils.clone(fulfillmentTask);
@@ -114,9 +111,9 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
     public PetasosTask getTask(TaskIdType taskId) {
         getLogger().debug(".getTask(): Entry, taskId --> {}", taskId);
         PetasosFulfillmentTask task = null;
-        if (getFulfillmentTaskCache().containsKey(taskId)) {
-            task = getFulfillmentTaskCache().get(taskId);
-        }
+
+        task = getFulfillmentTaskCache().get(taskId.getId());
+
         getLogger().debug(".getTask(): Exit, task->{}", task);
         return (task);
     }
@@ -124,10 +121,7 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
     @Override
     public Object getTaskLock(TaskIdType taskId) {
         getLogger().debug(".getTaskLock(): Entry, taskId --> {}", taskId);
-        Object lockObject = null;
-        if (getFulfillmentTaskCacheLockMap().containsKey(taskId)) {
-            lockObject = getFulfillmentTaskCacheLockMap().get(taskId);
-        }
+        Object lockObject = getTaskLock(taskId.getId());
         getLogger().debug(".getTaskLock(): Exit, lockObject->{}", lockObject);
         return (lockObject);
     }
@@ -135,10 +129,7 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
     @Override
     public void addTaskLock(TaskIdType taskId){
         if(taskId != null){
-            Object lockObject = getFulfillmentTaskCacheLockMap().get(taskId);
-            if(lockObject == null){
-                getFulfillmentTaskCacheLockMap().put(taskId, new Object());
-            }
+            getFulfillmentTaskCacheLockMap().putIfAbsent(taskId.getId(), new Object());
         }
     }
 
@@ -150,18 +141,12 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
         }
         PetasosFulfillmentTask task = null;
         synchronized (getCacheLock()) {
-            if (this.getFulfillmentTaskCache().containsKey(taskId)) {
-                synchronized (getFulfillmentTaskCacheLockMap().get(taskId)) {
-                    task = getFulfillmentTaskCache().get(taskId);
-                    getLogger().trace(".removeTask(): Removing task from map/cache");
-                    this.getFulfillmentTaskCache().remove(taskId);
-                }
-                this.getFulfillmentTaskCacheLockMap().remove(taskId);
-            } else {
-                getLogger().trace(".removeTask(): taks is not in map/cache, cannot remove it!");
-            }
+            task = getFulfillmentTaskCache().get(taskId);
+            getLogger().trace(".removeTask(): Removing task from map/cache");
+            this.getFulfillmentTaskCache().remove(taskId);
+            this.getFulfillmentTaskCacheLockMap().remove(taskId);
         }
-        getLogger().debug(".removeTask(): Exit");
+        getLogger().debug(".removeTask(): Exit, task->{}", task);
         return(task);
     }
 
@@ -183,15 +168,12 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
             throw (new IllegalArgumentException(".synchroniseTask(): fulfillmentTask is null"));
         }
         PetasosFulfillmentTask fulfillmentTask = (PetasosFulfillmentTask) task;
-        if(!getFulfillmentTaskCacheLockMap().containsKey(fulfillmentTask.getTaskId())){
-            getFulfillmentTaskCacheLockMap().put(fulfillmentTask.getTaskId(), new Object());
-        }
+
+        getFulfillmentTaskCacheLockMap().putIfAbsent(fulfillmentTask.getTaskId().getId(), new Object());
+
         PetasosFulfillmentTask clonedTask = null;
         synchronized (getFulfillmentTaskCacheLockMap().get(fulfillmentTask.getTaskId())) {
-            if (fulfillmentTaskCache.containsKey(fulfillmentTask.getTaskId())) {
-                fulfillmentTaskCache.remove(fulfillmentTask.getTaskId());
-            }
-            fulfillmentTaskCache.put(fulfillmentTask.getTaskId(), fulfillmentTask);
+            fulfillmentTaskCache.put(fulfillmentTask.getTaskId().getId(), fulfillmentTask);
             clonedTask = SerializationUtils.clone(fulfillmentTask);
         }
         getLogger().debug(".synchroniseTask(): Exit");
@@ -205,17 +187,30 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
             throw (new IllegalArgumentException(".refreshTask(): fulfillmentTask is null"));
         }
         PetasosFulfillmentTask fulfillmentTask = (PetasosFulfillmentTask) task;
-        if(!fulfillmentTaskCacheLockMap.containsKey(fulfillmentTask.getTaskId())){
-            fulfillmentTaskCacheLockMap.put(fulfillmentTask.getTaskId(), new Object());
-            fulfillmentTaskCache.put(fulfillmentTask.getTaskId(), fulfillmentTask);
-        }
         PetasosFulfillmentTask cacheFulfillmentTask = null;
-        PetasosTask cacheTask = getTask(task.getTaskId());
-        if(cacheTask != null) {
-            cacheFulfillmentTask = SerializationUtils.clone((PetasosFulfillmentTask) getTask(task.getTaskId()));
+        fulfillmentTaskCacheLockMap.putIfAbsent(fulfillmentTask.getTaskId().getId(), new Object());
+        synchronized (fulfillmentTaskCacheLockMap.get(fulfillmentTask.getTaskId().getId())) {
+            cacheFulfillmentTask = (PetasosFulfillmentTask) getTask(task.getTaskId());
+            if (cacheFulfillmentTask != null) {
+                fulfillmentTaskCache.put(fulfillmentTask.getTaskId().getId(), fulfillmentTask);
+                cacheFulfillmentTask = SerializationUtils.clone((PetasosFulfillmentTask) getTask(task.getTaskId()));
+            }
         }
         getLogger().debug(".refreshTask(): Exit");
         return(cacheFulfillmentTask);
+    }
+
+    @Override
+    public Object getTaskLock(String taskIdValue) {
+        if(StringUtils.isEmpty(taskIdValue)){
+            return(null);
+        }
+        Object lockObject = getFulfillmentTaskCacheLockMap().get(taskIdValue);
+        if(lockObject == null){
+            lockObject = new Object();
+            getFulfillmentTaskCacheLockMap().put(taskIdValue, lockObject);
+        }
+        return(lockObject);
     }
 
     public List<PetasosFulfillmentTask> getFulfillmentTaskList() {
@@ -324,11 +319,11 @@ public class LocalFulfillmentTaskCache implements PetasosTaskCacheServiceInterfa
         return(LOG);
     }
 
-    protected ConcurrentHashMap<TaskIdType, PetasosFulfillmentTask> getFulfillmentTaskCache() {
+    protected ConcurrentHashMap<String, PetasosFulfillmentTask> getFulfillmentTaskCache() {
         return fulfillmentTaskCache;
     }
 
-    protected ConcurrentHashMap<TaskIdType, Object> getFulfillmentTaskCacheLockMap(){
+    protected ConcurrentHashMap<String, Object> getFulfillmentTaskCacheLockMap(){
         return(this.fulfillmentTaskCacheLockMap);
     }
 

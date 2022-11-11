@@ -108,8 +108,8 @@ public class GlobalPetasosTaskContinuityWatchdog {
 
     protected void taskContinuityWatchdog(){
         getLogger().debug(".taskContinuityWatchdog(): Entry");
-        Set<TaskIdType> allTaskIds = actionableTaskDM.getAllTaskIds();
-        for(TaskIdType currentTaskId: allTaskIds){
+        Set<String> allTaskIds = actionableTaskDM.getAllTaskIds();
+        for(String currentTaskId: allTaskIds){
             if(getLogger().isInfoEnabled()){
                 getLogger().debug(".taskContinuityWatchdog(): Checking task {}", currentTaskId);
             }
