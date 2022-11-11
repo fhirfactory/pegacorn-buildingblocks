@@ -42,6 +42,7 @@ import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.codesystems.TaskCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thymeleaf.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -377,22 +378,36 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
     @Override
     protected List<CodeableConcept> specifyPerformerType(PetasosTask petasosTask) {
-        getLogger().debug(".specifyPerformerType(): Entry");
+        getLogger().warn(".specifyPerformerType(): Entry");
 
         PetasosActionableTask actionableTask = (PetasosActionableTask) petasosTask;
 
-        List<CodeableConcept> performerTypes = null;
+        List<CodeableConcept> performerTypes = new ArrayList<>();
         if(actionableTask.hasTaskPerformerTypes()){
-            performerTypes = new ArrayList<>();
+
+            getLogger().warn(".specifyPerformerType(): has performerTypes");
             List<TaskPerformerTypeType> taskPerformerTypes = actionableTask.getTaskPerformerTypes();
-            for(TaskPerformerTypeType currentPerformerType: taskPerformerTypes){
-                String functionToken = currentPerformerType.getRequiredPerformerType().getFunctionToken().getToken();
-                String functionDescription = currentPerformerType.getRequiredPerformerTypeDescription();
-                CodeableConcept performerTypeCC = getPerformerTypeFactory().newTaskPerformerType(functionToken, functionDescription);
-                performerTypes.add(performerTypeCC);
+            getLogger().warn(".specifyPerformerType(): taskPerformerTypes->{}", taskPerformerTypes);
+            if(taskPerformerTypes != null) {
+                for (TaskPerformerTypeType currentPerformerType : taskPerformerTypes) {
+                    getLogger().warn(".specifyPerformerType(): processing ->{}", currentPerformerType);
+                    String performerName = null;
+                    if(currentPerformerType.getRequiredParticipantName() != null){
+                        performerName = currentPerformerType.getRequiredParticipantName();
+                    }
+                    if(StringUtils.isEmpty(performerName) && currentPerformerType.getRequiredPerformerType() != null) {
+                        performerName = currentPerformerType.getRequiredPerformerType().getFunctionToken().getToken();
+                    }
+                    if(StringUtils.isEmpty(performerName)){
+                        performerName = "unknown";
+                    }
+                    String functionDescription = currentPerformerType.getRequiredPerformerTypeDescription();
+                    CodeableConcept performerTypeCC = getPerformerTypeFactory().newTaskPerformerType(performerName, functionDescription);
+                    performerTypes.add(performerTypeCC);
+                }
             }
         }
-        getLogger().debug(".specifyPerformerType(): Exit, performerTypes->{}", performerTypes);
+        getLogger().warn(".specifyPerformerType(): Exit, performerTypes->{}", performerTypes);
         return (performerTypes);
     }
 
@@ -407,17 +422,15 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
             if(actionableTask.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
                 //
                 // Create the Identifier
-                ComponentIdType nodeId = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID();
-                Period period = new Period();
-                if (nodeId.hasIdValidityStartInstant()) {
-                    Date startDate = Date.from(nodeId.getIdValidityStartInstant());
-                    period.setStart(startDate);
+                String participantName = null;
+                if(actionableTask.getTaskFulfillment().hasFulfillerWorkUnitProcessor()) {
+                    participantName = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantName();
                 }
-                if (nodeId.hasIdValidityEndInstant()) {
-                    Date endDate = Date.from(nodeId.getIdValidityEndInstant());
-                    period.setEnd(endDate);
+                if(StringUtils.isEmpty(participantName)){
+                    participantName = "Unknown";
                 }
-                Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, nodeId.getId(), period);
+                Identifier identifier = getIdentifierFactory().newIdentifier(PegacornIdentifierCodeEnum.IDENTIFIER_CODE_SOFTWARE_COMPONENT, participantName, null);
+                owner = new Reference();
                 owner.setIdentifier(identifier);
                 owner.setType(ResourceType.Device.name());
             }

@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.accessors;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalFulfillmentTaskCache;
 
@@ -34,18 +35,19 @@ public class PetasosFulfillmentTaskSharedInstanceAccessorFactory {
     @Inject
     private LocalFulfillmentTaskCache taskCache;
 
-    public PetasosFulfillmentTaskSharedInstance newFulfillmentTaskSharedAccessor(TaskIdType taskId){
-        PetasosFulfillmentTaskSharedInstance fulfillmentTask = new PetasosFulfillmentTaskSharedInstance(taskId, taskCache);
-        return(fulfillmentTask);
-    }
-
     public PetasosFulfillmentTaskSharedInstance newFulfillmentTaskSharedAccessor(PetasosFulfillmentTask task){
         PetasosFulfillmentTaskSharedInstance fulfillmentTask = new PetasosFulfillmentTaskSharedInstance(task, taskCache);
         return(fulfillmentTask);
     }
 
     public PetasosFulfillmentTaskSharedInstance getFulfillmentTaskSharedInstance(TaskIdType taskId){
-        PetasosFulfillmentTaskSharedInstance fulfillmentTask = new PetasosFulfillmentTaskSharedInstance(taskId, taskCache);
-        return(fulfillmentTask);
+        if(taskCache != null) {
+            PetasosFulfillmentTask task = (PetasosFulfillmentTask)taskCache.getTask(taskId);
+            if(task != null) {
+                PetasosFulfillmentTaskSharedInstance fulfillmentTask = new PetasosFulfillmentTaskSharedInstance(task, taskCache);
+                return (fulfillmentTask);
+            }
+        }
+        return(null);
     }
 }

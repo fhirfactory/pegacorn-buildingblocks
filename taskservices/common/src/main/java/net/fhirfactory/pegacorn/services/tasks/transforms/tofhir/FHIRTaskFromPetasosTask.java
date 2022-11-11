@@ -272,9 +272,11 @@ public abstract class FHIRTaskFromPetasosTask {
         getLogger().trace(".newTaskFromPetasosTask(): [Set PerformerType] Start");
         List<CodeableConcept> taskPerformerCC = specifyPerformerType(petasosTask);
         if(taskPerformerCC != null){
-            fhirTask.getPerformerType().addAll(taskPerformerCC);
+            for(CodeableConcept currentPerformer: taskPerformerCC) {
+                fhirTask.addPerformerType(currentPerformer);
+            }
         }
-        getLogger().trace(".newTaskFromPetasosTask(): [Set PerformerType] Finsh");
+        getLogger().trace(".newTaskFromPetasosTask(): [Set PerformerType] Finish");
 
         //
         // Set the Owner
@@ -298,7 +300,7 @@ public abstract class FHIRTaskFromPetasosTask {
         // Add the Task Input
         getLogger().trace(".newTaskFromPetasosTask(): [Set Input] Start");
         if(petasosTask.getTaskWorkItem().getIngresContent() != null){
-            Task.ParameterComponent taskInput = getWorkItemFactory().newWorkItemPayload(petasosTask.getTaskWorkItem().getIngresContent());
+            Task.ParameterComponent taskInput = getWorkItemFactory().newInputWorkItemPayload(petasosTask.getTaskWorkItem().getIngresContent());
             fhirTask.addInput(taskInput);
         }
         getLogger().trace(".newTaskFromPetasosTask(): [Set Input] Finish");
@@ -309,20 +311,22 @@ public abstract class FHIRTaskFromPetasosTask {
         if(petasosTask.getTaskWorkItem().hasEgressContent()){
             if(!petasosTask.getTaskWorkItem().getEgressContent().getPayloadElements().isEmpty()){
                 for(UoWPayload currentEgressPayload: petasosTask.getTaskWorkItem().getEgressContent().getPayloadElements()){
-                    Task.ParameterComponent taskOutput = getWorkItemFactory().newWorkItemPayload(currentEgressPayload);
-                    fhirTask.addInput(taskOutput);
+                    getLogger().warn(".newTaskFromPetasosTask(): [Set Output] currentEgressPayload->{}", currentEgressPayload);
+
+                    Task.TaskOutputComponent taskOutput = getWorkItemFactory().newOutputWorkItemPayload(currentEgressPayload);
+                    fhirTask.addOutput(taskOutput);
                 }
             }
         }
         getLogger().trace(".newTaskFromPetasosTask(): [Set Output] Start");
 
-        if(getLogger().isTraceEnabled()){
+        if(getLogger().isWarnEnabled()){
             try{
                 getFHIRJSONParser().setPrettyPrint(true);
                 String taskAsString = getFHIRJSONParser().encodeResourceToString(fhirTask);
-                getLogger().trace(".newTaskFromPetasosTask(): Task->{}", taskAsString);
+                getLogger().warn(".newTaskFromPetasosTask(): Task->{}", taskAsString);
             } catch(Exception ex){
-                getLogger().trace(".newTaskFromPetasosTask(): Can't print task...", ex);
+                getLogger().warn(".newTaskFromPetasosTask(): Can't print task...", ex);
             }
         }
 

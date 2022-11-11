@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories;
 
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -51,7 +52,11 @@ public class TaskPerformerTypeFactory {
         performerTypeCoding.setSystem(getPegacornTaskPerformerType());
         performerTypeCoding.setCode(wupFunctionID);
         performerTypeCC.addCoding(performerTypeCoding);
-        performerTypeCC.setText(wupDescription);
+        if(StringUtils.isNotEmpty(wupDescription)) {
+            performerTypeCC.setText(wupDescription);
+        } else {
+            performerTypeCC.setText(wupFunctionID);
+        }
         return(performerTypeCC);
     }
 

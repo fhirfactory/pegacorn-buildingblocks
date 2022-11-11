@@ -46,7 +46,7 @@ public class PetasosTaskJobCardSharedInstance {
     // Constructor(s)
     //
 
-    public PetasosTaskJobCardSharedInstance(TaskIdType actionableTaskId, ParticipantSharedTaskJobCardCache cache){
+    public PetasosTaskJobCardSharedInstance(TaskIdType actionableTaskId, ParticipantSharedTaskJobCardCache cache, boolean forceCreation){
         this.jobCardCache = cache;
         PetasosTaskJobCard jobCard = getJobCardCache().getJobCard(actionableTaskId);
         if(jobCard == null){
@@ -56,6 +56,16 @@ public class PetasosTaskJobCardSharedInstance {
             newJobCard.setLastActivityCheckInstant(Instant.now());
             getJobCardCache().registerJobCard(newJobCard);
             this.localJobCard = newJobCard;
+        } else {
+            this.localJobCard = jobCard;
+        }
+    }
+
+    public PetasosTaskJobCardSharedInstance(TaskIdType actionableTaskId, ParticipantSharedTaskJobCardCache cache){
+        this.jobCardCache = cache;
+        PetasosTaskJobCard jobCard = getJobCardCache().getJobCard(actionableTaskId);
+        if(jobCard == null){
+            this.localJobCard = null;
         } else {
             this.localJobCard = jobCard;
         }
@@ -262,6 +272,14 @@ public class PetasosTaskJobCardSharedInstance {
 
     public void setProcessingPlantParticipantName(String processingPlantParticipantName) {
         getLocalJobCard().setProcessingPlantParticipantName(processingPlantParticipantName);
+    }
+
+    public boolean isNull(){
+        if(localJobCard == null){
+            return(true);
+        } else {
+            return(false);
+        }
     }
 
     //

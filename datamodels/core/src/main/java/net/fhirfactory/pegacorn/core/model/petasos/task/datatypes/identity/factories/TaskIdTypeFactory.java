@@ -37,7 +37,7 @@ public class TaskIdTypeFactory {
     public TaskIdType newTaskId(TaskReasonTypeEnum taskReason, DataParcelTypeDescriptor contentDescriptor){
         StringBuilder idBuilder = new StringBuilder();
         idBuilder.append(taskReason.getTaskReasonDisplayName());
-        idBuilder.append("(");
+        idBuilder.append("-");
         if(contentDescriptor.hasDataParcelDefiner()){
             String definer = contentDescriptor.getDataParcelDefiner();
             String definerValue = definer.replaceAll(" ", "");
@@ -45,36 +45,36 @@ public class TaskIdTypeFactory {
         }
         if(contentDescriptor.hasDataParcelCategory()){
             String category = contentDescriptor.getDataParcelCategory();
-            idBuilder.append("."+category);
+            idBuilder.append("-"+category);
         }
         if(contentDescriptor.hasDataParcelSubCategory()){
             String subCategory = contentDescriptor.getDataParcelSubCategory();
-            idBuilder.append("."+subCategory);
+            idBuilder.append("-"+subCategory);
         }
         if(contentDescriptor.hasDataParcelResource()){
             String resource = contentDescriptor.getDataParcelResource();
-            idBuilder.append("."+resource);
+            idBuilder.append("-"+resource);
         }
         if(contentDescriptor.hasDataParcelSegment()){
             String segment = contentDescriptor.getDataParcelSegment();
-            idBuilder.append("."+segment);
+            idBuilder.append("-"+segment);
         }
         if(contentDescriptor.hasDataParcelAttribute()){
             String attribute = contentDescriptor.getDataParcelAttribute();
-            idBuilder.append("."+attribute);
+            idBuilder.append("-"+attribute);
         }
         if(contentDescriptor.hasDataParcelDiscriminatorType()){
             String descType = contentDescriptor.getDataParcelDiscriminatorType();
-            idBuilder.append("."+descType);
+            idBuilder.append("-"+descType);
         }
         if(contentDescriptor.hasDataParcelDiscriminatorValue()){
             String descValue = contentDescriptor.getDataParcelDiscriminatorValue();
-            idBuilder.append("."+descValue);
+            idBuilder.append("-"+descValue);
         }
-        idBuilder.append(")");
+        idBuilder.append("-");
         long leastSignificantBits = UUID.randomUUID().getLeastSignificantBits();
         String hexString = Long.toHexString(leastSignificantBits);
-        idBuilder.append("::");
+        idBuilder.append("-");
         idBuilder.append(hexString);
         TaskIdType id = new TaskIdType();
         id.setLocalId(idBuilder.toString());
@@ -84,46 +84,10 @@ public class TaskIdTypeFactory {
     public TaskIdType newTaskId(String participantName, TaskReasonTypeEnum taskReason, DataParcelTypeDescriptor contentDescriptor){
         StringBuilder idBuilder = new StringBuilder();
         idBuilder.append(participantName);
-        idBuilder.append("::");
-        idBuilder.append(taskReason.getTaskReasonDisplayName());
-        idBuilder.append("(");
-        if(contentDescriptor.hasDataParcelDefiner()){
-            String definer = contentDescriptor.getDataParcelDefiner();
-            String definerValue = definer.replaceAll(" ", "");
-            idBuilder.append(definerValue);
-        }
-        if(contentDescriptor.hasDataParcelCategory()){
-            String category = contentDescriptor.getDataParcelCategory();
-            idBuilder.append("."+category);
-        }
-        if(contentDescriptor.hasDataParcelSubCategory()){
-            String subCategory = contentDescriptor.getDataParcelSubCategory();
-            idBuilder.append("."+subCategory);
-        }
-        if(contentDescriptor.hasDataParcelResource()){
-            String resource = contentDescriptor.getDataParcelResource();
-            idBuilder.append("."+resource);
-        }
-        if(contentDescriptor.hasDataParcelSegment()){
-            String segment = contentDescriptor.getDataParcelSegment();
-            idBuilder.append("."+segment);
-        }
-        if(contentDescriptor.hasDataParcelAttribute()){
-            String attribute = contentDescriptor.getDataParcelAttribute();
-            idBuilder.append("."+attribute);
-        }
-        if(contentDescriptor.hasDataParcelDiscriminatorType()){
-            String descType = contentDescriptor.getDataParcelDiscriminatorType();
-            idBuilder.append("."+descType);
-        }
-        if(contentDescriptor.hasDataParcelDiscriminatorValue()){
-            String descValue = contentDescriptor.getDataParcelDiscriminatorValue();
-            idBuilder.append("."+descValue);
-        }
-        idBuilder.append(")");
+        idBuilder.append("-");
         long leastSignificantBits = UUID.randomUUID().getLeastSignificantBits();
         String hexString = Long.toHexString(leastSignificantBits);
-        idBuilder.append("::");
+        idBuilder.append("-");
         idBuilder.append(hexString);
         TaskIdType id = new TaskIdType();
         id.setLocalId(idBuilder.toString());

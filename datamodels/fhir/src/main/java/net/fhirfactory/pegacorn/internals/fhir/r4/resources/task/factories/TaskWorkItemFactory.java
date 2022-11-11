@@ -51,7 +51,7 @@ public class TaskWorkItemFactory {
         return (codeSystem);
     }
 
-    public Task.ParameterComponent newWorkItemPayload(UoWPayload payload){
+    public Task.ParameterComponent newInputWorkItemPayload(UoWPayload payload){
         String parcelManifestAsString = mapDataParcelManifestToString(payload.getPayloadManifest());
         if(StringUtils.isEmpty(parcelManifestAsString)){
             return(null);
@@ -62,6 +62,22 @@ public class TaskWorkItemFactory {
         workItemTypeCoding.setCode(parcelManifestAsString);
         workItemType.addCoding(workItemTypeCoding);
         Task.ParameterComponent taskWorkItem = new Task.ParameterComponent();
+        taskWorkItem.setType(workItemType);
+        taskWorkItem.setValue(new StringType(payload.getPayload()));
+        return(taskWorkItem);
+    }
+
+    public Task.TaskOutputComponent newOutputWorkItemPayload(UoWPayload payload){
+        String parcelManifestAsString = mapDataParcelManifestToString(payload.getPayloadManifest());
+        if(StringUtils.isEmpty(parcelManifestAsString)){
+            return(null);
+        }
+        CodeableConcept  workItemType = new CodeableConcept();
+        Coding workItemTypeCoding = new Coding();
+        workItemTypeCoding.setSystem(getPegacornTaskParameterComponentDataParcelDescriptor());
+        workItemTypeCoding.setCode(parcelManifestAsString);
+        workItemType.addCoding(workItemTypeCoding);
+        Task.TaskOutputComponent taskWorkItem = new Task.TaskOutputComponent();
         taskWorkItem.setType(workItemType);
         taskWorkItem.setValue(new StringType(payload.getPayload()));
         return(taskWorkItem);

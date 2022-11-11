@@ -130,21 +130,23 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
 
     public PetasosTaskExecutionStatusEnum notifyTaskFulfillerChange(TaskIdType actionableTaskId, TaskIdType fulfillmentTaskId ){
-        getLogger().debug(".notifyTaskStart(): Entry, actionableTaskId->{}, fulfillmentTaskId->{}", actionableTaskId, fulfillmentTaskId);
+        getLogger().warn(".notifyTaskStart(): Entry, actionableTaskId->{}, fulfillmentTaskId->{}", actionableTaskId, fulfillmentTaskId);
         if(fulfillmentTaskId == null || actionableTaskId == null){
             getLogger().debug(".notifyTaskStart(): Exit, actionableTaskId or fulfillmentTaskId is null");
             return(null);
         }
         PetasosActionableTaskSharedInstance petasosActionableTaskSharedInstance = taskInstanceFactory.getActionableTaskSharedInstance(actionableTaskId);
-        PetasosFulfillmentTaskSharedInstance petasosFulfillmentTaskSharedInstance = fulfillmentTaskFactory.newFulfillmentTaskSharedAccessor(fulfillmentTaskId);
+        PetasosFulfillmentTaskSharedInstance petasosFulfillmentTaskSharedInstance = fulfillmentTaskFactory.getFulfillmentTaskSharedInstance(fulfillmentTaskId);
+        if(petasosFulfillmentTaskSharedInstance != null) {
 
-        TaskFulfillmentType taskFulfillment = petasosFulfillmentTaskSharedInstance.getTaskFulfillment();
-        petasosActionableTaskSharedInstance.setTaskFulfillment(SerializationUtils.clone(taskFulfillment));
-        petasosActionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(petasosFulfillmentTaskSharedInstance.getTaskId()));
-        petasosActionableTaskSharedInstance.setExecutionStatus(petasosFulfillmentTaskSharedInstance.getExecutionStatus());
-        petasosActionableTaskSharedInstance.setUpdateInstant(Instant.now());
+            TaskFulfillmentType taskFulfillment = petasosFulfillmentTaskSharedInstance.getTaskFulfillment();
+            petasosActionableTaskSharedInstance.setTaskFulfillment(SerializationUtils.clone(taskFulfillment));
+            petasosActionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(petasosFulfillmentTaskSharedInstance.getTaskId()));
+            petasosActionableTaskSharedInstance.setExecutionStatus(petasosFulfillmentTaskSharedInstance.getExecutionStatus());
+            petasosActionableTaskSharedInstance.setUpdateInstant(Instant.now());
 
-        petasosActionableTaskSharedInstance.update();
+            petasosActionableTaskSharedInstance.update();
+        }
 
         PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getExecutionStatus();
         getLogger().debug(".notifyTaskStart(): Exit, executionStatus->{}", executionStatus);
@@ -153,7 +155,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
     @Override
     public PetasosTaskExecutionStatusEnum notifyTaskStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask) {
-        getLogger().debug(".notifyTaskStart(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskStart(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskStart(): Exit, taskId is null");
             return(null);
@@ -179,7 +181,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
     @Override
     public PetasosTaskExecutionStatusEnum notifyTaskFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().debug(".notifyTaskFinish(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskFinish(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFinish(): Exit, taskId is null");
             return(null);
@@ -188,6 +190,9 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         getLogger().trace(".notifyTaskFinish(): actionableTask.getTaskFulfillment()->{}", actionableTask.getTaskFulfillment());
         TaskFulfillmentType taskFulfillment = SerializationUtils.clone(fulfillmentTask.getTaskFulfillment());
         taskFulfillment.setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
+        if(taskFulfillment.hasFulfillerWorkUnitProcessor()) {
+            actionableTask.getTaskFulfillment().setFulfillerWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor());
+        }
         actionableTask.setTaskFulfillment(taskFulfillment);
         actionableTask.setUpdateInstant(Instant.now());
         actionableTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FINISHED);
@@ -226,18 +231,21 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
     @Override
     public PetasosTaskExecutionStatusEnum notifyTaskFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().debug(".notifyTaskFailure(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskFailure(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFailure(): Exit, taskId is null");
             return(null);
         }
-        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.newActionableTaskSharedInstance(taskId);
+        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.getActionableTaskSharedInstance(taskId);
 
         //
         // Update Fulfillment Status
         TaskFulfillmentType taskFulfillment = SerializationUtils.clone(fulfillmentTask.getTaskFulfillment());
         actionableTask.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
         actionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
+        if(taskFulfillment.hasFulfillerWorkUnitProcessor()) {
+            actionableTask.getTaskFulfillment().setFulfillerWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor());
+        }
         actionableTask.getTaskFulfillment().setFinishInstant(Instant.now());
         actionableTask.setTaskFulfillment(taskFulfillment);
         actionableTask.setUpdateInstant(Instant.now());
@@ -294,17 +302,20 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
     @Override
     public PetasosTaskExecutionStatusEnum notifyTaskCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
-        getLogger().debug(".notifyTaskCancellation(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskCancellation(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskCancellation(): Exit, taskId is null");
             return(null);
         }
-        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.newActionableTaskSharedInstance(taskId);
+        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.getActionableTaskSharedInstance(taskId);
 
         //
         // Update Fulfillment Status
         TaskFulfillmentType taskFulfillment = SerializationUtils.clone(fulfillmentTask.getTaskFulfillment());
         actionableTask.setTaskFulfillment(taskFulfillment);
+        if(taskFulfillment.hasFulfillerWorkUnitProcessor()) {
+            actionableTask.getTaskFulfillment().setFulfillerWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor());
+        }
         actionableTask.setUpdateInstant(Instant.now());
         actionableTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
 
@@ -359,12 +370,12 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
     @Override
     public PetasosTaskExecutionStatusEnum notifyTaskWaiting(TaskIdType taskId) {
-        getLogger().debug(".notifyTaskWaiting(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskWaiting(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskWaiting(): Exit, taskId is null");
             return(null);
         }
-        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.newActionableTaskSharedInstance(taskId);
+        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.getActionableTaskSharedInstance(taskId);
 
         //
         // Update Fulfillment Status
@@ -388,13 +399,12 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
     }
 
     public PetasosTaskExecutionStatusEnum notifyTaskFinalisation(TaskIdType taskId) {
-        getLogger().debug(".notifyTaskFinalisation(): Entry, taskId->{}", taskId);
+        getLogger().warn(".notifyTaskFinalisation(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFinalisation(): Exit, taskId is null");
             return(null);
         }
-        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.newActionableTaskSharedInstance(taskId);
-        PetasosFulfillmentTaskSharedInstance fulfillmentTask = fulfillmentTaskFactory.newFulfillmentTaskSharedAccessor(actionableTask.getTaskFulfillment().getTrackingID());
+        PetasosActionableTaskSharedInstance actionableTask = taskInstanceFactory.getActionableTaskSharedInstance(taskId);
 
         //
         // Synchronise the Participant Cache

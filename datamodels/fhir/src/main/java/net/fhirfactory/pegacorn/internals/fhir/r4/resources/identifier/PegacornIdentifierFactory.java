@@ -93,8 +93,10 @@ public class PegacornIdentifierFactory {
         identifier.setType(identifierType);
         identifier.setSystem(getLocalIdentifierSystem());
         identifier.setValue(value);
-        if(period.hasStart() || period.hasEnd()) {
-            identifier.setPeriod(period);
+        if(period != null) {
+            if (period.hasStart() || period.hasEnd()) {
+                identifier.setPeriod(period);
+            }
         }
         identifier.setAssigner(deploymentInstanceDetailInterface.getDeploymentInstanceOrganization());
         LOG.debug(".newIdentifier(): Exit, identifier->{}", identifier);

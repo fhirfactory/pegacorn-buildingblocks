@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.common;
 
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.ipc.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import org.jgroups.Address;
@@ -39,24 +40,26 @@ public abstract class PonosTaskRouterClientCommon extends JGroupsIntegrationPoin
     //
 
     protected Address resolveTargetAddressForTaskHub(){
-        getLogger().debug(".resolveTargetAddressForTaskReceiver(): Entry");
+        getLogger().warn(".resolveTargetAddressForTaskReceiver(): Entry");
 
         String taskRouterHubName = taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName();
+        getLogger().warn(".resolveTargetAddressForTaskReceiver(): taskRouterHubName->{}", taskRouterHubName);
         if(getIPCChannel() == null){
-            getLogger().debug(".resolveTargetAddressForTaskReceiver(): IPCChannel is null, exit returning (null)");
+            getLogger().warn(".resolveTargetAddressForTaskReceiver(): IPCChannel is null, exit returning (null)");
             return(null);
         }
-        getLogger().trace(".resolveTargetAddressForTaskReceiver(): IPCChannel is NOT null, get updated Address set via view");
+        getLogger().warn(".resolveTargetAddressForTaskReceiver(): IPCChannel is NOT null, get updated Address set via view");
         List<Address> addressList = getAllViewMembers();
         Address foundAddress = null;
         synchronized (this.getCurrentScannedMembershipLock()) {
-            getLogger().debug(".getCandidateTargetServiceAddress(): Got the Address set via view, now iterate through and see if one is suitable");
+            getLogger().warn(".getCandidateTargetServiceAddress(): Got the Address set via view, now iterate through and see if one is suitable");
             for (Address currentAddress : addressList) {
-                getLogger().debug(".resolveTargetAddressForTaskReceiver(): Iterating through Address list, current element->{}", currentAddress);
+                getLogger().warn(".resolveTargetAddressForTaskReceiver(): Iterating through Address list, current element->{}", currentAddress);
                 String currentService = deriveIntegrationPointSubsystemName(currentAddress.toString());
-                if (currentService.equals(taskRouterHubName)) {
-                    if(currentService.contains("Receiver")) {
-                        getLogger().debug(".resolveTargetAddressForTaskReceiver(): Exit, A match!");
+                getLogger().warn(".resolveTargetAddressForTaskReceiver(): Iterating through Address list, current service->{}", currentService);
+                if (currentService.contentEquals(taskRouterHubName)) {
+                    if(currentAddress.toString().contains(PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_ENDPOINT.getDisplayName())) {
+                        getLogger().warn(".resolveTargetAddressForTaskReceiver(): Exit, A match!");
                         foundAddress = currentAddress;
                         break;
                     }

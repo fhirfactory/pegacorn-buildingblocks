@@ -41,13 +41,6 @@ public class PetasosActionableTaskSharedInstance extends PetasosTaskSharedInstan
 
     public PetasosActionableTaskSharedInstance(TaskIdType taskId, ParticipantSharedActionableTaskCache actionableTaskDM){
         super(taskId, actionableTaskDM);
-        if(getInstance() == null){
-            PetasosActionableTask newTask = new PetasosActionableTask();
-            newTask.setTaskId(taskId);
-            PetasosActionableTask cacheTask = (PetasosActionableTask)getTaskCache().registerTask(newTask);
-            PetasosActionableTask clonedCacheTask = SerializationUtils.clone(cacheTask);
-            setLocalInstance(clonedCacheTask);
-        }
     }
 
     public PetasosActionableTaskSharedInstance(PetasosActionableTask actionableTask, ParticipantSharedActionableTaskCache actionableTaskDM){
@@ -57,6 +50,14 @@ public class PetasosActionableTaskSharedInstance extends PetasosTaskSharedInstan
     //
     // Business Methods
     //
+
+    public boolean isNull(){
+        if(getInstance() == null){
+            return(true);
+        } else {
+            return(false);
+        }
+    }
 
     @Override
     public void refresh(){

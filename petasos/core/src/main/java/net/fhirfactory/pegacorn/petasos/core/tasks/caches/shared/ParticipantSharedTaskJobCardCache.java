@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +39,8 @@ public class ParticipantSharedTaskJobCardCache {
     private static final Logger LOG = LoggerFactory.getLogger(ParticipantSharedTaskJobCardCache.class);
 
     // ActionableTaskId, FulfillmentTask JobCard Set (will be across ALL processing plants) Map
-    private ConcurrentHashMap<TaskIdType, PetasosTaskJobCard> actionableTaskJobCardMap;
-    private ConcurrentHashMap<TaskIdType, Object> actionableTaskJobCardLockMap;
+    private ConcurrentHashMap<String, PetasosTaskJobCard> actionableTaskJobCardMap;
+    private ConcurrentHashMap<String, Object> actionableTaskJobCardLockMap;
     //
     // Whole cache lock
     private Object cacheLock;
@@ -59,9 +60,16 @@ public class ParticipantSharedTaskJobCardCache {
     //
 
     public Object getJobCardLock(TaskIdType actionableTaskId){
-        Object jobCardLock = getActionableTaskJobCardLockMap().get(actionableTaskId);
+        Object jobCardLock = getActionableTaskJobCardLockMap().get(actionableTaskId.getId());
         return(jobCardLock);
     }
+
+    public Object getJobCardLock(String actionableTaskIdValue){
+        Object jobCardLock = getActionableTaskJobCardLockMap().get(actionableTaskIdValue);
+        return(jobCardLock);
+    }
+
+
 
     public void registerJobCard(PetasosTaskJobCard jobCard){
         getLogger().debug(".registerJobCard(): Entry, jobCard->{}", jobCard);
@@ -82,14 +90,10 @@ public class ParticipantSharedTaskJobCardCache {
         //
         // If it is already there - we are going to clobber is... use this method with discretion
         synchronized (getCacheLock()) {
-            if (getActionableTaskJobCardMap().containsKey(actionableTaskId)) {
-                getActionableTaskJobCardMap().remove(actionableTaskId);
-            }
-            if(!getActionableTaskJobCardLockMap().containsKey(actionableTaskId)){
-                getActionableTaskJobCardLockMap().put(actionableTaskId, new Object());
-            }
+
+            getActionableTaskJobCardLockMap().putIfAbsent(actionableTaskId.getId(), new Object());
             jobCard.setLastActivityCheckInstant(Instant.now());
-            getActionableTaskJobCardMap().put(jobCard.getActionableTaskId(), jobCard);
+            getActionableTaskJobCardMap().put(jobCard.getActionableTaskId().getId(), jobCard);
         }
         getLogger().debug(".registerJobCard(): Exit");
     }
@@ -109,10 +113,8 @@ public class ParticipantSharedTaskJobCardCache {
         //
         // Delete the values
         synchronized (getCacheLock()) {
-            if (getActionableTaskJobCardMap().containsKey(jobCard.getActionableTaskId())) {
-                getActionableTaskJobCardLockMap().remove(jobCard.getActionableTaskId());
-                getActionableTaskJobCardMap().remove(jobCard.getActionableTaskId());
-            }
+            getActionableTaskJobCardLockMap().remove(jobCard.getActionableTaskId().getId());
+            getActionableTaskJobCardMap().remove(jobCard.getActionableTaskId().getId());
         }
 
         getLogger().debug(".removeJobCard(): Exit");
@@ -130,15 +132,33 @@ public class ParticipantSharedTaskJobCardCache {
 
         //
         // Try and retrieve the Job Card
-        PetasosTaskJobCard petasosTaskJobCard = getActionableTaskJobCardMap().get(taskId);
+        PetasosTaskJobCard petasosTaskJobCard = getActionableTaskJobCardMap().get(taskId.getId());
 
         getLogger().debug(".getJobCard(): Exit, retrieved JobCard ->{}", petasosTaskJobCard);
         return(petasosTaskJobCard);
     }
 
-    public List<TaskIdType> getJobCardTaskIdList(){
+    public PetasosTaskJobCard getJobCard(String taskIdValue){
+        getLogger().debug(".getJobCard(): Entry, taskIdValue->{}", taskIdValue);
+
+        //
+        // Defensive Programming
+        if(StringUtils.isEmpty(taskIdValue)){
+            getLogger().debug(".getJobCard(): Exit, taskIdValue is null, returning null");
+            return(null);
+        }
+
+        //
+        // Try and retrieve the Job Card
+        PetasosTaskJobCard petasosTaskJobCard = getActionableTaskJobCardMap().get(taskIdValue);
+
+        getLogger().debug(".getJobCard(): Exit, retrieved JobCard ->{}", petasosTaskJobCard);
+        return(petasosTaskJobCard);
+    }
+
+    public List<String> getJobCardTaskIdList(){
         getLogger().debug(".getJobCardTaskIdList(): Entry");
-        List<TaskIdType> taskIdList = new ArrayList<>();
+        List<String> taskIdList = new ArrayList<>();
         if(getActionableTaskJobCardMap().isEmpty()){
             getLogger().debug(".getJobCardTaskIdList(): Exit, empty list... ");
             return(taskIdList);
@@ -154,11 +174,11 @@ public class ParticipantSharedTaskJobCardCache {
     // Getters (and Setters)
     //
 
-    protected Map<TaskIdType, PetasosTaskJobCard> getActionableTaskJobCardMap(){
+    protected Map<String, PetasosTaskJobCard> getActionableTaskJobCardMap(){
         return(actionableTaskJobCardMap);
     }
 
-    private ConcurrentHashMap<TaskIdType, Object> getActionableTaskJobCardLockMap(){
+    private ConcurrentHashMap<String, Object> getActionableTaskJobCardLockMap(){
         return(this.actionableTaskJobCardLockMap);
     }
 

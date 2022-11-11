@@ -88,12 +88,7 @@ public class PetasosActionableTaskSharedInstanceAccessorFactory {
         if(taskId == null){
             return(null);
         }
-        PetasosActionableTask task = taskCache.getTask(taskId);
-        if(task == null){
-            return(null);
-        }
-        PetasosActionableTask clonedTask = SerializationUtils.clone(task);
-        PetasosActionableTaskSharedInstance actionableTask = new PetasosActionableTaskSharedInstance(clonedTask, taskCache);
+        PetasosActionableTaskSharedInstance actionableTask = new PetasosActionableTaskSharedInstance(taskId, taskCache);
         return(actionableTask);
     }
 }

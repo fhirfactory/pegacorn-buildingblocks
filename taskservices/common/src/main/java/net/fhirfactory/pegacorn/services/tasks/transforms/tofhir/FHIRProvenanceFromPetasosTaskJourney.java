@@ -91,7 +91,7 @@ public class FHIRProvenanceFromPetasosTaskJourney {
         // Set Provenance Target (in this case, a Task)
         Reference targetReference = new Reference();
         targetReference.setIdentifier(taskIdentifier);
-        targetReference.setReference(ResourceType.Task.name());
+        targetReference.setType(ResourceType.Task.name());
         taskJourneyProvenance.addTarget(targetReference);
 
         //

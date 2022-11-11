@@ -39,6 +39,7 @@ public class PetasosFulfillmentTaskSharedInstance extends PetasosTaskSharedInsta
     // Constructor(s)
     //
 
+    /*
     public PetasosFulfillmentTaskSharedInstance(TaskIdType taskId, PetasosTaskCacheServiceInterface cache){
         super(taskId, cache);
         if(getInstance() == null){
@@ -52,6 +53,8 @@ public class PetasosFulfillmentTaskSharedInstance extends PetasosTaskSharedInsta
             setLocalInstance(clonedTask);
         }
     }
+   
+     */
 
     public PetasosFulfillmentTaskSharedInstance(PetasosFulfillmentTask task, PetasosTaskCacheServiceInterface cache){
         super(task, cache);

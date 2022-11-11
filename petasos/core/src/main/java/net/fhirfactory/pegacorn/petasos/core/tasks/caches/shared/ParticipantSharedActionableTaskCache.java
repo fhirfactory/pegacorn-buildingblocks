@@ -101,8 +101,9 @@ public class ParticipantSharedActionableTaskCache implements PetasosTaskCacheSer
             getTaskSpecificLockMap().put(actionableTask.getTaskId().getId(), new Object());
             getTaskCache().put(actionableTask.getTaskId().getId(), actionableTask);
         }
-        getLogger().debug(".registerActionableTask(): Exit, actionableTask->{}", actionableTask);
-        return(actionableTask);
+        PetasosActionableTask clonedTask = SerializationUtils.clone(actionableTask);
+        getLogger().debug(".registerActionableTask(): Exit, actionableTask->{}", clonedTask);
+        return(clonedTask);
     }
 
     @Override
@@ -155,13 +156,9 @@ public class ParticipantSharedActionableTaskCache implements PetasosTaskCacheSer
             getLogger().debug(".getTask(): Exit, taskId is empty");
             return(null);
         }
-        if(taskCache.containsKey(taskId.getId())){
-            PetasosActionableTask task = taskCache.get(taskId.getId());
-            getLogger().debug(".getTask(): Exit, task->{}", task);
-            return(task);
-        }
-        getLogger().debug(".getTask(): Exit, Task with TaskId({}) is not within the cahce", taskId);
-        return(null);
+        PetasosActionableTask task = getTask(taskId.getId());
+        getLogger().debug(".getTask(): Exit, task->{}", task);
+        return(task);
     }
 
     public PetasosActionableTask getTask(String taskIdValue){

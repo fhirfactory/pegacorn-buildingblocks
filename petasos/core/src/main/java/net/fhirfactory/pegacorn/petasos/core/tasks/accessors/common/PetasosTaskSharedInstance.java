@@ -51,20 +51,19 @@ public abstract class PetasosTaskSharedInstance {
     // Constructor(s)
     //
 
-    public PetasosTaskSharedInstance(TaskIdType taskId, PetasosTaskCacheServiceInterface taskCache){
+    public PetasosTaskSharedInstance(TaskIdType taskId, PetasosTaskCacheServiceInterface taskCache) {
         this.taskCache = taskCache;
-        if(getTaskCache().getTaskLock(taskId) != null){
-            setLocalInstance(getTaskCache().getTask(taskId));
+        PetasosTask task = getTaskCache().getTask(taskId);
+        if (task != null) {
+            PetasosTask clonedTask = SerializationUtils.clone(task);
+            setLocalInstance(clonedTask);
         }
     }
 
     public PetasosTaskSharedInstance(PetasosTask task, PetasosTaskCacheServiceInterface taskCache){
         this.taskCache = taskCache;
-        if(taskCache.getTaskLock(task.getTaskId()) == null) {
-            PetasosTask clonedTask = SerializationUtils.clone(task);
-            taskCache.registerTask(clonedTask);
-        }
-        setLocalInstance(task);
+        PetasosTask petasosTask = taskCache.registerTask(task);
+        setLocalInstance(petasosTask);
     }
 
     //

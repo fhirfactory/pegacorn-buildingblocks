@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.deployment.properties.reference.petasos.PetasosDefaultProperties;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.*;
@@ -91,16 +90,18 @@ public class ParticipantTaskExecutionController {
         if(actionableTask == null){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
-        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().newTaskJobCardSharedInstanceAccessor(actionableTask.getTaskId());
-        if(taskJobCard == null){
+        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().getTaskJobCardSharedInstanceAccessor(actionableTask.getTaskId());
+        if(taskJobCard == null || taskJobCard.isNull()){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
         PetasosTaskExecutionStatusEnum grantedStatus = null;
+        getLogger().trace(".requestTaskExecutionPrivilege(): taskJobCard->{}", taskJobCard);
         synchronized (taskJobCard.getLock()) {
             //
             // Exercise the Business Logic --> remember, this class/method will run on each POD (instance of the Participant), and so the
             // logic here is to address what the code within THIS pod (ProcessingPlant) should do (and communicate state to the other
             // ProcessingPlants within this Participant group via the shared PetasosTaskJobCard).
+
             switch (taskJobCard.getCurrentStatus()) {
                 case PETASOS_TASK_ACTIVITY_STATUS_WAITING: {
                     if (fulfillmentTask.hasTaskFulfillment()) {
@@ -164,8 +165,8 @@ public class ParticipantTaskExecutionController {
         if(fulfillmentTask == null){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
-        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().newTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
-        if(taskJobCard == null){
+        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().getTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
+        if(taskJobCard == null || taskJobCard.isNull()){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
         PetasosTaskExecutionStatusEnum grantedStatus = null;
@@ -213,8 +214,8 @@ public class ParticipantTaskExecutionController {
         if(fulfillmentTask == null){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
-        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().newTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
-        if(taskJobCard == null){
+        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().getTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
+        if(taskJobCard == null || taskJobCard.isNull()){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
         PetasosTaskExecutionStatusEnum grantedStatus = null;
@@ -263,8 +264,8 @@ public class ParticipantTaskExecutionController {
          if(fulfillmentTask == null){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
-        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().newTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
-        if(taskJobCard == null){
+        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().getTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
+        if(taskJobCard == null || taskJobCard.isNull()){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
         PetasosTaskExecutionStatusEnum grantedStatus = null;
@@ -301,8 +302,8 @@ public class ParticipantTaskExecutionController {
         if(fulfillmentTask == null){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
-        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().newTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
-        if(taskJobCard == null){
+        PetasosTaskJobCardSharedInstance taskJobCard = getTaskJobCardSharedInstanceAccessorFactory().getTaskJobCardSharedInstanceAccessor(fulfillmentTask.getActionableTaskId());
+        if(taskJobCard == null || taskJobCard.isNull()){
             return(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
         }
         PetasosTaskExecutionStatusEnum grantedStatus = null;

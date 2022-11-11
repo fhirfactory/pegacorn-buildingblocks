@@ -238,10 +238,10 @@ public class LocalPetasosTaskCleanupWatchdog extends WatchdogBase implements Pet
 
     protected void jobCardCleanup(){
         getLogger().debug(".jobCardCleanup(): Entry");
-        List<TaskIdType> allTaskIds = getTaskJobCardDM().getJobCardTaskIdList();
+        List<String> allTaskIds = getTaskJobCardDM().getJobCardTaskIdList();
         int size = allTaskIds.size();
         Long nowInSeconds = Instant.now().getEpochSecond();
-        for(TaskIdType currentTaskId: allTaskIds) {
+        for(String currentTaskId: allTaskIds) {
             if (getLogger().isInfoEnabled()) {
                 getLogger().debug(".jobCardCleanup(): Checking task {}", currentTaskId);
             }

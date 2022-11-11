@@ -124,7 +124,7 @@ public class PonosTaskRouterClientSender extends PonosTaskRouterClientCommon {
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
-        return (PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_ENDPOINT);
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_FORWARDER_ENDPOINT);
     }
 
     @Override
@@ -161,10 +161,16 @@ public class PonosTaskRouterClientSender extends PonosTaskRouterClientCommon {
         getLogger().debug(".forwardTask(): Entry, task->{}", task);
         Address targetAddress = resolveTargetAddressForTaskHub();
         if(targetAddress == null){
-            getLogger().error(".forwardTask(): Cannot find candidate service address for Ponos-IM: task->{}", task);
+            getLogger().error(".forwardTask(): Cannot find candidate service address for {}: task->{}",taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName(),  task);
             getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate " + taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
             getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate " + taskServiceProviderName.getPetasosTaskRepositoryServiceProviderName());
-            return(null);
+            TaskRouterResponsePacket response = new TaskRouterResponsePacket();
+            response.setRoutedTaskId(task.getTaskId());
+            response.setSuccessorTaskId(null);
+            response.setRoutingActivityInstant(Instant.now());
+            response.setParticipantStatus(PetasosParticipantControlStatusEnum.PARTICIPANT_IS_IN_ERROR);
+            response.setResponseCommentary("Cannot Find Ponos!!!!");
+            return(response);
         }
         try {
             String sourceName = getProcessingPlant().getMeAsASoftwareComponent().getParticipantName();

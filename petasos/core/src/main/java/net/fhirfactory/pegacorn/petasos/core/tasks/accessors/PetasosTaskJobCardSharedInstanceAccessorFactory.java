@@ -34,7 +34,8 @@ public class PetasosTaskJobCardSharedInstanceAccessorFactory {
     @Inject
     private ParticipantSharedTaskJobCardCache jobCardCache;
 
-    public PetasosTaskJobCardSharedInstance newTaskJobCardSharedInstanceAccessor(TaskIdType taskId){
+
+    public PetasosTaskJobCardSharedInstance getTaskJobCardSharedInstanceAccessor(TaskIdType taskId){
         PetasosTaskJobCardSharedInstance jobCard = new PetasosTaskJobCardSharedInstance(taskId, jobCardCache);
         return(jobCard);
     }
