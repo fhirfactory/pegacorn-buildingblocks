@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.local;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation;
 
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskActivityNotificationInterface;
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
@@ -52,14 +52,14 @@ import javax.inject.Inject;
 import java.time.Instant;
 
 @ApplicationScoped
-public class LocalPetasosActionableTaskActivityController implements PetasosTaskActivityNotificationInterface {
-    private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosActionableTaskActivityController.class);
+public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(TaskDataGridProxy.class);
 
     @Inject
     CamelContext camelctx;
 
     @Inject
-    private PetasosTaskBrokerInterface taskRepositoryService;
+    private PetasosTaskDataGridInterface taskRepositoryService;
 
     @Inject
     private PetasosTaskRepositoryServiceProviderNameInterface taskRepositoryServiceProviderNameInterface;
@@ -90,13 +90,13 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
 
     //
-    // Notifications
+    // Task DataGrid Integration Services
     //
 
-    public PetasosActionableTaskSharedInstance registerActionableTask(PetasosActionableTask actionableTask){
-        getLogger().debug(".registerActionableTask(): Entry, actionableTask->{}", actionableTask);
+    public PetasosActionableTaskSharedInstance queueTask(PetasosActionableTask actionableTask){
+        getLogger().debug(".queueTask(): Entry, actionableTask->{}", actionableTask);
         if(actionableTask == null){
-            getLogger().debug(".registerActionableTask(): Exit, actionableTask is null");
+            getLogger().debug(".queueTask(): Exit, actionableTask is null");
             return(null);
         }
         PetasosActionableTaskSharedInstance petasosActionableTaskSharedInstance = taskInstanceFactory.newActionableTaskSharedInstance(actionableTask);
@@ -105,12 +105,33 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         petasosActionableTaskSharedInstance.getTaskFulfillment().setRegistrationInstant(Instant.now());
         petasosActionableTaskSharedInstance.update();
         //
-        // Synchronise with Ponos
-        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().registerActionableTask(petasosActionableTaskSharedInstance.getInstance());
+        // Register with TaskDataGrid
+        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().queueTask(petasosActionableTaskSharedInstance.getInstance());
         if(petasosActionableTask == null){
             // Assume autonomous operation
         }
         petasosActionableTaskSharedInstance.update();
+
+        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getExecutionStatus();
+        getLogger().debug(".queueTask(): Exit, petasosActionableTaskSharedInstance->{}", petasosActionableTaskSharedInstance);
+        return (petasosActionableTaskSharedInstance);
+    }
+
+    public PetasosActionableTaskSharedInstance loadNextTask(String  performerName){
+        getLogger().debug(".loadNextTask(): Entry, participantName->{}", performerName);
+        if(performerName == null){
+            getLogger().debug(".loadNextTask(): Exit, performerName is null");
+            return(null);
+        }
+
+        //
+        // Retrieve next task from TaskDataGrid
+        PetasosActionableTask nextPendingActionableTask = getTaskRepositoryService().retrieveNextPendingActionableTask(performerName);
+        if(nextPendingActionableTask == null){
+            // nothing to do
+            return(null);
+        }
+        PetasosActionableTaskSharedInstance petasosActionableTaskSharedInstance = taskInstanceFactory.newActionableTaskSharedInstance(nextPendingActionableTask);
         //
         // Build a TaskJobCard
         PetasosTaskJobCard newJobCard = new PetasosTaskJobCard();
@@ -124,7 +145,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         jobCardSharedInstanceFactory.newTaskJobCardSharedInstanceAccessor(newJobCard);
 
         PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getExecutionStatus();
-        getLogger().debug(".registerActionableTask(): Exit, petasosActionableTaskSharedInstance->{}", petasosActionableTaskSharedInstance);
+        getLogger().debug(".queueTask(): Exit, petasosActionableTaskSharedInstance->{}", petasosActionableTaskSharedInstance);
         return (petasosActionableTaskSharedInstance);
     }
 
@@ -171,7 +192,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
 
         petasosActionableTaskSharedInstance.update();
         //
-        // Synchronise with Ponos
+        // Synchronise with TaskDataGrid
         PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(petasosActionableTaskSharedInstance.getInstance());
 
         PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getExecutionStatus();
@@ -221,7 +242,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         actionableTask.update();
 
         //
-        // Synchronise with Ponos
+        // Synchronise with TaskDataGrid
         PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
 
         PetasosTaskExecutionStatusEnum executionStatus = actionableTask.getExecutionStatus();
@@ -289,7 +310,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         actionableTask.update();
 
         //
-        // Synchronise with Ponos
+        // Synchronise with TaskDataGrid
         PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
 
         //
@@ -357,7 +378,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         actionableTask.update();
 
         //
-        // Synchronise with Ponos
+        // Synchronise with TaskDataGrid
         PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
 
         //
@@ -387,7 +408,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         actionableTask.update();
 
         //
-        // Synchronise with Ponos
+        // Synchronise with TaskDataGrid
         PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
 
         //
@@ -411,7 +432,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
         actionableTask.update();
 
         //
-        // Synchronise with Ponos
+        // Synchronise with TaskDataGrid
         PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
 
         //
@@ -426,7 +447,7 @@ public class LocalPetasosActionableTaskActivityController implements PetasosTask
     // Getters (and Setters)
     //
 
-    protected PetasosTaskBrokerInterface getTaskRepositoryService(){
+    protected PetasosTaskDataGridInterface getTaskRepositoryService(){
         return(taskRepositoryService);
     }
 

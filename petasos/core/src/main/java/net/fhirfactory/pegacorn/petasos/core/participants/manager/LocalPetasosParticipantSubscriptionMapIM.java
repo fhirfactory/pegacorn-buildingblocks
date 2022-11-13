@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.PubSubParticipant
 import net.fhirfactory.pegacorn.core.model.petasos.participant.TaskWorkItemSubscriptionRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantSubscriptionMapDM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution.LocalTaskDistributionDecisionEngine;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes.LocalTaskDistributionDecisionEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

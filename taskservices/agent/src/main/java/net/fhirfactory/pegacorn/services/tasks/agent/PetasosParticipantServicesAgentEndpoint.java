@@ -24,10 +24,8 @@ package net.fhirfactory.pegacorn.services.tasks.agent;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.*;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.PetasosParticipantSubscriptionServicesEndpointBase;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -56,7 +54,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
     private PetasosTaskRepositoryServiceProviderNameInterface taskServiceProviderName;
 
     @Inject
-    private LocalPetasosParticipantCacheIM localPetasosParticipantCacheIM;
+    private LocalParticipantManager localParticipantManager;
 
     //
     // Constructor(s)
@@ -125,7 +123,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] Start");
             PetasosParticipant myProcessingPlantPetasosParticipant = getParticipantHolder().getMyProcessingPlantPetasosParticipant();
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] myProcessingPlantPetasosParticipant->{}", myProcessingPlantPetasosParticipant);
-            PetasosParticipantRegistration localRegistration = localPetasosParticipantCacheIM.getLocalParticipantRegistration(myProcessingPlantPetasosParticipant.getComponentID());
+            PetasosParticipantRegistration localRegistration = localParticipantManager.getLocalParticipantRegistration(myProcessingPlantPetasosParticipant.getComponentID());
             getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Subscriptions] localRegistration->{}", localRegistration);
             if (localRegistration == null) {
                 getLogger().error(".petasosParticipantCacheSynchronisationDaemon(): My PetasosParticipantRegistration is all wrong!");
@@ -140,7 +138,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
                         centralRegistration = updatePetasosParticipant(localRegistration.getParticipant());
                     }
                     if(centralRegistration != null) {
-                        localPetasosParticipantCacheIM.synchroniseLocalWithCentralCacheDetail(centralRegistration);
+                        localParticipantManager.synchroniseLocalWithCentralCacheDetail(centralRegistration);
                     }
                 }
             }
@@ -156,7 +154,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
                     if (getLogger().isTraceEnabled()) {
                         getLogger().trace(".petasosParticipantCacheSynchronisationDaemon(): [Synchronise My Participant/Publishing] downstream subsystem participantName->{}", currentDownstreamPerformer.getSubsystemParticipantName());
                     }
-                    localPetasosParticipantCacheIM.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
+                    localParticipantManager.synchroniseLocalWithCentralCacheDetail(currentDownstreamPerformer);
                 }
             }
             getProcessingPlantMetricsAgent().touchWatchDogActivityIndicator("ParticipantCacheSynchronisationDaemon");

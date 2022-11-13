@@ -48,8 +48,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @ApplicationScoped
-public class LocalPetasosParticipantCacheIM {
-	private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosParticipantCacheIM.class);
+public class LocalParticipantManager {
+	private static final Logger LOG = LoggerFactory.getLogger(LocalParticipantManager.class);
 
 	@Inject
 	private LocalPetasosParticipantCacheDM participantCacheDM;
@@ -74,7 +74,7 @@ public class LocalPetasosParticipantCacheIM {
 	// Constructor(s)
  	//
 
-    public LocalPetasosParticipantCacheIM(){
+    public LocalParticipantManager(){
     }
 
 	//
@@ -313,6 +313,22 @@ public class LocalPetasosParticipantCacheIM {
 			synchroniseLocalWithCentralCacheDetail(participant);
 		}
 		getLogger().debug(".synchroniseLocalWithCentralCacheDetail(): Exit");
+	}
+
+	public Set<PetasosParticipant> getLocalParticipantSet(){
+		getLogger().debug(".getLocalParticipantSet(): Entry");
+
+		Set<PetasosParticipant> localParticipants = new HashSet<>();
+		Set<PetasosParticipant> participants = getParticipantCacheDM().getAllPetasosParticipants();
+
+		for(PetasosParticipant currentParticipant: participants){
+			if(StringUtils.isEmpty(currentParticipant.getSubsystemParticipantName()) || currentParticipant.getSubsystemParticipantName().contentEquals(myProcessingPlant.getSubsystemParticipantName())){
+				localParticipants.add(currentParticipant);
+			}
+		}
+
+		getLogger().debug(".getLocalParticipantSet(): Exit");
+		return(localParticipants);
 	}
 
 	/**

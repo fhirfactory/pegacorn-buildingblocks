@@ -39,8 +39,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution.LocalTaskDistributionDecisionEngine;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -69,7 +68,7 @@ public class TaskOutcome2NewTasksBean {
     private PetasosActionableTaskFactory actionableTaskFactory;
 
     @Inject
-    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    private TaskDataGridProxy centralTaskProxy;
 
     @Inject
     private LocalTaskDistributionDecisionEngine distributionDecisionEngine;
@@ -167,10 +166,10 @@ public class TaskOutcome2NewTasksBean {
         for(PetasosActionableTask currentNewActionableTask: newActionableTaskList){
             PetasosActionableTaskSharedInstance petasosActionableTaskSharedInstance = actionableTaskSharedInstanceFactory.newActionableTaskSharedInstance(currentNewActionableTask);
             newTaskList.add(petasosActionableTaskSharedInstance);
-            PetasosTaskExecutionStatusEnum petasosTaskExecutionStatusEnum = actionableTaskActivityController.notifyTaskWaiting(petasosActionableTaskSharedInstance.getTaskId());
+            PetasosTaskExecutionStatusEnum petasosTaskExecutionStatusEnum = centralTaskProxy.notifyTaskWaiting(petasosActionableTaskSharedInstance.getTaskId());
         }
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): Updating actionableTask with task completion details");
-        actionableTaskActivityController.notifyTaskFinalisation(actionableTask.getTaskId());
+        centralTaskProxy.notifyTaskFinalisation(actionableTask.getTaskId());
 
         //
         // Get out metricsAgent for the WUP that sent the task & do add some metrics

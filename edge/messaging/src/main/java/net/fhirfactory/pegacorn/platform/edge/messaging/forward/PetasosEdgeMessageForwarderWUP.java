@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapterDefinition;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PonosTaskRouterClientSender;
 import net.fhirfactory.pegacorn.petasos.wup.helper.EgressActivityFinalisationRegistration;
@@ -69,7 +69,7 @@ public class PetasosEdgeMessageForwarderWUP extends EdgeEgressMessagingGatewayWU
     LocalPetasosParticipantSubscriptionMapIM topicServer;
 
     @Inject
-    LocalPetasosParticipantCacheIM localPetasosParticipantCacheIM;
+    LocalParticipantManager localParticipantManager;
 
     @Override
     protected WorkshopInterface specifyWorkshop() {

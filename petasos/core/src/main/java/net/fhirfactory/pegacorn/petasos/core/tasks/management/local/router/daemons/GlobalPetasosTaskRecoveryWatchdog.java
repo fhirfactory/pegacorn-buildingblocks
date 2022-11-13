@@ -19,9 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons;
 
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridInterface;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 
@@ -37,7 +37,7 @@ public class GlobalPetasosTaskRecoveryWatchdog {
     private boolean initialised;
 
     @Inject
-    private PetasosTaskBrokerInterface taskBroker;
+    private PetasosTaskDataGridInterface taskBroker;
 
     @Inject
     private ParticipantSharedActionableTaskCache actionableTaskDM;
@@ -96,7 +96,7 @@ public class GlobalPetasosTaskRecoveryWatchdog {
         this.initialised = initialised;
     }
 
-    protected PetasosTaskBrokerInterface getTaskBroker() {
+    protected PetasosTaskDataGridInterface getTaskBroker() {
         return taskBroker;
     }
 

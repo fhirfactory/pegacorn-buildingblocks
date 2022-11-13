@@ -25,15 +25,20 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantControlStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantFulfillment;
 import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.common.ResourceSummaryBase;
 
 public class PetasosParticipantSummary extends ResourceSummaryBase {
     private String participantName;
+    private String participantDisplayName;
+    private String participantFullName;
+    private String subsystemName;
     private String nodeVersion;
     private PetasosParticipantFulfillment fulfillmentState;
     private TopologyNodeFunctionFDN topologyNodeFunctionFDN;
     private PetasosMonitoredComponentTypeEnum nodeType;
+    private PetasosParticipantControlStatusEnum controlStatus;
 
     //
     // Constructor(s)
@@ -41,15 +46,52 @@ public class PetasosParticipantSummary extends ResourceSummaryBase {
 
     public PetasosParticipantSummary(){
         this.participantName = null;
+        this.participantDisplayName = null;
+        this.participantFullName = null;
+        this.subsystemName = null;
         this.nodeVersion = null;
         this.fulfillmentState = null;
         this.topologyNodeFunctionFDN = null;
         this.nodeType = null;
+        this.controlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_ENABLED;
     }
 
     //
     // Getters and Setters
     //
+
+
+    public String getParticipantDisplayName() {
+        return participantDisplayName;
+    }
+
+    public void setParticipantDisplayName(String participantDisplayName) {
+        this.participantDisplayName = participantDisplayName;
+    }
+
+    public String getParticipantFullName() {
+        return participantFullName;
+    }
+
+    public void setParticipantFullName(String participantFullName) {
+        this.participantFullName = participantFullName;
+    }
+
+    public String getSubsystemName() {
+        return subsystemName;
+    }
+
+    public void setSubsystemName(String subsystemName) {
+        this.subsystemName = subsystemName;
+    }
+
+    public PetasosParticipantControlStatusEnum getControlStatus() {
+        return controlStatus;
+    }
+
+    public void setControlStatus(PetasosParticipantControlStatusEnum controlStatus) {
+        this.controlStatus = controlStatus;
+    }
 
     public String getParticipantName() {
         return participantName;
@@ -95,17 +137,23 @@ public class PetasosParticipantSummary extends ResourceSummaryBase {
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "PetasosParticipantSummary{" +
-                "participantName='" + participantName + '\'' +
-                ", nodeVersion='" + nodeVersion + '\'' +
-                ", fulfillmentState=" + fulfillmentState +
-                ", topologyNodeFunctionFDN=" + topologyNodeFunctionFDN +
-                ", nodeType=" + nodeType +
-                ", lastSynchronisationInstant=" + getLastSynchronisationInstant() +
-                ", lastActivityInstant=" + getLastActivityInstant() +
-                ", resourceId='" + getResourceId() + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("PetasosParticipantSummary{");
+        sb.append("participantName=").append(participantName);
+        sb.append(", participantDisplayName=").append(participantDisplayName);
+        sb.append(", participantFullName=").append(participantFullName);
+        sb.append(", subsystemName=").append(subsystemName);
+        sb.append(", nodeVersion=").append(nodeVersion);
+        sb.append(", fulfillmentState=").append(fulfillmentState);
+        sb.append(", topologyNodeFunctionFDN=").append(topologyNodeFunctionFDN);
+        sb.append(", nodeType=").append(nodeType);
+        sb.append(", controlStatus=").append(controlStatus);
+        sb.append(", lastSynchronisationInstant=").append(getLastSynchronisationInstant());
+        sb.append(", lastActivityInstant=").append(getLastActivityInstant());
+        sb.append(", resourceId=").append(getResourceId());
+        sb.append('}');
+        return sb.toString();
     }
 }

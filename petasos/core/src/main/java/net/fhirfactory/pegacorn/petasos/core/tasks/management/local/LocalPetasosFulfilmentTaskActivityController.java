@@ -33,7 +33,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.ParticipantTaskExecutionController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.LocalTaskRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +61,7 @@ public class LocalPetasosFulfilmentTaskActivityController {
     private ProcessingPlantInterface processingPlant;
 
     @Inject
-    private ParticipantTaskExecutionController taskExecutionController;
+    private LocalTaskRouter taskExecutionController;
 
     @Inject
     private PetasosTaskJobCardFactory jobCardFactory;

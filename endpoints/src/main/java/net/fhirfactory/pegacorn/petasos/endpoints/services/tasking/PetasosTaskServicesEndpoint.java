@@ -21,9 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.tasking;
 
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.interfaces.rmi.common.PetasosTaskResourceManagementInterface;
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskBrokerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskHandlerInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
@@ -32,13 +30,11 @@ import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedure
 import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.factories.RemoteProcedureCallRequestFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
-import net.fhirfactory.pegacorn.referencevalues.PegacornSystemReference;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -51,11 +47,10 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 
 @ApplicationScoped
-public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase implements PetasosTaskBrokerInterface {
+public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase implements PetasosTaskDataGridInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosTaskServicesEndpoint.class);
 
     @Produce
@@ -212,7 +207,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     //
     // Register a PetasosActionableTask
     @Override
-    public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask){
+    public PetasosActionableTask queueTask(PetasosActionableTask actionableTask){
         getLogger().debug(".registerActionableTask(): Entry, task->{}", actionableTask);
         JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -254,6 +249,11 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             getLogger().error(".registerActionableTask: Error (GeneralException) ->{}", e.getMessage());
             return(null);
         }
+    }
+
+    @Override
+    public PetasosActionableTask retrieveNextPendingActionableTask(String performerName) {
+        return null;
     }
 
     public RemoteProcedureCallResponse registerActionableTaskHandler(RemoteProcedureCallRequest rpcRequest){

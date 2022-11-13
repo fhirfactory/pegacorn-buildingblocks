@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEnd
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +50,7 @@ public abstract class PetasosParticipantSubscriptionServicesEndpointBase extends
     private static int CHANGE_DETECTION_SUBSCRIPTION_CHECK_COUNT = 10;
 
     @Inject
-    private LocalPetasosParticipantCacheIM participantCacheIM;
+    private LocalParticipantManager participantCacheIM;
 
     //
     // Constructor(s)

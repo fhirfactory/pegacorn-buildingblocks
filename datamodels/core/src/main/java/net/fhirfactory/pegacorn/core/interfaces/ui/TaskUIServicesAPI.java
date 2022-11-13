@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2022 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,12 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.participant;
+package net.fhirfactory.pegacorn.core.interfaces.ui;
 
-public enum PetasosParticipantStatusEnum {
-    PETASOS_PARTICIPANT_ACTIVE,
-    PETASOS_PARTICIPANT_IDLE,
-    PETASOS_PARTICIPANT_STARTING,
-    PETASOS_PARTICIPANT_STOPPING,
-    PETASOS_PARTICIPANT_FAILED
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.TaskSummary;
+
+import java.time.Instant;
+import java.util.List;
+
+public interface TaskUIServicesAPI {
+    public List<TaskSummary> listTasks(String participant, ActionableTaskOutcomeStatusEnum status, boolean order, Instant startTime, Instant endTime);
+    public TaskSummary initiateTaskRedo(String taskId);
+    public TaskSummary initiateTaskCancellation(String taskId);
 }

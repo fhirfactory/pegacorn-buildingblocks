@@ -19,12 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.model.petasos.participant;
+package net.fhirfactory.pegacorn.core.interfaces.tasks;
 
-public enum PetasosParticipantStatusEnum {
-    PETASOS_PARTICIPANT_ACTIVE,
-    PETASOS_PARTICIPANT_IDLE,
-    PETASOS_PARTICIPANT_STARTING,
-    PETASOS_PARTICIPANT_STOPPING,
-    PETASOS_PARTICIPANT_FAILED
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+
+import java.util.Map;
+
+public interface PetasosTaskDataGridInterface {
+    public PetasosActionableTask queueTask(PetasosActionableTask actionableTask);
+    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask);
+    public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask);
+
+    public Map<Integer, PetasosActionableTask> retrievePendingActionableTasks(String participantName);
+
+    public PetasosActionableTask retrieveNextPendingActionableTask(String performerName);
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2022 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,19 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.core.interfaces.tasks;
+package net.fhirfactory.pegacorn.core.interfaces.ui;
 
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantControlStatusEnum;
+import net.fhirfactory.pegacorn.core.model.ui.resources.simple.PetasosParticipantESR;
+import net.fhirfactory.pegacorn.core.model.ui.resources.summaries.PetasosParticipantSummary;
 
 import java.util.List;
-import java.util.Map;
 
-public interface PetasosTaskBrokerInterface {
-    public PetasosActionableTask registerActionableTask(PetasosActionableTask actionableTask);
-    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask);
-    public PetasosActionableTask updateActionableTask(PetasosActionableTask actionableTask);
-
-    public Map<Integer, PetasosActionableTask> retrievePendingActionableTasks(String participantName);
-
+public interface ParticipantUIServicesAPI {
+    public List<PetasosParticipantSummary> listSubsystems();
+    public PetasosParticipantSummary getParticipantSummary(String participantName);
+    public PetasosParticipantESR getParticipantESR(String participantName);
+    List<PetasosParticipantSummary> listParticipants(String subsystemName);
+    public PetasosParticipantSummary setControlStatus(String participantName, PetasosParticipantControlStatusEnum controlStatus);
 }

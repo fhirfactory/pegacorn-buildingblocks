@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons;
 
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskLifetimeExtensionInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalFulfillmentTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.common.DaemonBase;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.daemon.DaemonBase;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

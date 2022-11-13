@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PonosTaskRouterClientSender;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
@@ -58,7 +58,7 @@ public class JGroupsServiceManagementWUP extends MOAStandardWUP implements Petas
     LocalPetasosParticipantSubscriptionMapIM topicServer;
 
     @Inject
-    LocalPetasosParticipantCacheIM localPetasosParticipantCacheIM;
+    LocalParticipantManager localParticipantManager;
 
     @Override
     protected WorkshopInterface specifyWorkshop() {

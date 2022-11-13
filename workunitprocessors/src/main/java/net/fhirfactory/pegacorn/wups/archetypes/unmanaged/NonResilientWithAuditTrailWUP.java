@@ -45,7 +45,7 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornI
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.workshops.base.Workshop;
 import net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit.TransactionalWUPAuditEntryManager;
@@ -95,7 +95,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
     private PetasosFulfillmentTaskFactory fulfillmentTaskFactory;
 
     @Inject
-    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    private TaskDataGridProxy actionableTaskActivityController;
 
     @Inject
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
@@ -228,7 +228,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         return fulfillmentTaskFactory;
     }
 
-    protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController() {
+    protected TaskDataGridProxy getActionableTaskActivityController() {
         return actionableTaskActivityController;
     }
 
@@ -256,7 +256,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         //
         // Build and register a Petasos Actionable Task
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
-        getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
+        getActionableTaskActivityController().queueTask(petasosActionableTask);
         //
         // Build and register a Petasos Fulfillment Task
         PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, getTopologyNode());
@@ -274,7 +274,7 @@ public abstract class NonResilientWithAuditTrailWUP extends RouteBuilder {
         //
         // Build and register a Petasos Actionable Task
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
-        getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
+        getActionableTaskActivityController().queueTask(petasosActionableTask);
         //
         // Build and register a Petasos Fulfillment Task
         PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, getTopologyNode());

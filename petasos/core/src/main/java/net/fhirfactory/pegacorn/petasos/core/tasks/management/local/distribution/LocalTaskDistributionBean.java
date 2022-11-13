@@ -41,7 +41,8 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentT
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes.LocalTaskDistributionDecisionEngine;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
@@ -102,7 +103,7 @@ public class LocalTaskDistributionBean {
     private PetasosTaskJobCardFactory taskJobCardFactory;
 
     @Inject
-    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    private TaskDataGridProxy actionableTaskActivityController;
 
     @Inject
     private LocalPetasosParticipantCacheDM localPetasosParticipantCacheDM;

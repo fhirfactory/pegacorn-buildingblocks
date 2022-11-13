@@ -46,7 +46,6 @@ import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
@@ -57,7 +56,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTa
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
@@ -90,7 +89,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
     private PetasosFulfillmentTaskFactory fulfillmentTaskFactory;
 
     @Inject
-    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    private TaskDataGridProxy actionableTaskActivityController;
 
     @Inject
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
@@ -117,7 +116,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         PetasosActionableTask incomingActionableTask = handoverPacket.getActionableTask();
         TaskTraceabilityElementType upstreamTaskTraceability = handoverPacket.getUpstreamFulfillmentTaskDetails();
         PetasosActionableTask newActionableTask = actionableTaskFactory.newMessageBasedActionableTask(incomingActionableTask, upstreamTaskTraceability, taskWorkItem);
-        PetasosActionableTaskSharedInstance actionableTaskSharedInstance = actionableTaskActivityController.registerActionableTask(newActionableTask);
+        PetasosActionableTaskSharedInstance actionableTaskSharedInstance = actionableTaskActivityController.queueTask(newActionableTask);
         // Add some more metrics
         metricsAgent.incrementRegisteredTasks();
         getLogger().trace(".ipcReceiverActivityStart(): Create and register a new ActionableTask: Finish");
@@ -187,7 +186,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         return(this.fulfilmentTaskActivityController);
     }
 
-    protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController(){
+    protected TaskDataGridProxy getActionableTaskActivityController(){
         return(this.actionableTaskActivityController);
     }
 }

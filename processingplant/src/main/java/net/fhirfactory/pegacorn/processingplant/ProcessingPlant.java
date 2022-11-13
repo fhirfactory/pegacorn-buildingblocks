@@ -52,9 +52,9 @@ import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.com
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfaces.SolutionNodeFactoryInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantCacheIM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.GlobalPetasosTaskContinuityWatchdog;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.GlobalPetasosTaskRecoveryWatchdog;
+import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons.GlobalPetasosTaskContinuityWatchdog;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons.GlobalPetasosTaskRecoveryWatchdog;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
@@ -109,7 +109,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     private TaskPathwayManagementServiceInterface taskPathwayManagementService;
 
     @Inject
-    private LocalPetasosParticipantCacheIM localPetasosParticipantCacheIM;
+    private LocalParticipantManager localParticipantManager;
 
     @Inject
     private PegacornReferenceProperties pegacornReferenceProperties;
@@ -162,8 +162,8 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return(taskPathwayManagementService);
     }
 
-    protected LocalPetasosParticipantCacheIM getLocalPetasosParticipantCacheIM(){
-        return(localPetasosParticipantCacheIM);
+    protected LocalParticipantManager getLocalPetasosParticipantCacheIM(){
+        return(localParticipantManager);
     }
 
     protected FHIRElementTopicFactory getFHIRElementTopicFactory(){
@@ -237,11 +237,11 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             getLogger().info("ProcessingPlant::initialise(): [Check for My PetasosPartcipant] Start");
             if(!getParticipantHolder().hasMyProcessingPlantPetasosParticipant()){
                 getLogger().info("ProcessingPlant::initialise(): [Check for My PetasosPartcipant] Registering my PetasosParticipant!");
-                PetasosParticipantRegistration petasosParticipantRegistration = localPetasosParticipantCacheIM.registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), new HashSet<>());
+                PetasosParticipantRegistration petasosParticipantRegistration = localParticipantManager.registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), new HashSet<>());
                 getParticipantHolder().setMyProcessingPlantPetasosParticipant(petasosParticipantRegistration.getParticipant());
             }
-            if(localPetasosParticipantCacheIM.getLocalParticipantRegistration(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getComponentID()) == null){
-                PetasosParticipantRegistration petasosParticipantRegistration = localPetasosParticipantCacheIM.registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), new HashSet<>());
+            if(localParticipantManager.getLocalParticipantRegistration(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getComponentID()) == null){
+                PetasosParticipantRegistration petasosParticipantRegistration = localParticipantManager.registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), new HashSet<>());
                 if(petasosParticipantRegistration == null){
                     getLogger().error("ProcessingPlant::initialise(): [Check for My PetasosPartcipant] Cannot add my participant to local participant cache!");
                 }

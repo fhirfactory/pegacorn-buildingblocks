@@ -32,7 +32,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExec
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
@@ -53,7 +53,7 @@ public class TaskOutcomeCaptureBean {
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
 
     @Inject
-    private LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    private TaskDataGridProxy actionableTaskActivityController;
 
     @Inject
     private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceAccessorFactory;
@@ -149,7 +149,7 @@ public class TaskOutcomeCaptureBean {
         return(this.fulfilmentTaskActivityController);
     }
 
-    protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController(){
+    protected TaskDataGridProxy getActionableTaskActivityController(){
         return(this.actionableTaskActivityController);
     }
 

@@ -1,4 +1,4 @@
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.participant.watchdogs.common;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.daemon;
 
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;

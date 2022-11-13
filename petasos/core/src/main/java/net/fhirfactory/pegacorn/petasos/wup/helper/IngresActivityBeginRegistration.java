@@ -40,7 +40,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentT
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosActionableTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
@@ -67,7 +67,7 @@ public class IngresActivityBeginRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(IngresActivityBeginRegistration.class);
 
     @Inject
-    LocalPetasosActionableTaskActivityController actionableTaskActivityController;
+    TaskDataGridProxy actionableTaskActivityController;
 
     @Inject
     LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
@@ -119,7 +119,7 @@ public class IngresActivityBeginRegistration {
         getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Finish");
 
         getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Start");
-        PetasosActionableTaskSharedInstance actionableTaskSharedInstance =  getActionableTaskActivityController().registerActionableTask(petasosActionableTask);
+        PetasosActionableTaskSharedInstance actionableTaskSharedInstance =  getActionableTaskActivityController().queueTask(petasosActionableTask);
         // Add some more metrics
         metricsAgent.incrementRegisteredTasks();
         getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Finish");
@@ -185,7 +185,7 @@ public class IngresActivityBeginRegistration {
     // Getters (and Setters)
     //
 
-    protected LocalPetasosActionableTaskActivityController getActionableTaskActivityController() {
+    protected TaskDataGridProxy getActionableTaskActivityController() {
         return actionableTaskActivityController;
     }
 
