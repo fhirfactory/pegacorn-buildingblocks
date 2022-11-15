@@ -114,7 +114,7 @@ import java.time.Instant;
                 }
             }
 
-            fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL);
+            fulfillmentTask.getTaskWorkItem().getIngresContent().getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_CORE_DISTRIBUTION);
             fulfillmentTask.update();
             forwardingPacket.setTarget(theUoW.getPayloadTopicID().getTargetProcessingPlantParticipantName());
             forwardingPacket.setSource(processingPlant.getSubsystemParticipantName());

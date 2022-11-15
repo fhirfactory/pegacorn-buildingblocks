@@ -29,7 +29,7 @@ public enum DataParcelDirectionEnum {
     INFORMATION_FLOW_WORKFLOW_OUTPUT("Workflow.Output", "petasos.information_flow.workflow.direction.output"),
     INFORMATION_FLOW_WORKFLOW_INPUT("Workflow.Input", "petasos.information_flow.workflow.direction.input"),
     INFORMATION_FLOW_WORKFLOW_TRANSIENT("Workflow.Transient", "petasos.information_flow.workflow.direction.transient"),
-    INFORMATION_FLOW_SUBSYSTEM_IPC_DATA_PARCEL("IPC.Share", "petasos.information_flow.ipc.direction.share");
+    INFORMATION_FLOW_CORE_DISTRIBUTION("Task.InterSubsystemDistribution", "petasos.information_flow.task.direction.core_distribution");
 
     private String token;
     private String displayName;
