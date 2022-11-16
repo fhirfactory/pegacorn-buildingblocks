@@ -494,7 +494,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             manifest.setContentDescriptor(currentTriggerEvent);
             manifest.setContainerDescriptor(container);
             manifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
-            manifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_INBOUND_DATA_PARCEL);
+            manifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_CORE_DISTRIBUTION);
             manifest.setInterSubsystemDistributable(true);
             manifest.setSourceSystem(sourceSystem);
             manifest.setSourceProcessingPlantParticipantName(sourceSystem);

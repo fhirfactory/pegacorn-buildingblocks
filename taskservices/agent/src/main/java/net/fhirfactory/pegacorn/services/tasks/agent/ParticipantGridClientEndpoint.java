@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServi
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.*;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
-import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.PetasosParticipantSubscriptionServicesEndpointBase;
+import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.ParticipantServicesEndpointBase;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -39,8 +39,8 @@ import java.time.Instant;
 import java.util.*;
 
 @ApplicationScoped
-public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantSubscriptionServicesEndpointBase {
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosParticipantServicesAgentEndpoint.class);
+public class ParticipantGridClientEndpoint extends ParticipantServicesEndpointBase {
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipantGridClientEndpoint.class);
 
     private static Long PETASOS_PARTICIPANT_MAP_CACHE_SYNCHRONISATION_INITIAL_WAIT = 60000L;
     private static Long PETASOS_PARTICIPANT_MAP_CACHE_SYNCHRONISATION_PERIOD = 30000L;
@@ -60,7 +60,7 @@ public class PetasosParticipantServicesAgentEndpoint extends PetasosParticipantS
     // Constructor(s)
     //
 
-    public PetasosParticipantServicesAgentEndpoint(){
+    public ParticipantGridClientEndpoint(){
         super();
         this.synchronisationDaemonInitialised = false;
     }

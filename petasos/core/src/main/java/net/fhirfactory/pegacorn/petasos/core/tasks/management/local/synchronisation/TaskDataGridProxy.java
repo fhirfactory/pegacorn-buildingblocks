@@ -22,8 +22,8 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation;
 
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskActivityNotificationInterface;
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridInterface;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskActivityReportingInterface;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridClientInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
@@ -33,6 +33,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.da
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskExecutionControl;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
@@ -52,14 +54,14 @@ import javax.inject.Inject;
 import java.time.Instant;
 
 @ApplicationScoped
-public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterface {
+public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface {
     private static final Logger LOG = LoggerFactory.getLogger(TaskDataGridProxy.class);
 
     @Inject
     CamelContext camelctx;
 
     @Inject
-    private PetasosTaskDataGridInterface taskRepositoryService;
+    private PetasosTaskDataGridClientInterface taskRepositoryService;
 
     @Inject
     private PetasosTaskRepositoryServiceProviderNameInterface taskRepositoryServiceProviderNameInterface;
@@ -106,8 +108,8 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
         petasosActionableTaskSharedInstance.update();
         //
         // Register with TaskDataGrid
-        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().queueTask(petasosActionableTaskSharedInstance.getInstance());
-        if(petasosActionableTask == null){
+        TaskIdType taskId = getTaskRepositoryService().queueTask(petasosActionableTaskSharedInstance.getInstance());
+        if(taskId == null){
             // Assume autonomous operation
         }
         petasosActionableTaskSharedInstance.update();
@@ -126,7 +128,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
 
         //
         // Retrieve next task from TaskDataGrid
-        PetasosActionableTask nextPendingActionableTask = getTaskRepositoryService().retrieveNextPendingActionableTask(performerName);
+        PetasosActionableTask nextPendingActionableTask = getTaskRepositoryService().getNextPendingTask(performerName);
         if(nextPendingActionableTask == null){
             // nothing to do
             return(null);
@@ -175,7 +177,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
     }
 
     @Override
-    public PetasosTaskExecutionStatusEnum notifyTaskStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask) {
+    public TaskExecutionCommandEnum notifyTaskStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask) {
         getLogger().warn(".notifyTaskStart(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskStart(): Exit, taskId is null");
@@ -193,15 +195,17 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
         petasosActionableTaskSharedInstance.update();
         //
         // Synchronise with TaskDataGrid
-        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(petasosActionableTaskSharedInstance.getInstance());
+        TaskFulfillmentType taskFulfillment = petasosActionableTaskSharedInstance.getTaskFulfillment();
+        String participantName = taskFulfillment.getFulfillerWorkUnitProcessor().getParticipantName();
 
-        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getExecutionStatus();
-        getLogger().debug(".notifyTaskStart(): Exit, executionStatus->{}", executionStatus);
-        return (executionStatus);
+        TaskExecutionControl taskExecutionControl = getTaskRepositoryService().notifyTaskStart(participantName, petasosActionableTaskSharedInstance.getInstance().getTaskId(), taskFulfillment);
+
+        getLogger().debug(".notifyTaskStart(): Exit, taskExecutionControl->{}", taskExecutionControl);
+        return (taskExecutionControl.getExecutionCommand());
     }
 
     @Override
-    public PetasosTaskExecutionStatusEnum notifyTaskFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
+    public TaskExecutionCommandEnum notifyTaskFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
         getLogger().warn(".notifyTaskFinish(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFinish(): Exit, taskId is null");
@@ -243,15 +247,16 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
 
         //
         // Synchronise with TaskDataGrid
-        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
+        String participantName = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantName();
+        TaskOutcomeStatusType taskOutcomeStatus = actionableTask.getTaskOutcomeStatus();
+        TaskExecutionControl executionControl = getTaskRepositoryService().notifyTaskFinish(participantName, actionableTask.getInstance().getTaskId(), taskFulfillment, clonedEgressContent, taskOutcomeStatus, "Ordinary Processing");
 
-        PetasosTaskExecutionStatusEnum executionStatus = actionableTask.getExecutionStatus();
-        getLogger().debug(".notifyTaskFinish(): Exit, executionStatus->{}", executionStatus);
-        return(executionStatus);
+        getLogger().debug(".notifyTaskFinish(): Exit, executionStatus->{}", executionControl);
+        return(executionControl.getExecutionCommand());
     }
 
     @Override
-    public PetasosTaskExecutionStatusEnum notifyTaskFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
+    public TaskExecutionCommandEnum notifyTaskFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
         getLogger().warn(".notifyTaskFailure(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFailure(): Exit, taskId is null");
@@ -303,6 +308,8 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
         actionableTask.getTaskWorkItem().setProcessingOutcome(fulfillmentTask.getTaskWorkItem().getProcessingOutcome());
         if(StringUtils.isNotEmpty(fulfillmentTask.getTaskWorkItem().getFailureDescription())){
             actionableTask.getTaskWorkItem().setFailureDescription(fulfillmentTask.getTaskWorkItem().getFailureDescription());
+        } else {
+            actionableTask.getTaskWorkItem().setFailureDescription("Failure Reason Unknown");
         }
 
         //
@@ -311,18 +318,17 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
 
         //
         // Synchronise with TaskDataGrid
-        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
+        String participantName = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantName();
+        TaskOutcomeStatusType taskOutcomeStatus = actionableTask.getTaskOutcomeStatus();
+        String taskFailureReason = actionableTask.getTaskWorkItem().getFailureDescription();
+        TaskExecutionControl executionControl = getTaskRepositoryService().notifyTaskFailure(participantName, actionableTask.getInstance().getTaskId(), actionableTask.getTaskFulfillment(),clonedEgressContent,taskOutcomeStatus, taskFailureReason);
 
-        //
-        // Extract Task Status
-        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTask.getExecutionStatus();
-
-        getLogger().debug(".notifyTaskFailure(): Exit, executionStatus->{}", executionStatus);
-        return(executionStatus);
+        getLogger().debug(".notifyTaskFailure(): Exit, executionControl->{}", executionControl);
+        return(executionControl.getExecutionCommand());
     }
 
     @Override
-    public PetasosTaskExecutionStatusEnum notifyTaskCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
+    public TaskExecutionCommandEnum notifyTaskCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
         getLogger().warn(".notifyTaskCancellation(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskCancellation(): Exit, taskId is null");
@@ -379,18 +385,17 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
 
         //
         // Synchronise with TaskDataGrid
-        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
+        String participantName = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantName();
+        TaskOutcomeStatusType taskOutcomeStatus = actionableTask.getTaskOutcomeStatus();
+        String taskFailureReason = actionableTask.getTaskWorkItem().getFailureDescription();
+        TaskExecutionControl executionControl = getTaskRepositoryService().notifyTaskCancellation(participantName, actionableTask.getInstance().getTaskId(),taskFulfillment,egressContent,taskOutcomeStatus, "Locally Cancelled" );
 
-        //
-        // Extract Task Status
-        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTask.getExecutionStatus();
-
-        getLogger().debug(".notifyTaskCancellation(): Exit, executionStatus->{}", executionStatus);
-        return(executionStatus);
+        getLogger().debug(".notifyTaskCancellation(): Exit, executionControl->{}", executionControl);
+        return(executionControl.getExecutionCommand());
     }
 
     @Override
-    public PetasosTaskExecutionStatusEnum notifyTaskWaiting(TaskIdType taskId) {
+    public TaskExecutionCommandEnum notifyTaskWaiting(TaskIdType taskId) {
         getLogger().warn(".notifyTaskWaiting(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskWaiting(): Exit, taskId is null");
@@ -407,19 +412,11 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
         // Synchronise the Participant Cache
         actionableTask.update();
 
-        //
-        // Synchronise with TaskDataGrid
-        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
-
-        //
-        // Extract Task Status
-        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTask.getExecutionStatus();
-
-        getLogger().debug(".notifyTaskWaiting(): Exit, executionStatus->{}", executionStatus);
-        return(executionStatus);
+        getLogger().debug(".notifyTaskWaiting(): Exit, executionStatus->{}", TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
+        return(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
     }
 
-    public PetasosTaskExecutionStatusEnum notifyTaskFinalisation(TaskIdType taskId) {
+    public TaskExecutionCommandEnum notifyTaskFinalisation(TaskIdType taskId) {
         getLogger().warn(".notifyTaskFinalisation(): Entry, taskId->{}", taskId);
         if(taskId == null){
             getLogger().debug(".notifyTaskFinalisation(): Exit, taskId is null");
@@ -433,21 +430,19 @@ public class TaskDataGridProxy implements PetasosTaskActivityNotificationInterfa
 
         //
         // Synchronise with TaskDataGrid
-        PetasosActionableTask petasosActionableTask = getTaskRepositoryService().updateActionableTask(actionableTask.getInstance());
+        String participantName = actionableTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantName();
+        TaskCompletionSummaryType taskCompletionSummary = actionableTask.getTaskCompletionSummary();
+        TaskExecutionControl executionControl = getTaskRepositoryService().notifyTaskFinalisation(participantName, actionableTask.getInstance().getTaskId(),taskCompletionSummary);
 
-        //
-        // Extract Task Status
-        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTask.getExecutionStatus();
-
-        getLogger().debug(".notifyTaskWaiting(): Exit, executionStatus->{}", executionStatus);
-        return(executionStatus);
+        getLogger().debug(".notifyTaskWaiting(): Exit, executionControl->{}", executionControl);
+        return(executionControl.getExecutionCommand());
     }
 
     //
     // Getters (and Setters)
     //
 
-    protected PetasosTaskDataGridInterface getTaskRepositoryService(){
+    protected PetasosTaskDataGridClientInterface getTaskRepositoryService(){
         return(taskRepositoryService);
     }
 

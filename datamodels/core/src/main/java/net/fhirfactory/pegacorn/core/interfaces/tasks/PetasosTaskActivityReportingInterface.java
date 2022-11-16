@@ -19,27 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
+package net.fhirfactory.pegacorn.core.interfaces.tasks;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 
-import javax.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
-public class InterProcessingPlantHandoverPacketDecoderBean {
-    private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverPacketDecoderBean.class);
-
-    public InterProcessingPlantHandoverPacketDecoderBean() {
-    }
-
-    public InterProcessingPlantHandoverPacket handoverPacketDecode(InterProcessingPlantHandoverPacket incomingPacket) {
-        LOG.debug(".handoverPacketDecode(): Entry, incomingPacket --> {}", incomingPacket);
-        InterProcessingPlantHandoverPacket outgoingPacket = incomingPacket;
-        LOG.debug(".handoverPacketDecode(): Exit");
-        return outgoingPacket;
-    }
+public interface PetasosTaskActivityReportingInterface {
+    public TaskExecutionCommandEnum notifyTaskStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
+    public TaskExecutionCommandEnum notifyTaskFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
+    public TaskExecutionCommandEnum notifyTaskFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
+    public TaskExecutionCommandEnum notifyTaskCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask);
+    public TaskExecutionCommandEnum notifyTaskWaiting(TaskIdType taskId);
 }

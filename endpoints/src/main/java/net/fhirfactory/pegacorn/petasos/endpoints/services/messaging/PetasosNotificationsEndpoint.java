@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.common.PonosTaskRouterClientCommon;
+import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverResponsePacket;
 import net.fhirfactory.pegacorn.platform.edge.model.router.TaskRouterResponsePacket;
@@ -46,8 +46,8 @@ import javax.inject.Inject;
 import java.time.Instant;
 
 @ApplicationScoped
-public class PonosTaskRouterClientReceiver extends PonosTaskRouterClientCommon {
-    private static final Logger LOG = LoggerFactory.getLogger(PonosTaskRouterClientReceiver.class);
+public class PetasosNotificationsEndpoint extends JGroupsIntegrationPointBase {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosNotificationsEndpoint.class);
 
     @Produce
     private ProducerTemplate camelProducer;
@@ -59,7 +59,7 @@ public class PonosTaskRouterClientReceiver extends PonosTaskRouterClientCommon {
     // Constructor(s)
     //
 
-    public PonosTaskRouterClientReceiver(){
+    public PetasosNotificationsEndpoint(){
         super();
     }
 
@@ -122,12 +122,12 @@ public class PonosTaskRouterClientReceiver extends PonosTaskRouterClientCommon {
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
-        return (PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_ENDPOINT);
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_NOTIFICATIONS_ENDPOINT);
     }
 
     @Override
     protected EndpointPayloadTypeEnum specifyPetasosEndpointPayloadType() {
-        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_TASK_ROUTING_RECEIVER);
+        return (EndpointPayloadTypeEnum.ENDPOINT_PAYLOAD_INTERNAL_NOTIFICATIONS);
     }
 
     //

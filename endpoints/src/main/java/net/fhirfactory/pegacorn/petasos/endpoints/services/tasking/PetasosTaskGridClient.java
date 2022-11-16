@@ -21,16 +21,21 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.services.tasking;
 
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridInterface;
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskHandlerInterface;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridClientInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedureCallRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.RemoteProcedureCallResponse;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.rpc.factories.RemoteProcedureCallRequestFactory;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskExecutionControl;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.deployment.names.subsystems.SubsystemNames;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
@@ -46,18 +51,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.Instant;
-import java.util.Map;
 
 @ApplicationScoped
-public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase implements PetasosTaskDataGridInterface {
-    private static final Logger LOG = LoggerFactory.getLogger(PetasosTaskServicesEndpoint.class);
+public class PetasosTaskGridClient extends JGroupsIntegrationPointBase implements PetasosTaskDataGridClientInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosTaskGridClient.class);
 
     @Produce
     private ProducerTemplate camelProducer;
-
-    @Inject
-    private PetasosTaskHandlerInterface taskManagementHandler;
 
     @Inject
     private RemoteProcedureCallRequestFactory rpcRequestFactory;
@@ -70,7 +70,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     // Constructor(s)
     //
 
-    public PetasosTaskServicesEndpoint(){
+    public PetasosTaskGridClient(){
         super();
     }
 
@@ -122,7 +122,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
 
     @Override
     protected PetasosEndpointFunctionTypeEnum specifyPetasosEndpointFunctionType() {
-        return (PetasosEndpointFunctionTypeEnum.PETASOS_TASKING_ENDPOINT);
+        return (PetasosEndpointFunctionTypeEnum.PETASOS_TASK_DISTRIBUTION_GRID_CLIENT_ENDPOINT);
     }
 
     @Override
@@ -201,13 +201,11 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
     }
 
     //
-    // PetasosActionableTask Activities
+    // Task DataGrid Services
     //
 
-    //
-    // Register a PetasosActionableTask
     @Override
-    public PetasosActionableTask queueTask(PetasosActionableTask actionableTask){
+    public TaskIdType queueTask(PetasosActionableTask actionableTask){
         getLogger().debug(".registerActionableTask(): Entry, task->{}", actionableTask);
         JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
         Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
@@ -233,7 +231,7 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
             getLogger().debug(".registerActionableTask(): Exit, response->{}", response);
             if(response.isSuccessful()){
                 PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
-                return(registeredTask);
+                return(registeredTask.getTaskId());
             } else {
                 getMetricsAgent().incrementRemoteProcedureCallFailureCount();
                 getLogger().error(".registerActionableTask(): Could not register task, response->{}", response);
@@ -251,130 +249,41 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
         }
     }
 
-    @Override
-    public PetasosActionableTask retrieveNextPendingActionableTask(String performerName) {
-        return null;
-    }
-
-    public RemoteProcedureCallResponse registerActionableTaskHandler(RemoteProcedureCallRequest rpcRequest){
-        getLogger().debug(".registerActionableTaskHandler(): Entry, rpcRequest->{}", rpcRequest);
-        PetasosActionableTask taskToRegister = null;
-        getMetricsAgent().incrementRemoteProcedureCallHandledCount();
-        JGroupsIntegrationPointSummary endpointIdentifier = null;
-        if(rpcRequest != null){
-            if(rpcRequest.hasRequestContent()){
-                if(rpcRequest.hasRequestContentType()){
-                    if(rpcRequest.getRequestContentType().equals(PetasosActionableTask.class)){
-                        taskToRegister = (PetasosActionableTask) rpcRequest.getRequestContent();
-                    }
-                }
-            }
-            if(rpcRequest.hasRequestingEndpoint()){
-                endpointIdentifier = rpcRequest.getRequestingEndpoint();
-            }
-        }
-        PetasosActionableTask registeredTask = null;
-        if((taskToRegister != null) && (endpointIdentifier != null)) {
-            registeredTask = taskManagementHandler.registerActionableTask(taskToRegister, endpointIdentifier);
-        }
-        RemoteProcedureCallResponse rpcResponse = new RemoteProcedureCallResponse();
-        rpcResponse.setAssociatedRequestID(rpcRequest.getRequestID());
-        rpcResponse.setInScope(true);
-        rpcResponse.setInstantCompleted(Instant.now());
-        if(registeredTask != null){
-            rpcResponse.setResponseContent(registeredTask);
-            rpcResponse.setResponseContentType(PetasosActionableTask.class);
-            rpcResponse.setSuccessful(true);
-        } else {
-            rpcResponse.setSuccessful(false);
-        }
-        getLogger().debug(".registerActionableTaskHandler(): Exit, rpcResponse->{}", rpcResponse);
-        return(rpcResponse);
-    }
-
-    //
-    // Execute/Fulfill A PetasosActionableTask
-
-    @Override
-    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask){
-        getLogger().trace(".fulfillActionableTask(): Entry, task->{}", actionableTask);
-        JGroupsIntegrationPointSummary endpointIdentifier = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
-        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
-        if(targetAddress == null){
-            getLogger().warn(".fulfillActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
-            getLogger().error(".fulfillActionableTask(): Cannot find candidate Ponos-IM Instance!!!");
-            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.fulfillActionableTask())!!!");
-            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.fulfillActionableTask())!!!");
-            return(null);
-        }
-        RemoteProcedureCallRequest remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, endpointIdentifier);
-        try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = remoteProcedureCallRequest;
-            classSet[0] = RemoteProcedureCallRequest.class;
-            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            RemoteProcedureCallResponse response = null;
-            synchronized(getIPCChannelLock()) {
-                response = getRPCDispatcher().callRemoteMethod(targetAddress, "fulfillActionableTaskHandler", objectSet, classSet, requestOptions);
-            }
-            getLogger().debug(".fulfillActionableTask(): Exit, response->{}", response);
-            if(response.isSuccessful()){
-                PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
-                return(registeredTask);
-            } else {
-                getLogger().error(".fulfillActionableTask(): Could not register task, response->{}", response);
-                return(null);
-            }
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".fulfillActionableTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
-            return(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getLogger().error(".fulfillActionableTask: Error (GeneralException) ->{}", e.getMessage());
-            return(null);
-        }
-    }
-
-    public RemoteProcedureCallResponse fulfillActionableTaskHandler(RemoteProcedureCallRequest rpcRequest){
-        getLogger().debug(".fulfillActionableTaskHandler(): Entry, rpcRequest->{}", rpcRequest);
-        PetasosActionableTask taskToAction = null;
-        JGroupsIntegrationPointSummary endpointIdentifier = null;
-        if(rpcRequest != null){
-            if(rpcRequest.hasRequestContent()){
-                if(rpcRequest.hasRequestContentType()){
-                    if(rpcRequest.getRequestContentType().equals(PetasosActionableTask.class)){
-                        taskToAction = (PetasosActionableTask) rpcRequest.getRequestContent();
-                    }
-                }
-            }
-            if(rpcRequest.hasRequestingEndpoint()){
-                endpointIdentifier = rpcRequest.getRequestingEndpoint();
-            }
-        }
-        PetasosActionableTask updatedTask = null;
-        if((taskToAction != null) && (endpointIdentifier != null)) {
-            updatedTask = taskManagementHandler.fulfillActionableTask(taskToAction, endpointIdentifier);
-        }
-        RemoteProcedureCallResponse rpcResponse = new RemoteProcedureCallResponse();
-        rpcResponse.setAssociatedRequestID(rpcRequest.getRequestID());
-        rpcResponse.setInScope(true);
-        rpcResponse.setInstantCompleted(Instant.now());
-        if(updatedTask != null){
-            rpcResponse.setResponseContent(updatedTask);
-            rpcResponse.setResponseContentType(PetasosActionableTask.class);
-            rpcResponse.setSuccessful(true);
-        } else {
-            rpcResponse.setSuccessful(false);
-        }
-        getLogger().debug(".fulfillActionableTaskHandler(): Exit, rpcResponse->{}", rpcResponse);
-        return(rpcResponse);
-    }
-
     //
     // Update a PetasosActionableTask
 
+
     @Override
+    public PetasosActionableTask getNextPendingTask(String participantName) {
+        return null;
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskStart(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail) {
+        return null;
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskFinish(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
+        return null;
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskCancellation(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
+        return null;
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskFailure(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
+        return null;
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskFinalisation(String participantName, TaskIdType taskId, TaskCompletionSummaryType completionSummary) {
+        return null;
+    }
+
+
     public PetasosActionableTask updateActionableTask( PetasosActionableTask actionableTask){
         getLogger().debug(".updateActionableTask(): Entry, task->{}",  actionableTask);
         JGroupsIntegrationPointSummary endpointIdentifier = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
@@ -424,43 +333,4 @@ public class PetasosTaskServicesEndpoint extends JGroupsIntegrationPointBase imp
         }
     }
 
-    public RemoteProcedureCallResponse updateActionableTaskHandler(RemoteProcedureCallRequest rpcRequest ){
-        getLogger().debug(".updateActionableTaskHandler(): Entry, rpcRequest->{}", rpcRequest);
-        PetasosActionableTask taskToRegister = null;
-        JGroupsIntegrationPointSummary endpointIdentifier = null;
-        if(rpcRequest != null){
-            if(rpcRequest.hasRequestContent()){
-                if(rpcRequest.hasRequestContentType()){
-                    if(rpcRequest.getRequestContentType().equals(PetasosActionableTask.class)){
-                        taskToRegister = (PetasosActionableTask) rpcRequest.getRequestContent();
-                    }
-                }
-            }
-            if(rpcRequest.hasRequestingEndpoint()){
-                endpointIdentifier = rpcRequest.getRequestingEndpoint();
-            }
-        }
-        PetasosActionableTask updatedTask = null;
-        if((taskToRegister != null) && (endpointIdentifier != null)) {
-            updatedTask = taskManagementHandler.updateActionableTask(taskToRegister, endpointIdentifier);
-        }
-        RemoteProcedureCallResponse rpcResponse = new RemoteProcedureCallResponse();
-        rpcResponse.setAssociatedRequestID(rpcRequest.getRequestID());
-        rpcResponse.setInScope(true);
-        rpcResponse.setInstantCompleted(Instant.now());
-        if(updatedTask != null){
-            rpcResponse.setResponseContent(updatedTask);
-            rpcResponse.setResponseContentType(PetasosActionableTask.class);
-            rpcResponse.setSuccessful(true);
-        } else {
-            rpcResponse.setSuccessful(false);
-        }
-        getLogger().debug(".updateActionableTaskHandler(): Exit, rpcResponse->{}", rpcResponse);
-        return(rpcResponse);
-    }
-
-    @Override
-    public Map<Integer, PetasosActionableTask> retrievePendingActionableTasks(String participantName) {
-        return null;
-    }
 }

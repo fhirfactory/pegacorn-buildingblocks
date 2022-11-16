@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class PetasosParticipantSubscriptionServicesEndpointBase extends JGroupsIntegrationPointBase
+public abstract class ParticipantServicesEndpointBase extends JGroupsIntegrationPointBase
         implements TaskPathwayManagementServiceInterface {
 
     private boolean subscriptionCheckScheduled;
@@ -56,7 +56,7 @@ public abstract class PetasosParticipantSubscriptionServicesEndpointBase extends
     // Constructor(s)
     //
 
-    public PetasosParticipantSubscriptionServicesEndpointBase(){
+    public ParticipantServicesEndpointBase(){
         super();
         subscriptionCheckScheduled = false;
         subscriptionCheckLock = new Object();

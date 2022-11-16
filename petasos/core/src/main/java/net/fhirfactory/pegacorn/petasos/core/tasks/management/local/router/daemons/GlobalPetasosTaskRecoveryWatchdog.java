@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons;
 
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridInterface;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridClientInterface;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 
@@ -37,7 +37,7 @@ public class GlobalPetasosTaskRecoveryWatchdog {
     private boolean initialised;
 
     @Inject
-    private PetasosTaskDataGridInterface taskBroker;
+    private PetasosTaskDataGridClientInterface taskBroker;
 
     @Inject
     private ParticipantSharedActionableTaskCache actionableTaskDM;
@@ -96,7 +96,7 @@ public class GlobalPetasosTaskRecoveryWatchdog {
         this.initialised = initialised;
     }
 
-    protected PetasosTaskDataGridInterface getTaskBroker() {
+    protected PetasosTaskDataGridClientInterface getTaskBroker() {
         return taskBroker;
     }
 

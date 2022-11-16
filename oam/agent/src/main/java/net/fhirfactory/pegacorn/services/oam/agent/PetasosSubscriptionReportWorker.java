@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.core.interfaces.oam.subscriptions.PetasosSubscri
 import net.fhirfactory.pegacorn.core.interfaces.oam.subscriptions.PetasosSubscriptionReportingServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosSubscriptionSummaryReport;
-import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.PetasosParticipantSubscriptionServicesEndpointBase;
+import net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions.ParticipantServicesEndpointBase;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.PetasosSubscriptionReportingAgent;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
 import net.fhirfactory.pegacorn.services.oam.agent.common.AgentWorkerBase;
@@ -58,7 +58,7 @@ public class PetasosSubscriptionReportWorker extends AgentWorkerBase {
     private PetasosSubscriptionReportingAgent pubSubCollectionAgent;
 
     @Inject
-    private PetasosParticipantSubscriptionServicesEndpointBase subscriptionServicesBroker;
+    private ParticipantServicesEndpointBase subscriptionServicesBroker;
 
     @Inject
     private PetasosSubscriptionReportingServiceProviderNameInterface serviceProviderName;

@@ -36,7 +36,7 @@ public class CapabilityUtilisationBroker implements CapabilityUtilisationBrokerI
 
 
     @Inject
-    private PetasosTaskServicesEndpoint petasosTaskingEndpoint;
+    private PetasosTaskGridClient petasosTaskingEndpoint;
 
     @Override
     public CapabilityUtilisationResponse executeTask(String preferredCapabilityProvider, CapabilityUtilisationRequest task) {

@@ -28,7 +28,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.endpoint.PetasosEndpoint;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.endpoints.services.messaging.PonosTaskRouterClientSender;
 import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.MOAStandardWUP;
 import org.slf4j.Logger;
@@ -46,9 +45,6 @@ public class JGroupsServiceManagementWUP extends MOAStandardWUP implements Petas
     private static String WUP_VERSION = "1.0.0";
 
     @Inject
-    private PonosTaskRouterClientSender petasosMessagingEndpoint;
-
-    @Inject
     private EdgeWorkshop edgeWorkshop;
 
     @Inject
@@ -63,11 +59,6 @@ public class JGroupsServiceManagementWUP extends MOAStandardWUP implements Petas
     @Override
     protected WorkshopInterface specifyWorkshop() {
         return (edgeWorkshop);
-    }
-
-
-    protected PonosTaskRouterClientSender getPetasosMessagingEndpoint() {
-        return (petasosMessagingEndpoint);
     }
 
     //

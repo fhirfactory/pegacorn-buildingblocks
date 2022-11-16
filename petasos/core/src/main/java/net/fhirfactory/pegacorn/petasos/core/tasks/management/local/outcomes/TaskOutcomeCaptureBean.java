@@ -28,12 +28,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -82,7 +82,7 @@ public class TaskOutcomeCaptureBean {
             getLogger().debug(".captureAndRegisterOutcome(): Entry, fulfillmentTask->{}", convertToString(fulfillmentTask.getInstance()));
         }
         TaskIdType actionableTaskId = fulfillmentTask.getActionableTaskId();
-        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus = null;
+        TaskExecutionCommandEnum petasosTaskExecutionStatus = null;
         switch(fulfillmentTask.getTaskFulfillment().getStatus()){
             case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
             case FULFILLMENT_EXECUTION_STATUS_REGISTERED:

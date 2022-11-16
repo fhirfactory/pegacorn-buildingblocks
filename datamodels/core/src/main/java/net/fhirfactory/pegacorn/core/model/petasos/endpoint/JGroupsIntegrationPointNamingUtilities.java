@@ -133,11 +133,11 @@ public class JGroupsIntegrationPointNamingUtilities {
         return(oamDiscoveryName);
     }
 
-    public String getIPCEndpointChannelNameFromOtherChannelName(String channelName){
+    public String getTaskGridChannelNameFromOtherChannelName(String channelName){
         if(StringUtils.isEmpty(channelName)){
             return(null);
         }
-        String ipcName = remapFunctionTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_HUB_ENDPOINT);
+        String ipcName = remapFunctionTypeInChannelName(channelName, PetasosEndpointFunctionTypeEnum.PETASOS_TASK_DISTRIBUTION_GRID_ENDPOINT);
         return(ipcName);
     }
 
@@ -355,11 +355,11 @@ public class JGroupsIntegrationPointNamingUtilities {
     }
 
     public String getIPCFunctionName(){
-        return(PetasosEndpointFunctionTypeEnum.PETASOS_TASK_ROUTING_RECEIVER_HUB_ENDPOINT.getDisplayName());
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_NOTIFICATIONS_ENDPOINT.getDisplayName());
     }
 
     public String getPetasosTaskServicesFunctionName(){
-        return(PetasosEndpointFunctionTypeEnum.PETASOS_TASKING_ENDPOINT.getDisplayName());
+        return(PetasosEndpointFunctionTypeEnum.PETASOS_TASK_DISTRIBUTION_GRID_CLIENT_ENDPOINT.getDisplayName());
     }
 
     public String getPetasosInterceptionFunctionName(){

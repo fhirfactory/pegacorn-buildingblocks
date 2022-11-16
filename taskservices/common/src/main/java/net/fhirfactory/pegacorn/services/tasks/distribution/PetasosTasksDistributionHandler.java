@@ -21,30 +21,10 @@
  */
 package net.fhirfactory.pegacorn.services.tasks.distribution;
 
-import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskHandlerInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointIdentifier;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
-import org.apache.camel.ExchangePattern;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
-import org.slf4j.Logger;
+import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskGridServicesHandlerInterface;
 
-public abstract class PetasosTasksDistributionHandler implements PetasosTaskHandlerInterface {
+public abstract class PetasosTasksDistributionHandler implements PetasosTaskGridServicesHandlerInterface {
 
-    @Produce
-    private ProducerTemplate template;
 
-    abstract protected Logger specifyLogger();
 
-    protected Logger getLogger(){
-        return(specifyLogger());
-    }
-
-    @Override
-    public PetasosActionableTask fulfillActionableTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier) {
-        template.sendBody(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE, ExchangePattern.InOnly, actionableTask);
-        return(actionableTask);
-    }
 }
