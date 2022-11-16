@@ -29,26 +29,33 @@ import java.io.Serializable;
 import java.time.Instant;
 
 public class TaskStorageType implements Serializable {
-    private TaskStorageStatusEnum localStorageStatus;
-    private String localStorageLocation;
+    private TaskStorageStatusEnum localCacheStatus;
+    private String localCacheLocation;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant localStorageInstant;
-    private TaskStorageStatusEnum centralStorageStatus;
-    private String centralStorageLocation;
+    private Instant localCacheInstant;
+    private TaskStorageStatusEnum centralCacheStatus;
+    private String centralCacheLocation;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant centralStorageInstant;
+    private Instant centralCacheInstant;
+    private TaskStorageStatusEnum persistenceStatus;
+    private String persistenceLocation;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant persistenceInstant;
 
     //
     // Constructor(s)
     //
 
     public TaskStorageType(){
-        this.localStorageLocation = null;
-        this.localStorageStatus = TaskStorageStatusEnum.TASK_UNSAVED;
-        this.centralStorageLocation = null;
-        this.centralStorageStatus = TaskStorageStatusEnum.TASK_UNSAVED;
-        this.centralStorageInstant = null;
-        this.localStorageInstant = null;
+        this.localCacheLocation = null;
+        this.localCacheStatus = TaskStorageStatusEnum.TASK_UNSAVED;
+        this.centralCacheLocation = null;
+        this.centralCacheStatus = TaskStorageStatusEnum.TASK_UNSAVED;
+        this.centralCacheInstant = null;
+        this.localCacheInstant = null;
+        this.persistenceInstant = null;
+        this.persistenceLocation = null;
+        this.persistenceStatus = TaskStorageStatusEnum.TASK_UNSAVED;
     }
 
     //
@@ -56,52 +63,76 @@ public class TaskStorageType implements Serializable {
     //
 
 
-    public Instant getLocalStorageInstant() {
-        return localStorageInstant;
+    public TaskStorageStatusEnum getPersistenceStatus() {
+        return persistenceStatus;
     }
 
-    public void setLocalStorageInstant(Instant localStorageInstant) {
-        this.localStorageInstant = localStorageInstant;
+    public void setPersistenceStatus(TaskStorageStatusEnum persistenceStatus) {
+        this.persistenceStatus = persistenceStatus;
     }
 
-    public Instant getCentralStorageInstant() {
-        return centralStorageInstant;
+    public String getPersistenceLocation() {
+        return persistenceLocation;
     }
 
-    public void setCentralStorageInstant(Instant centralStorageInstant) {
-        this.centralStorageInstant = centralStorageInstant;
+    public void setPersistenceLocation(String persistenceLocation) {
+        this.persistenceLocation = persistenceLocation;
     }
 
-    public TaskStorageStatusEnum getLocalStorageStatus() {
-        return localStorageStatus;
+    public Instant getPersistenceInstant() {
+        return persistenceInstant;
     }
 
-    public void setLocalStorageStatus(TaskStorageStatusEnum localStorageStatus) {
-        this.localStorageStatus = localStorageStatus;
+    public void setPersistenceInstant(Instant persistenceInstant) {
+        this.persistenceInstant = persistenceInstant;
     }
 
-    public String getLocalStorageLocation() {
-        return localStorageLocation;
+    public Instant getLocalCacheInstant() {
+        return localCacheInstant;
     }
 
-    public void setLocalStorageLocation(String localStorageLocation) {
-        this.localStorageLocation = localStorageLocation;
+    public void setLocalCacheInstant(Instant localCacheInstant) {
+        this.localCacheInstant = localCacheInstant;
     }
 
-    public TaskStorageStatusEnum getCentralStorageStatus() {
-        return centralStorageStatus;
+    public Instant getCentralCacheInstant() {
+        return centralCacheInstant;
     }
 
-    public void setCentralStorageStatus(TaskStorageStatusEnum centralStorageStatus) {
-        this.centralStorageStatus = centralStorageStatus;
+    public void setCentralCacheInstant(Instant centralCacheInstant) {
+        this.centralCacheInstant = centralCacheInstant;
     }
 
-    public String getCentralStorageLocation() {
-        return centralStorageLocation;
+    public TaskStorageStatusEnum getLocalCacheStatus() {
+        return localCacheStatus;
     }
 
-    public void setCentralStorageLocation(String centralStorageLocation) {
-        this.centralStorageLocation = centralStorageLocation;
+    public void setLocalCacheStatus(TaskStorageStatusEnum localCacheStatus) {
+        this.localCacheStatus = localCacheStatus;
+    }
+
+    public String getLocalCacheLocation() {
+        return localCacheLocation;
+    }
+
+    public void setLocalCacheLocation(String localCacheLocation) {
+        this.localCacheLocation = localCacheLocation;
+    }
+
+    public TaskStorageStatusEnum getCentralCacheStatus() {
+        return centralCacheStatus;
+    }
+
+    public void setCentralCacheStatus(TaskStorageStatusEnum centralCacheStatus) {
+        this.centralCacheStatus = centralCacheStatus;
+    }
+
+    public String getCentralCacheLocation() {
+        return centralCacheLocation;
+    }
+
+    public void setCentralCacheLocation(String centralCacheLocation) {
+        this.centralCacheLocation = centralCacheLocation;
     }
 
     //
@@ -111,12 +142,15 @@ public class TaskStorageType implements Serializable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("TaskStorageType{");
-        sb.append("localStorageStatus=").append(localStorageStatus);
-        sb.append(", localStorageLocation=").append(localStorageLocation);
-        sb.append(", localStorageInstant=").append(localStorageInstant);
-        sb.append(", centralStorageStatus=").append(centralStorageStatus);
-        sb.append(", centralStorageLocation=").append(centralStorageLocation);
-        sb.append(", centralStorageLocation=").append(centralStorageInstant);
+        sb.append("localCacheStatus=").append(localCacheStatus);
+        sb.append(", localCacheLocation=").append(localCacheLocation);
+        sb.append(", localCacheInstant=").append(localCacheInstant);
+        sb.append(", centralCacheStatus=").append(centralCacheStatus);
+        sb.append(", centralCacheLocation=").append(centralCacheLocation);
+        sb.append(", centralCacheInstant=").append(centralCacheInstant);
+        sb.append(", persistenceStatus=").append(persistenceStatus);
+        sb.append(", persistenceInstant=").append(persistenceInstant);
+        sb.append(", persistenceLocation=").append(persistenceLocation);
         sb.append('}');
         return sb.toString();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2022 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,31 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.watchdogs.common;
+package net.fhirfactory.pegacorn.internals.fhir.r4.resources.device.valuesets;
 
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
+import org.hl7.fhir.r4.model.Device;
+import org.hl7.fhir.r4.model.codesystems.DeviceNametype;
 
-public abstract class WatchdogBase extends RouteBuilder {
+public enum DeviceNameTypeEnum {
+    DEVICE_DISPLAY_NAME("Display Name", Device.DeviceNameType.USERFRIENDLYNAME),
+    DEVICE_FULL_NAME("Full Name", Device.DeviceNameType.MODELNAME),
+    DEVICE_SUBSYSTEM_NAME("Subsytem Name", Device.DeviceNameType.OTHER);
 
-    //
-    // Constructor(s)
-    //
+    private Device.DeviceNameType token;
+    private String name;
 
-    public WatchdogBase(){
-        super();
+    private DeviceNameTypeEnum(String name,Device.DeviceNameType code){
+        this.token = code;
+        this.name = name;
     }
 
-    //
-    // Class Kickstarter
-    //
+    public Device.DeviceNameType getToken(){return(this.token);}
 
-    @Override
-    public void configure() throws Exception {
-        String name = getClass().getSimpleName();
-
-        from("timer://"+name+"?delay=1000&repeatCount=1")
-                .routeId(name)
-                .log(LoggingLevel.DEBUG, "Starting....");
+    public String getName(){
+        return(this.name);
     }
 }

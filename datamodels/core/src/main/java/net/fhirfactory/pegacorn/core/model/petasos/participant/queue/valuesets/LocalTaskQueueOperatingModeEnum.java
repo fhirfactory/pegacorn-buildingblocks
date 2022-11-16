@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2022 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,31 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.watchdogs.common;
+package net.fhirfactory.pegacorn.core.model.petasos.participant.queue.valuesets;
 
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
-
-public abstract class WatchdogBase extends RouteBuilder {
-
-    //
-    // Constructor(s)
-    //
-
-    public WatchdogBase(){
-        super();
-    }
-
-    //
-    // Class Kickstarter
-    //
-
-    @Override
-    public void configure() throws Exception {
-        String name = getClass().getSimpleName();
-
-        from("timer://"+name+"?delay=1000&repeatCount=1")
-                .routeId(name)
-                .log(LoggingLevel.DEBUG, "Starting....");
-    }
+public enum LocalTaskQueueOperatingModeEnum {
+    QUEUE_MODE_OFFLOAO_NOT_REQUIRED,
+    QUEUE_MODE_OFFLOAD_REQUIRED
 }

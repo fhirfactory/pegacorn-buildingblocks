@@ -25,10 +25,13 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterfac
 import net.fhirfactory.pegacorn.core.model.petasos.jobcard.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.deployment.properties.reference.petasos.PetasosDefaultProperties;
 import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalParticipantCache;
+import net.fhirfactory.pegacorn.petasos.core.participants.management.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.core.tasks.cache.LocalTaskJobCardCache;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +56,9 @@ public class LocalParticipantExecutionManager {
 
     @Inject
     private LocalParticipantCache participantRegistrationCache;
+
+    @Inject
+    private LocalParticipantManager participantManager;
 
     //
     // Constructor(s)
@@ -109,6 +115,83 @@ public class LocalParticipantExecutionManager {
         return(jobCard.getGrantedStatus());
     }
 
+    public boolean isTaskPerformerIdle(TaskPerformerTypeType performerType) {
+        getLogger().debug(".isTaskPerformerIdle(): Entry, performerType->{}", performerType);
+        if (performerType == null) {
+            getLogger().debug(".isTaskPerformerIdle(): Exit, performerType is null, returning false");
+            return (false);
+        }
+        if (performerType.getKnownTaskPerformer() == null) {
+            getLogger().debug(".isTaskPerformerIdle(): Exit, performerType.getKnownTaskPerformer() is null, returning false");
+            return (false);
+        }
+        if (StringUtils.isEmpty(performerType.getKnownTaskPerformer().getName())) {
+            getLogger().debug(".isTaskPerformerIdle(): Exit, performerType.getKnownTaskPerformer().getName() is empty, returning false");
+            return (false);
+        }
+        boolean isPerformerIdle = isTaskPerformerIdle(performerType.getKnownTaskPerformer().getName());
+        getLogger().debug(".isTaskPerformerIdle(): Exit, isPerformerIdle->{}", isPerformerIdle);
+        return(isPerformerIdle);
+    }
+
+    public boolean isTaskPerformerIdle(String performerName){
+        getLogger().debug(".isTaskPerformerIdle(): Entry, performerName->{}", performerName);
+        switch(getParticipantManager().getParticipantStatus(performerName)) {
+            case PARTICIPANT_IS_IDLE:
+                getLogger().debug(".isTaskPerformerIdle(): Exit, Performer is IDLE, returning true");
+                return(true);
+            case PARTICIPANT_IS_ACTIVE:
+                getLogger().debug(".isTaskPerformerIdle(): Exit, Performer is ACTIVE, returning false");
+                return(false);
+            case PARTICIPANT_IS_NOT_READY:
+                getLogger().debug(".isTaskPerformerIdle(): Exit, Performer is NOT_READY, returning false");
+                return(false);
+            case PARTICIPANT_IS_STOPPING:
+                getLogger().debug(".isTaskPerformerIdle(): Exit, Performer is STOPPING, returning false");
+                return(false);
+            case PARTICIPANT_HAS_FAILED:
+                getLogger().debug(".isTaskPerformerIdle(): Exit, Performer is FAILED, returning false");
+                return(false);
+            default:
+                getLogger().debug(".isTaskPerformerIdle(): Exit, Performer has no status, returning false");
+                return(false);
+        }
+    }
+
+    public boolean isTaskPerformerEnabled(TaskPerformerTypeType performerType) {
+        getLogger().debug(".isTaskPerformerEnabled(): Entry, performerType->{}", performerType);
+        if (performerType == null) {
+            getLogger().debug(".isTaskPerformerEnabled(): Exit, performerType is null, returning false");
+            return (false);
+        }
+        if (performerType.getKnownTaskPerformer() == null) {
+            getLogger().debug(".isTaskPerformerEnabled(): Exit, performerType.getKnownTaskPerformer() is null, returning false");
+            return (false);
+        }
+        if (StringUtils.isEmpty(performerType.getKnownTaskPerformer().getName())) {
+            getLogger().debug(".isTaskPerformerEnabled(): Exit, performerType.getKnownTaskPerformer().getName() is empty, returning false");
+            return (false);
+        }
+        boolean performerEnabled = isTaskPerformerEnabled(performerType.getKnownTaskPerformer().getName());
+        getLogger().debug(".isTaskPerformerEnabled(): Exit, performerEnabled->{}", performerEnabled);
+        return(performerEnabled);
+    }
+
+    public boolean isTaskPerformerEnabled(String performerName){
+        getLogger().debug(".isTaskPerformerEnabled(): Entry, performerName->{}", performerName);
+        boolean isSuspended = getParticipantManager().isParticipantSuspended(performerName);
+        getLogger().trace(".isTaskPerformerEnabled(): isSuspended->{}", isSuspended);
+        boolean isDisabled = getParticipantManager().isParticipantDisabled(performerName);
+        getLogger().trace(".isTaskPerformerEnabled(): isDisabled->{}", isDisabled);
+        if(isDisabled || isSuspended){
+            getLogger().debug(".isTaskPerformerEnabled(): Exit, is Disabled or Suspended, returning false");
+            return(false);
+        } else {
+            getLogger().debug(".isTaskPerformerEnabled(): Exit, neither Disabled nor Suspended, returning true");
+            return (true);
+        }
+    }
+
     //
     // Getters (and Setters)
     //
@@ -135,5 +218,9 @@ public class LocalParticipantExecutionManager {
 
     protected LocalParticipantCache getParticipantRegistrationCache(){
         return(participantRegistrationCache);
+    }
+
+    protected LocalParticipantManager getParticipantManager(){
+        return(participantManager);
     }
 }

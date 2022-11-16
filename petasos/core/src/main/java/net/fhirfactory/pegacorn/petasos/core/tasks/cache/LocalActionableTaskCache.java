@@ -109,9 +109,9 @@ public class LocalActionableTaskCache {
             if(!actionableTask.getTaskTraceability().hasPersistenceStatus()){
                 actionableTask.getTaskTraceability().setPersistenceStatus(new TaskStorageType());
             }
-            actionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageLocation(getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName());
-            actionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageStatus(TaskStorageStatusEnum.TASK_SAVED);
-            actionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageInstant(Instant.now());
+            actionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheLocation(getProcessingPlant().getTopologyNode().getParticipant().getParticipantId().getName());
+            actionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheStatus(TaskStorageStatusEnum.TASK_SAVED);
+            actionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheInstant(Instant.now());
         }
         getLogger().debug(".addToCache(): Exit, actionableTask->{}", actionableTask);
         return(true);

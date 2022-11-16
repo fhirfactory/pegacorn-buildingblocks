@@ -39,7 +39,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.data
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.TaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskStorageType;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.factories.TaskTraceabilityElementTypeFactory;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.valuesets.TaskStorageStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
@@ -152,8 +151,8 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Set ActionableTask to WAIT/Unsaved State] Start");
         localActionableTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
         localActionableTask.setRegistered(false);
-        localActionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageLocation(processingPlant.getTopologyNode().getComponentId().getDisplayName());
-        localActionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageStatus(TaskStorageStatusEnum.TASK_UNSAVED);
+        localActionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheLocation(processingPlant.getTopologyNode().getComponentId().getDisplayName());
+        localActionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheStatus(TaskStorageStatusEnum.TASK_UNSAVED);
         localActionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Set ActionableTask to WAIT/Unsaved State] Finish");
 
@@ -166,9 +165,9 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Register Task With Local Registry] Finish");
 
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Update ActionableTask Traceability to reflect Stored State] Start");
-        localJobCard.getPersistenceStatus().setLocalStorageInstant(localActionableTask.getTaskTraceability().getPersistenceStatus().getLocalStorageInstant());
-        localJobCard.getPersistenceStatus().setLocalStorageLocation(localActionableTask.getTaskTraceability().getPersistenceStatus().getLocalStorageLocation());
-        localJobCard.getPersistenceStatus().setLocalStorageStatus(localActionableTask.getTaskTraceability().getPersistenceStatus().getLocalStorageStatus());
+        localJobCard.getPersistenceStatus().setLocalCacheInstant(localActionableTask.getTaskTraceability().getPersistenceStatus().getLocalCacheInstant());
+        localJobCard.getPersistenceStatus().setLocalCacheLocation(localActionableTask.getTaskTraceability().getPersistenceStatus().getLocalCacheLocation());
+        localJobCard.getPersistenceStatus().setLocalCacheStatus(localActionableTask.getTaskTraceability().getPersistenceStatus().getLocalCacheStatus());
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Update ActionableTask Traceability to reflect Stored State] Finish");
 
 
@@ -181,14 +180,14 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             getLogger().warn(".registerLocallyCreatedActionableTask(): Cannot register ActionableTask, will try again in {} seconds", PONOS_CONNECTIVITY_RETRY_PERIOD/1000L);
             localActionableTask.getExecutionControl().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_WAIT);
         } else {
-            localJobCard.getPersistenceStatus().setCentralStorageStatus(jobcard.getPersistenceStatus().getCentralStorageStatus());
-            localJobCard.getPersistenceStatus().setCentralStorageLocation(jobcard.getPersistenceStatus().getCentralStorageLocation());
-            localJobCard.getPersistenceStatus().setCentralStorageInstant(jobcard.getPersistenceStatus().getCentralStorageInstant());
+            localJobCard.getPersistenceStatus().setCentralCacheStatus(jobcard.getPersistenceStatus().getCentralCacheStatus());
+            localJobCard.getPersistenceStatus().setCentralCacheLocation(jobcard.getPersistenceStatus().getCentralCacheLocation());
+            localJobCard.getPersistenceStatus().setCentralCacheInstant(jobcard.getPersistenceStatus().getCentralCacheInstant());
             localJobCard.setGrantedStatus(jobcard.getGrantedStatus());
             localJobCard.setUpdateInstant(Instant.now());
-            localActionableTask.getTaskTraceability().getPersistenceStatus().setCentralStorageInstant(jobcard.getPersistenceStatus().getCentralStorageInstant());
-            localActionableTask.getTaskTraceability().getPersistenceStatus().setCentralStorageStatus(jobcard.getPersistenceStatus().getCentralStorageStatus());
-            localActionableTask.getTaskTraceability().getPersistenceStatus().setCentralStorageLocation(jobcard.getPersistenceStatus().getCentralStorageLocation());
+            localActionableTask.getTaskTraceability().getPersistenceStatus().setCentralCacheInstant(jobcard.getPersistenceStatus().getCentralCacheInstant());
+            localActionableTask.getTaskTraceability().getPersistenceStatus().setCentralCacheStatus(jobcard.getPersistenceStatus().getCentralCacheStatus());
+            localActionableTask.getTaskTraceability().getPersistenceStatus().setCentralCacheLocation(jobcard.getPersistenceStatus().getCentralCacheLocation());
             localActionableTask.getExecutionControl().setExecutionCommand(jobcard.getGrantedStatus());
         }
         getLogger().trace(".registerLocallyCreatedActionableTask(): [Update ActionableTask Traceability to reflect Stored State] Finish");
@@ -225,17 +224,17 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
             }
             if (!hasPersistenceStatus) {
                 jobCard.setPersistenceStatus(new TaskStorageType());
-                jobCard.getPersistenceStatus().setCentralStorageLocation("unknown");
-                jobCard.getPersistenceStatus().setCentralStorageStatus(TaskStorageStatusEnum.TASK_SAVED);
-                jobCard.getPersistenceStatus().setCentralStorageInstant(Instant.now());
+                jobCard.getPersistenceStatus().setCentralCacheLocation("unknown");
+                jobCard.getPersistenceStatus().setCentralCacheStatus(TaskStorageStatusEnum.TASK_SAVED);
+                jobCard.getPersistenceStatus().setCentralCacheInstant(Instant.now());
             }
         }
         jobCard.setUpdateInstant(Instant.now());
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Create/Update TaskJobCard] Start");
 
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Set ActionableTask to Unsaved State] Start");
-        centralActionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageLocation(processingPlant.getTopologyNode().getComponentId().getDisplayName());
-        centralActionableTask.getTaskTraceability().getPersistenceStatus().setLocalStorageStatus(TaskStorageStatusEnum.TASK_UNSAVED);
+        centralActionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheLocation(processingPlant.getTopologyNode().getComponentId().getDisplayName());
+        centralActionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheStatus(TaskStorageStatusEnum.TASK_UNSAVED);
         centralActionableTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Set ActionableTask to Unsaved State] Finish");
 
@@ -248,13 +247,20 @@ public class LocalTaskActivityManager implements PetasosTaskActivityNotification
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Register Task With Local Registry] Finish");
 
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Update ActionableTask Traceability to reflect Stored State] Start");
-        jobCard.getPersistenceStatus().setLocalStorageInstant(centralActionableTask.getTaskTraceability().getPersistenceStatus().getLocalStorageInstant());
-        jobCard.getPersistenceStatus().setLocalStorageLocation(centralActionableTask.getTaskTraceability().getPersistenceStatus().getLocalStorageLocation());
-        jobCard.getPersistenceStatus().setLocalStorageStatus(centralActionableTask.getTaskTraceability().getPersistenceStatus().getLocalStorageStatus());
+        centralActionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheLocation(processingPlant.getTopologyNode().getComponentId().getDisplayName());
+        centralActionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheStatus(TaskStorageStatusEnum.TASK_SAVED);
+        centralActionableTask.getTaskTraceability().getPersistenceStatus().setLocalCacheInstant(Instant.now());
+        jobCard.getPersistenceStatus().setLocalCacheInstant(Instant.now());
+        jobCard.getPersistenceStatus().setLocalCacheLocation(processingPlant.getTopologyNode().getComponentId().getDisplayName());
+        jobCard.getPersistenceStatus().setLocalCacheStatus(TaskStorageStatusEnum.TASK_SAVED);
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Update ActionableTask Traceability to reflect Stored State] Finish");
 
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Put JobCard into Cache] Start");
         getLocalTaskJobCardCache().addJobCard(jobCard);
+        getLogger().trace(".registerCentrallyCreatedActionableTask(): [Put JobCard into Cache] Finish");
+
+        getLogger().trace(".registerCentrallyCreatedActionableTask(): [Put JobCard into Cache] Start");
+        TaskExecutionCommandEnum taskExecutionCommandEnum = notifyTaskWaiting(centralActionableTask.getTaskId());
         getLogger().trace(".registerCentrallyCreatedActionableTask(): [Put JobCard into Cache] Finish");
 
         PetasosTaskJobCard clonedJobCard = SerializationUtils.clone(jobCard);

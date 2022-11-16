@@ -38,7 +38,7 @@ public enum DRICaTSIdentifierCodeEnum {
     IDENTIFIER_CODE_FULFILLMENT_TASK("Fulfillment Task Id", "dricats.fhir.identifier.task.fulfillment_task", "FHIR::Task (A Unique Identifier for a Task representing the execution of a piece of work within the DRICaTS System)"),
     IDENTIFIER_CODE_AGGREGATE_TASK("Aggregate Task Id", "dricats.fhir.identifier.task.aggregate_task", "FHIR::Task (A Unique Identifier for a Task representing the execution of a set of one or more pieces of work within the DRICaTS System)"),
     IDENTIFIER_CODE_SOFTWARE_COMPONENT("Software Component Id", "dricats.fhir.identifier.device.software_component", "FHIR:Device (A Unique Identifier for a Software Component within the DRICaTS System"),
-    IDENTIFIER_CODE_PARTICIPANT_ID("Participant Identifier", "dricats.fhir.identifier.device.participant", "FHIR:Device (A Unique Identifier for a Participant within the DRICaTS Framework");
+    IDENTIFIER_CODE_PARTICIPANT_ID("Participant Identifier", "dricats.fhir.identifier.device.participant", "FHIR:Device (A Unique Identifier for a Participant within the DRICaTS Framework"),;
 
     private String token;
     private String displayName;

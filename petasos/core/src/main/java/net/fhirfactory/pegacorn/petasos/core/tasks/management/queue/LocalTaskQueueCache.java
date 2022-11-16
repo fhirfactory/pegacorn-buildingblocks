@@ -23,6 +23,8 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.queue;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.queue.ParticipantTaskQueue;
+import net.fhirfactory.pegacorn.core.model.petasos.task.queue.ParticipantTaskQueueEntry;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.participants.management.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.execution.LocalTaskActivityManager;
@@ -35,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ApplicationScoped
@@ -200,7 +204,7 @@ public class LocalTaskQueueCache {
         if(inserted){
             getLogger().debug(".queueTask(): Exit, task inserted!");
         } else {
-            getLogger().debug(".queueTask(): Exit, task not inserted, reason = {}", errorMessage);
+            getLogger().warn(".queueTask(): Exit, task not inserted, reason = {}", errorMessage);
         }
     }
 
@@ -257,6 +261,34 @@ public class LocalTaskQueueCache {
         }
         getLogger().debug(".pollNextTask(): Exit, taskQueueEntry->{}", taskQueueEntry);
         return(taskQueueEntry);
+    }
+
+    public Set<ParticipantTaskQueueEntry> getLastNTasks(String participantName, Integer queueOnloadThreshold, Integer nSize){
+        getLogger().debug(".getLastNTasks(): Entry, participantName->{}, nSize->{}", participantName, nSize);
+
+        if(StringUtils.isEmpty(participantName)){
+            getLogger().debug(".getLastNTasks(): Exit, participantName is empty");
+            return(new HashSet<>());
+        }
+        if(nSize == null || nSize < 1){
+            getLogger().debug(".getLastNTasks(): Exit, nSize is less than 1, nothing to get");
+            return(new HashSet<>());
+        }
+
+        Set<ParticipantTaskQueueEntry> lastNTasks = new HashSet<>();
+        synchronized (getParticipantQueueMapLock()){
+            Integer queueSize = getParticipantQueueSize(participantName);
+            if(queueSize > queueOnloadThreshold){
+                Integer size = nSize;
+                Integer offloadable = queueSize - queueOnloadThreshold;
+                if(offloadable < nSize){
+                    size = offloadable;
+                }
+                lastNTasks = getParticipantQueueMap().get(participantName).getLastNTasks(queueOnloadThreshold, nSize);
+            }
+        }
+        getLogger().debug(".getLastNTasks(): Exit, lastNTasks->{}", lastNTasks);
+        return(lastNTasks);
     }
 
 }

@@ -19,14 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.queue;
+package net.fhirfactory.pegacorn.core.model.petasos.participant.queue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.queue.ParticipantTaskQueueEntry;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ParticipantTaskQueue {
     private static final Logger LOG = LoggerFactory.getLogger(ParticipantTaskQueue.class);
@@ -188,6 +194,106 @@ public class ParticipantTaskQueue {
             return(true);
         }
         return(false);
+    }
+
+    public Set<ParticipantTaskQueueEntry> getLastNTasks(Integer queueOnloadThreshold, Integer nSize){
+        getLogger().debug(".getLastNTasks(): Entry, queueOnloadThreshold->{}, nSize->{}", queueOnloadThreshold, nSize);
+
+        if(queueOnloadThreshold == null || queueOnloadThreshold <= 0){
+            getLogger().debug(".getLastNTasks(): Exit, queueOnloadThreshold is less than 1, nothing to get");
+            return(new HashSet<>());
+        }
+        if(nSize == null || nSize < 1){
+            getLogger().debug(".getLastNTasks(): Exit, nSize is less than 1, nothing to get");
+            return(new HashSet<>());
+        }
+
+        HashSet<ParticipantTaskQueueEntry> lastNTasks = new HashSet<>();
+        Integer queueSize = getSize();
+        if(queueSize > queueOnloadThreshold){
+            Integer offloadSize = nSize;
+            Integer offloadable = queueSize - queueOnloadThreshold;
+            if(offloadable < nSize){
+                offloadSize = offloadable;
+            }
+            Integer startOfOffloadPoint = queueSize - offloadSize;
+
+            Integer counter = 0;
+            ParticipantTaskQueueEntry currentTaskQueueEntry = queueHead;
+            ParticipantTaskQueueEntry previousTaskQueueEntry = queueHead;
+            while(counter < startOfOffloadPoint){
+                ParticipantTaskQueueEntry nextTaskQueueEntry = currentTaskQueueEntry.getNextNode();
+                previousTaskQueueEntry = currentTaskQueueEntry;
+                currentTaskQueueEntry = nextTaskQueueEntry;
+                counter += 1;
+            }
+            previousTaskQueueEntry.setNextNode(null);
+            this.size = queueSize - offloadSize;
+            while(counter < size){
+                lastNTasks.add(currentTaskQueueEntry);
+                ParticipantTaskQueueEntry nextTaskQueueEntry = currentTaskQueueEntry.getNextNode();
+                currentTaskQueueEntry.setNextNode(null);
+                currentTaskQueueEntry = nextTaskQueueEntry;
+                counter += 1;
+            }
+        }
+        getLogger().debug(".getLastNTasks(): Exit, lastNTasks->{}", lastNTasks);
+        return(lastNTasks);
+    }
+
+    public ParticipantTaskQueueEntry findEntry(TaskIdType taskId){
+        getLogger().debug(".findEntry(): Entry");
+        ParticipantTaskQueueEntry entry = null;
+        synchronized (getQueueLock()){
+            ParticipantTaskQueueEntry currentEntry = queueHead;
+            if(currentEntry == null){
+                entry = null;
+            } else {
+                if (currentEntry.getTaskId().getId().equals(taskId.getId())) {
+                    entry = currentEntry;
+                } else {
+                    while (currentEntry.getNextNode() != null) {
+                        currentEntry = currentEntry.getNextNode();
+                        if (currentEntry.getTaskId().getId().equals(taskId.getId())) {
+                            entry = currentEntry;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        getLogger().debug(".findEntry(): Exit, entry->{}", entry);
+        return(entry);
+    }
+
+    public ParticipantTaskQueueEntry removeEntry(TaskIdType taskId){
+        getLogger().debug(".removeEntry(): Entry");
+        ParticipantTaskQueueEntry entry = null;
+        synchronized (getQueueLock()){
+            ParticipantTaskQueueEntry currentEntry = queueHead;
+            if(currentEntry == null){
+                entry = null;
+            } else {
+                if (currentEntry.getTaskId().getId().equals(taskId.getId())) {
+                    entry = currentEntry;
+                    queueHead = currentEntry.getNextNode();
+                    entry.setNextNode(null);
+                } else {
+                    while (currentEntry.getNextNode() != null) {
+                        ParticipantTaskQueueEntry previousEntry = currentEntry;
+                        currentEntry = currentEntry.getNextNode();
+                        if (currentEntry.getTaskId().getId().equals(taskId.getId())) {
+                            entry = currentEntry;
+                            previousEntry.setNextNode(currentEntry.getNextNode());
+                            entry.setNextNode(null);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        getLogger().debug(".removeEntry(): Exit, entry->{}", entry);
+        return(entry);
     }
 
     //

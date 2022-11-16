@@ -19,14 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.management.queue;
+package net.fhirfactory.pegacorn.core.model.petasos.task.queue;
 
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskSequenceNumber;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskStorageType;
 import org.jetbrains.annotations.NotNull;
 
-public class ParticipantTaskQueueEntry implements Comparable<ParticipantTaskQueueEntry> {
-    private TaskSequenceNumber sequenceNumber;
+public class ParticipantTaskQueueEntry extends TaskStorageType implements Comparable<ParticipantTaskQueueEntry> {
     private TaskIdType taskId;
     private ParticipantTaskQueueEntry nextNode;
     private ParticipantTaskQueueEntry previousNode;
@@ -36,7 +36,6 @@ public class ParticipantTaskQueueEntry implements Comparable<ParticipantTaskQueu
     //
 
     public ParticipantTaskQueueEntry(){
-        sequenceNumber = null;
         taskId = null;
     }
 
@@ -45,11 +44,14 @@ public class ParticipantTaskQueueEntry implements Comparable<ParticipantTaskQueu
     //
 
     public TaskSequenceNumber getSequenceNumber() {
-        return sequenceNumber;
+        return getTaskId().getTaskSequenceNumber();
     }
 
     public void setSequenceNumber(TaskSequenceNumber sequenceNumber) {
-        this.sequenceNumber = sequenceNumber;
+        if(getTaskId() == null){
+            this.setTaskId(new TaskIdType());
+        }
+        this.getTaskId().setTaskSequenceNumber(sequenceNumber);
     }
 
     public TaskIdType getTaskId() {
@@ -110,7 +112,6 @@ public class ParticipantTaskQueueEntry implements Comparable<ParticipantTaskQueu
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ParticipantTaskQueueEntry{");
-        sb.append("sequenceNumber=").append(sequenceNumber);
         sb.append(", taskId=").append(taskId);
         if(getPreviousNode() != null) {
             sb.append(", previousEntry=").append(getPreviousNode().getSequenceNumber());
@@ -122,6 +123,15 @@ public class ParticipantTaskQueueEntry implements Comparable<ParticipantTaskQueu
         } else {
             sb.append(", nextEntry=").append("null");
         }
+        sb.append(", localCacheStatus=").append(getLocalCacheStatus());
+        sb.append(", localCacheLocation=").append(getLocalCacheLocation());
+        sb.append(", localCacheInstant=").append(getLocalCacheInstant());
+        sb.append(", centralCacheStatus=").append(getCentralCacheStatus());
+        sb.append(", centralCacheLocation=").append(getCentralCacheLocation());
+        sb.append(", centralCacheInstant=").append(getCentralCacheInstant());
+        sb.append(", persistenceStatus=").append(getPersistenceStatus());
+        sb.append(", persistenceInstant=").append(getPersistenceInstant());
+        sb.append(", persistenceLocation=").append(getPersistenceLocation());
         sb.append('}');
         return sb.toString();
     }
