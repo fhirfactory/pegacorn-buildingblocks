@@ -23,9 +23,6 @@ package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.datagrid.datatypes.DatagridElementSourceResourceIdType;
@@ -33,12 +30,11 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskContextType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskExecutionControl;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
-import net.fhirfactory.pegacorn.internals.SerializableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +73,7 @@ public class PetasosTask implements Serializable {
 
     private Set<TaskIdType> aggregateTaskMembership;
 
-    private PetasosTaskExecutionStatusEnum executionStatus;
+    private TaskExecutionControl taskExecutionDetail;
 
     private boolean registered;
 
@@ -101,7 +97,7 @@ public class PetasosTask implements Serializable {
         this.taskReason = null;
         this.taskNodeAffinity = null;
         this.taskContext = null;
-        this.executionStatus = null;
+        this.taskExecutionDetail = new TaskExecutionControl();
     }
 
     //
@@ -109,17 +105,17 @@ public class PetasosTask implements Serializable {
     //
 
     @JsonIgnore
-    public boolean hasExecutionStatus(){
-        boolean hasValue = this.executionStatus != null;
+    public boolean hasTaskExecutionDetail(){
+        boolean hasValue = this.taskExecutionDetail != null;
         return(hasValue);
     }
 
-    public PetasosTaskExecutionStatusEnum getExecutionStatus() {
-        return executionStatus;
+    public TaskExecutionControl getTaskExecutionDetail() {
+        return taskExecutionDetail;
     }
 
-    public void setExecutionStatus(PetasosTaskExecutionStatusEnum executionStatus) {
-        this.executionStatus = executionStatus;
+    public void setTaskExecutionDetail(TaskExecutionControl executionStatus) {
+        this.taskExecutionDetail = executionStatus;
     }
 
     @JsonIgnore
@@ -327,7 +323,7 @@ public class PetasosTask implements Serializable {
                 && Objects.equals(getTaskReason(), that.getTaskReason())
                 && Objects.equals(getTaskNodeAffinity(), that.getTaskNodeAffinity())
                 && Objects.equals(getAggregateTaskMembership(), that.getAggregateTaskMembership())
-                && Objects.equals(getExecutionStatus(), that.getExecutionStatus());
+                && Objects.equals(getTaskExecutionDetail(), that.getTaskExecutionDetail());
         return(theyAreEqual);
     }
 
@@ -346,7 +342,7 @@ public class PetasosTask implements Serializable {
                 getTaskReason(),
                 getTaskNodeAffinity(),
                 getAggregateTaskMembership(),
-                getExecutionStatus(),
+                getTaskExecutionDetail(),
                 isRegistered());
     }
 
@@ -372,7 +368,7 @@ public class PetasosTask implements Serializable {
                 ", taskNodeAffinity=" + taskNodeAffinity +
                 ", aggregateTaskMembership=" + aggregateTaskMembership +
                 ", registered=" + registered +
-                ", executionStatus=" + getExecutionStatus() +
+                ", taskExecutionDetail=" + getTaskExecutionDetail() +
                 '}';
     }
 
@@ -528,6 +524,18 @@ public class PetasosTask implements Serializable {
                 this.getAggregateTaskMembership().clear();
                 this.getAggregateTaskMembership().addAll(update.getAggregateTaskMembership());
             }
+        }
+        // taskExecutionDetail
+        if(update.hasTaskExecutionDetail()){
+            if(!this.hasTaskExecutionDetail()){
+                this.setTaskExecutionDetail(update.getTaskExecutionDetail());
+            } else {
+                this.getTaskExecutionDetail().setExecutionWindow(update.getTaskExecutionDetail().getExecutionWindow());
+                this.getTaskExecutionDetail().setCurrentExecutionStatus(update.getTaskExecutionDetail().getCurrentExecutionStatus());
+                this.getTaskExecutionDetail().setExecutionCommand(update.getTaskExecutionDetail().getExecutionCommand());
+                this.getTaskExecutionDetail().setUpdateInstant(update.getTaskExecutionDetail().getUpdateInstant());
+            }
+
         }
         // registered
         this.setRegistered(update.isRegistered());

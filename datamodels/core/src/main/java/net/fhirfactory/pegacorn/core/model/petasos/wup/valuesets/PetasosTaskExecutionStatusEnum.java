@@ -26,7 +26,8 @@ package net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets;
  * @author ACT Health (Mark A. Hunter)
  */
 public enum PetasosTaskExecutionStatusEnum {
-    PETASOS_TASK_ACTIVITY_STATUS_WAITING("pegacorn.petasos.task.status.waiting"),
+    PETASOS_TASK_ACTIVITY_STATUS_QUEUED("pegacorn.petasos.task.status.queued"),
+    PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED("pegacorn.petasos.task.status.assigned"),
     PETASOS_TASK_ACTIVITY_STATUS_CANCELLED( "pegacorn.pegasos.task.status.cancelled"),
     PETASOS_TASK_ACTIVITY_STATUS_FAILED("pegacorn.pegasos.task.status.failed"),
     PETASOS_TASK_ACTIVITY_STATUS_FINISHED("pegacorn.pegasos.task.status.finished"),

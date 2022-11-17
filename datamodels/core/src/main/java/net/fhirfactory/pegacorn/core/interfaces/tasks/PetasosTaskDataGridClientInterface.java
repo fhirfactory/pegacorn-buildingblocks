@@ -28,9 +28,11 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datat
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskExecutionControl;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 
 public interface PetasosTaskDataGridClientInterface {
+    public PetasosActionableTask registerExternallyTriggeredTask(String participantName, PetasosActionableTask task);
     public TaskIdType queueTask(PetasosActionableTask actionableTask);
     public PetasosActionableTask getNextPendingTask(String participantName);
     public TaskExecutionControl notifyTaskStart(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail);

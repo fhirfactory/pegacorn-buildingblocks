@@ -29,7 +29,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.notifications.PetasosITOpsNotificationContentFactory;
 import org.apache.camel.Exchange;
@@ -47,14 +46,30 @@ public class WUPContainerEgressProcessor {
     }
 
     @Inject
-    LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
-
-    @Inject
     private PetasosITOpsNotificationAgentInterface notificationAgent;
 
     @Inject
     private PetasosITOpsNotificationContentFactory notificationContentFactory;
 
+    //
+    // Constructor(s)
+    //
+
+    //
+    // Getters (and Setters)
+    //
+
+    protected PetasosITOpsNotificationContentFactory getNotificationContentFactory(){
+        return(notificationContentFactory);
+    }
+
+    protected PetasosITOpsNotificationAgentInterface getNotificationAgent(){
+        return(notificationAgent);
+    }
+
+    //
+    // Business Methods
+    //
 
     public PetasosFulfillmentTaskSharedInstance egressContentProcessor(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
         if(getLogger().isDebugEnabled()){
@@ -77,22 +92,18 @@ public class WUPContainerEgressProcessor {
                         }
                     }
                 }
-                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFinish(fulfillmentTask);
                 metricsAgent.touchLastActivityFinishInstant();
                 metricsAgent.incrementFinishedTasks();
                 break;
             case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
-                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask);
                 metricsAgent.incrementCancelledTasks();
                 metricsAgent.touchLastActivityFinishInstant();
                 break;
             case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
-                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionNoActionRequired(fulfillmentTask);
                 metricsAgent.incrementFinishedTasks();
                 metricsAgent.touchLastActivityFinishInstant();
                 break;
             default:
-                fulfilmentTaskActivityController.notifyFulfillmentTaskExecutionFailure(fulfillmentTask);
                 metricsAgent.incrementFailedTasks();
                 metricsAgent.touchLastActivityFinishInstant();
                 createFailureNotification = true;

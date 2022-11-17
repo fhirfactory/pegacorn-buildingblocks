@@ -149,6 +149,346 @@ public class PetasosTaskGridClient extends JGroupsIntegrationPointBase implement
 
     }
 
+
+
+    //
+    // Task DataGrid Services
+    //
+
+    @Override
+    public TaskIdType queueTask(PetasosActionableTask actionableTask){
+        getLogger().debug(".registerActionableTask(): Entry, task->{}", actionableTask);
+        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".registerActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".registerActionableTask(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
+        }
+        try {
+            Object objectSet[] = new Object[]{actionableTask, jgroupsIPSummary};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            RemoteProcedureCallResponse response = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            synchronized (getIPCChannelLock()) {
+                response = getRPCDispatcher().callRemoteMethod(targetAddress, "queueTask", objectSet, classSet, requestOptions);
+            }
+            getLogger().debug(".registerActionableTask(): Exit, response->{}", response);
+            if(response.isSuccessful()){
+                PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
+                return(registeredTask.getTaskId());
+            } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getLogger().error(".registerActionableTask(): Could not register task, response->{}", response);
+                return(null);
+            }
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".registerActionableTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".registerActionableTask: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    @Override
+    public PetasosActionableTask registerExternallyTriggeredTask(String participantName, PetasosActionableTask actionableTask) {
+        getLogger().debug(".registerExternallyTriggeredTask(): Entry, actionableTask->{}", actionableTask);
+        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".registerExternallyTriggeredTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".registerExternallyTriggeredTask(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
+        }
+        try {
+            Object objectSet[] = new Object[]{participantName, actionableTask, jgroupsIPSummary};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            PetasosActionableTask registeredActionableTask = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            synchronized (getIPCChannelLock()) {
+                registeredActionableTask = getRPCDispatcher().callRemoteMethod(targetAddress, "registerExternallyTriggeredTask", objectSet, classSet, requestOptions);
+            }
+            getLogger().debug(".registerExternallyTriggeredTask(): Exit, response->{}", actionableTask);
+            if(registeredActionableTask != null){
+                return(registeredActionableTask);
+            } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getLogger().error(".registerExternallyTriggeredTask(): Could not register task, response->{}", actionableTask);
+                return(null);
+            }
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".registerExternallyTriggeredTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".registerExternallyTriggeredTask: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    //
+    // Update a PetasosActionableTask
+
+
+    @Override
+    public PetasosActionableTask getNextPendingTask(String participantName) {
+        getLogger().debug(".getNextPendingTask(): Entry, participantName->{}", participantName);
+        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".getNextPendingTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".getNextPendingTask(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
+        }
+        try {
+            Object objectSet[] = new Object[]{participantName, jgroupsIPSummary};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            PetasosActionableTask actionableTask = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            synchronized (getIPCChannelLock()) {
+                actionableTask = getRPCDispatcher().callRemoteMethod(targetAddress, "getNextPendingTask", objectSet, classSet, requestOptions);
+            }
+            getLogger().debug(".notifyTaskStart(): Exit, response->{}", actionableTask);
+            if(actionableTask != null){
+                return(actionableTask);
+            } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getLogger().error(".notifyTaskStart(): Could not update task, response is null");
+                return(null);
+            }
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".notifyTaskStart(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".notifyTaskStart: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskStart(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail) {
+        getLogger().debug(".notifyTaskStart(): Entry, taskId->{}", taskId);
+        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".notifyTaskStart(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".notifyTaskStart(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
+        }
+        try {
+            Object objectSet[] = new Object[]{participantName, taskId, taskFulfillmentDetail, jgroupsIPSummary};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            TaskExecutionControl taskExecutionControl = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            synchronized (getIPCChannelLock()) {
+                taskExecutionControl = getRPCDispatcher().callRemoteMethod(targetAddress, "notifyTaskStart", objectSet, classSet, requestOptions);
+            }
+            getLogger().debug(".notifyTaskStart(): Exit, response->{}", taskExecutionControl);
+            if(taskExecutionControl != null){
+                return(taskExecutionControl);
+            } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getLogger().error(".notifyTaskStart(): Could not update task, response->{}", taskId);
+                return(null);
+            }
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".notifyTaskStart(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".notifyTaskStart: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskFinish(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
+        getLogger().debug(".notifyTaskFinish(): Entry, taskId->{}", taskId);
+        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".notifyTaskFinish(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".notifyTaskFinish(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
+        }
+        try {
+            Object objectSet[] = new Object[]{participantName, taskId, taskFulfillmentDetail, egressPayload, taskOutcome, jgroupsIPSummary};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            TaskExecutionControl taskExecutionControl = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            synchronized (getIPCChannelLock()) {
+                taskExecutionControl = getRPCDispatcher().callRemoteMethod(targetAddress, "notifyTaskFinish", objectSet, classSet, requestOptions);
+            }
+            getLogger().debug(".notifyTaskFinish(): Exit, response->{}", taskExecutionControl);
+            if(taskExecutionControl != null){
+                return(taskExecutionControl);
+            } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getLogger().error(".notifyTaskFinish(): Could not update task, response->{}", taskId);
+                return(null);
+            }
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".notifyTaskFinish(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".notifyTaskFinish: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskCancellation(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
+        getLogger().debug(".notifyTaskCancellation(): Entry, taskId->{}", taskId);
+        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".notifyTaskCancellation(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".notifyTaskCancellation(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
+        }
+        try {
+            Object objectSet[] = new Object[]{participantName, taskId, taskFulfillmentDetail, egressPayload, taskOutcome, taskStatusReason, jgroupsIPSummary};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            TaskExecutionControl taskExecutionControl = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            synchronized (getIPCChannelLock()) {
+                taskExecutionControl = getRPCDispatcher().callRemoteMethod(targetAddress, "notifyTaskCancellation", objectSet, classSet, requestOptions);
+            }
+            getLogger().debug(".notifyTaskCancellation(): Exit, response->{}", taskExecutionControl);
+            if(taskExecutionControl != null){
+                return(taskExecutionControl);
+            } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getLogger().error(".notifyTaskCancellation(): Could not update task, response->{}", taskId);
+                return(null);
+            }
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".notifyTaskCancellation(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".notifyTaskCancellation: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskFailure(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
+        getLogger().debug(".notifyTaskFailure(): Entry, taskId->{}", taskId);
+        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".notifyTaskFailure(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".notifyTaskFailure(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
+        }
+        try {
+            Object objectSet[] = new Object[]{participantName, taskId, taskFulfillmentDetail, egressPayload, taskOutcome, taskStatusReason, jgroupsIPSummary};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            TaskExecutionControl taskExecutionControl = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            synchronized (getIPCChannelLock()) {
+                taskExecutionControl = getRPCDispatcher().callRemoteMethod(targetAddress, "notifyTaskFailure", objectSet, classSet, requestOptions);
+            }
+            getLogger().debug(".notifyTaskFailure(): Exit, response->{}", taskExecutionControl);
+            if(taskExecutionControl != null){
+                return(taskExecutionControl);
+            } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getLogger().error(".notifyTaskFailure(): Could not update task, response->{}", taskId);
+                return(null);
+            }
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".notifyTaskFailure(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".notifyTaskFailure: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+    @Override
+    public TaskExecutionControl notifyTaskFinalisation(String participantName, TaskIdType taskId, TaskCompletionSummaryType completionSummary) {
+        getLogger().debug(".notifyTaskFinalisation(): Entry, taskId->{}", taskId);
+        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
+        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
+        if(targetAddress == null){
+            getLogger().warn(".notifyTaskFinalisation(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
+            getLogger().error(".notifyTaskFinalisation(): Cannot find candidate Ponos-IM Instance!!!");
+            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
+            return(null);
+        }
+        try {
+            Object objectSet[] = new Object[]{participantName, taskId, completionSummary, jgroupsIPSummary};
+            Class classSet[] = createClassSet(objectSet);
+            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
+            TaskExecutionControl taskExecutionControl = null;
+            getMetricsAgent().incrementRemoteProcedureCallCount();
+            synchronized (getIPCChannelLock()) {
+                taskExecutionControl = getRPCDispatcher().callRemoteMethod(targetAddress, "notifyTaskFinalisation", objectSet, classSet, requestOptions);
+            }
+            getLogger().debug(".notifyTaskFinalisation(): Exit, response->{}", taskExecutionControl);
+            if(taskExecutionControl != null){
+                return(taskExecutionControl);
+            } else {
+                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+                getLogger().error(".notifyTaskFinalisation(): Could not update task, response->{}", taskId);
+                return(null);
+            }
+        } catch (NoSuchMethodException e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            getLogger().error(".notifyTaskFinalisation(): Error (NoSuchMethodException) ->{}", e.getMessage());
+            return(null);
+        } catch (Exception e) {
+            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
+            e.printStackTrace();
+            getLogger().error(".notifyTaskFinalisation: Error (GeneralException) ->{}", e.getMessage());
+            return(null);
+        }
+    }
+
+
     //
     // ****Tactical****
     // Task Execution / Capability Utilisation Services
@@ -164,10 +504,8 @@ public class PetasosTaskGridClient extends JGroupsIntegrationPointBase implement
             return(null);
         }
         try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = task;
-            classSet[0] = CapabilityUtilisationRequest.class;
+            Object objectSet[] = new Object[]{task};
+            Class classSet[] = createClassSet(objectSet);
             RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
             CapabilityUtilisationResponse response = null;
             synchronized (getIPCChannelLock()) {
@@ -192,145 +530,12 @@ public class PetasosTaskGridClient extends JGroupsIntegrationPointBase implement
             return(response);
         }
     }
-    
+
     public CapabilityUtilisationResponse executeTaskHandler(CapabilityUtilisationRequest task){
         getLogger().debug(".executeTaskHandler(): Entry, task->{}", task);
         CapabilityUtilisationResponse response = getProcessingPlant().executeTask(task);
         getLogger().debug(".executeTaskHandler(): Exit, response->{}", response);
         return(response);
-    }
-
-    //
-    // Task DataGrid Services
-    //
-
-    @Override
-    public TaskIdType queueTask(PetasosActionableTask actionableTask){
-        getLogger().debug(".registerActionableTask(): Entry, task->{}", actionableTask);
-        JGroupsIntegrationPointSummary jgroupsIPSummary = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
-        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
-        if(targetAddress == null){
-            getLogger().warn(".registerActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
-            getLogger().error(".registerActionableTask(): Cannot find candidate Ponos-IM Instance!!!");
-            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
-            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance (.registerActionableTask())!!!");
-            return(null);
-        }
-        RemoteProcedureCallRequest remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, jgroupsIPSummary);
-        try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = remoteProcedureCallRequest;
-            classSet[0] = RemoteProcedureCallRequest.class;
-            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            RemoteProcedureCallResponse response = null;
-            getMetricsAgent().incrementRemoteProcedureCallCount();
-            synchronized (getIPCChannelLock()) {
-                response = getRPCDispatcher().callRemoteMethod(targetAddress, "registerActionableTaskHandler", objectSet, classSet, requestOptions);
-            }
-            getLogger().debug(".registerActionableTask(): Exit, response->{}", response);
-            if(response.isSuccessful()){
-                PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
-                return(registeredTask.getTaskId());
-            } else {
-                getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-                getLogger().error(".registerActionableTask(): Could not register task, response->{}", response);
-                return(null);
-            }
-        } catch (NoSuchMethodException e) {
-            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            getLogger().error(".registerActionableTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
-            return(null);
-        } catch (Exception e) {
-            getMetricsAgent().incrementRemoteProcedureCallFailureCount();
-            e.printStackTrace();
-            getLogger().error(".registerActionableTask: Error (GeneralException) ->{}", e.getMessage());
-            return(null);
-        }
-    }
-
-    //
-    // Update a PetasosActionableTask
-
-
-    @Override
-    public PetasosActionableTask getNextPendingTask(String participantName) {
-        return null;
-    }
-
-    @Override
-    public TaskExecutionControl notifyTaskStart(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail) {
-        return null;
-    }
-
-    @Override
-    public TaskExecutionControl notifyTaskFinish(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
-        return null;
-    }
-
-    @Override
-    public TaskExecutionControl notifyTaskCancellation(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
-        return null;
-    }
-
-    @Override
-    public TaskExecutionControl notifyTaskFailure(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String taskStatusReason) {
-        return null;
-    }
-
-    @Override
-    public TaskExecutionControl notifyTaskFinalisation(String participantName, TaskIdType taskId, TaskCompletionSummaryType completionSummary) {
-        return null;
-    }
-
-
-    public PetasosActionableTask updateActionableTask( PetasosActionableTask actionableTask){
-        getLogger().debug(".updateActionableTask(): Entry, task->{}",  actionableTask);
-        JGroupsIntegrationPointSummary endpointIdentifier = createSummary(getJgroupsIPSet().getPetasosTaskServicesEndpoint());
-        Address targetAddress = getCandidateTargetServiceAddress(subsystemNames.getPetasosTaskRepositoryServiceProviderName());
-        if(targetAddress == null){
-            getLogger().warn(".updateActionableTask(): Cannot Access {} to update task",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
-            getLogger().error(".updateActionableTask(): Cannot find candidate Ponos-IM Instance!!!");
-            getMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance!!!");
-            getProcessingPlantMetricsAgent().sendITOpsNotification("Error: Cannot find candidate Ponos-IM Instance!!!");
-            return(null);
-        }
-        RemoteProcedureCallRequest remoteProcedureCallRequest = null;
-        try {
-            remoteProcedureCallRequest = rpcRequestFactory.newRemoteProcedureCallRequest(actionableTask, PetasosActionableTask.class, endpointIdentifier);
-        } catch(Exception ex){
-            getLogger().warn(".updateActionableTask(): Warning: Cannot formulate Ponos-IM RPC Request (for updateActionableTask)!!!",subsystemNames.getPetasosTaskRepositoryServiceProviderName() );
-            getMetricsAgent().sendITOpsNotification("Warning: Cannot formulate Ponos-IM RPC Request (for updateActionableTask)!!!");
-            getProcessingPlantMetricsAgent().sendITOpsNotification("Warning: Cannot formulate Ponos-IM RPC Request (for updateActionableTask)!!!");
-            return(null);
-        }
-
-        try {
-            Object objectSet[] = new Object[1];
-            Class classSet[] = new Class[1];
-            objectSet[0] = remoteProcedureCallRequest;
-            classSet[0] = RemoteProcedureCallRequest.class;
-            RequestOptions requestOptions = new RequestOptions( ResponseMode.GET_FIRST, getRPCUnicastTimeout());
-            RemoteProcedureCallResponse response = null;
-            synchronized (getIPCChannelLock()) {
-                response = getRPCDispatcher().callRemoteMethod(targetAddress, "updateActionableTaskHandler", objectSet, classSet, requestOptions);
-            }
-            getLogger().debug(".updateActionableTask(): Exit, response->{}", response);
-            if(response.isSuccessful()){
-                PetasosActionableTask registeredTask = (PetasosActionableTask) response.getResponseContent();
-                return(registeredTask);
-            } else {
-                getLogger().error(".updateActionableTask(): Could not update task, response->{}", response);
-                return(null);
-            }
-        } catch (NoSuchMethodException e) {
-            getLogger().error(".updateActionableTask(): Error (NoSuchMethodException) ->{}", e.getMessage());
-            return(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getLogger().error(".updateActionableTask: Error (GeneralException) ->{}", e.getMessage());
-            return(null);
-        }
     }
 
 }

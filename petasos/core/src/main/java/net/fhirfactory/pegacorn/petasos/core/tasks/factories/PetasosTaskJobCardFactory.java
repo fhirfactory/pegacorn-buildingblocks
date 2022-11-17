@@ -23,7 +23,6 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import org.slf4j.Logger;
@@ -46,11 +45,11 @@ public class PetasosTaskJobCardFactory {
         jobCard.setActionableTaskId(fulfillmentTask.getActionableTaskId());
         jobCard.setClusterMode(processingPlant.getMeAsASoftwareComponent().getConcurrencyMode());
         jobCard.setLastActivityCheckInstant(Instant.EPOCH);
-        jobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+        jobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
         jobCard.setExecutingFulfillmentTaskId(null);
         jobCard.setExecutingFulfillmentTaskIdAssignmentInstant(Instant.EPOCH);
         jobCard.setSystemMode(processingPlant.getMeAsASoftwareComponent().getResilienceMode());
-        jobCard.setLastRequestedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+        jobCard.setLastRequestedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
         jobCard.setExecutingProcessingPlant(processingPlant.getMeAsASoftwareComponent().getComponentID());
         jobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
         getLogger().debug(".newPetasosTaskJobCard(): Exit, jobCard->{}", jobCard);

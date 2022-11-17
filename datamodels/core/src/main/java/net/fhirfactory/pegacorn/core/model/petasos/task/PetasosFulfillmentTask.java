@@ -22,16 +22,11 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
-import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Objects;
 
@@ -152,7 +147,7 @@ public class PetasosFulfillmentTask extends PetasosTask{
                 "  taskPerformerTypes=" + getTaskPerformerTypes() +
                 "  isARetry=" + isaRetry() +
                 "  taskMetadata=" + getTaskContext() +
-                ", executionStatus=" + getExecutionStatus() +
+                ", executionStatus=" + getTaskExecutionDetail() +
                 '}';
     }
 }

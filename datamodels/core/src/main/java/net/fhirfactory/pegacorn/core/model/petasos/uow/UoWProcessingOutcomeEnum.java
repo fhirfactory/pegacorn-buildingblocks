@@ -33,7 +33,8 @@ public enum UoWProcessingOutcomeEnum {
     UOW_OUTCOME_NO_PROCESSING_REQUIRED("ProcessingOutcome.NoneRequired","pegacorn.uow.processing-outcome.nonerequired"),
     UOW_OUTCOME_FILTERED("ProcessingOutcome.Filtered","pegacorn.uow.processing-outcome.filtered"),
     UOW_OUTCOME_DISCARD("ProcessingOutcome.Discarded","pegacorn.uow.processing-outcome.discard"),
-    UOW_OUTCOME_NOTSTARTED("ProcessingOutcome.NotStarted","pegacorn.uow.processing-outcome.not_started");
+    UOW_OUTCOME_NOTSTARTED("ProcessingOutcome.NotStarted","pegacorn.uow.processing-outcome.not_started"),
+    UOW_OUTCOME_CANCELLED("ProcessingOutcome.Cancelled", "pegacorn.uow.processing-outcome.cancelled");
     
     private String token;
     private String displayName;

@@ -22,12 +22,14 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.valuesets.TaskReasonTypeEnum;
 
 import java.io.Serializable;
 
 public class TaskReasonType implements Serializable {
     private TaskReasonTypeEnum reasonType;
+    private Boolean retryTask;
 
     //
     // Constructor(s)
@@ -35,15 +37,30 @@ public class TaskReasonType implements Serializable {
 
     public TaskReasonType(){
         reasonType = TaskReasonTypeEnum.TASK_REASON_UNKNOWN;
+        retryTask = false;
     }
 
     public TaskReasonType(TaskReasonTypeEnum reasonType){
         this.reasonType = reasonType;
+        retryTask = false;
     }
 
     //
     // Getters and Setters (Bean Methods)
     //
+
+    public Boolean getRetryTask() {
+        return retryTask;
+    }
+
+    @JsonIgnore
+    public Boolean isRetryTask(){
+        return(retryTask);
+    }
+
+    public void setRetryTask(Boolean retryTask) {
+        this.retryTask = retryTask;
+    }
 
     public TaskReasonTypeEnum getReasonType() {
         return reasonType;
@@ -61,6 +78,7 @@ public class TaskReasonType implements Serializable {
     public String toString() {
         return "TaskReasonType{" +
                 "reasonType=" + reasonType +
+                ", retryTask=" + retryTask +
                 '}';
     }
 }

@@ -27,8 +27,10 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayloadSet;
@@ -42,6 +44,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardF
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,59 +117,76 @@ public class TaskOutcome2NewTasksBean {
         ArrayList<PetasosActionableTask> newActionableTaskList = new ArrayList<>();
         synchronized (actionableTask.getLockObject(actionableTask.getTaskId())) {
             //
-            // We need to establish whether this actionableTask has any successor (downstream) tasks (subscribed), cause if
-            // it doesn't, then we need to tag the message as being the "last-in-chain" and also "finalised". If it does
-            // have
-            if (!actionableTask.hasTaskCompletionSummary()) {
-                actionableTask.setTaskCompletionSummary(new TaskCompletionSummaryType());
-                actionableTask.getTaskCompletionSummary().setLastInChain(false);
-                actionableTask.getTaskCompletionSummary().setFinalised(false);
-            }
+            // We need to first test if the task failed. If so, create a new one to replace it and start it again!
+            if(actionableTask.getTaskOutcomeStatus().getOutcomeStatus().equals(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FAILED)){
+                TaskWorkItemType newWorkItem = new TaskWorkItemType();
+                newWorkItem.setIngresContent(SerializationUtils.clone(actionableTask.getTaskWorkItem().getIngresContent()));
+                PetasosActionableTask newDownstreamTask = actionableTaskFactory.newMessageBasedActionableTask(newWorkItem);
+                newDownstreamTask.setTaskTraceability(SerializationUtils.clone(actionableTask.getTaskTraceability()));
+                newDownstreamTask.getTaskId().setTaskSequenceNumber(actionableTask.getTaskId().getTaskSequenceNumber());
+                newDownstreamTask.getTaskReason().setRetryTask(true);
 
-            Boolean hasADownstreamTask = false;
-            for (UoWPayload currentPayload : egressPayloadList) {
-                DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
-                List<PetasosParticipant> subscriberList = distributionDecisionEngine.deriveSubscriberList(payloadManifest);
-                if(getLogger().isDebugEnabled()){
-                    getLogger().debug(".collectOutcomesAndCreateNewTasks(): number of subscribers for egressPayload->{} is count->{}", payloadManifest, subscriberList.size());
+                if (!actionableTask.hasTaskCompletionSummary()) {
+                    actionableTask.setTaskCompletionSummary(new TaskCompletionSummaryType());
                 }
-                if (!subscriberList.isEmpty()) {
-                    for(PetasosParticipant currentSubscriber: subscriberList) {
-                        TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
-                        getLogger().trace(".collectOutcomesAndCreateNewTasks(): newWorkItem->{}", newWorkItem);
-                        PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask.getInstance(), newWorkItem);
-                        TaskPerformerTypeType downstreamPerformerType = new TaskPerformerTypeType();
-                        downstreamPerformerType.setKnownFulfillerInstance(currentSubscriber.getComponentID());
-                        downstreamPerformerType.setRequiredPerformerType(currentSubscriber.getNodeFunctionFDN());
-                        downstreamPerformerType.setRequiredParticipantName(currentSubscriber.getParticipantName());
-                        downstreamPerformerType.setRequiredPerformerTypeDescription(currentSubscriber.getParticipantDisplayName());
-                        if(!newDownstreamTask.hasTaskPerformerTypes()){
-                            newDownstreamTask.setTaskPerformerTypes(new ArrayList<>());
-                        }
-                        newDownstreamTask.getTaskPerformerTypes().add(downstreamPerformerType);
-                        newActionableTaskList.add(newDownstreamTask);
-                        actionableTask.getTaskCompletionSummary().addDownstreamTask(newDownstreamTask.getTaskId());
+                actionableTask.getTaskCompletionSummary().setLastInChain(true);
+                actionableTask.getTaskCompletionSummary().setFinalised(true);
+
+                newActionableTaskList.add(newDownstreamTask);
+            } else {
+                //
+                // We need to establish whether this actionableTask has any successor (downstream) tasks (subscribed), cause if
+                // it doesn't, then we need to tag the message as being the "last-in-chain" and also "finalised". If it does
+                // have
+                if (!actionableTask.hasTaskCompletionSummary()) {
+                    actionableTask.setTaskCompletionSummary(new TaskCompletionSummaryType());
+                    actionableTask.getTaskCompletionSummary().setLastInChain(false);
+                    actionableTask.getTaskCompletionSummary().setFinalised(false);
+                }
+
+                Boolean hasADownstreamTask = false;
+                for (UoWPayload currentPayload : egressPayloadList) {
+                    DataParcelManifest payloadManifest = currentPayload.getPayloadManifest();
+                    List<PetasosParticipant> subscriberList = distributionDecisionEngine.deriveSubscriberList(payloadManifest);
+                    if (getLogger().isDebugEnabled()) {
+                        getLogger().debug(".collectOutcomesAndCreateNewTasks(): number of subscribers for egressPayload->{} is count->{}", payloadManifest, subscriberList.size());
                     }
-                    hasADownstreamTask = true;
+                    if (!subscriberList.isEmpty()) {
+                        for (PetasosParticipant currentSubscriber : subscriberList) {
+                            TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
+                            getLogger().trace(".collectOutcomesAndCreateNewTasks(): newWorkItem->{}", newWorkItem);
+                            PetasosActionableTask newDownstreamTask = newActionableTask(actionableTask.getInstance(), newWorkItem);
+                            TaskPerformerTypeType downstreamPerformerType = new TaskPerformerTypeType();
+                            downstreamPerformerType.setKnownFulfillerInstance(currentSubscriber.getComponentID());
+                            downstreamPerformerType.setRequiredPerformerType(currentSubscriber.getNodeFunctionFDN());
+                            downstreamPerformerType.setRequiredParticipantName(currentSubscriber.getParticipantName());
+                            downstreamPerformerType.setRequiredPerformerTypeDescription(currentSubscriber.getParticipantDisplayName());
+                            if (!newDownstreamTask.hasTaskPerformerTypes()) {
+                                newDownstreamTask.setTaskPerformerTypes(new ArrayList<>());
+                            }
+                            newDownstreamTask.getTaskPerformerTypes().add(downstreamPerformerType);
+                            newActionableTaskList.add(newDownstreamTask);
+                            actionableTask.getTaskCompletionSummary().addDownstreamTask(newDownstreamTask.getTaskId());
+                        }
+                        hasADownstreamTask = true;
+                    }
+                }
+                if (!hasADownstreamTask) {
+                    if (actionableTask.getTaskCompletionSummary().getDownstreamTaskMap().isEmpty()) {
+                        actionableTask.getTaskCompletionSummary().setLastInChain(true);
+                        actionableTask.getTaskCompletionSummary().setFinalised(true);
+                    }
                 }
             }
-            if (!hasADownstreamTask) {
-                if (actionableTask.getTaskCompletionSummary().getDownstreamTaskMap().isEmpty()) {
-                    actionableTask.getTaskCompletionSummary().setLastInChain(true);
-                    actionableTask.getTaskCompletionSummary().setFinalised(true);
-                }
-            }
-            actionableTask.update();
         }
+        actionableTask.update();
 
         //
         // Now we are going to create a new ActionableTaskSharedInstance and register it. This will allow us to "finalise"
         // the upstream task.
         List<PetasosActionableTaskSharedInstance> newTaskList = new ArrayList<>();
         for(PetasosActionableTask currentNewActionableTask: newActionableTaskList){
-            PetasosActionableTaskSharedInstance petasosActionableTaskSharedInstance = actionableTaskSharedInstanceFactory.newActionableTaskSharedInstance(currentNewActionableTask);
-            newTaskList.add(petasosActionableTaskSharedInstance);
-            TaskExecutionCommandEnum petasosTaskExecutionStatusEnum = centralTaskProxy.notifyTaskWaiting(petasosActionableTaskSharedInstance.getTaskId());
+            TaskIdType taskId = centralTaskProxy.queueTask(currentNewActionableTask);
         }
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): Updating actionableTask with task completion details");
         centralTaskProxy.notifyTaskFinalisation(actionableTask.getTaskId());

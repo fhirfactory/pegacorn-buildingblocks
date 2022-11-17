@@ -28,7 +28,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.da
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.common.PetasosTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,7 +145,7 @@ public class PetasosActionableTaskSharedInstance extends PetasosTaskSharedInstan
         return "PetasosActionableTaskSharedInstance{" +
                 "taskFulfillment=" + getTaskFulfillment() +
                 ", taskCompletionSummary=" + getTaskCompletionSummary() +
-                ", executionStatus=" + getExecutionStatus() +
+                ", executionStatus=" + getTaskExecutionDetail() +
                 ", sourceResourceId=" + getSourceResourceId() +
                 ", creationInstant=" + getCreationInstant() +
                 ", updateInstant=" + getUpdateInstant() +

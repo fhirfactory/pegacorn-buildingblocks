@@ -21,12 +21,21 @@
  */
 package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 public class TaskExecutionControl implements Serializable {
     TaskExecutionCommandEnum executionCommand;
+    private PetasosTaskExecutionStatusEnum currentExecutionStatus;
+    private String taskExecutionStatusReason;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant updateInstant;
     TaskWindow executionWindow;
 
     //
@@ -35,12 +44,45 @@ public class TaskExecutionControl implements Serializable {
 
     public TaskExecutionControl(){
         this.executionCommand = TaskExecutionCommandEnum.TASK_COMMAND_WAIT;
+        this.currentExecutionStatus = PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED;
         this.executionWindow = new TaskWindow();
+        this.updateInstant = Instant.now();
+        this.taskExecutionStatusReason = null;
     }
 
     //
     // Getters and Setters
     //
+
+    @JsonIgnore
+    public boolean hasTaskExecutionStatusReason(){
+        boolean hasValue = this.taskExecutionStatusReason != null;
+        return(hasValue);
+    }
+
+    public String getTaskExecutionStatusReason() {
+        return taskExecutionStatusReason;
+    }
+
+    public void setTaskExecutionStatusReason(String taskExecutionStatusReason) {
+        this.taskExecutionStatusReason = taskExecutionStatusReason;
+    }
+
+    public PetasosTaskExecutionStatusEnum getCurrentExecutionStatus() {
+        return currentExecutionStatus;
+    }
+
+    public void setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum currentExecutionStatus) {
+        this.currentExecutionStatus = currentExecutionStatus;
+    }
+
+    public Instant getUpdateInstant() {
+        return updateInstant;
+    }
+
+    public void setUpdateInstant(Instant updateInstant) {
+        this.updateInstant = updateInstant;
+    }
 
     public TaskExecutionCommandEnum getExecutionCommand() {
         return executionCommand;
@@ -64,9 +106,12 @@ public class TaskExecutionControl implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("TaskExecutionSchedule{");
+        final StringBuilder sb = new StringBuilder("TaskExecutionControl{");
         sb.append("executionCommand=").append(executionCommand);
+        sb.append(", currentExecutionStatus=").append(currentExecutionStatus);
+        sb.append(", updateInstant=").append(updateInstant);
         sb.append(", executionWindow=").append(executionWindow);
+        sb.append(", taskExeuctionStatusReason=").append(taskExecutionStatusReason);
         sb.append('}');
         return sb.toString();
     }

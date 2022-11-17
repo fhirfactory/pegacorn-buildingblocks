@@ -27,12 +27,13 @@ import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNo
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.notifications.PetasosITOpsNotificationContentFactory;
@@ -56,7 +57,7 @@ public class WUPContainerIngresProcessor {
     private DateTimeFormatter timeFormatter;
 
     @Inject
-    private LocalPetasosFulfilmentTaskActivityController fulfillmentActivityController;
+    private TaskDataGridProxy taskDataGrid;
 
     @Inject
     private PetasosFulfillmentTaskAuditServicesBroker auditServicesBroker;
@@ -94,6 +95,14 @@ public class WUPContainerIngresProcessor {
         return(this.timeFormatter);
     }
 
+    protected TaskDataGridProxy getTaskDataGrid(){
+        return(taskDataGrid);
+    }
+
+    protected PetasosFulfillmentTaskAuditServicesBroker getAuditServicesBroker(){
+        return(auditServicesBroker);
+    }
+
     //
     // Business Methods
     //
@@ -122,7 +131,7 @@ public class WUPContainerIngresProcessor {
      * @return Should return a WorkUnitTransportPacket that is forwarding onto the WUP Ingres Gatekeeper.
      */
     public PetasosFulfillmentTaskSharedInstance ingresContentProcessor(PetasosFulfillmentTaskSharedInstance fulfillmentTask, Exchange camelExchange) {
-        if(getLogger().isInfoEnabled()) {
+        if (getLogger().isInfoEnabled()) {
             getLogger().info(".ingresContentProcessor(): Entry, fulfillmentTaskId/ActionableTaskId->{}/{}", fulfillmentTask.getTaskId(), fulfillmentTask.getActionableTaskId());
         }
 
@@ -152,13 +161,13 @@ public class WUPContainerIngresProcessor {
         //
         // Add some notifications
         ITOpsNotificationContent notificationContent = new ITOpsNotificationContent();
-        if(fulfillmentTask.hasTaskWorkItem()) {
-            if(fulfillmentTask.getTaskWorkItem().hasIngresContent()) {
+        if (fulfillmentTask.hasTaskWorkItem()) {
+            if (fulfillmentTask.getTaskWorkItem().hasIngresContent()) {
                 UoWPayload payload = fulfillmentTask.getTaskWorkItem().getIngresContent();
 
                 StringBuilder unformattedMessageBuilder = new StringBuilder();
-                unformattedMessageBuilder.append("--- Received Task (PetasosFulfillmentTask): Ingres Queue Size: "+currentQueueSize+" ---");
-                unformattedMessageBuilder.append(" ("+ getTimeFormatter().format(Instant.now())+ ") ---\n");
+                unformattedMessageBuilder.append("--- Received Task (PetasosFulfillmentTask): Ingres Queue Size: " + currentQueueSize + " ---");
+                unformattedMessageBuilder.append(" (" + getTimeFormatter().format(Instant.now()) + ") ---\n");
                 unformattedMessageBuilder.append("Task ID (FulfillmentTask) --> " + fulfillmentTask.getTaskId().getId() + "\n");
                 unformattedMessageBuilder.append("Task ID (ActionableTask) --> " + fulfillmentTask.getActionableTaskId().getId() + "\n");
                 unformattedMessageBuilder.append(notificationContentFactory.newNotificationContentFromUoWPayload(payload));
@@ -167,70 +176,67 @@ public class WUPContainerIngresProcessor {
                 StringBuilder formattedMessageBuilder = new StringBuilder();
                 formattedMessageBuilder.append("<table>");
                 formattedMessageBuilder.append("<tr>");
-                formattedMessageBuilder.append("<th>Ingres Task</th><th>"+getTimeFormatter().format(Instant.now())+", QueueSize:"+currentQueueSize+"</th>");
+                formattedMessageBuilder.append("<th>Ingres Task</th><th>" + getTimeFormatter().format(Instant.now()) + ", QueueSize:" + currentQueueSize + "</th>");
                 formattedMessageBuilder.append("</tr>");
                 formattedMessageBuilder.append("<tr>");
-                formattedMessageBuilder.append("<td>FulfillmentTaskId</td><td>"+fulfillmentTask.getTaskId().getId()+"</td>");
+                formattedMessageBuilder.append("<td>FulfillmentTaskId</td><td>" + fulfillmentTask.getTaskId().getId() + "</td>");
                 formattedMessageBuilder.append("</tr>");
                 formattedMessageBuilder.append("<tr>");
-                formattedMessageBuilder.append("<td>ActionableTask</td><td>"+fulfillmentTask.getActionableTaskId().getId()+"</td>");
+                formattedMessageBuilder.append("<td>ActionableTask</td><td>" + fulfillmentTask.getActionableTaskId().getId() + "</td>");
                 formattedMessageBuilder.append("</tr>");
                 formattedMessageBuilder.append("<tr>");
-                formattedMessageBuilder.append("<td>Payload</td>"+notificationContentFactory.payloadTypeFromUoW(payload)+"</td>");
+                formattedMessageBuilder.append("<td>Payload</td>" + notificationContentFactory.payloadTypeFromUoW(payload) + "</td>");
                 formattedMessageBuilder.append("</tr>");
                 formattedMessageBuilder.append("</table>");
                 notificationContent.setFormattedContent(formattedMessageBuilder.toString());
             }
         }
-        if(StringUtils.isEmpty(notificationContent.getContent())){
+        if (StringUtils.isEmpty(notificationContent.getContent())) {
             notificationContent.setContent("Task Received (Metadata) \n" +
-            "Task Id (FulfillmentTask)--> " + fulfillmentTask.getTaskId().getId() + "\n" +
-            "Task Id (ActionableTask)--> " + fulfillmentTask.getActionableTaskId().getId());
+                    "Task Id (FulfillmentTask)--> " + fulfillmentTask.getTaskId().getId() + "\n" +
+                    "Task Id (ActionableTask)--> " + fulfillmentTask.getActionableTaskId().getId());
         }
         metricsAgent.sendITOpsNotification(notificationContent.getContent(), notificationContent.getFormattedContent());
 
         //
         // Write an AuditEvent
-        auditServicesBroker.logActivity(fulfillmentTask.getInstance());
+        getAuditServicesBroker().logActivity(fulfillmentTask.getInstance());
+
         //
         // Now check status
         boolean willExecute = false;
         boolean willBeCancelled = false;
+
+        fulfillmentTask.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
+        fulfillmentTask.setUpdateInstant(Instant.now());
+        fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
+        fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
+        fulfillmentTask.getTaskFulfillment().setToBeDiscarded(false);
+        fulfillmentTask.update();
+
         while (waitState) {
-            if(getLogger().isDebugEnabled()){
-                getLogger().debug(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}",fulfillmentTask.getTaskJobCard().getCurrentStatus());
-            }
-            //
-            // A bit of defensive programming //TODO Find out why this is needed
-            if(fulfillmentTask.getExecutionStatus() == null){
-                fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
-            }
-            if(fulfillmentTask.getExecutionStatus().equals(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING)){
-                PetasosTaskExecutionStatusEnum petasosTaskExecutionStatusEnum = fulfillmentActivityController.requestFulfillmentTaskExecutionPrivilege(fulfillmentTask);
-                if (petasosTaskExecutionStatusEnum == PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING) {
-                    fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
+            TaskExecutionCommandEnum taskExecutionCommand = getTaskDataGrid().notifyTaskStart(fulfillmentTask.getActionableTaskId(), fulfillmentTask.getInstance());
+            switch(taskExecutionCommand){
+                case TASK_COMMAND_WAIT:
+                    waitState = true;
+                    break;
+                case TASK_COMMAND_FAIL:
+                case TASK_COMMAND_CANCEL:
+                case TASK_COMMAND_FINISH:
+                case TASK_COMMAND_FINALISE:
+                case TASK_COMMAND_CLEAN_UP:
+                    fulfillmentTask.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
                     fulfillmentTask.setUpdateInstant(Instant.now());
                     fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-                    fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
-                    fulfillmentTask.getTaskFulfillment().setToBeDiscarded(false);
-                    fulfillmentTask.update();
-                    fulfillmentActivityController.notifyFulfillmentTaskExecutionStart(fulfillmentTask);
+                    fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
+                    fulfillmentTask.getTaskFulfillment().setToBeDiscarded(true);
                     waitState = false;
-                    willExecute = true;
+                    willBeCancelled = true;
                     break;
-                }
-            } else {
-                fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
-                fulfillmentTask.setUpdateInstant(Instant.now());
-                fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
-                fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
-                fulfillmentActivityController.notifyFulfillmentTaskExecutionCancellation(fulfillmentTask);
-                fulfillmentTask.getTaskFulfillment().setToBeDiscarded(true);
-                if(getLogger().isDebugEnabled()) {
-                    getLogger().debug(".ingresContentProcessor(): jobcard->{}", fulfillmentTask.getTaskJobCard());
-                }
-                waitState = false;
-                willBeCancelled = true;
+                case TASK_COMMAND_EXECUTE:
+                    willExecute = true;
+                    waitState = false;
+                    break;
             }
             if (waitState) {
                 try {
@@ -239,10 +245,11 @@ public class WUPContainerIngresProcessor {
                     getLogger().trace(".ingresContentProcessor(): Something interrupted my nap! reason --> {}", e.getMessage());
                 }
             }
-            if(getLogger().isInfoEnabled()){
+            if (getLogger().isInfoEnabled()) {
                 getLogger().debug(".ingresContentProcessor(): Looping, current fulfillmentTask.getTaskJobCard().getCurrentStatus()->{}", fulfillmentTask.getTaskJobCard().getCurrentStatus());
             }
         }
+
         //
         // Write Some Metrics
         if(willExecute){

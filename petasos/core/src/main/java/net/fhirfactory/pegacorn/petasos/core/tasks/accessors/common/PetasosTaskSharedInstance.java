@@ -30,11 +30,11 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskCo
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.datatypes.TaskExecutionControl;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 
@@ -79,17 +79,17 @@ public abstract class PetasosTaskSharedInstance {
     //
 
     @JsonIgnore
-    public boolean hasExecutionStatus(){
-        boolean hasValue = getLocalInstance().hasExecutionStatus();
+    public boolean hasTaskExecutionDetail(){
+        boolean hasValue = getLocalInstance().hasTaskExecutionDetail();
         return(hasValue);
     }
 
-    public void setExecutionStatus(PetasosTaskExecutionStatusEnum status){
-        getLocalInstance().setExecutionStatus(status);
+    public void setTaskExecutionDetail(TaskExecutionControl status){
+        getLocalInstance().setTaskExecutionDetail(status);
     }
 
-    public PetasosTaskExecutionStatusEnum getExecutionStatus(){
-        return(getLocalInstance().getExecutionStatus());
+    public TaskExecutionControl getTaskExecutionDetail(){
+        return(getLocalInstance().getTaskExecutionDetail());
     }
 
     @JsonIgnore

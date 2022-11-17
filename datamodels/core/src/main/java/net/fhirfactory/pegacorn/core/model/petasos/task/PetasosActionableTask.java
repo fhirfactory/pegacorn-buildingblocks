@@ -149,7 +149,7 @@ public class PetasosActionableTask extends PetasosTask{
                 "  taskReason=" + getTaskReason() +
                 "  taskNodeAffinity=" + getTaskNodeAffinity() +
                 "  taskMetadata=" + getTaskContext() +
-                ", executionStatus=" + getExecutionStatus() +
+                ", executionStatus=" + getTaskExecutionDetail() +
                 '}';
     }
 

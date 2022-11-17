@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation;
 
-import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskActivityReportingInterface;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskDataGridClientInterface;
 import net.fhirfactory.pegacorn.core.interfaces.tasks.PetasosTaskRepositoryServiceProviderNameInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
@@ -54,8 +54,11 @@ import javax.inject.Inject;
 import java.time.Instant;
 
 @ApplicationScoped
-public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface {
+public class TaskDataGridProxy {
     private static final Logger LOG = LoggerFactory.getLogger(TaskDataGridProxy.class);
+
+    private Long taskQueueRetryWaitTime;
+    private int taskQueueRetryMaxAttempt;
 
     @Inject
     CamelContext camelctx;
@@ -85,7 +88,10 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
     // Constructor(s)
     //
 
-
+    public TaskDataGridProxy(){
+        this.taskQueueRetryWaitTime = PetasosPropertyConstants.TASK_DATA_GRID_TASK_QUEUEING_RETRY_DELAY;
+        this.taskQueueRetryMaxAttempt = PetasosPropertyConstants.TASK_DATA_GRID_TASK_QUEUEING_MAX_RETRY;
+    }
     //
     // Post Construct
     //
@@ -95,28 +101,59 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
     // Task DataGrid Integration Services
     //
 
-    public PetasosActionableTaskSharedInstance queueTask(PetasosActionableTask actionableTask){
-        getLogger().debug(".queueTask(): Entry, actionableTask->{}", actionableTask);
-        if(actionableTask == null){
-            getLogger().debug(".queueTask(): Exit, actionableTask is null");
-            return(null);
+    public PetasosActionableTaskSharedInstance registerExternallyTriggeredTask(String participantName, PetasosActionableTask actionableTask){
+        getLogger().debug(".registerExternallyTriggeredTask(): Entry, actionableTask->{}", actionableTask);
+        if (actionableTask == null) {
+            getLogger().debug(".registerExternallyTriggeredTask(): Exit, actionableTask is null");
+            return (null);
         }
-        PetasosActionableTaskSharedInstance petasosActionableTaskSharedInstance = taskInstanceFactory.newActionableTaskSharedInstance(actionableTask);
-        petasosActionableTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
-        petasosActionableTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
-        petasosActionableTaskSharedInstance.getTaskFulfillment().setRegistrationInstant(Instant.now());
-        petasosActionableTaskSharedInstance.update();
         //
         // Register with TaskDataGrid
-        TaskIdType taskId = getTaskRepositoryService().queueTask(petasosActionableTaskSharedInstance.getInstance());
-        if(taskId == null){
-            // Assume autonomous operation
+        PetasosActionableTask registeredTask = null;
+        int taskQueueRetryCount = 0;
+        while (registeredTask == null && taskQueueRetryCount < getTaskQueueRetryMaxAttempt()){
+            registeredTask = getTaskRepositoryService().registerExternallyTriggeredTask(participantName, actionableTask);
+            if (registeredTask == null) {
+                taskQueueRetryCount++;
+                getLogger().error(".registerExternallyTriggeredTask(): Could not queue task, will try again in {} milliseconds", getTaskQueueRetryWaitTime());
+                try {
+                    Thread.sleep(getTaskQueueRetryWaitTime());
+                } catch (InterruptedException e) {
+                    getLogger().trace(".registerExternallyTriggeredTask(): Something interrupted my nap! reason->", e);
+                }
+            }
         }
-        petasosActionableTaskSharedInstance.update();
+        PetasosActionableTaskSharedInstance task = taskInstanceFactory.newActionableTaskSharedInstance(actionableTask);
+        task.getTaskExecutionDetail().setExecutionCommand(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE);
+        getLogger().debug(".registerExternallyTriggeredTask(): Exit, registeredTask->{}", registeredTask);
+        return (task);
+    }
 
-        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getExecutionStatus();
-        getLogger().debug(".queueTask(): Exit, petasosActionableTaskSharedInstance->{}", petasosActionableTaskSharedInstance);
-        return (petasosActionableTaskSharedInstance);
+    public TaskIdType queueTask(PetasosActionableTask actionableTask) {
+        getLogger().debug(".queueTask(): Entry, actionableTask->{}", actionableTask);
+        if (actionableTask == null) {
+            getLogger().debug(".queueTask(): Exit, actionableTask is null");
+            return (null);
+        }
+        //
+        // Register with TaskDataGrid
+        TaskIdType taskId = null;
+        int taskQueueRetryCount = 0;
+        while (taskId == null && taskQueueRetryCount < getTaskQueueRetryMaxAttempt()){
+            taskId = getTaskRepositoryService().queueTask(actionableTask);
+            if (taskId == null) {
+                taskQueueRetryCount++;
+                getLogger().error(".queueTask(): Could not queue task, will try again in {} milliseconds", getTaskQueueRetryWaitTime());
+                try {
+                    Thread.sleep(getTaskQueueRetryWaitTime());
+                } catch (InterruptedException e) {
+                    getLogger().trace(".queueTask(): Something interrupted my nap! reason->", e);
+                }
+            }
+        }
+
+        getLogger().debug(".queueTask(): Exit, taskId->{}", taskId);
+        return (taskId);
     }
 
     public PetasosActionableTaskSharedInstance loadNextTask(String  performerName){
@@ -139,14 +176,12 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         PetasosTaskJobCard newJobCard = new PetasosTaskJobCard();
         newJobCard.setActionableTaskId(petasosActionableTaskSharedInstance.getTaskId());
         newJobCard.setProcessingPlantParticipantName(processingPlant.getSubsystemParticipantName());
-        newJobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
-        newJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+        newJobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
+        newJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
         newJobCard.setSystemMode(processingPlant.getMeAsASoftwareComponent().getResilienceMode());
         newJobCard.setClusterMode(processingPlant.getMeAsASoftwareComponent().getConcurrencyMode());
         newJobCard.setLastActivityCheckInstant(Instant.now());
         jobCardSharedInstanceFactory.newTaskJobCardSharedInstanceAccessor(newJobCard);
-
-        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getExecutionStatus();
         getLogger().debug(".queueTask(): Exit, petasosActionableTaskSharedInstance->{}", petasosActionableTaskSharedInstance);
         return (petasosActionableTaskSharedInstance);
     }
@@ -165,18 +200,17 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
             TaskFulfillmentType taskFulfillment = petasosFulfillmentTaskSharedInstance.getTaskFulfillment();
             petasosActionableTaskSharedInstance.setTaskFulfillment(SerializationUtils.clone(taskFulfillment));
             petasosActionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(petasosFulfillmentTaskSharedInstance.getTaskId()));
-            petasosActionableTaskSharedInstance.setExecutionStatus(petasosFulfillmentTaskSharedInstance.getExecutionStatus());
+            petasosActionableTaskSharedInstance.setTaskExecutionDetail(petasosFulfillmentTaskSharedInstance.getTaskExecutionDetail());
             petasosActionableTaskSharedInstance.setUpdateInstant(Instant.now());
 
             petasosActionableTaskSharedInstance.update();
         }
 
-        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getExecutionStatus();
+        PetasosTaskExecutionStatusEnum executionStatus = petasosActionableTaskSharedInstance.getTaskExecutionDetail().getCurrentExecutionStatus();
         getLogger().debug(".notifyTaskStart(): Exit, executionStatus->{}", executionStatus);
         return (executionStatus);
     }
 
-    @Override
     public TaskExecutionCommandEnum notifyTaskStart(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask) {
         getLogger().warn(".notifyTaskStart(): Entry, taskId->{}", taskId);
         if(taskId == null){
@@ -190,7 +224,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         petasosActionableTaskSharedInstance.getTaskFulfillment().setFulfillerWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor());
         petasosActionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
         petasosActionableTaskSharedInstance.setUpdateInstant(Instant.now());
-        petasosActionableTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
+        petasosActionableTaskSharedInstance.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
 
         petasosActionableTaskSharedInstance.update();
         //
@@ -204,7 +238,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         return (taskExecutionControl.getExecutionCommand());
     }
 
-    @Override
+
     public TaskExecutionCommandEnum notifyTaskFinish(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
         getLogger().warn(".notifyTaskFinish(): Entry, taskId->{}", taskId);
         if(taskId == null){
@@ -220,7 +254,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         }
         actionableTask.setTaskFulfillment(taskFulfillment);
         actionableTask.setUpdateInstant(Instant.now());
-        actionableTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FINISHED);
+        actionableTask.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FINISHED);
 
         //
         // Update Outcome Status
@@ -255,7 +289,6 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         return(executionControl.getExecutionCommand());
     }
 
-    @Override
     public TaskExecutionCommandEnum notifyTaskFailure(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
         getLogger().warn(".notifyTaskFailure(): Entry, taskId->{}", taskId);
         if(taskId == null){
@@ -275,7 +308,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         actionableTask.getTaskFulfillment().setFinishInstant(Instant.now());
         actionableTask.setTaskFulfillment(taskFulfillment);
         actionableTask.setUpdateInstant(Instant.now());
-        actionableTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FAILED);
+        actionableTask.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FAILED);
 
         //
         // Update Outcome Status
@@ -327,7 +360,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         return(executionControl.getExecutionCommand());
     }
 
-    @Override
+
     public TaskExecutionCommandEnum notifyTaskCancellation(TaskIdType taskId, PetasosFulfillmentTask fulfillmentTask){
         getLogger().warn(".notifyTaskCancellation(): Entry, taskId->{}", taskId);
         if(taskId == null){
@@ -344,7 +377,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
             actionableTask.getTaskFulfillment().setFulfillerWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor());
         }
         actionableTask.setUpdateInstant(Instant.now());
-        actionableTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
+        actionableTask.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
 
         //
         // Update Completion Status
@@ -394,7 +427,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         return(executionControl.getExecutionCommand());
     }
 
-    @Override
+
     public TaskExecutionCommandEnum notifyTaskWaiting(TaskIdType taskId) {
         getLogger().warn(".notifyTaskWaiting(): Entry, taskId->{}", taskId);
         if(taskId == null){
@@ -406,7 +439,7 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         //
         // Update Fulfillment Status
         actionableTask.setUpdateInstant(Instant.now());
-        actionableTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+        actionableTask.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
 
         //
         // Synchronise the Participant Cache
@@ -450,4 +483,11 @@ public class TaskDataGridProxy implements PetasosTaskActivityReportingInterface 
         return(LOG);
     }
 
+    public Long getTaskQueueRetryWaitTime() {
+        return taskQueueRetryWaitTime;
+    }
+
+    public int getTaskQueueRetryMaxAttempt() {
+        return taskQueueRetryMaxAttempt;
+    }
 }

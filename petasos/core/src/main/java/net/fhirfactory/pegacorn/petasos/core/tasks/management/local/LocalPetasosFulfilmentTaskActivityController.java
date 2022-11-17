@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.Instant;
 
 /**
  * @author Mark A. Hunter
@@ -80,10 +79,10 @@ public class LocalPetasosFulfilmentTaskActivityController {
             petasosTaskJobCard = task.getTaskJobCard();
         } else {
             petasosTaskJobCard = jobCardFactory.newPetasosTaskJobCard(task);
-            petasosTaskJobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
-            petasosTaskJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+            petasosTaskJobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
+            petasosTaskJobCard.setGrantedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
             petasosTaskJobCard.setExecutingFulfillmentTaskId(null);
-            petasosTaskJobCard.setLastRequestedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+            petasosTaskJobCard.setLastRequestedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
             petasosTaskJobCard.setExecutingFulfillmentTaskIdAssignmentInstant(null);
             task.setTaskJobCard(petasosTaskJobCard);
         }
@@ -109,76 +108,6 @@ public class LocalPetasosFulfilmentTaskActivityController {
         fulfillmentTaskDM.removeTask(taskId);
     }
 
-    //
-    // Requests
-    //
-
-    public PetasosTaskExecutionStatusEnum requestFulfillmentTaskExecutionPrivilege(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
-        getLogger().trace(".requestFulfillmentTaskExecutionPrivilege(): Entry, fulfillmentTask->{}", fulfillmentTask);
-        if(getLogger().isDebugEnabled()){
-            getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Entry, WUP Component Id->{}", fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
-        }
-        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus = taskExecutionController.requestTaskExecutionPrivilege(fulfillmentTask.getInstance());
-        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
-        fulfillmentTask.update();
-        getLogger().debug(".requestFulfillmentTaskExecutionPrivilege(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
-        return(petasosTaskExecutionStatus);
-    }
-
-    //
-    // Notifications
-    //
-
-    public PetasosTaskExecutionStatusEnum notifyFulfillmentTaskExecutionStart(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
-        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Entry, fulfillmentTask->{}", fulfillmentTask);
-        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionStart(fulfillmentTask.getInstance());
-        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
-        fulfillmentTask.update();
-        //
-        // Create an audit event
-        auditServicesBroker.logActivity(fulfillmentTask.getInstance());
-        getLogger().debug(".notifyFulfillmentTaskExecutionStart(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
-        return(petasosTaskExecutionStatus);
-    }
-
-    public PetasosTaskExecutionStatusEnum notifyFulfillmentTaskExecutionFinish(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
-        getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Entry, fulfillmentTask->{}", fulfillmentTask);
-        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionFinish(fulfillmentTask.getInstance());
-        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
-        //
-        // Create an audit event
-        auditServicesBroker.logActivity(fulfillmentTask.getInstance(), false);
-        getLogger().debug(".notifyFulfillmentTaskExecutionFinish(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
-        return(petasosTaskExecutionStatus);
-    }
-
-    public PetasosTaskExecutionStatusEnum notifyFulfillmentTaskExecutionFailure(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
-        getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Entry, fulfillmentTask->{}", fulfillmentTask);
-        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskExecutionFailure(fulfillmentTask.getInstance());
-        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
-        //
-        // Create an audit event
-        auditServicesBroker.logActivity(fulfillmentTask.getInstance(), false);
-        getLogger().debug(".notifyFulfillmentTaskExecutionFailure(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
-        return(petasosTaskExecutionStatus);
-    }
-
-    public PetasosTaskExecutionStatusEnum notifyFulfillmentTaskExecutionCancellation(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
-        getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Entry, fulfillmentTask->{}", fulfillmentTask);
-        PetasosTaskExecutionStatusEnum petasosTaskExecutionStatus= taskExecutionController.reportTaskCancellation(fulfillmentTask.getInstance());
-        fulfillmentTask.getTaskJobCard().setGrantedStatus(petasosTaskExecutionStatus);
-        //
-        // Create an audit event
-        auditServicesBroker.logActivity(fulfillmentTask.getInstance(), false);
-        getLogger().debug(".notifyFulfillmentTaskExecutionCancellation(): Exit, petasosTaskExecutionStatus->{}", petasosTaskExecutionStatus);
-        return(petasosTaskExecutionStatus);
-    }
-
-    public Instant notifyFulfillmentTaskExecutionNoActionRequired(PetasosFulfillmentTaskSharedInstance fulfillmentTask){
-
-        Instant updateInstant = Instant.now();
-        return(updateInstant);
-    }
 
     //
     // Getters and Setters

@@ -30,8 +30,10 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskCo
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskTriggerSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
+import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWProcessingOutcomeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
@@ -67,7 +69,7 @@ public class IngresActivityBeginRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(IngresActivityBeginRegistration.class);
 
     @Inject
-    TaskDataGridProxy actionableTaskActivityController;
+    TaskDataGridProxy taskDataGridProxy;
 
     @Inject
     LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
@@ -119,14 +121,14 @@ public class IngresActivityBeginRegistration {
         getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Finish");
 
         getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Start");
-        PetasosActionableTaskSharedInstance actionableTaskSharedInstance =  getActionableTaskActivityController().queueTask(petasosActionableTask);
+        PetasosActionableTaskSharedInstance actionableTaskSharedInstance =  getTaskDataGridProxy().registerExternallyTriggeredTask(wup.getParticipantName(), petasosActionableTask);
         // Add some more metrics
         metricsAgent.incrementRegisteredTasks();
         getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Finish");
 
         getLogger().trace(".registerActivityStart(): Create a PetasosFulfillmentTask for the (local) processing implementation activity: Start");
         PetasosFulfillmentTask fulfillmentTask = getFulfillmentTaskFactory().newFulfillmentTask(petasosActionableTask, wup);
-        fulfillmentTask.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_WAITING);
+        fulfillmentTask.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
         fulfillmentTask.setUpdateInstant(Instant.now());
         fulfillmentTask.getTaskFulfillment().setStartInstant(Instant.now());
         fulfillmentTask.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED);
@@ -136,39 +138,38 @@ public class IngresActivityBeginRegistration {
         PetasosFulfillmentTaskSharedInstance petasosFulfillmentTaskSharedInstance = getFulfilmentTaskActivityController().registerFulfillmentTask(fulfillmentTask, true);// by default, use synchronous audit writing
         getLogger().trace(".registerActivityStart(): Register PetasosFulfillmentTask for the (local) processing implementation activity: Finish");
 
-        getLogger().trace(".registerActivityStart(): Request Execution Privileges: Start");
-        PetasosTaskExecutionStatusEnum grantedExecutionStatus = getFulfilmentTaskActivityController().requestFulfillmentTaskExecutionPrivilege(petasosFulfillmentTaskSharedInstance);
-        getLogger().trace(".registerActivityStart(): Request Execution Privileges: Finish");
-
         getLogger().trace(".registerActivityStart(): Set processing to the grantedExecutionStatus: Start");
-        if(grantedExecutionStatus.equals(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING)){
-            petasosFulfillmentTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
+        if(actionableTaskSharedInstance.getTaskExecutionDetail().getExecutionCommand().equals(TaskExecutionCommandEnum.TASK_COMMAND_EXECUTE)){
+            petasosFulfillmentTaskSharedInstance.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_EXECUTING);
             petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStartInstant(Instant.now());
             petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
             petasosFulfillmentTaskSharedInstance.update();
-            getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(petasosFulfillmentTaskSharedInstance);
+            getTaskDataGridProxy().notifyTaskStart(petasosFulfillmentTaskSharedInstance.getActionableTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
 
             actionableTaskSharedInstance.getTaskFulfillment().setFulfillerWorkUnitProcessor(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfillerWorkUnitProcessor());
             actionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(petasosFulfillmentTaskSharedInstance.getTaskId()));
             getLogger().trace(".registerActivityStart(): Before Update: actionableTaskSharedInstance.getTaskFulfillment()->{}", actionableTaskSharedInstance.getTaskFulfillment());
             actionableTaskSharedInstance.update();
             getLogger().trace(".registerActivityStart(): After Update: actionableTaskSharedInstance.getTaskFulfillment()->{}", actionableTaskSharedInstance.getTaskFulfillment());
-            getActionableTaskActivityController().notifyTaskStart(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
+            getTaskDataGridProxy().notifyTaskStart(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
 
             // Add some more metrics
             metricsAgent.incrementStartedTasks();
         }  else {
-            petasosFulfillmentTaskSharedInstance.setExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_FAILED);
+            petasosFulfillmentTaskSharedInstance.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
             petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStartInstant(Instant.now());
             petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setFinishInstant(Instant.now());
-            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_FAILED);
+            petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_CANCELLED);
             petasosFulfillmentTaskSharedInstance.update();
-            getFulfilmentTaskActivityController().notifyFulfillmentTaskExecutionStart(petasosFulfillmentTaskSharedInstance);
 
             actionableTaskSharedInstance.getTaskFulfillment().setFulfillerWorkUnitProcessor(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfillerWorkUnitProcessor());
             actionableTaskSharedInstance.getTaskFulfillment().setTrackingID(new FulfillmentTrackingIdType(fulfillmentTask.getTaskId()));
+            actionableTaskSharedInstance.getTaskExecutionDetail().setCurrentExecutionStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_CANCELLED);
+            actionableTaskSharedInstance.getTaskExecutionDetail().setUpdateInstant(Instant.now());
+            actionableTaskSharedInstance.getTaskExecutionDetail().setTaskExecutionStatusReason("Told to Cancel");
             actionableTaskSharedInstance.update();
-            getActionableTaskActivityController().notifyTaskFailure(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
+            getTaskDataGridProxy().notifyTaskCancellation(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
+            theUoW.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_CANCELLED);
         }
         getLogger().trace(".registerActivityStart(): Update status to reflect local processing is proceeding: Finish");
         //
@@ -185,8 +186,8 @@ public class IngresActivityBeginRegistration {
     // Getters (and Setters)
     //
 
-    protected TaskDataGridProxy getActionableTaskActivityController() {
-        return actionableTaskActivityController;
+    protected TaskDataGridProxy getTaskDataGridProxy() {
+        return taskDataGridProxy;
     }
 
     protected LocalPetasosFulfilmentTaskActivityController getFulfilmentTaskActivityController() {

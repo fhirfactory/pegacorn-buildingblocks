@@ -28,7 +28,6 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.da
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.common.PetasosTaskSharedInstance;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,7 +156,7 @@ public class PetasosFulfillmentTaskSharedInstance extends PetasosTaskSharedInsta
                 ", taskJobCard=" + getTaskJobCard() +
                 ", aRetry=" + isaRetry() +
                 ", instance=" + getInstance() +
-                ", executionStatus=" + getExecutionStatus() +
+                ", executionStatus=" + getTaskExecutionDetail() +
                 ", sourceResourceId=" + getSourceResourceId() +
                 ", creationInstant=" + getCreationInstant() +
                 ", updateInstant=" + getUpdateInstant() +

@@ -53,7 +53,7 @@ public class TaskOutcomeCaptureBean {
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskActivityController;
 
     @Inject
-    private TaskDataGridProxy actionableTaskActivityController;
+    private TaskDataGridProxy taskDataGridProxy;
 
     @Inject
     private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceAccessorFactory;
@@ -92,16 +92,16 @@ public class TaskOutcomeCaptureBean {
             case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
             case FULFILLMENT_EXECUTION_STATUS_FAILED:
                 getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies failure...");
-                petasosTaskExecutionStatus = actionableTaskActivityController.notifyTaskFailure(actionableTaskId, fulfillmentTask.getInstance());
+                petasosTaskExecutionStatus = getTaskDataGridProxy().notifyTaskFailure(actionableTaskId, fulfillmentTask.getInstance());
                 break;
             case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
                 getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies cancellation...");
-                petasosTaskExecutionStatus = actionableTaskActivityController.notifyTaskCancellation(actionableTaskId, fulfillmentTask.getInstance());
+                petasosTaskExecutionStatus = getTaskDataGridProxy().notifyTaskCancellation(actionableTaskId, fulfillmentTask.getInstance());
                 break;
             case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
             case FULFILLMENT_EXECUTION_STATUS_FINISHED:
                 getLogger().debug(".captureAndRegisterOutcome(): fulfillmentTask.getTaskFulfillment().getStatus() Implies (good) finish...");
-                petasosTaskExecutionStatus = actionableTaskActivityController.notifyTaskFinish(actionableTaskId, fulfillmentTask.getInstance());
+                petasosTaskExecutionStatus = getTaskDataGridProxy().notifyTaskFinish(actionableTaskId, fulfillmentTask.getInstance());
                 break;
         }
 
@@ -149,8 +149,8 @@ public class TaskOutcomeCaptureBean {
         return(this.fulfilmentTaskActivityController);
     }
 
-    protected TaskDataGridProxy getActionableTaskActivityController(){
-        return(this.actionableTaskActivityController);
+    protected TaskDataGridProxy getTaskDataGridProxy(){
+        return(this.taskDataGridProxy);
     }
 
     protected PetasosActionableTaskSharedInstanceAccessorFactory getActionableTaskSharedInstanceFactory(){

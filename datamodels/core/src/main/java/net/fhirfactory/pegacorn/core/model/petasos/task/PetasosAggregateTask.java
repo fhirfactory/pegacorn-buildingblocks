@@ -22,13 +22,11 @@
 package net.fhirfactory.pegacorn.core.model.petasos.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reporting.datatypes.TaskReportingType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.AggregateTaskStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
-import net.fhirfactory.pegacorn.internals.SerializableObject;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -159,7 +157,7 @@ public class PetasosAggregateTask extends PetasosTask{
                 ", taskNodeAffinity=" + getTaskNodeAffinity() +
                 ", taskMetadata=" + getTaskContext() +
                 ", subTasks=" + getSubTasks() +
-                ", executionStatus=" + getExecutionStatus() +
+                ", executionStatus=" + getTaskExecutionDetail() +
                 '}';
     }
 }
