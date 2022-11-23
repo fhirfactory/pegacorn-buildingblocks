@@ -24,14 +24,13 @@ package net.fhirfactory.pegacorn.core.interfaces.pathway;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistrationSet;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusSet;
 
 import java.util.Set;
 
 public interface TaskPathwayManagementServiceInterface {
     public boolean isPetasosParticipantRegistered(PetasosParticipant publisher);
-
-    // Producer (Subscription) Maps
-    public Set<PetasosParticipant> getDownstreamTaskPerformersForTaskProducer(String producerServiceName);
 
     // Participant Registration/De-Registration
     public PetasosParticipantRegistration registerPetasosParticipant(PetasosParticipant participant);
@@ -39,12 +38,12 @@ public interface TaskPathwayManagementServiceInterface {
     public PetasosParticipantRegistration deregisterPetasosParticipant(PetasosParticipant participant);
 
     // Performer Maps
-    public PetasosParticipantRegistration getPetasosParticipantRegistration(ComponentIdType participantId);
-    public Set<PetasosParticipantRegistration> getParticipantRegistrationSetForParticipantName(String participantSeviceName);
+    public PetasosParticipantRegistration getPetasosParticipantRegistration(String participantName);
 
     // Macro
     public Set<PetasosParticipantRegistration> getAllRegistrations();
-
+    public PetasosParticipantRegistrationSet updateParticipantRegistrationSet(String participantName, PetasosParticipantRegistrationSet registrationSet);
+    public PetasosParticipantStatusSet updateParticipantStatusSet(String participantName, PetasosParticipantStatusSet statusSet);
     //
     public PetasosParticipant getMyPetasosParticipant();
 }

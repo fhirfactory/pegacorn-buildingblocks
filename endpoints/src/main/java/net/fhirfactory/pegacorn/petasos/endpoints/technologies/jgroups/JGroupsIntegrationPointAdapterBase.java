@@ -60,7 +60,7 @@ public abstract class JGroupsIntegrationPointAdapterBase extends JGroupsAdapterB
     // Abstract Methods
     //
 
-    protected abstract String specifyIPCInterfaceName();
+    protected abstract String specifyEndpointConfigurationName();
     protected abstract PetasosEndpointTopologyTypeEnum specifyIPCType();
 
     //

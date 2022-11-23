@@ -23,16 +23,19 @@ package net.fhirfactory.pegacorn.core.model.petasos.participant;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
 
 public class PetasosParticipantRegistration implements Serializable {
     private String registrationId;
     private PetasosParticipantRegistrationStatusEnum registrationStatus;
+    private HashSet<ComponentIdType> participantInstances;
     private PetasosParticipant participant;
     private String registrationCommentary;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
@@ -46,9 +49,12 @@ public class PetasosParticipantRegistration implements Serializable {
         this.participant = null;
         this.lock = new SerializableObject();
         this.registrationId = UUID.randomUUID().toString();
+        participantInstances = new HashSet<>();
     }
 
     public PetasosParticipantRegistration(PetasosParticipantRegistration ori){
+        participantInstances = new HashSet<>();
+
         if(ori.getRegistrationId() != null){
             setRegistrationId(ori.getRegistrationId());
         }
@@ -65,6 +71,9 @@ public class PetasosParticipantRegistration implements Serializable {
             setParticipant(ori.getParticipant());
         }
         this.lock = new SerializableObject();
+        if(!ori.getParticipantInstances().isEmpty()){
+            getParticipantInstances().addAll(ori.getParticipantInstances());
+        }
     }
 
     //
@@ -76,6 +85,14 @@ public class PetasosParticipantRegistration implements Serializable {
     // Getters and Setters
     //
 
+
+    public HashSet<ComponentIdType> getParticipantInstances() {
+        return participantInstances;
+    }
+
+    public void setParticipantInstances(HashSet<ComponentIdType> participantInstances) {
+        this.participantInstances = participantInstances;
+    }
 
     public String getRegistrationId() {
         return registrationId;

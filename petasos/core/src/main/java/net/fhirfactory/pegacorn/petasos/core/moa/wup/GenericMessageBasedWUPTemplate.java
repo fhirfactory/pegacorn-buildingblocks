@@ -23,9 +23,9 @@ package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.core.model.component.valuesets.SoftwareComponentStatusEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
@@ -34,6 +34,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.adapters.base.IPCAdapter;
@@ -46,13 +47,13 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
+import net.fhirfactory.pegacorn.petasos.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportAgentFactory;
-import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgentAccessor;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.tasks.PetasosTaskReportAgentFactory;
+import net.fhirfactory.pegacorn.petasos.oam.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -211,6 +212,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
             getLogger().info(".initialise(): [Set my component status!] Start");
             this.getMeAsATopologyComponent().setComponentStatus(SoftwareComponentStatusEnum.SOFTWARE_COMPONENT_OPERATIONAL);
+            this.getMeAsAPetasosParticipant().setParticipantStatus(PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_IDLE);
             getLogger().info(".initialise(): [Set my component status!] Finish");
 
             this.initialised = true;

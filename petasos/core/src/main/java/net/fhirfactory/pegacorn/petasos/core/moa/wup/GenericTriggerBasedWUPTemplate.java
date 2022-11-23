@@ -23,11 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.PetasosEndpointContainerInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.WorkshopInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.*;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
@@ -48,13 +44,9 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
+import net.fhirfactory.pegacorn.petasos.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.PetasosTaskReportAgentFactory;
-import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
-
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -91,7 +83,6 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     private PetasosEndpointContainerInterface ingresEndpoint;
     private String wupInstanceName;
     private WorkUnitProcessorMetricsAgent metricsAgent;
-    private WorkUnitProcessorTaskReportAgent taskReportAgent;
     private boolean initialised;
 
     @Inject
@@ -117,12 +108,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
 
     @Inject
     private ProcessingPlantRoleSupportInterface processingPlantCapabilityStatement;
-    
-    @Inject
-    private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgentAccessor;
 
-    @Inject
-    private PetasosTaskReportAgentFactory taskReportAgentFactory;
 
     //
     // Constructor(s)

@@ -33,8 +33,8 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTa
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
-import net.fhirfactory.pegacorn.petasos.oam.reporting.tasks.agents.WorkUnitProcessorTaskReportAgent;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.status.TaskDataGridProxy;
+import net.fhirfactory.pegacorn.petasos.oam.tasks.agents.WorkUnitProcessorTaskReportAgent;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;

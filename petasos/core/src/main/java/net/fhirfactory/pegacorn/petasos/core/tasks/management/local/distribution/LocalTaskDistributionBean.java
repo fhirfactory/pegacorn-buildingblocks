@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.distribution;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosEdgeMessageForwarderService;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
@@ -34,17 +33,16 @@ import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosTaskJobCardSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.outcomes.LocalTaskDistributionDecisionEngine;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.routing.LocalTaskDistributionDecisionEngine;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.participants.cache.LocalPetasosParticipantCacheDM;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
@@ -55,7 +53,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
@@ -85,9 +82,6 @@ public class LocalTaskDistributionBean {
     private LocalPetasosFulfilmentTaskActivityController fulfilmentTaskBroker;
 
     @Inject
-    private PetasosEdgeMessageForwarderService forwarderService;
-
-    @Inject
     private ProcessingPlantInterface myProcessingPlant;
 
     @Inject
@@ -102,8 +96,6 @@ public class LocalTaskDistributionBean {
     @Inject
     private PetasosTaskJobCardFactory taskJobCardFactory;
 
-    @Inject
-    private TaskDataGridProxy actionableTaskActivityController;
 
     @Inject
     private LocalPetasosParticipantCacheDM localPetasosParticipantCacheDM;
@@ -184,7 +176,7 @@ public class LocalTaskDistributionBean {
             return;
         }
         TaskPerformerTypeType targetComponent = actionableTask.getTaskPerformerTypes().get(0);
-        ComponentIdType targetComponentId = targetComponent.getKnownFulfillerInstance();
+        String targetComponentId = targetComponent.getRequiredParticipantName();
         PetasosParticipant targetParticipant = localPetasosParticipantCacheDM.getPetasosParticipant(targetComponentId);
         if(targetParticipant == null){
             getLogger().warn(".distributeNewActionableTasks(): No Target To Deliver Task To!!!");
@@ -230,11 +222,7 @@ public class LocalTaskDistributionBean {
         ComponentIdType actualSubscriberId = null;
         getLogger().trace(".forwardTask(): Assigning target component id, based on whether it is a remote component or local");
         if(isRemoteTarget){
-            getLogger().trace(".forwardTask(): It is a remote target, so routing via the local forwarder service");
-            actualSubscriberId = forwarderService.getComponentId();
-        } else {
-            getLogger().trace(".forwardTask(): It is a local target, so routing directly to target");
-            actualSubscriberId = subscriber.getComponentID();
+            getLogger().warn(".forwardTask(): It is a remote target, so routing locally is impossible... why did i get it?");
         }
         getLogger().trace(".forwardTask(): The (LocalSubscriber aspect) IdentifieFHIRCommunicationToUoWr->{}", actualSubscriberId);
         WorkUnitProcessorSoftwareComponent currentNodeElement = (WorkUnitProcessorSoftwareComponent)topologyProxy.getNode(actualSubscriberId);
@@ -247,7 +235,7 @@ public class LocalTaskDistributionBean {
         PetasosFulfillmentTask petasosFulfillmentTask = fulfillmentTaskFactory.newFulfillmentTask(actionableTask.getInstance(), currentNodeElement);
         getLogger().trace(".forwardTask(): Create actually PetasosFulfillmentTask: petasosFulfillmentTask->{}", petasosFulfillmentTask);
         getLogger().trace(".forwardTask(): Create actually PetasosFulfillmentTask: Finish");
-        petasosFulfillmentTask.getTaskWorkItem().getPayloadTopicID().setTargetProcessingPlantParticipantName(subscriber.getSubsystemParticipantName());
+        petasosFulfillmentTask.getTaskWorkItem().getPayloadTopicID().setDestinationParticipant(subscriber.getParticipantId());
         //
         // Register The FulfillmentTask
         getLogger().trace(".forwardTask(): Register PetasosFulfillmentTask: Start");
@@ -265,13 +253,6 @@ public class LocalTaskDistributionBean {
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
         metricsAgent.incrementInternalMessageDistributionCount();
         metricsAgent.touchLastActivityInstant();
-        StringBuilder distributionMessageBuilder = new StringBuilder();
-        distributionMessageBuilder.append("--- Distributing new PetasosFulfillmentTask ---");
-        distributionMessageBuilder.append(" ("+ getTimeFormatter().format(Instant.now())+ ") ---\n");
-        distributionMessageBuilder.append("TaskID (FulfillmentTask) --> " + petasosFulfillmentTask.getTaskId().getId() + "\n");
-        distributionMessageBuilder.append("TaskID (ActionableTask) --> " + petasosFulfillmentTask.getActionableTaskId().getId() + "\n");
-        distributionMessageBuilder.append("Target --> " + subscriber.getParticipantName() + "\n");
-        metricsAgent.sendITOpsNotification(distributionMessageBuilder.toString());
         //
         // Forward the Task
         if(getLogger().isDebugEnabled())

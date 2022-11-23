@@ -24,11 +24,11 @@ package net.fhirfactory.pegacorn.processingplant;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 import net.fhirfactory.pegacorn.core.interfaces.auditing.PetasosAuditEventGranularityLevelInterface;
-import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
+import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.interfaces.capabilities.CapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.core.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
@@ -43,8 +43,10 @@ import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditE
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopSoftwareComponent;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
@@ -52,15 +54,16 @@ import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.com
 import net.fhirfactory.pegacorn.deployment.topology.factories.archetypes.interfaces.SolutionNodeFactoryInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons.GlobalPetasosTaskContinuityWatchdog;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons.GlobalPetasosTaskRecoveryWatchdog;
+import net.fhirfactory.pegacorn.petasos.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgentAccessor;
 import net.fhirfactory.pegacorn.util.PegacornEnvironmentProperties;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 
@@ -72,6 +75,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants.OUTBOUND_CHECKPOINT_WUP_NAME;
 
 public abstract class ProcessingPlant extends RouteBuilder implements ProcessingPlantRoleSupportInterface, ProcessingPlantInterface, PetasosAuditEventGranularityLevelInterface, CapabilityFulfillmentInterface {
 
@@ -240,7 +245,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
                 PetasosParticipantRegistration petasosParticipantRegistration = localParticipantManager.registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), new HashSet<>());
                 getParticipantHolder().setMyProcessingPlantPetasosParticipant(petasosParticipantRegistration.getParticipant());
             }
-            if(localParticipantManager.getLocalParticipantRegistration(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getComponentID()) == null){
+            if(localParticipantManager.getLocalParticipantRegistration(getParticipantHolder().getMyProcessingPlantPetasosParticipant().getParticipantName()) == null){
                 PetasosParticipantRegistration petasosParticipantRegistration = localParticipantManager.registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), new HashSet<>());
                 if(petasosParticipantRegistration == null){
                     getLogger().error("ProcessingPlant::initialise(): [Check for My PetasosPartcipant] Cannot add my participant to local participant cache!");
@@ -479,9 +484,14 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     // Remote Subscription Functions
     //
 
-    protected PetasosParticipantRegistration subscribeToRemoteDataParcels(List<DataParcelTypeDescriptor> triggerEventList, String sourceSystem){
-        getLogger().info(".subscribeToRemoteDataParcels(): Entry, sourceSystem->{}", sourceSystem);
+    protected PetasosParticipantRegistration subscribeToRemoteDataParcels(List<DataParcelTypeDescriptor> triggerEventList, String sourceSubsystemParticipantName){
+        getLogger().info(".subscribeToRemoteDataParcels(): Entry, sourceSubsystemParticipantName->{}", sourceSubsystemParticipantName);
         if(triggerEventList.isEmpty()){
+            getLogger().warn(".subscribeToRemoteDataParcels(): Exit, not subscribing to any remote content (subscriptionList is empty)");
+            return(null);
+        }
+        if(StringUtils.isEmpty(sourceSubsystemParticipantName)){
+            getLogger().warn(".subscribeToRemoteDataParcels(): Exit, not subscribing to any remote content (sourceParticipantName is empty)");
             return(null);
         }
         getLogger().trace(".subscribeToRemoteDataParcels(): We have entries in the subscription list, processing");
@@ -496,8 +506,14 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
             manifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
             manifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_CORE_DISTRIBUTION);
             manifest.setInterSubsystemDistributable(true);
-            manifest.setSourceSystem(sourceSystem);
-            manifest.setSourceProcessingPlantParticipantName(sourceSystem);
+            manifest.setSourceSystem(sourceSubsystemParticipantName);
+            String workshopName = DefaultWorkshopSetEnum.POLICY_ENFORCEMENT_WORKSHOP.getWorkshop();
+            String participantName = OUTBOUND_CHECKPOINT_WUP_NAME;
+            PetasosParticipantId previousParticipantId = new PetasosParticipantId(sourceSubsystemParticipantName, workshopName, participantName);
+            manifest.setPreviousParticipant(previousParticipantId);
+            PetasosParticipantId originParticipantId = new PetasosParticipantId();
+            originParticipantId.setSubsystemName(sourceSubsystemParticipantName);
+            manifest.setOriginParticipant(originParticipantId);
             manifestList.add(manifest);
         }
         getLogger().info(".subscribeToRemoteDataParcels(): Registration Processing Plant Petasos Participant ... :)");

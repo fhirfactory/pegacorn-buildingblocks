@@ -25,10 +25,11 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupp
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.valuesets.PetasosMonitoredComponentTypeEnum;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.PetasosLocalMetricsDM;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.EndpointMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.WorkUnitProcessorMetricsAgent;
+
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

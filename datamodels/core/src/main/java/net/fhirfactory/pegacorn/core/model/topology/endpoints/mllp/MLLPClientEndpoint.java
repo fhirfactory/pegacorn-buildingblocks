@@ -51,19 +51,15 @@ public class MLLPClientEndpoint extends StandardInteractClientTopologyEndpointPo
 
     @JsonIgnore
     public List<MLLPClientAdapter> getMLLPClientAdapters() {
-        List<MLLPClientAdapter> mllpAdapterList = new ArrayList<>();
-        for(IPCAdapter currentInterface: getAdapterList()){
-            MLLPClientAdapter currentClientAdapter = (MLLPClientAdapter)currentInterface;
-            mllpAdapterList.add(currentClientAdapter);
-        }
-        return mllpAdapterList;
-    }
-
-    @JsonIgnore
-    public void setMLLPClientAdapters(List<MLLPClientAdapter> targetMLLPClientAdapters) {
-        if(targetMLLPClientAdapters != null) {
-            this.getAdapterList().clear();
-            this.getAdapterList().addAll(targetMLLPClientAdapters);
+        if(getTargetSystem() != null) {
+            List<MLLPClientAdapter> mllpAdapterList = new ArrayList<>();
+            for (IPCAdapter currentInterface : getTargetSystem().getTargetPorts()) {
+                MLLPClientAdapter currentClientAdapter = (MLLPClientAdapter) currentInterface;
+                mllpAdapterList.add(currentClientAdapter);
+            }
+            return mllpAdapterList;
+        } else {
+            return(new ArrayList<>());
         }
     }
 
@@ -133,32 +129,46 @@ public class MLLPClientEndpoint extends StandardInteractClientTopologyEndpointPo
     // To String
     //
 
+
     @Override
     public String toString() {
-        return "InteractMLLPClientEndpoint{" +
-                "componentFDN=" + getComponentFDN() +
-                ", kubernetesDeployed=" + isKubernetesDeployed() +
-                ", otherConfigurationParameters=" + getOtherConfigurationParameters() +
-                ", concurrencyMode=" + getConcurrencyMode() +
-                ", resilienceMode=" + getResilienceMode() +
-                ", securityZone=" + getSecurityZone() +
-                ", componentID=" + getComponentID() +
-                ", nodeFunctionFDN=" + getNodeFunctionFDN() +
-                ", componentType=" + getComponentType() +
-                ", containingNodeFDN=" + getContainingNodeFDN() +
-                ", componentRDN=" + getComponentRDN() +
-                ", metrics=" + getMetrics() +
-                ", componentSystemRole=" + getComponentSystemRole() +
-                ", server=" + isServer() +
-                ", implementingWUP=" + getImplementingWUP() +
-                ", connectedSystemName='" + getConnectedSystemName() + '\'' +
-                ", endpointType=" + getEndpointType() +
-                ", adapterList=" + getAdapterList() +
-                ", targetSystem=" + getTargetSystem() +
-                ", targetMLLPPorts=" + getMLLPClientAdapters() +
-                ", targetSystemName='" + getTargetSystemName() + '\'' +
-                ", targetConnectionDescription='" + getTargetConnectionDescription() + '\'' +
-                ", detailedConnectionDescription='" + getDetailedConnectionDescription() + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("MLLPClientEndpoint{");
+        sb.append("MLLPClientAdapters=").append(getMLLPClientAdapters());
+        sb.append(", targetSystemName='").append(getTargetSystemName()).append('\'');
+        sb.append(", targetConnectionDescription='").append(getTargetConnectionDescription()).append('\'');
+        sb.append(", detailedConnectionDescription='").append(getDetailedConnectionDescription()).append('\'');
+        sb.append(", targetSystem=").append(getTargetSystem());
+        sb.append(", endpointConfigurationName='").append(getEndpointConfigurationName()).append('\'');
+        sb.append(", server=").append(isServer());
+        sb.append(", implementingWUP=").append(getImplementingWUP());
+        sb.append(", connectedSystemName='").append(getConnectedSystemName()).append('\'');
+        sb.append(", adapterList=").append(getAdapterList());
+        sb.append(", endpointType=").append(getEndpointType());
+        sb.append(", enablingProcessingPlantId=").append(getEnablingProcessingPlantId());
+        sb.append(", interfaceFunction=").append(getInterfaceFunction());
+        sb.append(", endpointStatus=").append(getEndpointStatus());
+        sb.append(", endpointDescription='").append(getEndpointDescription()).append('\'');
+        sb.append(", participantDisplayName='").append(getParticipantDisplayName()).append('\'');
+        sb.append(", participantName='").append(getParticipantName()).append('\'');
+        sb.append(", deploymentSite='").append(getDeploymentSite()).append('\'');
+        sb.append(", lastActivityInstant=").append(getLastActivityInstant());
+        sb.append(", lastReportingInstant=").append(getLastReportingInstant());
+        sb.append(", subsystemParticipantName='").append(getSubsystemParticipantName()).append('\'');
+        sb.append(", componentFDN=").append(getComponentFDN());
+        sb.append(", kubernetesDeployed=").append(isKubernetesDeployed());
+        sb.append(", otherConfigurationParameters=").append(getOtherConfigurationParameters());
+        sb.append(", concurrencyMode=").append(getConcurrencyMode());
+        sb.append(", resilienceMode=").append(getResilienceMode());
+        sb.append(", securityZone=").append(getSecurityZone());
+        sb.append(", componentID=").append(getComponentID());
+        sb.append(", nodeFunctionFDN=").append(getNodeFunctionFDN());
+        sb.append(", containingNodeFDN=").append(getContainingNodeFDN());
+        sb.append(", componentRDN=").append(getComponentRDN());
+        sb.append(", metrics=").append(getMetrics());
+        sb.append(", componentSystemRole=").append(getComponentSystemRole());
+        sb.append(", componentStatus=").append(getComponentStatus());
+        sb.append(", componentExecutionControl=").append(getComponentExecutionControl());
+        sb.append('}');
+        return sb.toString();
     }
 }

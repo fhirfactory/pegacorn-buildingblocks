@@ -25,22 +25,19 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.oam.notifications.PetasosITOpsNotificationAgentInterface;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.notifications.ITOpsNotificationContent;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.PetasosFulfillmentTaskAuditServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstance;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.status.TaskDataGridProxy;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgentAccessor;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.WorkUnitProcessorMetricsAgent;
 import net.fhirfactory.pegacorn.petasos.oam.notifications.PetasosITOpsNotificationContentFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.seda.SedaEndpoint;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,46 +154,6 @@ public class WUPContainerIngresProcessor {
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
         metricsAgent.incrementRegisteredTasks();
         metricsAgent.touchLastActivityInstant();
-
-        //
-        // Add some notifications
-        ITOpsNotificationContent notificationContent = new ITOpsNotificationContent();
-        if (fulfillmentTask.hasTaskWorkItem()) {
-            if (fulfillmentTask.getTaskWorkItem().hasIngresContent()) {
-                UoWPayload payload = fulfillmentTask.getTaskWorkItem().getIngresContent();
-
-                StringBuilder unformattedMessageBuilder = new StringBuilder();
-                unformattedMessageBuilder.append("--- Received Task (PetasosFulfillmentTask): Ingres Queue Size: " + currentQueueSize + " ---");
-                unformattedMessageBuilder.append(" (" + getTimeFormatter().format(Instant.now()) + ") ---\n");
-                unformattedMessageBuilder.append("Task ID (FulfillmentTask) --> " + fulfillmentTask.getTaskId().getId() + "\n");
-                unformattedMessageBuilder.append("Task ID (ActionableTask) --> " + fulfillmentTask.getActionableTaskId().getId() + "\n");
-                unformattedMessageBuilder.append(notificationContentFactory.newNotificationContentFromUoWPayload(payload));
-                notificationContent.setContent(unformattedMessageBuilder.toString());
-
-                StringBuilder formattedMessageBuilder = new StringBuilder();
-                formattedMessageBuilder.append("<table>");
-                formattedMessageBuilder.append("<tr>");
-                formattedMessageBuilder.append("<th>Ingres Task</th><th>" + getTimeFormatter().format(Instant.now()) + ", QueueSize:" + currentQueueSize + "</th>");
-                formattedMessageBuilder.append("</tr>");
-                formattedMessageBuilder.append("<tr>");
-                formattedMessageBuilder.append("<td>FulfillmentTaskId</td><td>" + fulfillmentTask.getTaskId().getId() + "</td>");
-                formattedMessageBuilder.append("</tr>");
-                formattedMessageBuilder.append("<tr>");
-                formattedMessageBuilder.append("<td>ActionableTask</td><td>" + fulfillmentTask.getActionableTaskId().getId() + "</td>");
-                formattedMessageBuilder.append("</tr>");
-                formattedMessageBuilder.append("<tr>");
-                formattedMessageBuilder.append("<td>Payload</td>" + notificationContentFactory.payloadTypeFromUoW(payload) + "</td>");
-                formattedMessageBuilder.append("</tr>");
-                formattedMessageBuilder.append("</table>");
-                notificationContent.setFormattedContent(formattedMessageBuilder.toString());
-            }
-        }
-        if (StringUtils.isEmpty(notificationContent.getContent())) {
-            notificationContent.setContent("Task Received (Metadata) \n" +
-                    "Task Id (FulfillmentTask)--> " + fulfillmentTask.getTaskId().getId() + "\n" +
-                    "Task Id (ActionableTask)--> " + fulfillmentTask.getActionableTaskId().getId());
-        }
-        metricsAgent.sendITOpsNotification(notificationContent.getContent(), notificationContent.getFormattedContent());
 
         //
         // Write an AuditEvent

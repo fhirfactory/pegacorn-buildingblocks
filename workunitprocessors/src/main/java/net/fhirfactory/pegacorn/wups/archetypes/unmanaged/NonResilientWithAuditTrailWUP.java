@@ -45,8 +45,8 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornI
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosTaskJobCardFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.status.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.workshops.base.Workshop;
 import net.fhirfactory.pegacorn.wups.archetypes.unmanaged.audit.TransactionalWUPAuditEntryManager;
 import org.apache.camel.builder.RouteBuilder;

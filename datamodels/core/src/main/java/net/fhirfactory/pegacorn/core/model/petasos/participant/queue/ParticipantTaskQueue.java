@@ -303,14 +303,21 @@ public class ParticipantTaskQueue {
     private String queueToString(){
         StringBuilder sb = new StringBuilder();
         ParticipantTaskQueueEntry currentEntry = queueHead;
+        int counter = 0;
         if(currentEntry == null){
             sb.append("queueHead=null");
             return(sb.toString());
         }
         sb.append("queueHead=").append(currentEntry);
         currentEntry = queueHead.getNextNode();
-        while(currentEntry != null){
+        while(currentEntry != null && counter < 100){
             sb.append(", ").append(currentEntry);
+            ParticipantTaskQueueEntry nextEntry = currentEntry.getNextNode();
+            currentEntry = nextEntry;
+            counter++;
+        }
+        if(currentEntry != null){
+            sb.append(", ....");
         }
         return(sb.toString());
     }

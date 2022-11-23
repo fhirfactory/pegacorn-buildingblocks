@@ -37,14 +37,6 @@ public abstract class PegacornCommonInterfaceNamesBase {
     public String getKubeReadinessEndpointName(){return("KubernetesSystemReadiness");}
     public String getKubeLivelinessEndpointName(){return("KubernetesSystemLiveliness");}
 
-    public String getPetasosIPCMessagingEndpointName(){return("petasos-ipc");}
-    public String getPetasosTopologyServicesEndpointName(){return("petasos-top");}
-    public String getPetasosSubscriptionsEndpointName(){return("petasos-sub");}
-    public String getPetasosTaskServicesEndpointName(){return("petasos-task");}
-    public String getPetasosAuditServicesEndpointName(){return("petasos-audit");}
-    public String getPetasosInterceptionEndpointName(){return("petasos-snoop");}
-    public String getPetasosMetricsEndpointName(){return("petasos-metric");}
-    public String getMultiZoneInfinispaEndpointName(){return("multi-infini");}
     public String getEdgeAnswerEndpointName(){return("edge-answer");}
     public String getEdgeAskEndpointName(){return("edge-ask");}
     //

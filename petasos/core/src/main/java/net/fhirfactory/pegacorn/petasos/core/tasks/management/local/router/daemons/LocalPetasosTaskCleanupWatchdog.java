@@ -32,7 +32,7 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalF
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.shared.ParticipantSharedTaskJobCardCache;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.daemon.DaemonBase;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgentAccessor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class LocalPetasosTaskCleanupWatchdog extends DaemonBase implements Petas
 
     private Long TASK_CLEANUP_CHECK_INITIAL_DELAY = 60000L; // milliseconds
     private Long TASK_CLEANUP_CHECK_PERIOD = 15000L; // milliseconds
-    private Long MINIMUM_TASK_AGE_FOR_RETIREMENT = 45L; // Seconds
+    private Long MINIMUM_TASK_AGE_FOR_RETIREMENT = 600L; // Seconds
 
     private Instant actionableTaskCheckInstant;
     private Instant taskJobCardCheckInstant;
@@ -90,7 +90,7 @@ public class LocalPetasosTaskCleanupWatchdog extends DaemonBase implements Petas
     }
 
     //
-    // Post Constrct
+    // Post Construct
     //
 
     @PostConstruct

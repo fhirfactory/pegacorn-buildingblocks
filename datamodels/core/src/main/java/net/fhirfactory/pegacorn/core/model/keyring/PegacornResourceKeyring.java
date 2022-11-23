@@ -123,7 +123,7 @@ public class PegacornResourceKeyring implements Serializable {
     @JsonIgnore
     public void setResourceId(IdType id){
         String mapEntryKey = getDefaultSourceSystemMapEntry();
-        getSourceSystemKeyMap().replace(mapEntryKey, id );
+        getSourceSystemKeyMap().put(mapEntryKey, id );
     }
 
     @JsonIgnore

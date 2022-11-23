@@ -216,14 +216,6 @@
 
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-petasos-core</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-buildingblocks-petasos-audit</artifactId>
             <version>${project.version}</version>
             <type>jar</type>

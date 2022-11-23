@@ -23,16 +23,15 @@ package net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantStatusEnum;
-import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
 import net.fhirfactory.pegacorn.deployment.properties.reference.petasos.PetasosDefaultProperties;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
-import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.*;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstance;
+import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosActionableTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.daemon.DaemonBase;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.status.TaskDataGridProxy;
+import net.fhirfactory.pegacorn.petasos.participants.manager.LocalParticipantManager;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgentAccessor;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -60,13 +59,10 @@ public class LocalTaskRouter extends DaemonBase {
     private static final Integer MAX_ITERATIONS_FOR_ROUTER_DAEMON_RUN = 5;
 
     @Inject
-    private PetasosActionableTaskSharedInstanceAccessorFactory actionableTaskSharedInstanceAccessorFactory;
+    private PetasosActionableTaskSharedInstanceAccessorFactory taskInstanceFactory;
 
     @Inject
-    private PetasosFulfillmentTaskSharedInstanceAccessorFactory fulfillmentTaskSharedInstanceAccessorFactory;
-
-    @Inject
-    private PetasosTaskJobCardSharedInstanceAccessorFactory taskJobCardSharedInstanceAccessorFactory;
+    private ProcessingPlantMetricsAgentAccessor processingPlantMetricsAgentAccessor;
 
     @Inject
     private ProcessingPlantInterface processingPlant;
@@ -99,7 +95,19 @@ public class LocalTaskRouter extends DaemonBase {
 
     @PostConstruct
     public void initialise(){
+        getLogger().debug(".initialise(): Entry");
+        if(isInitialised()){
+            getLogger().debug(".initialise(): Exit, already initialised, nothing to do!");
+            return;
+        }
+        getLogger().info(".initialise(): Start...");
 
+        getLogger().info(".initialise(): [Start Router Daemon] Start");
+        scheduleLocalTaskRouterDaemon();
+        getLogger().info(".initialise(): [Start Router Daemon] Finish");
+
+        setInitialised(true);
+        getLogger().info(".initialise(): Start...");
     }
 
     //
@@ -119,7 +127,7 @@ public class LocalTaskRouter extends DaemonBase {
                 getLogger().debug(".localTaskRouterDaemonTimerTask(): Exit");
             }
         };
-        Timer timer = new Timer("actionableTaskCleanupActivityTimer");
+        Timer timer = new Timer("TaskRouterDaemonScheduledActivity");
         timer.schedule(localTaskRouterDaemonTimerTask, LOCAL_TASK_ROUTER_DAEMON_STARTUP_DELAY, LOCAL_TASK_ROUTER_DAEMON_CHECK_PERIOD);
         getLogger().debug(".scheduleLocalTaskRouterDaemon(): Exit");
     }
@@ -132,25 +140,28 @@ public class LocalTaskRouter extends DaemonBase {
             boolean hadTasks = true;
             int iterationCount = 0;
             Set<PetasosParticipant> localParticipantSet = getLocalParticipantManager().getLocalParticipantSet();
+            getLogger().debug(".localTaskRouterDaemon(): localParticipantSet.size()->{}", localParticipantSet.size());
             while(hadTasks && iterationCount < MAX_ITERATIONS_FOR_ROUTER_DAEMON_RUN) {
                 for (PetasosParticipant localParticipant : localParticipantSet) {
+                    getLogger().debug(".localTaskRouterDaemon(): processing localParticipant->{}", localParticipant.getParticipantName());
                     if (localParticipant.getParticipantStatus().equals(PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_IDLE)) {
+                        getLogger().debug(".localTaskRouterDaemon(): participant {} is idle", localParticipant);
                         PetasosActionableTaskSharedInstance participantTask = getTaskDataGridProxy().loadNextTask(localParticipant.getParticipantName());
+                        getLogger().debug(".localTaskRouterDaemon(): participantTask->{}", participantTask);
                         if (participantTask != null) {
                             hadTasks = true;
+                            getLogger().warn(".localTaskRouterDaemon(): Got Task, forwarding it into WUP");
                             getCamelProducerService().sendBody(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE, ExchangePattern.InOnly, participantTask);
                         }
                     }
                 }
                 iterationCount += 1;
             }
-
-
         } catch(Exception ex){
             getLogger().warn(".localTaskRouterDaemon(): An Issue with the Local Task Router -> ", ex);
         }
         setTaskRouterDaemonRunning(false);
-        getLogger().debug(".localTaskRouterDaemon(): Exit");
+        getLogger().warn(".localTaskRouterDaemon(): Exit");
     }
 
     //
