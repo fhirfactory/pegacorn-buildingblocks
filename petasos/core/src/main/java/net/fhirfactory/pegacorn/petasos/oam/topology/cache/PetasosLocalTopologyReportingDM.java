@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.oam.topology.cache;
 
 import net.fhirfactory.pegacorn.core.model.petasos.oam.topology.reporting.PetasosMonitoredTopologyGraph;
-import net.fhirfactory.pegacorn.petasos.oam.common.LocalOAMCacheBase;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.common.LocalOAMCacheBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.oam.metrics.cache;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.WorkUnitProcessorMetricsData;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.metrics.component.common.CommonComponentMetricsData;
-import net.fhirfactory.pegacorn.petasos.oam.common.LocalOAMCacheBase;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.common.LocalOAMCacheBase;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

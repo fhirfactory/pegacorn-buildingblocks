@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import org.slf4j.Logger;
@@ -45,6 +46,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant utilisationUpdateInstant;
     private PetasosParticipantFulfillment fulfillmentState;
+    private PetasosParticipantControlStatusEnum participantControlStatus;
 
     //
     // Constructor(s)
@@ -57,12 +59,14 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
         this.fulfillmentState = null;
+        this.participantControlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_ENABLED;
     }
 
     public PetasosParticipant(PetasosParticipant ori){
         super(ori);
 
         this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
+        this.participantControlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_ENABLED;
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
         this.publishedWorkItemManifests = new HashSet<>();
@@ -82,11 +86,15 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
         if(ori.hasFulfillmentState()){
             this.setFulfillmentState(ori.getFulfillmentState());
         }
+        if(ori.hasParticipantControlStatus()){
+            this.setParticipantControlStatus(ori.participantControlStatus);
+        }
     }
 
     public PetasosParticipant(String participantName, SoftwareComponent ori){
         super(ori);
         this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;
+        this.participantControlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_ENABLED;
         this.setParticipantName(participantName);
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
@@ -95,6 +103,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
 
     public PetasosParticipant(SoftwareComponent ori){
         super(ori);
+        this.participantControlStatus = PetasosParticipantControlStatusEnum.PARTICIPANT_IS_ENABLED;
         this.participantStatus = PetasosParticipantStatusEnum.PETASOS_PARTICIPANT_STARTING;;
         this.utilisationUpdateInstant = null;
         this.subscriptions = new HashSet<>();
@@ -104,6 +113,30 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
     //
     // Getters (and Setters)
     //
+
+    @JsonIgnore
+    public PetasosParticipantId getParticipantId(){
+        PetasosParticipantId participantId = new PetasosParticipantId();
+        participantId.setName(getParticipantName());
+        participantId.setSubsystemName(getSubsystemParticipantName());
+        participantId.setFullName(getParticipantName());
+        participantId.setDisplayName(getParticipantDisplayName());
+        return(participantId);
+    }
+
+    @JsonIgnore
+    public boolean hasParticipantControlStatus(){
+        boolean hasValue = this.participantControlStatus != null;
+        return(hasValue);
+    }
+
+    public PetasosParticipantControlStatusEnum getParticipantControlStatus() {
+        return participantControlStatus;
+    }
+
+    public void setParticipantControlStatus(PetasosParticipantControlStatusEnum participantControlStatus) {
+        this.participantControlStatus = participantControlStatus;
+    }
 
     public boolean hasFulfillmentState(){
         boolean hasValue = this.fulfillmentState != null;
@@ -197,6 +230,7 @@ public class PetasosParticipant extends SoftwareComponent implements Serializabl
                 ", publishedWorkItemManifests=" + publishedWorkItemManifests +
                 ", utilisationUpdateInstant=" + utilisationUpdateInstant +
                 ", fulfillmentState=" + fulfillmentState +
+                ", participantControlStatus=" + participantControlStatus +
                 '}';
     }
 

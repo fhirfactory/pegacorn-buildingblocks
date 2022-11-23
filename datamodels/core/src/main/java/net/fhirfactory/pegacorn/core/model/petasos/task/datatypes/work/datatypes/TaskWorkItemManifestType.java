@@ -64,7 +64,7 @@ public class TaskWorkItemManifestType extends DataParcelManifest {
                 ", dataParcelType=" + getDataParcelType() +
                 ", enforcementPointApprovalStatus=" + getEnforcementPointApprovalStatus() +
                 ", dataParcelFlowDirection=" + getDataParcelFlowDirection() +
-                ", taskProducerProcessingPlantParticipantName=" + getSourceProcessingPlantParticipantName() +
+                ", taskProducerProcessingPlantParticipantName=" + getOriginParticipant() +
                 '}';
     }
 

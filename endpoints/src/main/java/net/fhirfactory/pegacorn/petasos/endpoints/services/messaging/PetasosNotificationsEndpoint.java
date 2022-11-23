@@ -91,11 +91,6 @@ public class PetasosNotificationsEndpoint extends JGroupsIntegrationPointBase {
     //
 
     @Override
-    protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getPetasosIPCMessagingEndpointName());
-    }
-
-    @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
         return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }

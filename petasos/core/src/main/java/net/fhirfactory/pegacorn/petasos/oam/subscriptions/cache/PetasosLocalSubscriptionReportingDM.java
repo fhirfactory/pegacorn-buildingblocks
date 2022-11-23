@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosProcessingPlantSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosSubscriptionSummaryReport;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosWorkUnitProcessorSubscriptionSummary;
-import net.fhirfactory.pegacorn.petasos.oam.common.LocalOAMCacheBase;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.cache.common.LocalOAMCacheBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

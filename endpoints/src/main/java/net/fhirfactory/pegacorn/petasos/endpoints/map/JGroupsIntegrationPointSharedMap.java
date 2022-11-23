@@ -22,12 +22,11 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.map;
 
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointConnectionTypeCodeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.factories.EndpointPayloadTypeFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
-import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
-import net.fhirfactory.pegacorn.workshops.EdgeWorkshop;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +34,8 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,8 +66,6 @@ public class JGroupsIntegrationPointSharedMap {
     @Inject
     private JGroupsIntegrationPointNamingUtilities integrationPointNamingUtilities;
 
-    @Inject
-    private EdgeWorkshop edgeWorkshop;
 
     //
     // Constructor(s)

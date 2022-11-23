@@ -21,7 +21,9 @@
  */
 package net.fhirfactory.pegacorn.core.model.dataparcel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.*;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -42,8 +44,9 @@ public class DataParcelManifest implements Serializable {
     private PolicyEnforcementPointApprovalStatusEnum enforcementPointApprovalStatus;
     private boolean interSubsystemDistributable;
     private DataParcelDirectionEnum dataParcelFlowDirection;
-    private String sourceProcessingPlantParticipantName;
-    private String targetProcessingPlantParticipantName;
+    private PetasosParticipantId previousParticipant;
+    private PetasosParticipantId originParticipant;
+    private PetasosParticipantId destinationParticipant;
 
     public DataParcelManifest(){
         this.contentDescriptor = null;
@@ -52,8 +55,9 @@ public class DataParcelManifest implements Serializable {
         this.intendedTargetSystem = null;
         this.interSubsystemDistributable = false;
         this.dataParcelFlowDirection = null;
-        this.sourceProcessingPlantParticipantName = null;
-        this.targetProcessingPlantParticipantName = null;
+        this.originParticipant = null;
+        this.destinationParticipant = null;
+        this.previousParticipant = null;
         this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
@@ -67,8 +71,9 @@ public class DataParcelManifest implements Serializable {
         this.intendedTargetSystem = null;
         this.interSubsystemDistributable = false;
         this.dataParcelFlowDirection = null;
-        this.sourceProcessingPlantParticipantName = null;
-        this.targetProcessingPlantParticipantName = null;
+        this.originParticipant = null;
+        this.destinationParticipant = null;
+        this.previousParticipant = null;
         this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
@@ -76,15 +81,15 @@ public class DataParcelManifest implements Serializable {
     }
 
     public DataParcelManifest(DataParcelManifest ori){
-        if(ori.hasTargetProcessingPlantParticipantName()){
-            this.setTargetProcessingPlantParticipantName(ori.getTargetProcessingPlantParticipantName());
+        if(ori.hasDestinationParticipant()){
+            this.setDestinationParticipant(ori.getDestinationParticipant());
         } else {
-            this.setTargetProcessingPlantParticipantName(null);
+            this.setDestinationParticipant(null);
         }
-        if(ori.hasSourceProcessingPlantParticipantName()){
-            this.setSourceProcessingPlantParticipantName(ori.getSourceProcessingPlantParticipantName());
+        if(ori.hasOriginParticipant()){
+            this.setOriginParticipant(ori.getOriginParticipant());
         } else {
-            this.setSourceProcessingPlantParticipantName(null);
+            this.setOriginParticipant(null);
         }
         if(ori.hasContainerDescriptor()) {
             this.containerDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContainerDescriptor());
@@ -138,30 +143,44 @@ public class DataParcelManifest implements Serializable {
     // Getters and Setters (and Has's)
     //
 
-    public boolean hasTargetProcessingPlantParticipantName(){
-        boolean hasValue = this.targetProcessingPlantParticipantName != null;
+    @JsonIgnore
+    public boolean hasPreviousParticipant(){
+        boolean hasValue = this.previousParticipant != null;
         return(hasValue);
     }
 
-    public String getTargetProcessingPlantParticipantName() {
-        return targetProcessingPlantParticipantName;
+    public PetasosParticipantId getPreviousParticipant() {
+        return previousParticipant;
     }
 
-    public void setTargetProcessingPlantParticipantName(String targetProcessingPlantParticipantName) {
-        this.targetProcessingPlantParticipantName = targetProcessingPlantParticipantName;
+    public void setPreviousParticipant(PetasosParticipantId previousParticipant) {
+        this.previousParticipant = previousParticipant;
     }
 
-    public boolean hasSourceProcessingPlantParticipantName(){
-        boolean hasValue = this.sourceProcessingPlantParticipantName != null;
+    public boolean hasDestinationParticipant(){
+        boolean hasValue = this.destinationParticipant != null;
         return(hasValue);
     }
 
-    public String getSourceProcessingPlantParticipantName() {
-        return sourceProcessingPlantParticipantName;
+    public PetasosParticipantId getDestinationParticipant() {
+        return destinationParticipant;
     }
 
-    public void setSourceProcessingPlantParticipantName(String taskProducerProcessingPlantParticipantName) {
-        this.sourceProcessingPlantParticipantName = taskProducerProcessingPlantParticipantName;
+    public void setDestinationParticipant(PetasosParticipantId destinationParticipant) {
+        this.destinationParticipant = destinationParticipant;
+    }
+
+    public boolean hasOriginParticipant(){
+        boolean hasValue = this.originParticipant != null;
+        return(hasValue);
+    }
+
+    public PetasosParticipantId getOriginParticipant() {
+        return originParticipant;
+    }
+
+    public void setOriginParticipant(PetasosParticipantId taskProducerProcessingPlantParticipantName) {
+        this.originParticipant = taskProducerProcessingPlantParticipantName;
     }
 
     public boolean hasDataParcelType(){
@@ -320,8 +339,9 @@ public class DataParcelManifest implements Serializable {
                 ", enforcementPointApprovalStatus=" + enforcementPointApprovalStatus +
                 ", interSubsystemDistributable=" + interSubsystemDistributable +
                 ", dataParcelFlowDirection=" + dataParcelFlowDirection +
-                ", sourceProcessingPlantParticipantName='" + sourceProcessingPlantParticipantName + '\'' +
-                ", targetProcessingPlantParticipantName='" + targetProcessingPlantParticipantName + '\'' +
+                ", previousParticipant=" + previousParticipant +
+                ", originParticipant=" + originParticipant +
+                ", destinationParticipant=" + destinationParticipant +
                 '}';
     }
 
@@ -334,11 +354,11 @@ public class DataParcelManifest implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataParcelManifest that = (DataParcelManifest) o;
-        return isInterSubsystemDistributable() == that.isInterSubsystemDistributable() && Objects.equals(getContentDescriptor(), that.getContentDescriptor()) && Objects.equals(getContainerDescriptor(), that.getContainerDescriptor()) && Objects.equals(getPayloadQuality(), that.getPayloadQuality()) && getNormalisationStatus() == that.getNormalisationStatus() && getValidationStatus() == that.getValidationStatus() && getDataParcelType() == that.getDataParcelType() && Objects.equals(getSourceSystem(), that.getSourceSystem()) && Objects.equals(getIntendedTargetSystem(), that.getIntendedTargetSystem()) && getEnforcementPointApprovalStatus() == that.getEnforcementPointApprovalStatus() && getDataParcelFlowDirection() == that.getDataParcelFlowDirection() && Objects.equals(getSourceProcessingPlantParticipantName(), that.getSourceProcessingPlantParticipantName()) && Objects.equals(getTargetProcessingPlantParticipantName(), that.getTargetProcessingPlantParticipantName());
+        return isInterSubsystemDistributable() == that.isInterSubsystemDistributable() && Objects.equals(getContentDescriptor(), that.getContentDescriptor()) && Objects.equals(getContainerDescriptor(), that.getContainerDescriptor()) && Objects.equals(getPayloadQuality(), that.getPayloadQuality()) && getNormalisationStatus() == that.getNormalisationStatus() && getValidationStatus() == that.getValidationStatus() && getDataParcelType() == that.getDataParcelType() && Objects.equals(getSourceSystem(), that.getSourceSystem()) && Objects.equals(getIntendedTargetSystem(), that.getIntendedTargetSystem()) && getEnforcementPointApprovalStatus() == that.getEnforcementPointApprovalStatus() && getDataParcelFlowDirection() == that.getDataParcelFlowDirection() && Objects.equals(getOriginParticipant(), that.getOriginParticipant()) && Objects.equals(getDestinationParticipant(), that.getDestinationParticipant());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getContentDescriptor(), getContainerDescriptor(), getPayloadQuality(), getNormalisationStatus(), getValidationStatus(), getDataParcelType(), getSourceSystem(), getIntendedTargetSystem(), getEnforcementPointApprovalStatus(), isInterSubsystemDistributable(), getDataParcelFlowDirection(), getSourceProcessingPlantParticipantName(), getTargetProcessingPlantParticipantName());
+        return Objects.hash(getContentDescriptor(), getContainerDescriptor(), getPayloadQuality(), getNormalisationStatus(), getValidationStatus(), getDataParcelType(), getSourceSystem(), getIntendedTargetSystem(), getEnforcementPointApprovalStatus(), isInterSubsystemDistributable(), getDataParcelFlowDirection(), getOriginParticipant(), getDestinationParticipant());
     }
 }

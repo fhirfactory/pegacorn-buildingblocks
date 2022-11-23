@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskCo
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskTriggerSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.schedule.valuesets.TaskExecutionCommandEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
@@ -42,9 +43,9 @@ import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentT
 import net.fhirfactory.pegacorn.petasos.core.tasks.accessors.PetasosFulfillmentTaskSharedInstanceAccessorFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosActionableTaskFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.factories.PetasosFulfillmentTaskFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.synchronisation.TaskDataGridProxy;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.LocalPetasosFulfilmentTaskActivityController;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.WorkUnitProcessorMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.status.TaskDataGridProxy;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.WorkUnitProcessorMetricsAgent;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.util.ArrayList;
 
 /**
  * This class (bean) is to be injected into the flow of an Ingres Only WUP Implementation
@@ -118,6 +120,15 @@ public class IngresActivityBeginRegistration {
         taskTriggerSummary.setTriggerLocation(wup.getComponentFDN().getToken().getTokenValue());
         taskContext.setTaskTriggerSummary(taskTriggerSummary);
         petasosActionableTask.setTaskContext(taskContext);
+        TaskPerformerTypeType taskPerformer = new TaskPerformerTypeType();
+        taskPerformer.setRequiredPerformerType(wup.getNodeFunctionFDN());
+        taskPerformer.setKnownFulfillerInstance(wup.getComponentID());
+        taskPerformer.setRequiredParticipantName(wup.getParticipantName());
+        taskPerformer.setRequiredPerformerTypeDescription(wup.getParticipantDisplayName());
+        if(petasosActionableTask.getTaskPerformerTypes() == null){
+            petasosActionableTask.setTaskPerformerTypes(new ArrayList<>());
+        }
+        petasosActionableTask.getTaskPerformerTypes().add(taskPerformer);
         getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Finish");
 
         getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Start");
@@ -144,6 +155,7 @@ public class IngresActivityBeginRegistration {
             petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStartInstant(Instant.now());
             petasosFulfillmentTaskSharedInstance.getTaskFulfillment().setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_ACTIVE);
             petasosFulfillmentTaskSharedInstance.update();
+
             getTaskDataGridProxy().notifyTaskStart(petasosFulfillmentTaskSharedInstance.getActionableTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
 
             actionableTaskSharedInstance.getTaskFulfillment().setFulfillerWorkUnitProcessor(petasosFulfillmentTaskSharedInstance.getTaskFulfillment().getFulfillerWorkUnitProcessor());
@@ -151,7 +163,6 @@ public class IngresActivityBeginRegistration {
             getLogger().trace(".registerActivityStart(): Before Update: actionableTaskSharedInstance.getTaskFulfillment()->{}", actionableTaskSharedInstance.getTaskFulfillment());
             actionableTaskSharedInstance.update();
             getLogger().trace(".registerActivityStart(): After Update: actionableTaskSharedInstance.getTaskFulfillment()->{}", actionableTaskSharedInstance.getTaskFulfillment());
-            getTaskDataGridProxy().notifyTaskStart(actionableTaskSharedInstance.getTaskId(), petasosFulfillmentTaskSharedInstance.getInstance());
 
             // Add some more metrics
             metricsAgent.incrementStartedTasks();

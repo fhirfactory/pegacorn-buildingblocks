@@ -23,7 +23,6 @@ package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PegacornIPCCommonValues;
 import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupportInterface;
-import net.fhirfactory.pegacorn.core.interfaces.edge.PetasosServicesEndpointRegistrationService;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointStatusEnum;
@@ -46,9 +45,9 @@ import net.fhirfactory.pegacorn.petasos.endpoints.services.common.ProcessingPlan
 import net.fhirfactory.pegacorn.petasos.endpoints.services.common.ProcessingPlantJGroupsIntegrationPointWatchdog;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgent;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.ProcessingPlantMetricsAgentAccessor;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.EndpointMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgentAccessor;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
@@ -92,9 +91,6 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
     private ProcessingPlantJGroupsIntegrationPointSet jgroupsIPSet;
 
     @Inject
-    private PetasosServicesEndpointRegistrationService endpointRegistrationService;
-
-    @Inject
     private PetasosMetricAgentFactory metricsFactory;
 
     @Inject
@@ -127,6 +123,11 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
     //
     // Implemented Abstract Methods
     //
+
+    @Override
+    protected String specifyEndpointConfigurationName() {
+        return (specifyPetasosEndpointFunctionType().getConfigurationName());
+    }
 
     @Override
     protected String specifyJGroupsChannelName() {
@@ -189,7 +190,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
         // Register myself with a WUP for Metrics Reporting
         //
         getLogger().info(".initialise(): Step 8: Start ==> Registering with WUP for Metrics");
-        endpointRegistrationService.registerEndpoint(specifyPetasosEndpointFunctionType(), getJGroupsIntegrationPoint());
+//        endpointRegistrationService.registerEndpoint(specifyPetasosEndpointFunctionType(), getJGroupsIntegrationPoint());
         getLogger().info(".initialise(): Step 8: Finish ==> Registering with WUP for Metrics");
         //
         // Create my Metrics Agent
@@ -348,6 +349,7 @@ public abstract class JGroupsIntegrationPointBase extends JGroupsIntegrationPoin
     //
     // Topology Endpoint Resolution (i.e. resolution of the JGroupsIntegrationPoint from the TopologyIM)
     //
+
 
     protected JGroupsIntegrationPoint resolveTopologyNodeForJGroupsIntegrationPoint(){
         getLogger().debug(".resolveTopologyNodeForJGroupsIntegrationPoint(): Entry, endpointFunction->{}", specifyPetasosEndpointFunctionType());

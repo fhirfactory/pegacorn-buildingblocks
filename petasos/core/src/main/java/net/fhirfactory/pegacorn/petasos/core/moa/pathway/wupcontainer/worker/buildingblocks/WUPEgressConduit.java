@@ -25,6 +25,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantNameHolder;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoW;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
@@ -101,9 +102,18 @@ public class WUPEgressConduit {
         if(incomingUoW.hasEgressContent()){
             for(UoWPayload currentEgressPayload: incomingUoW.getEgressContent().getPayloadElements()){
                 if(currentEgressPayload.getPayloadManifest() != null){
-                    if(!currentEgressPayload.getPayloadManifest().hasSourceProcessingPlantParticipantName()){
-                        currentEgressPayload.getPayloadManifest().setSourceProcessingPlantParticipantName(participantNameHolder.getSubsystemParticipantName());
+                    String subsystemParticipantName = participantNameHolder.getSubsystemParticipantName();
+                    String participantName = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantName();
+                    String participantDisplayName = fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getParticipantDisplayName();
+                    PetasosParticipantId participantId = new PetasosParticipantId();
+                    participantId.setSubsystemName(subsystemParticipantName);
+                    participantId.setName(participantName);
+                    participantId.setDisplayName(participantDisplayName);
+                    participantId.setFullName(participantName);
+                    if(!currentEgressPayload.getPayloadManifest().hasOriginParticipant()){
+                        currentEgressPayload.getPayloadManifest().setOriginParticipant(participantId);
                     }
+                    currentEgressPayload.getPayloadManifest().setPreviousParticipant(participantId);
                 }
             }
         }

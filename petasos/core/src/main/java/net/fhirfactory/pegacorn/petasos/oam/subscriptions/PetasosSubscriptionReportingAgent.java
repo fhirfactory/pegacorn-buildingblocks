@@ -26,15 +26,13 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterfac
 import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosProcessingPlantSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosPublisherSubscriptionSummary;
-import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosSubscriberSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.reporting.PetasosWorkUnitProcessorSubscriptionSummary;
 import net.fhirfactory.pegacorn.core.model.petasos.oam.subscriptions.valuesets.PetasosSubscriptionSummaryTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
-import net.fhirfactory.pegacorn.petasos.core.participants.cache.LocalPetasosParticipantCacheDM;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalPetasosParticipantSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.cache.PetasosLocalSubscriptionReportingDM;
 import net.fhirfactory.pegacorn.petasos.oam.subscriptions.factories.PetasosSubscriptionSummaryFactory;
+import net.fhirfactory.pegacorn.petasos.participants.cache.LocalPetasosParticipantCacheDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +47,6 @@ public class PetasosSubscriptionReportingAgent {
 
     @Inject
     private PetasosLocalSubscriptionReportingDM subscriptionReportingDM;
-
-    @Inject
-    private LocalPetasosParticipantSubscriptionMapIM subscriptionMapIM;
 
     @Inject
     private TaskPathwayManagementServiceInterface taskPathwayManagementService;
@@ -102,25 +97,10 @@ public class PetasosSubscriptionReportingAgent {
                 getLogger().debug(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Processing Participant->{}", currentParticipant.getParticipantName());
             }
             if(currentParticipant.getComponentType().equals(PegacornSystemComponentTypeTypeEnum.PROCESSING_PLANT)) {
-                if(currentParticipant.getParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
-                    //
-                    // My ProcessingPlant as a Subscriber
+                if(!currentParticipant.getParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
                     for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
-                        PetasosSubscriberSubscriptionSummary publisherSubscriptionSummary = new PetasosSubscriberSubscriptionSummary();
-                        getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For currentSubscription->{}", currentSubscription);
-                        publisherSubscriptionSummary.addTopic(currentSubscription);
-                        getLogger().trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding to SubscriberSummary List");
-
-                        publisherSubscriptionSummary.setPublisherParticipantName(currentSubscription.getSourceProcessingPlantParticipantName());
-                        publisherSubscriptionSummary.setParticipantName(processingPlant.getSubsystemParticipantName());
-                        publisherSubscriptionSummary.setSummaryType(PetasosSubscriptionSummaryTypeEnum.PROCESSING_PLANT_SUBSCRIPTION_SUMMARY);
-                        publisherSubscriptionSummary.setTimestamp(Instant.now());
-                        processingPlantSubscriptionSummary.addSubscriberSummary(publisherSubscriptionSummary);
-                    }
-                } else {
-                    for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
-                        if(currentSubscription.hasSourceProcessingPlantParticipantName()) {
-                            if (currentSubscription.getSourceProcessingPlantParticipantName().equals(processingPlant.getSubsystemParticipantName())) {
+                        if(currentSubscription.hasOriginParticipant()) {
+                            if (currentSubscription.getOriginParticipant().equals(processingPlant.getSubsystemParticipantName())) {
                                 getLogger().trace(".refreshLocalPubSubReportingMap(): Processing me as a Publisher/Producer");
                                 //
                                 // My ProcessingPlant as a Publisher

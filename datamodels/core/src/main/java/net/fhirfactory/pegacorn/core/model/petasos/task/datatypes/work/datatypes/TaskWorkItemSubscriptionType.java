@@ -26,10 +26,12 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelQualityStatement;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.*;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.crypto.Data;
 import java.io.Serializable;
 
 public class TaskWorkItemSubscriptionType implements Serializable {
@@ -46,8 +48,9 @@ public class TaskWorkItemSubscriptionType implements Serializable {
     private PolicyEnforcementPointApprovalStatusEnum enforcementPointApprovalStatus;
     private boolean interSubsystemDistributable;
     private DataParcelDirectionEnum dataParcelFlowDirection;
-    private String sourceProcessingPlantParticipantName;
-    private String targetProcessingPlantParticipantName;
+    private PetasosParticipantId previousParticipant;
+    private PetasosParticipantId originParticipant;
+    private PetasosParticipantId destinationParticipant;
 
     //
     // Constructor(s)
@@ -60,8 +63,9 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         this.externalTargetSystem = null;
         this.interSubsystemDistributable = false;
         this.dataParcelFlowDirection = null;
-        this.sourceProcessingPlantParticipantName = null;
-        this.targetProcessingPlantParticipantName = null;
+        this.previousParticipant = createPermissiveParticipantIdFilter();
+        this.originParticipant = createPermissiveParticipantIdFilter();
+        this.destinationParticipant = null;
         this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
@@ -75,8 +79,9 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         this.externalTargetSystem = null;
         this.interSubsystemDistributable = false;
         this.dataParcelFlowDirection = null;
-        this.sourceProcessingPlantParticipantName = null;
-        this.targetProcessingPlantParticipantName = null;
+        this.originParticipant = createPermissiveParticipantIdFilter();
+        this.previousParticipant = createPermissiveParticipantIdFilter();
+        this.destinationParticipant = null;
         this.enforcementPointApprovalStatus = PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_NEGATIVE;
         this.normalisationStatus = DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY;
         this.validationStatus = DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY;
@@ -84,15 +89,18 @@ public class TaskWorkItemSubscriptionType implements Serializable {
     }
 
     public TaskWorkItemSubscriptionType(DataParcelManifest ori){
-        if(ori.hasTargetProcessingPlantParticipantName()){
-            this.setTargetProcessingPlantParticipantName(SerializationUtils.clone(ori.getTargetProcessingPlantParticipantName()));
-        } else {
-            this.setTargetProcessingPlantParticipantName(null);
+        if(ori.hasPreviousParticipant()){
+            this.setPreviousParticipant(SerializationUtils.clone(ori.getPreviousParticipant()));
         }
-        if(ori.hasSourceProcessingPlantParticipantName()){
-            this.setSourceProcessingPlantParticipantName(SerializationUtils.clone(ori.getSourceProcessingPlantParticipantName()));
+        if(ori.hasDestinationParticipant()){
+            this.setDestinationParticipant(SerializationUtils.clone(ori.getDestinationParticipant()));
         } else {
-            this.setSourceProcessingPlantParticipantName(null);
+            this.setDestinationParticipant(null);
+        }
+        if(ori.hasOriginParticipant()){
+            this.setOriginParticipant(SerializationUtils.clone(ori.getOriginParticipant()));
+        } else {
+            this.setOriginParticipant(null);
         }
         if(ori.hasContainerDescriptor()) {
             this.containerDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContainerDescriptor());
@@ -143,15 +151,18 @@ public class TaskWorkItemSubscriptionType implements Serializable {
     }
 
     public TaskWorkItemSubscriptionType(TaskWorkItemSubscriptionType ori){
-        if(ori.hasTargetProcessingPlantParticipantName()){
-            this.setTargetProcessingPlantParticipantName(SerializationUtils.clone(ori.getTargetProcessingPlantParticipantName()));
-        } else {
-            this.setTargetProcessingPlantParticipantName(null);
+        if(ori.hasPreviousParticipant()){
+            this.setPreviousParticipant(SerializationUtils.clone(ori.getPreviousParticipant()));
         }
-        if(ori.hasSourceProcessingPlantParticipantName()){
-            this.setSourceProcessingPlantParticipantName(SerializationUtils.clone(ori.getSourceProcessingPlantParticipantName()));
+        if(ori.hasDestinationParticipant()){
+            this.setDestinationParticipant(SerializationUtils.clone(ori.getDestinationParticipant()));
         } else {
-            this.setSourceProcessingPlantParticipantName(null);
+            this.setDestinationParticipant(null);
+        }
+        if(ori.hasOriginParticipant()){
+            this.setOriginParticipant(SerializationUtils.clone(ori.getOriginParticipant()));
+        } else {
+            this.setOriginParticipant(null);
         }
         if(ori.hasContainerDescriptor()) {
             this.containerDescriptor = (DataParcelTypeDescriptor) SerializationUtils.clone(ori.getContainerDescriptor());
@@ -202,18 +213,36 @@ public class TaskWorkItemSubscriptionType implements Serializable {
     }
 
     //
+    // Simple Helper
+    //
+
+    private PetasosParticipantId createPermissiveParticipantIdFilter(){
+        PetasosParticipantId participantId = new PetasosParticipantId();
+        participantId.setVersion(DataParcelManifest.WILDCARD_CHARACTER);
+        participantId.setSubsystemName(DataParcelManifest.WILDCARD_CHARACTER);
+        participantId.setName(DataParcelManifest.WILDCARD_CHARACTER);
+        return(participantId);
+    }
+
+    //
     // If Exists
     //
 
     @JsonIgnore
-    public boolean hasTargetProcessingPlantParticipantName(){
-        boolean hasValue = this.targetProcessingPlantParticipantName != null;
+    public boolean hasPreviousParticipant(){
+        boolean hasValue = this.previousParticipant != null;
         return(hasValue);
     }
 
     @JsonIgnore
-    public boolean hasSourceProcessingPlantParticipantName(){
-        boolean hasValue = this.sourceProcessingPlantParticipantName != null;
+    public boolean hasDestinationParticipant(){
+        boolean hasValue = this.destinationParticipant != null;
+        return(hasValue);
+    }
+
+    @JsonIgnore
+    public boolean hasOriginParticipant(){
+        boolean hasValue = this.originParticipant != null;
         return(hasValue);
     }
 
@@ -280,6 +309,14 @@ public class TaskWorkItemSubscriptionType implements Serializable {
     //
     // Getters and Setters
     //
+
+    public PetasosParticipantId getPreviousParticipant() {
+        return previousParticipant;
+    }
+
+    public void setPreviousParticipant(PetasosParticipantId previousParticipant) {
+        this.previousParticipant = previousParticipant;
+    }
 
     @JsonIgnore
     protected Logger getLogger(){
@@ -374,20 +411,20 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         this.dataParcelFlowDirection = dataParcelFlowDirection;
     }
 
-    public String getSourceProcessingPlantParticipantName() {
-        return sourceProcessingPlantParticipantName;
+    public PetasosParticipantId getOriginParticipant() {
+        return originParticipant;
     }
 
-    public void setSourceProcessingPlantParticipantName(String sourceProcessingPlantParticipantName) {
-        this.sourceProcessingPlantParticipantName = sourceProcessingPlantParticipantName;
+    public void setOriginParticipant(PetasosParticipantId originParticipant) {
+        this.originParticipant = originParticipant;
     }
 
-    public String getTargetProcessingPlantParticipantName() {
-        return targetProcessingPlantParticipantName;
+    public PetasosParticipantId getDestinationParticipant() {
+        return destinationParticipant;
     }
 
-    public void setTargetProcessingPlantParticipantName(String targetProcessingPlantParticipantName) {
-        this.targetProcessingPlantParticipantName = targetProcessingPlantParticipantName;
+    public void setDestinationParticipant(PetasosParticipantId destinationParticipant) {
+        this.destinationParticipant = destinationParticipant;
     }
 
     //
@@ -396,22 +433,25 @@ public class TaskWorkItemSubscriptionType implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskWorkItemSubscription{" +
-                "contentDescriptor=" + contentDescriptor +
-                ", containerDescriptor=" + containerDescriptor +
-                ", payloadQuality=" + payloadQuality +
-                ", normalisationStatus=" + normalisationStatus +
-                ", validationStatus=" + validationStatus +
-                ", dataParcelType=" + dataParcelType +
-                ", externalSourceSystem='" + externalSourceSystem + '\'' +
-                ", externalTargetSystem='" + externalTargetSystem + '\'' +
-                ", enforcementPointApprovalStatus=" + enforcementPointApprovalStatus +
-                ", interSubsystemDistributable=" + interSubsystemDistributable +
-                ", dataParcelFlowDirection=" + dataParcelFlowDirection +
-                ", sourceProcessingPlantParticipantName='" + sourceProcessingPlantParticipantName + '\'' +
-                ", targetProcessingPlantParticipantName='" + targetProcessingPlantParticipantName + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("TaskWorkItemSubscriptionType{");
+        sb.append("contentDescriptor=").append(contentDescriptor);
+        sb.append(", containerDescriptor=").append(containerDescriptor);
+        sb.append(", payloadQuality=").append(payloadQuality);
+        sb.append(", normalisationStatus=").append(normalisationStatus);
+        sb.append(", validationStatus=").append(validationStatus);
+        sb.append(", dataParcelType=").append(dataParcelType);
+        sb.append(", externalSourceSystem=").append(externalSourceSystem);
+        sb.append(", externalTargetSystem=").append(externalTargetSystem);
+        sb.append(", enforcementPointApprovalStatus=").append(enforcementPointApprovalStatus);
+        sb.append(", interSubsystemDistributable=").append(interSubsystemDistributable);
+        sb.append(", dataParcelFlowDirection=").append(dataParcelFlowDirection);
+        sb.append(", previousParticipant=").append(previousParticipant);
+        sb.append(", originParticipant=").append(originParticipant);
+        sb.append(", destinationParticipant=").append(destinationParticipant);
+        sb.append('}');
+        return sb.toString();
     }
+
 
     //
     // To Simple String
@@ -438,11 +478,14 @@ public class TaskWorkItemSubscriptionType implements Serializable {
         if(hasExternalTargetSystem()){
             descriptionBuilder.append("<To:"+getExternalTargetSystem()+">");
         }
-        if(hasSourceProcessingPlantParticipantName()){
-            descriptionBuilder.append("<InternalFrom:"+getSourceProcessingPlantParticipantName()+">");
+        if(hasPreviousParticipant()){
+            descriptionBuilder.append("<Previous:"+ getPreviousParticipant()+">");
         }
-        if(hasTargetProcessingPlantParticipantName()){
-            descriptionBuilder.append("<InternalTo:"+getTargetProcessingPlantParticipantName()+">");
+        if(hasOriginParticipant()){
+            descriptionBuilder.append("<InternalFrom:"+ getOriginParticipant()+">");
+        }
+        if(hasDestinationParticipant()){
+            descriptionBuilder.append("<InternalTo:"+ getDestinationParticipant()+">");
         }
         if(hasEnforcementPointApprovalStatus()){
             descriptionBuilder.append("<"+getEnforcementPointApprovalStatus().getToken()+">");

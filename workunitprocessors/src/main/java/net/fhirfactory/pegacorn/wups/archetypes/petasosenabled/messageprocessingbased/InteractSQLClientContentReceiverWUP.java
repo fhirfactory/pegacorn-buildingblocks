@@ -28,6 +28,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.EndpointMetricsAgent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -43,7 +44,6 @@ import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEn
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.sql.SQLClientTopologyEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
 
 public abstract class InteractSQLClientContentReceiverWUP extends GenericMessageBasedWUPTemplate {
 	private static String DATABASE_USERNAME;

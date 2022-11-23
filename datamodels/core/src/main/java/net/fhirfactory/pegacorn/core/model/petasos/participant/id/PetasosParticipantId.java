@@ -53,6 +53,14 @@ public class PetasosParticipantId implements Serializable {
         this.fullName = subsystemName + "." + name;
     }
 
+    public PetasosParticipantId(String subsystemName, String workshop, String name, String version){
+        this.name = subsystemName + "." + workshop + "." + name;
+        this.version = version;
+        this.displayName = name;
+        this.subsystemName = subsystemName;
+        this.fullName = subsystemName + "." + workshop + "." + name;
+    }
+
     //
     // Getters and Setters
     //

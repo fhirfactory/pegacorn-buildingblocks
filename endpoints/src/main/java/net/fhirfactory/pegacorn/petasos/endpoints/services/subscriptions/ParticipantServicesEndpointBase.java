@@ -22,17 +22,15 @@
 package net.fhirfactory.pegacorn.petasos.endpoints.services.subscriptions;
 
 import net.fhirfactory.pegacorn.core.interfaces.pathway.TaskPathwayManagementServiceInterface;
-import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointFunctionTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.valuesets.PetasosEndpointTopologyTypeEnum;
+import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.jgroups.JGroupsIntegrationPointSummary;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.endpoint.valuesets.EndpointPayloadTypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.JGroupsIntegrationPointBase;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +47,6 @@ public abstract class ParticipantServicesEndpointBase extends JGroupsIntegration
     private int subscriptionCheckCount;
     private static int CHANGE_DETECTION_SUBSCRIPTION_CHECK_COUNT = 10;
 
-    @Inject
-    private LocalParticipantManager participantCacheIM;
 
     //
     // Constructor(s)
@@ -105,11 +101,6 @@ public abstract class ParticipantServicesEndpointBase extends JGroupsIntegration
     @Override
     protected String specifySubsystemParticipantName() {
         return (getProcessingPlant().getSubsystemParticipantName());
-    }
-
-    @Override
-    protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getPetasosSubscriptionsEndpointName());
     }
 
     @Override

@@ -85,11 +85,6 @@ public class PetasosOAMInterceptionEndpoint extends JGroupsIntegrationPointBase 
     }
 
     @Override
-    protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getPetasosInterceptionEndpointName());
-    }
-
-    @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
         return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }

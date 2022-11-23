@@ -60,11 +60,6 @@ public abstract class PetasosOAMMetricsEndpointBase extends JGroupsIntegrationPo
     }
 
     @Override
-    protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getPetasosMetricsEndpointName());
-    }
-
-    @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
         return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }

@@ -27,11 +27,12 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantRoleSupp
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSourceTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.http.HTTPServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.core.model.topology.endpoints.mllp.MLLPServerEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpointContainer;
-import net.fhirfactory.pegacorn.petasos.oam.metrics.agents.EndpointMetricsAgent;
+import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.EndpointMetricsAgent;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
@@ -39,7 +40,6 @@ import org.apache.camel.model.RouteDefinition;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import net.fhirfactory.pegacorn.core.model.topology.endpoints.file.FileShareSourceTopologyEndpoint;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
@@ -84,7 +84,7 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
 
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
-        return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT);
+        return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT);
     }
 
     @Override

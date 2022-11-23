@@ -34,8 +34,8 @@ public interface PetasosTaskGridServicesHandlerInterface {
     public TaskIdType queueTask(PetasosActionableTask actionableTask, JGroupsIntegrationPointSummary requesterEndpointIdentifier);
     public PetasosActionableTask getNextPendingTask(String participantName, JGroupsIntegrationPointSummary requestorEndpointSummary);
     public TaskExecutionControl notifyTaskStart(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, JGroupsIntegrationPointSummary requesterEndpointSummary);
-    public TaskExecutionControl notifyTaskFinish(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, JGroupsIntegrationPointSummary requesterEndpointSummary);
-    public TaskExecutionControl notifyTaskCancellation(String participantName,TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, JGroupsIntegrationPointSummary requesterEndpointSummary);
-    public TaskExecutionControl notifyTaskFailure(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, JGroupsIntegrationPointSummary requesterEndpointSummary);
+    public TaskExecutionControl notifyTaskFinish(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String statusReason, JGroupsIntegrationPointSummary requesterEndpointSummary);
+    public TaskExecutionControl notifyTaskCancellation(String participantName,TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String statusReason, JGroupsIntegrationPointSummary requesterEndpointSummary);
+    public TaskExecutionControl notifyTaskFailure(String participantName, TaskIdType taskId, TaskFulfillmentType taskFulfillmentDetail, UoWPayloadSet egressPayload, TaskOutcomeStatusType taskOutcome, String statusReason, JGroupsIntegrationPointSummary requesterEndpointSummary);
     public TaskExecutionControl notifyTaskFinalisation(String participantName, TaskIdType taskId, TaskCompletionSummaryType completionSummary, JGroupsIntegrationPointSummary requesterEndpointSummary);
 }

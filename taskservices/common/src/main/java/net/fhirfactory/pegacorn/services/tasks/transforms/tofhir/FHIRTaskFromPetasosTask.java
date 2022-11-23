@@ -113,6 +113,14 @@ public abstract class FHIRTaskFromPetasosTask {
         Task fhirTask = new Task();
 
         //
+        // Set Id
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Id If Present] Start");
+        if(petasosTask.getTaskId().getResourceId() != null){
+            fhirTask.setIdElement(petasosTask.getTaskId().getResourceId());
+        }
+        getLogger().trace(".newTaskFromPetasosTask(): [Set Id If Present] Finish");
+
+        //
         // Create and add the Task::Identifier
         getLogger().trace(".newTaskFromPetasosTask(): [Create and Add Identifier] Start");
         Identifier identifier = getTaskIdentifierFactory().newTaskIdentifier(TaskTypeTypeEnum.PETASOS_ACTIONABLE_TASK_TYPE, petasosTask.getTaskId());

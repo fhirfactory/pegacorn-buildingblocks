@@ -103,11 +103,6 @@ public abstract class PetasosAuditServicesEndpoint extends JGroupsIntegrationPoi
     //
 
     @Override
-    protected String specifyIPCInterfaceName() {
-        return (getInterfaceNames().getPetasosAuditServicesEndpointName());
-    }
-
-    @Override
     protected PetasosEndpointTopologyTypeEnum specifyIPCType() {
         return (PetasosEndpointTopologyTypeEnum.JGROUPS_INTEGRATION_POINT);
     }
