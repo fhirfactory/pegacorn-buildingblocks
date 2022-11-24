@@ -86,6 +86,7 @@ public class TaskTraceabilityTypeFactory {
         TaskTraceabilityType traceability = null;
         if (task.hasTaskTraceability()) {
             traceability = SerializationUtils.clone(task.getTaskTraceability());
+            traceability.setResourceId(null);
         } else {
             traceability = new TaskTraceabilityType();
         }

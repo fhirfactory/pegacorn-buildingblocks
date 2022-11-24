@@ -120,7 +120,7 @@ public class LocalTaskDistributionDecisionEngine extends TaskDistributionDecisio
         List<String> alreadySubscribedSubsystemParticipants = new ArrayList<>();
 
         for(PetasosParticipant currentParticipant: participants) {
-            getLogger().debug(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
+            getLogger().warn(".deriveSubscriberList(): Processing participant->{}/{}", currentParticipant.getParticipantName(), currentParticipant.getSubsystemParticipantName());
             for (TaskWorkItemSubscriptionType currentSubscription : currentParticipant.getSubscriptions()) {
                 if (applySubscriptionFilter(currentSubscription, parcelManifest)) {
                     if (!subscriberList.contains(currentParticipant)) {

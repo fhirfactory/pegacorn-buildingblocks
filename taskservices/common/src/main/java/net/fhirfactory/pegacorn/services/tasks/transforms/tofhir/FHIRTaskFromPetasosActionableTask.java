@@ -378,19 +378,19 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
     @Override
     protected List<CodeableConcept> specifyPerformerType(PetasosTask petasosTask) {
-        getLogger().warn(".specifyPerformerType(): Entry");
+        getLogger().debug(".specifyPerformerType(): Entry");
 
         PetasosActionableTask actionableTask = (PetasosActionableTask) petasosTask;
 
         List<CodeableConcept> performerTypes = new ArrayList<>();
         if(actionableTask.hasTaskPerformerTypes()){
 
-            getLogger().warn(".specifyPerformerType(): has performerTypes");
+            getLogger().trace(".specifyPerformerType(): has performerTypes");
             List<TaskPerformerTypeType> taskPerformerTypes = actionableTask.getTaskPerformerTypes();
-            getLogger().warn(".specifyPerformerType(): taskPerformerTypes->{}", taskPerformerTypes);
+            getLogger().trace(".specifyPerformerType(): taskPerformerTypes->{}", taskPerformerTypes);
             if(taskPerformerTypes != null) {
                 for (TaskPerformerTypeType currentPerformerType : taskPerformerTypes) {
-                    getLogger().warn(".specifyPerformerType(): processing ->{}", currentPerformerType);
+                    getLogger().trace(".specifyPerformerType(): processing ->{}", currentPerformerType);
                     String performerName = null;
                     if(currentPerformerType.getRequiredParticipantName() != null){
                         performerName = currentPerformerType.getRequiredParticipantName();
@@ -407,7 +407,7 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
                 }
             }
         }
-        getLogger().warn(".specifyPerformerType(): Exit, performerTypes->{}", performerTypes);
+        getLogger().debug(".specifyPerformerType(): Exit, performerTypes->{}", performerTypes);
         return (performerTypes);
     }
 

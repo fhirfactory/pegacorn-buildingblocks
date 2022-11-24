@@ -176,8 +176,8 @@ public class LocalTaskDistributionBean {
             return;
         }
         TaskPerformerTypeType targetComponent = actionableTask.getTaskPerformerTypes().get(0);
-        String targetComponentId = targetComponent.getRequiredParticipantName();
-        PetasosParticipant targetParticipant = localPetasosParticipantCacheDM.getPetasosParticipant(targetComponentId);
+        String targetParticipantName = targetComponent.getRequiredParticipantName();
+        PetasosParticipant targetParticipant = localPetasosParticipantCacheDM.getPetasosParticipant(targetParticipantName);
         if(targetParticipant == null){
             getLogger().warn(".distributeNewActionableTasks(): No Target To Deliver Task To!!!");
             return;
@@ -203,29 +203,12 @@ public class LocalTaskDistributionBean {
         String intendedTargetName = null;
         DataParcelManifest payloadTopicID = actionableTask.getTaskWorkItem().getPayloadTopicID();
 
-        if (getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber)) {
-            getLogger().trace(".forwardTask(): Has Remote Service as Target");
-            boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
-            boolean hasWildcardTarget = false;
-            if (getTaskDistributionDecisionEngine().hasIntendedTarget(payloadTopicID)) {
-                hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
-            }
-            boolean hasRemoteElement = getTaskDistributionDecisionEngine().hasRemoteServiceName(subscriber);
-            getLogger().trace(".forwardTask(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
-            if ((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement) {
-                intendedTargetName = subscriber.getSubsystemParticipantName();
-                getLogger().trace(".forwardTask(): Setting the intendedTargetSystem->{}", subscriber.getSubsystemParticipantName());
-                isRemoteTarget = true;
-            }
-        }
-
-        ComponentIdType actualSubscriberId = null;
         getLogger().trace(".forwardTask(): Assigning target component id, based on whether it is a remote component or local");
         if(isRemoteTarget){
             getLogger().warn(".forwardTask(): It is a remote target, so routing locally is impossible... why did i get it?");
         }
-        getLogger().trace(".forwardTask(): The (LocalSubscriber aspect) IdentifieFHIRCommunicationToUoWr->{}", actualSubscriberId);
-        WorkUnitProcessorSoftwareComponent currentNodeElement = (WorkUnitProcessorSoftwareComponent)topologyProxy.getNode(actualSubscriberId);
+        getLogger().trace(".forwardTask(): The (LocalSubscriber aspect) Participant Name->{}", subscriber.getParticipantName());
+        WorkUnitProcessorSoftwareComponent currentNodeElement = (WorkUnitProcessorSoftwareComponent)topologyProxy.getNode(subscriber.getParticipantName());
         getLogger().trace(".forwardTask(): The TopologyNode for the target currentNodeElement->{}", currentNodeElement);
         TopologyNodeFunctionFDNToken targetWUPFunctionToken = currentNodeElement.getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".forwardTask(): The WUPToken for the target targetWUPFunctionToken->{}", targetWUPFunctionToken);
@@ -250,9 +233,11 @@ public class LocalTaskDistributionBean {
         taskJobCardInstanceFactory.newTaskJobCardSharedInstanceAccessor(petasosTaskJobCard);
         //
         // Get out metricsAgent & do add some metrics
+        /*
         WorkUnitProcessorMetricsAgent metricsAgent = camelExchange.getProperty(PetasosPropertyConstants.WUP_METRICS_AGENT_EXCHANGE_PROPERTY, WorkUnitProcessorMetricsAgent.class);
         metricsAgent.incrementInternalMessageDistributionCount();
         metricsAgent.touchLastActivityInstant();
+         */
         //
         // Forward the Task
         if(getLogger().isDebugEnabled())

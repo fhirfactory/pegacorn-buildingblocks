@@ -88,6 +88,12 @@ public class FHIRProvenanceFromPetasosTaskJourney {
         Provenance taskJourneyProvenance = new Provenance();
 
         //
+        // Id
+        if(taskJourney.getResourceId() != null){
+            taskJourneyProvenance.setId(taskJourney.getResourceId());
+        }
+
+        //
         // Set Provenance Target (in this case, a Task)
         Reference targetReference = new Reference();
         targetReference.setIdentifier(taskIdentifier);

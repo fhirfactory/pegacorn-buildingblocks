@@ -3,7 +3,7 @@ package net.fhirfactory.pegacorn.core.model.capabilities.base.factories;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.fhirfactory.pegacorn.core.model.transaction.model.PegacornTransactionOutcome;
+import net.fhirfactory.pegacorn.core.model.transaction.model.InternalTransactionOutcome;
 import net.fhirfactory.pegacorn.core.model.transaction.model.SimpleResourceID;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.IdType;
@@ -32,9 +32,9 @@ public class MethodOutcomeFactory {
             outcome.setCreated(false);
             return (outcome);
         }
-        PegacornTransactionOutcome transactionOutcome = null;
+        InternalTransactionOutcome transactionOutcome = null;
         try {
-            transactionOutcome = getJSONMapper().readValue(methodOutcomeString, PegacornTransactionOutcome.class);
+            transactionOutcome = getJSONMapper().readValue(methodOutcomeString, InternalTransactionOutcome.class);
         } catch (JsonProcessingException e) {
             getLogger().error(".convertToMethodOutcome(): Cannot parse MethodOutcome object! ", e);
         }

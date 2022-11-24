@@ -23,11 +23,13 @@ package net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.traceability.
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
+import org.hl7.fhir.r4.model.IdType;
 
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TaskTraceabilityType implements Serializable {
+    public IdType resourceId;
     ConcurrentHashMap<Integer, TaskTraceabilityElementType> taskJourney;
 
     //
@@ -36,6 +38,7 @@ public class TaskTraceabilityType implements Serializable {
 
     public TaskTraceabilityType(){
         this.taskJourney = new ConcurrentHashMap<>();
+        this.resourceId = null;
     }
 
     //
@@ -48,6 +51,14 @@ public class TaskTraceabilityType implements Serializable {
 
     public void setTaskJourney(ConcurrentHashMap<Integer, TaskTraceabilityElementType> taskJourney) {
         this.taskJourney = taskJourney;
+    }
+
+    public IdType getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(IdType resourceId) {
+        this.resourceId = resourceId;
     }
 
     //
@@ -99,8 +110,10 @@ public class TaskTraceabilityType implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskTraceabilityType{" +
-                "taskJourney=" + taskJourney +
-                '}';
+        final StringBuffer sb = new StringBuffer("TaskTraceabilityType{");
+        sb.append("resourceId=").append(resourceId);
+        sb.append(", taskJourney=").append(taskJourney);
+        sb.append('}');
+        return sb.toString();
     }
 }

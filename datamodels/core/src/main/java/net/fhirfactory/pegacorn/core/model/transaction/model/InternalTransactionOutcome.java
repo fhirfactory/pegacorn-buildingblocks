@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransac
 
 import java.util.Objects;
 
-public class PegacornTransactionOutcome {
+public class InternalTransactionOutcome {
     private SimpleResourceID resourceID;
     private PegacornTransactionStatusEnum transactionStatus;
     private PegacornTransactionTypeEnum transactionType;
@@ -76,8 +76,8 @@ public class PegacornTransactionOutcome {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PegacornTransactionOutcome)) return false;
-        PegacornTransactionOutcome that = (PegacornTransactionOutcome) o;
+        if (!(o instanceof InternalTransactionOutcome)) return false;
+        InternalTransactionOutcome that = (InternalTransactionOutcome) o;
         return isTransactionSuccessful() == that.isTransactionSuccessful() && Objects.equals(getResourceID(), that.getResourceID()) && getTransactionStatus() == that.getTransactionStatus() && getTransactionType() == that.getTransactionType() && Objects.equals(getReason(), that.getReason());
     }
 
