@@ -36,15 +36,16 @@ import net.fhirfactory.pegacorn.core.model.componentid.PegacornSystemComponentTy
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
-import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.*;
 import net.fhirfactory.pegacorn.core.model.petasos.audit.valuesets.PetasosAuditEventGranularityLevelEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.endpoint.JGroupsIntegrationPointNamingUtilities;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipantRegistration;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.ProcessingPlantPetasosParticipantHolder;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosParticipantId;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
 import net.fhirfactory.pegacorn.core.model.topology.mode.NetworkSecurityZoneEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantSoftwareComponent;
@@ -56,6 +57,7 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons.GlobalPetasosTaskContinuityWatchdog;
 import net.fhirfactory.pegacorn.petasos.core.tasks.management.local.router.daemons.GlobalPetasosTaskRecoveryWatchdog;
+import net.fhirfactory.pegacorn.petasos.participants.cache.DistributedTaskSubscriptionMap;
 import net.fhirfactory.pegacorn.petasos.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.PetasosMetricAgentFactory;
 import net.fhirfactory.pegacorn.petasos.oam.metrics.collectors.ProcessingPlantMetricsAgent;
@@ -124,6 +126,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Inject
     private PetasosMetricAgentFactory metricAgentFactory;
+
+    @Inject
+    private DistributedTaskSubscriptionMap distributedTaskSubscriptionMap;
 
     //
     // Constructor(s)
@@ -207,6 +212,10 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     protected ProcessingPlantMetricsAgent getMetricsAgent(){
         return(metricsAgent);
+    }
+
+    protected DistributedTaskSubscriptionMap getDistributedTaskSubscriptionMap(){
+        return(this.distributedTaskSubscriptionMap);
     }
 
     //
@@ -484,43 +493,59 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
     // Remote Subscription Functions
     //
 
-    protected PetasosParticipantRegistration subscribeToRemoteDataParcels(List<DataParcelTypeDescriptor> triggerEventList, String sourceSubsystemParticipantName){
+    protected void subscribeToRemoteDataParcels(List<DataParcelTypeDescriptor> triggerEventList, String sourceSubsystemParticipantName){
         getLogger().info(".subscribeToRemoteDataParcels(): Entry, sourceSubsystemParticipantName->{}", sourceSubsystemParticipantName);
         if(triggerEventList.isEmpty()){
             getLogger().warn(".subscribeToRemoteDataParcels(): Exit, not subscribing to any remote content (subscriptionList is empty)");
-            return(null);
+            return;
         }
         if(StringUtils.isEmpty(sourceSubsystemParticipantName)){
             getLogger().warn(".subscribeToRemoteDataParcels(): Exit, not subscribing to any remote content (sourceParticipantName is empty)");
-            return(null);
+            return;
         }
         getLogger().trace(".subscribeToRemoteDataParcels(): We have entries in the subscription list, processing");
-        Set<TaskWorkItemManifestType> manifestList = new HashSet<>();
         for(DataParcelTypeDescriptor currentTriggerEvent: triggerEventList){
             getLogger().info(".subscribeToRemoteDataParcels(): currentTriggerEvent->{}", currentTriggerEvent);
-            DataParcelTypeDescriptor container = fhirElementTopicFactory.newTopicToken(ResourceType.Communication.name(), pegacornReferenceProperties.getPegacornDefaultFHIRVersion());
+            DataParcelTypeDescriptor container = new DataParcelTypeDescriptor();
+            container.setVersion(DataParcelManifest.WILDCARD_CHARACTER);
+            container.setDataParcelDefiner(DataParcelManifest.WILDCARD_CHARACTER);
+            container.setDataParcelCategory(DataParcelManifest.WILDCARD_CHARACTER);
+            container.setDataParcelSubCategory(DataParcelManifest.WILDCARD_CHARACTER);
+            container.setDataParcelResource(DataParcelManifest.WILDCARD_CHARACTER);
+            container.setDataParcelSegment(DataParcelManifest.WILDCARD_CHARACTER);
+            container.setDataParcelAttribute(DataParcelManifest.WILDCARD_CHARACTER);
+            container.setDataParcelDiscriminatorType(DataParcelManifest.WILDCARD_CHARACTER);
+            container.setDataParcelDiscriminatorValue(DataParcelManifest.WILDCARD_CHARACTER);
             getLogger().info(".subscribeToRemoteDataParcels(): container->{}", container);
-            TaskWorkItemManifestType manifest = new TaskWorkItemManifestType();
+            TaskWorkItemSubscriptionType manifest = new TaskWorkItemSubscriptionType();
             manifest.setContentDescriptor(currentTriggerEvent);
             manifest.setContainerDescriptor(container);
+            manifest.setNormalisationStatus(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY);
+            manifest.setValidationStatus(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY);
             manifest.setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
             manifest.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_CORE_DISTRIBUTION);
             manifest.setInterSubsystemDistributable(true);
-            manifest.setSourceSystem(sourceSubsystemParticipantName);
-            String workshopName = DefaultWorkshopSetEnum.POLICY_ENFORCEMENT_WORKSHOP.getWorkshop();
-            String participantName = OUTBOUND_CHECKPOINT_WUP_NAME;
-            PetasosParticipantId previousParticipantId = new PetasosParticipantId(sourceSubsystemParticipantName, workshopName, participantName);
+            manifest.setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
+            manifest.setExternalSourceSystem(DataParcelManifest.WILDCARD_CHARACTER);
+
+            PetasosParticipantId previousParticipantId = new PetasosParticipantId();
+            previousParticipantId.setSubsystemName(sourceSubsystemParticipantName);
+            previousParticipantId.setName(DataParcelManifest.WILDCARD_CHARACTER);
+            previousParticipantId.setVersion(DataParcelManifest.WILDCARD_CHARACTER);
             manifest.setPreviousParticipant(previousParticipantId);
+
             PetasosParticipantId originParticipantId = new PetasosParticipantId();
             originParticipantId.setSubsystemName(sourceSubsystemParticipantName);
+            originParticipantId.setName(DataParcelManifest.WILDCARD_CHARACTER);
+            originParticipantId.setVersion(DataParcelManifest.WILDCARD_CHARACTER);
             manifest.setOriginParticipant(originParticipantId);
-            manifestList.add(manifest);
+
+            getDistributedTaskSubscriptionMap().addSubscription(manifest);
         }
         getLogger().info(".subscribeToRemoteDataParcels(): Registration Processing Plant Petasos Participant ... :)");
-        PetasosParticipantRegistration participantRegistration = getLocalPetasosParticipantCacheIM().registerPetasosParticipant(getMeAsASoftwareComponent(), new HashSet<>(), manifestList);
-        getLogger().info(".subscribeToRemoteDataParcels(): Exit, participantRegistration->{}", participantRegistration);
-        return(participantRegistration);
     }
+
+
 
 
 }

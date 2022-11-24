@@ -222,14 +222,9 @@ public class LocalParticipantManager {
 			return(null);
 		}
 		//
-		// Update with global Pathway Service Manager
-		PetasosParticipantRegistration registration = getTaskPathwayManagementService().updatePetasosParticipant(participant);
-		//
-		// Update local DM with Global details
-		synchroniseLocalWithCentralCacheDetail(registration);
-		if(registration.getParticipant().getComponentID().equals(myProcessingPlant.getMeAsASoftwareComponent().getComponentID())){
-			participantHolder.setMyProcessingPlantPetasosParticipant(registration.getParticipant());
-		}
+		// Update with Local Participant Cache
+		getParticipantCacheDM().updatePetasosParticipant(participant);
+		PetasosParticipantRegistration registration = getParticipantCacheDM().getPetasosParticipantRegistration(participant.getParticipantName());
 		getLogger().debug(".updatePetasosParticipant(): Exit, registration->{}", registration);
 		return(registration);
 	}

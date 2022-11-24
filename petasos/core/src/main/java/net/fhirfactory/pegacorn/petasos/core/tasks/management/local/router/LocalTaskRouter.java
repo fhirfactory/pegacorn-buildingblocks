@@ -150,7 +150,7 @@ public class LocalTaskRouter extends DaemonBase {
                         getLogger().debug(".localTaskRouterDaemon(): participantTask->{}", participantTask);
                         if (participantTask != null) {
                             hadTasks = true;
-                            getLogger().warn(".localTaskRouterDaemon(): Got Task, forwarding it into WUP");
+                            getLogger().debug(".localTaskRouterDaemon(): Got Task, forwarding it into WUP");
                             getCamelProducerService().sendBody(PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE, ExchangePattern.InOnly, participantTask);
                         }
                     }
@@ -161,7 +161,7 @@ public class LocalTaskRouter extends DaemonBase {
             getLogger().warn(".localTaskRouterDaemon(): An Issue with the Local Task Router -> ", ex);
         }
         setTaskRouterDaemonRunning(false);
-        getLogger().warn(".localTaskRouterDaemon(): Exit");
+        getLogger().debug(".localTaskRouterDaemon(): Exit");
     }
 
     //

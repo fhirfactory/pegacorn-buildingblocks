@@ -44,7 +44,7 @@ public class ParticipantGridClientEndpoint extends ParticipantServicesEndpointBa
     private static final Logger LOG = LoggerFactory.getLogger(ParticipantGridClientEndpoint.class);
 
     private static Long PETASOS_PARTICIPANT_MAP_CACHE_SYNCHRONISATION_INITIAL_WAIT = 60000L;
-    private static Long PETASOS_PARTICIPANT_MAP_CACHE_SYNCHRONISATION_PERIOD = 300000L;
+    private static Long PETASOS_PARTICIPANT_MAP_CACHE_SYNCHRONISATION_PERIOD = 30000L;
 
     private static Long EXECUTION_STATUS_SYNCHRONISATION_INITIAL_WAIT = 60000L;
     private static Long EXECUTION_STATUS_SYNCHRONISATION_PERIOD = 30000L;

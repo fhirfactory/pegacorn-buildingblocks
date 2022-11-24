@@ -50,17 +50,22 @@ import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.core.model.dataparcel.valuesets.DataParcelDirectionEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.participant.PetasosParticipant;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemSubscriptionType;
+import net.fhirfactory.pegacorn.petasos.participants.cache.DistributedTaskSubscriptionMap;
 import net.fhirfactory.pegacorn.petasos.participants.manager.LocalParticipantManager;
 import net.fhirfactory.pegacorn.workshops.PolicyEnforcementWorkshop;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.MOAStandardWUP;
 import net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased.pep.beans.CoreDistributionPolicyEnforcementPoint;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
 
 public abstract class OutboundCheckPointWUP extends MOAStandardWUP implements PetasosInterSubsystemSubscriptionInterface {
+
+    private int startupDaemonExecutionCount;
+    private static final int REMOTE_SUBSCRIPTION_DAEMON_MAXIMUM_EXECUTION_COUNT = 10;
+    private static final Long REMOTE_SUBSCRIPTION_DAEMON_STARTUP_DELAY = 45000L;
+    private static final Long REMOTE_SUBSCRIPTION_DAEMON_CHECK_PERIOD = 10000L;
 
     @Inject
     private PolicyEnforcementWorkshop policyEnforcementWorkshop;
@@ -70,6 +75,66 @@ public abstract class OutboundCheckPointWUP extends MOAStandardWUP implements Pe
 
     @Inject
     private PegacornReferenceProperties referenceProperties;
+
+    @Inject
+    private DistributedTaskSubscriptionMap distributedTaskSubscriptionMap;
+
+    //
+    // Constructor(s)
+    //
+
+    public OutboundCheckPointWUP(){
+        super();
+        this.startupDaemonExecutionCount = 0;
+    }
+
+    //
+    // Post Construct
+    //
+
+    @Override
+    protected void executePostInitialisationActivities(){
+        scheduleRemoteContentSubscriptionDaemon();
+    }
+
+    //
+    // Remote Tasks Subscription Daemon
+    //
+
+    private void scheduleRemoteContentSubscriptionDaemon() {
+        getLogger().debug(".scheduleRemoteContentSubscriptionDaemon(): Entry");
+        Timer timer = new Timer("RemoteSubscriptionDaemonTimer");
+        TimerTask remoteSubscriptionDaemonTimerTask = new TimerTask() {
+            public void run() {
+                getLogger().debug(".remoteSubscriptionDaemonTimerTask(): Entry");
+                if(startupDaemonExecutionCount < REMOTE_SUBSCRIPTION_DAEMON_MAXIMUM_EXECUTION_COUNT) {
+                    remoteContentSubscriptionDaemon();
+                    startupDaemonExecutionCount++;
+                } else {
+                    timer.cancel();
+                }
+                getLogger().debug(".remoteSubscriptionDaemonTimerTask(): Exit");
+            }
+        };
+        timer.schedule(remoteSubscriptionDaemonTimerTask, REMOTE_SUBSCRIPTION_DAEMON_STARTUP_DELAY, REMOTE_SUBSCRIPTION_DAEMON_CHECK_PERIOD);
+        getLogger().debug(".scheduleRemoteContentSubscriptionDaemon(): Exit");
+    }
+
+    private void remoteContentSubscriptionDaemon(){
+        PetasosParticipant participant = getMeAsAPetasosParticipant();
+        List<TaskWorkItemSubscriptionType> subscriptions = distributedTaskSubscriptionMap.getSubscriptions();
+        for(TaskWorkItemSubscriptionType currentSubscription: subscriptions){
+            currentSubscription.setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_CORE_DISTRIBUTION);
+            if(!participant.getSubscriptions().contains(currentSubscription)){
+                participant.getSubscriptions().add(currentSubscription);
+            }
+        }
+        getLocalParticipantManager().updatePetasosParticipant(participant);
+    }
+
+    //
+    // Business Methods
+    //
 
     @Override
     protected List<DataParcelManifest> specifySubscriptionTopics() {
