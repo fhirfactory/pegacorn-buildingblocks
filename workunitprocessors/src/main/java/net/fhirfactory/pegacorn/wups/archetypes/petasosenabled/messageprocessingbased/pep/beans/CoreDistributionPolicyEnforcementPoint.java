@@ -73,10 +73,10 @@ public class CoreDistributionPolicyEnforcementPoint {
         UoWPayload egressPayload = SerializationUtils.clone(uow.getIngresContent());
         egressPayload.getPayloadManifest().setEnforcementPointApprovalStatus(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_POSITIVE);
         egressPayload.getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_OUTBOUND_DATA_PARCEL);
-        egressPayload.getPayloadManifest().setDataParcelFlowDirection(DataParcelDirectionEnum.INFORMATION_FLOW_CORE_DISTRIBUTION);
         egressPayload.getPayloadManifest().setValidationStatus(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATED_FALSE);
         egressPayload.getPayloadManifest().setNormalisationStatus(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_TRUE);
         egressPayload.getPayloadManifest().setDataParcelType(DataParcelTypeEnum.GENERAL_DATA_PARCEL_TYPE);
+        egressPayload.getPayloadManifest().setInterSubsystemDistributable(false);
         uow.getEgressContent().addPayloadElement(egressPayload);
         uow.setProcessingOutcome(UoWProcessingOutcomeEnum.UOW_OUTCOME_SUCCESS);
         return(uow);

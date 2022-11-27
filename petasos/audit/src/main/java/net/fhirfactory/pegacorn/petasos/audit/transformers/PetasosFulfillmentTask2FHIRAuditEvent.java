@@ -54,6 +54,10 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
     @Inject
     private ProcessingPlantInterface processingPlant;
 
+    //
+    // Constructor(s)
+    //
+
     public PetasosFulfillmentTask2FHIRAuditEvent(){
         this.jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         JavaTimeModule module = new JavaTimeModule();
@@ -61,9 +65,23 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
         this.jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
+    //
+    // Getters (and Setters)
+    //
+
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
+    //
+    // Business Logic
+    //
 
     public AuditEvent transform(PetasosFulfillmentTask fulfillmentTask){
+        getLogger().warn(".transform(): Entry, fulfillmentTask->{}", fulfillmentTask);
+
         if(fulfillmentTask == null){
+            getLogger().warn(".transform(): Exit, fulfillmentTask is emtpy");
             return(null);
         }
 
@@ -104,6 +122,7 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
                 extractProcessingPeriod(fulfillmentTask),
                 auditEventEntityComponent);
 
+        getLogger().warn(".transform(): Entry, auditEvent->{}", auditEvent);
         return(auditEvent);
     }
 }

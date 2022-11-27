@@ -94,13 +94,15 @@ public abstract class TaskDistributionDecisionEngineBase {
             getLogger().debug(".containerIsEqual(): Exit, subscribedManifest has no containerDescriptor, but publisherManifest does, returning -false-");
             return(false);
         }
-        if(!testManifestHasContainerDescriptor ) {
+        DataParcelTypeDescriptor subscriberContainer = subscribedManifest.getContainerDescriptor();
+        DataParcelTypeDescriptor publishedContainer = publisherManifest.getContainerDescriptor();
+        if(publishedContainer == null) {
             getLogger().debug(".containerIsEqual(): Exit, publisherManifest has no containerDescriptor, but subscribedManifest does, returning -false-");
-            return(false);
+            publishedContainer = new DataParcelTypeDescriptor();
         }
         getLogger().trace(".containerIsEqual(): publisherManifest and subscribedManifest both have containerDescriptors, now testing for equality");
 
-        boolean containersAreEqual = publisherManifest.getContainerDescriptor().isEqualWithWildcardsInOther(subscribedManifest.getContainerDescriptor());
+        boolean containersAreEqual = publishedContainer.isEqualWithWildcardsInOther(subscriberContainer);
 
         getLogger().debug(".containerIsEqual(): Exit, publisherManifest and subscribedManifest containerDescriptor comparison yielded->{}", containersAreEqual);
         return(containersAreEqual);

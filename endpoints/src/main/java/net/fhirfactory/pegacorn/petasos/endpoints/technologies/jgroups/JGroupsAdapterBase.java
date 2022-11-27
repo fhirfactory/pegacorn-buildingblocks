@@ -52,7 +52,7 @@ public abstract class JGroupsAdapterBase extends RouteBuilder implements Members
     private ArrayList<Address> currentScannedMembership;
     private Object currentScannedMembershipLock;
 
-    private static Long RPC_UNICAST_TIMEOUT = 5000L;
+    private static Long RPC_UNICAST_TIMEOUT = 10000L;
 
     private static int INITIALISATION_RETRY_COUNT = 5;
     private static Long INITIALISATION_RETRY_WAIT = 500L;

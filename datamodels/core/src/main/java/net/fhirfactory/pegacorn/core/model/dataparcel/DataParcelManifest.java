@@ -162,6 +162,7 @@ public class DataParcelManifest implements Serializable {
         this.previousParticipant = previousParticipant;
     }
 
+    @JsonIgnore
     public boolean hasDestinationParticipant(){
         boolean hasValue = this.destinationParticipant != null;
         return(hasValue);
@@ -175,6 +176,7 @@ public class DataParcelManifest implements Serializable {
         this.destinationParticipant = destinationParticipant;
     }
 
+    @JsonIgnore
     public boolean hasOriginParticipant(){
         boolean hasValue = this.originParticipant != null;
         return(hasValue);
@@ -188,51 +190,61 @@ public class DataParcelManifest implements Serializable {
         this.originParticipant = taskProducerProcessingPlantParticipantName;
     }
 
+    @JsonIgnore
     public boolean hasDataParcelType(){
         boolean has = this.dataParcelType != null;
         return(has);
     }
 
+    @JsonIgnore
     public boolean hasValidationStatus(){
         boolean has = this.validationStatus != null;
         return(has);
     }
 
+    @JsonIgnore
     public boolean hasNormalisationStatus(){
         boolean has = this.normalisationStatus != null;
         return(has);
     }
 
+    @JsonIgnore
     public boolean hasEnforcementPointApprovalStatus(){
         boolean has = this.enforcementPointApprovalStatus != null;
         return(has);
     }
 
+    @JsonIgnore
     public boolean hasDataParcelFlowDirection(){
         boolean has = this.dataParcelFlowDirection != null;
         return(has);
     }
 
+    @JsonIgnore
     public boolean hasContentDescriptor(){
         boolean hasCT = this.contentDescriptor != null;
         return(hasCT);
     }
 
+    @JsonIgnore
     public boolean hasContainerDescriptor(){
         boolean hasCT = this.containerDescriptor != null;
         return(hasCT);
     }
 
+    @JsonIgnore
     public boolean hasSourceSystem(){
         boolean hasSS = this.sourceSystem != null;
         return(hasSS);
     }
 
+    @JsonIgnore
     public boolean hasIntendedTargetSystem(){
         boolean hasITS = this.intendedTargetSystem != null;
         return(hasITS);
     }
 
+    @JsonIgnore
     public boolean hasDataParcelQualityStatement(){
         boolean hasDPQS = this.payloadQuality != null;
         return(hasDPQS);
