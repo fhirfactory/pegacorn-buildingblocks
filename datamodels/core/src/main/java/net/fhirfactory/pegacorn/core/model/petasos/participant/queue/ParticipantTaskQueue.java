@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.participant.id.PetasosPartici
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemManifestType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.queue.ParticipantTaskQueueEntry;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class ParticipantTaskQueue {
     }
 
     public ParticipantTaskQueue(PetasosParticipantId participantId){
-        this.participantId = participantId;
+        this.participantId = SerializationUtils.clone(participantId);
         this.queueHead = null;
         this.queueLock = new Object();
         this.size = 0;

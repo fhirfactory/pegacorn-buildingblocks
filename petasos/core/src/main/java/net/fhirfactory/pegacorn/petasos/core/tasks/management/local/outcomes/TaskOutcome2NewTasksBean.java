@@ -119,7 +119,9 @@ public class TaskOutcome2NewTasksBean {
             //
             // We need to first test if the task failed. If so, create a new one to replace it and start it again!
             if(actionableTask.getTaskOutcomeStatus().getOutcomeStatus().equals(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FAILED)){
+                getLogger().warn(".collectOutcomesAndCreateNewTasks(): Task has failed, creating re-do Task, actionableTask.getTaskId()->{}", actionableTask.getTaskId());
                 TaskWorkItemType newWorkItem = new TaskWorkItemType();
+                getLogger().warn(".collectOutcomesAndCreateNewTasks(): actionableTask.getTaskWorkItem().getIngresContent()->{}", actionableTask.getTaskWorkItem().getIngresContent());
                 newWorkItem.setIngresContent(SerializationUtils.clone(actionableTask.getTaskWorkItem().getIngresContent()));
                 PetasosActionableTask newDownstreamTask = actionableTaskFactory.newMessageBasedActionableTask(newWorkItem);
                 newDownstreamTask.setTaskTraceability(SerializationUtils.clone(actionableTask.getTaskTraceability()));

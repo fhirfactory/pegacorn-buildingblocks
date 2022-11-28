@@ -25,11 +25,13 @@ import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterfac
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.core.model.petasos.wup.valuesets.PetasosTaskExecutionStatusEnum;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.io.Serial;
 import java.time.Instant;
 
 @ApplicationScoped
@@ -41,17 +43,22 @@ public class PetasosTaskJobCardFactory {
 
     public PetasosTaskJobCard newPetasosTaskJobCard(PetasosFulfillmentTask fulfillmentTask){
         getLogger().debug(".newPetasosTaskJobCard(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        if(fulfillmentTask.hasTaskJobCard()){
+            return(fulfillmentTask.getTaskJobCard());
+        }
+
         PetasosTaskJobCard jobCard = new PetasosTaskJobCard();
-        jobCard.setActionableTaskId(fulfillmentTask.getActionableTaskId());
+        jobCard.setActionableTaskId(SerializationUtils.clone(fulfillmentTask.getActionableTaskId()));
         jobCard.setClusterMode(processingPlant.getMeAsASoftwareComponent().getConcurrencyMode());
         jobCard.setLastActivityCheckInstant(Instant.EPOCH);
         jobCard.setCurrentStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
-        jobCard.setExecutingFulfillmentTaskId(null);
+        jobCard.setExecutingFulfillmentTaskId(SerializationUtils.clone(fulfillmentTask.getTaskId()));
         jobCard.setExecutingFulfillmentTaskIdAssignmentInstant(Instant.EPOCH);
         jobCard.setSystemMode(processingPlant.getMeAsASoftwareComponent().getResilienceMode());
         jobCard.setLastRequestedStatus(PetasosTaskExecutionStatusEnum.PETASOS_TASK_ACTIVITY_STATUS_ASSIGNED);
-        jobCard.setExecutingProcessingPlant(processingPlant.getMeAsASoftwareComponent().getComponentID());
-        jobCard.setExecutingWorkUnitProcessor(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID());
+        jobCard.setExecutingProcessingPlant(SerializationUtils.clone(processingPlant.getMeAsASoftwareComponent().getComponentID()));
+        jobCard.setProcessingPlantParticipantName(processingPlant.getSubsystemParticipantName());
+        jobCard.setExecutingWorkUnitProcessor(SerializationUtils.clone(fulfillmentTask.getTaskFulfillment().getFulfillerWorkUnitProcessor().getComponentID()));
         getLogger().debug(".newPetasosTaskJobCard(): Exit, jobCard->{}", jobCard);
         return(jobCard);
     }

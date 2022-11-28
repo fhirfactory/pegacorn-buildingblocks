@@ -37,7 +37,7 @@ public enum FulfillmentExecutionStatusEnum {
     FULFILLMENT_EXECUTION_STATUS_ACTIVE_ELSEWHERE("ActiveElsewhere","petasos.fulfillment.execution_status.active_elsewhere"),
     FULFILLMENT_EXECUTION_STATUS_FINISHED("Finished","petasos.fulfillment.execution_status.finished"),
     FULFILLMENT_EXECUTION_STATUS_FINALISED("Finalised","petasos.fulfillment.execution_status.finalised"),
-    FULFILLMENT_EXECUTION_STATUS_FAILED("Failed", "petasos.petasos.agent.parcel.status.failed"),
+    FULFILLMENT_EXECUTION_STATUS_FAILED("Failed", "petasos.fulfillment.execution_status.failed"),
 	FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE("FinishedElsewhere", "petasos.fulfillment.execution_status.finished_elsewhere"),
 	FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE("FinalisedElsewhere", "petasos.fulfillment.execution_status.finalised_elsewhere");
     

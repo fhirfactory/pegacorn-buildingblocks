@@ -86,7 +86,7 @@ public class PetasosFulfillmentTaskFactory {
         //
         // Create a TaskId (is local, so simple UUID is ok) and add to our Task
         TaskIdType fulfillmentTaskId = new TaskIdType();
-        fulfillmentTaskId.setTaskSequenceNumber(actionableTask.getTaskId().getTaskSequenceNumber());
+        fulfillmentTaskId.setTaskSequenceNumber(SerializationUtils.clone(actionableTask.getTaskId().getTaskSequenceNumber()));
         fulfillmentTaskId.setLocalId(UUID.randomUUID().toString());
         fulfillmentTask.setTaskId(fulfillmentTaskId);
         //
@@ -107,8 +107,10 @@ public class PetasosFulfillmentTaskFactory {
         fulfillmentTask.setActionableTaskId(actionableTaskId);
         //
         // Get the ActionableTask's Task Reason (we don't need to clone it, it's an enum) and add it to our Task
-        TaskReasonType taskReason = actionableTask.getTaskReason();
-        fulfillmentTask.setTaskReason(taskReason);
+        if(actionableTask.hasTaskReason()) {
+            TaskReasonType taskReason = SerializationUtils.clone(actionableTask.getTaskReason());
+            fulfillmentTask.setTaskReason(taskReason);
+        }
         //
         // Get the Task Performer Types from the Actionable Task, clone them and add them to our task
         List<TaskPerformerTypeType> taskPerformers = new ArrayList<>();
@@ -121,14 +123,14 @@ public class PetasosFulfillmentTaskFactory {
         fulfillmentTask.setTaskPerformerTypes(taskPerformers);
         //
         // Assign the node affinity of the fulfillment task (from the actionable task)
-        fulfillmentTask.setTaskNodeAffinity(actionableTask.getTaskNodeAffinity());
+        fulfillmentTask.setTaskNodeAffinity(SerializationUtils.clone(actionableTask.getTaskNodeAffinity()));
         //
         // Now to add Fulfillment details
         TaskFulfillmentType fulfillment = new TaskFulfillmentType();
         fulfillment.setFulfillerWorkUnitProcessor(wupNode);
         fulfillment.setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
         fulfillment.setResilientActivity(true);
-        FulfillmentTrackingIdType trackingId = new FulfillmentTrackingIdType(fulfillmentTask.getTaskId());
+        FulfillmentTrackingIdType trackingId = new FulfillmentTrackingIdType(SerializationUtils.clone(fulfillmentTask.getTaskId()));
         fulfillment.setTrackingID(trackingId);
         fulfillment.setLastCheckedInstant(Instant.now());
         fulfillmentTask.setTaskFulfillment(fulfillment);

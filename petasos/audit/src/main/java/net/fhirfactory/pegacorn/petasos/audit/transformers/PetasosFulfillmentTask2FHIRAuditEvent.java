@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.audit.transformers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.Map;
 
 @ApplicationScoped
 public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
@@ -63,6 +65,8 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
         JavaTimeModule module = new JavaTimeModule();
         this.jsonMapper.registerModule(module);
         this.jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        this.jsonMapper.configure(MapperFeature.REQUIRE_SETTERS_FOR_GETTERS, true);
+        this.jsonMapper.configure(MapperFeature.USE_ANNOTATIONS, true);
     }
 
     //
@@ -88,14 +92,14 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
         UoW uow = fulfillmentTask.getTaskWorkItem();
         String auditEventEntityName = extractAuditEventEntityNameFromTask(fulfillmentTask);
 
-        String parcelAsString = null;
+        String parcelAsString = fulfillmentTask.toString();
 
-        try {
-            parcelAsString = jsonMapper.writeValueAsString(fulfillmentTask);
-        } catch (JsonProcessingException e) {
-            LOG.error(".transform(): Cannot convert UoW to string!!!",e);
-            return(null);
-        }
+//        try {
+//            parcelAsString = jsonMapper.writeValueAsString(fulfillmentTask);
+//        } catch (JsonProcessingException e) {
+//            LOG.error(".transform(): Cannot convert UoW to string!!!",e);
+//            return(null);
+//        }
 
         AuditEvent.AuditEventEntityComponent auditEventEntityComponent = auditEventEntityFactory.newAuditEventEntity(
                 AuditEventEntityTypeEnum.HL7_SYSTEM_OBJECT,

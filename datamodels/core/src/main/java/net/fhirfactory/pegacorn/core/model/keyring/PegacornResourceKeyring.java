@@ -32,6 +32,8 @@ import java.util.*;
 
 public class PegacornResourceKeyring implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(PegacornResourceKeyring.class);
+
+    @JsonIgnore
     protected Logger getLogger(){
         return(LOG);
     }
@@ -157,6 +159,7 @@ public class PegacornResourceKeyring implements Serializable {
         this.businessIdentifiersMap = businessIdentifiersMap;
     }
 
+    @JsonIgnore
     public String getDefaultSourceSystemMapEntry() {
         return DEFAULT_SOURCE_SYSTEM_MAP_ENTRY;
     }

@@ -142,6 +142,9 @@ public class LocalAuditEventServiceClientEventManager implements PetasosAuditEve
         if(synchronous){
             try {
                 success = auditEventService.logAuditEvent(auditEventServiceProvider.getPetasosAuditEventServiceProviderName(), auditEvent);
+                if(!success){
+                    printAuditEvent(auditEvent);
+                }
             } catch(Exception ex){
                 getLogger().warn(".writeQueuedAuditEvents(): Cannot write audit event, will print AuditEvent here, Message->{}, StackTrace->{}", ex.getCause(), ex.getStackTrace());
                 printAuditEvent(auditEvent);

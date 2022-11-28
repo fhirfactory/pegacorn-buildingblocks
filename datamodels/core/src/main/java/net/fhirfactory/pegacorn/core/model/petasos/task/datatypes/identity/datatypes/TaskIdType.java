@@ -107,14 +107,14 @@ public class TaskIdType extends PegacornResourceKeyring {
     public String toString() {
         final StringBuffer sb = new StringBuffer("TaskIdType{");
         sb.append("taskSequenceNumber=").append(taskSequenceNumber);
-        sb.append(", id='").append(getId()).append('\'');
+        sb.append(", id=").append(getId());
         sb.append(", primaryBusinessIdentifier=").append(getPrimaryBusinessIdentifier());
-        sb.append(", localId='").append(getLocalId()).append('\'');
+        sb.append(", localId=").append(getLocalId());
         sb.append(", sourceSystemKeyMap=").append(getSourceSystemKeyMap());
         sb.append(", resourceId=").append(getResourceId());
         sb.append(", businessIdentifiersMap=").append(getBusinessIdentifiersMap());
-        sb.append(", defaultSourceSystemMapEntry='").append(getDefaultSourceSystemMapEntry()).append('\'');
-        sb.append(", resourceType='").append(getResourceType()).append('\'');
+        sb.append(", defaultSourceSystemMapEntry=").append(getDefaultSourceSystemMapEntry());
+        sb.append(", resourceType=").append(getResourceType());
         sb.append('}');
         return sb.toString();
     }

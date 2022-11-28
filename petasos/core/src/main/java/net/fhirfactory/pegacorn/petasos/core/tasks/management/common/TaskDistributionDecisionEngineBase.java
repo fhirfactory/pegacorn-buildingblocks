@@ -318,65 +318,65 @@ public abstract class TaskDistributionDecisionEngineBase {
     }
 
     protected boolean filterParticipantId(PetasosParticipantId filterCriteria, PetasosParticipantId testParticipantId){
-        getLogger().warn(".filterParticipantId(): Entry, filterCriteria->{}, testParticipantId->{}", filterCriteria, testParticipantId);
+        getLogger().debug(".filterParticipantId(): Entry, filterCriteria->{}, testParticipantId->{}", filterCriteria, testParticipantId);
         if(filterCriteria == null && testParticipantId == null){
-            getLogger().warn(".filterParticipantId(): Exit, filterCriteria and testParticipantId are empty, returning -true-");
+            getLogger().debug(".filterParticipantId(): Exit, filterCriteria and testParticipantId are empty, returning -true-");
             return(false);
         }
         if(filterCriteria == null){
-            getLogger().warn(".filterParticipantId(): Exit, filterCriteria is empty, returning -false-");
+            getLogger().debug(".filterParticipantId(): Exit, filterCriteria is empty, returning -false-");
             return(false);
         }
         if(testParticipantId == null){
-            getLogger().warn(".filterParticipantId(): testParticipantId is empty, checking filter");
+            getLogger().trace(".filterParticipantId(): testParticipantId is empty, checking filter");
             boolean namePasses = filterString(filterCriteria.getName(), null);
             boolean subsystemPasses = filterString(filterCriteria.getSubsystemName(), null);
             boolean versionPasses = filterString(filterCriteria.getVersion(), null);
             if(namePasses && subsystemPasses && versionPasses){
-                getLogger().warn(".filterParticipantId(): Exit, testParticipantId is empty, filter has wildcards, returning -true-");
+                getLogger().debug(".filterParticipantId(): Exit, testParticipantId is empty, filter has wildcards, returning -true-");
                 return(true);
             } else {
-                getLogger().warn(".filterParticipantId(): Exit, testParticipantId is empty, filter does not contain wildcards, returning -false-");
+                getLogger().debug(".filterParticipantId(): Exit, testParticipantId is empty, filter does not contain wildcards, returning -false-");
                 return(false);
             }
         } else {
-            getLogger().warn(".filterParticipantId(): testParticipantId is NOT empty, applying filter");
+            getLogger().trace(".filterParticipantId(): testParticipantId is NOT empty, applying filter");
             boolean namePasses = filterString(filterCriteria.getName(), testParticipantId.getName());
             boolean subsystemPasses = filterString(filterCriteria.getSubsystemName(), testParticipantId.getSubsystemName());
             boolean versionPasses = filterString(filterCriteria.getVersion(), testParticipantId.getVersion());
             if(namePasses && subsystemPasses && versionPasses){
-                getLogger().warn(".filterParticipantId(): Exit, filter->{}", true);
+                getLogger().debug(".filterParticipantId(): Exit, filter->{}", true);
                 return(true);
             } else {
-                getLogger().warn(".filterParticipantId(): Exit, filter->{}", false);
+                getLogger().debug(".filterParticipantId(): Exit, filter->{}", false);
                 return(false);
             }
         }
     }
 
     protected boolean filterString(String filterCriteria, String testString){
-        getLogger().warn(".filterString(): Entry, filterCriteria->{}, testString->{}", filterCriteria, testString);
+        getLogger().debug(".filterString(): Entry, filterCriteria->{}, testString->{}", filterCriteria, testString);
         if(StringUtils.isEmpty(filterCriteria) && StringUtils.isEmpty(testString)){
-            getLogger().warn(".filterString(): Exit, both filterCriteria and testString are empty, returning -true-");
+            getLogger().debug(".filterString(): Exit, both filterCriteria and testString are empty, returning -true-");
             return(true);
         }
         if(StringUtils.isEmpty(filterCriteria)){
-            getLogger().warn(".filterString(): Exit, filterCriteria only is empty, returning -false-");
+            getLogger().debug(".filterString(): Exit, filterCriteria only is empty, returning -false-");
             return(false);
         }
         if(filterCriteria.contentEquals(DataParcelManifest.WILDCARD_CHARACTER)){
-            getLogger().warn(".filterString(): Exit, filterCriteria contains wildcard, returning -true-");
+            getLogger().debug(".filterString(): Exit, filterCriteria contains wildcard, returning -true-");
             return(true);
         }
         if(StringUtils.isEmpty(testString)){
-            getLogger().warn(".filterString(): Exit, filterCriteria requires content, testString is empty, returning -false-");
+            getLogger().debug(".filterString(): Exit, filterCriteria requires content, testString is empty, returning -false-");
             return(false);
         }
         if(filterCriteria.contentEquals(testString)){
-            getLogger().warn(".filterString(): Exit, filterCriteria and testString contain same content, returning -true-");
+            getLogger().debug(".filterString(): Exit, filterCriteria and testString contain same content, returning -true-");
             return(true);
         }
-        getLogger().warn(".filterString(): Exit, default, returning -false-");
+        getLogger().debug(".filterString(): Exit, default, returning -false-");
         return(false);
     }
 }

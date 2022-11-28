@@ -81,8 +81,10 @@ public class UoW implements Serializable {
 
     public UoW(){
         this.ingresContent = null;
+        getLogger().trace(".setIngresContent(): create an empty UoWPayloadSet and assign it to the egressContent");
         this.egressContent = new UoWPayloadSet();
-        this.processingOutcome = null;
+        getLogger().trace(".setIngresContent(): egressContent created and assigned");
+        this.processingOutcome = UoWProcessingOutcomeEnum.UOW_OUTCOME_NOTSTARTED;
         this.typeID = null;
         this.failureDescription = null;
         this.instanceID = null;
@@ -198,8 +200,24 @@ public class UoW implements Serializable {
     }
 
     public void setIngresContent(UoWPayload ingresContent) {
-        this.ingresContent = ingresContent;
+        getLogger().debug(".setIngresContent(): Constructor: inputPayload -->{}", ingresContent);
+        getLogger().trace(".setIngresContent(): Clone the ingressContent and assign it");
+        this.ingresContent = SerializationUtils.clone(ingresContent);
+        getLogger().trace(".setIngresContent(): ingressContent cloned and assigned");
+        getLogger().trace(".setIngresContent(): Creating the typeID, first extract inputPayload manifest");
+        FDN contentFDN = ingresContent.getPayloadManifest().getContentDescriptor().toFDN();
+        getLogger().trace(".setIngresContent(): Creating the typeID, now convert to an FDNToken");
+        FDNToken contentFDNToken = contentFDN.getToken();
+        getLogger().trace(".setIngresContent(): Creating the typeID, now clone it and assign it to the typeID of this UoW");
+        this.typeID = SerializationUtils.clone(contentFDNToken);
+        getLogger().trace(".setIngresContent(): typeID --> {}", this.typeID);
+        this.failureDescription = null;
+        getLogger().trace(".setIngresContent(): Now generating instanceID");
         generateInstanceID();
+        getLogger().trace(".setIngresContent(): instanceID generated");
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace(".setIngresContent(FDN, UoWPayloadSet): this.typeID --> {}, this.instanceID --> {}", this.typeID, this.instanceID);
+        }
     }
 
     // egressContent Bean/Helper methods
