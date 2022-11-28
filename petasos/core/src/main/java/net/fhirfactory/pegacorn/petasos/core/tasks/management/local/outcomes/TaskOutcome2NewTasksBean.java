@@ -119,21 +119,32 @@ public class TaskOutcome2NewTasksBean {
             //
             // We need to first test if the task failed. If so, create a new one to replace it and start it again!
             if(actionableTask.getTaskOutcomeStatus().getOutcomeStatus().equals(ActionableTaskOutcomeStatusEnum.ACTIONABLE_TASK_OUTCOME_STATUS_FAILED)){
-                getLogger().warn(".collectOutcomesAndCreateNewTasks(): Task has failed, creating re-do Task, actionableTask.getTaskId()->{}", actionableTask.getTaskId());
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Start");
                 TaskWorkItemType newWorkItem = new TaskWorkItemType();
-                getLogger().warn(".collectOutcomesAndCreateNewTasks(): actionableTask.getTaskWorkItem().getIngresContent()->{}", actionableTask.getTaskWorkItem().getIngresContent());
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Create Ingres Content");
                 newWorkItem.setIngresContent(SerializationUtils.clone(actionableTask.getTaskWorkItem().getIngresContent()));
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Create New Task Using Ingres Content");
                 PetasosActionableTask newDownstreamTask = actionableTaskFactory.newMessageBasedActionableTask(newWorkItem);
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Copy Traceability Information from Failed Task");
                 newDownstreamTask.setTaskTraceability(SerializationUtils.clone(actionableTask.getTaskTraceability()));
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Copy Sequence Number from Failed Task");
                 newDownstreamTask.getTaskId().setTaskSequenceNumber(actionableTask.getTaskId().getTaskSequenceNumber());
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Specify that task is a Retry Task");
                 newDownstreamTask.getTaskReason().setRetryTask(true);
-
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Copy TaskPerformer Detail from Failed Task");
+                if(newDownstreamTask.getTaskPerformerTypes() == null){
+                    newDownstreamTask.setTaskPerformerTypes(new ArrayList<>());
+                }
+                for(TaskPerformerTypeType currentTaskPerformer: actionableTask.getTaskPerformerTypes()){
+                    newDownstreamTask.getTaskPerformerTypes().add(currentTaskPerformer);
+                }
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Finished");
                 if (!actionableTask.hasTaskCompletionSummary()) {
                     actionableTask.setTaskCompletionSummary(new TaskCompletionSummaryType());
                 }
                 actionableTask.getTaskCompletionSummary().setLastInChain(true);
                 actionableTask.getTaskCompletionSummary().setFinalised(true);
-
+                getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Update NewTask List] newDownstreamTask->{}", newDownstreamTask);
                 newActionableTaskList.add(newDownstreamTask);
             } else {
                 //
@@ -188,7 +199,9 @@ public class TaskOutcome2NewTasksBean {
         // the upstream task.
         List<PetasosActionableTaskSharedInstance> newTaskList = new ArrayList<>();
         for(PetasosActionableTask currentNewActionableTask: newActionableTaskList){
+            getLogger().warn(".collectOutcomesAndCreateNewTasks(): Queueing Task->{}", currentNewActionableTask.getTaskId());
             TaskIdType taskId = centralTaskProxy.queueTask(currentNewActionableTask);
+            getLogger().warn(".collectOutcomesAndCreateNewTasks(): Queued Task, taskId->{}", taskId);
         }
         getLogger().trace(".collectOutcomesAndCreateNewTasks(): Updating actionableTask with task completion details");
         centralTaskProxy.notifyTaskFinalisation(actionableTask.getTaskId());
