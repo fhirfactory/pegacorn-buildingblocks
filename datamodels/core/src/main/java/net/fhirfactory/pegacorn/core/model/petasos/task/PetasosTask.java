@@ -132,6 +132,12 @@ public class PetasosTask implements Serializable {
         this.sourceResourceId = sourceResourceId;
     }
 
+    @JsonIgnore
+    public boolean hasCreationInstant(){
+        boolean hasValue = this.creationInstant != null;
+        return(hasValue);
+    }
+
     public Instant getCreationInstant() {
         return creationInstant;
     }

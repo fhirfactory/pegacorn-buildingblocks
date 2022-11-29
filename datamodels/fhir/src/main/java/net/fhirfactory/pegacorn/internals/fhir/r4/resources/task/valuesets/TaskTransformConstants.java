@@ -19,19 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.services.tasks.transforms.common;
+package net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets;
+
+import net.fhirfactory.pegacorn.core.constants.systemwide.PegacornReferenceProperties;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 @ApplicationScoped
 public class TaskTransformConstants {
+
+    @Inject
+    private PegacornReferenceProperties systemWideProperties;
+
     private static String SYSTEM_WIDE_FOCUS_EXTENSION_URL = "task.business_status.system_wide_focus";
     private static String CLUSTER_WIDE_FOCUS_EXTENSION_URL = "task.business_status.cluster_wide_focus";
     private static String TASK_RETRY_REQUIRED_EXTENSION_URL = "task.business_status.retry_required";
     private static String TASK_RETRY_COUNT_EXTENSION_URL = "task.business_status.task_retry_count";
 
-    private static String TASK_REGISTRATON_INSTANT_EXTENSION_URL = "task.period.registration_instant";
-    private static String TASK_FINALISATION_INSTANT_EXTENSION_URL = "task.period.finalisation_instant";
+    private static String DRICATS_TASK_FINALISATION_INSTANT_EXTENSION_SYSTEM = "/extension/petasos.task.period.finalisation_date";
+    private static String DRICATS_TASK_READY_INSTANT_EXTENSION_SYSTEM = "/extension/petasos.task.period.ready_date";
+    private static String DRICATS_TASK_REGISTRATION_INSTANT_EXTENSION_SYSTEM = "/extension/petasos.task.period.registration_date";
 
     //
     // Getters and Setters
@@ -53,11 +61,17 @@ public class TaskTransformConstants {
         return TASK_RETRY_COUNT_EXTENSION_URL;
     }
 
+    public String getTaskFinalisationInstantExtensionUrl() {
+        String system = systemWideProperties.getPegacornCodeSystemSite() + DRICATS_TASK_FINALISATION_INSTANT_EXTENSION_SYSTEM;
+        return(system);
+    }
     public String getTaskRegistratonInstantExtensionUrl() {
-        return TASK_REGISTRATON_INSTANT_EXTENSION_URL;
+        String system = systemWideProperties.getPegacornCodeSystemSite() + DRICATS_TASK_REGISTRATION_INSTANT_EXTENSION_SYSTEM;
+        return(system);
     }
 
-    public String getTaskFinalisationInstantExtensionUrl() {
-        return TASK_FINALISATION_INSTANT_EXTENSION_URL;
+    public String getTaskReadyInstantExtensionUrl() {
+        String system = systemWideProperties.getPegacornCodeSystemSite() + DRICATS_TASK_READY_INSTANT_EXTENSION_SYSTEM;
+        return(system);
     }
 }

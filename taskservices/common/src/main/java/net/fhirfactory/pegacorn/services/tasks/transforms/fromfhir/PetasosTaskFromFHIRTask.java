@@ -35,6 +35,9 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskEn
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.context.TaskTriggerSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.RetryTaskReasonType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.TaskReasonType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.valuesets.TaskReasonTypeEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.TaskTypeType;
@@ -46,9 +49,7 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifier
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeSystemFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierDataTypeHelpers;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.transformers.FHIRProvenanceToPetasosTaskJourneyTransformer;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskIdentifierFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskPerformerTypeFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskStatusReasonFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.*;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -80,6 +81,12 @@ public abstract class PetasosTaskFromFHIRTask {
 
     @Inject
     private FHIRProvenanceToPetasosTaskJourneyTransformer provenanceToTaskJourneyTransformer;
+
+    @Inject
+    private TaskReasonFactory taskReasonFactory;
+
+    @Inject
+    private TaskPeriodFactory taskPeriodFactory;
 
     //
     // Constructor(s)
@@ -129,46 +136,28 @@ public abstract class PetasosTaskFromFHIRTask {
         taskType.setTaskType(getTaskType());
         // TODO resolve TaskSubType
 
-        //
-        // Set the Task Work Item
-        TaskWorkItemType taskWorkItem = new TaskWorkItemType();
-        UoWPayload inputPayload = new UoWPayload();
-        Task.ParameterComponent currentInputComponent = fhirTask.getInputFirstRep();
-        String parcelManifestAsString = currentInputComponent.getType().getCodingFirstRep().getCode();
-        try {
-            DataParcelManifest dataParcelManifest = getJSONMapper().readValue(parcelManifestAsString, DataParcelManifest.class);
-            inputPayload.setPayloadManifest(dataParcelManifest);
-        } catch (JsonProcessingException e) {
-            getLogger().warn(".newPetasosTaskFromTask(): Could not resolve Data Parcel Manifest for Task Work Item Input Payload! StackTrace->{}", ExceptionUtils.getStackTrace(e));
+       getLogger().trace(".newPetasosTaskFromTask(): [Set .setTaskWorkItem()] Start");
+        TaskWorkItemType taskWorkItem = extractTaskWorkItemFromFHIRTask(fhirTask);
+        if(taskWorkItem != null) {
+            petasosTask.setTaskWorkItem(taskWorkItem);
         }
-        StringType inputPayloadValue = (StringType)currentInputComponent.getValue();
-        String inputPayloadString = inputPayloadValue.getValue();
-        inputPayload.setPayload(inputPayloadString);
-        taskWorkItem.setIngresContent(inputPayload);
-        // now the Task Work Item egress payload
-        for(Task.TaskOutputComponent currentOutput: fhirTask.getOutput()){
-            UoWPayload currentOutputPayload = new UoWPayload();
-            String currentOutputParcelManifestString = currentOutput.getType().getCodingFirstRep().getCode();
-            try {
-                DataParcelManifest dataParcelManifest = getJSONMapper().readValue(currentOutputParcelManifestString, DataParcelManifest.class);
-                currentOutputPayload.setPayloadManifest(dataParcelManifest);
-            } catch (JsonProcessingException e) {
-                getLogger().warn(".newPetasosTaskFromTask(): Could not resolve Data Parcel Manifest for Task Work Item Output Payload! StackTrace->{}", ExceptionUtils.getStackTrace(e));
-            }
-            StringType currentOutputPayloadStringType = (StringType)currentInputComponent.getValue();
-            String currentOutputPayloadString = currentOutputPayloadStringType.getValue();
-            taskWorkItem.getEgressContent().addPayloadElement(currentOutputPayload);
-        }
-        // Now assign it to the task
-        petasosTask.setTaskWorkItem(taskWorkItem);
+        getLogger().trace(".newPetasosTaskFromTask(): [Set .setTaskWorkItem()] Finish");
 
-        // Now assign the PerformerType
-        List<TaskPerformerTypeType> performerTypes = transformPerformerCodeableConceptIntoTaskPerformerType(fhirTask.getPerformerType());
+        getLogger().trace(".newPetasosTaskFromTask(): [Set .setTaskReason()] Start");
+        TaskReasonType taskReason = extractTaskReasonFromFHIRTask(fhirTask);
+        if(taskReason != null) {
+            petasosTask.setTaskReason(taskReason);
+        }
+        getLogger().trace(".newPetasosTaskFromTask(): [Set .setTaskReason()] Finish");
+
+        getLogger().trace(".newPetasosTaskFromTask(): [Set .setPerformerTypes()] Start");
+        List<TaskPerformerTypeType> performerTypes = extractPerformerTypesFromFHIRTask(fhirTask.getPerformerType());
         if(performerTypes != null){
             if(!performerTypes.isEmpty()){
                 petasosTask.getTaskPerformerTypes().addAll(performerTypes);
             }
         }
+        getLogger().trace(".newPetasosTaskFromTask(): [Set .setPerformerTypes()] Finish");
 
         // Now add the TaskContext
         TaskContextType taskContext = transformFHIRTaskToTaskContext(fhirTask);
@@ -183,7 +172,7 @@ public abstract class PetasosTaskFromFHIRTask {
         }
 
         // Now add the TaskOutcomeStatus
-        TaskOutcomeStatusType outcomeStatus = transformFHIRTaskToTaskOutcomeStatus(fhirTask);
+        TaskOutcomeStatusType outcomeStatus = extractOutcomeStatusFromFHIRTask(fhirTask);
         if(outcomeStatus != null){
             petasosTask.setTaskOutcomeStatus(outcomeStatus);
         }
@@ -191,7 +180,30 @@ public abstract class PetasosTaskFromFHIRTask {
         return(petasosTask);
     }
 
-    protected List<TaskPerformerTypeType> transformPerformerCodeableConceptIntoTaskPerformerType(List<CodeableConcept> performers){
+    protected TaskReasonType extractTaskReasonFromFHIRTask(Task fhirTask){
+        getLogger().debug(".extractTaskReasonFromFHIRTask(): Entry");
+        TaskReasonTypeEnum taskReasonTypeEnum = null;
+        RetryTaskReasonType taskRetryReason = null;
+        if(fhirTask.hasReasonCode()){
+            taskReasonTypeEnum = TaskReasonTypeEnum.fromTaskReasonCode(fhirTask.getReasonCode().getCodingFirstRep().getCode());
+        }
+        if(fhirTask.hasReasonReference()){
+            taskRetryReason = taskReasonFactory.extractRetryTaskReasonFromReference(fhirTask.getReasonReference());
+        }
+        if(taskRetryReason != null || taskReasonTypeEnum != null){
+            TaskReasonType taskReason = new TaskReasonType();
+            taskReason.setReasonType(taskReasonTypeEnum);
+            if(taskRetryReason != null){
+                taskReason.setRetryTask(true);
+                taskReason.setRetryTaskDetail(taskRetryReason);
+            }
+            return(taskReason);
+        }
+        getLogger().debug(".extractTaskReasonFromFHIRTask(): Exit");
+        return(null);
+    }
+
+    protected List<TaskPerformerTypeType> extractPerformerTypesFromFHIRTask(List<CodeableConcept> performers){
         getLogger().debug(".transformPerformerCodeableConceptIntoTaskPerformerType(): Entry");
         if(performers == null){
             getLogger().debug(".transformPerformerCodeableConceptIntoTaskPerformerType(): Exit, performers is null");
@@ -215,6 +227,39 @@ public abstract class PetasosTaskFromFHIRTask {
         getLogger().debug(".transformPerformerCodeableConceptIntoTaskPerformerType(): Exit, taskPerformers->{}", taskPerformers);
         return(taskPerformers);
     }
+
+    protected TaskWorkItemType extractTaskWorkItemFromFHIRTask(Task fhirTask){
+        TaskWorkItemType taskWorkItem = new TaskWorkItemType();
+        UoWPayload inputPayload = new UoWPayload();
+        Task.ParameterComponent currentInputComponent = fhirTask.getInputFirstRep();
+        String parcelManifestAsString = currentInputComponent.getType().getCodingFirstRep().getCode();
+        try {
+            DataParcelManifest dataParcelManifest = getJSONMapper().readValue(parcelManifestAsString, DataParcelManifest.class);
+            inputPayload.setPayloadManifest(dataParcelManifest);
+        } catch (JsonProcessingException e) {
+            getLogger().warn(".transformFHIRTaskToTaskWorkItem(): Could not resolve Data Parcel Manifest for Task Work Item Input Payload! StackTrace->{}", ExceptionUtils.getStackTrace(e));
+        }
+        StringType inputPayloadValue = (StringType)currentInputComponent.getValue();
+        String inputPayloadString = inputPayloadValue.getValue();
+        inputPayload.setPayload(inputPayloadString);
+        taskWorkItem.setIngresContent(inputPayload);
+        // now the Task Work Item egress payload
+        for(Task.TaskOutputComponent currentOutput: fhirTask.getOutput()){
+            UoWPayload currentOutputPayload = new UoWPayload();
+            String currentOutputParcelManifestString = currentOutput.getType().getCodingFirstRep().getCode();
+            try {
+                DataParcelManifest dataParcelManifest = getJSONMapper().readValue(currentOutputParcelManifestString, DataParcelManifest.class);
+                currentOutputPayload.setPayloadManifest(dataParcelManifest);
+            } catch (JsonProcessingException e) {
+                getLogger().warn(".transformFHIRTaskToTaskWorkItem(): Could not resolve Data Parcel Manifest for Task Work Item Output Payload! StackTrace->{}", ExceptionUtils.getStackTrace(e));
+            }
+            StringType currentOutputPayloadStringType = (StringType)currentInputComponent.getValue();
+            String currentOutputPayloadString = currentOutputPayloadStringType.getValue();
+            taskWorkItem.getEgressContent().addPayloadElement(currentOutputPayload);
+        }
+        return(taskWorkItem);
+    }
+
 
     protected TaskContextType transformFHIRTaskToTaskContext(Task fhirTask){
         getLogger().debug(".transformFHIRTaskToTaskContext(): Entry");
@@ -281,7 +326,7 @@ public abstract class PetasosTaskFromFHIRTask {
         return(membershipSet);
     }
 
-    protected TaskOutcomeStatusType transformFHIRTaskToTaskOutcomeStatus(Task fhirTask){
+    protected TaskOutcomeStatusType extractOutcomeStatusFromFHIRTask(Task fhirTask){
         getLogger().debug(".transformFHIRTaskToTaskOutcomeStatus(): Entry");
         if(fhirTask == null){
             getLogger().debug(".transformFHIRTaskToTaskOutcomeStatus(): Exit, fhirTask is null");
@@ -355,6 +400,7 @@ public abstract class PetasosTaskFromFHIRTask {
         getLogger().debug(".enrichPetasosActionableTaskWithTraceabilityDetails(): Exit");
         return(petasosTask);
     }
+
 
 
     //

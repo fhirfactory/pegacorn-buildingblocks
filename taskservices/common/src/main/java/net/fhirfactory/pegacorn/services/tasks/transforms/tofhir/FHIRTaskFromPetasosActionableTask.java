@@ -24,7 +24,6 @@ package net.fhirfactory.pegacorn.services.tasks.transforms.tofhir;
 import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosTask;
-import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.datatypes.TaskFulfillmenExecutionStatusType;
@@ -32,11 +31,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuese
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornIdentifierCodeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskExtensionSystemFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskPerformerTypeFactory;
-import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskStatusReasonFactory;
-import net.fhirfactory.pegacorn.services.tasks.transforms.common.TaskTransformConstants;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.*;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskTransformConstants;
 import org.apache.commons.lang3.SerializationUtils;
 import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.codesystems.TaskCode;
@@ -72,6 +68,12 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
     @Inject
     private TaskExtensionSystemFactory taskExtensionSystems;
+
+    @Inject
+    private TaskReasonFactory taskReasonFactory;
+
+    @Inject
+    private TaskPeriodFactory taskPeriodFactory;
 
     //
     // Constructor(s)
@@ -283,66 +285,9 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
         return (encounter);
     }
 
-    @Override
     protected Period specifyExecutionPeriod(PetasosTask petasosTask) {
-        getLogger().debug(".specifyEncounter(): Entry");
-
-        PetasosActionableTask actionableTask = (PetasosActionableTask) petasosTask;
-
-        Period executionPeriod = null;
-        if(actionableTask.hasTaskFulfillment()){
-            executionPeriod = new Period();
-            TaskFulfillmentType taskFulfillment = actionableTask.getTaskFulfillment();
-
-            if(taskFulfillment.hasRegistrationDate()) {
-                Extension registrationInstantExtension = new Extension();
-                registrationInstantExtension.setUrl(taskTransformConstants.getTaskRegistratonInstantExtensionUrl());
-                registrationInstantExtension.setValue(new InstantType(taskFulfillment.getRegistrationDate()));
-                executionPeriod.addExtension(registrationInstantExtension);
-            }
-            if(taskFulfillment.hasFinalisationDate()){
-                Extension finalisationInstantExtension = new Extension();
-                finalisationInstantExtension.setUrl(taskTransformConstants.getTaskFinalisationInstantExtensionUrl());
-                finalisationInstantExtension.setValue(new InstantType(taskFulfillment.getFinalisationDate()));
-                executionPeriod.addExtension(finalisationInstantExtension);
-            }
-            switch(taskFulfillment.getStatus()){
-                case FULFILLMENT_EXECUTION_STATUS_UNREGISTERED:
-                case FULFILLMENT_EXECUTION_STATUS_REGISTERED:
-                    break;
-                case FULFILLMENT_EXECUTION_STATUS_INITIATED:
-                case FULFILLMENT_EXECUTION_STATUS_ACTIVE:
-                case FULFILLMENT_EXECUTION_STATUS_ACTIVE_ELSEWHERE:
-                    executionPeriod.setStart(taskFulfillment.getStartDate());
-                    break;
-                case FULFILLMENT_EXECUTION_STATUS_CANCELLED:
-                    if(taskFulfillment.hasStartDate()){
-                        executionPeriod.setStart(taskFulfillment.getStartDate());
-                    } else {
-                        executionPeriod.setStart(taskFulfillment.getRegistrationDate());
-                    }
-                    if(taskFulfillment.hasCancellationDate()){
-                        executionPeriod.setEnd(taskFulfillment.getCancellationDate());
-                    }
-                    break;
-                case FULFILLMENT_EXECUTION_STATUS_NO_ACTION_REQUIRED:
-                case FULFILLMENT_EXECUTION_STATUS_FINISHED:
-                case FULFILLMENT_EXECUTION_STATUS_FINALISED:
-                case FULFILLMENT_EXECUTION_STATUS_FINISHED_ELSEWHERE:
-                case FULFILLMENT_EXECUTION_STATUS_FINALISED_ELSEWHERE:
-                    if(taskFulfillment.hasStartDate()){
-                        executionPeriod.setStart(taskFulfillment.getStartDate());
-                    } else {
-                        executionPeriod.setStart(taskFulfillment.getRegistrationDate());
-                    }
-                    if(taskFulfillment.hasFinishedDate()){
-                        executionPeriod.setEnd(taskFulfillment.getFinishedDate());
-                    }
-                    break;
-            }
-        }
-        getLogger().debug(".specifyEncounter(): Exit, executionPeriod->{}", executionPeriod);
-        return (executionPeriod);
+        Period period = taskPeriodFactory.buildExecutionPeriod(petasosTask);
+        return(period);
     }
 
     @Override
@@ -441,12 +386,26 @@ public class FHIRTaskFromPetasosActionableTask extends FHIRTaskFromPetasosTask {
 
     @Override
     protected CodeableConcept specifyReasonCode(PetasosTask petasosTask) {
+        getLogger().debug(".specifyReasonCode(): Entry");
+        if(petasosTask.hasTaskReason()) {
+            if(petasosTask.getTaskReason().getReasonType() != null){
+                CodeableConcept reasonCC = taskReasonFactory.newTaskReason(petasosTask.getTaskReason().getReasonType());
+                return(reasonCC);
+            }
+        }
+        getLogger().debug(".specifyReasonCode(): Exit");
         return null;
     }
 
     @Override
     protected Reference specifyReasonReference(PetasosTask petasosTask) {
-        return null;
+        if(petasosTask.hasTaskReason()) {
+            if(petasosTask.getTaskReason().hasRetryTaskDetail()) {
+                Reference reference = taskReasonFactory.newTaskReasonReference(petasosTask.getTaskReason().getRetryTaskDetail());
+                return(reference);
+            }
+        }
+        return(null);
     }
 
 

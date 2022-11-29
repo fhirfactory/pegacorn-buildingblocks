@@ -111,15 +111,22 @@ public class IngresActivityBeginRegistration {
         metricsAgent.touchLastActivityStartInstant();
         metricsAgent.touchLastActivityInstant();
 
-        getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Start");
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] Start");
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] [Specify TaskWorkItem] Start");
         TaskWorkItemType workItem = new TaskWorkItemType(theUoW.getIngresContent());
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] [Specify TaskWorkItem] Finish");
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] [Create Base PetasosActionableTask] Start");
         PetasosActionableTask petasosActionableTask = getActionableTaskFactory().newMessageBasedActionableTask(workItem);
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] [Create Base PetasosActionableTask] Finish");
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] [Create & Assign TaskContext] Start");
         TaskContextType taskContext = new TaskContextType();
         TaskTriggerSummaryType taskTriggerSummary = new TaskTriggerSummaryType();
         taskTriggerSummary.setTriggerTaskId(petasosActionableTask.getTaskId());
         taskTriggerSummary.setTriggerLocation(wup.getComponentFDN().getToken().getTokenValue());
         taskContext.setTaskTriggerSummary(taskTriggerSummary);
         petasosActionableTask.setTaskContext(taskContext);
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] [Create & Assign TaskContext] Finish");
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] [Create & Assign TaskPerformer] Start");
         TaskPerformerTypeType taskPerformer = new TaskPerformerTypeType();
         taskPerformer.setRequiredPerformerType(wup.getNodeFunctionFDN());
         taskPerformer.setKnownFulfillerInstance(wup.getComponentID());
@@ -129,7 +136,8 @@ public class IngresActivityBeginRegistration {
             petasosActionableTask.setTaskPerformerTypes(new ArrayList<>());
         }
         petasosActionableTask.getTaskPerformerTypes().add(taskPerformer);
-        getLogger().trace(".registerActivityStart(): Create PetasosActionableTask for the incoming message (processing activity): Finish");
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] [Create & Assign TaskPerformer] Finish");
+        getLogger().trace(".registerActivityStart(): [Create PetasosActionableTask] Finish");
 
         getLogger().trace(".registerActivityStart(): Register PetasosActionableTask for the incoming message (processing activity): Start");
         PetasosActionableTaskSharedInstance actionableTaskSharedInstance =  getTaskDataGridProxy().registerExternallyTriggeredTask(wup.getParticipantName(), petasosActionableTask);

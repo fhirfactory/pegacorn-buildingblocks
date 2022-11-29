@@ -31,7 +31,8 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.tasktype.value
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.provenance.transformers.FHIRProvenanceToPetasosTaskJourneyTransformer;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskBusinessStatusFactory;
-import net.fhirfactory.pegacorn.services.tasks.transforms.common.TaskTransformConstants;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.factories.TaskPeriodFactory;
+import net.fhirfactory.pegacorn.internals.fhir.r4.resources.task.valuesets.TaskTransformConstants;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,9 @@ public class PetasosActionableTaskFromFHIRTask extends PetasosTaskFromFHIRTask {
     @Inject
     private FHIRProvenanceToPetasosTaskJourneyTransformer provenanceToTaskJourneyTransformer;
 
+    @Inject
+    private TaskPeriodFactory taskPeriodFactory;
+
     @Override
     protected Logger getLogger() {
         return (LOG);
@@ -73,23 +77,63 @@ public class PetasosActionableTaskFromFHIRTask extends PetasosTaskFromFHIRTask {
         return (TaskTypeTypeEnum.PETASOS_ACTIONABLE_TASK_TYPE);
     }
 
-    public PetasosActionableTask transformFHIRTaskIntoPetasosActionableTask(Task task){
+    public PetasosActionableTask transformFHIRTaskIntoPetasosActionableTask(Task fhirTask){
         getLogger().debug(".transformFHIRTaskIntoPetasosActionableTask(): Entry");
-        if(task == null){
-            getLogger().debug(".transformFHIRTaskIntoPetasosActionableTask(): Exit, task is null");
+        if(fhirTask == null){
+            getLogger().debug(".transformFHIRTaskIntoPetasosActionableTask(): Exit, fhirTask is null");
             return(null);
         }
-        PetasosActionableTask actionableTask = (PetasosActionableTask) newPetasosTaskFromTask(task);
+        PetasosActionableTask actionableTask = (PetasosActionableTask) newPetasosTaskFromTask(fhirTask);
 
         //
         // Add FulfillmentStatus details
-        TaskFulfillmentType taskFulfillmentStatus = transformFHIRTaskToFulfillmentType(task);
+        TaskFulfillmentType taskFulfillmentStatus = transformFHIRTaskToFulfillmentType(fhirTask);
         if(taskFulfillmentStatus != null){
             actionableTask.setTaskFulfillment(taskFulfillmentStatus);
         }
 
+        getLogger().trace(".transformFHIRTaskIntoPetasosActionableTask(): [Update Task Timestamp Details] Start");
+        enrichTaskWithTimestampDetails(actionableTask, fhirTask);
+        getLogger().trace(".transformFHIRTaskIntoPetasosActionableTask(): [Update Task Timestamp Details] Finish");
+
         getLogger().debug(".transformFHIRTaskIntoPetasosActionableTask(): Exit");
         return(actionableTask);
+    }
+
+    public void enrichTaskWithTimestampDetails(PetasosActionableTask actionableTask, Task fhirTask){
+        if(fhirTask == null){
+            return;
+        }
+        if(actionableTask == null){
+            return;
+        }
+        if(!fhirTask.hasExecutionPeriod()){
+            return;
+        }
+        Instant taskRegistrationInstant = taskPeriodFactory.extractTaskRegistrationInstant(fhirTask);
+        Instant taskReadInstant = taskPeriodFactory.extractTaskReadyInstant(fhirTask);
+        Instant taskStartInstant = taskPeriodFactory.extractTaskStartInstant(fhirTask);
+        Instant taskFinishInstant = taskPeriodFactory.extractTaskFinishInstant(fhirTask);
+        Instant taskFinalisationInstant = taskPeriodFactory.extractTaskFinalisationInstant(fhirTask);
+
+        if(!actionableTask.hasTaskFulfillment()){
+            actionableTask.setTaskFulfillment(new TaskFulfillmentType());
+        }
+        if(taskRegistrationInstant != null){
+            actionableTask.getTaskFulfillment().setRegistrationInstant(taskRegistrationInstant);
+        }
+        if(taskReadInstant != null){
+            actionableTask.getTaskFulfillment().setReadyInstant(taskReadInstant);
+        }
+        if(taskStartInstant != null){
+            actionableTask.getTaskFulfillment().setStartInstant(taskStartInstant);
+        }
+        if(taskFinishInstant != null){
+            actionableTask.getTaskFulfillment().setFinishInstant(taskFinishInstant);
+        }
+        if(taskFinalisationInstant != null){
+            actionableTask.getTaskFulfillment().setFinalisationInstant(taskFinalisationInstant);
+        }
     }
 
 

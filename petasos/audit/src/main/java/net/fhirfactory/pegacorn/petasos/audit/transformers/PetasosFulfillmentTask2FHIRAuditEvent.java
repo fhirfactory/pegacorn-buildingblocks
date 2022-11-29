@@ -82,10 +82,10 @@ public class PetasosFulfillmentTask2FHIRAuditEvent extends Pegacorn2FHIRAuditEve
     //
 
     public AuditEvent transform(PetasosFulfillmentTask fulfillmentTask){
-        getLogger().warn(".transform(): Entry, fulfillmentTask->{}", fulfillmentTask);
+        getLogger().debug(".transform(): Entry, fulfillmentTask->{}", fulfillmentTask);
 
         if(fulfillmentTask == null){
-            getLogger().warn(".transform(): Exit, fulfillmentTask is emtpy");
+            getLogger().debug(".transform(): Exit, fulfillmentTask is emtpy");
             return(null);
         }
 

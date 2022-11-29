@@ -29,6 +29,7 @@ import java.io.Serializable;
 
 public class TaskReasonType implements Serializable {
     private TaskReasonTypeEnum reasonType;
+    private RetryTaskReasonType retryTaskDetail;
     private Boolean retryTask;
 
     //
@@ -38,11 +39,13 @@ public class TaskReasonType implements Serializable {
     public TaskReasonType(){
         reasonType = TaskReasonTypeEnum.TASK_REASON_UNKNOWN;
         retryTask = false;
+        retryTaskDetail = null;
     }
 
     public TaskReasonType(TaskReasonTypeEnum reasonType){
         this.reasonType = reasonType;
         retryTask = false;
+        retryTaskDetail = null;
     }
 
     //
@@ -70,15 +73,31 @@ public class TaskReasonType implements Serializable {
         this.reasonType = reasonType;
     }
 
+    @JsonIgnore
+    public boolean hasRetryTaskDetail(){
+        boolean hasValue = this.retryTaskDetail != null;
+        return(hasValue);
+    }
+
+    public RetryTaskReasonType getRetryTaskDetail() {
+        return retryTaskDetail;
+    }
+
+    public void setRetryTaskDetail(RetryTaskReasonType retryTaskDetail) {
+        this.retryTaskDetail = retryTaskDetail;
+    }
+
     //
     // To String
     //
 
     @Override
     public String toString() {
-        return "TaskReasonType{" +
-                "reasonType=" + reasonType +
-                ", retryTask=" + retryTask +
-                '}';
+        final StringBuilder sb = new StringBuilder("TaskReasonType{");
+        sb.append("reasonType=").append(reasonType);
+        sb.append(", retryTaskDetail=").append(retryTaskDetail);
+        sb.append(", retryTask=").append(retryTask);
+        sb.append('}');
+        return sb.toString();
     }
 }

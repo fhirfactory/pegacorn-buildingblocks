@@ -50,7 +50,7 @@ public class FHIRResourceSetFromPetasosActionableTask {
 
 
     public List<Resource> transformTask(PetasosActionableTask actionableTask){
-        getLogger().debug(".newTask(): Entry, actionableTask->{}", actionableTask);
+        getLogger().debug(".transformTask(): Entry, actionableTask->{}", actionableTask);
         List<Resource> resourceList = new ArrayList<>();
 
         //
@@ -68,7 +68,7 @@ public class FHIRResourceSetFromPetasosActionableTask {
 
         //
         // And done...
-        getLogger().debug(".newTask(): Exit, resourceList->{}", resourceList);
+        getLogger().debug(".transformTask(): Exit, resourceList->{}", resourceList);
         return(resourceList);
     }
 

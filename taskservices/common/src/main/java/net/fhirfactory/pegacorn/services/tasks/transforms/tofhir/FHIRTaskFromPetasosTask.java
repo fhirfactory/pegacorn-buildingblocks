@@ -302,6 +302,10 @@ public abstract class FHIRTaskFromPetasosTask {
         if(taskReasonCodeCC != null){
             fhirTask.setReasonCode(taskReasonCodeCC);
         }
+        Reference taskReasonReference = specifyReasonReference(petasosTask);
+        if(taskReasonReference != null){
+            fhirTask.setReasonReference(taskReasonReference);
+        }
         getLogger().trace(".newTaskFromPetasosTask(): [Set Reason] Finish");
 
         //

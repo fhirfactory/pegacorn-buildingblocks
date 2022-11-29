@@ -29,6 +29,7 @@ import net.fhirfactory.pegacorn.core.model.petasos.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.completion.datatypes.TaskCompletionSummaryType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.performer.datatypes.TaskPerformerTypeType;
+import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.reason.datatypes.RetryTaskReasonType;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.status.valuesets.ActionableTaskOutcomeStatusEnum;
 import net.fhirfactory.pegacorn.core.model.petasos.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.core.model.petasos.uow.UoWPayload;
@@ -130,6 +131,19 @@ public class TaskOutcome2NewTasksBean {
                 getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Copy Sequence Number from Failed Task");
                 newDownstreamTask.getTaskId().setTaskSequenceNumber(actionableTask.getTaskId().getTaskSequenceNumber());
                 getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Specify that task is a Retry Task");
+                RetryTaskReasonType taskRetry = new RetryTaskReasonType();
+                if(actionableTask.getTaskReason().hasRetryTaskDetail()){
+                    taskRetry.setOriginalTaskId(actionableTask.getTaskReason().getRetryTaskDetail().getOriginalTaskId());
+                    if(actionableTask.getTaskReason().getRetryTaskDetail().hasOriginalTaskExecutionInstant()){
+                        taskRetry.setOriginalTaskExecutionInstant(actionableTask.getTaskReason().getRetryTaskDetail().getOriginalTaskExecutionInstant());
+                    }
+                } else {
+                    taskRetry.setOriginalTaskId(actionableTask.getTaskId());
+                    taskRetry.setOriginalTaskExecutionInstant(actionableTask.getTaskFulfillment().getFinishInstant());
+                }
+                taskRetry.setPreviousRetryTaskId(actionableTask.getTaskId());
+                taskRetry.setPreviousTaskExecutionInstant(actionableTask.getTaskFulfillment().getFinishInstant());
+                newDownstreamTask.getTaskReason().setRetryTaskDetail(taskRetry);
                 newDownstreamTask.getTaskReason().setRetryTask(true);
                 getLogger().trace(".collectOutcomesAndCreateNewTasks(): [Create Replacement Task] Copy TaskPerformer Detail from Failed Task");
                 if(newDownstreamTask.getTaskPerformerTypes() == null){
