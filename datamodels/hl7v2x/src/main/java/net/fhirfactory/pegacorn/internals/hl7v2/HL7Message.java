@@ -371,7 +371,29 @@ public class HL7Message implements Serializable   {
 			
 		getSegments().remove(sourceSegment);
 	}
+
 	
+	/**
+	 * Moves the segment at the supplied index to the end of the message.
+	 * 
+	 * @param currentIndex
+	 * @throws Exception
+	 */
+	public void moveSegmentToEnd(int currentIndex) throws Exception {
+		moveSegment(currentIndex, getSegments().size() + 1);
+	}
+
+	
+	/**
+	 * Moves the segment to the end of the message.
+	 * 
+	 * @param currentIndex
+	 * @throws Exception
+	 */
+	public void moveSegmentToEnd(Segment segment) throws Exception {	
+		moveSegmentToEnd(getSegmentIndex(segment));
+	}	
+
 	
 	/**
 	 * Insert a segment.
