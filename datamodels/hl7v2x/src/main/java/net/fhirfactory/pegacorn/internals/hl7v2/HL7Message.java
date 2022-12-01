@@ -488,7 +488,24 @@ public class HL7Message implements Serializable   {
 	 * @param fieldIndex
 	 */
 	public void clearField(String segmentName, int fieldIndex) throws Exception {
-		setField(segmentName, fieldIndex, "");
+		for (Segment segment : getSegments(segmentName)) {
+			segment.clearField(fieldIndex);
+		}
+	}
+
+	
+	/**
+	 * Clears the same sub field from each occurrence of a segment.
+	 * 
+	 * @param segmentName
+	 * @param fieldIndex
+	 * @param subFieldIndex
+	 * @throws Exception
+	 */
+	public void clearSubField(String segmentName, int fieldIndex, int subFieldIndex) throws Exception {
+		for (Segment segment : getSegments(segmentName)) {
+			segment.clearSubField(fieldIndex, subFieldIndex);
+		}		
 	}
 
 	
