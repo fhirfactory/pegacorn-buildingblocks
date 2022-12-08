@@ -139,7 +139,7 @@ public abstract class CSV extends PegacornFile {
                     }
                     
                     // Now we know the number of columns matches it is now time to compare the values.
-                    for (int i = 0; i < nextLine.length; i++) {
+                    for (int i = 0; i < nextLine.length; i++) {                   	
                         if (!nextLine[i].equalsIgnoreCase(expectedHeadings[i])) {
                             throw new CSVParsingException("The header value read from the file (" + nextLine[i] + ") does not match the expected value (" + expectedHeadings[i] + ") at position (" + i + ")");
                         }
@@ -350,5 +350,8 @@ public abstract class CSV extends PegacornFile {
     }
     
     
+    protected boolean allowEmptyFile() {
+    	return true;
+    }
     
 }
