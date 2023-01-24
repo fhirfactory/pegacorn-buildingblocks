@@ -350,23 +350,19 @@ public class HL7Message implements Serializable   {
 	 * @param newIndex
 	 * @throws Exception
 	 */
-	If (newindex == currentIbdex) {return}
 	public void moveSegment(int currentIndex, int newIndex) throws Exception {    
         if (currentIndex >= getSegments().size()) {
             return;
         }
         boolean append = false;
+        Segment sourceSegment = getSegments().get(currentIndex);
+        getSegments().remove(sourceSegment);
         if (newIndex >= getSegments().size()) {
             append = true;
         }
-        Segment sourceSegment = getSegments().get(currentIndex);
-        getSegments().remove(sourceSegment);
         if (append) {
             getSegments().add(sourceSegment);
-        } else {            
-            if (newIndex > currentIndex) {
-                newIndex--;
-            }
+        } else {                    
             getSegments().add(newIndex, sourceSegment);
         }
     }
