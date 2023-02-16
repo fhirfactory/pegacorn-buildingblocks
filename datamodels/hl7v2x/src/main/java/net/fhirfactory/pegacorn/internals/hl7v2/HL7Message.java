@@ -350,27 +350,22 @@ public class HL7Message implements Serializable   {
 	 * @param newIndex
 	 * @throws Exception
 	 */
-	public void moveSegment(int currentIndex, int newIndex) throws Exception {	
-		if (currentIndex >= getSegments().size()) {
-			return;
-		}
-		
-		boolean append = false;
-		
-		if (newIndex >= getSegments().size()) {
-			append = true;
-		}
-		
-		Segment sourceSegment = getSegments().get(currentIndex);
-		
-		if (append) {
-			getSegments().add(SerializationUtils.clone(sourceSegment));
-		} else {
-			getSegments().add(newIndex, SerializationUtils.clone(sourceSegment));
-		}
-			
-		getSegments().remove(sourceSegment);
-	}
+	public void moveSegment(int currentIndex, int newIndex) throws Exception {    
+        if (currentIndex >= getSegments().size()) {
+            return;
+        }
+        boolean append = false;
+        Segment sourceSegment = getSegments().get(currentIndex);
+        getSegments().remove(sourceSegment);
+        if (newIndex >= getSegments().size()) {
+            append = true;
+        }
+        if (append) {
+            getSegments().add(sourceSegment);
+        } else {                    
+            getSegments().add(newIndex, sourceSegment);
+        }
+    }
 
 	
 	/**
