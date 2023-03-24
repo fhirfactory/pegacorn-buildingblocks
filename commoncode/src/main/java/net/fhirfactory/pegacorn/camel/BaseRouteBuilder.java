@@ -37,6 +37,8 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
 
     public BaseRouteBuilder(CamelContext context) {
         super(context);
+        context.setUseMDCLogging(true);
+        context.setUseBreadcrumb(true);
     }
     
     /**
