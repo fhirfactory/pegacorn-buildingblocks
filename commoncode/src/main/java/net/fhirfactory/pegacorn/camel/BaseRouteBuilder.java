@@ -47,8 +47,9 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
         RouteDefinition route = from(uri);
         route
             .onException(Exception.class)
-                .log(LoggingLevel.ERROR, getClass().getName() + ":: Exception occurred ${exception.message}, Body=${body}")
+                .log(LoggingLevel.ERROR, getClass().getName() + ":: Exception occurred ${exception.class.name} ${exception.message}, Body=${body}")
                 .handled(false)
+                .logStackTrace(true)
             .end()
             ;
         return route;
